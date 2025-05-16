@@ -1,0 +1,15 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+Sitemap: https://suitpax.com/sitemap.xml
+
+# Prevent Google from showing image previews in search results
+User-agent: Googlebot-Image
+Disallow: /
+
+# Prevent images from being indexed
+User-agent: Googlebot
+Disallow: /public/logo/
+Disallow: /public/images/
+Disallow: /public/agents/
