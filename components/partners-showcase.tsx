@@ -67,10 +67,6 @@ const partnerLogos = [
     name: "Eurazeo",
     url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Eurazeo_Logo_Blanc-LrQQUuCUZkWr242WM6QRkhL7LNnvWS.png",
   },
-  {
-    name: "Headline",
-    url: "https://cdn.brandfetch.io/headline.com/w/512/h/100/logo?c=1idU-l8vdm7C5__3dci",
-  },
 ]
 
 interface PartnersShowcaseProps {

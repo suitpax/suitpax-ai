@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { Check, Shield } from "lucide-react"
 import { ZiaChatInput } from "../ui/zia-chat-input"
 
@@ -13,6 +14,23 @@ export default function IntelligentPolicyShowcase() {
       <div className="container mx-auto px-4 md:px-6">
         {/* Header con estilo similar a Business Travel Revolution */}
         <div className="max-w-4xl mx-auto text-center mb-12">
+          <div className="flex items-center gap-1.5 mb-3 justify-center">
+            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
+              <Image
+                src="/logo/suitpax-bl-logo.webp"
+                alt="Suitpax"
+                width={60}
+                height={15}
+                className="h-3 w-auto mr-1"
+              />
+              Travel Policy
+            </span>
+            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[8px] font-medium text-gray-700">
+              <span className="w-1 h-1 rounded-full bg-black animate-pulse mr-1"></span>
+              Coming Q2 2025
+            </span>
+          </div>
+
           <motion.h2
             className="text-2xl md:text-2xl lg:text-2xl font-medium tracking-tighter text-black leading-none max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 10 }}
@@ -74,25 +92,12 @@ export default function IntelligentPolicyShowcase() {
             </ul>
           </div>
 
-          <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm overflow-hidden p-6">
+          <div className="bg-gray-50 rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-6">
             <div className="mb-4">
-              <h4 className="font-medium text-gray-900 mb-2">Suitpax AI</h4>
+              <h4 className="font-medium text-gray-900 mb-2">Ask Zia to create your policy</h4>
               <p className="text-sm text-gray-500">
                 Describe your needs and our AI will generate a custom travel policy for you
               </p>
-            </div>
-
-            <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover object-top"
-                style={{ transform: "scale(1.2)" }}
-              >
-                <source src="/videos/supermotion_co.mp4" type="video/mp4" />
-              </video>
             </div>
 
             {/* Componente de chat input */}
@@ -105,7 +110,7 @@ export default function IntelligentPolicyShowcase() {
                   (policy, i) => (
                     <span
                       key={i}
-                      className="inline-flex items-center rounded-lg bg-white px-2.5 py-1 text-xs font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors"
+                      className="inline-flex items-center rounded-xl bg-white px-2.5 py-1 text-xs font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors"
                     >
                       {policy}
                     </span>
@@ -113,6 +118,42 @@ export default function IntelligentPolicyShowcase() {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Sección de clientes simplificada */}
+        <div className="max-w-4xl mx-auto mt-12 text-center">
+          <h3 className="text-lg font-medium text-gray-900 mb-8">Trusted by companies of all sizes</h3>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-70">
+            <Image
+              src="/logos/mcp-logo-1.png"
+              alt="Client Logo"
+              width={120}
+              height={40}
+              className="mx-auto h-8 w-auto object-contain"
+            />
+            <Image
+              src="/logos/mcp-logo-2.png"
+              alt="Client Logo"
+              width={120}
+              height={40}
+              className="mx-auto h-8 w-auto object-contain"
+            />
+            <Image
+              src="/logos/hilton-logo.png"
+              alt="Client Logo"
+              width={120}
+              height={40}
+              className="mx-auto h-8 w-auto object-contain"
+            />
+            <Image
+              src="/logo/eurazeo-logo.png"
+              alt="Client Logo"
+              width={120}
+              height={40}
+              className="mx-auto h-8 w-auto object-contain"
+            />
           </div>
         </div>
       </div>

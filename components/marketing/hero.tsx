@@ -10,7 +10,7 @@ import { FadeContainer, FadeSpan } from "@/components/ui/animations"
 import CounterBadge from "@/components/ui/counter-badge"
 import MiniChat from "@/components/ui/mini-chat"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-import Image from "next/image"
+import { ArcadeEmbed } from "@/components/ui/arcade-embed"
 
 // Modificar las variaciones de título para hacerlas más inclusivas
 
@@ -153,6 +153,59 @@ const cities = [
   "Dublin",
   "Oslo",
   "Helsinki",
+  "Milan",
+  "Munich",
+  "Brussels",
+  "Frankfurt",
+  "Geneva",
+  "Zurich",
+  "Manchester",
+  "Birmingham",
+  "Lyon",
+  "Marseille",
+  "Hamburg",
+  "Cologne",
+  "Rotterdam",
+  "Turin",
+  "Bologna",
+  "Florence",
+  "Valencia",
+  "Seville",
+  "Porto",
+  "Warsaw",
+  "Krakow",
+  "Budapest",
+  "Vienna",
+  "Prague",
+  "Bratislava",
+  "Ljubljana",
+  "Zagreb",
+  "Belgrade",
+  "Bucharest",
+  "Sofia",
+  "Thessaloniki",
+  "Tallinn",
+  "Riga",
+  "Vilnius",
+  "Luxembourg",
+  "Monaco",
+  "Basel",
+  "Antwerp",
+  "Ghent",
+  "Düsseldorf",
+  "Stuttgart",
+  "Nuremberg",
+  "Hannover",
+  "Leipzig",
+  "Dresden",
+  "Gothenburg",
+  "Malmö",
+  "Tampere",
+  "Aarhus",
+  "Odense",
+  "Bergen",
+  "Stavanger",
+  "Reykjavik",
 ]
 
 // Reemplazar algunos de los subtitles con estas nuevas versiones:
@@ -187,6 +240,16 @@ const subtitles = [
   "One platform to manage it all: flights, hotels, ground transportation, expenses, and travel policies in a single interface.",
   "The only travel platform your business will ever need, with AI at its core and humans at the helm.",
   "Our platform brings together fragmented travel services into one cohesive, intelligent system built for modern businesses.",
+  "Connecting business travelers to Europe's most vibrant commercial hubs with AI-powered booking and expense management.",
+  "Streamline your European business travel with intelligent tools designed for the modern corporate traveler.",
+  "Navigate Europe's business landscape with ease using our AI-powered travel management platform.",
+  "From London to Milan, our platform optimizes every aspect of your European business travel experience.",
+  "Simplify cross-border European travel with intelligent booking, expense tracking, and policy compliance.",
+  "Designed for the European business traveler: seamless bookings, local insights, and expense automation.",
+  "Transforming corporate travel across Europe with AI agents that understand local business contexts.",
+  "Your European business travel companion: intelligent bookings, expense management, and travel insights.",
+  "Optimize your company's European travel budget with AI-powered recommendations and policy enforcement.",
+  "The ultimate European business travel platform: connecting you to key commercial centers with ease.",
 ]
 
 export const Hero = () => {
@@ -237,7 +300,7 @@ export const Hero = () => {
               <CityAnimateText cities={cities} />
             </motion.div>
 
-            <p className="mt-8 max-w-[700px] mx-auto text-black/80 md:text-xl lg:text-2xl leading-relaxed">
+            <p className="mt-8 max-w-[700px] mx-auto text-black/80 text-sm md:text-lg lg:text-xl leading-relaxed">
               <FadeSpan>{randomSubtitle}</FadeSpan>
             </p>
 
@@ -260,16 +323,7 @@ export const Hero = () => {
 
           {/* Dashboard Image - Sin mini badges */}
           <div className="mt-12 sm:mt-16 md:mt-20 w-full max-w-[95vw] mx-auto flex justify-center relative px-4 sm:px-6">
-            <div className="relative w-full aspect-[16/9] max-w-full sm:max-w-[90%] md:max-w-[85%] lg:max-w-5xl overflow-hidden rounded-md shadow-xl">
-              <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Suitpax%20-%20Plataforma%20de%20Viajes%20de%20Negocios-qBkHz3Ag4a2oNP9gDZKOoQP9tRD1U1.png"
-                alt="Suitpax Dashboard - Business Travel Platform"
-                fill
-                priority
-                sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 85vw"
-                className="object-cover rounded-md"
-              />
-            </div>
+            <ArcadeEmbed />
           </div>
 
           {/* Caption text */}

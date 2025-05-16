@@ -4,10 +4,9 @@ import AITravelAgents from "@/components/marketing/ai-travel-agents"
 import BusinessTravelRevolution from "@/components/marketing/business-travel-revolution"
 import FoundersOpenLetter from "@/components/marketing/founders-open-letter"
 import CloudAIShowcase from "@/components/marketing/cloud-ai-showcase"
-import IntelligentPolicyShowcase from "@/components/marketing/intelligent-policy-showcase"
 import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
-import VisionFounder from "@/components/marketing/vision-founder"
 import type { Metadata } from "next"
+import VisionFounder from "@/components/marketing/vision-founder"
 
 export const metadata: Metadata = {
   title: "Suitpax | AI-Powered Business Travel Platform",
@@ -70,7 +69,6 @@ export default function Home() {
         <AITravelAgents />
         <BusinessTravelRevolution />
         <CloudAIShowcase />
-        <IntelligentPolicyShowcase />
         <AIMeetingsAttachment />
         <VisionFounder />
         <FoundersOpenLetter />
