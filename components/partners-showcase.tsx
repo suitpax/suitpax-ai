@@ -71,67 +71,6 @@ const partnerLogos = [
     name: "Headline",
     url: "https://cdn.brandfetch.io/headline.com/w/512/h/100/logo?c=1idU-l8vdm7C5__3dci",
   },
-  // Nuevos logos añadidos
-  {
-    name: "Sequoia Capital",
-    url: "https://cdn.brandfetch.io/sequoiacap.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Accel",
-    url: "https://cdn.brandfetch.io/accel.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Index Ventures",
-    url: "https://cdn.brandfetch.io/indexventures.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Bessemer Venture Partners",
-    url: "https://cdn.brandfetch.io/bvp.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Founders Fund",
-    url: "https://cdn.brandfetch.io/foundersfund.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Khosla Ventures",
-    url: "https://cdn.brandfetch.io/khoslaventures.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "General Catalyst",
-    url: "https://cdn.brandfetch.io/generalcatalyst.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "NEA",
-    url: "https://cdn.brandfetch.io/nea.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Greylock",
-    url: "https://cdn.brandfetch.io/greylock.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Benchmark",
-    url: "https://cdn.brandfetch.io/benchmark.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Kleiner Perkins",
-    url: "https://cdn.brandfetch.io/kleinerperkins.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Tiger Global",
-    url: "https://cdn.brandfetch.io/tigerglobal.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "SoftBank Vision Fund",
-    url: "https://cdn.brandfetch.io/softbank.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Insight Partners",
-    url: "https://cdn.brandfetch.io/insightpartners.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
-    name: "Coatue",
-    url: "https://cdn.brandfetch.io/coatue.com/w/512/h/512/logo?c=1idU-l8vdm7C5__3dci",
-  },
 ]
 
 interface PartnersShowcaseProps {
