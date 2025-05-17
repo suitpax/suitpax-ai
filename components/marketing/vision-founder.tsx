@@ -1,167 +1,241 @@
 "use client"
-
-import { motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
-import { StarBorder } from "@/components/ui/star-border"
+import { PiArrowRightBold } from "react-icons/pi"
+import { BsHeartFill } from "react-icons/bs"
 
 export default function VisionFounder() {
   return (
-    <section className="relative overflow-hidden py-16 bg-gray-50">
-      <div className="absolute inset-0 z-0 w-full h-full opacity-30">
-        <Image
-          src="/images/green-gradient-bg.png"
-          alt="Green gradient background"
-          fill
-          className="object-cover object-center w-full h-full"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gray-50/80 backdrop-blur-sm"></div>
+    <section className="py-16 bg-gray-50 text-black relative overflow-hidden">
+      {/* Coordenadas decorativas como en el diseño de referencia */}
+      <div className="absolute top-0 left-0 right-0 overflow-hidden whitespace-nowrap">
+        <div className="animate-marquee inline-block">
+          <div className="flex justify-between text-xs border-b border-black/20 pb-2 mb-8 w-[200%]">
+            <span>37° 46' 30.0"</span>
+            <span>N</span>
+            <span>122° 25' 09.0"</span>
+            <span>W</span>
+            <span>37.7750</span>
+            <span>↑</span>
+            <span>-122.4194</span>
+            <span>→</span>
+            <span>San Francisco</span>
+            <span>California</span>
+            <span>37° 46' 30.0"</span>
+            <span>N</span>
+            <span>122° 25' 09.0"</span>
+            <span>W</span>
+            <span>37.7750</span>
+            <span>↑</span>
+            <span>-122.4194</span>
+            <span>→</span>
+            <span>San Francisco</span>
+            <span>California</span>
+          </div>
+        </div>
       </div>
 
-      <StarBorder className="absolute top-0 left-0 w-full h-full" />
+      <div className="container mx-auto px-4 md:px-6 relative">
+        <div className="pt-12">
+          {/* Suitpax symbol en el centro */}
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/logo/suitpax-symbol-2.png"
+              alt="Suitpax Symbol"
+              width={30}
+              height={30}
+              className="rounded-lg"
+            />
+          </div>
 
-      <div className="container relative z-10 mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <Badge variant="outline" className="bg-gray-200/50 backdrop-blur-sm">
-              FOUNDER&apos;S VISION
-            </Badge>
+          {/* Badges similares a AI Travel Agents */}
+          <div className="flex items-center gap-2 mb-4 justify-center">
+            <span className="inline-flex items-center rounded-xl bg-black/10 px-2.5 py-0.5 text-[10px] font-medium text-black">
+              Founder&apos;s Vision
+            </span>
+            <span className="inline-flex items-center rounded-xl bg-black/10 px-2.5 py-0.5 text-[9px] font-medium text-black">
+              <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse mr-1"></span>
+              2025
+            </span>
+            <span className="inline-flex items-center rounded-xl bg-black/10 px-2.5 py-0.5 text-[9px] font-medium text-black">
+              We <BsHeartFill className="inline-block mx-0.5 text-red-500" /> Business Travel
+            </span>
+          </div>
 
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none">
-              Reimagining business travel for the AI era
-            </h2>
+          {/* Título principal con estilo similar a AI Travel Agents */}
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-black leading-none text-center mb-4">
+            Our vision for the future of travel
+          </h2>
+          <p className="text-lg md:text-xl text-center max-w-2xl mx-auto mb-12 text-black/80">
+            Building the next generation of AI-powered travel systems for millions of business travelers
+          </p>
 
-            <p className="text-base md:text-lg text-gray-700 max-w-xl font-light">
-              Our mission is to transform how businesses approach travel by creating an intelligent ecosystem that
-              anticipates needs, eliminates friction, and delivers exceptional experiences.
-            </p>
-
-            <div className="pt-4">
-              <Link
-                href="/manifesto"
-                className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all"
-              >
-                <span className="font-medium">Read our manifesto</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-arrow-right"
+          {/* Stats en formato vertical */}
+          <div className="flex flex-col items-center mb-12 gap-2 w-full">
+            <div className="inline-block border border-black/30 px-4 py-1 mb-4 text-sm text-black/80 rounded-md bg-transparent font-medium">
+              2025 VISION
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+              {[
+                { label: "AI Agents", value: "100+", description: "Specialized travel experts" },
+                { label: "Global Coverage", value: "200+ Cities", description: "Worldwide support" },
+                { label: "Response Time", value: "< 1 min", description: "Instant assistance" },
+                { label: "User Experience", value: "Seamless", description: "Human-centered design" },
+              ].map((stat, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col items-center justify-center bg-transparent border border-black/30 rounded-md p-3 text-center w-full h-full"
                 >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </Link>
+                  <p className="text-xs font-medium text-black/70">{stat.label}</p>
+                  <p className="text-sm font-bold">{stat.value}</p>
+                  <p className="text-[10px] text-black/60">{stat.description}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="relative"
-          >
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
-                  <Image src="/founders/alberto-new.webp" alt="Alberto Zurano" fill className="object-cover" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium">Alberto Zurano</h3>
-                  <p className="text-sm text-gray-600">Founder & CEO</p>
-                </div>
+          {/* Sección de valores */}
+          <div className="inline-block border border-black/30 px-4 py-1 mb-8 mx-auto text-sm text-black/80 rounded-md bg-transparent font-medium">
+            OUR CORE PRINCIPLES
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+            {[
+              "AI-first approach: We build with and for artificial intelligence",
+              "Customer obsession: Every decision starts with the traveler",
+              "Radical transparency: Open communication and shared knowledge",
+              "Ownership mindset: Everyone acts like a founder",
+              "Continuous learning: We embrace growth and experimentation",
+              "Global impact: Our mission is to reach millions of business travelers worldwide",
+            ].map((value, index) => (
+              <div key={index} className="bg-transparent border border-black/20 p-3 rounded-md">
+                <p className="text-xs font-medium text-black/80">{value}</p>
               </div>
+            ))}
+          </div>
 
-              <blockquote className="text-gray-700 font-light italic mb-6">
-                "When I was 6 years old, I got lost in an airport. That experience sparked a lifelong passion to make
-                travel more seamless and intelligent. With Suitpax, we're building technology that I wish existed back
-                then—a platform that understands travelers' needs before they even arise."
-              </blockquote>
+          {/* Founder Card */}
+          <div className="mb-12">
+            <div className="inline-block border border-black/30 px-4 py-1 mb-8 mx-auto text-sm text-black/80 rounded-md bg-transparent font-medium">
+              FOUNDER&apos;S PERSPECTIVE
+            </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="lucide lucide-lightbulb"
-                    >
-                      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
-                      <path d="M9 18h6" />
-                      <path d="M10 22h4" />
-                    </svg>
+            <div className="max-w-2xl mx-auto bg-transparent backdrop-blur-xl p-6 rounded-md border border-black/20 relative overflow-hidden">
+              <div className="relative z-10">
+                <div className="flex items-center gap-4 mb-6">
+                  <Image
+                    src="/founders/alberto-new.webp"
+                    alt="Alberto Zurano"
+                    width={60}
+                    height={60}
+                    className="rounded-md object-cover"
+                  />
+                  <div>
+                    <h3 className="text-lg font-medium tracking-tighter">Alberto Zurano</h3>
+                    <p className="text-sm text-black/70">Founder & CEO</p>
                   </div>
-                  <p className="text-sm">Pioneering AI-first travel management since 2023</p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="lucide lucide-globe"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                      <path d="M2 12h20" />
-                    </svg>
-                  </div>
-                  <p className="text-sm">Building for global enterprises with local expertise</p>
-                </div>
+                <p className="text-sm text-black/80 mb-6 italic">
+                  "When I was 6 years old, I got lost in an airport. That experience sparked a lifelong passion to make
+                  travel more seamless and intelligent. With Suitpax, we're building technology that I wish existed back
+                  then—a platform that understands travelers' needs before they even arise. By 2025, our vision is to
+                  create an ecosystem where AI and humans work together to make business travel not just efficient, but
+                  truly enjoyable."
+                </p>
 
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="lucide lucide-sparkles"
-                    >
-                      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-                      <path d="M5 3v4" />
-                      <path d="M19 17v4" />
-                      <path d="M3 5h4" />
-                      <path d="M17 19h4" />
-                    </svg>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                  <div className="bg-black/5 p-3 rounded-md">
+                    <p className="text-xs font-medium text-black/80">
+                      Seamless integration with enterprise systems for frictionless travel management
+                    </p>
                   </div>
-                  <p className="text-sm">Committed to creating magical travel experiences</p>
+                  <div className="bg-black/5 p-3 rounded-md">
+                    <p className="text-xs font-medium text-black/80">
+                      Personalized AI agents that learn and adapt to each traveler's preferences
+                    </p>
+                  </div>
+                  <div className="bg-black/5 p-3 rounded-md">
+                    <p className="text-xs font-medium text-black/80">
+                      Real-time assistance and proactive problem-solving for stress-free journeys
+                    </p>
+                  </div>
+                  <div className="bg-black/5 p-3 rounded-md">
+                    <p className="text-xs font-medium text-black/80">
+                      Sustainable travel options that balance business needs with environmental responsibility
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="absolute -bottom-4 -right-4 bg-gray-200/50 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-gray-200 text-xs font-medium">
-              Launching Q2 2025
+          {/* Timeline 2025 */}
+          <div className="mb-12">
+            <div className="inline-block border border-black/30 px-4 py-1 mb-8 mx-auto text-sm text-black/80 rounded-md bg-transparent font-medium">
+              ROADMAP TO 2025
             </div>
-          </motion.div>
+
+            <div className="relative">
+              {/* Línea de tiempo */}
+              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-px bg-black/20"></div>
+
+              <div className="space-y-12 relative">
+                {[
+                  {
+                    year: "Q2 2025",
+                    title: "Global Launch",
+                    description: "Official launch of Suitpax platform with full feature set and global coverage",
+                  },
+                  {
+                    year: "Q1 2025",
+                    title: "Enterprise Integration",
+                    description: "Complete integration with major enterprise systems and travel providers",
+                  },
+                  {
+                    year: "Q4 2024",
+                    title: "Beta Program",
+                    description: "Expanded beta testing with select enterprise partners",
+                  },
+                  {
+                    year: "Q3 2024",
+                    title: "AI Agent Network",
+                    description: "Development of specialized AI agents for different travel scenarios",
+                  },
+                ].map((milestone, index) => (
+                  <div key={index} className="flex items-center justify-center">
+                    <div
+                      className={`w-full max-w-md bg-transparent border border-black/20 p-4 rounded-md relative ${
+                        index % 2 === 0 ? "text-left" : "text-right"
+                      }`}
+                    >
+                      <div
+                        className={`absolute top-1/2 transform -translate-y-1/2 ${
+                          index % 2 === 0 ? "right-0 translate-x-1/2" : "left-0 -translate-x-1/2"
+                        } w-3 h-3 rounded-full bg-black/80 z-10`}
+                      ></div>
+                      <span className="inline-block bg-black/10 px-2 py-0.5 rounded-md text-[10px] font-medium mb-2">
+                        {milestone.year}
+                      </span>
+                      <h4 className="text-sm font-medium">{milestone.title}</h4>
+                      <p className="text-xs text-black/70">{milestone.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Botón de acción */}
+          <div className="flex justify-center">
+            <Link
+              href="/manifesto"
+              className="inline-flex items-center gap-2 bg-transparent border border-black text-black hover:bg-black/10 px-4 py-2 rounded-xl transition-colors"
+            >
+              <span className="font-medium">Read our full manifesto</span>
+              <PiArrowRightBold className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </div>
     </section>

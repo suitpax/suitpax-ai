@@ -116,7 +116,7 @@ export default function CloudAIShowcase() {
               </span>
             </div>
             <h2 className="text-2xl md:text-2xl lg:text-2xl font-medium tracking-tighter text-black leading-none max-w-3xl mx-auto">
-              The future of business travel with voice AI
+              The future of business travel with Voice AI
             </h2>
             <p className="mt-3 text-sm font-medium text-gray-600 max-w-2xl">
               Suitpax combines human expertise with AI agents to transform business travel.
@@ -134,7 +134,7 @@ export default function CloudAIShowcase() {
           viewport={{ once: true }}
           className="w-full"
         >
-          <VantaCloudsCustomBackground className="w-full min-h-[500px] md:min-h-[600px] rounded-2xl flex items-center justify-center p-4 md:p-6 overflow-hidden">
+          <VantaCloudsCustomBackground className="w-full min-h-[500px] md:min-h-[600px] rounded-xl flex items-center justify-center p-4 md:p-6 overflow-hidden">
             <div className="w-full max-w-3xl">
               {/* Título y subtítulo por encima del input, estilo similar a BusinessTravelRevolution */}
               <div className="text-center mb-6 md:mb-8">
@@ -292,7 +292,7 @@ export default function CloudAIShowcase() {
                     <div className="flex items-center justify-between mt-2 text-[9px] text-white/70 relative z-10">
                       <span>BA 287 • May 18</span>
                       <span
-                        className={`${highlightFlight ? "bg-green-500/40 text-green-300" : "bg-green-500/20 text-green-400"} px-1.5 py-0.5 rounded-full text-[8px] transition-colors duration-500`}
+                        className={`${highlightFlight ? "bg-white/40 text-white" : "bg-white/20 text-white"} px-1.5 py-0.5 rounded-full text-[8px] transition-colors duration-500`}
                       >
                         Confirmed
                       </span>
@@ -368,7 +368,7 @@ export default function CloudAIShowcase() {
                     <div className="flex items-center justify-between mt-2 text-[9px] text-white/70 relative z-10">
                       <span>May 18 • 14:30</span>
                       <span
-                        className={`${highlightTransport ? "bg-green-500/40 text-green-300" : "bg-green-500/20 text-green-400"} px-1.5 py-0.5 rounded-full text-[8px] transition-colors duration-500`}
+                        className={`${highlightTransport ? "bg-white/40 text-white" : "bg-white/20 text-white"} px-1.5 py-0.5 rounded-full text-[8px] transition-colors duration-500`}
                       >
                         Confirmed
                       </span>
