@@ -150,6 +150,15 @@ export const Footer = () => {
               >
                 Pre-register
               </Link>
+              <Link
+                href="https://trust.inc/suitpax"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Trust Center
+                <PiArrowUpRightBold className="h-3 w-3 text-gray-400" />
+              </Link>
             </div>
 
             {/* Trust badges - Quitando el efecto de animación en escritorio */}
