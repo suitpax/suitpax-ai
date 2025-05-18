@@ -108,7 +108,7 @@ export const Navigation = () => {
                 Talk to founders
               </Link>
               <Link
-                href="https://accounts.suitpax.com/sign-in"
+                href="https://app.suitpax.com/sign-in"
                 className="px-2.5 py-1.5 text-sm text-black hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors flex items-center gap-1"
               >
                 <PiUserBold className="h-3.5 w-3.5" />
@@ -130,7 +130,7 @@ export const Navigation = () => {
                 asChild
                 className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
               >
-                <Link href="https://accounts.suitpax.com/waitlist">
+                <Link href="https://app.suitpax.com/sign-up">
                   Pre-register
                   <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
                 </Link>
@@ -230,7 +230,7 @@ export const Navigation = () => {
 
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
-                      href="https://accounts.suitpax.com/sign-in"
+                      href="https://app.suitpax.com/sign-in"
                       className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -241,7 +241,7 @@ export const Navigation = () => {
 
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
-                      href="https://accounts.suitpax.com/waitlist"
+                      href="https://app.suitpax.com/sign-up"
                       className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-gray-500 rounded-md transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >

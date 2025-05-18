@@ -148,7 +148,7 @@ export const Footer = () => {
                 Join Slack
               </Link>
               <Link
-                href="https://accounts.suitpax.com/waitlist"
+                href="https://app.suitpax.com/sign-up"
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
               >
                 Pre-register

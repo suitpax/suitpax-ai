@@ -279,7 +279,7 @@ export const Hero = () => {
         <FadeContainer className="relative flex flex-col items-center justify-center container px-4 md:px-6 mx-auto">
           <Badge
             text={badgeMessage}
-            href={badgeMessage === "Join our waitlist in the meantime." ? "https://accounts.suitpax.com/waitlist" : "#"}
+            href={badgeMessage === "Join our waitlist in the meantime." ? "https://app.suitpax.com/sign-up" : "#"}
             className="bg-white text-black hover:bg-gray-100 transition-colors"
           />
 

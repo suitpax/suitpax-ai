@@ -484,7 +484,11 @@ export const Plans = () => {
 
               <div className="mt-4">
                 <Link
-                  href={plan.id === "enterprise" || plan.id === "pro" ? "mailto:hello@suitpax.com" : "/signup"}
+                  href={
+                    plan.id === "enterprise" || plan.id === "pro"
+                      ? "mailto:hello@suitpax.com"
+                      : "https://app.suitpax.com/sign-up"
+                  }
                   className={`w-full py-2 px-4 rounded-xl text-center text-[10px] sm:text-xs font-medium transition-colors ${
                     plan.popular
                       ? "bg-black text-white hover:bg-gray-800"
