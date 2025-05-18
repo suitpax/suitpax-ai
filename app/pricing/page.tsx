@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Plans from "@/components/marketing/plans"
+import ComparePlans from "@/components/marketing/compare-plans"
 import Script from "next/script"
 
 export const metadata: Metadata = {
@@ -66,6 +67,13 @@ export default function PricingPage() {
             Suitpax Pricing Plans
           </h1>
           <Plans />
+        </section>
+
+        <section aria-labelledby="compare-plans-heading">
+          <h2 id="compare-plans-heading" className="sr-only">
+            Compare Suitpax Plans
+          </h2>
+          <ComparePlans />
         </section>
       </main>
     </>

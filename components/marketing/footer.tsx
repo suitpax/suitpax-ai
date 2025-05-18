@@ -112,6 +112,9 @@ export const Footer = () => {
               >
                 Talk to founders
               </Link>
+              <Link href="/pricing" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                Pricing
+              </Link>
 
               {/* Suitpax Deck Link - ACTUALIZADO */}
               <Link

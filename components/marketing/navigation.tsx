@@ -93,6 +93,15 @@ export const Navigation = () => {
                 Manifesto
               </Link>
               <Link
+                href="/pricing"
+                className={cn(
+                  "px-2.5 py-1.5 text-sm hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors",
+                  isActive("/pricing") ? "text-black bg-black/5 font-semibold" : "text-black",
+                )}
+              >
+                Pricing
+              </Link>
+              <Link
                 href="https://cal.com/team/founders/partnership"
                 className="px-2.5 py-1.5 text-sm text-black hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors"
               >
@@ -158,6 +167,18 @@ export const Navigation = () => {
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Manifesto
+                    </Link>
+                  </div>
+                  <div className="py-2 border-b border-gray-200/30">
+                    <Link
+                      href="/pricing"
+                      className={cn(
+                        "flex items-center w-full py-1 text-lg font-medium tracking-tighter hover:bg-black/5 rounded-md transition-colors",
+                        isActive("/pricing") ? "text-black bg-black/5 font-semibold" : "text-black",
+                      )}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Pricing
                     </Link>
                   </div>
                 </div>
