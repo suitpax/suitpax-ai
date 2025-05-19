@@ -130,7 +130,7 @@ const pricingPlans = [
       "24/5 priority support",
       "Team travel coordination",
       "Basic bank API integration",
-      "Advanced CRM intelligence",
+      "Advanced TRM intelligence",
     ],
     cta: "Contact us",
     badge: "Most Popular",
