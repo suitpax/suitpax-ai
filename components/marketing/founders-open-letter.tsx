@@ -22,7 +22,7 @@ export default function FoundersOpenLetter() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-tight max-w-4xl mx-auto bg-gradient-to-b from-white to-gray-300 bg-clip-text text-transparent normal-case"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-none max-w-4xl mx-auto bg-gradient-to-b from-white to-gray-300 bg-clip-text text-transparent normal-case"
           >
             Why we built Suitpax?
           </motion.h2>
@@ -31,7 +31,7 @@ export default function FoundersOpenLetter() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-4 text-sm font-medium text-white/60 max-w-2xl"
+            className="mt-4 text-xs sm:text-sm font-medium text-white/60 max-w-2xl"
           >
             Our journey to revolutionize business travel and why we believe it's time for a change
           </motion.p>

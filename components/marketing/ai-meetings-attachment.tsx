@@ -185,13 +185,13 @@ export const AIMeetingsAttachment = () => {
             </div>
 
             {/* Título aumentado un nivel */}
-            <h2 className="flex items-center justify-center text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-tight mb-4 py-2">
+            <h2 className="flex items-center justify-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-tight mb-4 py-2">
               <span className="bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text">
                 Seamless meeting coordination
               </span>
             </h2>
 
-            <p className="text-gray-400 text-xs sm:text-sm font-medium max-w-2xl mx-auto mb-2">
+            <p className="mt-4 text-xs sm:text-sm font-medium text-gray-400 max-w-2xl mx-auto mb-2">
               Our AI-powered meeting assistant integrates with your favorite tools to streamline scheduling,
               note-taking, and follow-up actions.
             </p>

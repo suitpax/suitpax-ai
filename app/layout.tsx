@@ -32,6 +32,14 @@ export const metadata: Metadata = {
     description:
       "The all-in-one business travel platform with AI superpowers. MCP-enhanced AI agents, expense management, flights, hotels, and cars—everything in one place. Transforming corporate travel with intelligent automation and contextual understanding.",
     siteName: "Suitpax",
+    images: [
+      {
+        url: "/og-image-new.png",
+        width: 1200,
+        height: 630,
+        alt: "Suitpax - Designed by humans. Powered by AI Agents",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -39,6 +47,7 @@ export const metadata: Metadata = {
     description:
       "AI travel agents with MCP superpowers. Transforming business travel with intelligent automation, contextual understanding, and seamless expense management. Built for scale, designed for humans.",
     creator: "@suitpax",
+    images: ["/og-image-new.png"],
   },
   keywords:
     "AI travel agents, business travel platform, MCP technology, AI superpowers, corporate travel management, expense automation, intelligent booking, contextual AI, travel intelligence, next-gen traveltech",

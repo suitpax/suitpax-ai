@@ -99,8 +99,10 @@ const AirportLoungeExperience = () => {
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-medium tracking-tighter mb-4">Premium Airport Lounge Access</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl mb-4">
+            Premium Airport Lounge Access
+          </h2>
+          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mx-auto">
             Transform your travel experience with exclusive access to premium airport lounges worldwide through Suitpax.
           </p>
         </div>

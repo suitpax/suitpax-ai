@@ -123,10 +123,10 @@ export const BankConnection = () => {
               Hyperspeed Finance
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-white leading-tight max-w-3xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-white leading-none max-w-4xl">
             Connect your bank. Reduce your costs.
           </h2>
-          <p className="mt-4 text-sm font-medium text-white/70 max-w-2xl mb-12">
+          <p className="mt-4 text-xs sm:text-sm font-medium text-white/70 max-w-2xl mb-12">
             Our Hyperspeed technology connects directly with your financial institutions, automating payments,
             optimizing expenses, and reducing your travel costs by up to 23%.
           </p>

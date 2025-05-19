@@ -192,10 +192,10 @@ export const AITravelAgents = () => {
               Q3 2025
             </span>
           </div>
-          <h2 className="text-2xl md:text-2xl lg:text-2xl font-medium tracking-tighter text-black leading-none">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
             {randomTitle}
           </h2>
-          <p className="mt-3 text-xs font-medium text-gray-500 max-w-2xl mb-6">{randomSubtitle}</p>
+          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6">{randomSubtitle}</p>
 
           {/* AI Chat Interface - Moved here */}
           <div className="max-w-2xl w-full mx-auto mb-12">
@@ -240,7 +240,7 @@ export const AITravelAgents = () => {
             </div>
 
             <div className="relative z-10">
-              <h3 className="text-2xl md:text-2xl font-medium text-left tracking-tighter text-black mb-4 leading-none">
+              <h3 className="text-2xl sm:text-3xl md:text-3xl font-medium text-left tracking-tighter text-black mb-4 leading-none">
                 Groundbreaking AI Agents with MCP superpowers
               </h3>
               <p className="text-lg font-medium text-gray-700 tracking-tighter mb-4">

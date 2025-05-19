@@ -289,10 +289,10 @@ export const Hiring = () => {
           </div>
 
           {/* Título principal con estilo similar a AI Travel Agents */}
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-black leading-none text-center mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl text-center mb-4">
             {randomTitle}
           </h2>
-          <p className="text-lg md:text-xl text-center max-w-2xl mx-auto mb-12 text-black/80">
+          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl text-center mx-auto mb-12">
             Build the next generation of agentic travel systems for millions of business travelers
           </p>
 

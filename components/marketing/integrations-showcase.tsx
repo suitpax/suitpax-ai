@@ -66,10 +66,10 @@ export const IntegrationsShowcase = () => {
               100+ Connectors
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
             Supercharge your workflow with seamless integrations
           </h2>
-          <p className="mt-4 text-xs font-medium text-gray-500 max-w-2xl mb-8">
+          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-8">
             Integrate with your favorite tools and services to streamline your workflow and enhance productivity.
           </p>
         </div>

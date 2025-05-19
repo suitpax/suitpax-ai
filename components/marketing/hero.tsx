@@ -286,7 +286,7 @@ export const Hero = () => {
           <CounterBadge className="mt-4" variant="light" />
 
           <div className="mt-10 text-center max-w-3xl mx-auto">
-            <h1 className="text-2xl font-medium tracking-tighter text-black sm:text-4xl md:text-5xl xl:text-6xl/none leading-none">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
               <FadeSpan>{randomTitle}</FadeSpan>
             </h1>
 
@@ -300,7 +300,7 @@ export const Hero = () => {
               <CityAnimateText cities={cities} />
             </motion.div>
 
-            <p className="mt-8 max-w-[700px] mx-auto text-black/80 text-sm md:text-lg lg:text-xl leading-relaxed">
+            <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mx-auto">
               <FadeSpan>{randomSubtitle}</FadeSpan>
             </p>
 

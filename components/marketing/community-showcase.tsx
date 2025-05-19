@@ -139,7 +139,7 @@ export default function CommunityShowcase() {
           </div>
 
           <motion.h2
-            className="text-3xl md:text-4xl lg:text-6xl font-medium tracking-tight text-black leading-tight max-w-4xl mx-auto"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -148,7 +148,7 @@ export default function CommunityShowcase() {
           </motion.h2>
 
           <motion.p
-            className="mt-3 text-[10px] font-medium text-gray-500 max-w-xl mb-6"
+            className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}

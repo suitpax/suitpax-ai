@@ -255,10 +255,10 @@ export const FlightBookingShowcase = () => {
               Global Flight Network
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-white leading-tight max-w-3xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-white leading-none max-w-4xl">
             Connecting you with the world's premier airlines
           </h2>
-          <p className="mt-4 text-sm font-medium text-white/70 max-w-2xl mb-12">
+          <p className="mt-4 text-xs sm:text-sm font-medium text-white/70 max-w-2xl mb-12">
             Our powerful booking system integrates directly with the most prestigious carriers worldwide, ensuring you
             always have access to the best routes, exclusive rates, and premium services.
           </p>

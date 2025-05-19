@@ -106,8 +106,10 @@ const FlightTeams = () => {
               Q3 2025
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-medium tracking-tighter text-black leading-none">{randomTitle}</h2>
-          <p className="mt-3 text-xs font-medium text-gray-500 max-w-2xl mb-6">{randomSubtitle}</p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
+            {randomTitle}
+          </h2>
+          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6">{randomSubtitle}</p>
         </div>
 
         {/* Trip selection tabs */}

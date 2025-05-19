@@ -115,10 +115,10 @@ export default function CloudAIShowcase() {
                 Human-AI Agentic
               </span>
             </div>
-            <h2 className="text-2xl md:text-2xl lg:text-2xl font-medium tracking-tighter text-black leading-none max-w-3xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl mx-auto">
               The future of business travel with Voice AI
             </h2>
-            <p className="mt-3 text-sm font-medium text-gray-600 max-w-2xl">
+            <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl">
               Suitpax combines human expertise with AI agents to transform business travel.
             </p>
             <p className="mt-2 text-xs font-light text-gray-500 max-w-2xl">
@@ -148,7 +148,7 @@ export default function CloudAIShowcase() {
                   />
                   <em className="font-serif italic">AI Assistant</em>
                 </h3>
-                <h2 className="text-xl font-medium tracking-tighter text-white sm:text-2xl md:text-3xl leading-none mb-3">
+                <h2 className="text-2xl sm:text-3xl md:text-3xl font-medium tracking-tighter text-white leading-none mb-3">
                   Speak your journey into existence
                 </h2>
               </div>

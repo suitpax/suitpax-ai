@@ -171,7 +171,7 @@ export default function BusinessTravelRevolution() {
           </div>
 
           <motion.h2
-            className="text-2xl md:text-2xl lg:text-2xl font-medium tracking-tighter text-black leading-none max-w-3xl mx-auto"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -192,7 +192,7 @@ export default function BusinessTravelRevolution() {
           </motion.div>
 
           <motion.p
-            className="mt-3 text-sm font-medium text-gray-600 max-w-2xl"
+            className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}

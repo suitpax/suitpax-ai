@@ -130,8 +130,8 @@ export const Navigation = () => {
                 asChild
                 className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
               >
-                <Link href="https://app.suitpax.com/sign-up">
-                  Pre-register
+                <Link href="mailto:suitpax.com">
+                  Beta access
                   <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
                 </Link>
               </Button>

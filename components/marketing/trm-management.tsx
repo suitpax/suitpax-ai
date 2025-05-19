@@ -129,10 +129,10 @@ const TrmManagement = () => {
               TRM Intelligence
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-white leading-none">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-white leading-none max-w-4xl">
             {trmTitle}
           </h2>
-          <p className="mt-3 text-sm font-medium text-white/80 max-w-2xl mb-4">{trmDescription}</p>
+          <p className="mt-4 text-xs sm:text-sm font-medium text-white/80 max-w-2xl mb-4">{trmDescription}</p>
         </div>
 
         {/* TRM Demo UI */}

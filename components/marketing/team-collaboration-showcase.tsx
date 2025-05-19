@@ -263,10 +263,10 @@ const TeamCollaborationShowcase = () => {
               Real-time collaboration
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
             Frictionless collaboration for travel teams
           </h2>
-          <p className="mt-3 text-sm font-light text-gray-600 max-w-2xl mb-4">
+          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-4">
             Connect your team, share documents, and coordinate tasks in a unified workspace specifically designed for
             corporate travel management
           </p>

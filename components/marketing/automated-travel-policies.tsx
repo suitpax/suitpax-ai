@@ -171,10 +171,10 @@ export const AutomatedTravelPolicies = () => {
               Q3 2025
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-black leading-none mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl mb-6">
             {randomTitle}
           </h2>
-          <p className="mt-3 text-xs font-medium text-gray-500 max-w-2xl mb-10">{randomSubtitle}</p>
+          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-10">{randomSubtitle}</p>
 
           {/* 16:9 Aspect Ratio Container for Hero Image */}
           <div className="w-full max-w-4xl mx-auto mb-12 relative">
