@@ -9,6 +9,8 @@ const partnerLogos = [
   { name: "Speedinvest", url: "https://cdn.brandfetch.io/speedinvest.com/w/512/h/116/logo?c=1idU-l8vdm7C5__3dci" },
   { name: "CoreNest", url: "https://cdn.brandfetch.io/corenest.com/w/314/h/72/theme/light/logo?c=1idU-l8vdm7C5__3dci" },
   { name: "A16Z", url: "https://cdn.brandfetch.io/a16z.com/w/512/h/117/logo?c=1idU-l8vdm7C5__3dci" },
+  { name: "Accel", url:
+"https://cdn.brandfetch.io/accel.com/w/512/h/161/theme/light/logo?c=1idU-l8vdm7C5__3dci" },
   { name: "Atomico", url: "https://cdn.brandfetch.io/atomico.com/w/512/h/102/theme/light/logo?c=1idU-l8vdm7C5__3dci" },
   {
     name: "EQT Group",
