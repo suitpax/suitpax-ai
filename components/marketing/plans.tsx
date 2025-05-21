@@ -117,7 +117,7 @@ const pricingPlans = [
     name: "Pro",
     description: "For growing businesses ready to optimize their travel operations",
     price: "€89",
-    annualPrice: "€71",
+    annualPrice: "€79",
     period: "per month",
     annualPeriod: "per month, billed annually",
     features: [
@@ -130,7 +130,7 @@ const pricingPlans = [
       "24/5 priority support",
       "Team travel coordination",
       "Basic bank API integration",
-      "Advanced TRM intelligence",
+      "Advanced CRM intelligence",
     ],
     cta: "Contact us",
     badge: "Most Popular",

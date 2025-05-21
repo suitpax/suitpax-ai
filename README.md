@@ -1,30 +1,12 @@
 # Suitpax
 
-Suitpax is the next-generation travel technology platform built to revolutionize business travel with AI-powered solutions.
-
----
-
-## Table of Contents
-
-1. [About Suitpax](#about-suitpax)
-2. [Project Structure](#project-structure)
-3. [Getting Started](#getting-started)
-4. [Features](#features)
-5. [UI Documentation](#ui-documentation)
-6. [Tech Stack](#tech-stack)
-7. [Contributing](#contributing)
-
----
-
-## About Suitpax
-
-Suitpax offers modern, AI-powered tools for seamless corporate travel management. Our platform includes virtual agents, deep CRM and financial integrations, task management, and much more—designed to streamline the entire business travel experience.
-
----
+Suitpax is a next-generation travel technology platform designed to revolutionize business travel with AI-powered solutions.
 
 ## Project Structure
 
-```
+The project follows a well-organized structure:
+
+\`\`\`
 suitpax-landing/
 ├── app/                    # Next.js App Router
 │   ├── layout.tsx          # Root layout
@@ -46,75 +28,63 @@ suitpax-landing/
 │   └── ui-docs/            # UI documentation
 ├── hooks/                  # Custom React hooks
 └── types/                  # TypeScript type definitions
-```
-
----
+\`\`\`
 
 ## Getting Started
 
-1. **Install Dependencies:**
-   ```bash
-   npm install
-   # or
-   yarn install
-   # or
-   pnpm install
-   ```
+First, install the dependencies:
 
-2. **Run the Development Server:**
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
-   ```
+\`\`\`bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+\`\`\`
 
-3. **Open your browser:**
-   Visit [http://localhost:3000](http://localhost:3000) to see the app running.
+Then, run the development server:
 
----
+\`\`\`bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+\`\`\`
 
-## Features
-
-- **AI-Powered Travel Agents:** Virtual agents to handle travel arrangements.
-- **Business Travel Management:** Comprehensive tools for managing corporate travel.
-- **CRM Integration:** Customer relationship management tailored for travel businesses.
-- **Financial Integration:** Connect with banking systems for seamless payments.
-- **Task Management:** Organize and track all travel-related tasks.
-- **Flight Booking:** Streamlined booking experience.
-
----
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## UI Documentation
 
-Full UI documentation is available in the `public/ui-docs` directory, including:
+Comprehensive UI documentation is available in the `public/ui-docs` directory. This documentation covers:
+
 - Design system overview
 - Component specifications
 - Style guidelines
 - Best practices
 
----
+## Features
+
+- **AI-Powered Travel Agents**: Virtual agents that handle travel arrangements
+- **Business Travel Management**: Comprehensive tools for managing corporate travel
+- **CRM Integration**: Customer relationship management for travel businesses
+- **Financial Integration**: Connect with banking systems for seamless payments
+- **Task Management**: Organize and track travel-related tasks
+- **Flight Booking**: Streamlined flight booking experience
 
 ## Tech Stack
 
-- **Framework:** Next.js (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **UI Components:** ShadCN UI
-- **Animation:** Framer Motion
-- **Icons:** Lucide React, React Icons
-
----
+- **Framework**: Next.js with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: ShadCN UI
+- **Animation**: Framer Motion
+- **Icons**: Lucide React, React Icons
 
 ## Contributing
 
-- Follow the established project structure.
-- Document all new components in the UI docs.
-- Maintain consistent styling using the design system.
-- Ensure all components are responsive.
-- Optimize code for performance and accessibility.
-
----
-
-Let me know if you want to add badges, a demo section, or further customization!
+1. Follow the project structure
+2. Document new components in the UI docs
+3. Maintain consistent styling using the design system
+4. Ensure responsive design for all components
+5. Optimize for performance and accessibility
