@@ -20,8 +20,8 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
   // Function to generate the agent grid
   const generateAgentGrid = () => {
     const grid = []
-    // Reducir el número de agentes a 80 (8×10 grid) para pantallas de ordenador
-    const totalAgents = typeof window !== "undefined" && window.innerWidth > 1024 ? 80 : 130
+    // Usar un número consistente de agentes en todas las pantallas
+    const totalAgents = 130
 
     for (let i = 0; i < totalAgents; i++) {
       // Use modulo to ensure even distribution of all agent images
@@ -56,7 +56,7 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
 
   return (
     <div className="relative mb-12 px-1 sm:px-2">
-      <div className="grid grid-cols-10 md:grid-cols-8 gap-1 sm:gap-1.5 md:gap-2 lg:gap-3">
+      <div className="grid grid-cols-10 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-14 gap-1 sm:gap-1.5 md:gap-2 lg:gap-2">
         {agentGrid.map((agent, index) => (
           <motion.div
             key={agent.id}
@@ -89,7 +89,7 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
               )}
             </AnimatePresence>
 
-            <div className="absolute inset-0 rounded-lg overflow-hidden bg-gray-100">
+            <div className="absolute inset-0 rounded-lg overflow-hidden bg-gray-100 lg:inset-[15%] xl:inset-[20%]">
               <Image
                 src={agent.image || "/placeholder.svg"}
                 alt="AI Travel Agent"
