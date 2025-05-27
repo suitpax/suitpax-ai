@@ -34,7 +34,7 @@ export default function CloudAIShowcase() {
       setInputText(text)
 
       // Si hay texto nuevo, activar el efecto brillante en los badges
-      if (text && text !== inputText) {
+      if (text && text.length > 0) {
         // Activar el efecto en el badge de vuelo
         setHighlightFlight(true)
 
@@ -61,14 +61,12 @@ export default function CloudAIShowcase() {
         }
       }
     },
+    onEnd: (finalTranscript) => {
+      setInputText(finalTranscript)
+    },
     continuous: true,
     language: detectedLanguage,
-    interimResults: true,
-    onError: (error) => {
-      console.error("Speech recognition error:", error)
-      setErrorMessage("Error en el reconocimiento de voz. Inténtalo de nuevo.")
-      setTimeout(() => setErrorMessage(null), 3000)
-    },
+    autoDetectLanguage: true,
   })
 
   const toggleListening = async () => {
@@ -79,6 +77,7 @@ export default function CloudAIShowcase() {
         // Verificar permisos antes de iniciar
         await navigator.mediaDevices.getUserMedia({ audio: true })
         resetTranscript()
+        setInputText("") // Limpiar el input text también
         startListening()
         setErrorMessage(null)
       } catch (error) {
@@ -169,9 +168,9 @@ export default function CloudAIShowcase() {
                   </div>
 
                   {/* Input de texto con reconocimiento de voz */}
-                  <div ref={inputRef} className="flex-1 py-2 px-2 text-xs text-gray-500 h-10 flex items-center">
-                    {inputText ? (
-                      <span className="inline-block text-xs">{inputText}</span>
+                  <div ref={inputRef} className="flex-1 py-2 px-2 text-xs text-gray-900 h-10 flex items-center">
+                    {transcript || inputText ? (
+                      <span className="inline-block text-xs text-gray-900 font-medium">{transcript || inputText}</span>
                     ) : (
                       <span className="inline-block text-xs text-gray-400">{voicePlaceholder}</span>
                     )}
