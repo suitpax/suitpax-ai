@@ -1,5 +1,16 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { motion } from "framer-motion"
+import Badge from "@/components/ui/badge"
+import CityAnimateText from "@/components/ui/city-animate-text"
+import { useEffect, useState } from "@/components/ui/animations"
+import { FadeContainer, FadeSpan } from "@/components/ui/animations"
+import CounterBadge from "@/components/ui/counter-badge"
+import MiniChat from "@/components/ui/mini-chat"
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import { ArcadeEmbed } from "@/components/ui/arcade-embed"
 import React from "react"
 
 const Hero = () => {
@@ -108,22 +119,136 @@ const Hero = () => {
     "Advanced TMS platform: Where artificial intelligence meets travel excellence.",
   ]
 
-  const [titleIndex, setTitleIndex] = React.useState(0)
+  const cities = ["London", "Paris", "New York", "Tokyo", "Dubai"]
 
-  React.useEffect(() => {
+  const subtitles = [
+    "The ultimate travel stack for modern companies",
+    "AI-powered travel management for modern workers.",
+    "Next-generation travel tools for growing businesses.",
+    "Your company's travel, perfectly managed.",
+    "Business travel that enhances your workflow.",
+    "Designed by humans. Powered by AI agents.",
+    "AI-driven travel for modern business.",
+    "Smarter business travel decisions.",
+    "The all in one solution for your company's travel needs.",
+    "Human vision. AI execution.",
+    "Human-led. AI-empowered.",
+    "Where human intuition meets AI agents.",
+    "AI-first business travel platform for the modern enterprise.",
+    "AI-first approach to solving business travel complexity.",
+    "Business travel reimagined: AI-first, human-centered, future-ready.",
+    "AI-first travel management for data-driven businesses.",
+    "Business travel simplified through AI-first automation.",
+    "Business travel intelligence: AI-first insights for better decisions.",
+    "AI-first travel platform built for business efficiency.",
+    "The future of business travel is AI-first and human-guided.",
+    "AI-first business travel: Smarter journeys, better outcomes.",
+    "Empowering your workforce with intelligent travel solutions.",
+    "AI-travel platform designed for the modern workforce.",
+    "Transforming business travel for distributed workforce teams.",
+    "Business platform that streamlines travel for global teams.",
+    "AI-travel intelligence for your entire business workforce.",
+    "Workforce mobility powered by AI-travel innovation.",
+    "Business-first approach to AI-travel management.",
+    "The platform connecting your workforce to seamless travel.",
+    "AI-travel orchestration for business teams everywhere.",
+    "Workforce travel simplified on a single business platform.",
+    "AI-travel solutions tailored to your business needs.",
+    "Unifying your workforce through intelligent business travel.",
+    "AI-travel management that grows with your business.",
+    "Workforce-centric business travel platform.",
+    "Connecting your global workforce through intelligent travel.",
+    "AI-travel coordination for distributed business teams.",
+    "Workforce travel management reimagined for modern business.",
+    "AI-travel intelligence built for business efficiency.",
+    "The TMS revolution: AI-powered travel management like never before.",
+    "Reimagining TMS with artificial intelligence and human expertise.",
+    "Next-generation TMS: Where AI meets intelligent travel management.",
+    "The future of TMS is here: AI-driven, human-centered, business-focused.",
+    "Revolutionary TMS platform powered by advanced AI technology.",
+    "TMS redefined: Intelligent automation meets seamless travel coordination.",
+    "The smartest TMS ever built: AI agents managing your business travel.",
+    "Beyond traditional TMS: AI-first travel management for modern enterprises.",
+    "TMS evolved: Artificial intelligence transforming corporate travel.",
+  ]
+
+  const [titleIndex, setTitleIndex] = React.useState(0)
+  const [subtitleIndex, setSubtitleIndex] = React.useState(0)
+
+  const [badgeMessage, setBadgeMessage] = useState("")
+
+  useEffect(() => {
     const intervalId = setInterval(() => {
       setTitleIndex((prevIndex) => (prevIndex + 1) % titleVariations.length)
+      setSubtitleIndex((prevIndex) => (prevIndex + 1) % subtitles.length)
     }, 5000) // Change title every 5 seconds
 
     return () => clearInterval(intervalId) // Cleanup on unmount
-  }, [titleVariations.length])
+  }, [titleVariations.length, subtitles.length])
+
+  useEffect(() => {
+    const updateBadgeMessage = () => {
+      const now = new Date()
+      const hour = now.getHours()
+
+      if (hour >= 5 && hour < 12) {
+        setBadgeMessage("Good morning!")
+      } else if (hour >= 12 && hour < 18) {
+        setBadgeMessage("Good afternoon!")
+      } else {
+        setBadgeMessage("Good evening!")
+      }
+    }
+
+    updateBadgeMessage() // Set initial message
+    const intervalId = setInterval(updateBadgeMessage, 60000) // Update every minute
+
+    return () => clearInterval(intervalId)
+  }, [])
+
+  const randomTitle = titleVariations[titleIndex]
+  const randomSubtitle = subtitles[subtitleIndex]
 
   return (
-    <section className="bg-gray-100 py-20">
-      <div className="container mx-auto text-center">
-        <h1 className="text-4xl font-bold mb-4">{titleVariations[titleIndex]}</h1>
-        <p className="text-lg text-gray-700 mb-8">Streamline your workforce travel with our innovative platform.</p>
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Get Started</button>
+    <section className="relative h-[100vh] w-full overflow-hidden">
+      <VantaHaloBackground />
+
+      <div className="container relative z-10 flex max-w-5xl flex-col items-center justify-center gap-4 pb-8 pt-6 md:pb-10 md:pt-14 lg:pb-20 lg:pt-24">
+        <Badge className="opacity-90">{badgeMessage}</Badge>
+        <CounterBadge />
+        <motion.h1
+          className="font-heading text-balance scroll-m-20 text-center text-4xl font-extrabold tracking-tight lg:text-5xl"
+          variants={FadeContainer}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+        >
+          <FadeSpan>{randomTitle}</FadeSpan>
+        </motion.h1>
+        <CityAnimateText cities={cities} />
+        <p className="max-w-[700px] text-balance text-center text-lg text-muted-foreground">{randomSubtitle}</p>
+        <div className="flex w-full items-center justify-center space-x-4">
+          <Link href="/manifesto" target="_blank">
+            <Button size="lg">Read our manifesto</Button>
+          </Link>
+          <Link href="https://cal.com/suitpax/30min" target="_blank">
+            <Button size="lg" variant="outline">
+              Talk to founders
+            </Button>
+          </Link>
+        </div>
+        <ArcadeEmbed />
+        <p className="mx-auto max-w-2xl text-center text-sm text-muted-foreground">
+          We are on a mission to revolutionize business travel with AI. Our platform is designed to make travel
+          management seamless, efficient, and enjoyable for companies of all sizes.
+        </p>
+        <motion.div
+          className="absolute bottom-0 right-0 mr-4 mb-4 rounded-full bg-white p-2 shadow-md transition-all hover:scale-110"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <MiniChat />
+        </motion.div>
       </div>
     </section>
   )
