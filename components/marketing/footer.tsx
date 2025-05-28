@@ -6,6 +6,7 @@ import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlac
 import { PiArrowUpRightBold } from "react-icons/pi"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
+import { Plane, Building2 } from "lucide-react"
 
 export const Footer = () => {
   const [isMobile, setIsMobile] = useState(false)
@@ -65,35 +66,13 @@ export const Footer = () => {
             <div className="mb-6">
               <p className="text-xs text-gray-400 mb-2 font-medium">System Status:</p>
               <Link href="https://status.suitpax.com" target="_blank" rel="noopener noreferrer">
-                <iframe
-                  src="https://status.suitpax.com/badge?theme=dark"
-                  width="250"
-                  height="30"
-                  frameBorder="0"
-                  scrolling="no"
-                  title="Suitpax System Status"
-                  style={{ colorScheme: "normal" }}
-                ></iframe>
+                <div className="inline-flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></div>
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    All Systems Operational
+                  </span>
+                </div>
               </Link>
-            </div>
-
-            {/* SourceForge Badge */}
-            <div className="mb-6">
-              <div
-                className="sf-root"
-                data-id="3853370"
-                data-badge="customers-love-us-white"
-                data-variant-id="sf"
-                style={{ width: "80px" }}
-              >
-                <Link
-                  href="https://sourceforge.net/software/product/Suitpax/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Suitpax Reviews
-                </Link>
-              </div>
             </div>
 
             <p className="text-xs text-gray-500">2261 Market Street STE 86661 San Francisco, CA, 94114</p>
@@ -354,6 +333,12 @@ export const Footer = () => {
                 <SiGmail className="h-5 w-5" />
                 <span className="sr-only">Email</span>
               </Link>
+            </div>
+            <div className="flex items-center gap-1 text-gray-400 text-xs mt-2">
+              <Plane className="h-3 w-3" />
+              <span>Airlines</span>
+              <Building2 className="h-3 w-3 ml-2" />
+              <span>Hotels</span>
             </div>
 
             <div className="mt-auto">
