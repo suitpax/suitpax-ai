@@ -9,18 +9,17 @@ interface CounterBadgeProps {
 }
 
 export default function CounterBadge({ className = "", variant = "light" }: CounterBadgeProps) {
-  const [count, setCount] = useState(20)
+  const [count, setCount] = useState(587)
 
   useEffect(() => {
-    // Calculate how many days have passed since April 14, 2025
-    const startDate = new Date(2025, 3, 14) // April 14, 2025
+    // Calculate how many days have passed since October 20, 2023
+    const startDate = new Date(2023, 9, 20) // October 20, 2023 (month is 0-indexed)
     const currentDate = new Date()
     const daysDiff = Math.max(0, (currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
     const daysPassed = Math.floor(daysDiff)
 
-    // Increase by 1 for each day, starting from 20
-    const calculatedCount = 20 + daysPassed
-    setCount(calculatedCount)
+    // Set the count to 587 days
+    setCount(587)
   }, [])
 
   return (
@@ -34,7 +33,7 @@ export default function CounterBadge({ className = "", variant = "light" }: Coun
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
         <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
       </span>
-      <span className="whitespace-nowrap">{count} business teams are waiting...</span>
+      <span className="whitespace-nowrap">{count} days building the next-gen of traveltech</span>
     </motion.div>
   )
 }
