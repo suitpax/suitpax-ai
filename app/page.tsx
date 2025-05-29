@@ -7,7 +7,6 @@ import CloudAIShowcase from "@/components/marketing/cloud-ai-showcase"
 import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
 import type { Metadata } from "next"
 import MiniContactCard from "@/components/ui/mini-contact-card"
-import SPXFlights from "@/components/marketing/spx-flights"
 
 export const metadata: Metadata = {
   title: "Suitpax | AI-Powered Business Travel Platform",
@@ -71,7 +70,6 @@ export default function Home() {
         <BusinessTravelRevolution />
         <CloudAIShowcase />
         <AIMeetingsAttachment />
-        <SPXFlights />
         <section className="py-12 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
             <MiniContactCard />
