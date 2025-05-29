@@ -32,10 +32,6 @@ const partnerLogos = [
     url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6411c8eb97f067973fecd771_Logo_B2V-SATcCcJFOCejd87mku1SxP6OjMRwEs.svg",
   },
   {
-    name: "Battery",
-    url: "https://cdn.brandfetch.io/battery.com/w/512/h/136/theme/light/logo?c=1idU-l8vdm7C5__3dci",
-  },
-  {
     name: "Kibo Ventures",
     url: "https://cdn.brandfetch.io/kiboventures.com/w/512/h/305/logo?c=1idU-l8vdm7C5__3dci",
   },
@@ -66,6 +62,10 @@ const partnerLogos = [
   {
     name: "Eurazeo",
     url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Eurazeo_Logo_Blanc-LrQQUuCUZkWr242WM6QRkhL7LNnvWS.png",
+  },
+  {
+    name: "Insight Partners",
+    url: "/logos/insight-partners-logo.png",
   },
   {
     name: "Headline",
