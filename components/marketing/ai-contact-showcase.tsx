@@ -110,21 +110,17 @@ export default function AIContactShowcase() {
 
             <div className="space-y-3 mb-6">
               <a
-                href="https://cal.com/team/founders/partnership"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="mailto:ai@suitpax.com?subject=Sign%20In%20Request&body=I'd%20like%20to%20sign%20in%20to%20Suitpax.%20Please%20provide%20access."
                 className="block w-full py-3 px-4 bg-black text-white hover:bg-gray-800 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg"
               >
-                Book a call with founders
+                Sign in
               </a>
 
               <a
-                href="https://cal.com/team/suitpax/demo"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="mailto:ai@suitpax.com?subject=Pre-register%20Request&body=I'd%20like%20to%20pre-register%20for%20Suitpax.%20Please%20add%20me%20to%20the%20waitlist."
                 className="block w-full py-3 px-4 bg-transparent border border-black text-black hover:bg-gray-50 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-md"
               >
-                Schedule product demo
+                Pre-register
               </a>
             </div>
 
