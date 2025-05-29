@@ -12,15 +12,14 @@ export default function CounterBadge({ className = "", variant = "light" }: Coun
   const [count, setCount] = useState(20)
 
   useEffect(() => {
-    // Calculate how many days have passed since April 14, 2025
-    const startDate = new Date(2023, 9, 20) // October 20, 2023 (mes 9 = octubre)
+    // Calculate how many days have passed since October 20, 2023
+    const startDate = new Date(2023, 9, 20) // October 20, 2023 (month 9 = October)
     const currentDate = new Date()
     const daysDiff = Math.max(0, (currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
     const daysPassed = Math.floor(daysDiff)
 
-    // Increase by 1 for each day, starting from 20
-    const calculatedCount = 580 + daysPassed
-    setCount(calculatedCount)
+    // Show actual days passed since first code
+    setCount(daysPassed)
   }, [])
 
   return (
