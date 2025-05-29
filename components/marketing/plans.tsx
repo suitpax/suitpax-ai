@@ -29,29 +29,24 @@ const subtitles = [
   "Enterprise-grade travel management at startup-friendly prices",
 ]
 
-// Chat placeholders for each plan
+// Chat placeholders para cada plan - Textos diferentes para cada plan
 const chatPlaceholders = {
-  beta: [
-    "Help me test the flight booking feature...",
-    "What beta features are available now?...",
-    "Can I provide feedback on the hotel search?...",
-  ],
   free: [
-    "Book a basic business trip to Chicago...",
-    "Find me a hotel near the conference center...",
+    "Help me find a budget hotel in Chicago...",
     "What's the cheapest flight to New York next week?...",
+    "Can I book a basic business trip to Dallas?...",
   ],
-  early: [
-    "Arrange travel for our marketing team to London...",
+  basic: [
+    "Find me a flight with lounge access to London...",
+    "Book a business hotel with meeting rooms in Berlin...",
+    "Schedule a team lunch near our client's office in Madrid...",
+  ],
+  pro: [
+    "Arrange travel for our marketing team to Tokyo...",
     "Set up our company travel policy for approval...",
-    "Find the best business hotels with meeting rooms in San Francisco...",
+    "Find the best business hotels with executive suites in Singapore...",
   ],
-  startups: [
-    "Analyze our portfolio companies' travel patterns...",
-    "Set up travel policies for our portfolio companies...",
-    "Schedule meetings with founders in multiple cities...",
-  ],
-  unicorn: [
+  enterprise: [
     "Coordinate global travel for our executive team...",
     "Analyze our Q2 travel spend and suggest optimizations...",
     "Set up custom approval workflows for our regional offices...",
@@ -61,20 +56,14 @@ const chatPlaceholders = {
 // Community images
 const communityImages = {
   free: ["/community/jordan-burgess.webp", "/community/bec-ferguson.webp"],
-  early: [
+  basic: ["/community/kelsey-lowe.webp", "/community/brianna-ware.webp", "/community/harriet-rojas.jpg"],
+  pro: [
     "/community/ammar-foley.webp",
     "/community/owen-harding.webp",
     "/community/nicolas-trevino.webp",
     "/community/isobel-fuller.webp",
   ],
-  startups: [
-    "/community/ammar-foley.webp",
-    "/community/owen-harding.webp",
-    "/community/jordan-burgess.webp",
-    "/community/adil-floyd.webp",
-    "/community/nicolas-trevino.webp",
-  ],
-  unicorn: [
+  enterprise: [
     "/community/ammar-foley.webp",
     "/community/owen-harding.webp",
     "/community/jordan-burgess.webp",
@@ -85,7 +74,7 @@ const communityImages = {
   ],
 }
 
-// Pricing plans
+// Pricing plans - Añadido nuevo plan "Starter" de 49€
 const pricingPlans = [
   {
     id: "free",
@@ -106,16 +95,42 @@ const pricingPlans = [
       "Basic travel policy templates",
     ],
     cta: "Get Started",
-    badge: "Starter",
+    badge: "Free",
     popular: false,
-    agentImage: "/agents/agent-1.png",
+    agentImage: "/agents/agent-sophia.jpeg",
     communityImages: ["/community/jordan-burgess.webp", "/community/bec-ferguson.webp"],
+    bgGradient: "from-gray-50 to-gray-100",
+  },
+  {
+    id: "basic",
+    name: "Basic",
+    description: "For growing teams ready to optimize their travel experience",
+    price: "€49",
+    annualPrice: "€39",
+    period: "per month",
+    annualPeriod: "per month, billed annually",
+    features: [
+      "15,000 AI tokens/month",
+      "30 AI travel searches per month",
+      "Up to 15 team members",
+      "Standard AI travel planning",
+      "Priority email support",
+      "Advanced expense tracking",
+      "Enhanced itinerary management",
+      "Standard travel policy templates",
+      "Basic CRM integration",
+    ],
+    cta: "Start 14-day trial",
+    badge: "Starter",
+    popular: true,
+    agentImage: "/agents/agent-emma.jpeg",
+    communityImages: ["/community/kelsey-lowe.webp", "/community/brianna-ware.webp", "/community/harriet-rojas.jpg"],
     bgGradient: "from-gray-50 to-gray-100",
   },
   {
     id: "pro",
     name: "Pro",
-    description: "For growing businesses ready to optimize their travel operations",
+    description: "For businesses ready to fully optimize their travel operations",
     price: "€89",
     annualPrice: "€79",
     period: "per month",
@@ -133,9 +148,9 @@ const pricingPlans = [
       "Advanced CRM intelligence",
     ],
     cta: "Contact us",
-    badge: "Most Popular",
-    popular: true,
-    agentImage: "/agents/kahn-avatar.png",
+    badge: "Advanced",
+    popular: false,
+    agentImage: "/agents/agent-marcus.jpeg",
     communityImages: [
       "/community/ammar-foley.webp",
       "/community/owen-harding.webp",
@@ -168,7 +183,7 @@ const pricingPlans = [
     cta: "Contact us",
     badge: "Enterprise",
     popular: false,
-    agentImage: "/agents/agent-5.png",
+    agentImage: "/agents/agent-alex.jpeg",
     communityImages: [
       "/community/ammar-foley.webp",
       "/community/owen-harding.webp",
@@ -182,12 +197,28 @@ const pricingPlans = [
   },
 ]
 
-// Mini Chat Component for each plan
+// Mini Chat Component para cada plan - Ahora con diferentes agentes y textos
 const MiniChat = ({ planId }: { planId: string }) => {
   const [typedText, setTypedText] = useState("")
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
   const placeholders = chatPlaceholders[planId as keyof typeof chatPlaceholders] || chatPlaceholders.free
+
+  // Asignar un agente diferente a cada plan
+  const getAgentImage = () => {
+    switch (planId) {
+      case "free":
+        return "/agents/agent-sophia.jpeg"
+      case "basic":
+        return "/agents/agent-emma.jpeg"
+      case "pro":
+        return "/agents/agent-marcus.jpeg"
+      case "enterprise":
+        return "/agents/agent-alex.jpeg"
+      default:
+        return "/agents/agent-sophia.jpeg"
+    }
+  }
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
@@ -226,17 +257,7 @@ const MiniChat = ({ planId }: { planId: string }) => {
     <div className="relative flex items-center gap-1 p-1 rounded-lg border border-gray-300 bg-white shadow-sm text-[9px] sm:text-[10px] mt-3">
       <div className="relative w-5 h-5 sm:w-6 sm:h-6 overflow-hidden rounded-full border border-gray-300 ml-1">
         <Image
-          src={
-            planId === "beta"
-              ? "/agents/agent-2.png"
-              : planId === "free"
-                ? "/agents/agent-1.png"
-                : planId === "early"
-                  ? "/agents/kahn-avatar.png"
-                  : planId === "startups"
-                    ? "/agents/agent-13.png"
-                    : "/agents/agent-5.png"
-          }
+          src={getAgentImage() || "/placeholder.svg"}
           alt="Agent"
           width={24}
           height={24}
@@ -338,10 +359,6 @@ const MissionValues = () => {
   )
 }
 
-{
-  /* FAQ Section */
-}
-
 export const Plans = () => {
   const [randomTitle, setRandomTitle] = useState("")
   const [randomSubtitle, setRandomSubtitle] = useState("")
@@ -418,15 +435,16 @@ export const Plans = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
+        {/* Grid modificado para 2x2 en pantallas grandes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
           {pricingPlans.map((plan, index) => (
             <motion.div
               key={plan.id}
-              className={`relative overflow-hidden bg-gradient-to-br ${plan.bgGradient} border border-black rounded-xl p-4 sm:p-5 flex flex-col h-full ${
+              className={`relative overflow-hidden bg-gradient-to-br ${plan.bgGradient} border border-black rounded-xl p-3 sm:p-4 flex flex-col h-full ${
                 plan.popular ? "border-2 shadow-lg" : "border shadow-sm"
               }`}
               whileHover={{
-                y: -8,
+                y: -4,
                 boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                 transition: { duration: 0.2 },
               }}
@@ -434,36 +452,36 @@ export const Plans = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              {/* Removed the VC Focused ribbon for Venture plan */}
-
-              <div className="mb-3 sm:mb-4 flex items-start justify-between">
+              {/* Diseño más compacto */}
+              <div className="mb-2 sm:mb-3 flex items-start justify-between">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-medium tracking-tighter text-black">{plan.name}</h3>
-                  <p className="text-[10px] sm:text-xs text-gray-600 mt-1 line-clamp-2">{plan.description}</p>
+                  <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">{plan.name}</h3>
+                  <p className="text-[9px] sm:text-[10px] text-gray-600 mt-0.5 line-clamp-2">{plan.description}</p>
                 </div>
                 {plan.badge && (
-                  <span className="inline-flex items-center rounded-xl bg-transparent border border-black px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-black">
+                  <span className="inline-flex items-center rounded-xl bg-transparent border border-black px-2 py-0.5 text-[8px] sm:text-[9px] font-medium text-black">
                     {plan.badge}
                   </span>
                 )}
               </div>
 
-              <div className="mb-3 sm:mb-4">
+              <div className="mb-2 sm:mb-3">
                 <div className="flex items-baseline">
-                  <span className="text-3xl sm:text-4xl font-medium tracking-tighter text-black">
+                  <span className="text-2xl sm:text-3xl font-medium tracking-tighter text-black">
                     {isAnnual ? plan.annualPrice : plan.price}
                   </span>
-                  <span className="text-[10px] sm:text-xs text-gray-500 ml-1">
+                  <span className="text-[9px] sm:text-[10px] text-gray-500 ml-1">
                     /{isAnnual ? plan.annualPeriod : plan.period}
                   </span>
                 </div>
               </div>
 
-              <ul className="space-y-2 mb-4 sm:mb-6 flex-grow">
+              {/* Features más compactas */}
+              <ul className="space-y-1 mb-3 sm:mb-4 flex-grow">
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start">
                     <svg
-                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-950 mt-0.5 mr-2 flex-shrink-0"
+                      className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-950 mt-0.5 mr-1.5 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -471,25 +489,25 @@ export const Plans = () => {
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <span className="text-[10px] sm:text-xs font-medium text-gray-700">{feature}</span>
+                    <span className="text-[9px] sm:text-[10px] font-medium text-gray-700">{feature}</span>
                   </li>
                 ))}
               </ul>
 
-              {/* Mini Chat UI */}
+              {/* Mini Chat UI con agente específico */}
               <MiniChat planId={plan.id} />
 
-              {/* Community Carousel - only for non-beta plans */}
+              {/* Community Carousel - solo para planes no beta */}
               {plan.id !== "beta" && plan.communityImages && <CommunityCarousel images={plan.communityImages} />}
 
-              <div className="mt-4">
+              <div className="mt-3">
                 <Link
                   href={
                     plan.id === "enterprise" || plan.id === "pro"
                       ? "mailto:hello@suitpax.com"
                       : "https://app.suitpax.com/sign-up"
                   }
-                  className={`w-full py-2 px-4 rounded-xl text-center text-[10px] sm:text-xs font-medium transition-colors ${
+                  className={`w-full py-1.5 px-3 rounded-xl text-center text-[9px] sm:text-[10px] font-medium transition-colors ${
                     plan.popular
                       ? "bg-black text-white hover:bg-gray-800"
                       : "bg-transparent border border-black text-black hover:bg-gray-100"
@@ -515,13 +533,20 @@ export const Plans = () => {
           <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-6 text-center">
             AI Token Usage {isAnnual ? "(Annual Plans)" : "(Monthly Plans)"}
           </h3>
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-3xl mx-auto">
+          <div className="grid grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
             <div className="text-center">
               <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
                 <div className="bg-emerald-950 h-1 w-1/5 rounded-full"></div>
               </div>
               <p className="text-[10px] sm:text-xs font-medium">Free</p>
               <p className="text-[8px] sm:text-[10px] text-gray-500">5K tokens</p>
+            </div>
+            <div className="text-center">
+              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
+                <div className="bg-emerald-950 h-1 w-1/3 rounded-full"></div>
+              </div>
+              <p className="text-[10px] sm:text-xs font-medium">Basic</p>
+              <p className="text-[8px] sm:text-[10px] text-gray-500">15K tokens</p>
             </div>
             <div className="text-center">
               <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">

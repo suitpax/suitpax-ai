@@ -92,6 +92,14 @@ const titleVariations = [
   "Workforce travel management reimagined for modern business.",
   "AI-travel intelligence built for business efficiency.",
   "The business platform that makes workforce travel effortless.",
+  // Nuevos títulos sobre TMS (Travel Management System)
+  "TMS reimagined: AI-powered travel management like never before.",
+  "The TMS revolution: Where artificial intelligence meets travel expertise.",
+  "Next-generation TMS with AI agents that think like your travel team.",
+  "TMS evolved: AI-first travel management for the modern enterprise.",
+  "Beyond traditional TMS: AI-driven travel intelligence for smart businesses.",
+  "The future of TMS is here: AI agents managing your entire travel ecosystem.",
+  "TMS redefined: Intelligent automation meets human-centered travel design.",
 ]
 
 // Badge update messages with time-based logic

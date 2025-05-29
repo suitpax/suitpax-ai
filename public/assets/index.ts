@@ -74,6 +74,16 @@ export const agentAssets = {
   agent54: "/agents/agent-54.png",
   agent55: "/agents/agent-55.png",
   agent56: "/agents/agent-56.png",
+
+  // New AI Agents for Plans
+  agentMarcus: "/agents/agent-marcus.jpeg",
+  agentSophia: "/agents/agent-sophia.jpeg",
+  agentEmma: "/agents/agent-emma.jpeg",
+  agentAlex: "/agents/agent-alex.jpeg",
+  agentZara: "/agents/agent-zara.jpeg",
+  agentLuna: "/agents/agent-luna.jpeg",
+  agentKai: "/agents/agent-kai.jpeg",
+
   kahnAvatar: "/agents/kahn-avatar.png",
 }
 
