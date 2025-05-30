@@ -132,7 +132,7 @@ const pricingPlans = [
     name: "Pro",
     description: "For businesses ready to fully optimize their travel operations",
     price: "€89",
-    annualPrice: "€79",
+    annualPrice: "€71",
     period: "per month",
     annualPeriod: "per month, billed annually",
     features: [

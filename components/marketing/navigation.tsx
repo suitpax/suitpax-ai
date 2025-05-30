@@ -112,7 +112,6 @@ export const Navigation = () => {
                 className="px-2.5 py-1.5 text-sm text-black hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors flex items-center gap-1"
               >
                 <PiUserBold className="h-3.5 w-3.5" />
-                Sign in
               </Link>
               <Link
                 href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
@@ -125,13 +124,13 @@ export const Navigation = () => {
 
             {/* Action Buttons */}
             <div className="flex items-center space-x-2">
-              {/* Pre-register Button (visible on all devices) */}
+              {/* Private Beta Button */}
               <Button
                 asChild
                 className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
               >
                 <Link href="mailto:suitpax.com">
-                  Beta access
+                  Private Beta
                   <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
                 </Link>
               </Button>
@@ -194,7 +193,7 @@ export const Navigation = () => {
                     </Link>
                   </div>
 
-                  {/* Suitpax Deck Link - ACTUALIZADO */}
+                  {/* Suitpax Deck Link */}
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
                       href="https://pitch-suitpax.vercel.app"
@@ -235,17 +234,16 @@ export const Navigation = () => {
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <PiUserBold className="h-4 w-4 mr-1.5" />
-                      Sign in
                     </Link>
                   </div>
 
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
-                      href="https://app.suitpax.com/sign-up"
+                      href="mailto:suitpax.com"
                       className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-gray-500 rounded-md transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      Pre-register
+                      <PiArrowUpRightBold className="h-4 w-4 mr-1.5" />
                     </Link>
                   </div>
                 </div>

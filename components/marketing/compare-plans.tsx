@@ -14,29 +14,26 @@ const featureCategories = [
       {
         name: "Monthly AI Tokens",
         description: "Number of AI tokens available for use each month",
-        beta: "5,000",
         free: "5,000",
-        startups: "15,000",
-        enterprise: "50,000",
-        pioneers: "Unlimited",
+        basic: "15,000",
+        pro: "25,000",
+        enterprise: "Unlimited",
       },
       {
         name: "AI Travel Searches",
         description: "Number of AI-powered travel searches per month",
-        beta: "10/month",
         free: "10/month",
-        startups: "30/month",
-        enterprise: "50/month",
-        pioneers: "Unlimited",
+        basic: "30/month",
+        pro: "50/month",
+        enterprise: "Unlimited",
       },
       {
         name: "Token Rollover",
         description: "Unused tokens roll over to the next month",
-        beta: false,
         free: false,
-        startups: false,
+        basic: false,
+        pro: false,
         enterprise: true,
-        pioneers: "N/A",
       },
     ],
   },
@@ -46,70 +43,26 @@ const featureCategories = [
       {
         name: "Itinerary Management",
         description: "Create, edit, and manage travel itineraries",
-        beta: "Basic",
         free: "Basic",
-        startups: "Advanced",
+        basic: "Standard",
+        pro: "Enhanced",
         enterprise: "Advanced",
-        pioneers: "Enterprise",
       },
       {
         name: "Travel Policies",
         description: "Set and enforce travel policies for your team",
-        beta: false,
-        free: "Basic",
-        startups: "Custom",
-        enterprise: "Multi-entity",
-        pioneers: "Global",
+        free: "Basic templates",
+        basic: "Standard templates",
+        pro: "Custom policies",
+        enterprise: "Global compliance",
       },
       {
         name: "Expense Tracking",
         description: "Track and manage travel expenses",
-        beta: "Basic",
         free: "Basic",
-        startups: "Advanced",
-        enterprise: "Portfolio-wide",
-        pioneers: "Enterprise",
-      },
-    ],
-  },
-  {
-    name: "AI Travel Agents",
-    features: [
-      {
-        name: "Basic Travel Planning",
-        description: "AI-powered travel planning capabilities",
-        beta: true,
-        free: true,
-        startups: true,
-        enterprise: true,
-        pioneers: true,
-      },
-      {
-        name: "Advanced AI Features",
-        description: "Enhanced AI capabilities for complex travel scenarios",
-        beta: false,
-        free: false,
-        startups: "Basic",
-        enterprise: "Advanced",
-        pioneers: "Enterprise",
-      },
-      {
-        name: "CRM Intelligence",
-        description: "AI-powered CRM insights for travel management",
-        beta: false,
-        free: false,
-        startups: "Basic",
-        enterprise: "Business-focused",
-        pioneers: "Enterprise",
-      },
-      {
-        name: "Custom AI Workflows",
-        description: "Create custom AI workflows for your business",
-        beta: false,
-        free: false,
-        startups: false,
-        enterprise: "Limited",
-        pioneers: "Unlimited",
+        basic: "Advanced",
+        pro: "AI-powered",
+        enterprise: "Enterprise-grade",
       },
     ],
   },
@@ -119,29 +72,26 @@ const featureCategories = [
       {
         name: "Team Members",
         description: "Number of team members allowed on the plan",
-        beta: "3",
         free: "5",
-        startups: "20",
-        enterprise: "30",
-        pioneers: "Unlimited",
+        basic: "15",
+        pro: "25",
+        enterprise: "Unlimited",
       },
       {
         name: "Team Coordination",
         description: "Coordinate travel for multiple team members",
-        beta: "Basic",
         free: "Basic",
-        startups: "Advanced",
-        enterprise: "Business-wide",
-        pioneers: "Global",
+        basic: "Standard",
+        pro: "Advanced",
+        enterprise: "Global",
       },
       {
         name: "Multi-Entity Management",
         description: "Manage travel across multiple business entities",
-        beta: false,
         free: false,
-        startups: false,
+        basic: false,
+        pro: false,
         enterprise: true,
-        pioneers: true,
       },
     ],
   },
@@ -151,79 +101,26 @@ const featureCategories = [
       {
         name: "Customer Support",
         description: "Access to customer support",
-        beta: "Email",
         free: "Email",
-        startups: "24/5 Priority",
-        enterprise: "24/5 Priority",
-        pioneers: "24/7 VIP",
+        basic: "Priority email",
+        pro: "24/5 Priority",
+        enterprise: "24/7 VIP",
       },
       {
         name: "Bank API Integration",
         description: "Connect bank accounts for seamless expense management",
-        beta: false,
         free: false,
-        startups: "Basic",
-        enterprise: "Advanced",
-        pioneers: "Full",
+        basic: "Basic",
+        pro: "Basic",
+        enterprise: "Full",
       },
       {
         name: "CRM Integration",
         description: "Connect with CRM systems for better customer insights",
-        beta: false,
         free: false,
-        startups: "Basic",
-        enterprise: "Business-focused",
-        pioneers: "Enterprise",
-      },
-      {
-        name: "Data Export & Reporting",
-        description: "Export travel data and generate custom reports",
-        beta: false,
-        free: "Basic CSV",
-        startups: "Advanced",
-        enterprise: "Custom Reports",
-        pioneers: "Enterprise Analytics",
-      },
-    ],
-  },
-  {
-    name: "Security & Compliance",
-    features: [
-      {
-        name: "Data Encryption",
-        description: "End-to-end encryption for all your travel data",
-        beta: true,
-        free: true,
-        startups: true,
-        enterprise: true,
-        pioneers: true,
-      },
-      {
-        name: "SSO Integration",
-        description: "Single Sign-On integration with your identity provider",
-        beta: false,
-        free: false,
-        startups: false,
-        enterprise: true,
-        pioneers: true,
-      },
-      {
-        name: "Compliance Reporting",
-        description: "Reports to ensure compliance with travel policies",
-        beta: false,
-        free: false,
-        startups: "Basic",
-        enterprise: "Advanced",
-        pioneers: "Enterprise",
-      },
-      {
-        name: "Audit Logs",
-        description: "Detailed logs of all actions taken in the platform",
-        beta: false,
-        free: false,
-        startups: "30 days",
-        enterprise: "90 days",
-        pioneers: "Unlimited",
+        basic: "Basic",
+        pro: "Advanced",
+        enterprise: "Enterprise",
       },
     ],
   },
@@ -301,46 +198,37 @@ export function ComparePlans() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b bg-gray-50">
-                    <th className="py-4 px-4 text-left w-1/6"></th>
-                    <th className="py-4 px-4 text-center w-1/6">
-                      <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium">Beta Access</span>
-                        <span className="text-xs text-gray-500">Limited</span>
-                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-black px-3 py-0.5 text-[10px] font-medium text-black">
-                          Beta
-                        </span>
-                      </div>
-                    </th>
-                    <th className="py-4 px-4 text-center w-1/6">
+                    <th className="py-4 px-4 text-left w-1/5"></th>
+                    <th className="py-4 px-4 text-center w-1/5">
                       <div className="flex flex-col items-center">
                         <span className="text-sm font-medium">Free</span>
-                        <span className="text-xs text-gray-500">$0</span>
+                        <span className="text-xs text-gray-500">€0</span>
                         <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-black px-3 py-0.5 text-[10px] font-medium text-black">
-                          Basic
+                          Free
                         </span>
                       </div>
                     </th>
-                    <th className="py-4 px-4 text-center w-1/6 bg-gray-50">
+                    <th className="py-4 px-4 text-center w-1/5 bg-gray-50">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium">Early</span>
-                        <span className="text-xs text-gray-500">{isAnnual ? "$39/month" : "$49/month"}</span>
+                        <span className="text-sm font-medium">Basic</span>
+                        <span className="text-xs text-gray-500">{isAnnual ? "€39/month" : "€49/month"}</span>
                         <span className="mt-1 inline-flex items-center rounded-full bg-black px-4 py-0.5 text-[10px] font-medium text-white">
                           Most Popular
                         </span>
                       </div>
                     </th>
-                    <th className="py-4 px-4 text-center w-1/6 bg-gray-50">
+                    <th className="py-4 px-4 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium">Startups</span>
-                        <span className="text-xs text-gray-500">{isAnnual ? "$99/month" : "$129/month"}</span>
+                        <span className="text-sm font-medium">Pro</span>
+                        <span className="text-xs text-gray-500">{isAnnual ? "€71/month" : "€89/month"}</span>
                         <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-black px-3 py-0.5 text-[10px] font-medium text-black">
-                          Growing Business
+                          Advanced
                         </span>
                       </div>
                     </th>
-                    <th className="py-4 px-4 text-center w-1/6">
+                    <th className="py-4 px-4 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium">Unicorn</span>
+                        <span className="text-sm font-medium">Enterprise</span>
                         <span className="text-xs text-gray-500">Custom pricing</span>
                         <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-black px-3 py-0.5 text-[10px] font-medium text-black">
                           Enterprise
@@ -397,13 +285,10 @@ export function ComparePlans() {
                                 </Tooltip>
                               </div>
                             </td>
-                            <td className="py-3 px-4 text-center">{renderFeatureValue(feature.beta)}</td>
                             <td className="py-3 px-4 text-center">{renderFeatureValue(feature.free)}</td>
-                            <td className="py-3 px-4 text-center bg-gray-50">{renderFeatureValue(feature.startups)}</td>
-                            <td className="py-3 px-4 text-center bg-gray-50">
-                              {renderFeatureValue(feature.enterprise)}
-                            </td>
-                            <td className="py-3 px-4 text-center">{renderFeatureValue(feature.pioneers)}</td>
+                            <td className="py-3 px-4 text-center bg-gray-50">{renderFeatureValue(feature.basic)}</td>
+                            <td className="py-3 px-4 text-center">{renderFeatureValue(feature.pro)}</td>
+                            <td className="py-3 px-4 text-center">{renderFeatureValue(feature.enterprise)}</td>
                           </motion.tr>
                         ))}
                     </React.Fragment>
