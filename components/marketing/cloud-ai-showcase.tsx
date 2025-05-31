@@ -35,15 +35,11 @@ export default function CloudAIShowcase() {
 
       // Si hay texto nuevo, activar el efecto brillante en los badges
       if (text && text.length > 0) {
-        // Activar el efecto en el badge de vuelo
         setHighlightFlight(true)
-
-        // Después de un breve retraso, activar el efecto en el badge de transporte
         setTimeout(() => {
           setHighlightTransport(true)
         }, 300)
 
-        // Desactivar los efectos después de un tiempo
         setTimeout(() => {
           setHighlightFlight(false)
         }, 2000)
@@ -169,11 +165,11 @@ export default function CloudAIShowcase() {
 
                   {/* Input de texto con reconocimiento de voz */}
                   <div ref={inputRef} className="flex-1 py-2 px-2 text-xs text-gray-900 h-10 flex items-center">
-                    {transcript || inputText ? (
-                      <span className="inline-block text-xs text-gray-900 font-medium">{transcript || inputText}</span>
-                    ) : (
+                    {isListening && transcript ? (
+                      <span className="inline-block text-xs text-gray-900 font-medium">{transcript}</span>
+                    ) : !isListening && !transcript ? (
                       <span className="inline-block text-xs text-gray-400">{voicePlaceholder}</span>
-                    )}
+                    ) : null}
                   </div>
 
                   {/* Botón de micrófono con indicador de escucha */}
