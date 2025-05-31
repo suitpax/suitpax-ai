@@ -3,28 +3,16 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
-import { PiArrowRightBold, PiSparkle, PiLightningBold, PiRocketLaunchBold } from "react-icons/pi"
+import { PiSparkle, PiRocket, PiLightning } from "react-icons/pi"
 
 export default function DisruptionCard() {
   const [isVisible, setIsVisible] = useState(false)
-  const [currentFeature, setCurrentFeature] = useState(0)
+  const [currentMessage, setCurrentMessage] = useState(0)
 
-  const features = [
-    {
-      icon: PiLightningBold,
-      title: "Instant Booking",
-      description: "AI-powered flight and hotel booking in seconds",
-    },
-    {
-      icon: PiSparkle,
-      title: "Smart Policies",
-      description: "Automated compliance with dynamic policy enforcement",
-    },
-    {
-      icon: PiRocketLaunchBold,
-      title: "Future Ready",
-      description: "Next-generation travel management platform",
-    },
+  const messages = [
+    "We're ready to disrupt the industry. Trust me...",
+    "The future of business travel starts here.",
+    "AI-powered. Human-centered. Revolutionary.",
   ]
 
   useEffect(() => {
@@ -36,242 +24,225 @@ export default function DisruptionCard() {
   }, [])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentFeature((prev) => (prev + 1) % features.length)
-    }, 3000)
+    if (isVisible) {
+      const interval = setInterval(() => {
+        setCurrentMessage((prev) => (prev + 1) % messages.length)
+      }, 4000)
 
-    return () => clearInterval(interval)
-  }, [features.length])
+      return () => clearInterval(interval)
+    }
+  }, [isVisible, messages.length])
 
   return (
     <section className="w-full py-12 md:py-24">
       <div className="container px-4 md:px-6 mx-auto">
-        {/* Header */}
-        <div className="flex flex-col items-center text-center space-y-4 mb-12">
+        <div className="flex flex-col items-center text-center space-y-4 mb-8">
           <div className="flex justify-center items-center gap-1.5 mb-3">
             <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
               <PiSparkle className="h-2.5 w-2.5 mr-1" />
-              Vision 2025
+              Vision
             </span>
             <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
               <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse mr-1"></span>
+              Future
+            </span>
+            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
+              <PiRocket className="h-2.5 w-2.5 mr-1" />
               Innovation
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl mx-auto">
-            Redefining business travel through innovation
+            The crystal clear future of business travel
           </h2>
-          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-3xl">
-            We're not just building another travel platform. We're creating the future of how businesses manage, book,
-            and optimize their travel operations with cutting-edge AI technology.
+          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl">
+            Transparency, innovation, and revolutionary technology converging to reshape how companies manage travel
+          </p>
+          <p className="mt-2 text-xs font-light text-gray-500 max-w-3xl">
+            Like light refracting through crystal, our AI illuminates every aspect of your travel program with
+            unprecedented clarity and precision
           </p>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          {/* Left Side - Features */}
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-xl md:text-2xl font-medium tracking-tighter text-black">The Crystal Clear Future</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Like a crystal cube that refracts light into infinite possibilities, Suitpax transforms complex travel
-                management into clear, actionable insights. Every booking, every expense, every policy decision becomes
-                transparent and optimized.
+        <div className="relative h-[600px] w-full rounded-2xl overflow-hidden border border-gray-200 shadow-xl">
+          {/* Imagen de fondo */}
+          <Image
+            src="/images/glass-cube-reflection.jpeg"
+            alt="Glass Cube Reflection - The Future of Business Travel"
+            fill
+            className="object-cover"
+            priority
+          />
+
+          {/* Overlay gradiente para mejor legibilidad */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+
+          {/* Contenido principal */}
+          <div className="absolute inset-0 flex flex-col items-center justify-between p-6 md:p-8">
+            {/* Header con badges */}
+            <div className="w-full flex justify-between items-start">
+              <div className="flex flex-col gap-2">
+                <span className="inline-flex items-center rounded-full bg-white/10 backdrop-blur-md px-3 py-1 text-xs font-medium text-white border border-white/20">
+                  <PiLightning className="h-3 w-3 mr-1" />
+                  Suitpax Vision 2025
+                </span>
+                <span className="inline-flex items-center rounded-full bg-white/10 backdrop-blur-md px-3 py-1 text-[10px] font-medium text-white border border-white/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5 animate-pulse"></span>
+                  Live Innovation
+                </span>
+              </div>
+              <motion.div
+                className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 cursor-pointer"
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                transition={{ duration: 0.2 }}
+              >
+                <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </motion.div>
+            </div>
+
+            {/* Título central */}
+            <div className="text-center">
+              <h3 className="text-3xl md:text-4xl lg:text-5xl font-serif tracking-tighter text-white mb-4 leading-tight">
+                Clarity in a complex world
+              </h3>
+              <p className="text-sm md:text-base text-white/80 max-w-2xl mx-auto leading-relaxed">
+                Every facet of business travel, illuminated by artificial intelligence
               </p>
             </div>
 
-            {/* Rotating Features */}
-            <div className="space-y-3">
-              {features.map((feature, index) => {
-                const Icon = feature.icon
-                return (
-                  <motion.div
-                    key={index}
-                    className={`p-4 rounded-xl border transition-all duration-500 ${
-                      currentFeature === index
-                        ? "bg-black text-white border-black shadow-lg"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
-                    }`}
-                    animate={{
-                      scale: currentFeature === index ? 1.02 : 1,
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          currentFeature === index ? "bg-white/20" : "bg-gray-100"
-                        }`}
-                      >
-                        <Icon className={`w-5 h-5 ${currentFeature === index ? "text-white" : "text-gray-700"}`} />
+            {/* Mini chat dinámico */}
+            <AnimatePresence mode="wait">
+              {isVisible && (
+                <motion.div
+                  key={currentMessage}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="bg-white/15 backdrop-blur-md rounded-2xl p-4 md:p-5 border border-white/30 shadow-2xl max-w-lg mx-auto"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-white/30 shadow-lg">
+                      <Image
+                        src="/agents/agent-42.png"
+                        alt="Suitpax AI Agent"
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="bg-white/25 backdrop-blur-md rounded-xl p-3 text-white text-sm md:text-base shadow-lg">
+                        <motion.p
+                          key={currentMessage}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.5 }}
+                          className="leading-relaxed"
+                        >
+                          {messages[currentMessage]}
+                        </motion.p>
                       </div>
-                      <div>
-                        <h4 className="font-medium text-sm">{feature.title}</h4>
-                        <p className={`text-xs ${currentFeature === index ? "text-white/80" : "text-gray-500"}`}>
-                          {feature.description}
-                        </p>
+                      <div className="mt-2 flex items-center justify-between">
+                        <div className="flex items-center">
+                          <p className="text-xs text-white/70 font-medium">Suitpax AI</p>
+                          <span className="mx-2 text-white/40">•</span>
+                          <p className="text-xs text-white/70">Just now</p>
+                        </div>
+                        <div className="flex space-x-1">
+                          {messages.map((_, index) => (
+                            <div
+                              key={index}
+                              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                                index === currentMessage ? "bg-white" : "bg-white/30"
+                              }`}
+                            />
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </motion.div>
-                )
-              })}
-            </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">
-              <div className="text-center">
-                <div className="text-2xl font-medium tracking-tighter text-black">98%</div>
-                <div className="text-xs text-gray-500">Policy Compliance</div>
+            {/* Footer con estadísticas */}
+            <div className="w-full flex justify-between items-end">
+              <div className="flex flex-col items-start">
+                <span className="text-xs text-white/70 mb-1">Suitpax</span>
+                <span className="text-sm md:text-base font-medium text-white font-serif tracking-tighter">
+                  Redefining Business Travel
+                </span>
+                <div className="flex items-center gap-4 mt-2">
+                  <span className="text-xs text-white/60">98.5% Accuracy</span>
+                  <span className="text-xs text-white/60">150+ Countries</span>
+                  <span className="text-xs text-white/60">24/7 Support</span>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-medium tracking-tighter text-black">3.2s</div>
-                <div className="text-xs text-gray-500">Avg. Booking Time</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-medium tracking-tighter text-black">24%</div>
-                <div className="text-xs text-gray-500">Cost Reduction</div>
+              <div className="flex flex-col items-end gap-2">
+                <span className="inline-flex items-center rounded-full bg-white/10 backdrop-blur-md px-3 py-1 text-xs font-medium text-white border border-white/20">
+                  2025
+                </span>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-white/10 backdrop-blur-md text-white text-xs font-medium px-4 py-2 rounded-full border border-white/20 hover:bg-white/20 transition-colors"
+                >
+                  Explore Vision
+                </motion.button>
               </div>
             </div>
           </div>
 
-          {/* Right Side - Visual */}
-          <div className="relative">
-            <div className="relative h-[600px] w-full rounded-2xl overflow-hidden">
-              {/* Background Image */}
-              <Image
-                src="/images/glass-cube-reflection.jpeg"
-                alt="Glass Cube Reflection"
-                fill
-                className="object-cover"
-                priority
-              />
-
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-
-              {/* Content Overlay */}
-              <div className="absolute inset-0 flex flex-col justify-between p-6">
-                {/* Top Badge */}
-                <div className="flex justify-between items-start">
-                  <span className="inline-flex items-center rounded-full bg-white/10 backdrop-blur-md px-3 py-1 text-[10px] font-medium text-white border border-white/20">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white mr-1.5 animate-pulse"></span>
-                    Live Innovation
-                  </span>
-                  <motion.div
-                    className="h-8 w-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 cursor-pointer"
-                    whileHover={{ scale: 1.1, rotate: 90 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <PiArrowRightBold className="h-4 w-4 text-white" />
-                  </motion.div>
-                </div>
-
-                {/* Center Content */}
-                <div className="flex-1 flex items-center justify-center">
-                  <AnimatePresence mode="wait">
-                    {isVisible && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                        className="bg-white/15 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl max-w-sm mx-auto"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border-2 border-white/30">
-                            <Image
-                              src="/agents/agent-42.png"
-                              alt="AI Agent"
-                              width={48}
-                              height={48}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <div className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-white text-sm mb-2">
-                              <p className="leading-relaxed">
-                                "We're ready to disrupt the industry. The future of business travel starts with
-                                transparency, intelligence, and seamless experiences. Trust me..."
-                              </p>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="text-xs text-white/90 font-medium">Suitpax AI</p>
-                                <p className="text-xs text-white/60">Chief Innovation Officer</p>
-                              </div>
-                              <span className="text-xs text-white/60">Just now</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Typing indicator */}
-                        <motion.div
-                          className="flex items-center gap-1 mt-3 px-3"
-                          animate={{ opacity: [0.5, 1, 0.5] }}
-                          transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2 }}
-                        >
-                          <div className="w-1 h-1 rounded-full bg-white/60"></div>
-                          <div className="w-1 h-1 rounded-full bg-white/60"></div>
-                          <div className="w-1 h-1 rounded-full bg-white/60"></div>
-                          <span className="text-xs text-white/60 ml-2">AI is thinking...</span>
-                        </motion.div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Bottom Content */}
-                <div className="flex justify-between items-end">
-                  <div>
-                    <h4 className="text-lg font-serif text-white tracking-tighter mb-1">Crystal Clear Vision</h4>
-                    <p className="text-xs text-white/70">Transforming complexity into clarity</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="inline-flex items-center rounded-xl bg-white/10 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-medium text-white border border-white/20">
-                      2025 Vision
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Elements */}
-              <motion.div
-                className="absolute top-20 right-20 w-3 h-3 rounded-full bg-white/30"
-                animate={{
-                  y: [0, -10, 0],
-                  opacity: [0.3, 0.8, 0.3],
-                }}
-                transition={{
-                  repeat: Number.POSITIVE_INFINITY,
-                  duration: 3,
-                  delay: 0,
-                }}
-              />
-              <motion.div
-                className="absolute bottom-32 left-16 w-2 h-2 rounded-full bg-white/40"
-                animate={{
-                  y: [0, -8, 0],
-                  opacity: [0.4, 0.9, 0.4],
-                }}
-                transition={{
-                  repeat: Number.POSITIVE_INFINITY,
-                  duration: 2.5,
-                  delay: 1,
-                }}
-              />
-            </div>
-          </div>
+          {/* Efectos de luz adicionales */}
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-blue-400/10 rounded-full blur-2xl"></div>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-12 text-center">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-black text-white text-sm font-medium px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors inline-flex items-center gap-2"
+        {/* Sección adicional de contenido */}
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            viewport={{ once: true }}
+            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
           >
-            Experience the Future
-            <PiArrowRightBold className="w-4 h-4" />
-          </motion.button>
+            <PiSparkle className="h-8 w-8 text-gray-700 mb-4" />
+            <h4 className="text-lg font-medium tracking-tighter text-black mb-2">Crystal Clear Insights</h4>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Every travel decision illuminated with AI-powered analytics and real-time data visualization.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            viewport={{ once: true }}
+            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+          >
+            <PiRocket className="h-8 w-8 text-gray-700 mb-4" />
+            <h4 className="text-lg font-medium tracking-tighter text-black mb-2">Revolutionary Technology</h4>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Cutting-edge AI that transforms complex travel management into simple, intelligent automation.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            viewport={{ once: true }}
+            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+          >
+            <PiLightning className="h-8 w-8 text-gray-700 mb-4" />
+            <h4 className="text-lg font-medium tracking-tighter text-black mb-2">Lightning Fast Results</h4>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Instant responses, real-time updates, and seamless integration across your entire travel ecosystem.
+            </p>
+          </motion.div>
         </div>
       </div>
     </section>

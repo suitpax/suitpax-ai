@@ -334,12 +334,6 @@ export const Footer = () => {
                 <span className="sr-only">Email</span>
               </Link>
             </div>
-            <div className="flex items-center gap-1 text-gray-400 text-xs mt-2">
-              <Plane className="h-3 w-3" />
-              <span>Airlines</span>
-              <Building2 className="h-3 w-3 ml-2" />
-              <span>Hotels</span>
-            </div>
 
             <div className="mt-auto">
               <p className="font-medium tracking-tighter text-gray-400 text-sm">
