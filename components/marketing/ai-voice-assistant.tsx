@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { motion } from "framer-motion"
+import { useState, useRef } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
-import { MdMic, MdMicOff, MdVolumeUp } from "react-icons/md"
+import { MdMic, MdMicOff, MdVolumeUp, MdSend } from "react-icons/md"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
 
 // Placeholder para el input de voz
@@ -50,12 +50,9 @@ export default function AIVoiceAssistant() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [conversationHistory, setConversationHistory] = useState<Array<{ type: "user" | "assistant"; text: string }>>(
-    [],
-  )
+  const [activeFeature, setActiveFeature] = useState("voice")
   const userInputRef = useRef<HTMLDivElement>(null)
   const assistantInputRef = useRef<HTMLDivElement>(null)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // Speech to text para el input del usuario
   const {
@@ -103,9 +100,6 @@ export default function AIVoiceAssistant() {
   const handleUserInput = async (input: string) => {
     setIsProcessing(true)
 
-    // Añadir al historial
-    setConversationHistory((prev) => [...prev, { type: "user", text: input }])
-
     // Simular tiempo de procesamiento más realista
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
@@ -147,39 +141,46 @@ export default function AIVoiceAssistant() {
     }
 
     setAssistantResponse(response)
-    setConversationHistory((prev) => [...prev, { type: "assistant", text: response }])
     setIsProcessing(false)
 
-    // Generar audio de la respuesta automáticamente
+    // Generar audio de la respuesta usando Web Speech API
     await generateSpeech(response)
   }
 
-  // Función para generar voz usando ElevenLabs
+  // Función para generar voz usando Web Speech API nativa
   const generateSpeech = async (text: string) => {
     try {
-      setIsPlaying(true)
-      const response = await fetch("/api/elevenlabs/text-to-speech", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text,
-          voiceId: "21m00Tcm4TlvDq8ikWAM", // Rachel voice (female English)
-          language: "en-US",
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`)
-      }
-
-      const audioBlob = await response.blob()
-      const audioUrl = URL.createObjectURL(audioBlob)
-
-      if (audioRef.current) {
-        audioRef.current.src = audioUrl
-        audioRef.current.play()
+      if ('speechSynthesis' in window) {
+        setIsPlaying(true)
+        
+        // Cancelar cualquier síntesis anterior
+        window.speechSynthesis.cancel()
+        
+        const utterance = new SpeechSynthesisUtterance(text)
+        utterance.lang = 'en-US'
+        utterance.rate = 0.9
+        utterance.pitch = 1.1
+        utterance.volume = 0.8
+        
+        // Buscar una voz femenina en inglés
+        const voices = window.speechSynthesis.getVoices()
+        const femaleVoice = voices.find(voice => 
+          voice.lang.includes('en') && 
+          (voice.name.toLowerCase().includes('female') || 
+           voice.name.toLowerCase().includes('woman') ||
+           voice.name.toLowerCase().includes('samantha') ||
+           voice.name.toLowerCase().includes('karen') ||
+           voice.name.toLowerCase().includes('susan'))
+        ) || voices.find(voice => voice.lang.includes('en'))
+        
+        if (femaleVoice) {
+          utterance.voice = femaleVoice
+        }
+        
+        utterance.onend = () => setIsPlaying(false)
+        utterance.onerror = () => setIsPlaying(false)
+        
+        window.speechSynthesis.speak(utterance)
       }
     } catch (error) {
       console.error("Error generating speech:", error)
@@ -187,310 +188,333 @@ export default function AIVoiceAssistant() {
     }
   }
 
-  // Manejar eventos de audio
-  useEffect(() => {
-    if (audioRef.current) {
-      const audio = audioRef.current
-
-      const handleEnded = () => setIsPlaying(false)
-      const handleError = () => setIsPlaying(false)
-
-      audio.addEventListener("ended", handleEnded)
-      audio.addEventListener("error", handleError)
-
-      return () => {
-        audio.removeEventListener("ended", handleEnded)
-        audio.removeEventListener("error", handleError)
-      }
-    }
-  }, [])
+  const features = [
+    {
+      id: "voice",
+      title: "Voice Commands",
+      description: "Natural speech recognition",
+      icon: MdMic,
+      color: "bg-blue-500",
+    },
+    {
+      id: "responses",
+      title: "AI Responses",
+      description: "Intelligent voice replies",
+      icon: MdVolumeUp,
+      color: "bg-green-500",
+    },
+    {
+      id: "assistant",
+      title: "Personal Assistant",
+      description: "24/7 travel support",
+      icon: MdSend,
+      color: "bg-purple-500",
+    },
+  ]
 
   return (
-    <section className="w-full py-12 md:py-24 bg-gray-300 text-black">
+    <section className="w-full py-12 md:py-24 bg-gray-50 text-black">
       <div className="container px-4 md:px-6 mx-auto">
-        {/* Coordenadas decorativas como en el componente Hiring */}
-        <div className="absolute top-0 left-0 right-0 overflow-hidden whitespace-nowrap">
-          <div className="animate-marquee inline-block">
-            <div className="flex justify-between text-xs border-b border-black/20 pb-2 mb-8 w-[200%]">
-              <span>37° 46' 30.0"</span>
-              <span>N</span>
-              <span>122° 25' 09.0"</span>
-              <span>W</span>
-              <span>37.7750</span>
-              <span>↑</span>
-              <span>-122.4194</span>
-              <span>→</span>
-              <span>San Francisco</span>
-              <span>California</span>
-              <span>37° 46' 30.0"</span>
-              <span>N</span>
-              <span>122° 25' 09.0"</span>
-              <span>W</span>
-              <span>37.7750</span>
-              <span>↑</span>
-              <span>-122.4194</span>
-              <span>→</span>
-              <span>San Francisco</span>
-              <span>California</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-12">
-          {/* Suitpax symbol en el centro */}
+        <div className="text-center mb-12">
+          {/* Logo pequeño */}
           <div className="flex justify-center mb-4">
             <Image
-              src="/logo/suitpax-symbol-2.png"
-              alt="Suitpax Symbol"
-              width={30}
-              height={30}
-              className="rounded-lg"
+              src="/logo/suitpax-bl-logo.webp"
+              alt="Suitpax"
+              width={80}
+              height={20}
+              className="h-5 w-auto"
             />
           </div>
 
-          {/* Badges similares a AI Travel Agents */}
-          <div className="flex items-center gap-2 mb-4 justify-center">
-            <span className="inline-flex items-center rounded-xl bg-black/10 px-2.5 py-0.5 text-[10px] font-medium text-black">
+          {/* Badges */}
+          <div className="flex items-center gap-2 mb-6 justify-center">
+            <span className="inline-flex items-center rounded-xl bg-black/10 px-3 py-1 text-xs font-medium text-black">
               Voice Assistant
             </span>
-            <span className="inline-flex items-center rounded-xl bg-black/10 px-2.5 py-0.5 text-[9px] font-medium text-black">
-              <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse mr-1"></span>
+            <span className="inline-flex items-center rounded-xl bg-black/10 px-3 py-1 text-xs font-medium text-black">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse mr-2"></span>
               AI Powered
             </span>
           </div>
 
-          {/* Título principal con estilo similar a AI Travel Agents */}
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl text-center mx-auto mb-4">
+          {/* Título principal */}
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-black leading-none max-w-5xl mx-auto mb-6">
             Talk to your AI travel assistant
           </h2>
-          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl text-center mx-auto mb-12">
-            Speak naturally and get intelligent responses about flights, hotels, and expenses
+          <p className="text-sm sm:text-base font-medium text-gray-600 max-w-3xl mx-auto mb-8">
+            Experience the future of business travel with voice-enabled AI that understands your needs and responds instantly
           </p>
+        </div>
 
-          {/* Card principal con estilo del BusinessTravelPlatform */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-1">
-              <div className="space-y-2">
-                <button className="w-full text-left px-4 py-3 rounded-xl transition-all bg-gray-100 border border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-black text-white">
-                      <MdMic className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-sm">Voice Commands</h3>
-                      <p className="text-xs text-gray-500 line-clamp-1">Ask questions using your voice</p>
-                    </div>
+        {/* Layout principal responsive */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl mx-auto">
+          {/* Panel lateral de características */}
+          <div className="lg:col-span-4 space-y-4">
+            <h3 className="text-lg font-medium tracking-tighter text-black mb-4">Features</h3>
+            {features.map((feature) => (
+              <motion.button
+                key={feature.id}
+                onClick={() => setActiveFeature(feature.id)}
+                className={`w-full text-left p-4 rounded-xl transition-all border-2 ${
+                  activeFeature === feature.id
+                    ? "bg-white border-gray-300 shadow-lg"
+                    : "bg-white/50 border-gray-200 hover:bg-white hover:border-gray-300"
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-xl ${feature.color} text-white`}>
+                    <feature.icon className="w-5 h-5" />
                   </div>
-                </button>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-sm text-black">{feature.title}</h4>
+                    <p className="text-xs text-gray-600 mt-1">{feature.description}</p>
+                  </div>
+                  {activeFeature === feature.id && (
+                    <motion.div
+                      layoutId="activeIndicator"
+                      className="w-2 h-2 rounded-full bg-black"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                </div>
+              </motion.button>
+            ))}
 
-                <button className="w-full text-left px-4 py-3 rounded-xl transition-all hover:bg-gray-50">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gray-100 text-gray-700">
-                      <MdVolumeUp className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-sm">Voice Responses</h3>
-                      <p className="text-xs text-gray-500 line-clamp-1">Listen to AI responses</p>
-                    </div>
-                  </div>
-                </button>
-
-                <button className="w-full text-left px-4 py-3 rounded-xl transition-all hover:bg-gray-50">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gray-100 text-gray-700">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-sm">Personal Assistant</h3>
-                      <p className="text-xs text-gray-500 line-clamp-1">Tailored to your needs</p>
-                    </div>
-                  </div>
-                </button>
+            {/* Estadísticas */}
+            <div className="mt-8 p-4 bg-white rounded-xl border border-gray-200">
+              <h4 className="text-sm font-medium text-black mb-3">Voice AI Stats</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-600">Response Time</span>
+                  <span className="text-xs font-medium text-black">< 2s</span>\
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-600">Accuracy</span>
+                  <span className="text-xs font-medium text-black">98.5%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-600">Languages</span>
+                  <span className="text-xs font-medium text-black">12+</span>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div className="md:col-span-2">
-              <div className="h-full flex flex-col">
-                <div className="relative w-full pt-[56.25%] rounded-xl overflow-hidden mb-4">
-                  <div className="absolute inset-0 bg-cover bg-center bg-gray-100">
-                    <div className="absolute inset-0 bg-black/10"></div>
-
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-11/12 md:w-4/5 bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-gray-200">
-                        <div className="flex flex-col">
-                          {/* Header con avatar de Emma */}
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <div className="relative w-8 h-8 overflow-hidden rounded-full border border-gray-200">
-                                <Image
-                                  src="/agents/agent-emma.jpeg"
-                                  alt="Emma - AI Travel Assistant"
-                                  width={32}
-                                  height={32}
-                                  className="w-full h-full object-cover"
-                                />
-                                {isPlaying && (
-                                  <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-pulse"></div>
-                                )}
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-medium">Emma</h4>
-                                <span className="text-[10px] text-gray-500">AI Travel Assistant</span>
-                              </div>
-                            </div>
-                            <span className="text-[10px] font-medium text-gray-500">VOICE ENABLED</span>
-                          </div>
-
-                          {/* Input del usuario */}
-                          <div className="flex items-center gap-2 p-2 rounded-lg border border-gray-200 bg-gray-50 mb-3">
-                            <div
-                              ref={userInputRef}
-                              className="flex-1 py-1 px-2 text-xs text-gray-900 min-h-[24px] flex items-center"
-                            >
-                              {isListening && transcript ? (
-                                <motion.span
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  className="inline-block text-xs text-gray-900 font-medium"
-                                >
-                                  {transcript}
-                                </motion.span>
-                              ) : !isListening && !transcript ? (
-                                <span className="inline-block text-xs text-gray-400">{voicePlaceholder}</span>
-                              ) : null}
-                            </div>
-                            <button
-                              onClick={toggleListening}
-                              className={`flex items-center justify-center w-6 h-6 rounded-full transition-all ${
-                                isListening
-                                  ? "bg-red-500 text-white animate-pulse"
-                                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                              }`}
-                            >
-                              {isListening ? <MdMicOff className="h-3 w-3" /> : <MdMic className="h-3 w-3" />}
-                            </button>
-                          </div>
-
-                          {/* Respuesta del asistente */}
-                          <div className="flex items-start gap-2 p-2 rounded-lg border border-gray-200 bg-white">
-                            <div
-                              ref={assistantInputRef}
-                              className="flex-1 py-1 px-2 text-xs text-gray-900 flex items-start"
-                            >
-                              {isProcessing ? (
-                                <div className="flex items-center space-x-1">
-                                  <motion.div
-                                    animate={{ opacity: [0.4, 1, 0.4] }}
-                                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5 }}
-                                    className="flex space-x-1"
-                                  >
-                                    <div className="w-1 h-1 rounded-full bg-gray-400"></div>
-                                    <div className="w-1 h-1 rounded-full bg-gray-400"></div>
-                                    <div className="w-1 h-1 rounded-full bg-gray-400"></div>
-                                  </motion.div>
-                                  <span className="text-xs text-gray-500 ml-2">Thinking...</span>
-                                </div>
-                              ) : assistantResponse ? (
-                                <motion.span
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  className="inline-block text-xs text-gray-900 leading-relaxed"
-                                >
-                                  {assistantResponse}
-                                </motion.span>
-                              ) : (
-                                <span className="inline-block text-xs text-gray-400">
-                                  Ask me anything about your business travel...
-                                </span>
-                              )}
-                            </div>
-                            {assistantResponse && (
-                              <button
-                                onClick={() => generateSpeech(assistantResponse)}
-                                className={`flex items-center justify-center w-6 h-6 rounded-full transition-all ${
-                                  isPlaying
-                                    ? "bg-blue-500 text-white animate-pulse"
-                                    : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                                }`}
-                              >
-                                <MdVolumeUp className="h-3 w-3" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+          {/* Panel principal de chat */}
+          <div className="lg:col-span-8">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+              {/* Header del chat */}
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="relative w-10 h-10 overflow-hidden rounded-full border-2 border-gray-200">
+                      <Image
+                        src="/agents/agent-emma.jpeg"
+                        alt="Emma - AI Travel Assistant"
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover"
+                      />
+                      {isPlaying && (
+                        <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-pulse"></div>
+                      )}
                     </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-black">Emma</h4>
+                      <p className="text-xs text-gray-600">AI Travel Assistant</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1"></span>
+                      Online
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Área de chat */}
+              <div className="p-6 min-h-[300px] flex flex-col">
+                {/* Input del usuario */}
+                <div className="mb-4">
+                  <label className="text-xs font-medium text-gray-700 mb-2 block">Your Message</label>
+                  <div className="relative flex items-center gap-3 p-3 rounded-xl border-2 border-gray-200 bg-gray-50 hover:border-gray-300 transition-colors">
+                    <div
+                      ref={userInputRef}
+                      className="flex-1 py-2 px-3 text-sm text-gray-900 min-h-[40px] flex items-center"
+                    >
+                      {isListening && transcript ? (
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="inline-block text-sm text-gray-900 font-medium"
+                        >
+                          {transcript}
+                        </motion.span>
+                      ) : !isListening && !transcript ? (
+                        <span className="inline-block text-sm text-gray-400">{voicePlaceholder}</span>
+                      ) : null}
+                    </div>
+
+                    <motion.button
+                      onClick={toggleListening}
+                      className={`flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 ${
+                        isListening
+                          ? "bg-red-500 text-white shadow-lg scale-110"
+                          : "bg-blue-500 text-white hover:bg-blue-600 hover:scale-105"
+                      }`}
+                      whileHover={{ scale: isListening ? 1.1 : 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {isListening ? <MdMicOff className="h-5 w-5" /> : <MdMic className="h-5 w-5" />}
+                    </motion.button>
+
+                    {/* Indicador de escucha */}
+                    <AnimatePresence>
+                      {isListening && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-red-500 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap shadow-lg"
+                        >
+                          Listening...
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
 
-                <div className="flex-grow">
-                  <h3 className="text-xl font-medium tracking-tighter text-black mb-2">
-                    Voice-Enabled Travel Assistant
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Emma can help you book flights, find hotels, and manage your travel expenses with simple voice
-                    commands.
-                  </p>
-
-                  <div className="mb-6">
-                    <h4 className="text-xs font-medium text-gray-500 mb-3">EXAMPLE COMMANDS</h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        "Book me a flight to London",
-                        "Find hotels in New York",
-                        "Process my expenses",
-                        "Check travel policy",
-                      ].map((example, i) => (
+                {/* Respuesta del asistente */}
+                <div className="flex-1">
+                  <label className="text-xs font-medium text-gray-700 mb-2 block">Emma's Response</label>
+                  <div className="relative flex items-start gap-3 p-4 rounded-xl border-2 border-blue-100 bg-blue-50/50 min-h-[120px]">
+                    <div ref={assistantInputRef} className="flex-1 py-2 text-sm text-gray-900">
+                      {isProcessing ? (
+                        <div className="flex items-center space-x-2">
+                          <motion.div
+                            animate={{ opacity: [0.4, 1, 0.4] }}
+                            transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5 }}
+                            className="flex space-x-1"
+                          >
+                            <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                            <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                            <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                          </motion.div>
+                          <span className="text-sm text-blue-600 ml-2">Emma is thinking...</span>
+                        </div>
+                      ) : assistantResponse ? (
                         <motion.div
-                          key={example}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.1, type: "spring", stiffness: 400, damping: 15 }}
-                          className="flex items-center gap-2 p-2 rounded-lg bg-white border border-gray-200 shadow-sm"
-                          onClick={() => handleUserInput(example)}
+                          className="space-y-2"
                         >
-                          <span className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100">
-                            <MdMic className="h-3 w-3 text-gray-700" />
-                          </span>
-                          <span className="text-xs font-medium">{example}</span>
+                          <p className="text-sm text-gray-900 leading-relaxed">{assistantResponse}</p>
                         </motion.div>
-                      ))}
+                      ) : (
+                        <span className="text-sm text-gray-400">
+                          Ask me anything about your business travel and I'll help you instantly...
+                        </span>
+                      )}
                     </div>
+
+                    {assistantResponse && (
+                      <motion.button
+                        onClick={() => generateSpeech(assistantResponse)}
+                        className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 ${
+                          isPlaying
+                            ? "bg-blue-500 text-white shadow-lg animate-pulse"
+                            : "bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-105"
+                        }`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <MdVolumeUp className="h-4 w-4" />
+                      </motion.button>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-xs font-medium text-gray-500 mb-1">POWERED BY ELEVENLABS</h4>
-                <p className="text-sm text-gray-600">Natural voice technology for seamless communication</p>
+              {/* Footer con ejemplos */}
+              <div className="bg-gray-50 p-4 border-t border-gray-200">
+                <p className="text-xs text-gray-600 mb-3 text-center">Try these voice commands:</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {[
+                    "Book me a flight to London",
+                    "Find hotels in New York",
+                    "Process my expenses",
+                    "Check travel policy",
+                  ].map((example, index) => (
+                    <motion.button
+                      key={index}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleUserInput(example)}
+                      className="text-xs bg-white hover:bg-gray-50 text-gray-700 px-3 py-2 rounded-lg transition-all duration-300 border border-gray-200 text-left"
+                    >
+                      <MdMic className="inline w-3 h-3 mr-2 text-gray-500" />
+                      "{example}"
+                    </motion.button>
+                  ))}
+                </div>
               </div>
-              <motion.div
-                className="flex items-center gap-1 text-xs font-medium text-black"
-                whileHover={{ scale: 1.05 }}
-              >
-                Learn more
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M6 12L10 8L6 4"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </motion.div>
+            </div>
+
+            {/* Footer informativo */}
+            <div className="mt-6 p-4 bg-white rounded-xl border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-medium text-gray-700 mb-1">POWERED BY SUITPAX AI VOICE</h4>
+                  <p className="text-sm text-gray-600">Advanced voice recognition and natural language processing</p>
+                </div>
+                <motion.div
+                  className="flex items-center gap-1 text-xs font-medium text-black cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  Learn more
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M6 12L10 8L6 4"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </motion.div>
+              </div>
             </div>
           </div>
-
-          {/* Audio element oculto */}
-          <audio ref={audioRef} className="hidden" />
         </div>
+
+        {/* Mensajes de estado */}
+        <AnimatePresence>
+          {errorMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mt-6 text-sm text-red-600 text-center bg-red-50 px-4 py-3 rounded-xl border border-red-200 max-w-2xl mx-auto"
+            >
+              {errorMessage}
+            </motion.div>
+          )}
+
+          {!browserSupportsSpeechRecognition && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6 text-sm text-orange-600 text-center bg-orange-50 px-4 py-3 rounded-xl border border-orange-200 max-w-2xl mx-auto"
+            >
+              Your browser doesn't support speech recognition. Try Chrome or Edge for the best experience.
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   )
