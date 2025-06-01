@@ -6,7 +6,6 @@ import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlac
 import { PiArrowUpRightBold } from "react-icons/pi"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import { Plane, Building2 } from "lucide-react"
 
 export const Footer = () => {
   const [isMobile, setIsMobile] = useState(false)
@@ -94,8 +93,6 @@ export const Footer = () => {
               <Link href="/pricing" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Pricing
               </Link>
-
-              {/* Suitpax Deck Link - ACTUALIZADO */}
               <Link
                 href="https://pitch-suitpax.vercel.app"
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center"
@@ -143,11 +140,10 @@ export const Footer = () => {
               </Link>
             </div>
 
-            {/* Trust badges - Quitando el efecto de animación en escritorio */}
+            {/* Trust badges */}
             <h3 className="text-white font-medium mb-3 text-sm">Certifications</h3>
             <div className="flex flex-col space-y-2">
               {isMobile ? (
-                // Versión móvil con animación
                 <motion.div
                   className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300"
                   whileHover={{ scale: 1.03, y: -2 }}
@@ -159,7 +155,6 @@ export const Footer = () => {
                   </span>
                 </motion.div>
               ) : (
-                // Versión escritorio sin animación
                 <div className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></div>
                   <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">

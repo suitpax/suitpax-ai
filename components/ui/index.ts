@@ -23,3 +23,15 @@ export * from "./animations"
 export * from "./bank-connection-modal"
 export * from "./demo-feature-card"
 export * from "./star-border"
+
+// Nuevos componentes UI
+export * from "./loading-spinner"
+export * from "./status-badge"
+export * from "./feature-highlight"
+export * from "./metric-card"
+export * from "./quick-action-button"
+export * from "./progress-indicator"
+export * from "./notification-toast"
+
+// Layout components
+export * from "../layout/page-header"

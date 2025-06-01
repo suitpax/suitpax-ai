@@ -3,7 +3,7 @@
 import { useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
-import VantaCloudsCustomBackground from "../ui/vanta-clouds-custom-background"
+import VantaCloudsBackground from "../ui/vanta-clouds-background"
 import { SiBritishairways, SiTesla } from "react-icons/si"
 import { MdMic, MdMicOff } from "react-icons/md"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
@@ -31,25 +31,23 @@ export default function CloudAIShowcase() {
     isMicrophoneAvailable,
   } = useSpeechToText({
     onTranscriptChange: (text) => {
-      setInputText(text)
+      setInputText(text) // Actualización en tiempo real del input
 
-      // Si hay texto nuevo, activar el efecto brillante en los badges
+      // Mantener los efectos de highlight existentes
       if (text && text.length > 0) {
         setHighlightFlight(true)
         setTimeout(() => {
           setHighlightTransport(true)
         }, 300)
-
         setTimeout(() => {
           setHighlightFlight(false)
         }, 2000)
-
         setTimeout(() => {
           setHighlightTransport(false)
         }, 2300)
       }
 
-      // Detectar idioma automáticamente
+      // Mantener la detección de idioma
       if (text.length > 10) {
         const detected = detectLanguage(text)
         if (detected.confidence > 0.6) {
@@ -84,7 +82,7 @@ export default function CloudAIShowcase() {
   }
 
   return (
-    <section className="w-full py-12 md:py-24">
+    <section className="w-full py-12 md:py-24 bg-blue-50">
       <div className="container px-4 md:px-6 mx-auto">
         <div className="flex flex-col items-center text-center space-y-4 mb-12">
           <motion.div
@@ -103,15 +101,15 @@ export default function CloudAIShowcase() {
                   height={12}
                   className="h-2.5 w-auto mr-1"
                 />
-                Intelligence
+                <em className="font-serif italic">Intelligence</em>
               </span>
               <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse mr-1"></span>
-                Human-AI Agentic
+                <em className="font-serif italic">Human-AI Agentic</em>
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl mx-auto">
-              The future of business travel with Voice AI
+              <em className="font-serif italic">The future of business travel</em> with Voice AI
             </h2>
             <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl">
               Suitpax combines human expertise with AI agents to transform business travel.
@@ -129,9 +127,9 @@ export default function CloudAIShowcase() {
           viewport={{ once: true }}
           className="w-full"
         >
-          <VantaCloudsCustomBackground className="w-full min-h-[500px] md:min-h-[600px] rounded-xl flex items-center justify-center p-4 md:p-6 overflow-hidden">
+          <VantaCloudsBackground className="w-full min-h-[500px] md:min-h-[600px] rounded-xl flex items-center justify-center p-4 md:p-6 overflow-hidden bg-blue-50">
             <div className="w-full max-w-3xl">
-              {/* Título y subtítulo por encima del input, estilo similar a BusinessTravelRevolution */}
+              {/* Título y subtítulo por encima del input, estilo similar a AIVoiceAssistant */}
               <div className="text-center mb-6 md:mb-8">
                 <h3 className="inline-flex items-center rounded-xl bg-gray-800/60 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-medium text-white mb-4 shadow-sm">
                   <Image
@@ -144,14 +142,14 @@ export default function CloudAIShowcase() {
                   <em className="font-serif italic">AI Assistant</em>
                 </h3>
                 <h2 className="text-2xl sm:text-3xl md:text-3xl font-medium tracking-tighter text-white leading-none mb-3">
-                  Speak your journey into existence
+                  <em className="font-serif italic">Speak your journey</em> into existence
                 </h2>
               </div>
 
               {/* Solo el input, sin la tarjeta blanca alrededor */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                {/* Input de chat con reconocimiento de voz */}
-                <div className="relative flex items-center gap-2 p-1 rounded-xl border border-gray-400 shadow-sm bg-white/90 backdrop-blur-md mb-4 md:mb-6">
+                {/* Input de chat con reconocimiento de voz mejorado */}
+                <div className="relative flex items-center gap-2 p-1 rounded-xl border border-gray-400 shadow-sm bg-white/90 backdrop-blur-md mb-4 md:mb-6 transition-all duration-300 hover:shadow-md">
                   {/* Avatar del agente AI */}
                   <div className="relative w-10 h-10 overflow-hidden rounded-full border border-gray-300 ml-2">
                     <Image
@@ -163,51 +161,87 @@ export default function CloudAIShowcase() {
                     />
                   </div>
 
-                  {/* Input de texto con reconocimiento de voz */}
+                  {/* Input de texto con reconocimiento de voz mejorado */}
                   <div ref={inputRef} className="flex-1 py-2 px-2 text-xs text-gray-900 h-10 flex items-center">
-                    {isListening && transcript ? (
-                      <span className="inline-block text-xs text-gray-900 font-medium">{transcript}</span>
-                    ) : !isListening && !transcript ? (
-                      <span className="inline-block text-xs text-gray-400">{voicePlaceholder}</span>
-                    ) : null}
+                    {inputText ? (
+                      <span className="inline-block text-xs text-gray-900 font-medium">
+                        <em className="font-serif italic">{inputText}</em>
+                      </span>
+                    ) : isListening ? (
+                      <div className="flex items-center space-x-2">
+                        <span className="inline-block text-xs text-blue-600 font-medium animate-pulse">
+                          <em className="font-serif italic">Listening... speak now</em>
+                        </span>
+                        <div className="flex space-x-1">
+                          <motion.div
+                            animate={{ opacity: [0.4, 1, 0.4] }}
+                            transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.2 }}
+                            className="w-1.5 h-1.5 rounded-full bg-blue-600"
+                          />
+                          <motion.div
+                            animate={{ opacity: [0.4, 1, 0.4] }}
+                            transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.2, delay: 0.2 }}
+                            className="w-1.5 h-1.5 rounded-full bg-blue-600"
+                          />
+                          <motion.div
+                            animate={{ opacity: [0.4, 1, 0.4] }}
+                            transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.2, delay: 0.4 }}
+                            className="w-1.5 h-1.5 rounded-full bg-blue-600"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="inline-block text-xs text-gray-400">
+                        <em className="font-serif italic">{voicePlaceholder}</em>
+                      </span>
+                    )}
                   </div>
 
-                  {/* Botón de micrófono con indicador de escucha */}
+                  {/* Botón de micrófono con indicador de escucha mejorado */}
                   <div className="relative mr-2">
                     <button
                       onClick={toggleListening}
-                      className={`flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
+                      className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ${
                         isListening
-                          ? "bg-red-500 text-white animate-pulse"
-                          : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                          ? "bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30"
+                          : "bg-gray-200 text-gray-600 hover:bg-gray-300 hover:scale-105"
                       }`}
                       aria-label={isListening ? "Stop listening" : "Start listening"}
                     >
                       {isListening ? <MdMicOff className="h-4 w-4" /> : <MdMic className="h-4 w-4" />}
                     </button>
 
-                    {/* Indicador de escucha flotante */}
+                    {/* Indicador de escucha flotante mejorado */}
                     {isListening && (
-                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap animate-pulse">
-                        Listening... ({detectedLanguage})
+                      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-[10px] px-2 py-1 rounded-full whitespace-nowrap animate-pulse">
+                        🎤 {detectedLanguage === "en-US" ? "English" : detectedLanguage}
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Mensajes de estado y error */}
+                {/* Mensajes de estado y error mejorados */}
                 <div className="flex flex-col items-center space-y-1 -mt-3 mb-3">
                   {/* Mensaje de error */}
                   {errorMessage && (
-                    <div className="text-xs text-red-500 text-center bg-red-50 px-2 py-1 rounded-full">
-                      {errorMessage}
+                    <div className="text-xs text-red-400 text-center bg-red-900/20 px-3 py-1 rounded-full backdrop-blur-sm">
+                      <em className="font-serif italic">{errorMessage}</em>
                     </div>
                   )}
 
                   {/* Mensaje de soporte del navegador */}
                   {!browserSupportsSpeechRecognition && (
-                    <div className="text-xs text-red-500 text-center">
-                      Tu navegador no soporta reconocimiento de voz. Intenta con Chrome o Edge.
+                    <div className="text-xs text-yellow-400 text-center bg-yellow-900/20 px-3 py-1 rounded-full backdrop-blur-sm">
+                      <em className="font-serif italic">
+                        Tu navegador no soporta reconocimiento de voz. Intenta con Chrome o Edge.
+                      </em>
+                    </div>
+                  )}
+
+                  {/* Indicador de estado de micrófono */}
+                  {!isMicrophoneAvailable && (
+                    <div className="text-xs text-orange-400 text-center bg-orange-900/20 px-3 py-1 rounded-full backdrop-blur-sm">
+                      <em className="font-serif italic">Micrófono no disponible. Permite el acceso al micrófono.</em>
                     </div>
                   )}
                 </div>
@@ -215,7 +249,7 @@ export default function CloudAIShowcase() {
                 {/* Ejemplos de itinerarios de viaje visuales y espectaculares */}
                 <div className="mb-6 space-y-3">
                   <p className="text-xs font-medium mb-2 text-center text-white">
-                    Your upcoming trip to San Francisco:
+                    <em className="font-serif italic">Your upcoming trip to San Francisco:</em>
                   </p>
 
                   {/* British Airways Flight Card - Moderna y minimalista con efecto brillante */}
@@ -378,17 +412,19 @@ export default function CloudAIShowcase() {
                     className="inline-flex items-center gap-1.5 rounded-full bg-black/80 backdrop-blur-sm px-4 py-2 text-xs font-medium text-white hover:bg-black/90 transition-colors"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                    Talk to founders
+                    <em className="font-serif italic">Talk to founders</em>
                   </a>
                 </div>
 
                 {/* "Powered by" text */}
                 <div className="mt-2 text-center">
-                  <span className="text-[10px] text-gray-600">Powered by Suitpax Engineering</span>
+                  <span className="text-[10px] text-gray-600">
+                    <em className="font-serif italic">Powered by Suitpax Engineering</em>
+                  </span>
                 </div>
               </motion.div>
             </div>
-          </VantaCloudsCustomBackground>
+          </VantaCloudsBackground>
         </motion.div>
       </div>
     </section>

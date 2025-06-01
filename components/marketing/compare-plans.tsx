@@ -129,11 +129,11 @@ const featureCategories = [
 // Helper function to render feature value
 const renderFeatureValue = (value: boolean | string) => {
   if (value === true) {
-    return <Check className="h-4 w-4 text-emerald-600" />
+    return <Check className="h-4 w-4 text-emerald-400" />
   } else if (value === false) {
-    return <X className="h-4 w-4 text-gray-300" />
+    return <X className="h-4 w-4 text-gray-600" />
   } else {
-    return <span className="text-xs font-medium">{value}</span>
+    return <span className="text-xs font-medium text-white">{value}</span>
   }
 }
 
@@ -151,7 +151,7 @@ export function ComparePlans() {
 
   return (
     <TooltipProvider>
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16 bg-black">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div
             className="text-center mb-8 sm:mb-12"
@@ -159,16 +159,16 @@ export function ComparePlans() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter text-black">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter text-white leading-none">
               Compare all features
             </h2>
-            <p className="mt-3 text-sm text-gray-500">Detailed comparison of all features across our plans</p>
+            <p className="mt-3 text-sm text-gray-400">Detailed comparison of all features across our plans</p>
             <div className="flex justify-center mt-6">
-              <div className="flex items-center bg-gray-100 p-1 rounded-full">
+              <div className="flex items-center bg-gray-800 p-1 rounded-full">
                 <button
                   onClick={() => setIsAnnual(false)}
                   className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
-                    !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
+                    !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-400"
                   }`}
                 >
                   Monthly
@@ -176,11 +176,11 @@ export function ComparePlans() {
                 <button
                   onClick={() => setIsAnnual(true)}
                   className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
-                    isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
+                    isAnnual ? "bg-white shadow-sm text-black" : "text-gray-400"
                   }`}
                 >
                   Annual
-                  <span className="ml-1 inline-flex items-center rounded-full bg-emerald-950 px-2 py-0.5 text-[9px] font-medium text-white">
+                  <span className="ml-1 inline-flex items-center rounded-full bg-emerald-500 px-2 py-0.5 text-[9px] font-medium text-black">
                     Save 20%
                   </span>
                 </button>
@@ -189,7 +189,7 @@ export function ComparePlans() {
           </motion.div>
 
           <motion.div
-            className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white"
+            className="overflow-x-auto rounded-xl border border-gray-800 shadow-2xl bg-gray-900"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -197,40 +197,40 @@ export function ComparePlans() {
             <div className="min-w-[800px]">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b bg-gray-50">
+                  <tr className="border-b border-gray-800 bg-gray-900">
                     <th className="py-4 px-4 text-left w-1/5"></th>
                     <th className="py-4 px-4 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium">Free</span>
-                        <span className="text-xs text-gray-500">€0</span>
-                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-black px-3 py-0.5 text-[10px] font-medium text-black">
+                        <span className="text-sm font-medium text-white">Free</span>
+                        <span className="text-xs text-gray-400">€0</span>
+                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-gray-600 px-3 py-0.5 text-[10px] font-medium text-gray-300">
                           Free
                         </span>
                       </div>
                     </th>
-                    <th className="py-4 px-4 text-center w-1/5 bg-gray-50">
+                    <th className="py-4 px-4 text-center w-1/5 bg-gray-800">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium">Basic</span>
-                        <span className="text-xs text-gray-500">{isAnnual ? "€39/month" : "€49/month"}</span>
-                        <span className="mt-1 inline-flex items-center rounded-full bg-black px-4 py-0.5 text-[10px] font-medium text-white">
+                        <span className="text-sm font-medium text-white">Basic</span>
+                        <span className="text-xs text-gray-400">{isAnnual ? "€39/month" : "€49/month"}</span>
+                        <span className="mt-1 inline-flex items-center rounded-full bg-white px-4 py-0.5 text-[10px] font-medium text-black">
                           Most Popular
                         </span>
                       </div>
                     </th>
                     <th className="py-4 px-4 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium">Pro</span>
-                        <span className="text-xs text-gray-500">{isAnnual ? "€71/month" : "€89/month"}</span>
-                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-black px-3 py-0.5 text-[10px] font-medium text-black">
+                        <span className="text-sm font-medium text-white">Pro</span>
+                        <span className="text-xs text-gray-400">{isAnnual ? "€71/month" : "€89/month"}</span>
+                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-gray-600 px-3 py-0.5 text-[10px] font-medium text-gray-300">
                           Advanced
                         </span>
                       </div>
                     </th>
                     <th className="py-4 px-4 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium">Enterprise</span>
-                        <span className="text-xs text-gray-500">Custom pricing</span>
-                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-black px-3 py-0.5 text-[10px] font-medium text-black">
+                        <span className="text-sm font-medium text-white">Enterprise</span>
+                        <span className="text-xs text-gray-400">Custom pricing</span>
+                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-gray-600 px-3 py-0.5 text-[10px] font-medium text-gray-300">
                           Enterprise
                         </span>
                       </div>
@@ -241,16 +241,16 @@ export function ComparePlans() {
                   {featureCategories.map((category, categoryIndex) => (
                     <React.Fragment key={category.name}>
                       <tr
-                        className={`border-b cursor-pointer hover:bg-gray-50 ${
-                          expandedCategory === category.name ? "bg-gray-50" : ""
+                        className={`border-b border-gray-800 cursor-pointer hover:bg-gray-800/50 ${
+                          expandedCategory === category.name ? "bg-gray-800/50" : ""
                         }`}
                         onClick={() => toggleCategory(category.name)}
                       >
                         <td colSpan={6} className="py-3 px-4">
                           <div className="flex items-center justify-between">
-                            <span className="font-medium text-sm">{category.name}</span>
+                            <span className="font-medium text-sm text-white">{category.name}</span>
                             <svg
-                              className={`w-4 h-4 transition-transform ${expandedCategory === category.name ? "rotate-180" : ""}`}
+                              className={`w-4 h-4 transition-transform text-gray-400 ${expandedCategory === category.name ? "rotate-180" : ""}`}
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -269,24 +269,28 @@ export function ComparePlans() {
                         category.features.map((feature, index) => (
                           <motion.tr
                             key={`${category.name}-${index}`}
-                            className={`border-b ${index % 2 === 1 ? "bg-gray-50" : ""}`}
+                            className={`border-b border-gray-800 ${index % 2 === 1 ? "bg-gray-800/30" : ""}`}
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: index * 0.05 }}
                           >
                             <td className="py-3 px-4">
                               <div className="flex items-center">
-                                <span className="text-xs sm:text-sm font-medium">{feature.name}</span>
+                                <span className="text-xs sm:text-sm font-medium text-white">{feature.name}</span>
                                 <Tooltip>
                                   <TooltipTrigger>
-                                    <HelpCircle className="h-3 w-3 text-gray-400 ml-1 cursor-help" />
+                                    <HelpCircle className="h-3 w-3 text-gray-500 ml-1 cursor-help" />
                                   </TooltipTrigger>
-                                  <TooltipContent>{feature.description}</TooltipContent>
+                                  <TooltipContent className="bg-gray-800 text-white border-gray-700">
+                                    {feature.description}
+                                  </TooltipContent>
                                 </Tooltip>
                               </div>
                             </td>
                             <td className="py-3 px-4 text-center">{renderFeatureValue(feature.free)}</td>
-                            <td className="py-3 px-4 text-center bg-gray-50">{renderFeatureValue(feature.basic)}</td>
+                            <td className="py-3 px-4 text-center bg-gray-800/30">
+                              {renderFeatureValue(feature.basic)}
+                            </td>
                             <td className="py-3 px-4 text-center">{renderFeatureValue(feature.pro)}</td>
                             <td className="py-3 px-4 text-center">{renderFeatureValue(feature.enterprise)}</td>
                           </motion.tr>
@@ -304,15 +308,15 @@ export function ComparePlans() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <p className="text-sm text-gray-500 mb-2">Need help choosing the right plan for your business?</p>
+            <p className="text-sm text-gray-400 mb-2">Need help choosing the right plan for your business?</p>
             {isAnnual && (
-              <p className="text-xs text-emerald-950 font-medium mb-3">
+              <p className="text-xs text-emerald-400 font-medium mb-3">
                 Annual plans include a 20% discount compared to monthly billing
               </p>
             )}
             <a
               href="mailto:hello@suitpax.com"
-              className="inline-flex items-center text-sm font-medium bg-black text-white rounded-xl px-5 py-2.5 hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center text-sm font-medium bg-white text-black rounded-xl px-5 py-2.5 hover:bg-gray-200 transition-colors"
             >
               Talk to our sales team
               <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

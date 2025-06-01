@@ -226,26 +226,6 @@ export const Navigation = () => {
                       Join our Slack community
                     </Link>
                   </div>
-
-                  <div className="py-2 border-b border-gray-200/30">
-                    <Link
-                      href="https://app.suitpax.com/sign-in"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <PiUserBold className="h-4 w-4 mr-1.5" />
-                    </Link>
-                  </div>
-
-                  <div className="py-2 border-b border-gray-200/30">
-                    <Link
-                      href="mailto:suitpax.com"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-gray-500 rounded-md transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <PiArrowUpRightBold className="h-4 w-4 mr-1.5" />
-                    </Link>
-                  </div>
                 </div>
 
                 {/* Social Icons - Mobile Only */}
