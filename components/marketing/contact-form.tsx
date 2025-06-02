@@ -44,43 +44,58 @@ export default function ContactForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    setStatus({ type: "loading", message: "Enviando mensaje..." })
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setStatus({
-          type: "success",
-          message: "¡Mensaje enviado correctamente! Te contactaremos pronto.",
-        })
-        setFormData({
-          name: "",
-          email: "",
-          company: "",
-          message: "",
-          subject: "",
-        })
-      } else {
-        setStatus({
-          type: "error",
-          message: data.error || "Error al enviar el mensaje",
-        })
-      }
-    } catch (error) {
+    // Validación básica
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       setStatus({
         type: "error",
-        message: "Error de conexión. Por favor, inténtalo de nuevo.",
+        message: "Por favor, completa todos los campos requeridos.",
       })
+      return
     }
+
+    // Validación de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      setStatus({
+        type: "error",
+        message: "Por favor, introduce un email válido.",
+      })
+      return
+    }
+
+    setStatus({ type: "loading", message: "Procesando tu mensaje..." })
+
+    // Simular envío (sin backend real)
+    setTimeout(() => {
+      setStatus({
+        type: "success",
+        message:
+          "¡Gracias por tu interés! Nos pondremos en contacto contigo pronto. Por ahora, puedes contactarnos directamente en hello@suitpax.com",
+      })
+
+      // Limpiar formulario
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        message: "",
+        subject: "",
+      })
+
+      // Opcional: Enviar datos a analytics o guardar en localStorage
+      if (typeof window !== "undefined") {
+        const contactData = {
+          ...formData,
+          timestamp: new Date().toISOString(),
+        }
+        console.log("Contact form submission:", contactData)
+
+        // Guardar en localStorage para referencia
+        const existingContacts = JSON.parse(localStorage.getItem("suitpax_contacts") || "[]")
+        existingContacts.push(contactData)
+        localStorage.setItem("suitpax_contacts", JSON.stringify(existingContacts))
+      }
+    }, 2000)
   }
 
   return (
@@ -159,12 +174,22 @@ export default function ContactForm() {
                   <strong>Email:</strong> hello@suitpax.com
                 </p>
                 <p className="text-gray-600">
-                  <strong>Teléfono:</strong> +34 900 123 456
+                  <strong>LinkedIn:</strong> /company/suitpax
                 </p>
                 <p className="text-gray-600">
                   <strong>Horario:</strong> Lun-Vie 9:00-18:00 CET
                 </p>
               </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl">
+              <p className="text-sm text-blue-800">
+                <strong>💡 Nota:</strong> Este es un formulario de demostración. Para contacto real, escríbenos
+                directamente a{" "}
+                <a href="mailto:hello@suitpax.com" className="underline font-medium">
+                  hello@suitpax.com
+                </a>
+              </p>
             </div>
           </motion.div>
 
@@ -286,7 +311,7 @@ export default function ContactForm() {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex items-center gap-2 p-3 rounded-xl ${
+                  className={`flex items-start gap-2 p-3 rounded-xl ${
                     status.type === "success"
                       ? "bg-green-50 text-green-700 border border-green-200"
                       : status.type === "error"
@@ -294,10 +319,10 @@ export default function ContactForm() {
                         : "bg-blue-50 text-blue-700 border border-blue-200"
                   }`}
                 >
-                  {status.type === "success" && <CheckCircle className="h-4 w-4" />}
-                  {status.type === "error" && <AlertCircle className="h-4 w-4" />}
+                  {status.type === "success" && <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />}
+                  {status.type === "error" && <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />}
                   {status.type === "loading" && (
-                    <div className="h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    <div className="h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mt-0.5 flex-shrink-0" />
                   )}
                   <span className="text-sm font-medium">{status.message}</span>
                 </motion.div>
@@ -312,7 +337,7 @@ export default function ContactForm() {
                 {status.type === "loading" ? (
                   <>
                     <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Enviando...
+                    Procesando...
                   </>
                 ) : (
                   <>

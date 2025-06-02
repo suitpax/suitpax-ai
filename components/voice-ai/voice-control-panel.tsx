@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useVoiceAI } from "@/contexts/voice-ai-context"
-import { MdMic, MdMicOff, MdVolumeUp, MdVolumeOff, MdSettings } from "react-icons/md"
+import { MdMic, MdMicOff, MdVolumeUp, MdVolumeOff, MdSettings, MdError, MdWarning } from "react-icons/md"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface VoiceControlPanelProps {
@@ -33,8 +33,10 @@ export default function VoiceControlPanel({ className = "" }: VoiceControlPanelP
 
   const [showSettings, setShowSettings] = useState(false)
   const [availableVoices, setAvailableVoices] = useState<{ id: string; name: string }[]>([])
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [warningMessage, setWarningMessage] = useState<string | null>(null)
 
-  // Cargar voces disponibles
+  // Cargar voces disponibles con manejo de errores
   useEffect(() => {
     const loadVoices = async () => {
       try {
@@ -42,61 +44,156 @@ export default function VoiceControlPanel({ className = "" }: VoiceControlPanelP
         if (response.ok) {
           const data = await response.json()
           setAvailableVoices(data.voices || [])
+        } else {
+          console.warn("No se pudieron cargar las voces de ElevenLabs")
+          // Usar voces por defecto
+          setAvailableVoices([
+            { id: ELEVENLABS_VOICES.EMMA, name: "Emma" },
+            { id: ELEVENLABS_VOICES.SOPHIA, name: "Sophia" },
+            { id: ELEVENLABS_VOICES.MICHAEL, name: "Michael" },
+          ])
         }
       } catch (error) {
         console.error("Error loading voices:", error)
+        setErrorMessage("No se pudieron cargar las voces disponibles")
+        // Usar voces por defecto
+        setAvailableVoices([
+          { id: ELEVENLABS_VOICES.EMMA, name: "Emma" },
+          { id: ELEVENLABS_VOICES.SOPHIA, name: "Sophia" },
+          { id: ELEVENLABS_VOICES.MICHAEL, name: "Michael" },
+        ])
       }
     }
 
     loadVoices()
   }, [])
 
+  // Manejar errores del estado de voz
+  useEffect(() => {
+    if (state.error) {
+      setErrorMessage(state.error)
+      // Limpiar error después de 5 segundos
+      const timer = setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [state.error])
+
+  // Verificar permisos y mostrar advertencias
+  useEffect(() => {
+    if (!state.permissionGranted && typeof navigator !== "undefined") {
+      setWarningMessage("Se requieren permisos de micrófono para usar el reconocimiento de voz")
+    } else {
+      setWarningMessage(null)
+    }
+  }, [state.permissionGranted])
+
   // Manejar cambio de idioma
   const handleLanguageChange = (language: string) => {
-    setLanguage(language as any)
+    try {
+      setLanguage(language as any)
+      setErrorMessage(null)
+    } catch (error) {
+      setErrorMessage("Error al cambiar idioma")
+    }
   }
 
   // Manejar cambio de voz
   const handleVoiceChange = (voiceId: string) => {
-    setVoice(voiceId)
+    try {
+      setVoice(voiceId)
+      setErrorMessage(null)
+    } catch (error) {
+      setErrorMessage("Error al cambiar voz")
+    }
   }
 
   // Manejar cambio de volumen
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateSettings({ volume: Number.parseFloat(e.target.value) })
+    try {
+      const volume = Number.parseFloat(e.target.value)
+      if (volume >= 0 && volume <= 1) {
+        updateSettings({ volume })
+        setErrorMessage(null)
+      }
+    } catch (error) {
+      setErrorMessage("Error al ajustar volumen")
+    }
   }
 
   // Manejar cambio de estabilidad
   const handleStabilityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateSettings({ stability: Number.parseFloat(e.target.value) })
+    try {
+      const stability = Number.parseFloat(e.target.value)
+      if (stability >= 0 && stability <= 1) {
+        updateSettings({ stability })
+        setErrorMessage(null)
+      }
+    } catch (error) {
+      setErrorMessage("Error al ajustar estabilidad")
+    }
   }
 
   // Manejar cambio de similitud
   const handleSimilarityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateSettings({ similarityBoost: Number.parseFloat(e.target.value) })
+    try {
+      const similarityBoost = Number.parseFloat(e.target.value)
+      if (similarityBoost >= 0 && similarityBoost <= 1) {
+        updateSettings({ similarityBoost })
+        setErrorMessage(null)
+      }
+    } catch (error) {
+      setErrorMessage("Error al ajustar similitud")
+    }
   }
 
   // Manejar cambio de detección automática de idioma
   const handleAutoDetectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateSettings({ autoDetectLanguage: e.target.checked })
+    try {
+      updateSettings({ autoDetectLanguage: e.target.checked })
+      setErrorMessage(null)
+    } catch (error) {
+      setErrorMessage("Error al cambiar configuración de detección automática")
+    }
   }
 
   // Manejar clic en el botón de micrófono
   const handleMicrophoneClick = async () => {
-    if (state.isListening) {
-      stopListening()
-    } else {
-      await startListening()
+    try {
+      if (state.isListening) {
+        stopListening()
+      } else {
+        await startListening()
+      }
+      setErrorMessage(null)
+    } catch (error) {
+      setErrorMessage("Error al controlar el micrófono")
     }
   }
 
   // Manejar clic en el botón de hablar
   const handleSpeakClick = async () => {
-    if (state.isSpeaking) {
-      cancelSpeech()
-    } else {
-      // Ejemplo de texto para hablar
-      await speak("Hola, soy tu asistente de viaje. ¿En qué puedo ayudarte hoy?")
+    try {
+      if (state.isSpeaking) {
+        cancelSpeech()
+      } else {
+        // Ejemplo de texto para hablar
+        await speak("Hola, soy tu asistente de viaje. ¿En qué puedo ayudarte hoy?")
+      }
+      setErrorMessage(null)
+    } catch (error) {
+      setErrorMessage("Error al controlar la síntesis de voz")
+    }
+  }
+
+  // Limpiar transcripción con manejo de errores
+  const handleClearTranscript = () => {
+    try {
+      clearTranscript()
+      setErrorMessage(null)
+    } catch (error) {
+      setErrorMessage("Error al limpiar transcripción")
     }
   }
 
@@ -111,6 +208,45 @@ export default function VoiceControlPanel({ className = "" }: VoiceControlPanelP
           <MdSettings className="h-4 w-4 text-gray-700" />
         </button>
       </div>
+
+      {/* Mensajes de error y advertencia */}
+      <AnimatePresence>
+        {errorMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2"
+          >
+            <MdError className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-xs font-medium text-red-700">Error</p>
+              <p className="text-xs text-red-600">{errorMessage}</p>
+            </div>
+            <button onClick={() => setErrorMessage(null)} className="ml-auto text-red-400 hover:text-red-600">
+              ×
+            </button>
+          </motion.div>
+        )}
+
+        {warningMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-2"
+          >
+            <MdWarning className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-xs font-medium text-yellow-700">Advertencia</p>
+              <p className="text-xs text-yellow-600">{warningMessage}</p>
+            </div>
+            <button onClick={() => setWarningMessage(null)} className="ml-auto text-yellow-400 hover:text-yellow-600">
+              ×
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Estado actual */}
       <div className="mb-4 p-3 bg-gray-50 rounded-lg">
@@ -158,14 +294,23 @@ export default function VoiceControlPanel({ className = "" }: VoiceControlPanelP
           </span>
         </div>
 
-        {state.error && <div className="mt-2 text-xs text-red-500">{state.error}</div>}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium">Permisos:</span>
+          <span className={`text-xs ${state.permissionGranted ? "text-green-600" : "text-red-600"}`}>
+            {state.permissionGranted ? "Concedidos" : "Denegados"}
+          </span>
+        </div>
       </div>
 
       {/* Transcripción */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-medium">Transcripción:</span>
-          <button onClick={clearTranscript} className="text-[10px] text-gray-500 hover:text-gray-700">
+          <button
+            onClick={handleClearTranscript}
+            className="text-[10px] text-gray-500 hover:text-gray-700 disabled:opacity-50"
+            disabled={!state.transcript}
+          >
             Limpiar
           </button>
         </div>
@@ -180,9 +325,15 @@ export default function VoiceControlPanel({ className = "" }: VoiceControlPanelP
           onClick={handleMicrophoneClick}
           className={`p-3 rounded-full ${
             state.isListening ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          } transition-colors`}
-          disabled={!state.permissionGranted}
-          title={state.isListening ? "Detener escucha" : "Iniciar escucha"}
+          } transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+          disabled={!state.permissionGranted || state.isProcessing}
+          title={
+            !state.permissionGranted
+              ? "Permisos de micrófono requeridos"
+              : state.isListening
+                ? "Detener escucha"
+                : "Iniciar escucha"
+          }
         >
           {state.isListening ? <MdMicOff className="h-5 w-5" /> : <MdMic className="h-5 w-5" />}
         </button>
@@ -191,7 +342,8 @@ export default function VoiceControlPanel({ className = "" }: VoiceControlPanelP
           onClick={handleSpeakClick}
           className={`p-3 rounded-full ${
             state.isSpeaking ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          } transition-colors`}
+          } transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+          disabled={state.isProcessing}
           title={state.isSpeaking ? "Detener voz" : "Hablar"}
         >
           {state.isSpeaking ? <MdVolumeOff className="h-5 w-5" /> : <MdVolumeUp className="h-5 w-5" />}
@@ -218,7 +370,7 @@ export default function VoiceControlPanel({ className = "" }: VoiceControlPanelP
                   value={settings.language}
                   onChange={(e) => handleLanguageChange(e.target.value)}
                   disabled={settings.autoDetectLanguage}
-                  className="w-full text-xs p-2 border border-gray-300 rounded-md bg-white"
+                  className="w-full text-xs p-2 border border-gray-300 rounded-md bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
                   <option value="en-US">Inglés</option>
                   <option value="es-ES">Español</option>
