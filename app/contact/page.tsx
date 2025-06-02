@@ -1,13 +1,12 @@
 import type { Metadata } from "next"
 import ContactForm from "@/components/marketing/contact-form"
 import Navigation from "@/components/marketing/navigation"
-import Footer from "@/components/marketing/footer"
 
 export const metadata: Metadata = {
-  title: "Contacto | Suitpax - Revoluciona tus viajes de negocio",
+  title: "Contact Us | Suitpax - Transform Your Business Travel",
   description:
-    "Ponte en contacto con Suitpax para descubrir cómo podemos transformar la gestión de viajes de tu empresa con IA avanzada.",
-  keywords: "contacto suitpax, viajes de negocio, gestión de viajes corporativos, IA, travel management",
+    "Get in touch with Suitpax to discover how we can transform your company's travel management with advanced AI solutions.",
+  keywords: "contact suitpax, business travel, corporate travel management, AI, travel management",
 }
 
 export default function ContactPage() {
@@ -17,7 +16,7 @@ export default function ContactPage() {
       <div className="pt-20">
         <ContactForm />
       </div>
-      <Footer />
+      {/* Footer removed to avoid repetition */}
     </main>
   )
 }

@@ -41,11 +41,11 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
       <div className="relative z-10 w-full max-w-md md:max-w-lg p-4 sm:p-6 md:p-8 mx-2 sm:mx-4 bg-black backdrop-blur-md rounded-3xl border border-white/10 min-h-[450px] sm:min-h-[500px] flex flex-col justify-between overflow-hidden shadow-[0_0_20px_rgba(255,255,255,0.1)]">
         <div className="relative z-10 flex justify-center mb-3 sm:mb-6">
           <Image
-            src="/suitpax-white-logo.png"
-            alt="Suitpax Logo"
-            width={140}
-            height={35}
-            className="h-6 sm:h-8 w-auto"
+            src="/logo/suitpax-cloud-logo.webp"
+            alt="Suitpax Cloud Logo"
+            width={120}
+            height={30}
+            className="h-5 sm:h-6 w-auto"
           />
         </div>
 
@@ -65,51 +65,50 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
         <form onSubmit={handleSubmit} className="relative z-10 space-y-4 sm:space-y-5">
           <div className="bg-black/40 backdrop-blur-md border border-white/20 rounded-2xl p-3 sm:p-5">
             <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4 relative">
-              <div className="relative w-10 h-10 sm:w-14 sm:h-14 rounded-full overflow-hidden border border-white/20 flex-shrink-0">
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden border border-white/20 flex-shrink-0">
                 <Image
-                  src="/ai-agent-emma.jpg"
-                  alt="AI Assistant Zia"
-                  width={56}
-                  height={56}
-                  className="object-cover"
+                  src="/agents/agent-maya.jpeg"
+                  alt="AI Assistant"
+                  width={48}
+                  height={48}
+                  className="object-cover filter grayscale"
                 />
               </div>
               <div className="flex-1">
-                <p className="text-white text-sm sm:text-base font-medium">Zia from Suitpax</p>
-                <p className="text-white/60 text-xs sm:text-sm">AI Agent</p>
+                <p className="text-white text-sm sm:text-base font-medium">AI Verification System</p>
+                <p className="text-white/60 text-xs sm:text-sm">Secure Access Portal</p>
               </div>
             </div>
 
-            {/* Monitoring badge - moved below Zia's info */}
+            {/* Mini AI Agents Grid */}
             <div className="mb-3 sm:mb-4">
-              <div
-                className="bg-black/60 backdrop-blur-md rounded-full border border-white/10 overflow-hidden flex items-center p-1 sm:p-1.5 shadow-lg"
-                style={{ width: "160px", maxWidth: "100%" }}
-              >
-                <div className="relative w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden mr-2">
-                  <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover"
-                    style={{ objectPosition: "center 30%" }}
+              <div className="grid grid-cols-6 gap-1 sm:gap-1.5 max-w-[200px]">
+                {[
+                  "/agents/agent-nova.jpeg",
+                  "/agents/agent-aria.jpeg",
+                  "/agents/agent-sage.jpeg",
+                  "/agents/agent-ruby.png",
+                  "/agents/agent-tyler.png",
+                  "/agents/agent-maya.jpeg",
+                ].map((src, index) => (
+                  <div
+                    key={index}
+                    className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-lg overflow-hidden border border-white/10"
                   >
-                    <source src="/videos/ai-agent-demo.mp4" type="video/mp4" />
-                  </video>
-                </div>
-                <div className="flex items-center">
-                  <span className="relative flex h-1.5 sm:h-2 w-1.5 sm:w-2 mr-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-1.5 sm:h-2 w-1.5 sm:w-2 bg-white"></span>
-                  </span>
-                  <span className="text-[10px] sm:text-xs text-white whitespace-nowrap">Monitoring access</span>
-                </div>
+                    <Image
+                      src={src || "/placeholder.svg"}
+                      alt={`AI Agent ${index + 1}`}
+                      width={28}
+                      height={28}
+                      className="object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 
             <p className="text-white/90 text-sm sm:text-base mb-3 sm:mb-5">
-              Hello, I'm Zia, your Suitpax AI verification Agent. What company are you from?
+              Hello, our AI verification system will validate your access. What company are you from?
             </p>
 
             <div className="space-y-3 sm:space-y-4">
@@ -158,7 +157,7 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
               />
             </div>
             <label htmlFor="terms" className="ml-2 text-xs sm:text-sm text-white/70">
-              I acknowledge this material contains confidential information
+              I acknowledge this website contains confidential information
             </label>
           </div>
 
@@ -175,7 +174,13 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
         {/* Technology by text inside the card */}
         <div className="relative z-10 mt-4 sm:mt-6 flex items-center justify-center gap-1.5 text-white/40">
           <span className="text-[10px] sm:text-xs font-light">Technology by</span>
-          <Image src="/suitpax-white-logo.png" alt="Suitpax" width={50} height={13} className="h-2.5 sm:h-3 w-auto" />
+          <Image
+            src="/logo/suitpax-cloud-logo.webp"
+            alt="Suitpax Cloud"
+            width={60}
+            height={16}
+            className="h-3 sm:h-4 w-auto"
+          />
         </div>
       </div>
     </div>
