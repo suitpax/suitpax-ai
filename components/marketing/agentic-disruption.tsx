@@ -159,6 +159,9 @@ export default function AgenticDisruption() {
           >
             {randomSubtitle}
           </motion.p>
+          <p className="mt-2 text-xs font-light text-gray-500 max-w-2xl">
+            Real-time AI agents that understand context and make intelligent decisions for your business travel needs.
+          </p>
         </div>
 
         {/* Disruption Metrics */}
@@ -237,7 +240,7 @@ export default function AgenticDisruption() {
                   alt="AI Agent"
                   width={32}
                   height={32}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
                 />
               </motion.div>
             ))}
