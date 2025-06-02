@@ -24,6 +24,15 @@ const subtitleVariations = [
 
 // AI Agents specializing in business travel disruption
 const disruptiveAgents = [
+  "/agents/agent-nova.jpeg",
+  "/agents/agent-aria.jpeg",
+  "/agents/agent-sage.jpeg",
+  "/agents/agent-ruby.png",
+  "/agents/agent-tyler.png",
+  "/agents/agent-maya.jpeg",
+  "/agents/agent-zoe.jpeg",
+  "/agents/agent-kai-new.png",
+  "/agents/agent-luna-new.png",
   "/agents/agent-2.png",
   "/agents/agent-41.png",
   "/agents/agent-9.png",
@@ -40,6 +49,14 @@ const disruptiveAgents = [
   "/agents/agent-15.png",
   "/agents/agent-16.png",
   "/agents/agent-17.png",
+  "/agents/agent-18.png",
+  "/agents/agent-19.png",
+  "/agents/agent-20.png",
+  "/agents/agent-21.png",
+  "/agents/agent-22.png",
+  "/agents/agent-23.png",
+  "/agents/agent-24.png",
+  "/agents/agent-25.png",
 ]
 
 // Disruption metrics and achievements
@@ -135,7 +152,7 @@ export default function AgenticDisruption() {
           </motion.h2>
 
           <motion.p
-            className="mt-2 text-lg font-medium text-gray-600 max-w-2xl mb-6"
+            className="text-gray-600 font-light max-w-2xl mb-6"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -167,12 +184,21 @@ export default function AgenticDisruption() {
         </div>
 
         {/* AI Agents Showcase */}
-        <div className="flex flex-col items-center mb-16">
+        <div className="flex flex-col items-center mb-8">
           <span className="inline-flex items-center rounded-xl bg-gray-200 px-3 py-1 text-xs font-medium text-gray-800 mb-6">
             AI Travel Agents
           </span>
           <div className="flex justify-center gap-2 mb-4 flex-wrap max-w-2xl">
             {[
+              "/agents/agent-nova.jpeg",
+              "/agents/agent-aria.jpeg",
+              "/agents/agent-sage.jpeg",
+              "/agents/agent-ruby.png",
+              "/agents/agent-tyler.png",
+              "/agents/agent-maya.jpeg",
+              "/agents/agent-zoe.jpeg",
+              "/agents/agent-kai-new.png",
+              "/agents/agent-luna-new.png",
               "/agents/agent-2.png",
               "/agents/agent-41.png",
               "/agents/agent-9.png",
@@ -189,6 +215,14 @@ export default function AgenticDisruption() {
               "/agents/agent-15.png",
               "/agents/agent-16.png",
               "/agents/agent-17.png",
+              "/agents/agent-18.png",
+              "/agents/agent-19.png",
+              "/agents/agent-20.png",
+              "/agents/agent-21.png",
+              "/agents/agent-22.png",
+              "/agents/agent-23.png",
+              "/agents/agent-24.png",
+              "/agents/agent-25.png",
             ].map((image, index) => (
               <motion.div
                 key={index}
