@@ -23,14 +23,26 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
       return
     }
 
-    if (password === correctPassword) {
+    // Verificar que el nombre de empresa no esté vacío
+    if (!company.trim()) {
+      setError(true)
+      setTimeout(() => setError(false), 2000)
+      return
+    }
+
+    // Verificar que la contraseña sea correcta
+    if (password !== correctPassword) {
+      setError(true)
+      setTimeout(() => setError(false), 2000)
+      return
+    }
+
+    // Si ambos campos están correctos, permitir acceso
+    if (company.trim() && password === correctPassword) {
       setIsAnimating(true)
       setTimeout(() => {
         onUnlock()
       }, 1000)
-    } else {
-      setError(true)
-      setTimeout(() => setError(false), 2000)
     }
   }
 
@@ -116,8 +128,11 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                className="w-full py-2.5 sm:py-3 pl-3 sm:pl-4 pr-3 sm:pr-4 bg-black/50 backdrop-blur-md border border-white/20 rounded-xl focus:ring-1 focus:ring-white/30 focus:border-transparent outline-none transition text-white text-sm sm:text-base"
+                className={`w-full py-2.5 sm:py-3 pl-3 sm:pl-4 pr-3 sm:pr-4 bg-black/50 backdrop-blur-md border ${
+                  error && !company.trim() ? "border-red-500 animate-shake" : "border-white/20"
+                } rounded-xl focus:ring-1 focus:ring-white/30 focus:border-transparent outline-none transition text-white text-sm sm:text-base`}
                 placeholder="Enter your company name"
+                required
               />
 
               <div className="relative">
@@ -126,9 +141,12 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={`w-full py-2.5 sm:py-3 pl-3 sm:pl-4 pr-8 sm:pr-10 bg-black/50 backdrop-blur-md border ${
-                    error ? "border-red-500 animate-shake" : "border-white/20"
+                    error && (!password || password !== correctPassword)
+                      ? "border-red-500 animate-shake"
+                      : "border-white/20"
                   } rounded-xl focus:ring-1 focus:ring-white/30 focus:border-transparent outline-none transition text-white text-sm sm:text-base`}
                   placeholder="Enter access code"
+                  required
                 />
                 <button
                   type="button"
