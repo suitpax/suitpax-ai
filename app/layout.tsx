@@ -1,10 +1,12 @@
-"use client"
-
 import type React from "react"
 import { Inter } from "next/font/google"
-import ClientLayout from "./client-layout"
+import Navigation from "@/components/marketing/navigation"
+import Footer from "@/components/marketing/footer"
+// Mantenemos el archivo pero comentamos la importación
+// import SplashScreen from "@/components/splash-screen"
 import type { Metadata } from "next"
 import "./globals.css"
+import IntercomProvider from "@/components/intercom/intercom-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -77,19 +79,14 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#000000" />
-        <style jsx global>{`
-          @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-          }
-          .animate-shake {
-            animation: shake 0.5s ease-in-out;
-          }
-        `}</style>
       </head>
       <body className={inter.className}>
-        <ClientLayout>{children}</ClientLayout>
+        {/* Quitamos el componente SplashScreen */}
+        {/* <SplashScreen /> */}
+        <Navigation />
+        <main className="overflow-hidden w-full">{children}</main>
+        <Footer />
+        <IntercomProvider />
       </body>
     </html>
   )

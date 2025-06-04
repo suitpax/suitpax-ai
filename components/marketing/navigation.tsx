@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { PiDotsNineBold, PiDotsSixBold, PiArrowUpRightBold, PiUserBold } from "react-icons/pi"
+import { PiDotsNineBold, PiDotsSixBold, PiArrowUpRightBold } from "react-icons/pi"
 import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack } from "react-icons/si"
 import { cn } from "@/lib/utils"
 
@@ -106,12 +106,6 @@ export const Navigation = () => {
                 className="px-2.5 py-1.5 text-sm text-black hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors"
               >
                 Talk to founders
-              </Link>
-              <Link
-                href="https://app.suitpax.com/sign-in"
-                className="px-2.5 py-1.5 text-sm text-black hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors flex items-center gap-1"
-              >
-                <PiUserBold className="h-3.5 w-3.5" />
               </Link>
               <Link
                 href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
