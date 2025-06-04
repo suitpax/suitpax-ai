@@ -1,14 +1,8 @@
-"use client"
-
 import type React from "react"
-import { Inter } from "next/font/google"
 import ClientLayout from "./client-layout"
 import type { Metadata } from "next"
-import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
-
-// Actualizar la descripción en el metadata para enfatizar AI travel agents y superpowers
+// Metadata para SEO
 export const metadata: Metadata = {
   title: "Suitpax | The next-gen AI traveltech",
   description:
@@ -67,30 +61,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <html lang="en" className="scroll-smooth">
-      <head>
-        <meta name="application-name" content="Suitpax" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Suitpax | The next-gen AI traveltech" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#000000" />
-        <style jsx global>{`
-          @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-          }
-          .animate-shake {
-            animation: shake 0.5s ease-in-out;
-          }
-        `}</style>
-      </head>
-      <body className={inter.className}>
-        <ClientLayout>{children}</ClientLayout>
-      </body>
-    </html>
-  )
+  return <ClientLayout>{children}</ClientLayout>
 }
+
+
+import './globals.css'
