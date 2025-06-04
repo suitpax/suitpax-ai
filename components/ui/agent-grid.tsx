@@ -55,15 +55,15 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
   }
 
   return (
-    <div className="relative mb-12 px-1 sm:px-2">
-      <div className="grid grid-cols-10 md:grid-cols-12 lg:grid-cols-16 xl:grid-cols-18 gap-1 sm:gap-1 md:gap-1 lg:gap-1">
+    <div className="relative mb-6 px-0">
+      <div className="grid grid-cols-10 md:grid-cols-12 lg:grid-cols-16 xl:grid-cols-18 gap-0.5 sm:gap-0.5 md:gap-0.5 lg:gap-0.5">
         {agentGrid.map((agent, index) => (
           <motion.div
             key={agent.id}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: index * 0.003 }}
-            className="aspect-square relative cursor-pointer p-0.5 md:p-0 lg:p-0"
+            className="aspect-square relative cursor-pointer p-0"
             onClick={() => handleAgentSelect(agent.id)}
           >
             <AnimatePresence>
@@ -89,7 +89,7 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
               )}
             </AnimatePresence>
 
-            <div className="absolute inset-0 rounded-lg overflow-hidden bg-gray-100 md:inset-[10%] lg:inset-[25%] xl:inset-[30%]">
+            <div className="absolute inset-0 rounded-lg overflow-hidden bg-gray-100 md:inset-[5%] lg:inset-[15%] xl:inset-[20%]">
               <Image
                 src={agent.image || "/placeholder.svg"}
                 alt="AI Travel Agent"

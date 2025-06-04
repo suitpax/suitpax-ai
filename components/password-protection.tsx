@@ -23,26 +23,14 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
       return
     }
 
-    // Verificar que el nombre de empresa no esté vacío
-    if (!company.trim()) {
-      setError(true)
-      setTimeout(() => setError(false), 2000)
-      return
-    }
-
-    // Verificar que la contraseña sea correcta
-    if (password !== correctPassword) {
-      setError(true)
-      setTimeout(() => setError(false), 2000)
-      return
-    }
-
-    // Si ambos campos están correctos, permitir acceso
-    if (company.trim() && password === correctPassword) {
+    if (password === correctPassword) {
       setIsAnimating(true)
       setTimeout(() => {
         onUnlock()
       }, 1000)
+    } else {
+      setError(true)
+      setTimeout(() => setError(false), 2000)
     }
   }
 
@@ -128,11 +116,8 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                className={`w-full py-2.5 sm:py-3 pl-3 sm:pl-4 pr-3 sm:pr-4 bg-black/50 backdrop-blur-md border ${
-                  error && !company.trim() ? "border-red-500 animate-shake" : "border-white/20"
-                } rounded-xl focus:ring-1 focus:ring-white/30 focus:border-transparent outline-none transition text-white text-sm sm:text-base`}
+                className="w-full py-2.5 sm:py-3 pl-3 sm:pl-4 pr-3 sm:pr-4 bg-black/50 backdrop-blur-md border border-white/20 rounded-xl focus:ring-1 focus:ring-white/30 focus:border-transparent outline-none transition text-white text-sm sm:text-base"
                 placeholder="Enter your company name"
-                required
               />
 
               <div className="relative">
@@ -141,12 +126,9 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={`w-full py-2.5 sm:py-3 pl-3 sm:pl-4 pr-8 sm:pr-10 bg-black/50 backdrop-blur-md border ${
-                    error && (!password || password !== correctPassword)
-                      ? "border-red-500 animate-shake"
-                      : "border-white/20"
+                    error ? "border-red-500 animate-shake" : "border-white/20"
                   } rounded-xl focus:ring-1 focus:ring-white/30 focus:border-transparent outline-none transition text-white text-sm sm:text-base`}
                   placeholder="Enter access code"
-                  required
                 />
                 <button
                   type="button"
@@ -195,9 +177,9 @@ export default function PasswordProtection({ onUnlock }: { onUnlock: () => void 
           <Image
             src="/logo/suitpax-cloud-logo.webp"
             alt="Suitpax Cloud"
-            width={60}
-            height={16}
-            className="h-3 sm:h-4 w-auto"
+            width={45}
+            height={12}
+            className="h-2 sm:h-2.5 w-auto"
           />
         </div>
       </div>
