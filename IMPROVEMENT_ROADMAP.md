@@ -1,4 +1,4 @@
-# 🚀 Suitpax Landing Page - Roadmap de Mejoras
+# Suitpax - Roadmap de mejoras
 
 ## 📋 **Mejoras Inmediatas (Próximas 2 semanas)**
 
@@ -29,7 +29,7 @@
 - [ ] **Multi-idioma completo** - ES, FR, DE, PT, IT
 - [ ] **Localización de contenido** - Adaptar ejemplos y casos de uso por región
 - [ ] **Monedas locales** - Precios en moneda local automática
-- [ ] **Compliance regional** - GDPR, CCPA, LGPD adaptado por región
+- [ ] **Compliance regional** - GDPR, CCPA, LGPD adaptado por región ✅
 - [ ] **Timezone awareness** - Horarios y fechas localizadas
 
 ### 🔐 **Seguridad y Compliance**
@@ -46,12 +46,11 @@
 - [ ] **Conversion funnel optimization** - Optimización basada en datos
 - [ ] **Predictive analytics** - Modelos de predicción de churn y conversión
 
-## 🚀 **Mejoras a Largo Plazo (3-6 meses)**
+## 🚀 **Mejoras a Largo Plazo (2-4 meses)**
 
 ### 🤝 **Integraciones y Ecosistema**
 - [ ] **API pública** - SDK para desarrolladores externos
-- [ ] **Zapier integration** - Conectores con 3000+ apps
-- [ ] **Slack/Teams bots** - Bots nativos para plataformas de trabajo
+- [ ] **MCP integration** 
 - [ ] **Calendar integrations** - Sincronización bidireccional con calendarios
 - [ ] **ERP integrations** - SAP, Oracle, NetSuite connectors
 
@@ -61,13 +60,6 @@
 - [ ] **Case studies interactivos** - Historias de éxito detalladas
 - [ ] **ROI calculator** - Herramienta de cálculo de retorno de inversión
 - [ ] **Best practices guide** - Guías de mejores prácticas por industria
-
-### 🌟 **Innovación y Futuro**
-- [ ] **AR/VR experiences** - Tours virtuales de destinos
-- [ ] **Blockchain integration** - Verificación descentralizada de identidad
-- [ ] **IoT integration** - Conectividad con dispositivos de viaje
-- [ ] **Sustainability tracking** - Huella de carbono en tiempo real
-- [ ] **Neural interfaces** - Preparación para interfaces cerebro-computadora
 
 ## 🎨 **Mejoras de Diseño Específicas**
 
