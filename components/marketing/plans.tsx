@@ -506,3 +506,60 @@ export const Plans = () => {
               </div>
               <p className="text-[10px] sm:text-xs font-medium">Free</p>
               <p className="text-[8px] sm:text-[10px] text-gray-500">5K tokens</p
+</div>
+            <div className="text-center">
+              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
+                <div className="bg-emerald-950 h-1 w-1/2 rounded-full"></div>
+              </div>
+              <p className="text-[10px] sm:text-xs font-medium">Pro</p>
+              <p className="text-[8px] sm:text-[10px] text-gray-500">25K tokens</p>
+            </div>
+            <div className="text-center">
+              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
+                <div className="bg-emerald-950 h-1 w-full rounded-full"></div>
+              </div>
+              <p className="text-[10px] sm:text-xs font-medium">Enterprise</p>
+              <p className="text-[8px] sm:text-[10px] text-gray-500">Unlimited</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Mission and Values Section */}
+        <MissionValues />
+
+        {/* FAQ Section */}
+        <FAQ items={defaultFAQItems} />
+
+        <motion.div
+          className="mt-16 sm:mt-20 text-center max-w-2xl mx-auto bg-gray-50 p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-2">Need a custom solution?</h3>
+          <p className="text-xs sm:text-sm text-gray-600 mb-5">
+            Our enterprise plans are tailored to your specific business travel needs. Contact our sales team to learn
+            more about how we can customize a solution for your organization.
+          </p>
+          <Link
+            href="mailto:hello@suitpax.com"
+            className="inline-flex items-center text-xs sm:text-sm font-medium bg-black text-white px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors"
+          >
+            Contact our sales team
+            <svg
+              className="w-4 h-4 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+export default Plans
