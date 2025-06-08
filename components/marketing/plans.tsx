@@ -68,7 +68,7 @@ const communityImages = {
   ],
 }
 
-// Pricing plans - Solo 3 planes
+// Pricing plans - Removido plan Basic
 const pricingPlans = [
   {
     id: "free",
@@ -401,8 +401,8 @@ export const Plans = () => {
           </div>
         </div>
 
-        {/* Grid modificado para 3 planes */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-7xl mx-auto">
+        {/* Grid modificado para 3 columnas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
           {pricingPlans.map((plan, index) => (
             <motion.div
               key={plan.id}
@@ -418,7 +418,7 @@ export const Plans = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              {/* Header */}
+              {/* Diseño más compacto */}
               <div className="mb-2 sm:mb-3 flex items-start justify-between">
                 <div>
                   <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">{plan.name}</h3>
@@ -431,7 +431,6 @@ export const Plans = () => {
                 )}
               </div>
 
-              {/* Pricing */}
               <div className="mb-2 sm:mb-3">
                 <div className="flex items-baseline">
                   <span className="text-2xl sm:text-3xl font-medium tracking-tighter text-black">
@@ -443,7 +442,7 @@ export const Plans = () => {
                 </div>
               </div>
 
-              {/* Features */}
+              {/* Features más compactas */}
               <ul className="space-y-1 mb-3 sm:mb-4 flex-grow">
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start">
@@ -461,13 +460,12 @@ export const Plans = () => {
                 ))}
               </ul>
 
-              {/* Mini Chat */}
+              {/* Mini Chat UI con agente específico */}
               <MiniChat planId={plan.id} />
 
-              {/* Community Carousel */}
+              {/* Community Carousel - solo para planes no beta */}
               {plan.id !== "beta" && plan.communityImages && <CommunityCarousel images={plan.communityImages} />}
 
-              {/* CTA Button */}
               <div className="mt-3">
                 <Link
                   href={
@@ -488,7 +486,10 @@ export const Plans = () => {
           ))}
         </div>
 
-        {/* Token Usage Visualization */}
+        <div className="flex justify-center mt-12">
+          <CounterBadge />
+        </div>
+
         <motion.div
           className="mt-16 sm:mt-20"
           initial={{ opacity: 0, y: 20 }}
@@ -504,7 +505,4 @@ export const Plans = () => {
                 <div className="bg-emerald-950 h-1 w-1/5 rounded-full"></div>
               </div>
               <p className="text-[10px] sm:text-xs font-medium">Free</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">5K tokens</p>
-            </div>
-            <div className="text-center">
-              
+              <p className="text-[8px] sm:text-[10px] text-gray-500">5K tokens</p
