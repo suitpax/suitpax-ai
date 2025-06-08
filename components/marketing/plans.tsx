@@ -36,11 +36,6 @@ const chatPlaceholders = {
     "What's the cheapest flight to New York next week?...",
     "Can I book a basic business trip to Dallas?...",
   ],
-  basic: [
-    "Find me a flight with lounge access to London...",
-    "Book a business hotel with meeting rooms in Berlin...",
-    "Schedule a team lunch near our client's office in Madrid...",
-  ],
   pro: [
     "Arrange travel for our marketing team to Tokyo...",
     "Set up our company travel policy for approval...",
@@ -56,7 +51,6 @@ const chatPlaceholders = {
 // Community images
 const communityImages = {
   free: ["/community/jordan-burgess.webp", "/community/bec-ferguson.webp"],
-  basic: ["/community/kelsey-lowe.webp", "/community/brianna-ware.webp", "/community/harriet-rojas.jpg"],
   pro: [
     "/community/ammar-foley.webp",
     "/community/owen-harding.webp",
@@ -74,7 +68,7 @@ const communityImages = {
   ],
 }
 
-// Pricing plans - Añadido nuevo plan "Starter" de 49€
+// Pricing plans - Solo 3 planes
 const pricingPlans = [
   {
     id: "free",
@@ -102,32 +96,6 @@ const pricingPlans = [
     bgGradient: "from-gray-50 to-gray-100",
   },
   {
-    id: "basic",
-    name: "Basic",
-    description: "For growing teams ready to optimize their travel experience",
-    price: "€49",
-    annualPrice: "€39",
-    period: "per month",
-    annualPeriod: "per month, billed annually",
-    features: [
-      "15,000 AI tokens/month",
-      "30 AI travel searches per month",
-      "Up to 15 team members",
-      "Standard AI travel planning",
-      "Priority email support",
-      "Advanced expense tracking",
-      "Enhanced itinerary management",
-      "Standard travel policy templates",
-      "Basic CRM integration",
-    ],
-    cta: "Start 14-day trial",
-    badge: "Starter",
-    popular: true,
-    agentImage: "/agents/agent-emma.jpeg",
-    communityImages: ["/community/kelsey-lowe.webp", "/community/brianna-ware.webp", "/community/harriet-rojas.jpg"],
-    bgGradient: "from-gray-50 to-gray-100",
-  },
-  {
     id: "pro",
     name: "Pro",
     description: "For businesses ready to fully optimize their travel operations",
@@ -149,7 +117,7 @@ const pricingPlans = [
     ],
     cta: "Contact us",
     badge: "Advanced",
-    popular: false,
+    popular: true,
     agentImage: "/agents/agent-marcus.jpeg",
     communityImages: [
       "/community/ammar-foley.webp",
@@ -209,8 +177,6 @@ const MiniChat = ({ planId }: { planId: string }) => {
     switch (planId) {
       case "free":
         return "/agents/agent-sophia.jpeg"
-      case "basic":
-        return "/agents/agent-emma.jpeg"
       case "pro":
         return "/agents/agent-marcus.jpeg"
       case "enterprise":
@@ -435,8 +401,8 @@ export const Plans = () => {
           </div>
         </div>
 
-        {/* Grid modificado para 2x2 en pantallas grandes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
+        {/* Grid modificado para 3 planes */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-7xl mx-auto">
           {pricingPlans.map((plan, index) => (
             <motion.div
               key={plan.id}
@@ -452,7 +418,7 @@ export const Plans = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              {/* Diseño más compacto */}
+              {/* Header */}
               <div className="mb-2 sm:mb-3 flex items-start justify-between">
                 <div>
                   <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">{plan.name}</h3>
@@ -465,6 +431,7 @@ export const Plans = () => {
                 )}
               </div>
 
+              {/* Pricing */}
               <div className="mb-2 sm:mb-3">
                 <div className="flex items-baseline">
                   <span className="text-2xl sm:text-3xl font-medium tracking-tighter text-black">
@@ -476,7 +443,7 @@ export const Plans = () => {
                 </div>
               </div>
 
-              {/* Features más compactas */}
+              {/* Features */}
               <ul className="space-y-1 mb-3 sm:mb-4 flex-grow">
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start">
@@ -494,12 +461,13 @@ export const Plans = () => {
                 ))}
               </ul>
 
-              {/* Mini Chat UI con agente específico */}
+              {/* Mini Chat */}
               <MiniChat planId={plan.id} />
 
-              {/* Community Carousel - solo para planes no beta */}
+              {/* Community Carousel */}
               {plan.id !== "beta" && plan.communityImages && <CommunityCarousel images={plan.communityImages} />}
 
+              {/* CTA Button */}
               <div className="mt-3">
                 <Link
                   href={
@@ -520,10 +488,7 @@ export const Plans = () => {
           ))}
         </div>
 
-        <div className="flex justify-center mt-12">
-          <CounterBadge />
-        </div>
-
+        {/* Token Usage Visualization */}
         <motion.div
           className="mt-16 sm:mt-20"
           initial={{ opacity: 0, y: 20 }}
@@ -533,7 +498,7 @@ export const Plans = () => {
           <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-6 text-center">
             AI Token Usage {isAnnual ? "(Annual Plans)" : "(Monthly Plans)"}
           </h3>
-          <div className="grid grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-3xl mx-auto">
             <div className="text-center">
               <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
                 <div className="bg-emerald-950 h-1 w-1/5 rounded-full"></div>
@@ -542,65 +507,4 @@ export const Plans = () => {
               <p className="text-[8px] sm:text-[10px] text-gray-500">5K tokens</p>
             </div>
             <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-1/3 rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Basic</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">15K tokens</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-1/2 rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Pro</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">25K tokens</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-full rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Enterprise</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">Unlimited</p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Mission and Values Section */}
-        <MissionValues />
-
-        {/* FAQ Section */}
-        <FAQ items={defaultFAQItems} />
-
-        <motion.div
-          className="mt-16 sm:mt-20 text-center max-w-2xl mx-auto bg-gray-50 p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
-          <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-2">Need a custom solution?</h3>
-          <p className="text-xs sm:text-sm text-gray-600 mb-5">
-            Our enterprise plans are tailored to your specific business travel needs. Contact our sales team to learn
-            more about how we can customize a solution for your organization.
-          </p>
-          <Link
-            href="mailto:hello@suitpax.com"
-            className="inline-flex items-center text-xs sm:text-sm font-medium bg-black text-white px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors"
-          >
-            Contact our sales team
-            <svg
-              className="w-4 h-4 ml-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-            </svg>
-          </Link>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-export default Plans
+              
