@@ -177,7 +177,7 @@ export function ComparePlans() {
           </motion.div>
 
           <motion.div
-            className="overflow-x-auto rounded-xl border border-gray-800 shadow-2xl bg-gray-900"
+            className="overflow-x-auto rounded-xl border border-gray-800 shadow-2xl bg-black"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -185,7 +185,7 @@ export function ComparePlans() {
             <div className="min-w-[800px]">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-800 bg-gray-900">
+                  <tr className="border-b border-gray-800 bg-black">
                     <th className="py-4 px-4 text-left w-1/4"></th>
                     <th className="py-4 px-4 text-center w-1/4">
                       <div className="flex flex-col items-center">
