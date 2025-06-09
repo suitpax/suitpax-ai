@@ -118,7 +118,7 @@ const pricingPlans = [
       "Priority email support",
       "Enhanced expense tracking",
     ],
-    cta: "Start 14-day trial",
+    cta: "Talk to founders",
     badge: "Popular",
     popular: true,
     agentImage: "/agents/agent-marcus.jpeg",
@@ -332,7 +332,7 @@ const MissionValues = () => {
 export const Plans = () => {
   const [randomTitle, setRandomTitle] = useState("")
   const [randomSubtitle, setRandomSubtitle] = useState("")
-  const [isAnnual, setIsAnnual] = useState(false)
+  const [isAnnual, setIsAnnual] = useState(true)
 
   useEffect(() => {
     // Seleccionar un título aleatorio al montar el componente
