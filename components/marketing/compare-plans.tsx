@@ -15,6 +15,7 @@ const featureCategories = [
         name: "Monthly AI Tokens",
         description: "Number of AI tokens available for use each month",
         free: "5,000",
+        basic: "15,000",
         pro: "25,000",
         enterprise: "Unlimited",
       },
@@ -22,6 +23,7 @@ const featureCategories = [
         name: "AI Travel Searches",
         description: "Number of AI-powered travel searches per month",
         free: "10/month",
+        basic: "30/month",
         pro: "50/month",
         enterprise: "Unlimited",
       },
@@ -29,6 +31,7 @@ const featureCategories = [
         name: "Token Rollover",
         description: "Unused tokens roll over to the next month",
         free: false,
+        basic: false,
         pro: false,
         enterprise: true,
       },
@@ -41,6 +44,7 @@ const featureCategories = [
         name: "Itinerary Management",
         description: "Create, edit, and manage travel itineraries",
         free: "Basic",
+        basic: "Standard",
         pro: "Enhanced",
         enterprise: "Advanced",
       },
@@ -48,6 +52,7 @@ const featureCategories = [
         name: "Travel Policies",
         description: "Set and enforce travel policies for your team",
         free: "Basic templates",
+        basic: "Standard templates",
         pro: "Custom policies",
         enterprise: "Global compliance",
       },
@@ -55,6 +60,7 @@ const featureCategories = [
         name: "Expense Tracking",
         description: "Track and manage travel expenses",
         free: "Basic",
+        basic: "Advanced",
         pro: "AI-powered",
         enterprise: "Enterprise-grade",
       },
@@ -67,6 +73,7 @@ const featureCategories = [
         name: "Team Members",
         description: "Number of team members allowed on the plan",
         free: "5",
+        basic: "15",
         pro: "25",
         enterprise: "Unlimited",
       },
@@ -74,6 +81,7 @@ const featureCategories = [
         name: "Team Coordination",
         description: "Coordinate travel for multiple team members",
         free: "Basic",
+        basic: "Standard",
         pro: "Advanced",
         enterprise: "Global",
       },
@@ -81,6 +89,7 @@ const featureCategories = [
         name: "Multi-Entity Management",
         description: "Manage travel across multiple business entities",
         free: false,
+        basic: false,
         pro: false,
         enterprise: true,
       },
@@ -93,6 +102,7 @@ const featureCategories = [
         name: "Customer Support",
         description: "Access to customer support",
         free: "Email",
+        basic: "Priority email",
         pro: "24/5 Priority",
         enterprise: "24/7 VIP",
       },
@@ -100,6 +110,7 @@ const featureCategories = [
         name: "Bank API Integration",
         description: "Connect bank accounts for seamless expense management",
         free: false,
+        basic: "Basic",
         pro: "Basic",
         enterprise: "Full",
       },
@@ -107,6 +118,7 @@ const featureCategories = [
         name: "CRM Integration",
         description: "Connect with CRM systems for better customer insights",
         free: false,
+        basic: "Basic",
         pro: "Advanced",
         enterprise: "Enterprise",
       },
@@ -177,7 +189,7 @@ export function ComparePlans() {
           </motion.div>
 
           <motion.div
-            className="overflow-x-auto rounded-xl border border-gray-800 shadow-2xl bg-black"
+            className="overflow-x-auto rounded-xl border border-gray-800 shadow-2xl bg-gray-900"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -185,9 +197,9 @@ export function ComparePlans() {
             <div className="min-w-[800px]">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-800 bg-black">
-                    <th className="py-4 px-4 text-left w-1/4"></th>
-                    <th className="py-4 px-4 text-center w-1/4">
+                  <tr className="border-b border-gray-800 bg-gray-900">
+                    <th className="py-4 px-4 text-left w-1/5"></th>
+                    <th className="py-4 px-4 text-center w-1/5">
                       <div className="flex flex-col items-center">
                         <span className="text-sm font-medium text-white">Free</span>
                         <span className="text-xs text-gray-400">€0</span>
@@ -196,16 +208,25 @@ export function ComparePlans() {
                         </span>
                       </div>
                     </th>
-                    <th className="py-4 px-4 text-center w-1/4">
+                    <th className="py-4 px-4 text-center w-1/5 bg-gray-800">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium text-white">Pro</span>
-                        <span className="text-xs text-gray-400">{isAnnual ? "€71/month" : "€89/month"}</span>
+                        <span className="text-sm font-medium text-white">Basic</span>
+                        <span className="text-xs text-gray-400">{isAnnual ? "€39/month" : "€49/month"}</span>
                         <span className="mt-1 inline-flex items-center rounded-full bg-white px-4 py-0.5 text-[10px] font-medium text-black">
                           Most Popular
                         </span>
                       </div>
                     </th>
-                    <th className="py-4 px-4 text-center w-1/4">
+                    <th className="py-4 px-4 text-center w-1/5">
+                      <div className="flex flex-col items-center">
+                        <span className="text-sm font-medium text-white">Pro</span>
+                        <span className="text-xs text-gray-400">{isAnnual ? "€71/month" : "€89/month"}</span>
+                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-gray-600 px-3 py-0.5 text-[10px] font-medium text-gray-300">
+                          Advanced
+                        </span>
+                      </div>
+                    </th>
+                    <th className="py-4 px-4 text-center w-1/5">
                       <div className="flex flex-col items-center">
                         <span className="text-sm font-medium text-white">Enterprise</span>
                         <span className="text-xs text-gray-400">Custom pricing</span>
@@ -225,18 +246,21 @@ export function ComparePlans() {
                         }`}
                         onClick={() => toggleCategory(category.name)}
                       >
-                        <td colSpan={4} className="py-3 px-4">
+                        <td colSpan={6} className="py-3 px-4">
                           <div className="flex items-center justify-between">
                             <span className="font-medium text-sm text-white">{category.name}</span>
                             <svg
-                              className={`w-4 h-4 transition-transform text-gray-400 ${
-                                expandedCategory === category.name ? "rotate-180" : ""
-                              }`}
+                              className={`w-4 h-4 transition-transform text-gray-400 ${expandedCategory === category.name ? "rotate-180" : ""}`}
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
                             >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M19 9l-7 7-7-7"
+                              ></path>
                             </svg>
                           </div>
                         </td>
@@ -264,6 +288,9 @@ export function ComparePlans() {
                               </div>
                             </td>
                             <td className="py-3 px-4 text-center">{renderFeatureValue(feature.free)}</td>
+                            <td className="py-3 px-4 text-center bg-gray-800/30">
+                              {renderFeatureValue(feature.basic)}
+                            </td>
                             <td className="py-3 px-4 text-center">{renderFeatureValue(feature.pro)}</td>
                             <td className="py-3 px-4 text-center">{renderFeatureValue(feature.enterprise)}</td>
                           </motion.tr>
