@@ -106,7 +106,7 @@ const pricingPlans = [
     annualPeriod: "per month, billed annually",
     features: [
       "25,000 AI tokens/month",
-      "50 AI travel searches per month",
+      "20 AI travel searches per month",
       "Up to 15 team members",
       "AI-powered expense management",
       "Advanced itinerary planning",
