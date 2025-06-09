@@ -90,7 +90,7 @@ const pricingPlans = [
       "Basic travel policy templates",
     ],
     cta: "Get Started",
-    badge: "Free",
+    badge: "Starter",
     popular: false,
     agentImage: "/agents/agent-sophia.jpeg",
     communityImages: ["/community/jordan-burgess.webp", "/community/bec-ferguson.webp"],
