@@ -55,21 +55,21 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
   }
 
   return (
-    <div className="relative mb-12 px-1 sm:px-2">
-      <div className="grid grid-cols-10 md:grid-cols-12 lg:grid-cols-16 xl:grid-cols-18 gap-1 sm:gap-1 md:gap-1 lg:gap-1">
+    <div className="relative mb-8 px-0.5">
+      <div className="grid grid-cols-12 sm:grid-cols-14 md:grid-cols-16 lg:grid-cols-18 xl:grid-cols-20 gap-0.5">
         {agentGrid.map((agent, index) => (
           <motion.div
             key={agent.id}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: index * 0.003 }}
-            className="aspect-square relative cursor-pointer p-0.5 md:p-0 lg:p-0"
+            className="aspect-square relative cursor-pointer"
             onClick={() => handleAgentSelect(agent.id)}
           >
             <AnimatePresence>
               {selectedAgent === agent.id && (
                 <motion.div
-                  className="absolute inset-0 rounded-lg z-10 pointer-events-none"
+                  className="absolute inset-0 rounded-md z-10 pointer-events-none"
                   initial={{ opacity: 0 }}
                   animate={{
                     opacity: [0.4, 0.7, 0.4],
@@ -83,19 +83,19 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
                   }}
                   style={{
                     background: "rgba(6, 95, 70, 0.3)",
-                    boxShadow: "0 0 15px 5px rgba(6, 95, 70, 0.2)",
+                    boxShadow: "0 0 12px 3px rgba(6, 95, 70, 0.2)",
                   }}
                 />
               )}
             </AnimatePresence>
 
-            <div className="absolute inset-0 rounded-lg overflow-hidden bg-gray-100 md:inset-[10%] lg:inset-[25%] xl:inset-[30%]">
+            <div className="absolute inset-[15%] rounded-md overflow-hidden bg-gray-100">
               <Image
                 src={agent.image || "/placeholder.svg"}
                 alt="AI Travel Agent"
                 fill
                 className="object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
-                sizes="(max-width: 768px) 30px, (max-width: 1024px) 25px, 20px"
+                sizes="(max-width: 640px) 20px, (max-width: 768px) 18px, (max-width: 1024px) 16px, 14px"
               />
             </div>
           </motion.div>
@@ -103,10 +103,10 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
       </div>
 
       <div
-        className="absolute inset-0 bg-gradient-to-t from-gray-50/90 via-transparent to-transparent pointer-events-none"
+        className="absolute inset-0 bg-gradient-to-t from-gray-50/95 via-transparent to-transparent pointer-events-none"
         style={{
           background:
-            "linear-gradient(to top, rgba(249, 250, 251, 0.95), rgba(249, 250, 251, 0) 50%, rgba(249, 250, 251, 0))",
+            "linear-gradient(to top, rgba(249, 250, 251, 0.95), rgba(249, 250, 251, 0) 40%, rgba(249, 250, 251, 0))",
         }}
       ></div>
     </div>
