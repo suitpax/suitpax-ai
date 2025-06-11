@@ -36,6 +36,10 @@ const defaultCities = [
   "Brussels", // Added city
   "Geneva", // Added city
   "Munich", // Added city
+  "Barcelona", // Added European city
+  "Copenhagen", // Added European city
+  "Lisbon", // Added European city
+  "Stockholm", // Added European city
 ]
 
 // Añadir esta función al inicio del componente CityAnimateText

@@ -114,7 +114,7 @@ const getBadgeMessage = () => {
 
   // Random selection for other times
   const messages = [
-    "Launching at the end of Q3 2025.",
+    "Launching at the end of Q2 2025.",
     "Our AI Agents are at the gym...",
     "Join our waitlist in the meantime.",
     "The next-gen of traveltech.",

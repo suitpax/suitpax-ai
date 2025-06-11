@@ -2,8 +2,8 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack } from "react-icons/si"
-import { PiArrowUpRightBold } from "react-icons/pi"
+import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack, SiDiscord } from "react-icons/si"
+import { PiArrowUpRightBold, PiCalendarCheckBold } from "react-icons/pi"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 
@@ -111,11 +111,16 @@ export const Footer = () => {
                   <PiArrowUpRightBold className="h-3 w-3 ml-1 text-gray-400" />
                 </div>
               </Link>
-
               <Link
-                href="/travel-expense-management"
-                className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
-              ></Link>
+                href="https://lu.ma/suitpax"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
+              >
+                <PiCalendarCheckBold className="h-3.5 w-3.5" />
+                Join Suitpax Events
+                <PiArrowUpRightBold className="h-3 w-3 text-gray-400" />
+              </Link>
               <Link
                 href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
@@ -294,6 +299,15 @@ export const Footer = () => {
               >
                 <SiProducthunt className="h-5 w-5" />
                 <span className="sr-only">Product Hunt</span>
+              </Link>
+              <Link
+                href="https://discord.gg/suitpax" // Reemplaza con tu enlace de Discord
+                className="text-gray-400 hover:text-gray-200 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <SiDiscord className="h-5 w-5" />
+                <span className="sr-only">Discord</span>
               </Link>
               <Link
                 href="https://instagram.com/suitpax"
