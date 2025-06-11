@@ -59,7 +59,7 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
       {" "}
       {/* Reducido mb de mb-12 a mb-8 */}
       {/* Ajuste de columnas: menos columnas en pantallas grandes para que los agentes sean más grandes */}
-      <div className="grid grid-cols-10 sm:grid-cols-12 md:grid-cols-14 lg:grid-cols-10 xl:grid-cols-12 gap-0.5">
+      <div className="grid grid-cols-10 gap-1 sm:gap-1">
         {agentGrid.map((agent, index) => (
           <motion.div
             key={agent.id}
@@ -92,13 +92,13 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
               )}
             </AnimatePresence>
             {/* Ajuste del inset para que la imagen ocupe más espacio, similar a móvil */}
-            <div className="absolute inset-[10%] sm:inset-[12%] md:inset-[15%] lg:inset-[10%] xl:inset-[12%] rounded-md overflow-hidden bg-gray-100">
+            <div className="absolute inset-0.5 rounded-lg overflow-hidden bg-gray-100">
               <Image
                 src={agent.image || "/placeholder.svg"}
                 alt="AI Travel Agent"
                 fill
                 className="object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
-                sizes="(max-width: 640px) 30px, (max-width: 768px) 35px, (max-width: 1024px) 40px, 45px" // Tamaños ajustados para ser más grandes
+                sizes="30px" // Tamaños ajustados para ser más grandes
               />
             </div>
           </motion.div>
