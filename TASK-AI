@@ -1,0 +1,3 @@
+El Dashboard se debe cargar dinámicamente con estados cero para que el usuario lo configure y detecte toda su información real vale? Instala Supabase y configuralo y dime los pasos siguientes para configurarlo y proteger el acceso al Dashboard mediante middleware y el signin y sio sign-up vale? Y configura los planes correctamente, quita por favor el plan Starter del chat route, solo son 3 planes y extrae la información y acuérdate de que una vez accedamos al signin o sign-up estaremos e el dominio app.suitpax.com
+
+
