@@ -36,15 +36,10 @@ const chatPlaceholders = {
     "What's the cheapest flight to New York next week?...",
     "Can I book a basic business trip to Dallas?...",
   ],
-  basic: [
+  pro: [
     "Find me a flight with lounge access to London...",
     "Book a business hotel with meeting rooms in Berlin...",
     "Schedule a team lunch near our client's office in Madrid...",
-  ],
-  pro: [
-    "Arrange travel for our marketing team to Tokyo...",
-    "Set up our company travel policy for approval...",
-    "Find the best business hotels with executive suites in Singapore...",
   ],
   enterprise: [
     "Coordinate global travel for our executive team...",
@@ -56,12 +51,12 @@ const chatPlaceholders = {
 // Community images
 const communityImages = {
   free: ["/community/jordan-burgess.webp", "/community/bec-ferguson.webp"],
-  basic: ["/community/kelsey-lowe.webp", "/community/brianna-ware.webp", "/community/harriet-rojas.jpg"],
   pro: [
+    "/community/kelsey-lowe.webp", 
+    "/community/brianna-ware.webp", 
+    "/community/harriet-rojas.jpg",
     "/community/ammar-foley.webp",
     "/community/owen-harding.webp",
-    "/community/nicolas-trevino.webp",
-    "/community/isobel-fuller.webp",
   ],
   enterprise: [
     "/community/ammar-foley.webp",
@@ -74,7 +69,7 @@ const communityImages = {
   ],
 }
 
-// Pricing plans - Añadido nuevo plan "Starter" de 49€
+// Pricing plans - Eliminado plan Basic, Pro ahora tiene precio de €49
 const pricingPlans = [
   {
     id: "free",
@@ -95,67 +90,44 @@ const pricingPlans = [
       "Basic travel policy templates",
     ],
     cta: "Get Started",
-    badge: "Free",
+    badge: "Starter",
     popular: false,
     agentImage: "/agents/agent-sophia.jpeg",
     communityImages: ["/community/jordan-burgess.webp", "/community/bec-ferguson.webp"],
     bgGradient: "from-gray-50 to-gray-100",
   },
   {
-    id: "basic",
-    name: "Basic",
-    description: "For growing teams ready to optimize their travel experience",
-    price: "€49",
-    annualPrice: "€39",
-    period: "per month",
-    annualPeriod: "per month, billed annually",
-    features: [
-      "15,000 AI tokens/month",
-      "30 AI travel searches per month",
-      "Up to 15 team members",
-      "Standard AI travel planning",
-      "Priority email support",
-      "Advanced expense tracking",
-      "Enhanced itinerary management",
-      "Standard travel policy templates",
-      "Basic CRM integration",
-    ],
-    cta: "Start 14-day trial",
-    badge: "Starter",
-    popular: true,
-    agentImage: "/agents/agent-emma.jpeg",
-    communityImages: ["/community/kelsey-lowe.webp", "/community/brianna-ware.webp", "/community/harriet-rojas.jpg"],
-    bgGradient: "from-gray-50 to-gray-100",
-  },
-  {
     id: "pro",
     name: "Pro",
     description: "For businesses ready to fully optimize their travel operations",
-    price: "€89",
-    annualPrice: "€71",
+    price: "€74",
+    annualPrice: "€59",
     period: "per month",
     annualPeriod: "per month, billed annually",
     features: [
       "25,000 AI tokens/month",
-      "50 AI travel searches per month",
-      "Up to 25 team members",
+      "20 AI travel searches per month",
+      "Up to 15 team members",
       "AI-powered expense management",
       "Advanced itinerary planning",
       "Custom travel policies",
       "24/5 priority support",
       "Team travel coordination",
       "Basic bank API integration",
-      "Advanced CRM intelligence",
+      "Advanced TRM intelligence",
+      "Priority email support",
+      "Enhanced expense tracking",
     ],
-    cta: "Contact us",
-    badge: "Advanced",
-    popular: false,
+    cta: "Talk to founders",
+    badge: "Popular",
+    popular: true,
     agentImage: "/agents/agent-marcus.jpeg",
     communityImages: [
+      "/community/kelsey-lowe.webp", 
+      "/community/brianna-ware.webp", 
+      "/community/harriet-rojas.jpg",
       "/community/ammar-foley.webp",
       "/community/owen-harding.webp",
-      "/community/nicolas-trevino.webp",
-      "/community/isobel-fuller.webp",
     ],
     bgGradient: "from-gray-50 to-gray-100",
   },
@@ -209,8 +181,6 @@ const MiniChat = ({ planId }: { planId: string }) => {
     switch (planId) {
       case "free":
         return "/agents/agent-sophia.jpeg"
-      case "basic":
-        return "/agents/agent-emma.jpeg"
       case "pro":
         return "/agents/agent-marcus.jpeg"
       case "enterprise":
@@ -362,7 +332,7 @@ const MissionValues = () => {
 export const Plans = () => {
   const [randomTitle, setRandomTitle] = useState("")
   const [randomSubtitle, setRandomSubtitle] = useState("")
-  const [isAnnual, setIsAnnual] = useState(false)
+  const [isAnnual, setIsAnnual] = useState(true)
 
   useEffect(() => {
     // Seleccionar un título aleatorio al montar el componente
@@ -435,8 +405,8 @@ export const Plans = () => {
           </div>
         </div>
 
-        {/* Grid modificado para 2x2 en pantallas grandes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
+        {/* Grid modificado para mostrar 3 planes en fila */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-6xl mx-auto">
           {pricingPlans.map((plan, index) => (
             <motion.div
               key={plan.id}
@@ -503,7 +473,7 @@ export const Plans = () => {
               <div className="mt-3">
                 <Link
                   href={
-                    plan.id === "enterprise" || plan.id === "pro"
+                    plan.id === "enterprise"
                       ? "mailto:hello@suitpax.com"
                       : "https://app.suitpax.com/sign-up"
                   }
@@ -533,20 +503,12 @@ export const Plans = () => {
           <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-6 text-center">
             AI Token Usage {isAnnual ? "(Annual Plans)" : "(Monthly Plans)"}
           </h3>
-          <div className="grid grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto">
             <div className="text-center">
               <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
                 <div className="bg-emerald-950 h-1 w-1/5 rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Free</p>
+<p className="text-[10px] sm:text-xs font-medium">Free</p>
               <p className="text-[8px] sm:text-[10px] text-gray-500">5K tokens</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-1/3 rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Basic</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">15K tokens</p>
             </div>
             <div className="text-center">
               <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
@@ -570,8 +532,7 @@ export const Plans = () => {
 
         {/* FAQ Section */}
         <FAQ items={defaultFAQItems} />
-
-        <motion.div
+<motion.div
           className="mt-16 sm:mt-20 text-center max-w-2xl mx-auto bg-gray-50 p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -604,3 +565,4 @@ export const Plans = () => {
 }
 
 export default Plans
+            
