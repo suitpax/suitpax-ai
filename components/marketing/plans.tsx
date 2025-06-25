@@ -494,38 +494,40 @@ export const Plans = () => {
           <CounterBadge />
         </div>
 
-        <motion.div
-          className="mt-16 sm:mt-20"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-6 text-center">
-            AI Token Usage {isAnnual ? "(Annual Plans)" : "(Monthly Plans)"}
-          </h3>
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-1/5 rounded-full"></div>
-<p className="text-[10px] sm:text-xs font-medium">Free</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">5K tokens</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-1/2 rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Pro</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">25K tokens</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-full rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Enterprise</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">Unlimited</p>
-            </div>
-          </div>
-        </motion.div>
+ <motion.div
+  className="mt-16 sm:mt-20"
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6, delay: 0.4 }}
+>
+  <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-6 text-center">
+    AI Token Usage {isAnnual ? "(Annual Plans)" : "(Monthly Plans)"}
+  </h3>
+  <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto">
+    <div className="text-center">
+      <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
+        <div className="bg-emerald-950 h-1 w-1/5 rounded-full"></div>
+      </div>
+      <p className="text-[10px] sm:text-xs font-medium">Free</p>
+      <p className="text-[8px] sm:text-[10px] text-gray-500">5K tokens</p>
+    </div>
+    <div className="text-center">
+      <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
+        <div className="bg-emerald-950 h-1 w-1/2 rounded-full"></div>
+      </div>
+      <p className="text-[10px] sm:text-xs font-medium">Pro</p>
+      <p className="text-[8px] sm:text-[10px] text-gray-500">25K tokens</p>
+    </div>
+    <div className="text-center">
+      <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
+        <div className="bg-emerald-950 h-1 w-full rounded-full"></div>
+      </div>
+      <p className="text-[10px] sm:text-xs font-medium">Enterprise</p>
+      <p className="text-[8px] sm:text-[10px] text-gray-500">Unlimited</p>
+    </div>
+  </div>
+</motion.div>p>
+   
 
         {/* Mission and Values Section */}
         <MissionValues />
