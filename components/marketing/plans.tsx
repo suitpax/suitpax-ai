@@ -526,7 +526,7 @@ export const Plans = () => {
       <p className="text-[8px] sm:text-[10px] text-gray-500">Unlimited</p>
     </div>
   </div>
-</motion.div>p>
+</motion.div>
    
 
         {/* Mission and Values Section */}
