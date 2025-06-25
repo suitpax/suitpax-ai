@@ -25,9 +25,9 @@ export default function AIVoiceAssistant() {
   const [detectedLanguage, setDetectedLanguage] = useState<string>("en-US")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [currentAgent] = useState({
-    name: "Emma",
-    role: "AI Travel Assistant",
-    image: "/agents/agent-emma.jpeg",
+    name: "Rhina",
+    role: "AI Agent",
+    image: "/agents/agent-41.jpeg",
   })
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -59,7 +59,7 @@ export default function AIVoiceAssistant() {
         processUserInput(finalTranscript)
       }
     },
-    continuous: false,
+    continuous: true,
     language: detectedLanguage,
     autoDetectLanguage: true,
   })
@@ -390,7 +390,7 @@ export default function AIVoiceAssistant() {
                 />
                 <em className="font-serif italic">Voice Intelligence</em>
               </span>
-              <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
+              <span className="inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse mr-1"></span>
                 <em className="font-serif italic">Real-time Speech</em>
               </span>
