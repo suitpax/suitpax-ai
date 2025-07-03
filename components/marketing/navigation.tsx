@@ -6,7 +6,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { PiDotsNineBold, PiDotsSixBold, PiArrowUpRightBold } from "react-icons/pi"
-import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
+import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, } from "react-icons/si"
 import { cn } from "@/lib/utils"
 
 export const Navigation = () => {
@@ -207,7 +207,7 @@ export const Navigation = () => {
                   <div className="py-2 border-b border-gray-200/30">
                    
                   </div>
-               
+                </div>
 
                 {/* Social Icons - Mobile Only */}
                 <div className="mt-4 px-0">
