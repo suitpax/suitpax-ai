@@ -6,7 +6,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { PiDotsNineBold, PiDotsSixBold, PiArrowUpRightBold } from "react-icons/pi"
-import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack } from "react-icons/si"
+import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, } from "react-icons/si"
 import { cn } from "@/lib/utils"
 
 export const Navigation = () => {
@@ -107,13 +107,7 @@ export const Navigation = () => {
               >
                 Talk to founders
               </Link>
-              <Link
-                href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
-                className="px-2 py-0.5 text-xs text-black bg-transparent border border-black rounded-md font-medium tracking-tighter transition-colors flex items-center gap-1"
-              >
-                <SiSlack className="h-3 w-3" />
-                Join Slack
-              </Link>
+             
             </div>
 
             {/* Action Buttons */}
