@@ -44,7 +44,6 @@ export const Navigation = () => {
     }
   }, [isMobileMenuOpen])
 
-  // Helper function to check if a link is active
   const isActive = (path: string) => {
     if (path === "/") {
       return pathname === path
@@ -107,7 +106,6 @@ export const Navigation = () => {
               >
                 Talk to founders
               </Link>
-             
             </div>
 
             {/* Action Buttons */}
@@ -117,7 +115,7 @@ export const Navigation = () => {
                 asChild
                 className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
               >
-                <Link href="mailto:suitpax.com">
+                <Link href="mailto:hello@suitpax.com">
                   Private Beta
                   <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
                 </Link>
@@ -139,7 +137,7 @@ export const Navigation = () => {
             </div>
           </div>
 
-          {/* Mobile Menu - Simplified */}
+          {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <div ref={menuRef} className="lg:hidden overflow-hidden transition-all duration-300 ease-in-out">
               <nav className="mt-6 border-t border-gray-200/30 pt-4">
@@ -202,10 +200,6 @@ export const Navigation = () => {
                         <PiArrowUpRightBold className="h-3 w-3 ml-1 text-gray-500" />
                       </div>
                     </Link>
-                  </div>
-
-                  <div className="py-2 border-b border-gray-200/30">
-                   
                   </div>
                 </div>
 
