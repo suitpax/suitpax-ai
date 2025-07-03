@@ -9,26 +9,58 @@ import AgenticDisruption from "@/components/marketing/agentic-disruption"
 import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
 import type { Metadata } from "next"
 import SuitpaxHubMap from "@/components/marketing/suitpax-hub-map"
-import Features from "@/components/marketing/features"
-import AgentGrid from "@/components/ui/agent-grid"
-import CounterBadge from "@/components/ui/counter-badge"
-// Marketing Components
-import FlightsShowcase from "@/components/marketing/flights-showcase"
-import BankIntegration from "@/components/marketing/bank-integration"
-import TravelPolicy from "@/components/marketing/travel-policy"
-import ExpenseManagement from "@/components/marketing/expense-management"
-import SmartBooking from "@/components/marketing/smart-booking"
-import DashboardShowcase from "@/components/marketing/dashboard-showcase"
-import Integration from "@/components/marketing/integration"
-import AISuggestions from "@/components/marketing/ai-suggestions"
-import Analytics from "@/components/marketing/analytics"
-import Reports from "@/components/marketing/reports"
-import Invoicing from "@/components/marketing/invoicing"
-import SecurityShowcase from "@/components/marketing/security-showcase"
-import ComplianceShowcase from "@/components/marketing/compliance-showcase"
-import GlobalPresence from "@/components/marketing/global-presence"
-import CustomWorkflows from "@/components/marketing/custom-workflows"
-import DataInsights from "@/components/marketing/data-insights"
+
+export const metadata: Metadata = {
+  title: "Suitpax | AI-Powered Business Travel Platform",
+  description:
+    "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
+  openGraph: {
+    title: "Suitpax | AI-Powered Business Travel Platform",
+    description:
+      "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
+    url: "https://suitpax.com",
+    siteName: "Suitpax",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Suitpax | AI-Powered Business Travel Platform",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Suitpax | AI-Powered Business Travel Platform",
+    description:
+      "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
+    images: ["/twitter-image.png"],
+    creator: "@suitpax",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "verification_token",
+  },
+  alternates: {
+    canonical: "https://suitpax.com",
+    languages: {
+      "en-US": "https://suitpax.com/en-US",
+      "es-ES": "https://suitpax.com/es-ES",
+    },
+  },
+}
 
 export default function Home() {
   return (
@@ -39,28 +71,10 @@ export default function Home() {
         <AITravelAgents />
         <BusinessTravelRevolution />
         <SuitpaxHubMap />
-        <Features />
-        <FlightsShowcase />
-        <SmartBooking />
-        <DashboardShowcase />
-        <TravelPolicy />
-        <ExpenseManagement />
-        <BankIntegration />
-        <Integration />
-        <Analytics />
-        <Reports />
-        <Invoicing />
-        <DataInsights />
-        <CustomWorkflows />
-        <SecurityShowcase />
-        <ComplianceShowcase />
-        <GlobalPresence />
-        <AISuggestions />
         <CloudAIShowcase />
         <AgenticDisruption />
         <AIVoiceAssistant />
         <AIMeetingsAttachment />
-        <Testimonials />
         <FoundersOpenLetter />
       </main>
     </>
