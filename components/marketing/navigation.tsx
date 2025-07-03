@@ -207,7 +207,7 @@ export const Navigation = () => {
                   <div className="py-2 border-b border-gray-200/30">
                    
                   </div>
-                </div>
+               
 
                 {/* Social Icons - Mobile Only */}
                 <div className="mt-4 px-0">
