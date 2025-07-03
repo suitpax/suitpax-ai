@@ -205,14 +205,7 @@ export const Navigation = () => {
                   </div>
 
                   <div className="py-2 border-b border-gray-200/30">
-                    <Link
-                      href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <SiSlack className="h-4 w-4 mr-1.5" />
-                      Join our Slack community
-                    </Link>
+                   
                   </div>
                 </div>
 
