@@ -74,7 +74,7 @@ export const Footer = () => {
               </Link>
             </div>
 
-            <p className="text-xs text-gray-500">2261 Av.Fabraquer 2, Alicante, VA, 03560</p>
+            <p className="text-xs text-gray-500">Av.Fabraquer 21, Alicante, VA, 03560</p>
           </div>
 
           {/* Columna 2: Enlaces y certificaciones */}
