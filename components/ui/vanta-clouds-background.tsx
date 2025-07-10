@@ -30,7 +30,7 @@ export default function VantaCloudsBackground({ children, className = "" }: Vant
         minWidth: 200.0,
         // Colores personalizados para un fondo más neutro y gris
         backgroundColor: 0xf5f5f5, // Gris muy claro para el fondo
-        skyColor: 0xc7e5f2,
+        skyColor: 0xd1d5db, // Gray-300, un gris más neutro para el cielo
         cloudColor: 0xe5e7eb, // Gray-200 para las nubes
         cloudShadowColor: 0x9ca3af, // Gray-400 para las sombras de las nubes
         sunColor: 0x000000, // Eliminando el sol (negro sin opacidad)

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiDiscord } from "react-icons/si"
+import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack, SiDiscord } from "react-icons/si"
 import { PiArrowUpRightBold, PiCalendarCheckBold } from "react-icons/pi"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
@@ -74,7 +74,7 @@ export const Footer = () => {
               </Link>
             </div>
 
-            <p className="text-xs text-gray-500">Av.Fabraquer 21, Alicante, VA, 03560</p>
+            <p className="text-xs text-gray-500">2261 Market Street STE 86661 San Francisco, CA, 94114</p>
           </div>
 
           {/* Columna 2: Enlaces y certificaciones */}
@@ -121,7 +121,13 @@ export const Footer = () => {
                 Join Suitpax Events
                 <PiArrowUpRightBold className="h-3 w-3 text-gray-400" />
               </Link>
-            
+              <Link
+                href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
+              >
+                <SiSlack className="h-3.5 w-3.5" />
+                Join Slack
+              </Link>
               <Link
                 href="https://app.suitpax.com/sign-up"
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm"

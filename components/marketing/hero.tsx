@@ -10,7 +10,7 @@ import { FadeContainer, FadeSpan } from "@/components/ui/animations"
 import CounterBadge from "@/components/ui/counter-badge"
 import MiniChat from "@/components/ui/mini-chat"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-
+import { ArcadeEmbed } from "@/components/ui/arcade-embed"
 
 // Modificar las variaciones de título para hacerlas más inclusivas
 
@@ -329,6 +329,10 @@ export const Hero = () => {
             </div>
           </div>
 
+          {/* Dashboard Image - Sin mini badges */}
+          <div className="mt-12 sm:mt-16 md:mt-20 w-full max-w-[95vw] mx-auto flex justify-center relative px-4 sm:px-6">
+            <ArcadeEmbed />
+          </div>
 
           {/* Caption text */}
           <div className="mt-6 text-center">
