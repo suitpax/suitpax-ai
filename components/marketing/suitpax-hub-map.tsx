@@ -25,7 +25,6 @@ const teamMembers = [
     status: "traveling",
     action: "Quick Call",
     icon: PiPhoneBold,
-    gradient: "from-blue-500 to-purple-600",
   },
   {
     name: "Owen Harding",
@@ -34,7 +33,6 @@ const teamMembers = [
     status: "available",
     action: "Video Chat",
     icon: PiVideoCameraBold,
-    gradient: "from-green-500 to-emerald-600",
   },
   {
     name: "Jordan Burgess",
@@ -43,7 +41,6 @@ const teamMembers = [
     status: "in-event",
     action: "Join Live Event",
     icon: PiWaveformBold,
-    gradient: "from-red-500 to-pink-600",
   },
   {
     name: "Nicolas Trevino",
@@ -52,7 +49,6 @@ const teamMembers = [
     status: "traveling",
     action: "Schedule Meet",
     icon: PiCalendarBold,
-    gradient: "from-orange-500 to-yellow-600",
   },
   {
     name: "Scott Clayton",
@@ -61,7 +57,6 @@ const teamMembers = [
     status: "available",
     action: "Connect Now",
     icon: PiLightningBold,
-    gradient: "from-cyan-500 to-blue-600",
   },
   {
     name: "Lana Steiner",
@@ -70,7 +65,6 @@ const teamMembers = [
     status: "in-event",
     action: "Join Suitpax Live",
     icon: PiWaveformBold,
-    gradient: "from-purple-500 to-indigo-600",
   },
 ]
 
@@ -133,13 +127,13 @@ const features = [
 const getStatusColor = (status: string) => {
   switch (status) {
     case "traveling":
-      return "bg-black"
+      return "bg-white"
     case "available":
-      return "bg-gray-600"
+      return "bg-gray-300"
     case "in-meeting":
       return "bg-gray-400"
     case "in-event":
-      return "bg-gray-800"
+      return "bg-gray-600"
     default:
       return "bg-gray-500"
   }
@@ -164,20 +158,20 @@ export default function SuitpaxHubMap() {
   const [selectedMember, setSelectedMember] = useState<(typeof teamMembers)[0] | null>(null)
 
   return (
-    <section className="pt-12 pb-6 bg-gray-50">
+    <section className="pt-12 pb-6 bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-6">
+          <div className="inline-flex items-center rounded-xl bg-white/5 backdrop-blur-sm px-2.5 py-0.5 text-[10px] font-medium text-white/80 border border-white/10 mb-6">
             Global Team Network
           </div>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-black mb-4">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-white mb-4">
             <span className="font-serif italic">Connect</span> <span className="font-sans">with your team</span>
             <br />
             <span className="font-sans">anywhere in the</span> <span className="font-serif italic">world</span>
           </h2>
 
-          <p className="text-sm font-light text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm font-light text-white/60 max-w-2xl mx-auto">
             Suitpax Hub Map transforms business travel into meaningful connections. Discover teammates, partners, and
             opportunities wherever your journey takes you.
           </p>
@@ -186,7 +180,7 @@ export default function SuitpaxHubMap() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Map Section */}
           <div className="relative">
-            <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-6">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl p-6">
               <div
                 className="relative w-full aspect-square max-w-lg mx-auto rounded-xl overflow-hidden"
                 style={{
@@ -195,8 +189,8 @@ export default function SuitpaxHubMap() {
                   backgroundPosition: "center",
                 }}
               >
-                {/* Subtle overlay for better contrast */}
-                <div className="absolute inset-0 bg-black/10"></div>
+                {/* Dark overlay for better contrast */}
+                <div className="absolute inset-0 bg-black/40"></div>
 
                 {/* Team member avatars distributed across the map */}
                 <div className="absolute inset-0">
@@ -232,28 +226,21 @@ export default function SuitpaxHubMap() {
                           />
                         </div>
 
-                        {/* Spectacular interactive badge */}
+                        {/* Modern interactive badge */}
                         <motion.div
                           initial={{ opacity: 0, y: 10, scale: 0.8 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           transition={{ delay: index * 0.15 + 0.4, type: "spring", stiffness: 300, damping: 20 }}
                           className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 group-hover:scale-110 transition-all duration-300"
                         >
-                          <div
-                            className={`bg-gradient-to-r ${member.gradient} text-white rounded-lg px-2 py-1 text-[8px] font-medium whitespace-nowrap shadow-xl border border-white/20 backdrop-blur-sm`}
-                          >
+                          <div className="bg-white/10 backdrop-blur-md text-white rounded-lg px-2 py-1 text-[8px] font-medium whitespace-nowrap shadow-xl border border-white/20">
                             <div className="flex items-center gap-1">
                               <member.icon className="w-2.5 h-2.5" />
                               <span>{member.action}</span>
                             </div>
-                            {/* Shine effect */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            {/* Subtle glow effect */}
+                            <div className="absolute inset-0 bg-white/5 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                           </div>
-
-                          {/* Glow effect */}
-                          <div
-                            className={`absolute inset-0 bg-gradient-to-r ${member.gradient} rounded-lg blur-md opacity-30 -z-10 group-hover:opacity-50 transition-opacity duration-300`}
-                          ></div>
                         </motion.div>
                       </div>
 
@@ -288,7 +275,7 @@ export default function SuitpaxHubMap() {
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className={`w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r ${member.gradient} text-white rounded-lg text-[10px] font-semibold shadow-lg hover:shadow-xl transition-all duration-300`}
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-black text-white rounded-lg text-[10px] font-semibold shadow-lg hover:bg-gray-800 transition-all duration-300"
                           >
                             <member.icon className="w-3 h-3" />
                             {member.action}
@@ -299,7 +286,7 @@ export default function SuitpaxHubMap() {
                   ))}
                 </div>
 
-                {/* City badges with real images */}
+                {/* City badges with modern styling */}
                 <div className="absolute bottom-4 left-4 right-4">
                   <div className="flex flex-wrap gap-2 justify-center">
                     {cityBadges.slice(0, 4).map((city, index) => (
@@ -309,18 +296,18 @@ export default function SuitpaxHubMap() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 + 0.8 }}
                         whileHover={{ scale: 1.05 }}
-                        className="bg-white/95 backdrop-blur-md rounded-lg p-2 shadow-lg border border-gray-200/50 flex items-center gap-2 hover:shadow-xl transition-all duration-300"
+                        className="bg-white/10 backdrop-blur-md rounded-lg p-2 shadow-lg border border-white/20 flex items-center gap-2 hover:bg-white/20 transition-all duration-300"
                       >
                         <Image
                           src={city.image || "/placeholder.svg"}
                           alt={city.name}
                           width={28}
                           height={20}
-                          className="rounded object-cover"
+                          className="rounded object-cover opacity-80"
                         />
                         <div>
-                          <p className="text-[10px] font-semibold text-black">{city.name}</p>
-                          <p className="text-[8px] text-gray-500">{city.members} members</p>
+                          <p className="text-[10px] font-semibold text-white">{city.name}</p>
+                          <p className="text-[8px] text-white/60">{city.members} members</p>
                         </div>
                       </motion.div>
                     ))}
@@ -329,18 +316,18 @@ export default function SuitpaxHubMap() {
               </div>
 
               <div className="mt-4 text-center">
-                <p className="text-xs font-medium text-gray-700 mb-2">Live Team Activity</p>
-                <div className="flex items-center justify-center gap-3 text-[10px] text-gray-500">
+                <p className="text-xs font-medium text-white mb-2">Live Team Activity</p>
+                <div className="flex items-center justify-center gap-3 text-[10px] text-white/60">
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-black rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                     <span>6 traveling</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+                    <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
                     <span>8 available</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-gray-600 rounded-full animate-pulse"></div>
                     <span>2 in events</span>
                   </div>
                 </div>
@@ -350,9 +337,9 @@ export default function SuitpaxHubMap() {
 
           {/* Features Section */}
           <div className="space-y-4">
-            <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-5">
-              <h3 className="text-lg font-medium tracking-tighter text-black mb-3">Smart Team Discovery</h3>
-              <p className="text-xs text-gray-600 mb-4">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl p-5">
+              <h3 className="text-lg font-medium tracking-tighter text-white mb-3">Smart Team Discovery</h3>
+              <p className="text-xs text-white/70 mb-4">
                 AI-powered insights help you make the most of every business trip by connecting you with the right
                 people at the right time.
               </p>
@@ -364,71 +351,71 @@ export default function SuitpaxHubMap() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1, type: "spring", stiffness: 400, damping: 15 }}
-                    className="p-3 rounded-xl bg-gray-50 border border-gray-200"
+                    className="p-3 rounded-xl bg-white/5 border border-white/10"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="p-1.5 rounded-lg bg-white">
-                        <feature.icon className="w-3 h-3 text-gray-700" />
+                      <div className="p-1.5 rounded-lg bg-white/10">
+                        <feature.icon className="w-3 h-3 text-white" />
                       </div>
                     </div>
-                    <h4 className="text-xs font-medium text-black mb-1">{feature.title}</h4>
-                    <p className="text-[10px] text-gray-500">{feature.description}</p>
+                    <h4 className="text-xs font-medium text-white mb-1">{feature.title}</h4>
+                    <p className="text-[10px] text-white/60">{feature.description}</p>
                   </motion.div>
                 ))}
               </div>
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-5">
-              <h4 className="text-lg font-medium tracking-tighter text-black mb-3">Quick Connect</h4>
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl p-5">
+              <h4 className="text-lg font-medium tracking-tighter text-white mb-3">Quick Connect</h4>
 
               <div className="space-y-2">
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
                 >
                   <div className="flex items-center gap-2">
-                    <PiAirplaneTakeoffBold className="w-3 h-3 text-gray-700" />
-                    <span className="text-xs font-medium">Find teammates in NYC</span>
+                    <PiAirplaneTakeoffBold className="w-3 h-3 text-white" />
+                    <span className="text-xs font-medium text-white">Find teammates in NYC</span>
                   </div>
-                  <span className="text-[10px] text-gray-500">3 available</span>
+                  <span className="text-[10px] text-white/60">3 available</span>
                 </motion.button>
 
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
                 >
                   <div className="flex items-center gap-2">
-                    <PiWaveformBold className="w-3 h-3 text-gray-700" />
-                    <span className="text-xs font-medium">Join Suitpax Live event</span>
+                    <PiWaveformBold className="w-3 h-3 text-white" />
+                    <span className="text-xs font-medium text-white">Join Suitpax Live event</span>
                   </div>
-                  <span className="text-[10px] text-gray-500">Starting now</span>
+                  <span className="text-[10px] text-white/60">Starting now</span>
                 </motion.button>
 
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
                 >
                   <div className="flex items-center gap-2">
-                    <PiVideoCameraBold className="w-3 h-3 text-gray-700" />
-                    <span className="text-xs font-medium">Start team video call</span>
+                    <PiVideoCameraBold className="w-3 h-3 text-white" />
+                    <span className="text-xs font-medium text-white">Start team video call</span>
                   </div>
-                  <span className="text-[10px] text-gray-500">5 online</span>
+                  <span className="text-[10px] text-white/60">5 online</span>
                 </motion.button>
 
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
                 >
                   <div className="flex items-center gap-2">
-                    <PiDevicesBold className="w-3 h-3 text-gray-700" />
-                    <span className="text-xs font-medium">Book shared workspace</span>
+                    <PiDevicesBold className="w-3 h-3 text-white" />
+                    <span className="text-xs font-medium text-white">Book shared workspace</span>
                   </div>
-                  <span className="text-[10px] text-gray-500">WeWork SoHo</span>
+                  <span className="text-[10px] text-white/60">WeWork SoHo</span>
                 </motion.button>
               </div>
             </div>
@@ -437,16 +424,16 @@ export default function SuitpaxHubMap() {
 
         {/* Bottom CTA */}
         <div className="mt-8 text-center">
-          <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-6">
-            <h3 className="text-xl font-medium tracking-tighter text-black mb-3">Never travel alone again</h3>
-            <p className="text-xs text-gray-600 mb-4 max-w-md mx-auto">
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl p-6">
+            <h3 className="text-xl font-medium tracking-tighter text-white mb-3">Never travel alone again</h3>
+            <p className="text-xs text-white/70 mb-4 max-w-md mx-auto">
               Join thousands of professionals who use Suitpax Hub Map to turn business trips into networking
               opportunities and meaningful connections.
             </p>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-xl font-medium text-xs hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-black rounded-xl font-medium text-xs hover:bg-gray-100 transition-colors"
             >
               <PiMapPinBold className="w-3 h-3" />
               Explore Hub Map
