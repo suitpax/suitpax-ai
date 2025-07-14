@@ -194,13 +194,24 @@ export default function SuitpaxHubMap() {
 
                 {/* Team member avatars distributed across the map */}
                 <div className="absolute inset-0">
-                  {teamMembers.map((member, index) => (
+                  {teamMembers.map((member, index) => {
+                    // Better distribution positions for 6 members
+                    const positions = [
+                      { top: '15%', left: '20%' },  // Top left
+                      { top: '25%', left: '75%' },  // Top right
+                      { top: '45%', left: '15%' },  // Middle left
+                      { top: '40%', left: '65%' },  // Middle right
+                      { top: '70%', left: '30%' },  // Bottom left
+                      { top: '65%', left: '80%' },  // Bottom right
+                    ]
+                    
+                    return (
                     <motion.div
                       key={member.name}
                       className="absolute cursor-pointer group"
                       style={{
-                        top: `${20 + (index % 3) * 25}%`,
-                        left: `${15 + Math.floor(index / 3) * 25}%`,
+                        top: positions[index]?.top || '50%',
+                        left: positions[index]?.left || '50%',
                       }}
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -231,11 +242,11 @@ export default function SuitpaxHubMap() {
                           initial={{ opacity: 0, y: 10, scale: 0.8 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           transition={{ delay: index * 0.15 + 0.4, type: "spring", stiffness: 300, damping: 20 }}
-                          className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 group-hover:scale-110 transition-all duration-300"
+                          className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 group-hover:scale-110 transition-all duration-300"
                         >
-                          <div className="bg-white/10 backdrop-blur-md text-white rounded-lg px-2 py-1 text-[8px] font-medium whitespace-nowrap shadow-xl border border-white/20">
-                            <div className="flex items-center gap-1">
-                              <member.icon className="w-2.5 h-2.5" />
+                          <div className="bg-white/10 backdrop-blur-md text-white rounded-lg px-3 py-1.5 text-[9px] font-medium whitespace-nowrap shadow-xl border border-white/20">
+                            <div className="flex items-center gap-1.5">
+                              <member.icon className="w-3 h-3" />
                               <span>{member.action}</span>
                             </div>
                             {/* Subtle glow effect */}
@@ -249,7 +260,7 @@ export default function SuitpaxHubMap() {
                           initial={{ opacity: 0, y: 15, scale: 0.8 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 15, scale: 0.8 }}
-                          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-200/50 p-4 min-w-[160px] z-30"
+                          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-200/50 p-4 min-w-[160px] z-30"
                         >
                           <div className="flex items-center gap-3 mb-3">
                             <Image
