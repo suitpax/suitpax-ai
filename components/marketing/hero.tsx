@@ -5,14 +5,14 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import Badge from "@/components/ui/badge"
 import CityAnimateText from "@/components/ui/city-animate-text"
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "@/components/ui/animations"
 import { FadeContainer, FadeSpan } from "@/components/ui/animations"
 import CounterBadge from "@/components/ui/counter-badge"
 import MiniChat from "@/components/ui/mini-chat"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-import { ArcadeEmbed } from "@/components/ui/arcade-embed"
 
 // Modificar las variaciones de título para hacerlas más inclusivas
+
 // Reemplazar algunos de los titleVariations con estas nuevas versiones:
 const titleVariations = [
   "AI traveltech platform for modern businesses. Made for humans",
@@ -105,10 +105,12 @@ const titleVariations = [
 const getBadgeMessage = () => {
   const now = new Date()
   const hour = now.getHours()
+
   // Show "AI Agents are sleeping" after 9 PM (21:00)
   if (hour >= 21 || hour < 6) {
     return "Our AI Agents are sleeping..."
   }
+
   // Random selection for other times
   const messages = [
     "Launching at the end of Q2 2025.",
@@ -116,6 +118,7 @@ const getBadgeMessage = () => {
     "Join our waitlist in the meantime.",
     "The next-gen of traveltech.",
   ]
+
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
@@ -311,23 +314,18 @@ export const Hero = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
               <Button
                 asChild
-                className="rounded-full bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
+                className="rounded-xl bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
                 <Link href="/manifesto">Read our manifesto</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="rounded-full bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
+                className="rounded-xl bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
                 <Link href="https://cal.com/team/founders/partnership">Talk to founders</Link>
               </Button>
             </div>
-          </div>
-
-          {/* Dashboard Image - Sin mini badges */}
-          <div className="mt-12 sm:mt-16 md:mt-20 w-full max-w-[95vw] mx-auto flex justify-center relative px-4 sm:px-6">
-            <ArcadeEmbed />
           </div>
 
           {/* Caption text */}

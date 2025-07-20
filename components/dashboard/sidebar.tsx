@@ -1,64 +1,71 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
+import { Home, Briefcase, Bot, CreditCard, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Plane, Bot, Users, Settings, LifeBuoy, type LucideIcon } from "lucide-react"
+import Image from "next/image"
 
-interface NavItem {
-  href: string
-  label: string
-  icon: LucideIcon
-}
-
-const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/business-travel", label: "Business Travel", icon: Plane },
-  { href: "/dashboard/ai-agents", label: "AI Agents", icon: Bot },
-  { href: "/dashboard/team", label: "Team", icon: Users },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+const sidebarNavItems = [
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "Business Travel",
+    href: "/dashboard/business-travel",
+    icon: Briefcase,
+  },
+  {
+    title: "AI Agents",
+    href: "/dashboard/ai-agents",
+    icon: Bot,
+  },
+  {
+    title: "Billing",
+    href: "/dashboard/billing",
+    icon: CreditCard,
+  },
+  {
+    title: "Settings",
+    href: "/dashboard/settings",
+    icon: Settings,
+  },
 ]
 
-export default function Sidebar() {
+export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white md:flex">
-      <div className="flex h-16 items-center justify-center border-b border-gray-200 px-4">
-        <Link href="/dashboard">
-          <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={120} height={30} />
-        </Link>
-      </div>
-      <nav className="flex flex-1 flex-col gap-4 p-4">
-        <ul className="flex flex-1 flex-col gap-1">
-          {navItems.map((item) => (
-            <li key={item.label}>
+    <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40">
+      <div className="flex h-full max-h-screen flex-col gap-2">
+        <div className="flex h-[60px] items-center border-b px-6">
+          <Link className="flex items-center gap-2 font-semibold" href="/">
+            <Image src="/logo/suitpax-cloud-logo.webp" alt="Suitpax Logo" width={32} height={32} />
+            <span className="">Suitpax</span>
+          </Link>
+        </div>
+        <div className="flex-1 overflow-auto py-2">
+          <nav className="grid items-start px-4 text-sm font-medium">
+            {sidebarNavItems.map((item) => (
               <Link
+                key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900",
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
                   {
-                    "bg-gray-100 font-medium text-gray-900": pathname === item.href,
+                    "bg-gray-200/50 text-gray-900 dark:bg-gray-800 dark:text-gray-50": pathname === item.href,
                   },
                 )}
               >
                 <item.icon className="h-4 w-4" />
-                {item.label}
+                {item.title}
               </Link>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-auto">
-          <Link
-            href="/support"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900"
-          >
-            <LifeBuoy className="h-4 w-4" />
-            Support
-          </Link>
+            ))}
+          </nav>
         </div>
-      </nav>
-    </aside>
+      </div>
+    </div>
   )
 }

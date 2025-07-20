@@ -8,9 +8,8 @@ import { Button } from "@/components/ui/button"
 import { PiDotsNineBold, PiDotsSixBold, PiArrowUpRightBold } from "react-icons/pi"
 import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack } from "react-icons/si"
 import { cn } from "@/lib/utils"
-import type { User } from "@supabase/supabase-js"
 
-export const Navigation = ({ user }: { user: User | null }) => {
+export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -45,6 +44,7 @@ export const Navigation = ({ user }: { user: User | null }) => {
     }
   }, [isMobileMenuOpen])
 
+  // Helper function to check if a link is active
   const isActive = (path: string) => {
     if (path === "/") {
       return pathname === path
@@ -68,6 +68,7 @@ export const Navigation = ({ user }: { user: User | null }) => {
       >
         <div className="w-full px-4 py-1">
           <div className="relative flex items-center justify-between">
+            {/* Logo */}
             <Link href="/" className="flex items-center">
               <span className="sr-only">Suitpax</span>
               <Image
@@ -80,6 +81,7 @@ export const Navigation = ({ user }: { user: User | null }) => {
               />
             </Link>
 
+            {/* Desktop Navigation */}
             <div className="hidden lg:flex lg:items-center lg:justify-center lg:space-x-6 absolute left-1/2 -translate-x-1/2">
               <Link
                 href="/manifesto"
@@ -107,36 +109,27 @@ export const Navigation = ({ user }: { user: User | null }) => {
               </Link>
               <Link
                 href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
-                className="px-2 py-0.5 text-xs text-black bg-transparent border border-black rounded-full font-medium tracking-tighter transition-colors flex items-center gap-1"
+                className="px-2 py-0.5 text-xs text-black bg-transparent border border-black rounded-md font-medium tracking-tighter transition-colors flex items-center gap-1"
               >
                 <SiSlack className="h-3 w-3" />
                 Join Slack
               </Link>
             </div>
 
+            {/* Action Buttons */}
             <div className="flex items-center space-x-2">
-              {user ? (
-                <Button
-                  asChild
-                  className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
-                >
-                  <Link href="/dashboard">
-                    Dashboard
-                    <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
-                  </Link>
-                </Button>
-              ) : (
-                <Button
-                  asChild
-                  className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
-                >
-                  <Link href="/signup">
-                    Sign Up Free
-                    <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
-                  </Link>
-                </Button>
-              )}
+              {/* Sign Up Button */}
+              <Button
+                asChild
+                className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
+              >
+                <Link href="/signup">
+                  Sign Up
+                  <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
+                </Link>
+              </Button>
 
+              {/* Mobile Menu Button */}
               <button
                 type="button"
                 ref={buttonRef}
@@ -152,10 +145,23 @@ export const Navigation = ({ user }: { user: User | null }) => {
             </div>
           </div>
 
+          {/* Mobile Menu - Simplified */}
           {isMobileMenuOpen && (
             <div ref={menuRef} className="lg:hidden overflow-hidden transition-all duration-300 ease-in-out">
               <nav className="mt-6 border-t border-gray-200/30 pt-4">
                 <div className="px-0">
+                  <div className="py-2 border-b border-gray-200/30">
+                    <Link
+                      href="/login"
+                      className={cn(
+                        "flex items-center w-full py-1 text-lg font-medium tracking-tighter hover:bg-black/5 rounded-md transition-colors",
+                        isActive("/login") ? "text-black bg-black/5 font-semibold" : "text-black",
+                      )}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Login
+                    </Link>
+                  </div>
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
                       href="/manifesto"
@@ -193,6 +199,7 @@ export const Navigation = ({ user }: { user: User | null }) => {
                     </Link>
                   </div>
 
+                  {/* Suitpax Deck Link */}
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
                       href="https://pitch-suitpax.vercel.app"
@@ -227,6 +234,7 @@ export const Navigation = ({ user }: { user: User | null }) => {
                   </div>
                 </div>
 
+                {/* Social Icons - Mobile Only */}
                 <div className="mt-4 px-0">
                   <div className="flex justify-start space-x-4 py-2">
                     <Link href="https://twitter.com/suitpax" className="text-gray-500 hover:text-black">
@@ -278,6 +286,7 @@ export const Navigation = ({ user }: { user: User | null }) => {
                   </div>
                 </div>
 
+                {/* Contact Badge - Mobile Only */}
                 <div className="mt-6 px-0 pb-4">
                   <div className="flex flex-col items-start space-y-2">
                     <a

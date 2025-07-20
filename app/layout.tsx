@@ -1,11 +1,16 @@
 import type React from "react"
 import { Inter } from "next/font/google"
+import Navigation from "@/components/marketing/navigation"
+import Footer from "@/components/marketing/footer"
+// Mantenemos el archivo pero comentamos la importación
+// import SplashScreen from "@/components/splash-screen"
 import type { Metadata } from "next"
 import "./globals.css"
 import IntercomProvider from "@/components/intercom/intercom-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
+// Actualizar la descripción en el metadata para enfatizar AI travel agents y superpowers
 export const metadata: Metadata = {
   title: "Suitpax | The next-gen AI traveltech",
   description:
@@ -76,7 +81,11 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
       </head>
       <body className={inter.className}>
-        {children}
+        {/* Quitamos el componente SplashScreen */}
+        {/* <SplashScreen /> */}
+        <Navigation />
+        <main className="overflow-hidden w-full">{children}</main>
+        <Footer />
         <IntercomProvider />
       </body>
     </html>
