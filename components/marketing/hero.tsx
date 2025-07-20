@@ -355,3 +355,5 @@ export const Hero = () => {
     </VantaHaloBackground>
   )
 }
+
+export default Hero
