@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack, SiDiscord } from "react-icons/si"
+import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
 import { PiArrowUpRightBold, PiCalendarCheckBold } from "react-icons/pi"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
@@ -10,7 +10,6 @@ import { useEffect, useState } from "react"
 export const Footer = () => {
   const [isMobile, setIsMobile] = useState(false)
 
-  // Detectar si es dispositivo móvil
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
@@ -24,29 +23,13 @@ export const Footer = () => {
     }
   }, [])
 
-  // Cargar el script de SourceForge después de que el componente se monte
-  useEffect(() => {
-    const script = document.createElement("script")
-    script.async = true
-    script.src = "https://b.sf-syn.com/badge_js?sf_id=3853370&variant_id=sf"
-    document.body.appendChild(script)
-
-    return () => {
-      document.body.removeChild(script)
-    }
-  }, [])
-
   return (
     <footer className="relative bg-black overflow-hidden">
-      {/* Background pattern */}
       <div className="absolute inset-0 opacity-[0.02] bg-repeat bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px]"></div>
-
-      {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/60"></div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Columna 1: Logo e información principal */}
           <div className="flex flex-col items-start">
             <Link href="/" className="inline-block mb-4">
               <Image
@@ -61,7 +44,6 @@ export const Footer = () => {
               The next-gen of traveltech with superpowers
             </p>
 
-            {/* Status badge en posición destacada */}
             <div className="mb-6">
               <p className="text-xs text-gray-400 mb-2 font-medium">System Status:</p>
               <Link href="https://status.suitpax.com" target="_blank" rel="noopener noreferrer">
@@ -77,7 +59,6 @@ export const Footer = () => {
             <p className="text-xs text-gray-500">2261 Market Street STE 86661 San Francisco, CA, 94114</p>
           </div>
 
-          {/* Columna 2: Enlaces y certificaciones */}
           <div className="flex flex-col items-start">
             <h3 className="text-white font-medium mb-4 text-sm">Company</h3>
             <div className="flex flex-col space-y-2 mb-6">
@@ -122,13 +103,6 @@ export const Footer = () => {
                 <PiArrowUpRightBold className="h-3 w-3 text-gray-400" />
               </Link>
               <Link
-                href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
-                className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
-              >
-                <SiSlack className="h-3.5 w-3.5" />
-                Join Slack
-              </Link>
-              <Link
                 href="https://app.suitpax.com/sign-up"
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
               >
@@ -145,7 +119,6 @@ export const Footer = () => {
               </Link>
             </div>
 
-            {/* Trust badges */}
             <h3 className="text-white font-medium mb-3 text-sm">Certifications</h3>
             <div className="flex flex-col space-y-2">
               {isMobile ? (
@@ -274,7 +247,6 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Columna 3: Redes sociales y copyright */}
           <div className="flex flex-col items-start">
             <h3 className="text-white font-medium mb-4 text-sm">Connect with us</h3>
             <div className="flex space-x-4 mb-6">
@@ -299,15 +271,6 @@ export const Footer = () => {
               >
                 <SiProducthunt className="h-5 w-5" />
                 <span className="sr-only">Product Hunt</span>
-              </Link>
-              <Link
-                href="https://discord.gg/suitpax" // Reemplaza con tu enlace de Discord
-                className="text-gray-400 hover:text-gray-200 transition-colors"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <SiDiscord className="h-5 w-5" />
-                <span className="sr-only">Discord</span>
               </Link>
               <Link
                 href="https://instagram.com/suitpax"

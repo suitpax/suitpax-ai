@@ -90,7 +90,7 @@ export const VideoShowcase = () => {
 
     // Preload video
     const videoElement = document.createElement("video")
-    videoElement.src = "/videos/supermotion_co_2.mp4"
+    videoElement.src = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/supermotion_co%20%282%29-GWuBXOG5erdxB4voOtmDHtr4BcHhK6.mp4"
     videoElement.preload = "auto"
     videoElement.muted = true
     videoElement.oncanplaythrough = () => setVideoLoaded(true)
@@ -174,7 +174,7 @@ export const VideoShowcase = () => {
           transition={{ duration: 0.6 }}
         >
           <VideoPlayer
-            src="/videos/supermotion_co_2.mp4"
+            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/supermotion_co%20%282%29-GWuBXOG5erdxB4voOtmDHtr4BcHhK6.mp4"
             poster="/images/suitpax-dashboard.jpeg"
             fallbackImage="/images/suitpax-dashboard.jpeg"
             aspectRatio="video"

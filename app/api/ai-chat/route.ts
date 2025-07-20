@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server"
+import { anthropic } from "@ai-sdk/anthropic"
+import { streamText } from "ai"
 
 // Tipos para los mensajes
 export interface Message {
@@ -16,7 +18,7 @@ const PREDEFINED_RESPONSES: Record<string, string[]> = {
   hotel: [
     "I've found 5 hotels near your destination. The highest rated is the Grand Plaza Hotel with 4.8 stars.",
     "There's a boutique hotel just 5 minutes from your meeting location. They have availability for your dates.",
-    "Would you prefer a hotel with a gym and pool? I can filter the results based on your preferences.",
+    "Would you like me to book a hotel with a gym and pool? I can filter the results based on your preferences.",
   ],
   meeting: [
     "I've scheduled your meeting for tomorrow at 2:00 PM. All participants have been notified.",
@@ -46,52 +48,25 @@ const PREDEFINED_RESPONSES: Record<string, string[]> = {
   ],
 }
 
-// Función para generar una respuesta basada en el mensaje del usuario
-function generateResponse(message: string): string {
-  // Convertir a minúsculas para facilitar la búsqueda de palabras clave
-  const lowerMessage = message.toLowerCase()
+export const maxDuration = 30
 
-  // Buscar palabras clave en el mensaje
-  for (const [keyword, responses] of Object.entries(PREDEFINED_RESPONSES)) {
-    if (lowerMessage.includes(keyword)) {
-      // Devolver una respuesta aleatoria de la categoría correspondiente
-      return responses[Math.floor(Math.random() * responses.length)]
-    }
-  }
-
-  // Si no se encuentra ninguna palabra clave, devolver una respuesta predeterminada
-  const defaultResponses = PREDEFINED_RESPONSES.default
-  return defaultResponses[Math.floor(Math.random() * defaultResponses.length)]
-}
-
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { messages } = await request.json()
+    const { messages } = await req.json()
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: "Invalid request format. Expected an array of messages." }, { status: 400 })
     }
 
-    // Obtener el último mensaje del usuario
-    const lastUserMessage = messages.filter((msg) => msg.role === "user").pop()
+    const result = await streamText({
+      model: anthropic("claude-3-haiku-20240307"),
+      system: `You are Suitpax, a helpful and friendly AI assistant specialized in business travel. 
+               Your goal is to help users book flights, manage expenses, and organize their business trips efficiently.
+               Provide concise, helpful, and friendly responses. Use markdown for formatting if necessary.`,
+      messages,
+    })
 
-    if (!lastUserMessage) {
-      return NextResponse.json({ error: "No user message found in the conversation." }, { status: 400 })
-    }
-
-    // Simular un tiempo de procesamiento (entre 1 y 3 segundos)
-    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000))
-
-    // Generar una respuesta basada en el mensaje del usuario
-    const responseContent = generateResponse(lastUserMessage.content)
-
-    // Crear el mensaje de respuesta
-    const responseMessage: Message = {
-      role: "assistant",
-      content: responseContent,
-    }
-
-    return NextResponse.json({ message: responseMessage })
+    return result.toAIStreamResponse()
   } catch (error) {
     console.error("Error processing AI chat request:", error)
     return NextResponse.json({ error: "Failed to process your request. Please try again." }, { status: 500 })

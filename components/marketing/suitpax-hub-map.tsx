@@ -7,10 +7,8 @@ import {
   PiMapPinBold,
   PiUsersBold,
   PiChatCircleBold,
-  PiAirplaneTakeoffBold,
   PiBuildingsBold,
   PiCalendarBold,
-  PiDevicesBold,
   PiPhoneBold,
   PiVideoCameraBold,
   PiWaveformBold,
@@ -23,7 +21,7 @@ const teamMembers = [
     image: "/community/ammar-foley.webp",
     location: "San Francisco",
     status: "traveling",
-    action: "Quick Call",
+    action: "Call",
     icon: PiPhoneBold,
   },
   {
@@ -31,7 +29,7 @@ const teamMembers = [
     image: "/community/owen-harding.webp",
     location: "New York",
     status: "available",
-    action: "Video Chat",
+    action: "Video",
     icon: PiVideoCameraBold,
   },
   {
@@ -39,7 +37,7 @@ const teamMembers = [
     image: "/community/jordan-burgess.webp",
     location: "London",
     status: "in-event",
-    action: "Join Live Event",
+    action: "Join Live",
     icon: PiWaveformBold,
   },
   {
@@ -47,7 +45,7 @@ const teamMembers = [
     image: "/community/nicolas-trevino.webp",
     location: "Berlin",
     status: "traveling",
-    action: "Schedule Meet",
+    action: "Schedule",
     icon: PiCalendarBold,
   },
   {
@@ -55,7 +53,7 @@ const teamMembers = [
     image: "/community/scott-clayton.webp",
     location: "Toronto",
     status: "available",
-    action: "Connect Now",
+    action: "Connect",
     icon: PiLightningBold,
   },
   {
@@ -63,7 +61,7 @@ const teamMembers = [
     image: "/community/lana-steiner.jpg",
     location: "Paris",
     status: "in-event",
-    action: "Join Suitpax Live",
+    action: "Join Event",
     icon: PiWaveformBold,
   },
 ]
@@ -85,19 +83,9 @@ const cityBadges = [
     members: 1,
   },
   {
-    name: "Tokyo",
-    image: "/placeholder.svg?height=32&width=48",
-    members: 2,
-  },
-  {
     name: "New York",
     image: "/placeholder.svg?height=32&width=48",
     members: 4,
-  },
-  {
-    name: "Berlin",
-    image: "/placeholder.svg?height=32&width=48",
-    members: 1,
   },
 ]
 
@@ -105,37 +93,37 @@ const features = [
   {
     icon: PiMapPinBold,
     title: "Real-time Location",
-    description: "See where your team is traveling",
+    description: "See where your team is traveling in real-time",
   },
   {
     icon: PiUsersBold,
     title: "Team Connections",
-    description: "Connect with colleagues nearby",
+    description: "Connect with colleagues in the same city",
   },
   {
     icon: PiChatCircleBold,
     title: "Smart Networking",
-    description: "AI-powered introductions",
+    description: "AI-powered introductions to relevant contacts",
   },
   {
     icon: PiBuildingsBold,
     title: "Company Hubs",
-    description: "Discover partner offices",
+    description: "Discover partner offices and coworking spaces",
   },
 ]
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case "traveling":
-      return "bg-white"
-    case "available":
-      return "bg-gray-300"
-    case "in-meeting":
       return "bg-gray-400"
+    case "available":
+      return "bg-green-400"
+    case "in-meeting":
+      return "bg-orange-400"
     case "in-event":
-      return "bg-gray-600"
+      return "bg-blue-400"
     default:
-      return "bg-gray-500"
+      return "bg-gray-300"
   }
 }
 
@@ -158,135 +146,136 @@ export default function SuitpaxHubMap() {
   const [selectedMember, setSelectedMember] = useState<(typeof teamMembers)[0] | null>(null)
 
   return (
-    <section className="pt-12 pb-6 bg-black">
+    <section className="pt-20 pb-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center rounded-xl bg-white/5 backdrop-blur-sm px-2.5 py-0.5 text-[10px] font-medium text-white/80 border border-white/10 mb-6">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center rounded-full bg-gray-100/80 backdrop-blur-sm px-3 py-1 text-xs font-medium text-gray-600 mb-8">
             Global Team Network
           </div>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-white mb-4">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight text-black mb-6 leading-none">
             <span className="font-serif italic">Connect</span> <span className="font-sans">with your team</span>
             <br />
             <span className="font-sans">anywhere in the</span> <span className="font-serif italic">world</span>
           </h2>
 
-          <p className="text-sm font-light text-white/60 max-w-2xl mx-auto">
-            Suitpax Hub Map transforms business travel into meaningful connections. Discover teammates, partners, and
-            opportunities wherever your journey takes you.
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto font-light">
+            Uncover and activate high-intent teammates viewing your business travel opportunities
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Map Section */}
           <div className="relative">
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl p-6">
+            <div className="bg-gray-50/50 backdrop-blur-sm rounded-3xl border border-gray-200/50 p-8 shadow-sm">
               <div
-                className="relative w-full aspect-square max-w-lg mx-auto rounded-xl overflow-hidden"
+                className="relative w-full aspect-square max-w-lg mx-auto rounded-2xl overflow-hidden bg-white border border-gray-200/50"
                 style={{
                   backgroundImage: `url('/images/radial-pattern-bg.jpeg')`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}
               >
-                {/* Dark overlay for better contrast */}
-                <div className="absolute inset-0 bg-black/40"></div>
+                {/* Subtle overlay */}
+                <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px]"></div>
 
-                {/* Team member avatars distributed across the map */}
+                {/* Connection lines */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                  <defs>
+                    <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                      <circle cx="2" cy="2" r="1" fill="#e5e7eb" opacity="0.5" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#dots)" />
+
+                  {/* Connection lines between users */}
+                  <g stroke="#e5e7eb" strokeWidth="1" opacity="0.3">
+                    <line x1="20%" y1="25%" x2="45%" y2="35%" strokeDasharray="2,2" />
+                    <line x1="45%" y1="35%" x2="70%" y2="25%" strokeDasharray="2,2" />
+                    <line x1="20%" y1="60%" x2="45%" y2="70%" strokeDasharray="2,2" />
+                    <line x1="45%" y1="70%" x2="70%" y2="60%" strokeDasharray="2,2" />
+                  </g>
+                </svg>
+
+                {/* Team member avatars */}
                 <div className="absolute inset-0">
-                  {teamMembers.map((member, index) => {
-                    // Better distribution positions for 6 members
-                    const positions = [
-                      { top: '15%', left: '20%' },  // Top left
-                      { top: '25%', left: '75%' },  // Top right
-                      { top: '45%', left: '15%' },  // Middle left
-                      { top: '40%', left: '65%' },  // Middle right
-                      { top: '70%', left: '30%' },  // Bottom left
-                      { top: '65%', left: '80%' },  // Bottom right
-                    ]
-                    
-                    return (
+                  {teamMembers.map((member, index) => (
                     <motion.div
                       key={member.name}
                       className="absolute cursor-pointer group"
                       style={{
-                        top: positions[index]?.top || '50%',
-                        left: positions[index]?.left || '50%',
+                        top: `${20 + (index % 3) * 25}%`,
+                        left: `${15 + Math.floor(index / 3) * 25}%`,
                       }}
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.15, type: "spring", stiffness: 400, damping: 15 }}
-                      whileHover={{ scale: 1.1, zIndex: 10 }}
+                      transition={{ delay: index * 0.1, type: "spring", stiffness: 300, damping: 20 }}
+                      whileHover={{ scale: 1.05, zIndex: 10 }}
                       onClick={() => setSelectedMember(member)}
                     >
                       <div className="relative">
-                        <div className="relative">
+                        {/* User avatar with subtle shadow */}
+                        <div className="relative bg-white rounded-2xl p-1 shadow-sm border border-gray-200/50">
                           <Image
                             src={member.image || "/placeholder.svg"}
                             alt={member.name}
-                            width={36}
-                            height={36}
-                            className="rounded-xl object-cover shadow-lg ring-2 ring-white/50"
+                            width={40}
+                            height={40}
+                            className="rounded-xl object-cover"
                           />
                           <div
                             className={`absolute -top-1 -right-1 w-3 h-3 ${getStatusColor(
                               member.status,
-                            )} rounded-full border-2 border-white ${
-                              member.status === "traveling" || member.status === "in-event" ? "animate-pulse" : ""
-                            }`}
+                            )} rounded-full border-2 border-white shadow-sm`}
                           />
                         </div>
 
-                        {/* Modern interactive badge */}
+                        {/* Hacker News style badge */}
                         <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          transition={{ delay: index * 0.15 + 0.4, type: "spring", stiffness: 300, damping: 20 }}
-                          className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 group-hover:scale-110 transition-all duration-300"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 + 0.3 }}
+                          className="absolute -bottom-1 left-1/2 transform -translate-x-1/2"
                         >
-                          <div className="bg-white/10 backdrop-blur-md text-white rounded-lg px-3 py-1.5 text-[9px] font-medium whitespace-nowrap shadow-xl border border-white/20">
-                            <div className="flex items-center gap-1.5">
-                              <member.icon className="w-3 h-3" />
+                          <div className="bg-gray-100/90 backdrop-blur-sm text-gray-600 rounded-full px-2 py-1 text-[10px] font-medium whitespace-nowrap shadow-sm border border-gray-200/50">
+                            <div className="flex items-center gap-1">
+                              <member.icon className="w-2.5 h-2.5" />
                               <span>{member.action}</span>
                             </div>
-                            {/* Subtle glow effect */}
-                            <div className="absolute inset-0 bg-white/5 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                           </div>
                         </motion.div>
                       </div>
 
                       {selectedMember?.name === member.name && (
                         <motion.div
-                          initial={{ opacity: 0, y: 15, scale: 0.8 }}
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 15, scale: 0.8 }}
-                          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-200/50 p-4 min-w-[160px] z-30"
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white/95 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200/50 p-4 min-w-[160px] z-30"
                         >
                           <div className="flex items-center gap-3 mb-3">
                             <Image
                               src={member.image || "/placeholder.svg"}
                               alt={member.name}
-                              width={28}
-                              height={28}
-                              className="rounded-lg object-cover"
+                              width={32}
+                              height={32}
+                              className="rounded-xl object-cover"
                             />
                             <div>
-                              <p className="text-xs font-semibold text-black">{member.name}</p>
-                              <p className="text-[10px] text-gray-500">{member.location}</p>
+                              <p className="text-sm font-medium text-black">{member.name}</p>
+                              <p className="text-xs text-gray-500">{member.location}</p>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-2 mb-3">
-                            <div className={`w-2.5 h-2.5 ${getStatusColor(member.status)} rounded-full`}></div>
-                            <span className="text-[10px] text-gray-600 font-medium">
-                              {getStatusLabel(member.status)}
-                            </span>
+                            <div className={`w-2 h-2 ${getStatusColor(member.status)} rounded-full`}></div>
+                            <span className="text-xs text-gray-600">{getStatusLabel(member.status)}</span>
                           </div>
 
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-black text-white rounded-lg text-[10px] font-semibold shadow-lg hover:bg-gray-800 transition-all duration-300"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-900 text-white rounded-xl text-xs font-medium shadow-sm hover:bg-gray-800 transition-colors"
                           >
                             <member.icon className="w-3 h-3" />
                             {member.action}
@@ -297,48 +286,61 @@ export default function SuitpaxHubMap() {
                   ))}
                 </div>
 
-                {/* City badges with modern styling */}
+                {/* City badges at bottom */}
                 <div className="absolute bottom-4 left-4 right-4">
                   <div className="flex flex-wrap gap-2 justify-center">
-                    {cityBadges.slice(0, 4).map((city, index) => (
+                    {cityBadges.map((city, index) => (
                       <motion.div
                         key={city.name}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 + 0.8 }}
-                        whileHover={{ scale: 1.05 }}
-                        className="bg-white/10 backdrop-blur-md rounded-lg p-2 shadow-lg border border-white/20 flex items-center gap-2 hover:bg-white/20 transition-all duration-300"
+                        transition={{ delay: index * 0.1 + 0.6 }}
+                        className="bg-gray-100/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-gray-200/50 flex items-center gap-2"
                       >
                         <Image
                           src={city.image || "/placeholder.svg"}
                           alt={city.name}
-                          width={28}
-                          height={20}
-                          className="rounded object-cover opacity-80"
+                          width={16}
+                          height={12}
+                          className="rounded object-cover"
                         />
                         <div>
-                          <p className="text-[10px] font-semibold text-white">{city.name}</p>
-                          <p className="text-[8px] text-white/60">{city.members} members</p>
+                          <p className="text-[10px] font-medium text-gray-700">{city.name}</p>
+                        </div>
+                        <div className="bg-gray-200 text-gray-600 rounded-full px-1.5 py-0.5 text-[8px] font-medium">
+                          {city.members}
                         </div>
                       </motion.div>
                     ))}
                   </div>
                 </div>
+
+                {/* New connection badge */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.2 }}
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                >
+                  <div className="bg-gray-100/90 backdrop-blur-sm text-gray-600 rounded-full px-3 py-1.5 text-xs font-medium shadow-sm border border-gray-200/50">
+                    New connection
+                  </div>
+                </motion.div>
               </div>
 
-              <div className="mt-4 text-center">
-                <p className="text-xs font-medium text-white mb-2">Live Team Activity</p>
-                <div className="flex items-center justify-center gap-3 text-[10px] text-white/60">
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <div className="mt-6 text-center">
+                <p className="text-sm font-medium text-gray-700 mb-3">Live Team Activity</p>
+                <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                     <span>6 traveling</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                     <span>8 available</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-gray-600 rounded-full animate-pulse"></div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                     <span>2 in events</span>
                   </div>
                 </div>
@@ -347,108 +349,76 @@ export default function SuitpaxHubMap() {
           </div>
 
           {/* Features Section */}
-          <div className="space-y-4">
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl p-5">
-              <h3 className="text-lg font-medium tracking-tighter text-white mb-3">Smart Team Discovery</h3>
-              <p className="text-xs text-white/70 mb-4">
+          <div className="space-y-6">
+            <div className="bg-gray-50/50 backdrop-blur-sm rounded-3xl border border-gray-200/50 p-8 shadow-sm">
+              <h3 className="text-2xl font-medium tracking-tight text-black mb-4">
+                <span className="font-serif italic">Smart</span> <span className="font-sans">Team Discovery</span>
+              </h3>
+              <p className="text-gray-500 mb-8 font-light">
                 AI-powered insights help you make the most of every business trip by connecting you with the right
                 people at the right time.
               </p>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-6">
                 {features.map((feature, index) => (
                   <motion.div
                     key={feature.title}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1, type: "spring", stiffness: 400, damping: 15 }}
-                    className="p-3 rounded-xl bg-white/5 border border-white/10"
+                    transition={{ delay: index * 0.1, type: "spring", stiffness: 300, damping: 20 }}
+                    className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-gray-200/50 shadow-sm"
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="p-1.5 rounded-lg bg-white/10">
-                        <feature.icon className="w-3 h-3 text-white" />
-                      </div>
+                    <div className="p-2 rounded-xl bg-gray-50 border border-gray-200/50">
+                      <feature.icon className="w-4 h-4 text-gray-600" />
                     </div>
-                    <h4 className="text-xs font-medium text-white mb-1">{feature.title}</h4>
-                    <p className="text-[10px] text-white/60">{feature.description}</p>
+                    <div>
+                      <h4 className="text-sm font-medium text-black mb-1">{feature.title}</h4>
+                      <p className="text-xs text-gray-500 font-light">{feature.description}</p>
+                    </div>
                   </motion.div>
                 ))}
               </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl p-5">
-              <h4 className="text-lg font-medium tracking-tighter text-white mb-3">Quick Connect</h4>
-
-              <div className="space-y-2">
-                <motion.button
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <PiAirplaneTakeoffBold className="w-3 h-3 text-white" />
-                    <span className="text-xs font-medium text-white">Find teammates in NYC</span>
-                  </div>
-                  <span className="text-[10px] text-white/60">3 available</span>
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <PiWaveformBold className="w-3 h-3 text-white" />
-                    <span className="text-xs font-medium text-white">Join Suitpax Live event</span>
-                  </div>
-                  <span className="text-[10px] text-white/60">Starting now</span>
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <PiVideoCameraBold className="w-3 h-3 text-white" />
-                    <span className="text-xs font-medium text-white">Start team video call</span>
-                  </div>
-                  <span className="text-[10px] text-white/60">5 online</span>
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <PiDevicesBold className="w-3 h-3 text-white" />
-                    <span className="text-xs font-medium text-white">Book shared workspace</span>
-                  </div>
-                  <span className="text-[10px] text-white/60">WeWork SoHo</span>
-                </motion.button>
-              </div>
+            {/* CTA Button */}
+            <div className="text-center">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-2xl font-medium text-sm shadow-sm hover:bg-gray-800 transition-colors border border-gray-200/20"
+              >
+                <PiMapPinBold className="w-4 h-4" />
+                Try a demo for growth
+              </motion.button>
             </div>
           </div>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-8 text-center">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl p-6">
-            <h3 className="text-xl font-medium tracking-tighter text-white mb-3">Never travel alone again</h3>
-            <p className="text-xs text-white/70 mb-4 max-w-md mx-auto">
+        {/* Bottom section */}
+        <div className="mt-20 text-center">
+          <div className="bg-gray-50/50 backdrop-blur-sm rounded-3xl border border-gray-200/50 p-12 shadow-sm">
+            <h3 className="text-3xl font-medium tracking-tight text-black mb-4">
+              <span className="font-serif italic">Never</span> <span className="font-sans">travel alone again</span>
+            </h3>
+            <p className="text-gray-500 mb-8 max-w-md mx-auto font-light">
               Join thousands of professionals who use Suitpax Hub Map to turn business trips into networking
               opportunities and meaningful connections.
             </p>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-black rounded-xl font-medium text-xs hover:bg-gray-100 transition-colors"
-            >
-              <PiMapPinBold className="w-3 h-3" />
-              Explore Hub Map
-            </motion.button>
+
+            {/* Mock website preview */}
+            <div className="bg-white rounded-2xl border border-gray-200/50 p-6 shadow-sm max-w-md mx-auto">
+              <div className="text-center mb-4">
+                <p className="text-sm font-medium text-gray-900">suitpax.com</p>
+              </div>
+              <div className="space-y-3 mb-6">
+                <div className="h-2 bg-gray-100 rounded"></div>
+                <div className="h-2 bg-gray-100 rounded w-3/4"></div>
+                <div className="h-2 bg-gray-100 rounded w-1/2"></div>
+              </div>
+              <div className="bg-gray-100/90 backdrop-blur-sm text-gray-600 rounded-full px-3 py-1.5 text-xs font-medium inline-block">
+                Your demo
+              </div>
+            </div>
           </div>
         </div>
       </div>
