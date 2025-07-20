@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  profile   Profile?
+  trips     Trip[]
+  expenses  Expense[]
+  chatMessages ChatMessage[]
+  flightSearches FlightSearch[]
+
+  @@map("users")
+}
+
+model Profile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  fullName    String?
+  companyName String?
+  role        String?
+  phone       String?
+  preferences Json?
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Company {
+  id       String @id @default(cuid())
+  name     String
+  domain   String?
+  logoUrl  String?
+  settings Json?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  trips Trip[]
+
+  @@map("companies")
+}
+
+model Trip {
+  id          String    @id @default(cuid())
+  userId      String
+  companyId   String?
+  title       String
+  destination String?
+  startDate   DateTime?
+  endDate     DateTime?
+  status      TripStatus @default(PLANNED)
+  budget      Decimal?
+  notes       String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company  Company?  @relation(fields: [companyId], references: [id])
+  expenses Expense[]
+
+  @@map("trips")
+}
+
+model Expense {
+  id          String        @id @default(cuid())
+  tripId      String?
+  userId      String
+  category    ExpenseCategory
+  amount      Decimal
+  currency    String        @default("USD")
+  description String?
+  receiptUrl  String?
+  date        DateTime      @default(now())
+  status      ExpenseStatus @default(PENDING)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  trip Trip? @relation(fields: [tripId], references: [id])
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("expenses")
+}
+
+model ChatMessage {
+  id       String @id @default(cuid())
+  userId   String
+  message  String
+  response String
+  context  String?
+  
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
+
+model FlightSearch {
+  id           String   @id @default(cuid())
+  userId       String
+  origin       String
+  destination  String
+  departureDate DateTime
+  returnDate   DateTime?
+  passengers   Int      @default(1)
+  travelClass  String   @default("economy")
+  resultsCount Int      @default(0)
+  
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("flight_searches")
+}
+
+model Policy {
+  id          String @id @default(cuid())
+  companyId   String
+  name        String
+  description String?
+  rules       Json
+  isActive    Boolean @default(true)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("policies")
+}
+
+model Approval {
+  id        String        @id @default(cuid())
+  expenseId String
+  approverId String
+  status    ApprovalStatus @default(PENDING)
+  comments  String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("approvals")
+}
+
+// Enums
+enum TripStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum ExpenseCategory {
+  FLIGHT
+  HOTEL
+  MEAL
+  TRANSPORT
+  ENTERTAINMENT
+  OTHER
+}
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

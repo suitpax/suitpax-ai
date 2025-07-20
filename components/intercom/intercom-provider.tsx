@@ -1,39 +1,74 @@
 "use client"
 
-import { useEffect } from "react"
-import Intercom from "@intercom/messenger-js-sdk"
+import type React from "react"
 
-type IntercomProviderProps = {
-  user?: {
-    id?: string
-    name?: string
-    email?: string
-    createdAt?: number
+import { useEffect } from "react"
+
+declare global {
+  interface Window {
+    Intercom: any
+    intercomSettings: any
   }
 }
 
-export default function IntercomProvider({ user }: IntercomProviderProps) {
-  useEffect(() => {
-    // Only initialize Intercom on the client side
-    if (typeof window !== "undefined") {
-      // Initialize Intercom with the app ID and user data if available
-      Intercom({
-        app_id: "t7e59vcn",
-        user_id: user?.id, // Use optional chaining to safely access user data
-        name: user?.name,
-        email: user?.email,
-        created_at: user?.createdAt,
-      })
+interface IntercomProviderProps {
+  children?: React.ReactNode
+}
 
-      // Clean up function to shut down Intercom when component unmounts
-      return () => {
-        if (typeof window !== "undefined" && window.Intercom) {
-          window.Intercom("shutdown")
+export default function IntercomProvider({ children }: IntercomProviderProps = {}) {
+  useEffect(() => {
+    const APP_ID = "t7e59vcn"
+
+    // Initialize Intercom
+    ;(() => {
+      const w = window as any
+      const ic = w.Intercom
+      if (typeof ic === "function") {
+        ic("reattach_activator")
+        ic("update", w.intercomSettings)
+      } else {
+        const d = document
+        const i = () => {
+          // @ts-ignore
+          i.c(arguments)
+        }
+        // @ts-ignore
+        i.q = []
+        // @ts-ignore
+        i.c = (args: any) => {
+          // @ts-ignore
+          i.q.push(args)
+        }
+        w.Intercom = i
+        const l = () => {
+          const s = d.createElement("script")
+          s.type = "text/javascript"
+          s.async = true
+          s.src = `https://widget.intercom.io/widget/${APP_ID}`
+          const x = d.getElementsByTagName("script")[0]
+          x.parentNode?.insertBefore(s, x)
+        }
+        if (document.readyState === "complete") {
+          l()
+        } else if (w.attachEvent) {
+          w.attachEvent("onload", l)
+        } else {
+          w.addEventListener("load", l, false)
         }
       }
-    }
-  }, [user]) // Re-initialize when user data changes
+    })()
 
-  // This component doesn't render anything visible
-  return null
+    // Boot Intercom
+    window.Intercom("boot", {
+      app_id: APP_ID,
+    })
+
+    return () => {
+      if (window.Intercom) {
+        window.Intercom("shutdown")
+      }
+    }
+  }, [])
+
+  return children || null
 }

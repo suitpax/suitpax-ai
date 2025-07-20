@@ -2,27 +2,24 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { createClient } from "@/lib/supabase/server"
+import { Navigation } from "@/components/marketing/navigation"
+import { Footer } from "@/components/marketing/footer"
+import IntercomProvider from "@/components/intercom/intercom-provider"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+})
 
 export const metadata: Metadata = {
   title: {
-    default: "Suitpax | AI-Powered Business Travel Platform",
+    default: "Suitpax - AI-Powered Business Travel Platform",
     template: "%s | Suitpax",
   },
   description:
-    "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
-  keywords: [
-    "business travel",
-    "AI travel",
-    "expense management",
-    "corporate travel",
-    "travel management",
-    "business trips",
-    "travel booking",
-    "AI agents",
-  ],
+    "Transform your business travel with AI agents, automated expense management, and intelligent booking. The future of corporate travel is here.",
+  keywords: ["business travel", "AI travel", "expense management", "corporate travel", "travel booking"],
   authors: [{ name: "Suitpax Team" }],
   creator: "Suitpax",
   publisher: "Suitpax",
@@ -31,29 +28,28 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://suitpax.com"),
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://suitpax.com",
-    siteName: "Suitpax",
-    title: "Suitpax | AI-Powered Business Travel Platform",
+    title: "Suitpax - AI-Powered Business Travel Platform",
     description:
-      "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
+      "Transform your business travel with AI agents, automated expense management, and intelligent booking.",
+    siteName: "Suitpax",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image-new.png",
         width: 1200,
         height: 630,
-        alt: "Suitpax | AI-Powered Business Travel Platform",
+        alt: "Suitpax - AI-Powered Business Travel Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Suitpax | AI-Powered Business Travel Platform",
+    title: "Suitpax - AI-Powered Business Travel Platform",
     description:
-      "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
+      "Transform your business travel with AI agents, automated expense management, and intelligent booking.",
     images: ["/twitter-image.png"],
     creator: "@suitpax",
   },
@@ -68,33 +64,21 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
-  },
-  manifest: "/manifest.json",
     generator: 'v0.dev'
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
   return (
-    <html lang="en" className="scroll-smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
-      <body className={`${inter.className} antialiased`}>
-        <div className="flex min-h-screen flex-col">{children}</div>
+    <html lang="en" className={inter.variable}>
+      <body className={`${inter.className} antialiased bg-black`}>
+        <Navigation />
+        <main className="relative">{children}</main>
+        <Footer />
+        <IntercomProvider />
       </body>
     </html>
   )
