@@ -10,6 +10,7 @@ import { FadeContainer, FadeSpan } from "@/components/ui/animations"
 import CounterBadge from "@/components/ui/counter-badge"
 import MiniChat from "@/components/ui/mini-chat"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import { ArcadeEmbed } from "@/components/ui/arcade-embed"
 
 // Modificar las variaciones de título para hacerlas más inclusivas
 // Reemplazar algunos de los titleVariations con estas nuevas versiones:
@@ -104,10 +105,12 @@ const titleVariations = [
 const getBadgeMessage = () => {
   const now = new Date()
   const hour = now.getHours()
+
   // Show "AI Agents are sleeping" after 9 PM (21:00)
   if (hour >= 21 || hour < 6) {
     return "Our AI Agents are sleeping..."
   }
+
   // Random selection for other times
   const messages = [
     "Launching at the end of Q2 2025.",
@@ -115,6 +118,7 @@ const getBadgeMessage = () => {
     "Join our waitlist in the meantime.",
     "The next-gen of traveltech.",
   ]
+
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
@@ -314,6 +318,7 @@ export const Hero = () => {
               >
                 <Link href="/manifesto">Read our manifesto</Link>
               </Button>
+
               <Button
                 asChild
                 variant="outline"
@@ -322,6 +327,11 @@ export const Hero = () => {
                 <Link href="https://cal.com/team/founders/partnership">Talk to founders</Link>
               </Button>
             </div>
+          </div>
+
+          {/* Dashboard Image - Sin mini badges */}
+          <div className="mt-12 sm:mt-16 md:mt-20 w-full max-w-[95vw] mx-auto flex justify-center relative px-4 sm:px-6">
+            <ArcadeEmbed />
           </div>
 
           {/* Caption text */}

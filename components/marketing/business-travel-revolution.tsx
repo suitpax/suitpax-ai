@@ -187,7 +187,7 @@ export default function BusinessTravelRevolution() {
             transition={{ duration: 0.5, delay: 0.3 }}
             whileHover={{ scale: 1.05 }}
           >
-            <span className="text-lg font-semibold tracking-tighter mr-2">LAUNCHING Q2 2025</span>
+            <span className="text-lg font-semibold tracking-tighter mr-2">LAUNCHING Q3 2025</span>
             <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
           </motion.div>
 

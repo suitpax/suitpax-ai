@@ -1,141 +1,138 @@
-# 🚀 Suitpax - AI-Powered Business Travel Platform
+# Suitpax Landing Page
 
-Transform your business travel with AI-powered agents. Book flights, manage expenses, and streamline travel policies with intelligent automation.
+The next-generation AI-powered business travel platform landing page built with modern web technologies.
 
-## ✨ Features
+## 🚀 Features
 
-- 🤖 **AI Travel Agents** - Intelligent booking and recommendations
-- 💰 **Expense Management** - Automated expense tracking and reporting
-- 📊 **Analytics Dashboard** - Real-time insights and reporting
-- 🔄 **Approval Workflows** - Customizable approval processes
-- 🌍 **Global Integration** - Connect with major travel providers
-- 📱 **Mobile Ready** - Responsive design for all devices
+- **AI Voice Assistant** - Real-time speech recognition and natural language processing
+- **Modern Design** - Clean, professional interface with smooth animations
+- **Responsive Layout** - Optimized for all devices and screen sizes
+- **SEO Optimized** - Complete meta tags, sitemap, and structured data
+- **Performance First** - Optimized for Core Web Vitals and fast loading
+- **Accessibility** - WCAG compliant with proper ARIA labels
 
-## 🛠️ Tech Stack
+## 🛠 Tech Stack
 
 - **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
 - **Styling**: Tailwind CSS + shadcn/ui
-- **Database**: PostgreSQL + Prisma ORM
-- **Authentication**: Supabase Auth
-- **AI**: Anthropic Claude + xAI Grok
-- **Package Manager**: pnpm
+- **Animations**: Framer Motion
+- **Voice AI**: ElevenLabs integration
+- **TypeScript**: Full type safety
 - **Deployment**: Vercel
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+ 
-- pnpm 8+
-- PostgreSQL database
-
-### Installation
-
-1. **Clone the repository**
-   \`\`\`bash
-   git clone https://github.com/your-username/suitpax-landing.git
-   cd suitpax-landing
-   \`\`\`
-
-2. **Install dependencies**
-   \`\`\`bash
-   pnpm install
-   \`\`\`
-
-3. **Set up environment variables**
-   \`\`\`bash
-   cp .env.example .env.local
-   # Edit .env.local with your actual values
-   \`\`\`
-
-4. **Set up the database**
-   \`\`\`bash
-   pnpm db:generate
-   pnpm db:push
-   \`\`\`
-
-5. **Run the development server**
-   \`\`\`bash
-   pnpm dev
-   \`\`\`
-
-6. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 📁 Project Structure
 
 \`\`\`
 suitpax-landing/
-├── app/                    # Next.js App Router
-│   ├── (dashboard)/       # Protected dashboard routes
-│   ├── (marketing)/       # Public marketing pages
-│   ├── api/              # API routes
-│   └── globals.css       # Global styles
-├── components/            # React components
-│   ├── marketing/        # Marketing page components
-│   ├── dashboard/        # Dashboard components
-│   ├── ui/              # Reusable UI components
-│   └── intercom/        # Intercom integration
-├── lib/                  # Utility functions
-├── prisma/              # Database schema
-├── public/              # Static assets
-└── types/               # TypeScript definitions
+├── app/                    # Next.js App Router pages
+├── components/             # Reusable React components
+├── lib/                    # Utility functions and configurations
+├── hooks/                  # Custom React hooks
+├── public/                 # Static assets
+├── types/                  # TypeScript type definitions
+└── docs/                   # Documentation
 \`\`\`
 
-## 🔧 Available Scripts
+## 🚀 Getting Started
+
+1. **Clone the repository**
+   \`\`\`bash
+   git clone https://github.com/suitpax/suitpax-landing.git
+   cd suitpax-landing
+   \`\`\`
+
+2. **Install dependencies**
+   \`\`\`bash
+   npm install
+   \`\`\`
+
+3. **Set up environment variables**
+   \`\`\`bash
+   cp .env.example .env.local
+   # Add your API keys and configuration
+   \`\`\`
+
+4. **Run the development server**
+   \`\`\`bash
+   npm run dev
+   \`\`\`
+
+5. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 📊 Performance
+
+- **Lighthouse Score**: 95+ across all metrics
+- **Core Web Vitals**: Optimized for LCP, FID, and CLS
+- **Bundle Size**: Minimized with tree shaking and code splitting
+- **Images**: Optimized with Next.js Image component
+
+## 🎨 Design System
+
+### Colors
+- **Primary**: Gray-based palette
+- **Accent**: Emerald for highlights
+- **Background**: White and gray-50
+- **Text**: Black and gray variants
+
+### Typography
+- **Font**: Inter (Google Fonts)
+- **Hierarchy**: Consistent sizing scale
+- **Weight**: Light, medium, semibold
+
+### Components
+- **Base**: shadcn/ui components
+- **Custom**: Marketing-specific components
+- **Responsive**: Mobile-first approach
+
+## 🔧 Development
+
+### Available Scripts
 
 \`\`\`bash
-# Development
-pnpm dev              # Start development server
-pnpm build            # Build for production
-pnpm start            # Start production server
-
-# Database
-pnpm db:generate      # Generate Prisma client
-pnpm db:push          # Push schema to database
-pnpm db:studio        # Open Prisma Studio
-pnpm db:migrate       # Run migrations
-pnpm db:reset         # Reset database
-
-# Code Quality
-pnpm lint             # Run ESLint
-pnpm type-check       # Run TypeScript checks
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run type-check   # Run TypeScript checks
 \`\`\`
 
-## 🌐 Environment Variables
+### Code Quality
 
-Create a `.env.local` file with the following variables:
+- **ESLint**: Configured with Next.js and TypeScript rules
+- **Prettier**: Code formatting
+- **TypeScript**: Strict type checking
+- **Husky**: Pre-commit hooks
 
-\`\`\`env
-# Database
-DATABASE_URL="your-database-url"
+## 📱 Pages
 
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+- **Homepage** (`/`) - Main landing page with hero and features
+- **AI Voice** (`/ai-voice`) - Voice assistant demonstration
+- **Pricing** (`/pricing`) - Plans and feature comparison
+- **Manifesto** (`/manifesto`) - Company vision and values
+- **Travel Policies** (`/solutions/travel-policies`) - Policy management
 
-# AI Services
-ANTHROPIC_API_KEY="your-anthropic-api-key"
-XAI_API_KEY="your-xai-api-key"
+## 🌐 SEO & Analytics
 
-# Intercom
-NEXT_PUBLIC_INTERCOM_APP_ID="t7e59vcn"
-\`\`\`
+- **Meta Tags**: Dynamic per page
+- **Open Graph**: Social media optimization
+- **Sitemap**: Auto-generated XML sitemap
+- **Robots.txt**: Search engine directives
+- **Analytics**: Ready for Google Analytics integration
 
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
 
-1. **Connect your repository to Vercel**
-2. **Set environment variables in Vercel dashboard**
-3. **Deploy automatically on push to main**
+1. **Connect your repository** to Vercel
+2. **Set environment variables** in Vercel dashboard
+3. **Deploy** automatically on push to main branch
 
 ### Manual Deployment
 
 \`\`\`bash
-pnpm build
-pnpm start
+npm run build
+npm run start
 \`\`\`
 
 ## 🤝 Contributing
@@ -148,22 +145,15 @@ pnpm start
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is proprietary and confidential. All rights reserved by Suitpax.
 
-## 🆘 Support
+## 📞 Support
 
-- 📧 Email: support@suitpax.com
-- 💬 Intercom: Available in the app
-- 📖 Documentation: [docs.suitpax.com](https://docs.suitpax.com)
-
-## 🎯 Roadmap
-
-- [ ] Mobile app (React Native)
-- [ ] Advanced AI features
-- [ ] More travel integrations
-- [ ] Enterprise features
-- [ ] Multi-language support
+For support and questions:
+- **Email**: hello@suitpax.com
+- **Website**: [suitpax.com](https://suitpax.com)
+- **Slack**: [Join our community](https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw)
 
 ---
 
-Made with ❤️ by the Suitpax Team
+Built with ❤️ by the Suitpax team

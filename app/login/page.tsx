@@ -35,8 +35,8 @@ export default function LoginPage() {
       setError(error.message)
       setIsSubmitting(false)
     } else {
-      router.push("/dashboard")
-      router.refresh()
+      // Redirect to app.suitpax.com instead of local dashboard
+      window.location.href = "https://app.suitpax.com/dashboard"
     }
   }
 
@@ -44,7 +44,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: `https://app.suitpax.com/auth/callback`,
       },
     })
     if (error) {

@@ -1,66 +1,58 @@
 import type React from "react"
-import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import type { Metadata } from "next"
 import "./globals.css"
-import { Navigation } from "@/components/marketing/navigation"
-import { Footer } from "@/components/marketing/footer"
 import IntercomProvider from "@/components/intercom/intercom-provider"
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-})
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: {
-    default: "Suitpax - AI-Powered Business Travel Platform",
-    template: "%s | Suitpax",
-  },
+  title: "Suitpax | The next-gen AI traveltech",
   description:
-    "Transform your business travel with AI agents, automated expense management, and intelligent booking. The future of corporate travel is here.",
-  keywords: ["business travel", "AI travel", "expense management", "corporate travel", "travel booking"],
-  authors: [{ name: "Suitpax Team" }],
-  creator: "Suitpax",
-  publisher: "Suitpax",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
+    "AI-powered business travel platform with MCP-enhanced agents. Revolutionizing corporate travel with AI superpowers, intelligent expense management, and seamless booking experiences.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16" },
+      { url: "/favicon-32x32.png", sizes: "32x32" },
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon.ico",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://suitpax.com",
-    title: "Suitpax - AI-Powered Business Travel Platform",
+    title: "Suitpax | The next-gen AI traveltech",
     description:
-      "Transform your business travel with AI agents, automated expense management, and intelligent booking.",
+      "The all-in-one business travel platform with AI superpowers. MCP-enhanced AI agents, expense management, flights, hotels, and cars—everything in one place. Transforming corporate travel with intelligent automation and contextual understanding.",
     siteName: "Suitpax",
     images: [
       {
         url: "/og-image-new.png",
         width: 1200,
         height: 630,
-        alt: "Suitpax - AI-Powered Business Travel Platform",
+        alt: "Suitpax - Designed by humans. Powered by AI Agents",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Suitpax - AI-Powered Business Travel Platform",
+    title: "Suitpax | The next-gen AI traveltech",
     description:
-      "Transform your business travel with AI agents, automated expense management, and intelligent booking.",
-    images: ["/twitter-image.png"],
+      "AI travel agents with MCP superpowers. Transforming business travel with intelligent automation, contextual understanding, and seamless expense management. Built for scale, designed for humans.",
     creator: "@suitpax",
+    images: ["/og-image-new.png"],
   },
+  keywords:
+    "AI travel agents, business travel platform, MCP technology, AI superpowers, corporate travel management, expense automation, intelligent booking, contextual AI, travel intelligence, next-gen traveltech",
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
+      "max-image-preview": "none",
       "max-snippet": -1,
     },
   },
@@ -73,11 +65,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className={`${inter.className} antialiased bg-black`}>
-        <Navigation />
-        <main className="relative">{children}</main>
-        <Footer />
+    <html lang="en" className="scroll-smooth">
+      <head>
+        <meta name="application-name" content="Suitpax" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Suitpax | The next-gen AI traveltech" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#000000" />
+      </head>
+      <body className={inter.className}>
+        {children}
         <IntercomProvider />
       </body>
     </html>

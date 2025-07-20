@@ -6,7 +6,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { PiDotsNineBold, PiDotsSixBold, PiArrowUpRightBold } from "react-icons/pi"
-import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
+import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack } from "react-icons/si"
 import { cn } from "@/lib/utils"
 import type { User } from "@supabase/supabase-js"
 
@@ -105,6 +105,13 @@ export const Navigation = ({ user }: { user: User | null }) => {
               >
                 Talk to founders
               </Link>
+              <Link
+                href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
+                className="px-2 py-0.5 text-xs text-black bg-transparent border border-black rounded-md font-medium tracking-tighter transition-colors flex items-center gap-1"
+              >
+                <SiSlack className="h-3 w-3" />
+                Join Slack
+              </Link>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -132,7 +139,7 @@ export const Navigation = ({ user }: { user: User | null }) => {
                     className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
                   >
                     <Link href="/signup">
-                      Sign Up
+                      Sign Up Free
                       <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
                     </Link>
                   </Button>
@@ -214,6 +221,17 @@ export const Navigation = ({ user }: { user: User | null }) => {
                         <span className="font-serif italic text-sm">Deck</span>
                         <PiArrowUpRightBold className="h-3 w-3 ml-1 text-gray-500" />
                       </div>
+                    </Link>
+                  </div>
+
+                  <div className="py-2 border-b border-gray-200/30">
+                    <Link
+                      href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
+                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <SiSlack className="h-4 w-4 mr-1.5" />
+                      Join our Slack community
                     </Link>
                   </div>
                 </div>

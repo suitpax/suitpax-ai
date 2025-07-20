@@ -35,6 +35,7 @@ export default function SignUpPage() {
         data: {
           full_name: fullName,
         },
+        emailRedirectTo: `https://app.suitpax.com/auth/callback`,
       },
     })
 
@@ -50,7 +51,7 @@ export default function SignUpPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: `https://app.suitpax.com/auth/callback`,
       },
     })
     if (error) {
@@ -85,7 +86,7 @@ export default function SignUpPage() {
               <h3 className="text-lg font-medium text-gray-900">Check your email</h3>
               <p className="mt-2 text-sm text-gray-600">
                 We've sent a confirmation link to your email address. Please click the link to complete your
-                registration.
+                registration and access your dashboard at app.suitpax.com.
               </p>
             </div>
           ) : (
