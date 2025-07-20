@@ -1,8 +1,11 @@
 -- Drop existing tables if they exist to start fresh
+drop table if exists public.bookings cascade;
+drop table if exists public.hotels cascade;
 drop table if exists public.profiles cascade;
 drop table if exists public.plans cascade;
 drop type if exists public.plan_name;
 drop type if exists public.subscription_status;
+drop type if exists public.booking_status;
 
 -- Create plans table
 create type plan_name as enum ('Starter', 'Pro', 'Enterprise');
@@ -36,7 +39,7 @@ create table profiles (
   has_completed_onboarding boolean default false not null
 );
 
--- Set up Row Level Security (RLS)
+-- Set up Row Level Security (RLS) for profiles
 alter table profiles enable row level security;
 
 create policy "Public profiles are viewable by everyone." on profiles
@@ -47,6 +50,42 @@ create policy "Users can insert their own profile." on profiles
 
 create policy "Users can update own profile." on profiles
   for update using (auth.uid() = id);
+
+-- Create hotels table
+create table hotels (
+  id serial primary key,
+  name text not null,
+  city text not null,
+  country text not null,
+  image_url text,
+  price_per_night numeric(10, 2),
+  rating numeric(2, 1)
+);
+
+-- Create a type for booking status
+create type booking_status as enum ('pending', 'confirmed', 'canceled');
+
+-- Create bookings table
+create table bookings (
+  id serial primary key,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  hotel_id integer references public.hotels(id) on delete set null,
+  check_in_date date not null,
+  check_out_date date not null,
+  status booking_status default 'pending',
+  total_price numeric(10, 2),
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Set up RLS for bookings
+alter table bookings enable row level security;
+create policy "Users can view their own bookings." on bookings
+  for select using (auth.uid() = user_id);
+create policy "Users can create bookings." on bookings
+  for insert with check (auth.uid() = user_id);
+create policy "Users can update their own bookings." on bookings
+  for update using (auth.uid() = user_id);
+
 
 -- This trigger automatically creates a profile for new users.
 create function public.handle_new_user()

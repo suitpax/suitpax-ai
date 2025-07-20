@@ -2,12 +2,12 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack, SiDiscord } from "react-icons/si"
+import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiDiscord } from "react-icons/si"
 import { PiArrowUpRightBold, PiCalendarCheckBold } from "react-icons/pi"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 
-export const Footer = () => {
+export default function Footer() {
   const [isMobile, setIsMobile] = useState(false)
 
   // Detectar si es dispositivo móvil
@@ -118,15 +118,8 @@ export const Footer = () => {
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
               >
                 <PiCalendarCheckBold className="h-3.5 w-3.5" />
-                Join Suitpax Events
+                Hackaton
                 <PiArrowUpRightBold className="h-3 w-3 text-gray-400" />
-              </Link>
-              <Link
-                href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
-                className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
-              >
-                <SiSlack className="h-3.5 w-3.5" />
-                Join Slack
               </Link>
               <Link
                 href="https://app.suitpax.com/sign-up"
@@ -370,5 +363,3 @@ export const Footer = () => {
     </footer>
   )
 }
-
-export default Footer

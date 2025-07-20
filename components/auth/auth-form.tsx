@@ -95,7 +95,7 @@ export function AuthForm({ view }: { view: ViewType }) {
 
         <p className="mt-6 text-center text-xs text-gray-500">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-          <Link href={isLogin ? "/signup" : "/login"} className="text-sky-400 hover:text-sky-300 font-medium">
+          <Link href={isLogin ? "/signup" : "/login"} className="text-gray-400 hover:text-white font-medium">
             {isLogin ? "Sign up" : "Log in"}
           </Link>
         </p>

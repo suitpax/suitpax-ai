@@ -5,7 +5,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import Badge from "@/components/ui/badge"
 import CityAnimateText from "@/components/ui/city-animate-text"
-import { useEffect, useState } from "@/components/ui/animations"
+import { useEffect, useState } from "react"
 import { FadeContainer, FadeSpan } from "@/components/ui/animations"
 import CounterBadge from "@/components/ui/counter-badge"
 import MiniChat from "@/components/ui/mini-chat"
@@ -355,5 +355,3 @@ export const Hero = () => {
     </VantaHaloBackground>
   )
 }
-
-export default Hero

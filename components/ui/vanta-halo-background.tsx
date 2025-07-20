@@ -28,12 +28,13 @@ export default function VantaHaloBackground({ children, className = "" }: VantaH
         gyroControls: false,
         minHeight: 200.0,
         minWidth: 200.0,
-        backgroundColor: 0xe4e5ed,
-        baseColor: 0xd2d3d7,
-        size: 0.8,
-        amplitudeFactor: 1,
-        xOffset: 0,
-        yOffset: 0,
+        // Colores personalizados para un fondo más neutro y gris
+        backgroundColor: 0xe5e7eb, // light-gray (gray-200)
+        baseColor: 0xdbeafe, // light-blue (blue-200)
+        size: 1.0,
+        amplitudeFactor: 1.2,
+        xOffset: 0.1,
+        yOffset: 0.1,
       })
 
       setVantaEffect(effect)

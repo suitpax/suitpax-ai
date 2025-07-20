@@ -1,50 +1,51 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
-import { headers } from "next/headers"
+import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { createClient } from "@/lib/supabase/server"
 
 export async function login(formData: FormData) {
-  const email = formData.get("email") as string
-  const password = formData.get("password") as string
   const supabase = createClient()
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-
-  if (error) {
-    return redirect("/login?message=Could not authenticate user")
+  const data = {
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
   }
 
-  return redirect("/dashboard")
+  const { error } = await supabase.auth.signInWithPassword(data)
+
+  if (error) {
+    return redirect(
+      `/login?message=${encodeURIComponent("Could not authenticate user. Please check your credentials.")}`,
+    )
+  }
+
+  revalidatePath("/", "layout")
+  redirect("/dashboard")
 }
 
 export async function signup(formData: FormData) {
-  const origin = headers().get("origin")
-  const email = formData.get("email") as string
-  const password = formData.get("password") as string
   const supabase = createClient()
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
-  })
-
-  if (error) {
-    return redirect("/signup?message=Could not authenticate user")
+  const data = {
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
   }
 
-  return redirect("/login?message=Check email to continue sign in process")
+  const { error } = await supabase.auth.signUp(data)
+
+  if (error) {
+    return redirect(`/signup?message=${encodeURIComponent("Could not create account. Please try again.")}`)
+  }
+
+  revalidatePath("/", "layout")
+  redirect("/dashboard")
 }
 
 export async function signInWithGoogle() {
-  const origin = headers().get("origin")
   const supabase = createClient()
+  const origin = process.env.NEXT_PUBLIC_APP_URL!
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
@@ -53,8 +54,8 @@ export async function signInWithGoogle() {
   })
 
   if (error) {
-    console.log(error)
-    return redirect("/login?message=Could not authenticate with Google")
+    console.error("Error signing in with Google:", error)
+    return redirect(`/login?message=${encodeURIComponent("Could not authenticate with Google.")}`)
   }
 
   return redirect(data.url)
