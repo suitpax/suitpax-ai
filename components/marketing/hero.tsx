@@ -311,14 +311,14 @@ export const Hero = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
               <Button
                 asChild
-                className="rounded-xl bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
+                className="rounded-full bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
                 <Link href="/manifesto">Read our manifesto</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="rounded-xl bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
+                className="rounded-full bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
                 <Link href="https://cal.com/team/founders/partnership">Talk to founders</Link>
               </Button>

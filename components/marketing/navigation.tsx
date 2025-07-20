@@ -107,7 +107,7 @@ export const Navigation = ({ user }: { user: User | null }) => {
               </Link>
               <Link
                 href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
-                className="px-2 py-0.5 text-xs text-black bg-transparent border border-black rounded-md font-medium tracking-tighter transition-colors flex items-center gap-1"
+                className="px-2 py-0.5 text-xs text-black bg-transparent border border-black rounded-full font-medium tracking-tighter transition-colors flex items-center gap-1"
               >
                 <SiSlack className="h-3 w-3" />
                 Join Slack
@@ -126,24 +126,15 @@ export const Navigation = ({ user }: { user: User | null }) => {
                   </Link>
                 </Button>
               ) : (
-                <>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="h-7 text-xs font-medium tracking-tighter rounded-full px-3 py-1 hidden sm:inline-flex"
-                  >
-                    <Link href="/login">Sign In</Link>
-                  </Button>
-                  <Button
-                    asChild
-                    className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
-                  >
-                    <Link href="/signup">
-                      Sign Up Free
-                      <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
-                    </Link>
-                  </Button>
-                </>
+                <Button
+                  asChild
+                  className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
+                >
+                  <Link href="/signup">
+                    Sign Up Free
+                    <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
+                  </Link>
+                </Button>
               )}
 
               <button
