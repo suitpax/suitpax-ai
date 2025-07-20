@@ -9,7 +9,6 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-
     if (!error) {
       // Redirect to app.suitpax.com instead of local
       return NextResponse.redirect(`https://app.suitpax.com${next}`)

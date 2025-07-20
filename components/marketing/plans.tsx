@@ -1,11 +1,10 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Check, X } from "lucide-react"
-import Link from "next/link"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
 const plans = [
   {
@@ -13,62 +12,75 @@ const plans = [
     price: "€0",
     period: "forever",
     description: "Perfect for trying out our platform",
-    features: ["5 AI agent interactions per month", "Basic travel search", "Email support", "Access to community"],
-    limitations: ["No booking capabilities", "Limited AI features", "No expense management", "No team collaboration"],
+    features: ["5 AI searches per month", "Basic travel recommendations", "Email support", "Access to community"],
+    limitations: ["No expense management", "No team collaboration", "No priority support", "No advanced AI features"],
     cta: "Get Started",
-    href: "/signup",
+    href: "https://app.suitpax.com/sign-up",
     popular: false,
-    color: "gray",
   },
   {
     name: "Startup",
     price: "€39",
-    originalPrice: "€49",
+    annualPrice: "€31",
     period: "per month",
-    yearlyPrice: "€31",
-    yearlyOriginal: "€39",
     description: "Ideal for growing startups and small teams",
     features: [
-      "100 AI agent interactions per month",
-      "Full booking capabilities",
+      "100 AI searches per month",
+      "Advanced travel recommendations",
       "Basic expense management",
       "Team collaboration (up to 5 members)",
       "Priority email support",
       "Travel policy templates",
       "Basic reporting",
     ],
-    limitations: ["Limited integrations", "Basic reporting only", "No custom workflows"],
+    limitations: ["Limited integrations", "No custom AI training", "No dedicated support"],
     cta: "Start Free Trial",
-    href: "/signup?plan=startup",
+    href: "https://app.suitpax.com/sign-up?plan=startup",
     popular: true,
-    color: "emerald",
-    badge: "Most Popular",
+  },
+  {
+    name: "Basic",
+    price: "€49",
+    annualPrice: "€39",
+    period: "per month",
+    description: "Great for small to medium businesses",
+    features: [
+      "500 AI searches per month",
+      "Advanced travel recommendations",
+      "Full expense management",
+      "Team collaboration (up to 10 members)",
+      "Priority support",
+      "Custom travel policies",
+      "Advanced reporting",
+      "API access",
+    ],
+    limitations: ["Limited custom integrations", "No dedicated account manager"],
+    cta: "Start Free Trial",
+    href: "https://app.suitpax.com/sign-up?plan=basic",
+    popular: false,
   },
   {
     name: "Pro",
     price: "€79",
-    originalPrice: "€99",
+    annualPrice: "€63",
     period: "per month",
-    yearlyPrice: "€63",
-    yearlyOriginal: "€79",
-    description: "For established businesses with advanced needs",
+    description: "Perfect for scaling businesses",
     features: [
-      "Unlimited AI agent interactions",
-      "Advanced booking with preferences",
-      "Complete expense management",
+      "Unlimited AI searches",
+      "Advanced AI travel agents",
+      "Complete expense management suite",
       "Unlimited team members",
       "24/7 priority support",
-      "Custom travel policies",
-      "Advanced reporting & analytics",
-      "API access",
       "Custom integrations",
+      "Advanced analytics & reporting",
+      "Custom AI training",
       "Dedicated account manager",
+      "SLA guarantee",
     ],
     limitations: [],
     cta: "Start Free Trial",
-    href: "/signup?plan=pro",
+    href: "https://app.suitpax.com/sign-up?plan=pro",
     popular: false,
-    color: "blue",
   },
   {
     name: "Enterprise",
@@ -77,154 +89,94 @@ const plans = [
     description: "Tailored solutions for large organizations",
     features: [
       "Everything in Pro",
-      "Custom AI agent training",
+      "Custom AI model training",
       "White-label solutions",
       "On-premise deployment options",
-      "Custom SLA agreements",
-      "Dedicated infrastructure",
+      "Custom integrations",
+      "Dedicated support team",
+      "Custom SLA",
       "Advanced security features",
-      "Custom reporting",
-      "Integration support",
-      "Training & onboarding",
+      "Compliance certifications",
     ],
     limitations: [],
     cta: "Contact Sales",
-    href: "/contact",
+    href: "https://cal.com/team/founders/partnership",
     popular: false,
-    color: "purple",
   },
 ]
 
 export default function Plans() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-medium tracking-tighter text-black mb-4">Choose Your Plan</h2>
+          <h2 className="text-4xl md:text-5xl font-medium tracking-tighter text-black mb-6">Choose your plan</h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Start free and scale as you grow. All plans include our core AI travel agents.
+            Start free and scale as you grow. All plans include our core AI travel features.
           </p>
-          <div className="mt-8 flex items-center justify-center gap-4">
-            <span className="text-sm font-medium text-gray-900">Monthly</span>
-            <div className="relative">
-              <input
-                type="checkbox"
-                id="billing-toggle"
-                className="sr-only"
-                onChange={(e) => {
-                  const cards = document.querySelectorAll("[data-plan-card]")
-                  cards.forEach((card) => {
-                    const monthlyPrice = card.querySelector("[data-monthly-price]")
-                    const yearlyPrice = card.querySelector("[data-yearly-price]")
-                    const monthlyPeriod = card.querySelector("[data-monthly-period]")
-                    const yearlyPeriod = card.querySelector("[data-yearly-period]")
-
-                    if (e.target.checked) {
-                      monthlyPrice?.classList.add("hidden")
-                      yearlyPrice?.classList.remove("hidden")
-                      monthlyPeriod?.classList.add("hidden")
-                      yearlyPeriod?.classList.remove("hidden")
-                    } else {
-                      monthlyPrice?.classList.remove("hidden")
-                      yearlyPrice?.classList.add("hidden")
-                      monthlyPeriod?.classList.remove("hidden")
-                      yearlyPeriod?.classList.add("hidden")
-                    }
-                  })
-                }}
-              />
-              <label htmlFor="billing-toggle" className="flex items-center cursor-pointer">
-                <div className="relative">
-                  <div className="block bg-gray-200 w-14 h-8 rounded-full"></div>
-                  <div className="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition transform"></div>
-                </div>
-              </label>
-            </div>
-            <span className="text-sm font-medium text-gray-900">
-              Yearly <span className="text-emerald-600 font-semibold">(Save 20%)</span>
-            </span>
+          <div className="mt-8 inline-flex items-center bg-white rounded-xl p-1 shadow-sm">
+            <button className="px-4 py-2 text-sm font-medium text-gray-900 bg-gray-100 rounded-lg">Monthly</button>
+            <button className="px-4 py-2 text-sm font-medium text-gray-500">Annual (20% off)</button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              data-plan-card
+              className={`relative bg-white rounded-2xl border p-8 ${
+                plan.popular ? "border-emerald-500 shadow-lg scale-105" : "border-gray-200 shadow-sm"
+              }`}
             >
-              <Card
-                className={`relative h-full ${
-                  plan.popular ? "border-emerald-500 shadow-lg scale-105" : "border-gray-200"
+              {plan.popular && (
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white">
+                  Most Popular
+                </Badge>
+              )}
+
+              <div className="text-center mb-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{plan.name}</h3>
+                <div className="mb-4">
+                  <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
+                  {plan.annualPrice && (
+                    <div className="text-sm text-gray-500 mt-1">
+                      <span className="line-through">{plan.price}</span>{" "}
+                      <span className="text-emerald-600 font-medium">{plan.annualPrice}</span> annually
+                    </div>
+                  )}
+                  <span className="text-gray-500 text-sm">/{plan.period}</span>
+                </div>
+                <p className="text-gray-600 text-sm">{plan.description}</p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                {plan.features.map((feature, featureIndex) => (
+                  <div key={featureIndex} className="flex items-start">
+                    <Check className="h-5 w-5 text-emerald-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">{feature}</span>
+                  </div>
+                ))}
+                {plan.limitations.map((limitation, limitationIndex) => (
+                  <div key={limitationIndex} className="flex items-start">
+                    <X className="h-5 w-5 text-gray-400 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-gray-500">{limitation}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                asChild
+                className={`w-full ${
+                  plan.popular
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                    : "bg-gray-900 hover:bg-gray-800 text-white"
                 }`}
               >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-emerald-500 text-white px-4 py-1">{plan.badge}</Badge>
-                  </div>
-                )}
-
-                <CardHeader className="text-center pb-8">
-                  <CardTitle className="text-xl font-semibold text-gray-900">{plan.name}</CardTitle>
-                  <div className="mt-4">
-                    <div data-monthly-price>
-                      <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                      {plan.period !== "contact us" && plan.period !== "forever" && (
-                        <span className="text-gray-500 ml-1" data-monthly-period>
-                          /{plan.period.split(" ")[1]}
-                        </span>
-                      )}
-                      {plan.period === "forever" && <span className="text-gray-500 ml-1">{plan.period}</span>}
-                      {plan.period === "contact us" && <span className="text-gray-500 ml-1">{plan.period}</span>}
-                    </div>
-
-                    {plan.yearlyPrice && (
-                      <div data-yearly-price className="hidden">
-                        <span className="text-4xl font-bold text-gray-900">{plan.yearlyPrice}</span>
-                        <span className="text-gray-500 ml-1" data-yearly-period>
-                          /month
-                        </span>
-                        <div className="text-sm text-gray-500 mt-1">
-                          <span className="line-through">{plan.yearlyOriginal}/month</span>
-                          <span className="text-emerald-600 ml-2 font-semibold">Save 20%</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <CardDescription className="text-gray-600 mt-2">{plan.description}</CardDescription>
-                </CardHeader>
-
-                <CardContent className="space-y-6">
-                  <div className="space-y-3">
-                    {plan.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-start gap-3">
-                        <Check className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">{feature}</span>
-                      </div>
-                    ))}
-
-                    {plan.limitations.map((limitation, limitationIndex) => (
-                      <div key={limitationIndex} className="flex items-start gap-3">
-                        <X className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-gray-500">{limitation}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Button
-                    asChild
-                    className={`w-full ${
-                      plan.popular
-                        ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                        : "bg-gray-900 hover:bg-gray-800 text-white"
-                    }`}
-                  >
-                    <Link href={plan.href}>{plan.cta}</Link>
-                  </Button>
-                </CardContent>
-              </Card>
+                <Link href={plan.href}>{plan.cta}</Link>
+              </Button>
             </motion.div>
           ))}
         </div>
@@ -232,8 +184,11 @@ export default function Plans() {
         <div className="text-center mt-12">
           <p className="text-gray-600 mb-4">All plans include a 14-day free trial. No credit card required.</p>
           <p className="text-sm text-gray-500">
-            Need a custom solution?{" "}
-            <Link href="/contact" className="text-emerald-600 hover:text-emerald-700 font-medium">
+            Need something different?{" "}
+            <Link
+              href="https://cal.com/team/founders/partnership"
+              className="text-emerald-600 hover:text-emerald-700 font-medium"
+            >
               Contact our sales team
             </Link>
           </p>

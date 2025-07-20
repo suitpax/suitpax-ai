@@ -105,12 +105,10 @@ const titleVariations = [
 const getBadgeMessage = () => {
   const now = new Date()
   const hour = now.getHours()
-
   // Show "AI Agents are sleeping" after 9 PM (21:00)
   if (hour >= 21 || hour < 6) {
     return "Our AI Agents are sleeping..."
   }
-
   // Random selection for other times
   const messages = [
     "Launching at the end of Q2 2025.",
@@ -118,7 +116,6 @@ const getBadgeMessage = () => {
     "Join our waitlist in the meantime.",
     "The next-gen of traveltech.",
   ]
-
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
@@ -318,7 +315,6 @@ export const Hero = () => {
               >
                 <Link href="/manifesto">Read our manifesto</Link>
               </Button>
-
               <Button
                 asChild
                 variant="outline"
