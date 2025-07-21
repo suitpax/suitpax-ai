@@ -58,5 +58,16 @@ export async function signInWithGoogle() {
     return redirect(`/login?message=${encodeURIComponent("Could not authenticate with Google.")}`)
   }
 
-  return redirect(data.url)
+  if (data.url) {
+    return redirect(data.url)
+  }
+
+  return redirect(`/login?message=${encodeURIComponent("Could not get Google auth URL.")}`)
+}
+
+export async function signOut() {
+  const supabase = createClient()
+  await supabase.auth.signOut()
+  revalidatePath("/", "layout")
+  redirect("/login")
 }

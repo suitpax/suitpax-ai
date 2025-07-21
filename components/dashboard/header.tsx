@@ -9,12 +9,16 @@ export default function Header() {
     <header className="flex h-14 items-center gap-4 border-b bg-white px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="shrink-0 md:hidden bg-transparent">
+          <Button
+            variant="outline"
+            size="icon"
+            className="shrink-0 md:hidden bg-transparent border-0 hover:bg-gray-100"
+          >
             <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="flex flex-col p-0">
+        <SheetContent side="left" className="flex flex-col p-0 w-[280px] sm:w-[280px]">
           <Sidebar />
         </SheetContent>
       </Sheet>

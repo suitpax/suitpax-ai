@@ -17,7 +17,7 @@ interface OnboardingModalProps {
   isOpen: boolean
 }
 
-export function OnboardingModal({ isOpen }: OnboardingModalProps) {
+export default function OnboardingModal({ isOpen }: OnboardingModalProps) {
   const [open, setOpen] = useState(isOpen)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -26,11 +26,11 @@ export function OnboardingModal({ isOpen }: OnboardingModalProps) {
     const result = await completeOnboarding()
     if (result.success) {
       setOpen(false)
+      window.location.reload()
     } else {
-      // Handle error, maybe show a toast
       console.error(result.error)
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
   return (
