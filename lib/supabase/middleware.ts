@@ -17,7 +17,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.get(name)?.value
         },
         set(name: string, value: string, options: CookieOptions) {
-          // Si se establece la cookie, actualiza las cookies de la solicitud y la respuesta.
+          // Si se establece una cookie, actualiza las cookies de la solicitud y la respuesta.
           request.cookies.set({
             name,
             value,
@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
           })
         },
         remove(name: string, options: CookieOptions) {
-          // Si se elimina la cookie, actualiza las cookies de la solicitud y la respuesta.
+          // Si se elimina una cookie, actualiza las cookies de la solicitud y la respuesta.
           request.cookies.set({
             name,
             value: "",
@@ -56,19 +56,10 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  // Refrescar la sesión antes de cargar los Server Components.
-  // Esto también se encargará de refrescar la sesión por ti.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // Esto refrescará la cookie de sesión si ha expirado.
+  // Es importante esperar a que esto termine para asegurar que la sesión esté actualizada
+  // antes de que se ejecute la lógica principal del middleware.
+  await supabase.auth.getUser()
 
-  // Si el usuario no está autenticado e intenta acceder a una ruta protegida,
-  // redirígelo a la página de login.
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/login"
-    return NextResponse.redirect(url)
-  }
-
-  return response
+  return { supabase, response }
 }
