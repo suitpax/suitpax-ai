@@ -362,7 +362,7 @@ const MissionValues = () => {
 export const Plans = () => {
   const [randomTitle, setRandomTitle] = useState("")
   const [randomSubtitle, setRandomSubtitle] = useState("")
-  const [isAnnual, setIsAnnual] = useState(false)
+  const [isAnnual, setIsAnnual] = useState(true)
 
   useEffect(() => {
     // Seleccionar un título aleatorio al montar el componente
