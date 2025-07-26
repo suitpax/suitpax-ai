@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { PiGlobe, PiPercent, PiHeadphones, PiLightning, PiArrowRight } from "react-icons/pi"
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 
 // Mini Chat para Vuelos
 const FlightsMiniChat = () => {
@@ -38,8 +39,8 @@ const AirlineIcon = ({ logo, name }: { logo: string; name: string }) => {
         src={logo || "/placeholder.svg"}
         alt={name}
         width={100}
-        height={40}
-        className="h-8 w-auto object-contain brightness-0 invert"
+        height={32}
+        className="h-6 w-auto object-contain brightness-0 invert"
       />
     </div>
   )
@@ -81,16 +82,13 @@ const airlines = [
 
 const MCPFlightsShowcase = () => {
   return (
-    <section className="w-full bg-black py-20 relative overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-[0.03] bg-repeat bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px]"></div>
-
-      {/* Disruptive elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 right-[5%] w-64 h-64 rounded-full bg-gradient-to-br from-sky-500/10 to-emerald-500/10 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 left-[5%] w-80 h-80 rounded-full bg-gradient-to-tr from-emerald-500/10 to-sky-500/10 blur-3xl animate-pulse [animation-delay:2s]"></div>
-      </div>
-
+    <VantaHaloBackground
+      className="w-full py-20 relative overflow-hidden"
+      backgroundColor={0x0} // black
+      baseColor={0xd1d5db} // gray-300
+      size={0.7}
+      amplitudeFactor={0.7}
+    >
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -106,7 +104,7 @@ const MCPFlightsShowcase = () => {
               MCP-Powered Flights
             </div>
 
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium tracking-tighter leading-tight mb-4 py-2">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-tight mb-4 py-2">
               <span className="bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text">
                 Your Personal AI Flight Agent
               </span>
@@ -207,7 +205,7 @@ const MCPFlightsShowcase = () => {
           </div>
         </div>
       </div>
-    </section>
+    </VantaHaloBackground>
   )
 }
 

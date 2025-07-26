@@ -4,7 +4,7 @@ import type React from "react"
 import { useRef, useEffect, useState } from "react"
 import Script from "next/script"
 
-interface VantaHaloBackgroundProps {
+interface VantaHeroBackgroundProps {
   children: React.ReactNode
   className?: string
   backgroundColor?: number
@@ -13,14 +13,14 @@ interface VantaHaloBackgroundProps {
   amplitudeFactor?: number
 }
 
-export default function VantaHaloBackground({
+export default function VantaHeroBackground({
   children,
   className = "",
-  backgroundColor = 0x0, // Default black
-  baseColor = 0x06b6d4, // Default cyan
-  size = 1.2,
-  amplitudeFactor = 1.5,
-}: VantaHaloBackgroundProps) {
+  backgroundColor = 0xf3f4f6, // gray-100
+  baseColor = 0xd1d5db, // gray-300
+  size = 1.0,
+  amplitudeFactor = 1.2,
+}: VantaHeroBackgroundProps) {
   const vantaRef = useRef<HTMLDivElement>(null)
   const [vantaEffect, setVantaEffect] = useState<any>(null)
   const [scriptsLoaded, setScriptsLoaded] = useState(false)
