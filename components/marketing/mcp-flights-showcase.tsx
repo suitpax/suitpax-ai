@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { Globe, BadgePercent, Headset, Zap, ArrowRight } from "lucide-react"
+import { PiGlobe, PiPercent, PiHeadphones, PiLightning, PiArrowRight } from "react-icons/pi"
 
 // Mini Chat para Vuelos
 const FlightsMiniChat = () => {
@@ -25,13 +25,13 @@ const FlightsMiniChat = () => {
           Find a business class flight from JFK to LHR...
         </span>
       </div>
-      <ArrowRight className="w-4 h-4 text-gray-400 mr-1" />
+      <PiArrowRight className="w-4 h-4 text-gray-400 mr-1" />
     </motion.div>
   )
 }
 
 // Componente de aerolínea
-const AirlineIcon = ({ logo, name }) => {
+const AirlineIcon = ({ logo, name }: { logo: string; name: string }) => {
   return (
     <div className="flex justify-center items-center p-2 rounded-xl transition-all hover:bg-gray-800/50">
       <Image
@@ -140,7 +140,7 @@ const MCPFlightsShowcase = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                 <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-gray-200/10">
                   <div className="flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-gray-300" />
+                    <PiGlobe className="w-4 h-4 text-gray-300" />
                     <div>
                       <div className="text-[10px] text-gray-300 font-medium">Global Coverage</div>
                       <div className="text-[8px] text-gray-400">10,000+ airlines</div>
@@ -149,7 +149,7 @@ const MCPFlightsShowcase = () => {
                 </div>
                 <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-gray-200/10">
                   <div className="flex items-center gap-2">
-                    <BadgePercent className="w-4 h-4 text-gray-300" />
+                    <PiPercent className="w-4 h-4 text-gray-300" />
                     <div>
                       <div className="text-[10px] text-gray-300 font-medium">Best Prices</div>
                       <div className="text-[8px] text-gray-400">AI-powered savings</div>
@@ -158,7 +158,7 @@ const MCPFlightsShowcase = () => {
                 </div>
                 <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-gray-200/10">
                   <div className="flex items-center gap-2">
-                    <Headset className="w-4 h-4 text-gray-300" />
+                    <PiHeadphones className="w-4 h-4 text-gray-300" />
                     <div>
                       <div className="text-[10px] text-gray-300 font-medium">24/7 Support</div>
                       <div className="text-[8px] text-gray-400">Human + AI assistance</div>
@@ -167,7 +167,7 @@ const MCPFlightsShowcase = () => {
                 </div>
                 <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-gray-200/10">
                   <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-gray-300" />
+                    <PiLightning className="w-4 h-4 text-gray-300" />
                     <div>
                       <div className="text-[10px] text-gray-300 font-medium">Instant Booking</div>
                       <div className="text-[8px] text-gray-400">One-click confirmation</div>
