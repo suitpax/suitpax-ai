@@ -6,17 +6,19 @@ import { usePathname } from "next/navigation"
 import Navigation from "@/components/marketing/navigation"
 import Footer from "@/components/marketing/footer"
 
-const ConditionalLayout = ({ children }: { children: React.ReactNode }) => {
+export default function ConditionalLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const pathname = usePathname()
 
-  // Rutas que deben mostrar pantalla completa (sin navigation/footer)
-  const isFullScreenRoute =
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/signup") ||
-    pathname.startsWith("/auth")
+  // Hide navigation and footer for dashboard, login, and signup pages
+  const isDashboard = pathname?.startsWith("/dashboard")
+  const isAuth = pathname === "/login" || pathname === "/signup"
+  const shouldHideNavAndFooter = isDashboard || isAuth
 
-  if (isFullScreenRoute) {
+  if (shouldHideNavAndFooter) {
     return <>{children}</>
   }
 
@@ -28,5 +30,3 @@ const ConditionalLayout = ({ children }: { children: React.ReactNode }) => {
     </>
   )
 }
-
-export default ConditionalLayout

@@ -16,30 +16,70 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { PiUser, PiCreditCard, PiGear, PiSignOut } from "react-icons/pi"
+import type { User } from "@supabase/supabase-js"
 
 export function UserNav() {
   const router = useRouter()
   const supabase = createClient()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
+        setUser(user)
+      } catch (error) {
+        console.error("Error fetching user:", error)
+      } finally {
+        setLoading(false)
+      }
     }
+
     getUser()
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
   }, [supabase])
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/")
-    router.refresh()
+    try {
+      await supabase.auth.signOut()
+      router.push("/")
+      router.refresh()
+    } catch (error) {
+      console.error("Error signing out:", error)
+    }
   }
 
   const getInitials = (email: string) => {
     return email.charAt(0).toUpperCase()
+  }
+
+  const getUserDisplayName = () => {
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name
+    }
+    if (user?.email) {
+      return user.email.split("@")[0]
+    }
+    return "User"
+  }
+
+  if (loading) {
+    return <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />
+  }
+
+  if (!user) {
+    return null
   }
 
   return (
@@ -51,14 +91,16 @@ export function UserNav() {
               src={user?.user_metadata?.avatar_url || "/placeholder.svg?width=32&height=32&query=user+avatar"}
               alt={user?.email || "User"}
             />
-            <AvatarFallback>{user?.email ? getInitials(user.email) : <PiUser className="h-4 w-4" />}</AvatarFallback>
+            <AvatarFallback className="bg-gray-200">
+              {user?.email ? getInitials(user.email) : <PiUser className="h-4 w-4" />}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user?.user_metadata?.full_name || "My Account"}</p>
+            <p className="text-sm font-medium leading-none">{getUserDisplayName()}</p>
             <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
           </div>
         </DropdownMenuLabel>
@@ -81,7 +123,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut}>
+        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600">
           <PiSignOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

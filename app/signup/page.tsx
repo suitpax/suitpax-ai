@@ -4,7 +4,11 @@ import { redirect } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 
-export default async function SignupPage() {
+export default async function SignupPage({
+  searchParams,
+}: {
+  searchParams: { message?: string }
+}) {
   const supabase = createClient()
   const {
     data: { user },
@@ -22,7 +26,7 @@ export default async function SignupPage() {
             <h1 className="text-3xl font-bold tracking-tighter">Sign Up</h1>
             <p className="text-balance text-gray-500">Create your account to start your 7-day free trial.</p>
           </div>
-          <AuthForm view="signup" />
+          <AuthForm mode="signup" message={searchParams.message} />
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link href="/login" className="underline">
