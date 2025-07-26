@@ -2,8 +2,18 @@ import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
+  const url = request.nextUrl.clone()
+  const hostname = request.headers.get("host") || ""
+
+  // Handle subdomain routing
+  const isAppSubdomain = hostname.includes("app.suitpax.com") || hostname.includes("app.localhost")
+  const isMainDomain = hostname.includes("suitpax.com") || hostname.includes("localhost:3000")
+
+  // Create Supabase client
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
   })
 
   const supabase = createServerClient(
@@ -11,61 +21,80 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
+        get(name: string) {
+          return request.cookies.get(name)?.value
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
+        set(name: string, value: string, options: any) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
           })
-          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: any) {
+          request.cookies.set({
+            name,
+            value: "",
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: "",
+            ...options,
+          })
         },
       },
     },
   )
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
-
+  // Get user session
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/signup") &&
-    !request.nextUrl.pathname.startsWith("/auth") &&
-    request.nextUrl.pathname.startsWith("/dashboard")
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone()
-    url.pathname = "/login"
-    return NextResponse.redirect(url)
+  // Dashboard routes - require authentication and app subdomain
+  if (url.pathname.startsWith("/dashboard")) {
+    if (!user) {
+      // Redirect to login on main domain
+      return NextResponse.redirect(new URL("/login", `https://suitpax.com`))
+    }
+
+    if (!isAppSubdomain) {
+      // Redirect to app subdomain
+      return NextResponse.redirect(new URL(url.pathname, `https://app.suitpax.com`))
+    }
   }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-  // creating a new response object with NextResponse.next() you must:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object here instead of the supabaseResponse object
+  // Auth routes - redirect authenticated users
+  if (["/login", "/signup"].includes(url.pathname)) {
+    if (user) {
+      return NextResponse.redirect(new URL("/dashboard", `https://app.suitpax.com`))
+    }
+  }
 
-  return supabaseResponse
+  // Main domain - redirect dashboard access to app subdomain
+  if (isMainDomain && !isAppSubdomain && url.pathname.startsWith("/dashboard")) {
+    return NextResponse.redirect(new URL(url.pathname, `https://app.suitpax.com`))
+  }
+
+  return response
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 }

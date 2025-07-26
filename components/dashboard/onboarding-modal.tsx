@@ -10,13 +10,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
-import { PiRocket, PiCheckCircle } from "react-icons/pi"
+import { PiUser, PiCheckCircle, PiArrowRight } from "react-icons/pi"
 
 export default function OnboardingModal() {
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
+  const [formData, setFormData] = useState({
+    fullName: "",
+    company: "",
+    role: "",
+  })
   const supabase = createClient()
 
   useEffect(() => {
@@ -27,12 +34,15 @@ export default function OnboardingModal() {
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("has_completed_onboarding")
+          .select("has_completed_onboarding, full_name")
           .eq("id", user.id)
           .single()
 
         if (!profile?.has_completed_onboarding) {
           setOpen(true)
+          if (profile?.full_name) {
+            setFormData((prev) => ({ ...prev, fullName: profile.full_name }))
+          }
         }
       }
     }
@@ -41,26 +51,19 @@ export default function OnboardingModal() {
 
   const onboardingSteps = [
     {
-      title: "Welcome to Suitpax!",
-      description: "Let's get you started with your AI-powered business travel platform.",
-      content:
-        "Your 7-day free trial has begun. Explore all features and see how Suitpax can revolutionize your workflow.",
+      title: "Welcome to Suitpax",
+      description: "Let's set up your account to get started.",
+      content: "We'll help you configure your business travel platform in just a few steps.",
     },
     {
-      title: "Dashboard Overview",
-      description: "Your central hub for all travel management activities.",
-      content: "Monitor your travel expenses, track bookings, and get insights into your business travel patterns.",
+      title: "Tell us about yourself",
+      description: "Help us personalize your experience.",
+      content: "basic-info",
     },
     {
-      title: "AI Agents",
-      description: "Meet your intelligent travel assistants.",
-      content:
-        "Our AI agents can book flights, find hotels, manage expenses, and handle travel policies automatically.",
-    },
-    {
-      title: "Business Travel",
-      description: "Streamline your corporate travel processes.",
-      content: "Book flights, hotels, and manage itineraries with intelligent recommendations and policy compliance.",
+      title: "You're all set!",
+      description: "Your account is ready to use.",
+      content: "Start exploring your AI-powered business travel platform.",
     },
   ]
 
@@ -79,7 +82,13 @@ export default function OnboardingModal() {
         data: { user },
       } = await supabase.auth.getUser()
       if (user) {
-        await supabase.from("profiles").update({ has_completed_onboarding: true }).eq("id", user.id)
+        await supabase
+          .from("profiles")
+          .update({
+            has_completed_onboarding: true,
+            full_name: formData.fullName,
+          })
+          .eq("id", user.id)
 
         setOpen(false)
         window.location.reload()
@@ -92,28 +101,74 @@ export default function OnboardingModal() {
   }
 
   const currentStepData = onboardingSteps[currentStep]
+  const canProceed = currentStep !== 1 || formData.fullName.trim() !== ""
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[500px] bg-white/95 backdrop-blur-sm border-gray-200">
+    <Dialog open={open} onOpenChange={() => {}}>
+      <DialogContent className="sm:max-w-[480px] bg-white border-gray-200" hideClose>
         <DialogHeader>
-          <div className="flex items-center gap-2 mb-2">
-            <PiRocket className="h-6 w-6 text-emerald-600" />
-            <DialogTitle className="text-2xl font-medium tracking-tighter">{currentStepData.title}</DialogTitle>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <PiUser className="h-5 w-5 text-gray-700" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-medium text-gray-900">{currentStepData.title}</DialogTitle>
+              <DialogDescription className="text-gray-600 mt-1">{currentStepData.description}</DialogDescription>
+            </div>
           </div>
-          <DialogDescription className="text-base">{currentStepData.description}</DialogDescription>
         </DialogHeader>
 
-        <div className="py-6">
-          <p className="text-gray-600 leading-relaxed">{currentStepData.content}</p>
+        <div className="py-4">
+          {currentStepData.content === "basic-info" ? (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-sm font-medium text-gray-700">
+                  Full Name *
+                </Label>
+                <Input
+                  id="fullName"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, fullName: e.target.value }))}
+                  placeholder="Enter your full name"
+                  className="border-gray-200"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="company" className="text-sm font-medium text-gray-700">
+                  Company (Optional)
+                </Label>
+                <Input
+                  id="company"
+                  value={formData.company}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, company: e.target.value }))}
+                  placeholder="Enter your company name"
+                  className="border-gray-200"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="role" className="text-sm font-medium text-gray-700">
+                  Role (Optional)
+                </Label>
+                <Input
+                  id="role"
+                  value={formData.role}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, role: e.target.value }))}
+                  placeholder="e.g., Travel Manager, Executive Assistant"
+                  className="border-gray-200"
+                />
+              </div>
+            </div>
+          ) : (
+            <p className="text-gray-600 leading-relaxed">{currentStepData.content}</p>
+          )}
 
           {/* Progress indicator */}
           <div className="flex items-center gap-2 mt-6">
             {onboardingSteps.map((_, index) => (
               <div
                 key={index}
-                className={`h-2 w-8 rounded-full transition-colors ${
-                  index <= currentStep ? "bg-emerald-600" : "bg-gray-200"
+                className={`h-1.5 flex-1 rounded-full transition-colors ${
+                  index <= currentStep ? "bg-gray-400" : "bg-gray-200"
                 }`}
               />
             ))}
@@ -128,19 +183,27 @@ export default function OnboardingModal() {
             variant="outline"
             onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
             disabled={currentStep === 0}
+            className="border-gray-200 text-gray-700"
           >
             Previous
           </Button>
-          <Button onClick={handleNext} disabled={isLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+          <Button
+            onClick={handleNext}
+            disabled={isLoading || !canProceed}
+            className="bg-gray-900 hover:bg-gray-800 text-white"
+          >
             {isLoading ? (
-              "Completing..."
+              "Setting up..."
             ) : currentStep === onboardingSteps.length - 1 ? (
               <>
                 <PiCheckCircle className="mr-2 h-4 w-4" />
                 Get Started
               </>
             ) : (
-              "Next"
+              <>
+                Next
+                <PiArrowRight className="ml-2 h-4 w-4" />
+              </>
             )}
           </Button>
         </DialogFooter>

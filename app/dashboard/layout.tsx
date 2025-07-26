@@ -1,30 +1,28 @@
-import type React from "react"
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
-import Header from "@/components/dashboard/header"
-import Sidebar from "@/components/dashboard/sidebar"
+"use client"
 
-export default async function DashboardLayout({
+import type React from "react"
+
+import { useState } from "react"
+import Sidebar from "@/components/dashboard/sidebar"
+import Header from "@/components/dashboard/header"
+
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createClient()
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return redirect("/login")
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed)
   }
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <Sidebar />
-      <div className="flex flex-col">
-        <Header />
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-gray-50">{children}</main>
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar isCollapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+      <div className={`flex flex-1 flex-col transition-all duration-300 ${sidebarCollapsed ? "md:ml-16" : "md:ml-64"}`}>
+        <Header onToggleSidebar={toggleSidebar} />
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   )

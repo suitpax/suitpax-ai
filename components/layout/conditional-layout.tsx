@@ -2,23 +2,29 @@
 
 import type React from "react"
 
-import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
+import { isAppDomain } from "@/lib/domain-utils"
 import Navigation from "@/components/marketing/navigation"
 import Footer from "@/components/marketing/footer"
 
-export default function ConditionalLayout({
-  children,
-}: {
+interface ConditionalLayoutProps {
   children: React.ReactNode
-}) {
-  const pathname = usePathname()
+}
 
-  // Hide navigation and footer for dashboard, login, and signup pages
-  const isDashboard = pathname?.startsWith("/dashboard")
-  const isAuth = pathname === "/login" || pathname === "/signup"
-  const shouldHideNavAndFooter = isDashboard || isAuth
+export default function ConditionalLayout({ children }: ConditionalLayoutProps) {
+  const [showLayout, setShowLayout] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
-  if (shouldHideNavAndFooter) {
+  useEffect(() => {
+    setIsClient(true)
+    setShowLayout(!isAppDomain())
+  }, [])
+
+  if (!isClient) {
+    return <>{children}</>
+  }
+
+  if (!showLayout) {
     return <>{children}</>
   }
 

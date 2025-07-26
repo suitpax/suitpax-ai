@@ -294,7 +294,7 @@ export default function Footer() {
                 <span className="sr-only">Product Hunt</span>
               </Link>
               <Link
-                href="https://discord.gg/suitpax" // Reemplaza con tu enlace de Discord
+                href="https://discord.gg/suitpax"
                 className="text-gray-400 hover:text-gray-200 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"

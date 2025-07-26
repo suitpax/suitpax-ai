@@ -15,13 +15,11 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    return redirect(
-      `/login?message=${encodeURIComponent("Could not authenticate user. Please check your credentials.")}`,
-    )
+    redirect("/login?message=Could not authenticate user")
   }
 
   revalidatePath("/", "layout")
-  redirect("/dashboard")
+  redirect("https://app.suitpax.com/dashboard")
 }
 
 export async function signup(formData: FormData) {
@@ -35,39 +33,35 @@ export async function signup(formData: FormData) {
   const { error } = await supabase.auth.signUp(data)
 
   if (error) {
-    return redirect(`/signup?message=${encodeURIComponent("Could not create account. Please try again.")}`)
+    redirect("/signup?message=Could not create user")
   }
 
   revalidatePath("/", "layout")
-  redirect("/dashboard")
+  redirect("/login?message=Check email to continue sign in process")
 }
 
 export async function signInWithGoogle() {
   const supabase = createClient()
-  const origin = process.env.NEXT_PUBLIC_APP_URL!
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo: "https://app.suitpax.com/auth/callback",
     },
   })
 
   if (error) {
-    console.error("Error signing in with Google:", error)
-    return redirect(`/login?message=${encodeURIComponent("Could not authenticate with Google.")}`)
+    redirect("/login?message=Could not authenticate with Google")
   }
 
   if (data.url) {
-    return redirect(data.url)
+    redirect(data.url)
   }
-
-  return redirect(`/login?message=${encodeURIComponent("Could not get Google auth URL.")}`)
 }
 
 export async function signOut() {
   const supabase = createClient()
   await supabase.auth.signOut()
   revalidatePath("/", "layout")
-  redirect("/")
+  redirect("https://suitpax.com")
 }

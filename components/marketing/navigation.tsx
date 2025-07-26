@@ -229,7 +229,7 @@ export const Navigation = () => {
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <SiSlack className="h-4 w-4 mr-1.5" />
-                      Join our Slack community
+                      Join Slack
                     </Link>
                   </div>
                 </div>

@@ -22,6 +22,10 @@ import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 
+interface HeaderProps {
+  onToggleSidebar: () => void
+}
+
 const sidebarNavItems = [
   {
     title: "Dashboard",
@@ -50,7 +54,7 @@ const sidebarNavItems = [
   },
 ]
 
-export default function Header() {
+export default function Header({ onToggleSidebar }: HeaderProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -58,30 +62,25 @@ export default function Header() {
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut()
-      router.push("/")
-      router.refresh()
+      window.location.href = "https://suitpax.com"
     } catch (error) {
       console.error("Error signing out:", error)
     }
   }
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-white px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
+    <header className="flex h-14 items-center gap-4 border-b border-gray-200 bg-white px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
       <Sheet>
         <SheetTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className="shrink-0 md:hidden bg-transparent border-0 hover:bg-gray-100"
-          >
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={onToggleSidebar}>
             <PiList className="h-5 w-5" />
-            <span className="sr-only">Toggle navigation menu</span>
+            <span className="sr-only">Toggle sidebar</span>
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col p-0 w-[280px] sm:w-[280px]">
           <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-              <Link href="/" className="flex items-center gap-2 font-semibold">
+              <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
                 <Image src="/logo/suitpax-symbol.webp" alt="Suitpax Logo" width={24} height={24} />
                 <span>Suitpax</span>
               </Link>
