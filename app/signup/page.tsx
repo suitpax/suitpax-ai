@@ -1,6 +1,8 @@
 import { AuthForm } from "@/components/auth/auth-form"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
+import Image from "next/image"
+import Link from "next/link"
 
 export default async function SignupPage() {
   const supabase = createClient()
@@ -13,19 +15,38 @@ export default async function SignupPage() {
   }
 
   return (
-    <section className="relative flex min-h-screen w-full items-center justify-center bg-black py-20 overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-[0.02] bg-repeat bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px]"></div>
-
-      {/* Tech orbs */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 right-[5%] w-64 h-64 rounded-full bg-gradient-to-br from-sky-500/5 to-purple-500/5 blur-3xl"></div>
-        <div className="absolute bottom-1/4 left-[5%] w-80 h-80 rounded-full bg-gradient-to-tr from-emerald-500/5 to-sky-500/5 blur-3xl"></div>
+    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
+      <div className="flex items-center justify-center py-12">
+        <div className="mx-auto grid w-[350px] gap-6">
+          <div className="grid gap-2 text-center">
+            <h1 className="text-3xl font-bold tracking-tighter">Sign Up</h1>
+            <p className="text-balance text-gray-500">Create your account to start your 7-day free trial.</p>
+          </div>
+          <AuthForm view="signup" />
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{" "}
+            <Link href="/login" className="underline">
+              Login
+            </Link>
+          </div>
+        </div>
       </div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <AuthForm view="signup" />
+      <div className="hidden bg-gray-100 lg:block relative">
+        <Image
+          src="/images/jfk-delta-one-lounge-2.webp"
+          alt="Image"
+          width="1920"
+          height="1080"
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="absolute bottom-8 left-8 right-8 text-white p-4 bg-black/50 backdrop-blur-sm rounded-lg">
+          <h3 className="text-xl font-medium">
+            "The future of business travel is here. Automated, intelligent, and seamless."
+          </h3>
+          <p className="text-sm text-gray-300 mt-2">- Suitpax AI</p>
+        </div>
       </div>
-    </section>
+    </div>
   )
 }

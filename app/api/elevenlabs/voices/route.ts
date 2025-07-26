@@ -1,9 +1,18 @@
 import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const apiKey = process.env.ELEVENLABS_API_KEY
-
     if (!apiKey) {
       return NextResponse.json({ error: "ELEVENLABS_API_KEY no está configurada" }, { status: 500 })
     }
@@ -21,8 +30,6 @@ export async function GET() {
     }
 
     const data = await response.json()
-
-    // Formatear los datos para que sean más fáciles de usar
     const voices = data.voices.map((voice: any) => ({
       id: voice.voice_id,
       name: voice.name,

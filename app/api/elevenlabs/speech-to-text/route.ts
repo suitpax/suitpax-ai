@@ -1,6 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
 
 export async function POST(request: NextRequest) {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const formData = await request.formData()
     const audioFile = formData.get("audio") as File
@@ -9,16 +19,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No audio file provided" }, { status: 400 })
     }
 
-    // Convertir el archivo a un ArrayBuffer
     const arrayBuffer = await audioFile.arrayBuffer()
     const audioBlob = new Blob([arrayBuffer], { type: audioFile.type })
 
-    // Crear un FormData para enviar a ElevenLabs
     const elevenLabsFormData = new FormData()
     elevenLabsFormData.append("file", audioBlob, "audio.webm")
     elevenLabsFormData.append("model_id", "whisper-1")
 
-    // Enviar a ElevenLabs para transcripción
     const response = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
       method: "POST",
       headers: {
