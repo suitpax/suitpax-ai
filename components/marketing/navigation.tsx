@@ -154,7 +154,7 @@ export const Navigation = () => {
                     <Link
                       href="/login"
                       className={cn(
-                        "flex items-center w-full py-1 text-lg font-medium tracking-tighter hover:bg-black/5 rounded-md transition-colors",
+                        "flex items-center w-full py-2 px-3 text-lg font-medium tracking-tighter hover:bg-black/5 rounded-lg transition-colors",
                         isActive("/login") ? "text-black bg-black/5 font-semibold" : "text-black",
                       )}
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -166,7 +166,7 @@ export const Navigation = () => {
                     <Link
                       href="/manifesto"
                       className={cn(
-                        "flex items-center w-full py-1 text-lg font-medium tracking-tighter hover:bg-black/5 rounded-md transition-colors",
+                        "flex items-center w-full py-2 px-3 text-lg font-medium tracking-tighter hover:bg-black/5 rounded-lg transition-colors",
                         isActive("/manifesto") ? "text-black bg-black/5 font-semibold" : "text-black",
                       )}
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -178,7 +178,7 @@ export const Navigation = () => {
                     <Link
                       href="/pricing"
                       className={cn(
-                        "flex items-center w-full py-1 text-lg font-medium tracking-tighter hover:bg-black/5 rounded-md transition-colors",
+                        "flex items-center w-full py-2 px-3 text-lg font-medium tracking-tighter hover:bg-black/5 rounded-lg transition-colors",
                         isActive("/pricing") ? "text-black bg-black/5 font-semibold" : "text-black",
                       )}
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -192,7 +192,7 @@ export const Navigation = () => {
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
                       href="https://cal.com/team/founders/partnership"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
+                      className="flex items-center w-full py-2 px-3 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-lg transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Talk to founders
@@ -203,7 +203,7 @@ export const Navigation = () => {
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
                       href="https://pitch-suitpax.vercel.app"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
+                      className="flex items-center w-full py-2 px-3 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-lg transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -225,11 +225,11 @@ export const Navigation = () => {
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
                       href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
+                      className="flex items-center w-full py-2 px-3 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-lg transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <SiSlack className="h-4 w-4 mr-1.5" />
-                      Join Slack
+                      Join our Slack community
                     </Link>
                   </div>
                 </div>

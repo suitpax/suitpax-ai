@@ -19,36 +19,29 @@ export default async function SignupPage({
   }
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
-          <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold tracking-tighter">Sign Up</h1>
-            <p className="text-balance text-gray-500">Create your account to start your 7-day free trial.</p>
-          </div>
-          <AuthForm mode="signup" message={searchParams.message} />
-          <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
-            <Link href="/login" className="underline">
-              Login
-            </Link>
-          </div>
+    <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans">
+      <div className="w-full max-w-md mx-auto">
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-block">
+            <Image
+              src="/logo/suitpax-bl-logo.webp"
+              alt="Suitpax Logo"
+              width={140}
+              height={30}
+              priority
+              className="h-8 w-auto"
+            />
+          </Link>
         </div>
-      </div>
-      <div className="hidden bg-gray-100 lg:block relative">
-        <Image
-          src="/images/jfk-delta-one-lounge-2.webp"
-          alt="Image"
-          width="1920"
-          height="1080"
-          className="h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/30"></div>
-        <div className="absolute bottom-8 left-8 right-8 text-white p-4 bg-black/50 backdrop-blur-sm rounded-lg">
-          <h3 className="text-xl font-medium">
-            "The future of business travel is here. Automated, intelligent, and seamless."
-          </h3>
-          <p className="text-sm text-gray-300 mt-2">- Suitpax AI</p>
+
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+          <div className="p-8 md:p-10">
+            <div className="text-center mb-6">
+              <h1 className="text-2xl font-medium tracking-tighter text-black">Create your Account</h1>
+              <p className="text-gray-500 mt-1 text-sm">Start your journey with the future of travel.</p>
+            </div>
+            <AuthForm mode="signup" message={searchParams.message} />
+          </div>
         </div>
       </div>
     </div>
