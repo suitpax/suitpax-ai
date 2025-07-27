@@ -15,11 +15,12 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    redirect("/login?message=Could not authenticate user")
+    return redirect(`/login?message=${encodeURIComponent(error.message)}`)
   }
 
   revalidatePath("/", "layout")
-  redirect("https://app.suitpax.com/dashboard")
+  const appUrl = process.env.NODE_ENV === "development" ? "http://app.localhost:3000" : "https://app.suitpax.com"
+  return redirect(`${appUrl}/dashboard`)
 }
 
 export async function signup(formData: FormData) {
@@ -33,29 +34,31 @@ export async function signup(formData: FormData) {
   const { error } = await supabase.auth.signUp(data)
 
   if (error) {
-    redirect("/signup?message=Could not create user")
+    return redirect(`/signup?message=${encodeURIComponent(error.message)}`)
   }
 
   revalidatePath("/", "layout")
-  redirect("/login?message=Check email to continue sign in process")
+  return redirect("/login?message=Check email to continue sign in process")
 }
 
 export async function signInWithGoogle() {
   const supabase = createClient()
+  const isDevelopment = process.env.NODE_ENV === "development"
+  const callbackUrl = isDevelopment ? "http://localhost:3000/auth/callback" : "https://suitpax.com/auth/callback"
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: "https://app.suitpax.com/auth/callback",
+      redirectTo: callbackUrl,
     },
   })
 
   if (error) {
-    redirect("/login?message=Could not authenticate with Google")
+    return redirect(`/login?message=${encodeURIComponent(error.message)}`)
   }
 
   if (data.url) {
-    redirect(data.url)
+    return redirect(data.url)
   }
 }
 
@@ -63,5 +66,6 @@ export async function signOut() {
   const supabase = createClient()
   await supabase.auth.signOut()
   revalidatePath("/", "layout")
-  redirect("https://suitpax.com")
+  const mainUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://suitpax.com"
+  return redirect(mainUrl)
 }

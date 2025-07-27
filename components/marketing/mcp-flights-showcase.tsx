@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { PiGlobe, PiPercent, PiHeadphones, PiLightning, PiArrowRight } from "react-icons/pi"
+import { PiPercent, PiArrowRight, PiShieldCheck, PiLeaf, PiRobot } from "react-icons/pi"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 
 // Mini Chat para Vuelos
@@ -86,8 +86,8 @@ const MCPFlightsShowcase = () => {
       className="w-full py-20 relative overflow-hidden"
       backgroundColor={0x0} // black
       baseColor={0xd1d5db} // gray-300
-      size={0.7}
-      amplitudeFactor={0.7}
+      size={0.5}
+      amplitudeFactor={0.5}
     >
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto">
@@ -104,11 +104,15 @@ const MCPFlightsShowcase = () => {
               MCP-Powered Flights
             </div>
 
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-tight mb-4 py-2">
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tighter leading-tight mb-3 py-2">
               <span className="bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text">
                 Your Personal AI Flight Agent
               </span>
             </h2>
+
+            <p className="text-base text-gray-400 max-w-2xl mx-auto">
+              The most advanced flight booking engine, designed for modern business travel.
+            </p>
 
             <p className="mt-4 text-sm font-medium text-gray-400 max-w-2xl mx-auto mb-6">
               Our AI agents, powered by the Model Context Protocol, understand your travel needs to find the perfect
@@ -122,55 +126,37 @@ const MCPFlightsShowcase = () => {
 
           {/* Flight Showcase */}
           <div className="mb-12 max-w-2xl mx-auto">
-            <div className="rounded-xl border border-gray-500/20 p-2.5 bg-black/20 backdrop-blur-sm">
-              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg border border-gray-200/10">
-                <Image
-                  src="/images/flight-showcase-dark.png"
-                  alt="Flight Booking Interface"
-                  width={1200}
-                  height={750}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-              </div>
-
-              {/* Feature badges */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-                <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-gray-200/10">
-                  <div className="flex items-center gap-2">
-                    <PiGlobe className="w-4 h-4 text-gray-300" />
-                    <div>
-                      <div className="text-[10px] text-gray-300 font-medium">Global Coverage</div>
-                      <div className="text-[8px] text-gray-400">10,000+ airlines</div>
-                    </div>
-                  </div>
+            <div className="rounded-xl border border-gray-500/20 p-4 bg-black/20 backdrop-blur-sm">
+              <div className="grid md:grid-cols-2 gap-6 items-center">
+                <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-gray-200/10 bg-black/30 flex items-center justify-center">
+                  <Image
+                    src="/images/flight-showcase-dark.png"
+                    alt="Flight Booking Interface"
+                    width={800}
+                    height={800}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-gray-200/10">
-                  <div className="flex items-center gap-2">
-                    <PiPercent className="w-4 h-4 text-gray-300" />
-                    <div>
-                      <div className="text-[10px] text-gray-300 font-medium">Best Prices</div>
-                      <div className="text-[8px] text-gray-400">AI-powered savings</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-gray-200/10">
-                  <div className="flex items-center gap-2">
-                    <PiHeadphones className="w-4 h-4 text-gray-300" />
-                    <div>
-                      <div className="text-[10px] text-gray-300 font-medium">24/7 Support</div>
-                      <div className="text-[8px] text-gray-400">Human + AI assistance</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-gray-200/10">
-                  <div className="flex items-center gap-2">
-                    <PiLightning className="w-4 h-4 text-gray-300" />
-                    <div>
-                      <div className="text-[10px] text-gray-300 font-medium">Instant Booking</div>
-                      <div className="text-[8px] text-gray-400">One-click confirmation</div>
-                    </div>
-                  </div>
+                <div className="flex flex-col justify-center">
+                  <h3 className="font-medium text-white mb-4">Automated & Intelligent</h3>
+                  <ul className="space-y-3 text-sm text-gray-300">
+                    <li className="flex items-center gap-2.5">
+                      <PiShieldCheck className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                      <span>Automated policy compliance</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <PiPercent className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                      <span>Real-time pricing & availability</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <PiLeaf className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                      <span>Carbon footprint tracking</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <PiRobot className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                      <span>24/7 AI-powered support</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
