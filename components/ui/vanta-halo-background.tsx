@@ -1,26 +1,16 @@
 "use client"
 
 import type React from "react"
+
 import { useRef, useEffect, useState } from "react"
 import Script from "next/script"
 
 interface VantaHaloBackgroundProps {
   children: React.ReactNode
   className?: string
-  backgroundColor?: number
-  baseColor?: number
-  size?: number
-  amplitudeFactor?: number
 }
 
-export default function VantaHaloBackground({
-  children,
-  className = "",
-  backgroundColor = 0x0, // Default black
-  baseColor = 0x06b6d4, // Default cyan
-  size = 1.2,
-  amplitudeFactor = 1.5,
-}: VantaHaloBackgroundProps) {
+export default function VantaHaloBackground({ children, className = "" }: VantaHaloBackgroundProps) {
   const vantaRef = useRef<HTMLDivElement>(null)
   const [vantaEffect, setVantaEffect] = useState<any>(null)
   const [scriptsLoaded, setScriptsLoaded] = useState(false)
@@ -28,6 +18,7 @@ export default function VantaHaloBackground({
   useEffect(() => {
     if (!scriptsLoaded || !vantaRef.current) return
 
+    // Solo inicializar si no existe ya
     if (!vantaEffect) {
       // @ts-ignore - Vanta se carga globalmente
       const effect = window.VANTA.HALO({
@@ -37,24 +28,21 @@ export default function VantaHaloBackground({
         gyroControls: false,
         minHeight: 200.0,
         minWidth: 200.0,
-        backgroundColor: backgroundColor,
-        baseColor: baseColor,
-        size: size,
-        amplitudeFactor: amplitudeFactor,
-        xOffset: 0.1,
-        yOffset: 0.1,
+        backgroundColor: 0xe4e5ed,
+        baseColor: 0xd2d3d7,
+        size: 0.8,
+        amplitudeFactor: 1,
+        xOffset: 0,
+        yOffset: 0,
       })
 
       setVantaEffect(effect)
     }
 
     return () => {
-      if (vantaEffect) {
-        vantaEffect.destroy()
-        setVantaEffect(null)
-      }
+      if (vantaEffect) vantaEffect.destroy()
     }
-  }, [vantaEffect, scriptsLoaded, backgroundColor, baseColor, size, amplitudeFactor])
+  }, [vantaEffect, scriptsLoaded])
 
   const handleScriptsLoad = () => {
     setScriptsLoaded(true)
@@ -62,12 +50,8 @@ export default function VantaHaloBackground({
 
   return (
     <>
-      <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
-        onLoad={handleScriptsLoad}
-        strategy="afterInteractive"
-      />
-      <Script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.halo.min.js" strategy="afterInteractive" />
+      <Script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" onLoad={handleScriptsLoad} />
+      <Script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.halo.min.js" />
 
       <div ref={vantaRef} className={`${className}`}>
         {children}

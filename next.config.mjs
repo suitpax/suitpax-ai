@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -7,44 +8,9 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['localhost', 'suitpax.com', 'app.suitpax.com'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
+    domains: ['images.unsplash.com', 'v0.blob.com'],
     unoptimized: true,
   },
-  async rewrites() {
-    return [
-      {
-        source: '/dashboard/:path*',
-        destination: '/dashboard/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'app.suitpax.com',
-          },
-        ],
-      },
-    ]
-  },
-  async redirects() {
-    return [
-      {
-        source: '/dashboard/:path*',
-        destination: 'https://app.suitpax.com/dashboard/:path*',
-        permanent: true,
-        has: [
-          {
-            type: 'host',
-            value: 'suitpax.com',
-          },
-        ],
-      },
-    ]
-  },
-}
+};
 
-export default nextConfig
+export default nextConfig;

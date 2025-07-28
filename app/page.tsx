@@ -8,8 +8,8 @@ import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
 import AgenticDisruption from "@/components/marketing/agentic-disruption"
 import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
 import type { Metadata } from "next"
-import MCPFlightsShowcase from "@/components/marketing/mcp-flights-showcase"
-import Navigation from "@/components/marketing/navigation"
+import SuitpaxHubMap from "@/components/marketing/suitpax-hub-map"
+import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
 
 export const metadata: Metadata = {
   title: "Suitpax | AI-Powered Business Travel Platform",
@@ -66,13 +66,13 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <Navigation />
       <main id="main-content" className="w-full">
         <Hero />
         <PartnersShowcase />
         <AITravelAgents />
         <BusinessTravelRevolution />
-        <MCPFlightsShowcase />
+        <MCPFlightsAIAgents />
+        <SuitpaxHubMap />
         <CloudAIShowcase />
         <AgenticDisruption />
         <AIVoiceAssistant />

@@ -1,168 +1,374 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
-import { PiGithubLogo, PiTwitterLogo, PiLinkedinLogo, PiYoutubeLogo, PiArrowRight } from "react-icons/pi"
-import { HackerNewsBadge } from "@/components/ui/hacker-news-badge"
-import { Button } from "@/components/ui/button"
+import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack, SiDiscord } from "react-icons/si"
+import { PiArrowUpRightBold, PiCalendarCheckBold } from "react-icons/pi"
+import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
 
-const footerSections = [
-  {
-    title: "Product",
-    links: [
-      { name: "Business Travel", href: "#" },
-      { name: "Expense Management", href: "/travel-expense-management" },
-      { name: "AI Agents", href: "#" },
-      { name: "Pricing", href: "/pricing" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { name: "About Us", href: "#" },
-      { name: "Manifesto", href: "/manifesto" },
-      { name: "Careers", href: "#" },
-      { name: "Contact", href: "/contact" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { name: "Blog", href: "#" },
-      { name: "Help Center", href: "#" },
-      { name: "API Documentation", href: "#" },
-      { name: "Security", href: "#" },
-    ],
-  },
-  {
-    title: "Legal",
-    links: [
-      { name: "Terms of Service", href: "#" },
-      { name: "Privacy Policy", href: "#" },
-      { name: "Cookie Policy", href: "#" },
-    ],
-  },
-]
+export const Footer = () => {
+  const [isMobile, setIsMobile] = useState(false)
 
-const socialLinks = [
-  { name: "GitHub", icon: PiGithubLogo, href: "#" },
-  { name: "Twitter", icon: PiTwitterLogo, href: "#" },
-  { name: "LinkedIn", icon: PiLinkedinLogo, href: "#" },
-  { name: "YouTube", icon: PiYoutubeLogo, href: "#" },
-]
+  // Detectar si es dispositivo móvil
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
 
-export default function Footer() {
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+
+    return () => {
+      window.removeEventListener("resize", checkMobile)
+    }
+  }, [])
+
+  // Cargar el script de SourceForge después de que el componente se monte
+  useEffect(() => {
+    const script = document.createElement("script")
+    script.async = true
+    script.src = "https://b.sf-syn.com/badge_js?sf_id=3853370&variant_id=sf"
+    document.body.appendChild(script)
+
+    return () => {
+      document.body.removeChild(script)
+    }
+  }, [])
+
   return (
-    <footer className="bg-black text-gray-400 border-t border-gray-800">
-      {/* Top Section with CTA and Badges */}
-      <div className="bg-gray-900/50">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 lg:py-20 text-center">
-          <h2 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
-            Ready to Revolutionize Your Business Travel?
-          </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-400">
-            Join thousands of innovative companies and take control of your travel expenses with the power of AI.
-          </p>
-          <div className="mt-8 flex justify-center">
-            <Link href="/signup">
-              <Button size="lg" className="bg-white text-black hover:bg-gray-200 transition-colors shadow-lg">
-                Get Started Free
-                <PiArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-          <div className="mt-8 flex justify-center gap-4 flex-wrap items-center">
-            <HackerNewsBadge />
-            <div className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-sm font-medium text-emerald-300">
-              <span className="relative flex h-2 w-2 mr-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span>Vercel AI Hackathon Winner</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <footer className="relative bg-black overflow-hidden">
+      {/* Background pattern */}
+      <div className="absolute inset-0 opacity-[0.02] bg-repeat bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px]"></div>
 
-      {/* Bottom Section with Links */}
-      <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
-        <div className="xl:grid xl:grid-cols-3 xl:gap-8">
-          <div className="space-y-8 xl:col-span-1">
-            <Image src="/logo/suitpax-cloud-logo.webp" alt="Suitpax Logo" width={120} height={32} />
-            <p className="text-sm text-gray-400">
-              The AI-powered platform for seamless business travel and expense management.
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/60"></div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Columna 1: Logo e información principal */}
+          <div className="flex flex-col items-start">
+            <Link href="/" className="inline-block mb-4">
+              <Image
+                src="/logo/suitpax-cloud-logo.webp"
+                alt="Suitpax Logo"
+                width={100}
+                height={25}
+                className="h-6 w-auto"
+              />
+            </Link>
+            <p className="text-gray-400 mb-6 font-medium tracking-tighter text-xs text-left">
+              The next-gen of traveltech with superpowers
             </p>
-            <div className="flex space-x-6">
-              {socialLinks.map((item) => (
-                <a key={item.name} href={item.href} className="text-gray-400 hover:text-white transition-colors">
-                  <span className="sr-only">{item.name}</span>
-                  <item.icon className="h-6 w-6" aria-hidden="true" />
-                </a>
-              ))}
+
+            {/* Status badge en posición destacada */}
+            <div className="mb-6">
+              <p className="text-xs text-gray-400 mb-2 font-medium">System Status:</p>
+              <Link href="https://status.suitpax.com" target="_blank" rel="noopener noreferrer">
+                <div className="inline-flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></div>
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    All Systems Operational
+                  </span>
+                </div>
+              </Link>
+            </div>
+
+            <p className="text-xs text-gray-500">2261 Market Street STE 86661 San Francisco, CA, 94114</p>
+          </div>
+
+          {/* Columna 2: Enlaces y certificaciones */}
+          <div className="flex flex-col items-start">
+            <h3 className="text-white font-medium mb-4 text-sm">Company</h3>
+            <div className="flex flex-col space-y-2 mb-6">
+              <Link href="/manifesto" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                Manifesto
+              </Link>
+              <Link
+                href="https://cal.com/team/founders/partnership"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
+              >
+                Talk to founders
+              </Link>
+              <Link href="/pricing" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                Pricing
+              </Link>
+              <Link
+                href="https://pitch-suitpax.vercel.app"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="flex items-center">
+                  <Image
+                    src="/logo/suitpax-cloud-logo.webp"
+                    alt="Suitpax"
+                    width={60}
+                    height={15}
+                    className="h-4 w-auto mr-1"
+                  />
+                  <span className="font-serif italic">Deck</span>
+                  <PiArrowUpRightBold className="h-3 w-3 ml-1 text-gray-400" />
+                </div>
+              </Link>
+              <Link
+                href="https://lu.ma/suitpax"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
+              >
+                <PiCalendarCheckBold className="h-3.5 w-3.5" />
+                Join Suitpax Events
+                <PiArrowUpRightBold className="h-3 w-3 text-gray-400" />
+              </Link>
+              <Link
+                href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
+              >
+                <SiSlack className="h-3.5 w-3.5" />
+                Join Slack
+              </Link>
+              <Link
+                href="https://app.suitpax.com/sign-up"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
+              >
+                Pre-register
+              </Link>
+              <Link
+                href="https://trust.inc/suitpax"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Trust Center
+                <PiArrowUpRightBold className="h-3 w-3 text-gray-400" />
+              </Link>
+            </div>
+
+            {/* Trust badges */}
+            <h3 className="text-white font-medium mb-3 text-sm">Certifications</h3>
+            <div className="flex flex-col space-y-2">
+              {isMobile ? (
+                <motion.div
+                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></div>
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    SOC 2 Type I
+                  </span>
+                </motion.div>
+              ) : (
+                <div className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></div>
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    SOC 2 Type I
+                  </span>
+                </div>
+              )}
+
+              {isMobile ? (
+                <motion.div
+                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    GDPR Ready
+                  </span>
+                </motion.div>
+              ) : (
+                <div className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    GDPR Ready
+                  </span>
+                </div>
+              )}
+
+              {isMobile ? (
+                <motion.div
+                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-300 mr-1.5 animate-pulse"></div>
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    CCPA Compliant
+                  </span>
+                </motion.div>
+              ) : (
+                <div className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-300 mr-1.5 animate-pulse"></div>
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    CCPA Compliant
+                  </span>
+                </div>
+              )}
+
+              {isMobile ? (
+                <motion.div
+                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300 cursor-pointer"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  onClick={() => {
+                    const link = document.createElement("a")
+                    link.href = "/legal/suitpax-ai-dpa.pdf"
+                    link.download = "Suitpax-AI-DPA.pdf"
+                    document.body.appendChild(link)
+                    link.click()
+                    document.body.removeChild(link)
+                  }}
+                >
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    DPA Suitpax AI
+                  </span>
+                </motion.div>
+              ) : (
+                <div
+                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300 cursor-pointer"
+                  onClick={() => {
+                    const link = document.createElement("a")
+                    link.href = "/legal/suitpax-ai-dpa.pdf"
+                    link.download = "Suitpax-AI-DPA.pdf"
+                    document.body.appendChild(link)
+                    link.click()
+                    document.body.removeChild(link)
+                  }}
+                >
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    DPA Suitpax AI
+                  </span>
+                </div>
+              )}
+
+              {isMobile ? (
+                <motion.div
+                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    <Link
+                      href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      AI Act
+                    </Link>
+                  </span>
+                </motion.div>
+              ) : (
+                <div className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
+                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                    <Link
+                      href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      AI Act
+                    </Link>
+                  </span>
+                </div>
+              )}
             </div>
           </div>
-          <div className="mt-12 grid grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
-            <div className="md:grid md:grid-cols-2 md:gap-8">
-              <div>
-                <h3 className="text-sm font-semibold text-white tracking-wider uppercase">{footerSections[0].title}</h3>
-                <ul role="list" className="mt-4 space-y-4">
-                  {footerSections[0].links.map((item) => (
-                    <li key={item.name}>
-                      <Link href={item.href} className="text-base text-gray-400 hover:text-white transition-colors">
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="mt-12 md:mt-0">
-                <h3 className="text-sm font-semibold text-white tracking-wider uppercase">{footerSections[1].title}</h3>
-                <ul role="list" className="mt-4 space-y-4">
-                  {footerSections[1].links.map((item) => (
-                    <li key={item.name}>
-                      <Link href={item.href} className="text-base text-gray-400 hover:text-white transition-colors">
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+
+          {/* Columna 3: Redes sociales y copyright */}
+          <div className="flex flex-col items-start">
+            <h3 className="text-white font-medium mb-4 text-sm">Connect with us</h3>
+            <div className="flex space-x-4 mb-6">
+              <Link href="https://twitter.com/suitpax" className="text-gray-400 hover:text-gray-200 transition-colors">
+                <SiX className="h-5 w-5" />
+                <span className="sr-only">X</span>
+              </Link>
+              <Link
+                href="https://linkedin.com/company/suitpax"
+                className="text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                <SiLinkedin className="h-5 w-5" />
+                <span className="sr-only">LinkedIn</span>
+              </Link>
+              <Link href="https://github.com/suitpax" className="text-gray-400 hover:text-gray-200 transition-colors">
+                <SiGithub className="h-5 w-5" />
+                <span className="sr-only">GitHub</span>
+              </Link>
+              <Link
+                href="https://www.producthunt.com/products/suitpax-2"
+                className="text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                <SiProducthunt className="h-5 w-5" />
+                <span className="sr-only">Product Hunt</span>
+              </Link>
+              <Link
+                href="https://discord.gg/suitpax" // Reemplaza con tu enlace de Discord
+                className="text-gray-400 hover:text-gray-200 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <SiDiscord className="h-5 w-5" />
+                <span className="sr-only">Discord</span>
+              </Link>
+              <Link
+                href="https://instagram.com/suitpax"
+                className="text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-5 w-5"
+                >
+                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+                </svg>
+                <span className="sr-only">Instagram</span>
+              </Link>
+              <Link
+                href="https://www.crunchbase.com/organization/suitpax"
+                className="text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                <SiCrunchbase className="h-5 w-5" />
+                <span className="sr-only">Crunchbase</span>
+              </Link>
+              <Link href="mailto:hello@suitpax.com" className="text-gray-400 hover:text-gray-200 transition-colors">
+                <SiGmail className="h-5 w-5" />
+                <span className="sr-only">Email</span>
+              </Link>
             </div>
-            <div className="md:grid md:grid-cols-2 md:gap-8">
-              <div>
-                <h3 className="text-sm font-semibold text-white tracking-wider uppercase">{footerSections[2].title}</h3>
-                <ul role="list" className="mt-4 space-y-4">
-                  {footerSections[2].links.map((item) => (
-                    <li key={item.name}>
-                      <Link href={item.href} className="text-base text-gray-400 hover:text-white transition-colors">
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="mt-12 md:mt-0">
-                <h3 className="text-sm font-semibold text-white tracking-wider uppercase">{footerSections[3].title}</h3>
-                <ul role="list" className="mt-4 space-y-4">
-                  {footerSections[3].links.map((item) => (
-                    <li key={item.name}>
-                      <Link href={item.href} className="text-base text-gray-400 hover:text-white transition-colors">
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+
+            <div className="mt-auto">
+              <p className="font-medium tracking-tighter text-gray-400 text-sm">
+                &copy; {new Date().getFullYear()} Suitpax. All rights reserved.
+              </p>
+              <p className="mt-2 text-xs font-medium tracking-tighter text-gray-500">
+                "Suitpax" and logo are registered trademarks of the company.
+              </p>
             </div>
           </div>
         </div>
-        <div className="mt-12 border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} Suitpax, Inc. All rights reserved.</p>
-          <div className="flex items-center mt-4 sm:mt-0">
-            <span className="text-sm text-gray-500 mr-2">Technology by</span>
-            <Image src="/logo/suitpax-symbol.webp" alt="Suitpax Symbol" width={20} height={20} />
-            <span className="ml-1 font-semibold text-gray-400">Suitpax</span>
+        <div className="w-full border-t border-gray-800 mt-8 pt-4 flex justify-center">
+          <div className="flex items-center justify-center">
+            <span className="text-[9px] text-gray-500 flex items-center">Technology by</span>
+            <Image
+              src="/logo/suitpax-cloud-logo.webp"
+              alt="Suitpax Technology"
+              width={50}
+              height={12}
+              className="h-3 w-auto opacity-50 ml-1.5"
+            />
           </div>
         </div>
       </div>
     </footer>
   )
 }
+
+export default Footer

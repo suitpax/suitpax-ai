@@ -5,11 +5,11 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import Badge from "@/components/ui/badge"
 import CityAnimateText from "@/components/ui/city-animate-text"
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "@/components/ui/animations"
 import { FadeContainer, FadeSpan } from "@/components/ui/animations"
 import CounterBadge from "@/components/ui/counter-badge"
 import MiniChat from "@/components/ui/mini-chat"
-import VantaHeroBackground from "@/components/ui/vanta-hero-background"
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 
 // Modificar las variaciones de título para hacerlas más inclusivas
 
@@ -278,7 +278,7 @@ export const Hero = () => {
   }, [])
 
   return (
-    <VantaHeroBackground className="w-full min-h-[100vh] md:min-h-[90vh] lg:min-h-[100vh]">
+    <VantaHaloBackground className="w-full min-h-[100vh] md:min-h-[90vh] lg:min-h-[100vh]">
       <section
         aria-label="hero"
         className="relative w-full overflow-hidden py-20 md:py-32 lg:py-40 pt-24 flex items-center justify-center min-h-[100vh] md:min-h-[90vh] lg:min-h-[100vh]"
@@ -352,7 +352,7 @@ export const Hero = () => {
           </motion.div>
         </FadeContainer>
       </section>
-    </VantaHeroBackground>
+    </VantaHaloBackground>
   )
 }
 
