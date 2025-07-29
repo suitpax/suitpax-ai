@@ -1,22 +1,19 @@
-import type { Metadata } from "next"
 import ContactForm from "@/components/marketing/contact-form"
-import Navigation from "@/components/marketing/navigation"
-
-export const metadata: Metadata = {
-  title: "Contact Us | Suitpax - Transform Your Business Travel",
-  description:
-    "Get in touch with Suitpax to discover how we can transform your company's travel management with advanced AI solutions.",
-  keywords: "contact suitpax, business travel, corporate travel management, AI, travel management",
-}
+import Image from "next/image"
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Navigation />
-      <div className="pt-20">
+    <div className="relative min-h-screen w-full overflow-hidden">
+      <Image
+        src="/placeholder.svg?width=1920&height=1080"
+        alt="background"
+        layout="fill"
+        objectFit="cover"
+        className="z-0"
+      />
+      <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
         <ContactForm />
       </div>
-      {/* Footer removed to avoid repetition */}
-    </main>
+    </div>
   )
 }

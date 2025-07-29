@@ -1,25 +1,23 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
+import { FcGoogle } from "react-icons/fc"
+import toast from "react-hot-toast"
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [fullName, setFullName] = useState("")
-  const [companyName, setCompanyName] = useState("")
-  const [planType, setPlanType] = useState("free")
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -27,7 +25,7 @@ export default function SignUpPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
+    const toastId = toast.loading("Creating account...")
 
     try {
       const { error } = await supabase.auth.signUp({
@@ -36,20 +34,19 @@ export default function SignUpPage() {
         options: {
           data: {
             full_name: fullName,
-            company_name: companyName,
-            plan_type: planType,
           },
           emailRedirectTo: `${window.location.origin}/api/auth/callback`,
         },
       })
 
       if (error) {
-        setError(error.message)
+        toast.error(error.message, { id: toastId })
       } else {
+        toast.success("Confirmation email sent!", { id: toastId })
         setSuccess(true)
       }
     } catch (error) {
-      setError("An unexpected error occurred")
+      toast.error("An unexpected error occurred", { id: toastId })
     } finally {
       setLoading(false)
     }
@@ -57,8 +54,7 @@ export default function SignUpPage() {
 
   const handleGoogleSignUp = async () => {
     setLoading(true)
-    setError("")
-
+    const toastId = toast.loading("Redirecting to Google...")
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -68,11 +64,11 @@ export default function SignUpPage() {
       })
 
       if (error) {
-        setError(error.message)
+        toast.error(error.message, { id: toastId })
         setLoading(false)
       }
     } catch (error) {
-      setError("An unexpected error occurred")
+      toast.error("An unexpected error occurred", { id: toastId })
       setLoading(false)
     }
   }
@@ -80,17 +76,17 @@ export default function SignUpPage() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
             <CardTitle className="text-2xl font-medium tracking-tighter">Check your email</CardTitle>
-            <CardDescription>We've sent you a confirmation link to complete your registration</CardDescription>
+            <CardDescription>We've sent a confirmation link to {email}</CardDescription>
           </CardHeader>
-          <CardContent className="text-center">
+          <CardContent>
             <p className="text-sm text-gray-600 mb-4">
-              Click the link in your email to verify your account and start using Suitpax.
+              Click the link in the email to verify your account and start using Suitpax.
             </p>
             <Button asChild variant="outline">
-              <Link href="/auth/login">Back to login</Link>
+              <Link href="/auth/login">Back to Login</Link>
             </Button>
           </CardContent>
         </Card>
@@ -99,102 +95,76 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-medium tracking-tighter">Create your Suitpax account</CardTitle>
-          <CardDescription>Start managing your business travel with AI</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>
-          )}
-
-          <Button onClick={handleGoogleSignUp} disabled={loading} variant="outline" className="w-full bg-transparent">
-            Continue with Google
-          </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Or continue with email</span>
-            </div>
+    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
+      <div className="flex items-center justify-center py-12">
+        <div className="mx-auto grid w-[350px] gap-6">
+          <div className="grid gap-2 text-center">
+            <h1 className="text-3xl font-bold tracking-tighter">Get Started</h1>
+            <p className="text-balance text-muted-foreground">Create an account to start your journey with Suitpax</p>
           </div>
-
-          <form onSubmit={handleSignUp} className="space-y-4">
-            <div>
-              <Label htmlFor="fullName">Full Name</Label>
-              <Input
-                id="fullName"
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-                minLength={6}
-              />
-            </div>
-            <div>
-              <Label htmlFor="companyName">Company Name (Optional)</Label>
-              <Input
-                id="companyName"
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                disabled={loading}
-              />
-            </div>
-            <div>
-              <Label htmlFor="planType">Plan</Label>
-              <Select value={planType} onValueChange={setPlanType} disabled={loading}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="free">Free - €0/month</SelectItem>
-                  <SelectItem value="basic">Basic - €49/month</SelectItem>
-                  <SelectItem value="pro">Pro - €89/month</SelectItem>
-                  <SelectItem value="enterprise">Enterprise - Custom</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Creating account..." : "Create account"}
+          <div className="grid gap-4">
+            <form onSubmit={handleSignUp} className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="fullName">Full Name</Label>
+                <Input
+                  id="fullName"
+                  placeholder="John Doe"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  minLength={6}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Creating Account..." : "Create an account"}
+              </Button>
+            </form>
+            <Button variant="outline" className="w-full bg-transparent" onClick={handleGoogleSignUp} disabled={loading}>
+              <FcGoogle className="mr-2 h-4 w-4" />
+              Sign up with Google
             </Button>
-          </form>
-
-          <div className="text-center text-sm">
+          </div>
+          <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
-            <Link href="/auth/login" className="font-medium text-black hover:text-gray-700">
+            <Link href="/auth/login" className="underline">
               Sign in
             </Link>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+      <div className="hidden bg-muted lg:block">
+        <Image
+          src="/placeholder.svg?width=1920&height=1080"
+          alt="Image"
+          width="1920"
+          height="1080"
+          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+        />
+      </div>
     </div>
   )
 }

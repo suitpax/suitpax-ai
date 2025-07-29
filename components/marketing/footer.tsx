@@ -61,7 +61,7 @@ export const Footer = () => {
               </Link>
             </div>
 
-            <p className="text-xs text-gray-500">2261 Market Street STE 86661 San Francisco, CA, 94114</p>
+            <p className="text-xs text-gray-500">Av. Fabraquer, 21, Alicante, Spain, 03560</p>
           </div>
 
           {/* Columna 2: Products & Services */}

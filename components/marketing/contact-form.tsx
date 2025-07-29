@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { RiSendPlaneFill, RiCheckboxCircleFill, RiMailFill, RiUserFill, RiQuestionFill } from "react-icons/ri"
+import { Send, Check, Mail, User, MessageSquare } from "lucide-react"
+import toast from "react-hot-toast"
 
 interface FormData {
   name: string
@@ -24,7 +24,6 @@ export default function ContactForm() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [error, setError] = useState("")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -37,7 +36,7 @@ export default function ContactForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setError("")
+    const toastId = toast.loading("Sending message...")
 
     try {
       const response = await fetch("/api/public/contact", {
@@ -52,10 +51,11 @@ export default function ContactForm() {
         throw new Error("Failed to send message")
       }
 
+      toast.success("Message sent successfully!", { id: toastId })
       setIsSubmitted(true)
       setFormData({ name: "", email: "", message: "" })
     } catch (err) {
-      setError("Failed to send message. Please try again.")
+      toast.error("Failed to send message. Please try again.", { id: toastId })
     } finally {
       setIsSubmitting(false)
     }
@@ -64,13 +64,13 @@ export default function ContactForm() {
   if (isSubmitted) {
     return (
       <motion.div
-        className="max-w-md mx-auto bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm text-center"
+        className="w-full max-w-md bg-white/80 backdrop-blur-lg p-8 rounded-2xl border border-gray-200 shadow-lg text-center"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <RiCheckboxCircleFill className="text-emerald-600" size={32} />
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Check className="text-green-600 h-8 w-8" />
         </div>
         <h3 className="text-xl font-medium tracking-tighter mb-2">Message Sent!</h3>
         <p className="text-gray-600 text-sm mb-6">Thank you for reaching out. We'll get back to you within 24 hours.</p>
@@ -83,7 +83,7 @@ export default function ContactForm() {
 
   return (
     <motion.div
-      className="max-w-md mx-auto bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm"
+      className="w-full max-w-md bg-white/80 backdrop-blur-lg p-8 rounded-2xl border border-gray-200 shadow-lg"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -93,14 +93,10 @@ export default function ContactForm() {
         <p className="text-gray-600 text-sm">Have questions? We'd love to hear from you.</p>
       </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-6">{error}</div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <Label htmlFor="name" className="flex items-center gap-2 text-sm font-medium mb-2">
-            <RiUserFill className="text-gray-500" size={16} />
+        <div className="space-y-2">
+          <Label htmlFor="name" className="flex items-center gap-2 text-sm font-medium">
+            <User className="text-gray-500 h-4 w-4" />
             Full Name
           </Label>
           <Input
@@ -116,9 +112,9 @@ export default function ContactForm() {
           />
         </div>
 
-        <div>
-          <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium mb-2">
-            <RiMailFill className="text-gray-500" size={16} />
+        <div className="space-y-2">
+          <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium">
+            <Mail className="text-gray-500 h-4 w-4" />
             Email Address
           </Label>
           <Input
@@ -134,9 +130,9 @@ export default function ContactForm() {
           />
         </div>
 
-        <div>
-          <Label htmlFor="message" className="flex items-center gap-2 text-sm font-medium mb-2">
-            <RiQuestionFill className="text-gray-500" size={16} />
+        <div className="space-y-2">
+          <Label htmlFor="message" className="flex items-center gap-2 text-sm font-medium">
+            <MessageSquare className="text-gray-500 h-4 w-4" />
             Your Message
           </Label>
           <Textarea
@@ -164,16 +160,12 @@ export default function ContactForm() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <RiSendPlaneFill size={16} />
+              <Send className="h-4 w-4" />
               Send Message
             </div>
           )}
         </Button>
       </form>
-
-      <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-        <p className="text-xs text-gray-500">We typically respond within 24 hours during business days.</p>
-      </div>
     </motion.div>
   )
 }

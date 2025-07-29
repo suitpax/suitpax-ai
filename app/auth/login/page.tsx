@@ -1,28 +1,28 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
+import { FcGoogle } from "react-icons/fc"
+import toast from "react-hot-toast"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
   const router = useRouter()
   const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
+    const toastId = toast.loading("Signing in...")
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -31,12 +31,14 @@ export default function LoginPage() {
       })
 
       if (error) {
-        setError(error.message)
+        toast.error(error.message, { id: toastId })
       } else {
+        toast.success("Signed in successfully!", { id: toastId })
         router.push("/dashboard")
+        router.refresh()
       }
     } catch (error) {
-      setError("An unexpected error occurred")
+      toast.error("An unexpected error occurred", { id: toastId })
     } finally {
       setLoading(false)
     }
@@ -44,8 +46,7 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setLoading(true)
-    setError("")
-
+    const toastId = toast.loading("Redirecting to Google...")
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -55,82 +56,79 @@ export default function LoginPage() {
       })
 
       if (error) {
-        setError(error.message)
+        toast.error(error.message, { id: toastId })
         setLoading(false)
       }
     } catch (error) {
-      setError("An unexpected error occurred")
+      toast.error("An unexpected error occurred", { id: toastId })
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-medium tracking-tighter">Sign in to Suitpax</CardTitle>
-          <CardDescription>Access your AI-powered business travel platform</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>
-          )}
-
-          <Button onClick={handleGoogleLogin} disabled={loading} variant="outline" className="w-full bg-transparent">
-            Continue with Google
-          </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Or continue with email</span>
-            </div>
+    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
+      <div className="flex items-center justify-center py-12">
+        <div className="mx-auto grid w-[350px] gap-6">
+          <div className="grid gap-2 text-center">
+            <h1 className="text-3xl font-bold tracking-tighter">Welcome Back</h1>
+            <p className="text-balance text-muted-foreground">Enter your email below to login to your account</p>
           </div>
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Signing in..." : "Sign in"}
+          <div className="grid gap-4">
+            <form onSubmit={handleLogin} className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <Link href="/auth/forgot-password" className="ml-auto inline-block text-sm underline">
+                    Forgot your password?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Signing In..." : "Login"}
+              </Button>
+            </form>
+            <Button variant="outline" className="w-full bg-transparent" onClick={handleGoogleLogin} disabled={loading}>
+              <FcGoogle className="mr-2 h-4 w-4" />
+              Login with Google
             </Button>
-          </form>
-
-          <div className="text-center text-sm">
-            <Link href="/auth/forgot-password" className="text-gray-600 hover:text-gray-900">
-              Forgot your password?
-            </Link>
           </div>
-
-          <div className="text-center text-sm">
-            Don't have an account?{" "}
-            <Link href="/auth/signup" className="font-medium text-black hover:text-gray-700">
+          <div className="mt-4 text-center text-sm">
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/signup" className="underline">
               Sign up
             </Link>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+      <div className="hidden bg-muted lg:block">
+        <Image
+          src="/placeholder.svg?width=1920&height=1080"
+          alt="Image"
+          width="1920"
+          height="1080"
+          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+        />
+      </div>
     </div>
   )
 }
