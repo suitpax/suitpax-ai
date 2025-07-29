@@ -218,9 +218,9 @@ export default function AIVoiceAssistant() {
             viewport={{ once: true }}
           >
             <div className="flex justify-center items-center gap-2 mb-6">
-              <Image src="/logo/suitpax-cloud-logo.webp" alt="Suitpax" width={60} height={15} className="h-4 w-auto" />
-              <span className="inline-flex items-center rounded-xl bg-gray-200 px-3 py-1 text-xs font-medium text-gray-700">
-                AI Voice Assistant
+              <Image src="/logo/suitpax-cloud-logo.webp" alt="Suitpax" width={50} height={12} className="h-3 w-auto" />
+              <span className="inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-700">
+                AI Voice
               </span>
             </div>
 
@@ -251,12 +251,12 @@ export default function AIVoiceAssistant() {
                     <Image
                       src="/agents/agent-5.png"
                       alt="Zia - AI Travel Assistant"
-                      width={160}
-                      height={160}
-                      className="rounded-2xl mx-auto border border-gray-200"
+                      width={140}
+                      height={140}
+                      className="rounded-xl mx-auto border border-gray-200"
                     />
-                    <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center border-4 border-white">
-                      <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-black rounded-full flex items-center justify-center border-4 border-white">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                     </div>
                   </div>
                 </div>
@@ -266,7 +266,7 @@ export default function AIVoiceAssistant() {
 
                 <button
                   onClick={startCall}
-                  className="inline-flex items-center gap-3 bg-black hover:bg-gray-800 text-white px-8 py-4 rounded-2xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="inline-flex items-center gap-3 bg-black hover:bg-gray-800 text-white px-8 py-4 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   <Phone className="w-5 h-5" />
                   Start Voice Call
@@ -288,18 +288,18 @@ export default function AIVoiceAssistant() {
                       <Image
                         src="/agents/agent-5.png"
                         alt="Zia"
-                        width={80}
-                        height={80}
-                        className="rounded-2xl border border-gray-200"
+                        width={70}
+                        height={70}
+                        className="rounded-xl border border-gray-200"
                       />
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-black rounded-full border-2 border-white flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
                       </div>
                     </div>
                     <div>
                       <h3 className="text-xl font-medium text-black">Zia AI Assistant</h3>
                       <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-black rounded-full animate-pulse"></div>
                         <span className="text-sm text-gray-600">Connected</span>
                       </div>
                     </div>
@@ -308,7 +308,7 @@ export default function AIVoiceAssistant() {
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={() => setIsMuted(!isMuted)}
-                      className={`p-3 rounded-full transition-colors ${
+                      className={`p-3 rounded-xl transition-colors ${
                         isMuted ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600"
                       } hover:bg-gray-200`}
                     >
@@ -316,7 +316,7 @@ export default function AIVoiceAssistant() {
                     </button>
                     <button
                       onClick={endCall}
-                      className="p-3 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                      className="p-3 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
                     >
                       <PhoneOff className="w-5 h-5" />
                     </button>
@@ -324,7 +324,7 @@ export default function AIVoiceAssistant() {
                 </div>
 
                 {/* Messages */}
-                <div className="bg-white rounded-2xl p-6 max-h-80 overflow-y-auto space-y-4 border border-gray-200">
+                <div className="bg-white rounded-xl p-6 max-h-80 overflow-y-auto space-y-4 border border-gray-200">
                   <AnimatePresence>
                     {messages.map((message) => (
                       <motion.div
@@ -335,7 +335,7 @@ export default function AIVoiceAssistant() {
                         className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-sm px-4 py-3 rounded-2xl text-sm ${
+                          className={`max-w-sm px-4 py-3 rounded-xl text-sm ${
                             message.type === "user"
                               ? "bg-black text-white"
                               : "bg-gray-100 text-gray-900 border border-gray-200"
@@ -349,7 +349,7 @@ export default function AIVoiceAssistant() {
 
                   {isProcessing && (
                     <div className="flex justify-start">
-                      <div className="bg-gray-100 px-4 py-3 rounded-2xl border border-gray-200">
+                      <div className="bg-gray-100 px-4 py-3 rounded-xl border border-gray-200">
                         <Loader2 className="w-4 h-4 animate-spin" />
                       </div>
                     </div>
@@ -358,8 +358,8 @@ export default function AIVoiceAssistant() {
 
                 {/* Current transcript */}
                 {transcript && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
-                    <p className="text-sm text-blue-800">
+                  <div className="bg-gray-100 border border-gray-200 rounded-xl p-4">
+                    <p className="text-sm text-gray-800">
                       <span className="font-medium">You're saying:</span> {transcript}
                     </p>
                   </div>
@@ -371,7 +371,7 @@ export default function AIVoiceAssistant() {
                     <button
                       onClick={toggleListening}
                       disabled={isProcessing}
-                      className={`rounded-full w-20 h-20 transition-all duration-200 ${
+                      className={`rounded-xl w-20 h-20 transition-all duration-200 ${
                         isListening
                           ? "bg-red-500 hover:bg-red-600 animate-pulse shadow-lg shadow-red-500/25"
                           : "bg-black hover:bg-gray-800 shadow-lg"
@@ -385,9 +385,9 @@ export default function AIVoiceAssistant() {
                     </button>
 
                     {isPlaying && (
-                      <div className="flex items-center space-x-3 px-6 py-3 bg-emerald-100 rounded-2xl border border-emerald-200">
-                        <Volume2 className="w-5 h-5 text-emerald-600" />
-                        <span className="text-sm font-medium text-emerald-800">Zia is speaking...</span>
+                      <div className="flex items-center space-x-3 px-6 py-3 bg-gray-100 rounded-xl border border-gray-200">
+                        <Volume2 className="w-5 h-5 text-gray-600" />
+                        <span className="text-sm font-medium text-gray-800">Zia is speaking...</span>
                       </div>
                     )}
                   </div>
@@ -404,7 +404,7 @@ export default function AIVoiceAssistant() {
                 </div>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                     <p className="text-sm text-red-600">{error}</p>
                   </div>
                 )}
@@ -439,9 +439,9 @@ export default function AIVoiceAssistant() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl p-8"
+                className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl p-8"
               >
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mb-6 text-2xl">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-medium tracking-tighter text-black mb-4">{feature.title}</h3>
