@@ -16,6 +16,7 @@ interface SpeechToTextResult {
   startListening: () => void
   stopListening: () => void
   resetTranscript: () => void
+  detectedLanguage: { language: string; speechCode: string; confidence: number }
 }
 
 export function useSpeechToText(options: SpeechToTextOptions = {}): SpeechToTextResult {
@@ -25,6 +26,7 @@ export function useSpeechToText(options: SpeechToTextOptions = {}): SpeechToText
   const [isListening, setIsListening] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const [detectedLanguage, setDetectedLanguage] = useState({ language: "English", speechCode: "en-US", confidence: 0 })
 
   // Check if speech recognition is supported
   const isSupported =
@@ -59,7 +61,9 @@ export function useSpeechToText(options: SpeechToTextOptions = {}): SpeechToText
         }
       }
 
-      setTranscript(finalTranscript || interimTranscript)
+      const newTranscript = finalTranscript || interimTranscript
+      setTranscript(newTranscript)
+      setDetectedLanguage(detectLanguage(newTranscript))
     }
 
     recognition.onerror = (event) => {
@@ -99,6 +103,7 @@ export function useSpeechToText(options: SpeechToTextOptions = {}): SpeechToText
   const resetTranscript = useCallback(() => {
     setTranscript("")
     setError(null)
+    setDetectedLanguage({ language: "English", speechCode: "en-US", confidence: 0 })
   }, [])
 
   return {
@@ -109,6 +114,7 @@ export function useSpeechToText(options: SpeechToTextOptions = {}): SpeechToText
     startListening,
     stopListening,
     resetTranscript,
+    detectedLanguage,
   }
 }
 
@@ -163,4 +169,86 @@ interface SpeechRecognitionAlternative {
 declare var SpeechRecognition: {
   prototype: SpeechRecognition
   new (): SpeechRecognition
+}
+
+// Simple language detection utility
+function detectLanguage(text: string): { language: string; speechCode: string; confidence: number } {
+  const spanishWords = [
+    "el",
+    "la",
+    "de",
+    "que",
+    "y",
+    "a",
+    "en",
+    "un",
+    "es",
+    "se",
+    "no",
+    "te",
+    "lo",
+    "le",
+    "da",
+    "su",
+    "por",
+    "son",
+    "con",
+    "para",
+    "al",
+    "una",
+    "su",
+    "del",
+    "las",
+    "los",
+  ]
+  const englishWords = [
+    "the",
+    "be",
+    "to",
+    "of",
+    "and",
+    "a",
+    "in",
+    "that",
+    "have",
+    "i",
+    "it",
+    "for",
+    "not",
+    "on",
+    "with",
+    "he",
+    "as",
+    "you",
+    "do",
+    "at",
+  ]
+
+  const words = text.toLowerCase().split(/\s+/)
+  let spanishCount = 0
+  let englishCount = 0
+
+  words.forEach((word) => {
+    if (spanishWords.includes(word)) spanishCount++
+    if (englishWords.includes(word)) englishCount++
+  })
+
+  const total = spanishCount + englishCount
+  if (total === 0) {
+    return { language: "English", speechCode: "en-US", confidence: 0 }
+  }
+
+  if (spanishCount > englishCount) {
+    return {
+      language: "Spanish",
+      speechCode: "es-ES",
+      confidence: spanishCount / total,
+    }
+  } else {
+    return {
+      language: "English",
+      speechCode: "en-US",
+      confidence: englishCount / total,
+    }
+  }
 }

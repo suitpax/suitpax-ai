@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "latest",
-    "@ai-sdk/xai": "latest",
     "@anthropic-ai/sdk": "latest",
     "@emotion/is-prop-valid": "latest",
     "@emotion/react": "latest",

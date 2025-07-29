@@ -6,7 +6,7 @@ import Image from "next/image"
 import VantaCloudsBackground from "../ui/vanta-clouds-background"
 import { SiBritishairways, SiTesla } from "react-icons/si"
 import { MdMic, MdMicOff } from "react-icons/md"
-import { useSpeechToText } from "@/hooks/use-speech-recognition"
+import { useSpeechToText } from "@/hooks/use-speech-to-text"
 import { detectLanguage } from "@/lib/language-detection"
 
 // Placeholder simple para el input de voz
