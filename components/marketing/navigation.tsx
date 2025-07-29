@@ -86,46 +86,38 @@ export const Navigation = () => {
               <Link
                 href="/manifesto"
                 className={cn(
-                  "px-2.5 py-1.5 text-sm hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors",
-                  isActive("/manifesto") ? "text-black bg-black/5 font-semibold" : "text-black",
+                  "px-3 py-1.5 text-sm hover:bg-black/5 rounded-full font-medium tracking-tighter transition-colors bg-black text-white",
+                  isActive("/manifesto") ? "text-white bg-black font-semibold" : "text-white bg-black",
                 )}
               >
-                Manifesto
+                Read our manifesto
               </Link>
               <Link
                 href="/pricing"
                 className={cn(
-                  "px-2.5 py-1.5 text-sm hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors",
-                  isActive("/pricing") ? "text-black bg-black/5 font-semibold" : "text-black",
+                  "px-3 py-1.5 text-sm hover:bg-black/5 rounded-full font-medium tracking-tighter transition-colors bg-black text-white",
+                  isActive("/pricing") ? "text-white bg-black font-semibold" : "text-white bg-black",
                 )}
               >
                 Pricing
               </Link>
               <Link
                 href="https://cal.com/team/founders/partnership"
-                className="px-2.5 py-1.5 text-sm text-black hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors"
+                className="px-3 py-1.5 text-sm text-white hover:bg-black/80 rounded-full font-medium tracking-tighter transition-colors bg-black"
               >
-                Talk to founders
+                Talk to me
               </Link>
             </div>
 
             {/* Action Buttons */}
             <div className="flex items-center space-x-2">
-              {/* Login Button - Desktop */}
-              <Button
-                asChild
-                className="hidden lg:flex h-7 text-xs font-medium tracking-tighter rounded-full bg-gray-100 text-black hover:bg-gray-200 px-3 py-1 shadow-sm min-w-[70px] items-center gap-1"
-              >
-                <Link href="https://app.suitpax.com/auth/login">Login</Link>
-              </Button>
-
               {/* Sign Up Button */}
               <Button
                 asChild
                 className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
               >
                 <Link href="https://app.suitpax.com/auth/signup">
-                  Sign Up
+                  Sign up
                   <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
                 </Link>
               </Button>
@@ -160,7 +152,7 @@ export const Navigation = () => {
                       )}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      Manifesto
+                      Read our manifesto
                     </Link>
                   </div>
                   <div className="py-2 border-b border-gray-200/30">
@@ -184,7 +176,7 @@ export const Navigation = () => {
                       className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      Talk to founders
+                      Talk to me
                     </Link>
                   </div>
 

@@ -11,9 +11,7 @@ import CounterBadge from "@/components/ui/counter-badge"
 import MiniChat from "@/components/ui/mini-chat"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 
-// Modificar las variaciones de título para hacerlas más inclusivas
-
-// Reemplazar algunos de los titleVariations con estas nuevas versiones:
+// Title variations updated
 const titleVariations = [
   "AI traveltech platform for modern businesses. Made for humans",
   "Business travel, reimagined for today's world.",
@@ -28,14 +26,6 @@ const titleVariations = [
   "Business travel that enhances your workflow.",
   "Designed by humans. Powered by AI agents.",
   "AI-driven travel for modern business.",
-  // Nuevos títulos enfocados en MCP (Model Context Protocol)
-  "MCP: AI agents that understand your business travel needs.",
-  "Business travel platform with MCP-powered intelligence.",
-  "MCP + AI agents: The perfect travel management duo.",
-  "Suitpax MCP: Smarter business travel decisions.",
-  "AI travel agents with MCP: Context-aware recommendations.",
-  "MCP business travel: Where AI meets human expertise.",
-  // Nuevos títulos con "all in one"
   "All in one business travel platform for startups and growing companies.",
   "The all in one solution for your company's travel needs.",
   "Suitpax: All in one travel management for teams of all sizes.",
@@ -44,12 +34,10 @@ const titleVariations = [
   "All in one travel infrastructure for modern businesses.",
   "The all in one travel solution that grows with your company.",
   "All in one travel management with human-centered design.",
-  // Nuevo título añadido
   "The complete business travel ecosystem: Flights, Hotels, Cars, and Expense Management.",
   "Human vision. AI execution. Reinventing business travel and expense management.",
   "Human-led. AI-empowered. Transforming how companies travel and manage expenses.",
   "Where human intuition meets AI agents to redefine corporate travel and financial control.",
-  // Nuevos títulos sobre AI-first y business travel
   "AI-first business travel platform for the modern enterprise.",
   "Redefining business travel with AI-first principles and human expertise.",
   "AI-first approach to solving business travel complexity.",
@@ -65,7 +53,6 @@ const titleVariations = [
   "Transforming business travel with AI-first innovation.",
   "The future of business travel is AI-first and human-guided.",
   "AI-first business travel: Smarter journeys, better outcomes.",
-  // Nuevos títulos con workforce, AI-travel, business, platform
   "Empowering your workforce with intelligent travel solutions.",
   "AI-travel platform designed for the modern workforce.",
   "Transforming business travel for distributed workforce teams.",
@@ -91,7 +78,6 @@ const titleVariations = [
   "Workforce travel management reimagined for modern business.",
   "AI-travel intelligence built for business efficiency.",
   "The business platform that makes workforce travel effortless.",
-  // Nuevos títulos sobre TMS (Travel Management System)
   "TMS reimagined: AI-powered travel management like never before.",
   "The TMS revolution: Where artificial intelligence meets travel expertise.",
   "Next-generation TMS with AI agents that think like your travel team.",
@@ -215,7 +201,7 @@ const cities = [
   "Reykjavik",
 ]
 
-// Reemplazar algunos de los subtitles con estas nuevas versiones:
+// Subtitles updated
 const subtitles = [
   "The next-gen of traveltech with AI superpowers. AI travel agents, expense management, and global travel services—all in one. Built for startups and growing businesses.",
   "A comprehensive platform that simplifies business travel through intelligent automation. Perfect for teams of all sizes.",
@@ -227,22 +213,18 @@ const subtitles = [
   "Manage flights, hotels, cars, and expenses with intelligent AI agents that understand your business needs.",
   "Revolutionize your company's travel management with context-aware AI and seamless expense integration.",
   "Global business travel simplified: AI agents handle bookings while you focus on what matters most.",
-  // Nuevos subtítulos enfocados en workforce
   "Empower your distributed workforce with AI-driven travel tools that adapt to changing business needs and travel patterns.",
   "Unify your global workforce travel experience with a platform that understands each team member's preferences and requirements.",
   "Support your remote workforce with intelligent travel solutions that make business trips efficient, productive, and stress-free.",
   "Give your workforce the travel tools they deserve: intuitive booking, expense automation, and 24/7 AI support.",
-  // Nuevos subtítulos enfocados en AI-travel
   "AI-travel intelligence that learns from your company's patterns to deliver personalized recommendations and cost savings.",
   "Experience the future of business travel with AI-travel agents that handle everything from booking to expense reconciliation.",
   "Our AI-travel platform combines machine learning with human expertise to create the ultimate business travel experience.",
   "AI-travel coordination that anticipates needs, solves problems, and optimizes every aspect of your business trips.",
-  // Nuevos subtítulos enfocados en business
   "Business travel reimagined for the digital age: faster bookings, smarter recommendations, and seamless expense management.",
   "Transform how your business handles travel with intelligent automation, policy compliance, and real-time reporting.",
   "The business travel solution that scales with your company, from your first business trip to your thousandth.",
   "Designed specifically for business needs: policy enforcement, duty of care, expense integration, and travel optimization.",
-  // Nuevos subtítulos enfocados en platform
   "A unified platform connecting all aspects of business travel: booking, expense management, reporting, and team coordination.",
   "One platform to manage it all: flights, hotels, ground transportation, expenses, and travel policies in a single interface.",
   "The only travel platform your business will ever need, with AI at its core and humans at the helm.",
@@ -314,16 +296,16 @@ export const Hero = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
               <Button
                 asChild
-                className="rounded-xl bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
+                className="rounded-full bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
                 <Link href="/manifesto">Read our manifesto</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="rounded-xl bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
+                className="rounded-full bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
-                <Link href="https://cal.com/team/founders/partnership">Talk to founders</Link>
+                <Link href="https://cal.com/team/founders/partnership">Talk to me</Link>
               </Button>
             </div>
           </div>
