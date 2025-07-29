@@ -29,6 +29,7 @@ interface SidebarProps {
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "AI Travel Assistant", href: "/dashboard/ai-chat", icon: MessageSquare, badge: "AI" },
+  { name: "Voice AI Agents", href: "/dashboard/voice-ai", icon: Sparkles, badge: "NEW" },
   { name: "Flight Booking", href: "/dashboard/flights", icon: Plane },
   { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
   { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },

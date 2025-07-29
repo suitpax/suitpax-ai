@@ -18,18 +18,38 @@ export interface Voice {
   preview_url?: string
 }
 
+export const ELEVENLABS_VOICES = {
+  EMMA: "EXAVITQu4vr4xnSDxMaL", // Sarah - Professional female
+  MARCUS: "VR6AewLTigWG4xSOukaG", // Josh - Professional male
+  SOPHIA: "21m00Tcm4TlvDq8ikWAM", // Rachel - Elegant female
+  ALEX: "29vD33N1CtxCmqQRPOHJ", // Drew - Tech-savvy male
+  MICHAEL: "CYw3kZ02Hs0563khs1fj", // Antoni - Versatile male
+}
+
 export const AGENT_VOICES: Record<string, Voice> = {
   emma: {
-    voice_id: "EXAVITQu4vr4xnSDxMaL", // Sarah - Professional female voice
+    voice_id: ELEVENLABS_VOICES.EMMA,
     name: "Sarah",
     category: "professional",
     description: "Warm, professional female voice perfect for executive assistance",
   },
   marcus: {
-    voice_id: "VR6AewLTigWG4xSOukaG", // Josh - Professional male voice
+    voice_id: ELEVENLABS_VOICES.MARCUS,
     name: "Josh",
     category: "professional",
     description: "Authoritative, clear male voice ideal for corporate communication",
+  },
+  sophia: {
+    voice_id: ELEVENLABS_VOICES.SOPHIA,
+    name: "Rachel",
+    category: "elegant",
+    description: "Sophisticated female voice perfect for luxury services",
+  },
+  alex: {
+    voice_id: ELEVENLABS_VOICES.ALEX,
+    name: "Drew",
+    category: "modern",
+    description: "Contemporary male voice ideal for tech-focused interactions",
   },
 }
 
