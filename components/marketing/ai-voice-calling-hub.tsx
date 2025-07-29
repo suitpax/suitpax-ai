@@ -1,393 +1,435 @@
 "use client"
 
+import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
+import {
+  Phone,
+  PhoneCall,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react"
 import Image from "next/image"
-import { useState, useEffect, useRef } from "react"
-import { PiPhoneFill, PiMicrophoneFill, PiStopFill, PiSpeakerHighFill } from "react-icons/pi"
 
-const voiceAgents = [
+// AI Agents data with larger images
+const aiAgents = [
   {
-    id: 1,
-    name: "Emma",
-    role: "Executive Travel Assistant",
-    image: "/agents/agent-emma.jpeg",
-    voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah - Professional female
-    languages: ["English", "Spanish", "French"],
-    specialty: "Executive flights and luxury accommodations",
-    accent: "American",
-    status: "available" as const,
-  },
-  {
-    id: 2,
-    name: "Marcus",
-    role: "Corporate Travel Specialist",
-    image: "/agents/agent-marcus.jpeg",
-    voiceId: "VR6AewLTigWG4xSOukaG", // Josh - Professional male
-    languages: ["English", "German", "Italian"],
-    specialty: "Policy compliance and cost optimization",
-    accent: "British",
-    status: "available" as const,
-  },
-  {
-    id: 3,
+    id: "sophia",
     name: "Sophia",
-    role: "Concierge & VIP Services",
-    image: "/agents/agent-sophia.jpeg",
-    voiceId: "21m00Tcm4TlvDq8ikWAM", // Rachel - Elegant female
-    languages: ["English", "French", "Portuguese"],
-    specialty: "Luxury experiences and concierge services",
-    accent: "Canadian",
-    status: "available" as const,
+    role: "Travel Specialist",
+    avatar: "/agents/agent-sophia.jpeg",
+    voice: "alloy",
+    description: "Expert in business travel planning",
   },
   {
-    id: 4,
+    id: "marcus",
+    name: "Marcus",
+    role: "Expense Manager",
+    avatar: "/agents/agent-marcus.jpeg",
+    voice: "echo",
+    description: "Specialized in expense optimization",
+  },
+  {
+    id: "emma",
+    name: "Emma",
+    role: "Policy Advisor",
+    avatar: "/agents/agent-emma.jpeg",
+    voice: "fable",
+    description: "Travel policy compliance expert",
+  },
+  {
+    id: "alex",
     name: "Alex",
-    role: "Tech & Innovation Guide",
-    image: "/agents/agent-alex.jpeg",
-    voiceId: "29vD33N1CtxCmqQRPOHJ", // Drew - Tech-savvy male
-    languages: ["English", "Mandarin", "Korean"],
-    specialty: "Travel apps and digital integration",
-    accent: "Australian",
-    status: "available" as const,
+    role: "Booking Assistant",
+    avatar: "/agents/agent-alex.jpeg",
+    voice: "onyx",
+    description: "Flight and hotel booking specialist",
   },
 ]
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "available":
-      return "bg-green-400"
-    case "busy":
-      return "bg-orange-400"
-    case "offline":
-      return "bg-gray-400"
-    default:
-      return "bg-gray-300"
-  }
+interface CallStatus {
+  type: "idle" | "connecting" | "connected" | "speaking" | "listening" | "error"
+  message: string
 }
 
-export const AIVoiceCallingHub = () => {
-  const [selectedAgent, setSelectedAgent] = useState(voiceAgents[0])
-  const [isCallActive, setIsCallActive] = useState(false)
-  const [isListening, setIsListening] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [transcript, setTranscript] = useState("")
-  const [response, setResponse] = useState("")
+export default function AIVoiceCallingHub() {
+  const [selectedAgent, setSelectedAgent] = useState(aiAgents[0])
+  const [callStatus, setCallStatus] = useState<CallStatus>({ type: "idle", message: "Ready to call" })
+  const [isRecording, setIsRecording] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const startListening = async () => {
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio()
+    audioRef.current.onended = () => setIsPlaying(false)
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+    }
+  }, [])
+
+  const startCall = async () => {
+    try {
+      setCallStatus({ type: "connecting", message: "Connecting to AI agent..." })
+
+      // Simulate connection delay
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
+      setCallStatus({ type: "connected", message: `Connected to ${selectedAgent.name}` })
+
+      // Auto-start with greeting
+      setTimeout(() => {
+        handleAIResponse(
+          "Hello! I'm " +
+            selectedAgent.name +
+            ", your " +
+            selectedAgent.role +
+            ". How can I help you with your business travel today?",
+        )
+      }, 1000)
+    } catch (error) {
+      setCallStatus({ type: "error", message: "Failed to connect. Please try again." })
+    }
+  }
+
+  const endCall = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop()
+    }
+    if (audioRef.current) {
+      audioRef.current.pause()
+    }
+    setCallStatus({ type: "idle", message: "Ready to call" })
+    setIsRecording(false)
+    setIsPlaying(false)
+    setAudioUrl(null)
+  }
+
+  const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mediaRecorder = new MediaRecorder(stream)
-      mediaRecorderRef.current = mediaRecorder
+      mediaRecorderRef.current = new MediaRecorder(stream)
       audioChunksRef.current = []
 
-      mediaRecorder.ondataavailable = (event) => {
+      mediaRecorderRef.current.ondataavailable = (event) => {
         audioChunksRef.current.push(event.data)
       }
 
-      mediaRecorder.onstop = async () => {
+      mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" })
-        await processAudio(audioBlob)
+        await processVoiceInput(audioBlob)
         stream.getTracks().forEach((track) => track.stop())
       }
 
-      mediaRecorder.start()
-      setIsListening(true)
+      mediaRecorderRef.current.start()
+      setIsRecording(true)
+      setCallStatus({ type: "listening", message: "Listening..." })
     } catch (error) {
-      console.error("Error accessing microphone:", error)
+      setCallStatus({ type: "error", message: "Microphone access denied" })
     }
   }
 
-  const stopListening = () => {
-    if (mediaRecorderRef.current && isListening) {
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop()
-      setIsListening(false)
+      setIsRecording(false)
     }
   }
 
-  const processAudio = async (audioBlob: Blob) => {
-    setIsProcessing(true)
-
+  const processVoiceInput = async (audioBlob: Blob) => {
     try {
-      // Convert speech to text
-      const formData = new FormData()
-      formData.append("audio", audioBlob)
+      setCallStatus({ type: "speaking", message: "Processing your request..." })
 
-      const transcriptResponse = await fetch("/api/elevenlabs/speech-to-text", {
-        method: "POST",
-        body: formData,
-      })
+      // Convert speech to text (simulated)
+      const transcript = "I need to book a flight from New York to London for next week"
 
-      const { transcript: userTranscript } = await transcriptResponse.json()
-      setTranscript(userTranscript)
-
-      // Generate AI response
-      const chatResponse = await fetch("/api/voice-ai/conversation", {
+      // Get AI response
+      const response = await fetch("/api/voice-ai/conversation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: userTranscript,
-          agentId: selectedAgent.id,
+          message: transcript,
+          agent: selectedAgent.id,
+          context: "business_travel_booking",
         }),
       })
 
-      const { response: aiResponse } = await chatResponse.json()
-      setResponse(aiResponse)
+      const data = await response.json()
 
-      // Generate speech from AI response
-      const speechResponse = await fetch("/api/elevenlabs/text-to-speech", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: aiResponse,
-          voiceId: selectedAgent.voiceId,
-        }),
-      })
-
-      if (speechResponse.ok) {
-        const audioBlob = await speechResponse.blob()
-        const audioUrl = URL.createObjectURL(audioBlob)
-        setAudioUrl(audioUrl)
-
-        // Play the audio
-        if (audioRef.current) {
-          audioRef.current.src = audioUrl
-          audioRef.current.play()
-        }
+      if (data.success) {
+        await handleAIResponse(data.response)
+      } else {
+        setCallStatus({ type: "error", message: "Failed to process request" })
       }
     } catch (error) {
-      console.error("Error processing audio:", error)
-    } finally {
-      setIsProcessing(false)
+      setCallStatus({ type: "error", message: "Processing failed" })
     }
   }
 
-  const handleCall = () => {
-    if (isCallActive) {
-      // End call
-      setIsCallActive(false)
-      setIsListening(false)
-      setTranscript("")
-      setResponse("")
-      setAudioUrl(null)
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.stop()
+  const handleAIResponse = async (text: string) => {
+    try {
+      // Convert text to speech using ElevenLabs
+      const response = await fetch("/api/elevenlabs/text-to-speech", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          voice: selectedAgent.voice,
+        }),
+      })
+
+      if (response.ok) {
+        const audioBlob = await response.blob()
+        const url = URL.createObjectURL(audioBlob)
+        setAudioUrl(url)
+
+        if (audioRef.current) {
+          audioRef.current.src = url
+          audioRef.current.play()
+          setIsPlaying(true)
+        }
+
+        setCallStatus({ type: "connected", message: `${selectedAgent.name} is speaking...` })
       }
-    } else {
-      // Start call
-      setIsCallActive(true)
-      setResponse(
-        `Hello! I'm ${selectedAgent.name}, your ${selectedAgent.role.toLowerCase()}. How can I help you with your business travel today?`,
-      )
+    } catch (error) {
+      setCallStatus({ type: "error", message: "Speech synthesis failed" })
     }
   }
 
-  useEffect(() => {
-    return () => {
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl)
+  const togglePlayback = () => {
+    if (audioRef.current && audioUrl) {
+      if (isPlaying) {
+        audioRef.current.pause()
+        setIsPlaying(false)
+      } else {
+        audioRef.current.play()
+        setIsPlaying(true)
       }
     }
-  }, [audioUrl])
+  }
+
+  const getStatusIcon = () => {
+    switch (callStatus.type) {
+      case "connecting":
+        return <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+      case "connected":
+        return <CheckCircle className="h-5 w-5 text-green-500" />
+      case "error":
+        return <AlertCircle className="h-5 w-5 text-red-500" />
+      default:
+        return <Phone className="h-5 w-5 text-gray-500" />
+    }
+  }
 
   return (
-    <section className="py-8 bg-white">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700">
-              <PiMicrophoneFill className="w-2.5 h-2.5 mr-1" />
-              Voice AI
-            </span>
-            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-[8px] font-medium text-gray-700">
-              <span className="w-1 h-1 rounded-full bg-black animate-pulse mr-1"></span>
-              Live Demo
-            </span>
+    <section className="pt-12 pb-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-6">
+            <em className="font-serif italic">AI Voice Calling</em>
           </div>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tighter text-black leading-none mb-3">
-            Talk to our AI agents
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6">
+            <em className="font-serif italic">Talk to Your</em>
+            <br />
+            <span className="text-gray-700">AI Travel Assistant</span>
           </h2>
-          <p className="text-xs font-medium text-gray-500 max-w-lg mx-auto">
-            Experience natural voice conversations with AI travel specialists powered by ElevenLabs
+          <p className="text-lg font-light text-gray-600 max-w-2xl mx-auto">
+            Experience the future of business travel with voice-powered AI agents. Just speak naturally and get instant
+            help.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Agent Selection */}
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Choose your specialist</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {voiceAgents.map((agent) => (
-                  <motion.button
-                    key={agent.id}
-                    onClick={() => setSelectedAgent(agent)}
-                    className={`p-4 rounded-xl border text-left transition-all ${
-                      selectedAgent.id === agent.id
-                        ? "bg-gray-50 border-gray-300 shadow-sm"
-                        : "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-                    }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="flex items-start gap-3 mb-3">
-                      <div className="relative">
-                        <Image
-                          src={agent.image || "/placeholder.svg"}
-                          alt={agent.name}
-                          width={40}
-                          height={40}
-                          className="rounded-lg object-cover"
-                        />
-                        <div
-                          className={`absolute -top-0.5 -right-0.5 w-3 h-3 ${getStatusColor(
-                            agent.status,
-                          )} rounded-full border-2 border-white`}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-gray-900 truncate">{agent.name}</h4>
-                        <p className="text-xs text-gray-600 truncate">{agent.role}</p>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">{agent.specialty}</p>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          {/* Agent Selection */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="space-y-6"
+          >
+            <h3 className="text-xl font-medium tracking-tighter mb-4">
+              <em className="font-serif italic">Choose Your AI Agent</em>
+            </h3>
 
-            {/* Voice Interface */}
-            <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="relative">
-                  <Image
-                    src={selectedAgent.image || "/placeholder.svg"}
-                    alt={selectedAgent.name}
-                    width={56}
-                    height={56}
-                    className="rounded-xl object-cover"
-                  />
-                  <div
-                    className={`absolute -top-1 -right-1 w-4 h-4 ${getStatusColor(
-                      selectedAgent.status,
-                    )} rounded-full border-2 border-white`}
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-medium text-gray-900">{selectedAgent.name}</h3>
-                  <p className="text-sm text-gray-600 mb-2">{selectedAgent.role}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {selectedAgent.languages.map((lang) => (
-                      <span
-                        key={lang}
-                        className="inline-flex items-center rounded-lg bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-700"
-                      >
-                        {lang}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Call Controls */}
-              <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              {aiAgents.map((agent) => (
                 <motion.button
-                  onClick={handleCall}
-                  className={`w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
-                    isCallActive ? "bg-red-600 hover:bg-red-700 text-white" : "bg-black hover:bg-gray-800 text-white"
+                  key={agent.id}
+                  onClick={() => setSelectedAgent(agent)}
+                  className={`p-4 rounded-2xl border transition-all duration-200 text-left ${
+                    selectedAgent.id === agent.id
+                      ? "border-black bg-gray-50"
+                      : "border-gray-200 bg-white hover:border-gray-300"
                   }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <PiPhoneFill className="w-4 h-4" />
-                  {isCallActive ? "End Call" : "Start Voice Call"}
+                  <div className="flex items-center gap-3 mb-3">
+                    <Image
+                      src={agent.avatar || "/placeholder.svg"}
+                      alt={agent.name}
+                      width={48}
+                      height={48}
+                      className="rounded-full object-cover"
+                    />
+                    <div>
+                      <h4 className="font-medium text-gray-900">{agent.name}</h4>
+                      <p className="text-xs text-gray-600">{agent.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs font-light text-gray-500">{agent.description}</p>
                 </motion.button>
-
-                {isCallActive && (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-                    {/* Voice Controls */}
-                    <div className="flex gap-2">
-                      <motion.button
-                        onClick={isListening ? stopListening : startListening}
-                        disabled={isProcessing}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-medium transition-all ${
-                          isListening
-                            ? "bg-red-100 text-red-700 border border-red-200"
-                            : "bg-green-100 text-green-700 border border-green-200 hover:bg-green-200"
-                        }`}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        {isListening ? (
-                          <>
-                            <PiStopFill className="w-3 h-3" />
-                            Stop Listening
-                          </>
-                        ) : (
-                          <>
-                            <PiMicrophoneFill className="w-3 h-3" />
-                            {isProcessing ? "Processing..." : "Speak"}
-                          </>
-                        )}
-                      </motion.button>
-                    </div>
-
-                    {/* Conversation Display */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-3 max-h-48 overflow-y-auto">
-                      {response && (
-                        <div className="flex items-start gap-2">
-                          <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                            <PiSpeakerHighFill className="w-3 h-3 text-gray-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-xs font-medium text-gray-900 mb-1">{selectedAgent.name}</p>
-                            <p className="text-xs text-gray-600">{response}</p>
-                          </div>
-                        </div>
-                      )}
-
-                      {transcript && (
-                        <div className="flex items-start gap-2">
-                          <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <PiMicrophoneFill className="w-3 h-3 text-blue-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-xs font-medium text-gray-900 mb-1">You</p>
-                            <p className="text-xs text-gray-600">{transcript}</p>
-                          </div>
-                        </div>
-                      )}
-
-                      {isListening && (
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-                          Listening...
-                        </div>
-                      )}
-
-                      {isProcessing && (
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                          Processing your request...
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-
-              {/* Hidden audio element for playback */}
-              <audio ref={audioRef} style={{ display: "none" }} />
+              ))}
             </div>
-          </div>
+          </motion.div>
+
+          {/* Voice Interface */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm"
+          >
+            {/* Selected Agent Display */}
+            <div className="text-center mb-8">
+              <div className="relative inline-block mb-4">
+                <Image
+                  src={selectedAgent.avatar || "/placeholder.svg"}
+                  alt={selectedAgent.name}
+                  width={80}
+                  height={80}
+                  className="rounded-full object-cover mx-auto"
+                />
+                <div
+                  className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white ${
+                    callStatus.type === "connected"
+                      ? "bg-green-500"
+                      : callStatus.type === "connecting"
+                        ? "bg-yellow-500"
+                        : callStatus.type === "error"
+                          ? "bg-red-500"
+                          : "bg-gray-400"
+                  }`}
+                />
+              </div>
+              <h4 className="text-lg font-medium text-gray-900">{selectedAgent.name}</h4>
+              <p className="text-sm text-gray-600">{selectedAgent.role}</p>
+            </div>
+
+            {/* Status */}
+            <div className="flex items-center justify-center gap-2 mb-6 p-3 rounded-xl bg-gray-50">
+              {getStatusIcon()}
+              <span className="text-sm font-medium text-gray-700">{callStatus.message}</span>
+            </div>
+
+            {/* Controls */}
+            <div className="space-y-4">
+              {callStatus.type === "idle" && (
+                <button
+                  onClick={startCall}
+                  className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  <PhoneCall className="h-5 w-5" />
+                  Start Call with {selectedAgent.name}
+                </button>
+              )}
+
+              {(callStatus.type === "connected" ||
+                callStatus.type === "listening" ||
+                callStatus.type === "speaking") && (
+                <div className="space-y-3">
+                  <div className="flex gap-3">
+                    <button
+                      onClick={isRecording ? stopRecording : startRecording}
+                      disabled={callStatus.type === "speaking"}
+                      className={`flex-1 font-medium py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
+                        isRecording
+                          ? "bg-red-500 hover:bg-red-600 text-white"
+                          : "bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-400"
+                      }`}
+                    >
+                      {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                      {isRecording ? "Stop" : "Speak"}
+                    </button>
+
+                    <button
+                      onClick={() => setIsMuted(!isMuted)}
+                      className={`px-4 py-3 rounded-xl transition-all duration-200 ${
+                        isMuted ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                    </button>
+                  </div>
+
+                  {audioUrl && (
+                    <button
+                      onClick={togglePlayback}
+                      className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                      {isPlaying ? "Pause Response" : "Play Response"}
+                    </button>
+                  )}
+
+                  <button
+                    onClick={endCall}
+                    className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    <Phone className="h-4 w-4 rotate-[135deg]" />
+                    End Call
+                  </button>
+                </div>
+              )}
+
+              {callStatus.type === "error" && (
+                <button
+                  onClick={() => setCallStatus({ type: "idle", message: "Ready to call" })}
+                  className="w-full bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200"
+                >
+                  Try Again
+                </button>
+              )}
+            </div>
+
+            {/* Demo Instructions */}
+            <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+              <h5 className="font-medium text-blue-900 mb-2">
+                <em className="font-serif italic">Try saying:</em>
+              </h5>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• "Book me a flight to London next week"</li>
+                <li>• "What's my travel budget status?"</li>
+                <li>• "Find hotels near the conference center"</li>
+                <li>• "Check my expense reports"</li>
+              </ul>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>
   )
 }
-
-export default AIVoiceCallingHub

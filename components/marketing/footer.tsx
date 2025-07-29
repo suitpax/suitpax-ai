@@ -77,10 +77,7 @@ export const Footer = () => {
               <Link href="/pricing" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Pricing
               </Link>
-              <Link
-                href="https://app.suitpax.com/auth/signup"
-                className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
-              >
+              <Link href="/auth/signup" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Pre-register
               </Link>
               <Link
@@ -157,7 +154,7 @@ export const Footer = () => {
                     cert.action === "download"
                       ? () => {
                           const link = document.createElement("a")
-                          link.href = "/legal/suitpax-ai-dpa.pdf"
+                          link.href = "/legal/anthropic-dpa.pdf"
                           link.download = "Suitpax-AI-DPA.pdf"
                           document.body.appendChild(link)
                           link.click()
