@@ -1,103 +1,71 @@
-/**
- * Utilidades para interactuar con la API de ElevenLabs
- */
+import { ElevenLabsApi } from "elevenlabs"
 
-// Constantes para la API de ElevenLabs
-const ELEVENLABS_API_URL = "https://api.elevenlabs.io/v1"
+const apiKey = process.env.ELEVENLABS_API_KEY
 
-// Voces predefinidas de ElevenLabs (puedes personalizar según tus necesidades)
-export const ELEVENLABS_VOICES = {
-  EMMA: "21m00Tcm4TlvDq8ikWAM", // Rachel
-  SOPHIA: "AZnzlk1XvdvUeBnXmlld", // Domi
-  MICHAEL: "TxGEqnHWrfWFTfGW9XjX", // Josh
+if (!apiKey) {
+  throw new Error("ELEVENLABS_API_KEY is not set")
 }
 
-/**
- * Convierte texto a voz utilizando la API de ElevenLabs
- */
-export async function textToSpeech(
-  text: string,
-  voiceId: string = ELEVENLABS_VOICES.EMMA,
-  stability = 0.5,
-  similarityBoost = 0.75,
-): Promise<ArrayBuffer> {
+const elevenlabs = new ElevenLabsApi({
+  apiKey,
+})
+
+export interface Voice {
+  voice_id: string
+  name: string
+  category: string
+  description: string
+  preview_url?: string
+}
+
+export const AGENT_VOICES: Record<string, Voice> = {
+  emma: {
+    voice_id: "EXAVITQu4vr4xnSDxMaL", // Sarah - Professional female voice
+    name: "Sarah",
+    category: "professional",
+    description: "Warm, professional female voice perfect for executive assistance",
+  },
+  marcus: {
+    voice_id: "VR6AewLTigWG4xSOukaG", // Josh - Professional male voice
+    name: "Josh",
+    category: "professional",
+    description: "Authoritative, clear male voice ideal for corporate communication",
+  },
+}
+
+export async function generateSpeech(text: string, voiceId: string): Promise<ArrayBuffer> {
   try {
-    const response = await fetch(`${ELEVENLABS_API_URL}/text-to-speech/${voiceId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "xi-api-key": process.env.ELEVENLABS_API_KEY || "",
+    const audio = await elevenlabs.generate({
+      voice: voiceId,
+      text,
+      model_id: "eleven_multilingual_v2",
+      voice_settings: {
+        stability: 0.5,
+        similarity_boost: 0.8,
+        style: 0.2,
+        use_speaker_boost: true,
       },
-      body: JSON.stringify({
-        text,
-        model_id: "eleven_multilingual_v2",
-        voice_settings: {
-          stability,
-          similarity_boost: similarityBoost,
-        },
-      }),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(`ElevenLabs API error: ${errorData.detail || response.statusText}`)
-    }
-
-    return await response.arrayBuffer()
+    return audio
   } catch (error) {
-    console.error("Error en text-to-speech:", error)
+    console.error("Error generating speech:", error)
     throw error
   }
 }
 
-/**
- * Obtiene información sobre las voces disponibles en ElevenLabs
- */
-export async function getVoices() {
+export async function getAvailableVoices(): Promise<Voice[]> {
   try {
-    const response = await fetch(`${ELEVENLABS_API_URL}/voices`, {
-      headers: {
-        "xi-api-key": process.env.ELEVENLABS_API_KEY || "",
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`Error al obtener voces: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    return data.voices
+    const voices = await elevenlabs.voices.getAll()
+    return voices.voices.map((voice) => ({
+      voice_id: voice.voice_id,
+      name: voice.name,
+      category: voice.category || "general",
+      description: voice.description || "",
+      preview_url: voice.preview_url,
+    }))
   } catch (error) {
-    console.error("Error al obtener voces:", error)
-    throw error
-  }
-}
-
-/**
- * Convierte voz a texto utilizando la API de ElevenLabs
- */
-export async function speechToText(audioBlob: Blob): Promise<string> {
-  try {
-    const formData = new FormData()
-    formData.append("file", audioBlob, "audio.webm")
-    formData.append("model_id", "whisper-1")
-
-    const response = await fetch(`${ELEVENLABS_API_URL}/speech-to-text`, {
-      method: "POST",
-      headers: {
-        "xi-api-key": process.env.ELEVENLABS_API_KEY || "",
-      },
-      body: formData,
-    })
-
-    if (!response.ok) {
-      throw new Error(`Error en speech-to-text: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    return data.text
-  } catch (error) {
-    console.error("Error en speech-to-text:", error)
-    throw error
+    console.error("Error fetching voices:", error)
+    return []
   }
 }

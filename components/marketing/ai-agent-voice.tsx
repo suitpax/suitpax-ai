@@ -11,6 +11,7 @@ import {
   PiWaveformBold,
   PiXBold,
   PiGlobeSimpleBold,
+  PiStarFill,
 } from "react-icons/pi"
 import { useAudioRecorder } from "@/hooks/use-audio-recorder"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
@@ -40,6 +41,8 @@ export default function AIAgentVoice() {
     role: "Executive Travel Assistant",
     image: "/agents/agent-13.png",
     voiceId: ELEVENLABS_VOICES.EMMA,
+    rating: 4.9,
+    calls: 47,
   })
   const [supportedLanguages] = useState(getSupportedLanguages())
   const [showLanguageIndicator, setShowLanguageIndicator] = useState(false)
@@ -110,7 +113,7 @@ export default function AIAgentVoice() {
       const welcomeMessage = {
         id: Date.now().toString(),
         sender: "assistant" as const,
-        text: `Hello! I'm ${currentAssistant.name}, your ${currentAssistant.role.toLowerCase()}. How can I help you today?`,
+        text: `Hello! I'm ${currentAssistant.name}, your Suitpax AI ${currentAssistant.role.toLowerCase()}. How can I help you today?`,
         timestamp: new Date(),
         language: "en-US",
       }
@@ -409,14 +412,47 @@ export default function AIAgentVoice() {
     return language ? language.nativeName : "Unknown"
   }
 
+  const assistants = [
+    {
+      id: "emma",
+      name: "Emma",
+      role: "Executive Travel Assistant",
+      image: "/agents/agent-13.png",
+      voiceId: ELEVENLABS_VOICES.EMMA,
+      rating: 4.9,
+      calls: 47,
+    },
+    {
+      id: "sophia",
+      name: "Sophia",
+      role: "Concierge",
+      image: "/agents/agent-30.png",
+      voiceId: ELEVENLABS_VOICES.SOPHIA,
+      rating: 4.8,
+      calls: 32,
+    },
+    {
+      id: "michael",
+      name: "Michael",
+      role: "Flight Specialist",
+      image: "/agents/agent-5.png",
+      voiceId: ELEVENLABS_VOICES.MICHAEL,
+      rating: 4.7,
+      calls: 28,
+    },
+  ]
+
   return (
-    <section className="w-full py-20 md:py-28 bg-gray-50 overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6">
+    <section className="w-full py-20 md:py-28 bg-black overflow-hidden">
+      {/* Background pattern */}
+      <div className="absolute inset-0 opacity-[0.02] bg-repeat bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px]"></div>
+
+      <div className="container mx-auto px-4 md:px-6 relative">
         <div className="flex flex-col items-center text-center mb-12">
           <div className="flex items-center gap-1.5 mb-3">
-            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
+            <span className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[9px] font-medium text-gray-300 border border-gray-700">
               <Image
-                src="/logo/suitpax-bl-logo.webp"
+                src="/logo/suitpax-cloud-logo.webp"
                 alt="Suitpax"
                 width={60}
                 height={15}
@@ -424,14 +460,14 @@ export default function AIAgentVoice() {
               />
               Voice AI
             </span>
-            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[8px] font-medium text-gray-700">
-              <span className="w-1 h-1 rounded-full bg-black animate-pulse mr-1"></span>
+            <span className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[8px] font-medium text-gray-300 border border-gray-700">
+              <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse mr-1"></span>
               Coming Q2 2025
             </span>
           </div>
 
           <motion.h2
-            className="text-2xl md:text-2xl lg:text-2xl font-medium tracking-tighter text-black leading-none max-w-3xl mx-auto"
+            className="text-2xl md:text-2xl lg:text-2xl font-medium tracking-tighter text-white leading-none max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -440,28 +476,28 @@ export default function AIAgentVoice() {
           </motion.h2>
 
           <div className="max-w-5xl mx-auto w-full">
-            <div className="relative bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+            <div className="relative bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 shadow-xl overflow-hidden">
               <div className="grid md:grid-cols-5 h-full">
                 {/* Left sidebar */}
-                <div className="md:col-span-1 bg-white/80 border-r border-gray-200 p-4">
+                <div className="md:col-span-1 bg-gray-800/50 border-r border-gray-700 p-4">
                   <div className="flex items-center space-x-2 mb-6">
-                    <div className="bg-gray-100 rounded-full p-1">
+                    <div className="bg-gray-700 rounded-full p-1">
                       <Image
-                        src="/logo/suitpax-bl-logo.webp"
+                        src="/logo/suitpax-cloud-logo.webp"
                         alt="Suitpax"
                         width={16}
                         height={16}
                         className="h-3 w-auto"
                       />
                     </div>
-                    <span className="text-[10px] font-medium text-gray-700">Suitpax Voice</span>
+                    <span className="text-[10px] font-medium text-gray-300">Suitpax Voice</span>
                   </div>
 
                   <nav className="space-y-1">
                     <button
                       onClick={() => setActiveTab("voice")}
                       className={`w-full text-left px-3 py-2 rounded-lg text-xs flex items-center space-x-2 ${
-                        activeTab === "voice" ? "bg-gray-100 text-black" : "text-gray-600 hover:bg-gray-50"
+                        activeTab === "voice" ? "bg-gray-700 text-white" : "text-gray-400 hover:bg-gray-700/50"
                       }`}
                     >
                       <PiWaveformBold className="h-3.5 w-3.5" />
@@ -470,7 +506,7 @@ export default function AIAgentVoice() {
                     <button
                       onClick={() => setActiveTab("history")}
                       className={`w-full text-left px-3 py-2 rounded-lg text-xs flex items-center space-x-2 ${
-                        activeTab === "history" ? "bg-gray-100 text-black" : "text-gray-600 hover:bg-gray-50"
+                        activeTab === "history" ? "bg-gray-700 text-white" : "text-gray-400 hover:bg-gray-700/50"
                       }`}
                     >
                       <svg
@@ -491,7 +527,7 @@ export default function AIAgentVoice() {
                     <button
                       onClick={() => setActiveTab("settings")}
                       className={`w-full text-left px-3 py-2 rounded-lg text-xs flex items-center space-x-2 ${
-                        activeTab === "settings" ? "bg-gray-100 text-black" : "text-gray-600 hover:bg-gray-50"
+                        activeTab === "settings" ? "bg-gray-700 text-white" : "text-gray-400 hover:bg-gray-700/50"
                       }`}
                     >
                       <svg
@@ -514,79 +550,35 @@ export default function AIAgentVoice() {
                   <div className="mt-8">
                     <p className="text-[10px] text-gray-500 mb-2 font-medium">VOICE ASSISTANTS</p>
                     <div className="space-y-2">
-                      <div
-                        className="flex items-center space-x-2 p-2 rounded-lg bg-gray-100/80 border border-gray-200 cursor-pointer"
-                        onClick={() =>
-                          setCurrentAssistant({
-                            id: "emma",
-                            name: "Emma",
-                            role: "Executive Travel Assistant",
-                            image: "/agents/agent-13.png",
-                            voiceId: ELEVENLABS_VOICES.EMMA,
-                          })
-                        }
-                      >
-                        <Image
-                          src="/agents/agent-13.png"
-                          alt="Emma"
-                          width={24}
-                          height={24}
-                          className="rounded-full h-6 w-6 object-cover"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-black truncate">Emma</p>
-                          <p className="text-[9px] text-gray-600 truncate">Travel Expert</p>
+                      {assistants.map((assistant) => (
+                        <div
+                          key={assistant.id}
+                          className={`flex items-center space-x-2 p-2 rounded-lg cursor-pointer transition-colors ${
+                            currentAssistant.id === assistant.id
+                              ? "bg-gray-700 border border-gray-600"
+                              : "hover:bg-gray-700/50"
+                          }`}
+                          onClick={() => setCurrentAssistant(assistant)}
+                        >
+                          <Image
+                            src={assistant.image || "/placeholder.svg"}
+                            alt={assistant.name}
+                            width={24}
+                            height={24}
+                            className="rounded-full h-6 w-6 object-cover"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-white truncate">{assistant.name}</p>
+                            <div className="flex items-center gap-1">
+                              <PiStarFill className="w-2 h-2 text-yellow-400" />
+                              <span className="text-[9px] text-gray-400">{assistant.rating}</span>
+                            </div>
+                          </div>
+                          {currentAssistant.id === assistant.id && (
+                            <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                          )}
                         </div>
-                        <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                      </div>
-                      <div
-                        className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() =>
-                          setCurrentAssistant({
-                            id: "sophia",
-                            name: "Sophia",
-                            role: "Concierge",
-                            image: "/agents/agent-30.png",
-                            voiceId: ELEVENLABS_VOICES.SOPHIA,
-                          })
-                        }
-                      >
-                        <Image
-                          src="/agents/agent-30.png"
-                          alt="Sophia"
-                          width={24}
-                          height={24}
-                          className="rounded-full h-6 w-6 object-cover"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-700 truncate">Sophia</p>
-                          <p className="text-[9px] text-gray-500 truncate">Concierge</p>
-                        </div>
-                      </div>
-                      <div
-                        className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() =>
-                          setCurrentAssistant({
-                            id: "michael",
-                            name: "Michael",
-                            role: "Flight Specialist",
-                            image: "/agents/agent-5.png",
-                            voiceId: ELEVENLABS_VOICES.MICHAEL,
-                          })
-                        }
-                      >
-                        <Image
-                          src="/agents/agent-5.png"
-                          alt="Michael"
-                          width={24}
-                          height={24}
-                          className="rounded-full h-6 w-6 object-cover"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-700 truncate">Michael</p>
-                          <p className="text-[9px] text-gray-500 truncate">Flight Specialist</p>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -594,7 +586,7 @@ export default function AIAgentVoice() {
                 {/* Main content */}
                 <div className="md:col-span-4 flex flex-col h-full min-h-[550px]">
                   {/* Header */}
-                  <div className="border-b border-gray-200 p-4 flex justify-between items-center">
+                  <div className="border-b border-gray-700 p-4 flex justify-between items-center">
                     <div className="flex items-center space-x-3">
                       <Image
                         src={currentAssistant.image || "/placeholder.svg"}
@@ -604,8 +596,8 @@ export default function AIAgentVoice() {
                         className="rounded-full h-8 w-8 object-cover"
                       />
                       <div>
-                        <p className="text-sm text-black font-medium">{currentAssistant.name}</p>
-                        <p className="text-xs text-gray-600">{currentAssistant.role}</p>
+                        <p className="text-sm text-white font-medium">{currentAssistant.name}</p>
+                        <p className="text-xs text-gray-400">{currentAssistant.role}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -616,22 +608,22 @@ export default function AIAgentVoice() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[8px] font-medium text-gray-700 border border-gray-200"
+                            className="inline-flex items-center rounded-full bg-gray-700 px-2 py-0.5 text-[8px] font-medium text-gray-300 border border-gray-600"
                           >
-                            <PiGlobeSimpleBold className="h-3 w-3 mr-1 text-gray-500" />
+                            <PiGlobeSimpleBold className="h-3 w-3 mr-1 text-gray-400" />
                             <span>{getLanguageName(detectedLanguage)}</span>
                           </motion.div>
                         )}
                       </AnimatePresence>
-                      <div className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[8px] font-medium text-gray-700 border border-gray-200">
-                        <span className="mr-1.5">AI Powered</span>
+                      <div className="inline-flex items-center rounded-full bg-gray-700 px-2 py-0.5 text-[8px] font-medium text-gray-300 border border-gray-600">
+                        <span className="mr-1.5">Suitpax AI</span>
                         <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
                       </div>
                     </div>
                   </div>
 
                   {/* Conversation area */}
-                  <div className="flex-1 p-4 overflow-y-auto bg-gradient-to-b from-white/90 to-white/70">
+                  <div className="flex-1 p-4 overflow-y-auto bg-gradient-to-b from-gray-900/50 to-gray-800/30">
                     <AnimatePresence>
                       {isCallActive ? (
                         <motion.div
@@ -652,8 +644,8 @@ export default function AIAgentVoice() {
                                 <div
                                   className={`h-6 w-6 rounded-full ${
                                     message.sender === "user"
-                                      ? "bg-black flex items-center justify-center"
-                                      : "bg-gray-100 flex items-center justify-center"
+                                      ? "bg-white flex items-center justify-center"
+                                      : "bg-gray-700 flex items-center justify-center"
                                   }`}
                                 >
                                   {message.sender === "user" ? (
@@ -665,7 +657,7 @@ export default function AIAgentVoice() {
                                       strokeWidth="2"
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
-                                      className="h-3 w-3 text-white"
+                                      className="h-3 w-3 text-black"
                                     >
                                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                                       <circle cx="12" cy="7" r="4" />
@@ -679,7 +671,7 @@ export default function AIAgentVoice() {
                                       strokeWidth="2"
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
-                                      className="h-3 w-3 text-gray-600"
+                                      className="h-3 w-3 text-gray-300"
                                     >
                                       <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                                     </svg>
@@ -690,9 +682,9 @@ export default function AIAgentVoice() {
                                 <div
                                   className={`${
                                     message.sender === "user"
-                                      ? "bg-black rounded-lg rounded-tr-none"
-                                      : "bg-gray-100 rounded-lg rounded-tl-none"
-                                  } p-3 text-xs ${message.sender === "user" ? "text-white" : "text-gray-700"}`}
+                                      ? "bg-white rounded-lg rounded-tr-none"
+                                      : "bg-gray-700 rounded-lg rounded-tl-none"
+                                  } p-3 text-xs ${message.sender === "user" ? "text-black" : "text-gray-200"}`}
                                 >
                                   {message.text}
                                   {message.language && message.language !== "en-US" && (
@@ -710,7 +702,7 @@ export default function AIAgentVoice() {
                                   </span>
                                   {message.sender === "assistant" && message.audioUrl && (
                                     <button
-                                      className="ml-2 text-gray-500 hover:text-gray-700"
+                                      className="ml-2 text-gray-400 hover:text-gray-200"
                                       onClick={() => {
                                         if (audioPlayerRef.current && message.audioUrl) {
                                           audioPlayerRef.current.src = message.audioUrl
@@ -729,7 +721,7 @@ export default function AIAgentVoice() {
                           {isProcessing && (
                             <div className="flex items-start space-x-3">
                               <div className="flex-shrink-0 mt-1">
-                                <div className="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center">
+                                <div className="h-6 w-6 rounded-full bg-gray-700 flex items-center justify-center">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
@@ -738,14 +730,14 @@ export default function AIAgentVoice() {
                                     strokeWidth="2"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    className="h-3 w-3 text-gray-600"
+                                    className="h-3 w-3 text-gray-300"
                                   >
                                     <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                                   </svg>
                                 </div>
                               </div>
                               <div className="flex-1">
-                                <div className="bg-gray-100 rounded-lg rounded-tl-none p-3">
+                                <div className="bg-gray-700 rounded-lg rounded-tl-none p-3">
                                   <div className="flex items-center space-x-1 h-4">
                                     <motion.div
                                       animate={{ opacity: [0.4, 1, 0.4] }}
@@ -775,16 +767,23 @@ export default function AIAgentVoice() {
                             height={80}
                             className="rounded-full h-20 w-20 object-cover mb-4"
                           />
-                          <h3 className="text-lg font-medium text-black mb-2">{currentAssistant.name}</h3>
-                          <p className="text-sm text-gray-600 mb-6">{currentAssistant.role}</p>
+                          <h3 className="text-lg font-medium text-white mb-2">{currentAssistant.name}</h3>
+                          <p className="text-sm text-gray-400 mb-2">{currentAssistant.role}</p>
+                          <div className="flex items-center gap-2 mb-6">
+                            <div className="flex items-center gap-1">
+                              <PiStarFill className="w-3 h-3 text-yellow-400" />
+                              <span className="text-xs text-gray-400">{currentAssistant.rating}</span>
+                            </div>
+                            <span className="text-xs text-gray-500">•</span>
+                            <span className="text-xs text-gray-400">{currentAssistant.calls} calls today</span>
+                          </div>
                           <p className="text-xs text-gray-500 max-w-md mb-8">
                             Start a voice conversation with {currentAssistant.name} to plan your next business trip,
-                            book flights, find hotels, and more. {currentAssistant.name} uses advanced AI to understand
-                            your needs and provide personalized recommendations.
+                            book flights, find hotels, and more. Powered by Suitpax AI technology.
                           </p>
                           <button
                             onClick={toggleCall}
-                            className="bg-black hover:bg-black/90 text-white rounded-xl px-8 py-3 text-sm flex items-center space-x-2 font-medium shadow-lg"
+                            className="bg-white hover:bg-gray-100 text-black rounded-xl px-8 py-3 text-sm flex items-center space-x-2 font-medium shadow-lg"
                           >
                             <PiPhoneFill className="h-4 w-4" />
                             <span>Start Conversation</span>
@@ -796,9 +795,9 @@ export default function AIAgentVoice() {
 
                   {/* Audio controls */}
                   {isCallActive && (
-                    <div className="border-t border-gray-200 p-4">
+                    <div className="border-t border-gray-700 p-4">
                       <div className="mb-3">
-                        <div className="relative h-10 bg-gray-100 rounded-lg overflow-hidden">
+                        <div className="relative h-10 bg-gray-800 rounded-lg overflow-hidden">
                           {/* Mejorado visualizador de ondas de audio */}
                           <div ref={waveformRef} className="absolute inset-0 flex items-center justify-center">
                             <div className="flex items-center space-x-[2px] h-full px-2">
@@ -806,7 +805,7 @@ export default function AIAgentVoice() {
                                 <motion.div
                                   key={index}
                                   data-waveform-bar
-                                  className={`w-[2px] rounded-full ${isListening ? "bg-black" : "bg-gray-400"}`}
+                                  className={`w-[2px] rounded-full ${isListening ? "bg-white" : "bg-gray-600"}`}
                                   initial={{ height: 4 }}
                                   animate={
                                     isListening
@@ -826,7 +825,7 @@ export default function AIAgentVoice() {
                             </div>
                           </div>
                           <div
-                            className="h-full bg-gray-300"
+                            className="h-full bg-gray-600"
                             style={{ width: `${audioProgress}%`, transition: "width 0.1s linear" }}
                           ></div>
                         </div>
@@ -841,37 +840,37 @@ export default function AIAgentVoice() {
                               isListening
                                 ? "bg-red-500"
                                 : isProcessing
-                                  ? "bg-gray-300 opacity-50 cursor-not-allowed"
-                                  : "bg-gray-100 hover:bg-gray-200"
+                                  ? "bg-gray-600 opacity-50 cursor-not-allowed"
+                                  : "bg-gray-700 hover:bg-gray-600"
                             } transition-colors shadow-sm`}
                           >
                             {isListening ? (
                               <PiPauseFill className="h-4 w-4 text-white" />
                             ) : (
-                              <PiMicrophoneFill className="h-4 w-4 text-gray-700" />
+                              <PiMicrophoneFill className="h-4 w-4 text-gray-300" />
                             )}
                           </button>
                           <button
-                            className="rounded-xl p-2.5 bg-gray-100 hover:bg-gray-200 transition-colors shadow-sm"
+                            className="rounded-xl p-2.5 bg-gray-700 hover:bg-gray-600 transition-colors shadow-sm"
                             onClick={() => {
                               if (audioPlayerRef.current) {
                                 audioPlayerRef.current.play()
                               }
                             }}
                           >
-                            <PiPlayFill className="h-4 w-4 text-gray-700" />
+                            <PiPlayFill className="h-4 w-4 text-gray-300" />
                           </button>
 
                           {/* Botón para mostrar idioma detectado */}
                           <button
-                            className="rounded-xl p-2.5 bg-gray-100 hover:bg-gray-200 transition-colors shadow-sm"
+                            className="rounded-xl p-2.5 bg-gray-700 hover:bg-gray-600 transition-colors shadow-sm"
                             onClick={() => setShowLanguageIndicator(!showLanguageIndicator)}
                           >
-                            <PiGlobeSimpleBold className="h-4 w-4 text-gray-700" />
+                            <PiGlobeSimpleBold className="h-4 w-4 text-gray-300" />
                           </button>
                         </div>
 
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-gray-400">
                           {audioPlayerRef.current
                             ? `${Math.floor(audioPlayerRef.current.currentTime / 60)}:${Math.floor(
                                 audioPlayerRef.current.currentTime % 60,
@@ -892,8 +891,8 @@ export default function AIAgentVoice() {
                       {/* Hidden audio player */}
                       <audio ref={audioPlayerRef} className="hidden" onEnded={() => setAudioProgress(0)} />
 
-                      {recordingError && <p className="text-xs text-red-500 mt-2">{recordingError}</p>}
-                      {speechRecognitionError && <p className="text-xs text-red-500 mt-2">{speechRecognitionError}</p>}
+                      {recordingError && <p className="text-xs text-red-400 mt-2">{recordingError}</p>}
+                      {speechRecognitionError && <p className="text-xs text-red-400 mt-2">{speechRecognitionError}</p>}
                     </div>
                   )}
                 </div>
@@ -902,7 +901,7 @@ export default function AIAgentVoice() {
 
             {/* Estadísticas en formato vertical similar a los badges del Hero */}
             <div className="flex flex-col space-y-2 mt-8">
-              <div className="inline-flex items-center rounded-xl bg-white/70 backdrop-blur-sm px-3 py-1.5 text-[10px] font-medium text-gray-700 border border-gray-200 shadow-sm">
+              <div className="inline-flex items-center rounded-xl bg-gray-800/50 backdrop-blur-sm px-3 py-1.5 text-[10px] font-medium text-gray-300 border border-gray-700 shadow-sm">
                 <div className="flex-1 flex items-center">
                   <div className="h-1.5 w-1.5 rounded-full bg-green-500 mr-2"></div>
                   <span>Voice Recognition</span>
@@ -910,7 +909,7 @@ export default function AIAgentVoice() {
                 <span className="font-medium ml-2">99% Accuracy</span>
               </div>
 
-              <div className="inline-flex items-center rounded-xl bg-white/70 backdrop-blur-sm px-3 py-1.5 text-[10px] font-medium text-gray-700 border border-gray-200 shadow-sm">
+              <div className="inline-flex items-center rounded-xl bg-gray-800/50 backdrop-blur-sm px-3 py-1.5 text-[10px] font-medium text-gray-300 border border-gray-700 shadow-sm">
                 <div className="flex-1 flex items-center">
                   <div className="h-1.5 w-1.5 rounded-full bg-green-500 mr-2"></div>
                   <span>Language Support</span>
@@ -918,7 +917,7 @@ export default function AIAgentVoice() {
                 <span className="font-medium ml-2">40+ Languages</span>
               </div>
 
-              <div className="inline-flex items-center rounded-xl bg-white/70 backdrop-blur-sm px-3 py-1.5 text-[10px] font-medium text-gray-700 border border-gray-200 shadow-sm">
+              <div className="inline-flex items-center rounded-xl bg-gray-800/50 backdrop-blur-sm px-3 py-1.5 text-[10px] font-medium text-gray-300 border border-gray-700 shadow-sm">
                 <div className="flex-1 flex items-center">
                   <div className="h-1.5 w-1.5 rounded-full bg-green-500 mr-2"></div>
                   <span>Response Time</span>
@@ -926,12 +925,12 @@ export default function AIAgentVoice() {
                 <span className="font-medium ml-2">0.8s Average</span>
               </div>
 
-              <div className="inline-flex items-center rounded-xl bg-white/70 backdrop-blur-sm px-3 py-1.5 text-[10px] font-medium text-gray-700 border border-gray-200 shadow-sm">
+              <div className="inline-flex items-center rounded-xl bg-gray-800/50 backdrop-blur-sm px-3 py-1.5 text-[10px] font-medium text-gray-300 border border-gray-700 shadow-sm">
                 <div className="flex-1 flex items-center">
                   <div className="h-1.5 w-1.5 rounded-full bg-green-500 mr-2"></div>
                   <span>Powered by</span>
                 </div>
-                <span className="font-medium ml-2">ElevenLabs API</span>
+                <span className="font-medium ml-2">Suitpax AI</span>
               </div>
             </div>
           </div>

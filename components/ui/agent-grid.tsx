@@ -20,8 +20,8 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
   // Function to generate the agent grid
   const generateAgentGrid = () => {
     const grid = []
-    // Usar un número consistente de agentes en todas las pantallas
-    const totalAgents = 130 // Puedes ajustar este número si es necesario
+    // Aumentar el número de agentes para hacer la grid más densa
+    const totalAgents = 200 // Aumentado de 130 a 200
 
     for (let i = 0; i < totalAgents; i++) {
       // Use modulo to ensure even distribution of all agent images
@@ -55,24 +55,22 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
   }
 
   return (
-    <div className="relative mb-8 px-0.5">
-      {" "}
-      {/* Reducido mb de mb-12 a mb-8 */}
-      {/* Ajuste de columnas: menos columnas en pantallas grandes para que los agentes sean más grandes */}
-      <div className="grid grid-cols-10 gap-1 sm:gap-1">
+    <div className="relative mb-6 px-0.5">
+      {/* Aumentar columnas para hacer la grid más densa y compacta */}
+      <div className="grid grid-cols-12 sm:grid-cols-14 md:grid-cols-16 lg:grid-cols-18 xl:grid-cols-20 gap-0.5">
         {agentGrid.map((agent, index) => (
           <motion.div
             key={agent.id}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: index * 0.003 }}
+            transition={{ duration: 0.2, delay: index * 0.001 }}
             className="aspect-square relative cursor-pointer"
             onClick={() => handleAgentSelect(agent.id)}
           >
             <AnimatePresence>
               {selectedAgent === agent.id && (
                 <motion.div
-                  className="absolute inset-0 rounded-md z-10 pointer-events-none" // Redondeo más sutil
+                  className="absolute inset-0 rounded-sm z-10 pointer-events-none"
                   initial={{ opacity: 0 }}
                   animate={{
                     opacity: [0.4, 0.7, 0.4],
@@ -81,24 +79,24 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{
                     duration: 2,
-                    repeat: Number.POSITIVE_INFINITY, // Corregido de Infinity a Number.POSITIVE_INFINITY
+                    repeat: Number.POSITIVE_INFINITY,
                     ease: "easeInOut",
                   }}
                   style={{
-                    background: "rgba(6, 95, 70, 0.3)", // emerald-950 con opacidad
-                    boxShadow: "0 0 12px 3px rgba(6, 95, 70, 0.2)", // Sombra sutil emerald-950
+                    background: "rgba(6, 95, 70, 0.3)",
+                    boxShadow: "0 0 8px 2px rgba(6, 95, 70, 0.2)",
                   }}
                 />
               )}
             </AnimatePresence>
-            {/* Ajuste del inset para que la imagen ocupe más espacio, similar a móvil */}
-            <div className="absolute inset-0.5 rounded-lg overflow-hidden bg-gray-100">
+            {/* Reducir el inset para hacer las imágenes más pequeñas y compactas */}
+            <div className="absolute inset-0.5 rounded-sm overflow-hidden bg-gray-100">
               <Image
                 src={agent.image || "/placeholder.svg"}
                 alt="AI Travel Agent"
                 fill
                 className="object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
-                sizes="30px" // Tamaños ajustados para ser más grandes
+                sizes="20px" // Reducido de 30px a 20px
               />
             </div>
           </motion.div>
@@ -108,7 +106,7 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
         className="absolute inset-0 bg-gradient-to-t from-gray-50/95 via-transparent to-transparent pointer-events-none"
         style={{
           background:
-            "linear-gradient(to top, rgba(249, 250, 251, 0.95), rgba(249, 250, 251, 0) 40%, rgba(249, 250, 251, 0))", // Ajustado para que el gradiente sea más sutil
+            "linear-gradient(to top, rgba(249, 250, 251, 0.95), rgba(249, 250, 251, 0) 30%, rgba(249, 250, 251, 0))",
         }}
       ></div>
     </div>

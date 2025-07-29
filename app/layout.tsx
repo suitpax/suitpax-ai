@@ -1,16 +1,15 @@
 import type React from "react"
+import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import Navigation from "@/components/marketing/navigation"
 import Footer from "@/components/marketing/footer"
-// Mantenemos el archivo pero comentamos la importación
-// import SplashScreen from "@/components/splash-screen"
-import type { Metadata } from "next"
-import "./globals.css"
 import IntercomProvider from "@/components/intercom/intercom-provider"
+import AppErrorBoundary from "@/components/error-boundary"
+import { Toaster } from "react-hot-toast"
+import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
-// Actualizar la descripción en el metadata para enfatizar AI travel agents y superpowers
 export const metadata: Metadata = {
   title: "Suitpax | The next-gen AI traveltech",
   description:
@@ -81,12 +80,34 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
       </head>
       <body className={inter.className}>
-        {/* Quitamos el componente SplashScreen */}
-        {/* <SplashScreen /> */}
-        <Navigation />
-        <main className="overflow-hidden w-full">{children}</main>
-        <Footer />
-        <IntercomProvider />
+        <AppErrorBoundary>
+          <Navigation />
+          <main className="overflow-hidden w-full">{children}</main>
+          <Footer />
+          <IntercomProvider />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: "#363636",
+                color: "#fff",
+                fontSize: "14px",
+                borderRadius: "8px",
+              },
+              success: {
+                style: {
+                  background: "#10b981",
+                },
+              },
+              error: {
+                style: {
+                  background: "#ef4444",
+                },
+              },
+            }}
+          />
+        </AppErrorBoundary>
       </body>
     </html>
   )
