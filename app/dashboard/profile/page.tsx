@@ -1,249 +1,273 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Save, User } from "lucide-react"
+import { motion } from "framer-motion"
+import { User, Mail, Phone, Building, Globe, Save, Loader2 } from "lucide-react"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import toast from "react-hot-toast"
+
+interface UserProfile {
+  full_name?: string
+  company?: string
+  phone?: string
+  timezone?: string
+  preferences?: {
+    seat_preference?: string
+    meal_preference?: string
+    notification_settings?: {
+      email?: boolean
+      sms?: boolean
+      push?: boolean
+    }
+  }
+}
 
 export default function ProfilePage() {
-  const [loading, setLoading] = useState(false)
+  const [profile, setProfile] = useState<UserProfile>({})
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState("")
-  const [profile, setProfile] = useState({
-    full_name: "",
-    company_name: "",
-    job_title: "",
-    phone: "",
-    travel_preferences: "",
-    preferred_airline: "",
-    preferred_hotel_chain: "",
-    dietary_restrictions: "",
-  })
+  const [user, setUser] = useState<any>(null)
 
-  const supabase = createClient()
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
-    async function loadProfile() {
-      setLoading(true)
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
+    fetchProfile()
+  }, [])
 
-        if (session) {
-          const { data } = await supabase.from("users").select("*").eq("id", session.user.id).single()
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch("/api/user/profile")
+      const data = await response.json()
 
-          if (data) {
-            setProfile({
-              full_name: data.full_name || "",
-              company_name: data.company_name || "",
-              job_title: data.job_title || "",
-              phone: data.phone || "",
-              travel_preferences: data.travel_preferences || "",
-              preferred_airline: data.preferred_airline || "",
-              preferred_hotel_chain: data.preferred_hotel_chain || "",
-              dietary_restrictions: data.dietary_restrictions || "",
-            })
-          }
-        }
-      } catch (error) {
-        console.error("Error loading profile:", error)
-      } finally {
-        setLoading(false)
+      if (response.ok) {
+        setUser(data.user)
+        setProfile(data.profile || {})
+      } else {
+        toast.error("Failed to load profile")
       }
+    } catch (error) {
+      toast.error("Error loading profile")
+    } finally {
+      setLoading(false)
     }
-
-    loadProfile()
-  }, [supabase])
+  }
 
   const handleSave = async () => {
     setSaving(true)
-    setMessage("")
 
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(profile),
+      })
 
-      if (session) {
-        const { error } = await supabase.from("users").update(profile).eq("id", session.user.id)
-
-        if (error) {
-          setMessage("Error saving profile. Please try again.")
-        } else {
-          setMessage("Profile saved successfully!")
-        }
+      if (response.ok) {
+        toast.success("Profile updated successfully")
+      } else {
+        toast.error("Failed to update profile")
       }
     } catch (error) {
-      setMessage("Error saving profile. Please try again.")
+      toast.error("Error updating profile")
     } finally {
       setSaving(false)
     }
   }
 
+  const handleInputChange = (field: string, value: any) => {
+    setProfile((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const handlePreferenceChange = (field: string, value: any) => {
+    setProfile((prev) => ({
+      ...prev,
+      preferences: {
+        ...prev.preferences,
+        [field]: value,
+      },
+    }))
+  }
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-600" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-3">
-        <User className="h-8 w-8 text-gray-600" />
-        <div>
-          <h1 className="text-3xl font-medium tracking-tighter text-black">Profile Settings</h1>
-          <p className="text-gray-600">Manage your personal information and travel preferences</p>
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <h1 className="text-2xl font-medium tracking-tighter text-gray-900">
+          <em className="font-serif italic">Profile Settings</em>
+        </h1>
+        <p className="mt-1 text-sm text-gray-600">Manage your account information and preferences.</p>
+      </motion.div>
+
+      {/* Profile Form */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
+      >
+        <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-6">
+          <em className="font-serif italic">Personal Information</em>
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Full Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                value={profile.full_name || ""}
+                onChange={(e) => handleInputChange("full_name", e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
+                placeholder="Enter your full name"
+              />
+            </div>
+          </div>
+
+          {/* Email (read-only) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="email"
+                value={user?.email || ""}
+                disabled
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-gray-50 text-gray-500"
+              />
+            </div>
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="tel"
+                value={profile.phone || ""}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
+                placeholder="Enter your phone number"
+              />
+            </div>
+          </div>
+
+          {/* Company */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
+            <div className="relative">
+              <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                value={profile.company || ""}
+                onChange={(e) => handleInputChange("company", e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
+                placeholder="Enter your company name"
+              />
+            </div>
+          </div>
+
+          {/* Timezone */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+            <div className="relative">
+              <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <select
+                value={profile.timezone || ""}
+                onChange={(e) => handleInputChange("timezone", e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
+              >
+                <option value="">Select timezone</option>
+                <option value="America/New_York">Eastern Time (ET)</option>
+                <option value="America/Chicago">Central Time (CT)</option>
+                <option value="America/Denver">Mountain Time (MT)</option>
+                <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                <option value="Europe/London">London (GMT)</option>
+                <option value="Europe/Paris">Paris (CET)</option>
+                <option value="Asia/Tokyo">Tokyo (JST)</option>
+              </select>
+            </div>
+          </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="border border-gray-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-xl font-medium tracking-tighter">Personal Information</CardTitle>
-            <CardDescription>Update your basic profile information</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="full_name">Full Name</Label>
-              <Input
-                id="full_name"
-                value={profile.full_name}
-                onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                className="rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="company_name">Company Name</Label>
-              <Input
-                id="company_name"
-                value={profile.company_name}
-                onChange={(e) => setProfile({ ...profile, company_name: e.target.value })}
-                className="rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="job_title">Job Title</Label>
-              <Input
-                id="job_title"
-                value={profile.job_title}
-                onChange={(e) => setProfile({ ...profile, job_title: e.target.value })}
-                placeholder="e.g., Sales Manager"
-                className="rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                value={profile.phone}
-                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                placeholder="+1 (555) 123-4567"
-                className="rounded-xl"
-              />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Travel Preferences */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
+      >
+        <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-6">
+          <em className="font-serif italic">Travel Preferences</em>
+        </h3>
 
-        <Card className="border border-gray-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-xl font-medium tracking-tighter">Travel Preferences</CardTitle>
-            <CardDescription>Set your travel preferences for better recommendations</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="preferred_airline">Preferred Airline</Label>
-              <Select
-                value={profile.preferred_airline}
-                onValueChange={(value) => setProfile({ ...profile, preferred_airline: value })}
-              >
-                <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder="Select airline" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="american">American Airlines</SelectItem>
-                  <SelectItem value="delta">Delta Air Lines</SelectItem>
-                  <SelectItem value="united">United Airlines</SelectItem>
-                  <SelectItem value="southwest">Southwest Airlines</SelectItem>
-                  <SelectItem value="jetblue">JetBlue Airways</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="preferred_hotel_chain">Preferred Hotel Chain</Label>
-              <Select
-                value={profile.preferred_hotel_chain}
-                onValueChange={(value) => setProfile({ ...profile, preferred_hotel_chain: value })}
-              >
-                <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder="Select hotel chain" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="marriott">Marriott</SelectItem>
-                  <SelectItem value="hilton">Hilton</SelectItem>
-                  <SelectItem value="hyatt">Hyatt</SelectItem>
-                  <SelectItem value="ihg">IHG</SelectItem>
-                  <SelectItem value="accor">Accor</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dietary_restrictions">Dietary Restrictions</Label>
-              <Input
-                id="dietary_restrictions"
-                value={profile.dietary_restrictions}
-                onChange={(e) => setProfile({ ...profile, dietary_restrictions: e.target.value })}
-                placeholder="e.g., Vegetarian, Gluten-free"
-                className="rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="travel_preferences">Additional Travel Notes</Label>
-              <Textarea
-                id="travel_preferences"
-                value={profile.travel_preferences}
-                onChange={(e) => setProfile({ ...profile, travel_preferences: e.target.value })}
-                placeholder="Any specific preferences or requirements..."
-                className="rounded-xl min-h-[100px]"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Seat Preference */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Seat Preference</label>
+            <select
+              value={profile.preferences?.seat_preference || ""}
+              onChange={(e) => handlePreferenceChange("seat_preference", e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
+            >
+              <option value="">No preference</option>
+              <option value="window">Window</option>
+              <option value="aisle">Aisle</option>
+              <option value="middle">Middle</option>
+            </select>
+          </div>
 
-      {message && (
-        <Alert className={message.includes("Error") ? "border-red-200 bg-red-50" : "border-green-200 bg-green-50"}>
-          <AlertDescription className={message.includes("Error") ? "text-red-800" : "text-green-800"}>
-            {message}
-          </AlertDescription>
-        </Alert>
-      )}
+          {/* Meal Preference */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Meal Preference</label>
+            <select
+              value={profile.preferences?.meal_preference || ""}
+              onChange={(e) => handlePreferenceChange("meal_preference", e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
+            >
+              <option value="">Standard</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="vegan">Vegan</option>
+              <option value="kosher">Kosher</option>
+              <option value="halal">Halal</option>
+              <option value="gluten-free">Gluten Free</option>
+            </select>
+          </div>
+        </div>
+      </motion.div>
 
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={saving} className="bg-black text-white hover:bg-gray-800">
-          {saving ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="mr-2 h-4 w-4" />
-              Save Changes
-            </>
-          )}
-        </Button>
-      </div>
+      {/* Save Button */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+        className="flex justify-end"
+      >
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-xl text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
+      </motion.div>
     </div>
   )
 }

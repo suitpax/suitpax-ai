@@ -1,94 +1,88 @@
 "use client"
 
-import type React from "react"
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Plane, MessageSquare, CreditCard, Users, Calendar, MapPin } from "lucide-react"
+import { motion } from "framer-motion"
+import { Plane, MessageSquare, CreditCard, Calendar, Users, BarChart3 } from "lucide-react"
 import Link from "next/link"
 
-interface QuickAction {
-  title: string
-  description: string
-  icon: React.ReactNode
-  href: string
-  color: string
-}
+const actions = [
+  {
+    name: "Book Flight",
+    description: "Find and book your next flight",
+    href: "/dashboard/flights",
+    icon: Plane,
+    color: "bg-blue-500",
+  },
+  {
+    name: "AI Chat",
+    description: "Get travel assistance from AI",
+    href: "/dashboard/ai-chat",
+    icon: MessageSquare,
+    color: "bg-green-500",
+  },
+  {
+    name: "Submit Expense",
+    description: "Upload and track expenses",
+    href: "/dashboard/expenses",
+    icon: CreditCard,
+    color: "bg-purple-500",
+  },
+  {
+    name: "Schedule Meeting",
+    description: "Plan team travel meetings",
+    href: "/dashboard/calendar",
+    icon: Calendar,
+    color: "bg-orange-500",
+  },
+  {
+    name: "Manage Team",
+    description: "Add or remove team members",
+    href: "/dashboard/team",
+    icon: Users,
+    color: "bg-pink-500",
+  },
+  {
+    name: "View Analytics",
+    description: "Track travel spending and trends",
+    href: "/dashboard/analytics",
+    icon: BarChart3,
+    color: "bg-indigo-500",
+  },
+]
 
-export function QuickActions() {
-  const actions: QuickAction[] = [
-    {
-      title: "Book a Flight",
-      description: "Find and book your next business trip",
-      icon: <Plane className="h-5 w-5" />,
-      href: "/dashboard/flights",
-      color: "bg-blue-50 text-blue-600 border-blue-200",
-    },
-    {
-      title: "AI Assistant",
-      description: "Chat with your travel AI assistant",
-      icon: <MessageSquare className="h-5 w-5" />,
-      href: "/dashboard/ai-chat",
-      color: "bg-purple-50 text-purple-600 border-purple-200",
-    },
-    {
-      title: "Manage Expenses",
-      description: "Track and manage travel expenses",
-      icon: <CreditCard className="h-5 w-5" />,
-      href: "/dashboard/expenses",
-      color: "bg-green-50 text-green-600 border-green-200",
-    },
-    {
-      title: "Team Management",
-      description: "Invite and manage team members",
-      icon: <Users className="h-5 w-5" />,
-      href: "/dashboard/team",
-      color: "bg-orange-50 text-orange-600 border-orange-200",
-    },
-    {
-      title: "Trip Calendar",
-      description: "View your upcoming trips",
-      icon: <Calendar className="h-5 w-5" />,
-      href: "/dashboard/calendar",
-      color: "bg-red-50 text-red-600 border-red-200",
-    },
-    {
-      title: "Travel Policies",
-      description: "Review company travel policies",
-      icon: <MapPin className="h-5 w-5" />,
-      href: "/dashboard/policies",
-      color: "bg-indigo-50 text-indigo-600 border-indigo-200",
-    },
-  ]
-
+export default function QuickActions() {
   return (
-    <Card className="border border-gray-200 shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-xl font-medium tracking-tighter">Quick Actions</CardTitle>
-        <CardDescription>Common tasks to get you started</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {actions.map((action, index) => (
-            <Button
-              key={index}
-              asChild
-              variant="outline"
-              className={`h-auto p-4 justify-start text-left border ${action.color} hover:opacity-80`}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.1 }}
+      className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
+    >
+      <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-4">
+        <em className="font-serif italic">Quick Actions</em>
+      </h3>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {actions.map((action, index) => (
+          <motion.div
+            key={action.name}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: index * 0.05 }}
+          >
+            <Link
+              href={action.href}
+              className="group flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-colors"
             >
-              <Link href={action.href}>
-                <div className="flex items-start space-x-3">
-                  <div className="mt-0.5">{action.icon}</div>
-                  <div>
-                    <div className="font-medium">{action.title}</div>
-                    <div className="text-xs opacity-70 mt-1">{action.description}</div>
-                  </div>
-                </div>
-              </Link>
-            </Button>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+              <div
+                className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}
+              >
+                <action.icon className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-sm font-medium text-gray-900 text-center">{action.name}</p>
+              <p className="text-xs text-gray-500 text-center mt-1">{action.description}</p>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
   )
 }

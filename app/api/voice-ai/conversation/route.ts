@@ -1,107 +1,57 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
-import { generateAgentResponse, generateWelcomeMessage } from "@/lib/anthropic"
-import type { Database } from "@/lib/supabase/types"
-
-export interface ConversationMessage {
-  role: "user" | "assistant"
-  content: string
-}
+import { streamText } from "ai"
+import { anthropic } from "@ai-sdk/anthropic"
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, agentId, conversationHistory = [], isWelcome = false } = await request.json()
-
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
-
     // Verify authentication
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
-    if (!session) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get user data for context
-    const { data: user } = await supabase.from("users").select("*").eq("id", session.user.id).single()
+    const { transcript, context } = await request.json()
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    if (!transcript) {
+      return NextResponse.json({ error: "Transcript is required" }, { status: 400 })
     }
 
-    // Check token limits
-    if (user.ai_tokens_used >= user.ai_tokens_limit) {
-      return NextResponse.json(
+    const result = await streamText({
+      model: anthropic("claude-3-haiku-20240307"),
+      messages: [
         {
-          error: "You've reached your AI token limit. Please upgrade your plan to continue.",
+          role: "system",
+          content: `You are Suitpax Voice AI, a conversational travel assistant. You're designed for voice interactions, so:
+          - Keep responses concise and natural for speech
+          - Use a friendly, professional tone
+          - Ask clarifying questions when needed
+          - Focus on actionable travel assistance
+          - Avoid long lists or complex formatting
+          
+          You help with flight bookings, hotel recommendations, travel policies, and general business travel assistance.
+          
+          Context: ${context || "No additional context provided"}`,
         },
-        { status: 429 },
-      )
-    }
-
-    if (!agentId) {
-      return NextResponse.json({ error: "Agent ID is required" }, { status: 400 })
-    }
-
-    let responseText: string
-
-    try {
-      if (isWelcome) {
-        // Generate welcome message
-        responseText = await generateWelcomeMessage(agentId)
-      } else {
-        if (!message) {
-          return NextResponse.json({ error: "Message is required" }, { status: 400 })
-        }
-
-        // Build conversation context
-        const messages: ConversationMessage[] = [...conversationHistory, { role: "user", content: message }]
-
-        // Generate response using Anthropic Claude
-        responseText = await generateAgentResponse(messages, agentId, {
-          name: user.full_name,
-          company: user.company_name,
-          plan: user.plan_type,
-        })
-      }
-
-      // Calculate approximate tokens (estimation)
-      const tokensUsed = Math.ceil((message?.length || 0 + responseText.length) / 4)
-
-      // Update user tokens
-      await supabase
-        .from("users")
-        .update({
-          ai_tokens_used: user.ai_tokens_used + tokensUsed,
-        })
-        .eq("id", session.user.id)
-
-      return NextResponse.json({
-        response: responseText,
-        agentId,
-        tokensUsed,
-        remainingTokens: user.ai_tokens_limit - (user.ai_tokens_used + tokensUsed),
-        timestamp: new Date().toISOString(),
-      })
-    } catch (aiError) {
-      console.error("AI Error:", aiError)
-      return NextResponse.json(
         {
-          error: "Error processing AI request. Please try again.",
+          role: "user",
+          content: transcript,
         },
-        { status: 500 },
-      )
-    }
+      ],
+      temperature: 0.8,
+      maxTokens: 500,
+    })
+
+    return result.toAIStreamResponse()
   } catch (error) {
-    console.error("Error in voice AI conversation:", error)
-    return NextResponse.json(
-      {
-        error: "Internal server error",
-      },
-      { status: 500 },
-    )
+    console.error("Voice AI error:", error)
+    return NextResponse.json({ error: "Failed to process voice request" }, { status: 500 })
   }
 }

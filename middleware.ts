@@ -1,33 +1,39 @@
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import type { Database } from "@/lib/supabase/types"
 
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient<Database>({ req, res })
+export function middleware(request: NextRequest) {
+  // Solo manejar rutas públicas, permitir todas las demás
+  const { pathname } = request.nextUrl
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  // Protect dashboard routes
-  if (req.nextUrl.pathname.startsWith("/dashboard")) {
-    if (!session) {
-      return NextResponse.redirect(new URL("/auth/login", req.url))
-    }
+  // Permitir todas las rutas públicas y estáticas
+  if (
+    pathname.startsWith("/api/public") ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon") ||
+    pathname === "/" ||
+    pathname.startsWith("/manifesto") ||
+    pathname.startsWith("/pricing") ||
+    pathname.startsWith("/travel-expense-management") ||
+    pathname.startsWith("/contact") ||
+    pathname.startsWith("/solutions") ||
+    pathname.startsWith("/public") ||
+    pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico)$/)
+  ) {
+    return NextResponse.next()
   }
 
-  // Redirect authenticated users away from auth pages
-  if (req.nextUrl.pathname.startsWith("/auth")) {
-    if (session && req.nextUrl.pathname !== "/auth/callback") {
-      return NextResponse.redirect(new URL("/dashboard", req.url))
-    }
-  }
-
-  return res
+  // Permitir todas las rutas de auth y dashboard localmente
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth/:path*"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
 }

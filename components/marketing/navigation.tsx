@@ -6,7 +6,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { PiDotsNineBold, PiDotsSixBold, PiArrowUpRightBold } from "react-icons/pi"
-import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
+import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
 import { cn } from "@/lib/utils"
 
 export const Navigation = () => {
@@ -116,7 +116,7 @@ export const Navigation = () => {
                 asChild
                 className="hidden lg:flex h-7 text-xs font-medium tracking-tighter rounded-full bg-gray-100 text-black hover:bg-gray-200 px-3 py-1 shadow-sm min-w-[70px] items-center gap-1"
               >
-                <Link href="/auth/login">Login</Link>
+                <Link href="https://app.suitpax.com/auth/login">Login</Link>
               </Button>
 
               {/* Sign Up Button */}
@@ -124,7 +124,7 @@ export const Navigation = () => {
                 asChild
                 className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
               >
-                <Link href="/auth/signup">
+                <Link href="https://app.suitpax.com/auth/signup">
                   Sign Up
                   <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
                 </Link>
@@ -188,17 +188,6 @@ export const Navigation = () => {
                     </Link>
                   </div>
 
-                  {/* Login Link - Mobile Only */}
-                  <div className="py-2 border-b border-gray-200/30">
-                    <Link
-                      href="/auth/login"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Login
-                    </Link>
-                  </div>
-
                   {/* Suitpax Deck Link */}
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
@@ -223,6 +212,29 @@ export const Navigation = () => {
                   </div>
                 </div>
 
+                {/* Account Section - Mobile Only */}
+                <div className="px-0 mt-4">
+                  <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Account</h4>
+                  <div className="py-2 border-b border-gray-200/30">
+                    <Link
+                      href="https://app.suitpax.com/auth/login"
+                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                  </div>
+                  <div className="py-2 border-b border-gray-200/30">
+                    <Link
+                      href="https://app.suitpax.com/auth/signup"
+                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Create Account
+                    </Link>
+                  </div>
+                </div>
+
                 {/* Social Icons - Mobile Only */}
                 <div className="mt-4 px-0">
                   <div className="flex justify-start space-x-4 py-2">
@@ -237,10 +249,6 @@ export const Navigation = () => {
                     <Link href="https://github.com/suitpax" className="text-gray-500 hover:text-black">
                       <SiGithub className="h-4 w-4" />
                       <span className="sr-only">GitHub</span>
-                    </Link>
-                    <Link href="https://producthunt.com/products/suitpax-2" className="text-gray-500 hover:text-black">
-                      <SiProducthunt className="h-4 w-4" />
-                      <span className="sr-only">Product Hunt</span>
                     </Link>
                     <Link href="https://instagram.com/suitpax" className="text-gray-500 hover:text-black">
                       <svg

@@ -1,7 +1,6 @@
 "use client"
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from "react"
-import { type SpeechRecognition, SpeechSynthesisUtterance } from "types/speech-recognition" // Assuming SpeechRecognition and SpeechSynthesisUtterance are declared in a separate file
 
 // Types
 export interface VoiceCommand {
@@ -125,12 +124,11 @@ export function VoiceAIProvider({
   })
 
   // Speech Recognition
-  const recognition = React.useRef<SpeechRecognition | null>(null)
-  const speechSynthesis = React.useRef<SpeechSynthesisUtterance | null>(null)
+  const recognition = React.useRef<any>(null)
 
   // Initialize speech recognition
   useEffect(() => {
-    if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
+    if (typeof window !== "undefined" && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
       const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition
       recognition.current = new SpeechRecognition()
 
@@ -145,7 +143,7 @@ export function VoiceAIProvider({
           if (enableLogging) console.log("Speech recognition started")
         }
 
-        recognition.current.onresult = (event) => {
+        recognition.current.onresult = (event: any) => {
           let finalTranscript = ""
 
           for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -170,7 +168,7 @@ export function VoiceAIProvider({
           }
         }
 
-        recognition.current.onerror = (event) => {
+        recognition.current.onerror = (event: any) => {
           dispatch({ type: "SET_ERROR", payload: `Error de reconocimiento: ${event.error}` })
           dispatch({ type: "SET_LISTENING", payload: false })
           if (enableLogging) console.error("Speech recognition error:", event.error)
@@ -184,15 +182,17 @@ export function VoiceAIProvider({
     }
 
     // Check microphone permission
-    navigator.mediaDevices
-      ?.getUserMedia({ audio: true })
-      .then(() => {
-        dispatch({ type: "SET_PERMISSION", payload: true })
-      })
-      .catch(() => {
-        dispatch({ type: "SET_PERMISSION", payload: false })
-        dispatch({ type: "SET_ERROR", payload: "Permisos de micrófono requeridos" })
-      })
+    if (typeof navigator !== "undefined" && navigator.mediaDevices) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then(() => {
+          dispatch({ type: "SET_PERMISSION", payload: true })
+        })
+        .catch(() => {
+          dispatch({ type: "SET_PERMISSION", payload: false })
+          dispatch({ type: "SET_ERROR", payload: "Permisos de micrófono requeridos" })
+        })
+    }
   }, [settings.language, commands, enableLogging])
 
   // Start listening
@@ -276,8 +276,9 @@ export function VoiceAIProvider({
             dispatch({ type: "SET_SPEAKING", payload: false })
           }
 
-          speechSynthesis.current = utterance
-          window.speechSynthesis.speak(utterance)
+          if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.speak(utterance)
+          }
         }
       } catch (error) {
         dispatch({ type: "SET_ERROR", payload: "Error al generar voz" })
@@ -291,7 +292,9 @@ export function VoiceAIProvider({
 
   // Cancel speech
   const cancelSpeech = useCallback(() => {
-    window.speechSynthesis.cancel()
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel()
+    }
     dispatch({ type: "SET_SPEAKING", payload: false })
   }, [])
 
@@ -341,12 +344,4 @@ export function useVoiceAI() {
     throw new Error("useVoiceAI must be used within a VoiceAIProvider")
   }
   return context
-}
-
-// Declare global types for speech recognition
-declare global {
-  interface Window {
-    webkitSpeechRecognition: any
-    SpeechRecognition: any
-  }
 }

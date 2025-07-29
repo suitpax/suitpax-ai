@@ -1,85 +1,74 @@
 "use client"
 
-import type React from "react"
+import { motion } from "framer-motion"
+import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { TrendingUp, TrendingDown, Plane, DollarSign, Clock, Users } from "lucide-react"
+const stats = [
+  {
+    name: "Total Trips",
+    value: "28",
+    change: "+12%",
+    changeType: "increase",
+    description: "from last month",
+  },
+  {
+    name: "Total Savings",
+    value: "$12,450",
+    change: "+8.2%",
+    changeType: "increase",
+    description: "from last month",
+  },
+  {
+    name: "Avg. Trip Cost",
+    value: "$2,340",
+    change: "-3.1%",
+    changeType: "decrease",
+    description: "from last month",
+  },
+  {
+    name: "Team Members",
+    value: "12",
+    change: "0%",
+    changeType: "neutral",
+    description: "no change",
+  },
+]
 
-interface StatCard {
-  title: string
-  value: string
-  change: string
-  changeType: "positive" | "negative" | "neutral"
-  icon: React.ReactNode
-  description?: string
-}
-
-interface StatsOverviewProps {
-  userPlan: string
-  tokensUsed: number
-  tokensLimit: number
-  travelSearches: number
-}
-
-export function StatsOverview({ userPlan, tokensUsed, tokensLimit, travelSearches }: StatsOverviewProps) {
-  const tokenUsagePercentage = (tokensUsed / tokensLimit) * 100
-
-  const stats: StatCard[] = [
-    {
-      title: "AI Tokens Used",
-      value: `${tokensUsed.toLocaleString()}`,
-      change: `${tokenUsagePercentage.toFixed(1)}% of limit`,
-      changeType: tokenUsagePercentage > 80 ? "negative" : "neutral",
-      icon: <Clock className="h-4 w-4" />,
-      description: `${tokensLimit.toLocaleString()} total available`,
-    },
-    {
-      title: "Travel Searches",
-      value: travelSearches.toString(),
-      change: "+12% from last month",
-      changeType: "positive",
-      icon: <Plane className="h-4 w-4" />,
-    },
-    {
-      title: "Cost Savings",
-      value: "$2,450",
-      change: "+8% from last month",
-      changeType: "positive",
-      icon: <DollarSign className="h-4 w-4" />,
-    },
-    {
-      title: "Team Members",
-      value: "1",
-      change: "Invite more team members",
-      changeType: "neutral",
-      icon: <Users className="h-4 w-4" />,
-    },
-  ]
-
+export default function StatsOverview() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((stat, index) => (
-        <Card key={index} className="border border-gray-200 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-            <div className="text-gray-500">{stat.icon}</div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
-            <div className="flex items-center space-x-1 text-xs text-gray-600">
-              {stat.changeType === "positive" && <TrendingUp className="h-3 w-3 text-green-600" />}
-              {stat.changeType === "negative" && <TrendingDown className="h-3 w-3 text-red-600" />}
-              <span>{stat.change}</span>
+        <motion.div
+          key={stat.name}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: index * 0.1 }}
+          className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">{stat.name}</p>
+              <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
             </div>
-            {stat.description && <p className="text-xs text-gray-500 mt-1">{stat.description}</p>}
-            {stat.title === "AI Tokens Used" && (
-              <div className="mt-2">
-                <Progress value={tokenUsagePercentage} className="h-1" />
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            <div className="flex items-center space-x-1">
+              {stat.changeType === "increase" && <TrendingUp className="h-4 w-4 text-green-600" />}
+              {stat.changeType === "decrease" && <TrendingDown className="h-4 w-4 text-red-600" />}
+              {stat.changeType === "neutral" && <Minus className="h-4 w-4 text-gray-400" />}
+              <span
+                className={`text-sm font-medium ${
+                  stat.changeType === "increase"
+                    ? "text-green-600"
+                    : stat.changeType === "decrease"
+                      ? "text-red-600"
+                      : "text-gray-400"
+                }`}
+              >
+                {stat.change}
+              </span>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">{stat.description}</p>
+        </motion.div>
       ))}
     </div>
   )

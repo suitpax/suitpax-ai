@@ -3,135 +3,147 @@
 import type React from "react"
 
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { motion } from "framer-motion"
+import { Mail, ArrowLeft, Loader2, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion } from "framer-motion"
-import { PiArrowLeftBold, PiEnvelopeBold, PiCheckCircleBold } from "react-icons/pi"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import toast from "react-hot-toast"
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
-  const [error, setError] = useState("")
+  const [emailSent, setEmailSent] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const supabase = createClientComponentClient()
+
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError("")
 
     try {
-      const supabase = createClient()
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
       })
 
       if (error) {
-        throw error
+        toast.error(error.message)
+      } else {
+        setEmailSent(true)
+        toast.success("Password reset email sent!")
       }
-
-      setIsSuccess(true)
-    } catch (error: any) {
-      setError(error.message || "An error occurred. Please try again.")
+    } catch (error) {
+      toast.error("An unexpected error occurred")
     } finally {
       setIsLoading(false)
     }
   }
 
-  if (isSuccess) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 p-8 text-center"
-          >
-            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <PiCheckCircleBold className="w-8 h-8 text-green-400" />
-            </div>
-
-            <h1 className="text-2xl font-medium text-white mb-4">Check your email</h1>
-            <p className="text-gray-400 mb-6">
-              We've sent a password reset link to <strong className="text-white">{email}</strong>
-            </p>
-
-            <Link
-              href="/auth/login"
-              className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              <PiArrowLeftBold className="w-4 h-4" />
-              Back to login
-            </Link>
-          </motion.div>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 p-8"
+          transition={{ duration: 0.6 }}
+          className="text-center"
         >
-          {/* Header */}
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-block mb-6">
-              <Image src="/logo/suitpax-cloud-logo.webp" alt="Suitpax" width={120} height={30} className="h-8 w-auto" />
+          <Link href="/" className="inline-block">
+            <Image
+              src="/logo/suitpax-bl-logo.webp"
+              alt="Suitpax"
+              width={120}
+              height={40}
+              className="mx-auto h-10 w-auto"
+            />
+          </Link>
+          <h2 className="mt-6 text-3xl font-medium tracking-tighter text-gray-900">
+            <em className="font-serif italic">Reset your password</em>
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Remember your password?{" "}
+            <Link href="/auth/login" className="font-medium text-gray-900 hover:underline">
+              Sign in
             </Link>
+          </p>
+        </motion.div>
+      </div>
 
-            <h1 className="text-2xl font-medium text-white mb-2">Reset your password</h1>
-            <p className="text-gray-400">Enter your email address and we'll send you a link to reset your password.</p>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email address
-              </label>
-              <div className="relative">
-                <PiEnvelopeBold className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
-                  placeholder="Enter your email"
-                />
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-white py-8 px-4 shadow-sm rounded-2xl border border-gray-200 sm:px-10"
+        >
+          {emailSent ? (
+            <div className="text-center">
+              <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900">Check your email</h3>
+              <p className="mt-2 text-sm text-gray-600">
+                We've sent a password reset link to <strong>{email}</strong>
+              </p>
+              <div className="mt-6">
+                <Link
+                  href="/auth/login"
+                  className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to sign in
+                </Link>
               </div>
             </div>
-
-            {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                <p className="text-red-400 text-sm">{error}</p>
+          ) : (
+            <>
+              <div className="mb-6">
+                <p className="text-sm text-gray-600">
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
               </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-white text-black py-3 px-4 rounded-xl font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isLoading ? "Sending..." : "Send reset link"}
-            </button>
-          </form>
+              <form className="space-y-6" onSubmit={handleResetPassword}>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email address
+                  </label>
+                  <div className="mt-1 relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent sm:text-sm"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                </div>
 
-          {/* Footer */}
-          <div className="mt-6 text-center">
-            <Link
-              href="/auth/login"
-              className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              <PiArrowLeftBold className="w-4 h-4" />
-              Back to login
-            </Link>
-          </div>
+                <div>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send reset link"}
+                  </button>
+                </div>
+
+                <div className="text-center">
+                  <Link
+                    href="/auth/login"
+                    className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to sign in
+                  </Link>
+                </div>
+              </form>
+            </>
+          )}
         </motion.div>
       </div>
     </div>

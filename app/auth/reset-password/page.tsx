@@ -3,12 +3,13 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import { motion } from "framer-motion"
+import { Eye, EyeOff, Lock, ArrowRight, Loader2, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion } from "framer-motion"
-import { PiEyeBold, PiEyeSlashBold, PiLockBold, PiCheckCircleBold } from "react-icons/pi"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { useRouter, useSearchParams } from "next/navigation"
+import toast from "react-hot-toast"
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("")
@@ -16,179 +17,186 @@ export default function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
-  const [error, setError] = useState("")
+  const [passwordReset, setPasswordReset] = useState(false)
 
+  const supabase = createClientComponentClient()
   const router = useRouter()
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Verificar si tenemos los parámetros necesarios para el reset
+    // Check if we have the necessary tokens from the URL
     const accessToken = searchParams.get("access_token")
     const refreshToken = searchParams.get("refresh_token")
 
     if (!accessToken || !refreshToken) {
-      setError("Invalid reset link. Please request a new password reset.")
+      toast.error("Invalid reset link")
+      router.push("/auth/forgot-password")
     }
-  }, [searchParams])
+  }, [searchParams, router])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
+      toast.error("Passwords don't match")
       return
     }
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long")
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters")
       return
     }
 
     setIsLoading(true)
 
     try {
-      const supabase = createClient()
-
-      // Actualizar la contraseña
       const { error } = await supabase.auth.updateUser({
         password: password,
       })
 
       if (error) {
-        throw error
+        toast.error(error.message)
+      } else {
+        setPasswordReset(true)
+        toast.success("Password updated successfully!")
       }
-
-      setIsSuccess(true)
-
-      // Redirigir al dashboard después de 2 segundos
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 2000)
-    } catch (error: any) {
-      setError(error.message || "An error occurred. Please try again.")
+    } catch (error) {
+      toast.error("An unexpected error occurred")
     } finally {
       setIsLoading(false)
     }
   }
 
-  if (isSuccess) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 p-8 text-center"
-          >
-            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <PiCheckCircleBold className="w-8 h-8 text-green-400" />
-            </div>
-
-            <h1 className="text-2xl font-medium text-white mb-4">Password updated!</h1>
-            <p className="text-gray-400 mb-6">
-              Your password has been successfully updated. You'll be redirected to your dashboard shortly.
-            </p>
-
-            <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto"></div>
-          </motion.div>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 p-8"
+          transition={{ duration: 0.6 }}
+          className="text-center"
         >
-          {/* Header */}
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-block mb-6">
-              <Image src="/logo/suitpax-cloud-logo.webp" alt="Suitpax" width={120} height={30} className="h-8 w-auto" />
-            </Link>
+          <Link href="/" className="inline-block">
+            <Image
+              src="/logo/suitpax-bl-logo.webp"
+              alt="Suitpax"
+              width={120}
+              height={40}
+              className="mx-auto h-10 w-auto"
+            />
+          </Link>
+          <h2 className="mt-6 text-3xl font-medium tracking-tighter text-gray-900">
+            <em className="font-serif italic">Set new password</em>
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">Enter your new password below</p>
+        </motion.div>
+      </div>
 
-            <h1 className="text-2xl font-medium text-white mb-2">Set new password</h1>
-            <p className="text-gray-400">Enter your new password below.</p>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                New password
-              </label>
-              <div className="relative">
-                <PiLockBold className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-12 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
-                  placeholder="Enter new password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-white py-8 px-4 shadow-sm rounded-2xl border border-gray-200 sm:px-10"
+        >
+          {passwordReset ? (
+            <div className="text-center">
+              <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900">Password updated</h3>
+              <p className="mt-2 text-sm text-gray-600">Your password has been successfully updated.</p>
+              <div className="mt-6">
+                <Link
+                  href="/auth/login"
+                  className="inline-flex items-center justify-center w-full py-2 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gray-900 hover:bg-gray-800"
                 >
-                  {showPassword ? <PiEyeSlashBold className="w-5 h-5" /> : <PiEyeBold className="w-5 h-5" />}
-                </button>
+                  Sign in with new password
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </div>
             </div>
+          ) : (
+            <form className="space-y-6" onSubmit={handleResetPassword}>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  New password
+                </label>
+                <div className="mt-1 relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent sm:text-sm"
+                    placeholder="Enter new password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                <p className="mt-1 text-xs text-gray-500">Must be at least 6 characters</p>
+              </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
-                Confirm password
-              </label>
-              <div className="relative">
-                <PiLockBold className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-12 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
-                  placeholder="Confirm new password"
-                />
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  Confirm new password
+                </label>
+                <div className="mt-1 relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent sm:text-sm"
+                    placeholder="Confirm new password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
                 <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  type="submit"
+                  disabled={isLoading}
+                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {showConfirmPassword ? <PiEyeSlashBold className="w-5 h-5" /> : <PiEyeBold className="w-5 h-5" />}
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      Update password
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
                 </button>
               </div>
-            </div>
-
-            {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                <p className="text-red-400 text-sm">{error}</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-white text-black py-3 px-4 rounded-xl font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isLoading ? "Updating..." : "Update password"}
-            </button>
-          </form>
-
-          {/* Footer */}
-          <div className="mt-6 text-center">
-            <Link href="/auth/login" className="text-sm text-gray-400 hover:text-white transition-colors">
-              Back to login
-            </Link>
-          </div>
+            </form>
+          )}
         </motion.div>
       </div>
     </div>

@@ -2,9 +2,8 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { SiX, SiGithub, SiProducthunt, SiLinkedin, SiCrunchbase, SiGmail, SiSlack, SiDiscord } from "react-icons/si"
+import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail, SiDiscord } from "react-icons/si"
 import { PiArrowUpRightBold, PiCalendarCheckBold } from "react-icons/pi"
-import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 
 export const Footer = () => {
@@ -24,18 +23,6 @@ export const Footer = () => {
     }
   }, [])
 
-  // Cargar el script de SourceForge después de que el componente se monte
-  useEffect(() => {
-    const script = document.createElement("script")
-    script.async = true
-    script.src = "https://b.sf-syn.com/badge_js?sf_id=3853370&variant_id=sf"
-    document.body.appendChild(script)
-
-    return () => {
-      document.body.removeChild(script)
-    }
-  }, [])
-
   return (
     <footer className="relative bg-black overflow-hidden">
       {/* Background pattern */}
@@ -45,7 +32,7 @@ export const Footer = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/60"></div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Columna 1: Logo e información principal */}
           <div className="flex flex-col items-start">
             <Link href="/" className="inline-block mb-4">
@@ -77,21 +64,24 @@ export const Footer = () => {
             <p className="text-xs text-gray-500">2261 Market Street STE 86661 San Francisco, CA, 94114</p>
           </div>
 
-          {/* Columna 2: Enlaces y certificaciones */}
+          {/* Columna 2: Products & Services */}
           <div className="flex flex-col items-start">
-            <h3 className="text-white font-medium mb-4 text-sm">Company</h3>
+            <h3 className="text-white font-medium mb-4 text-sm">Products</h3>
             <div className="flex flex-col space-y-2 mb-6">
-              <Link href="/manifesto" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
-                Manifesto
-              </Link>
               <Link
-                href="https://cal.com/team/founders/partnership"
+                href="/travel-expense-management"
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
               >
-                Talk to founders
+                Expense Management
               </Link>
               <Link href="/pricing" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Pricing
+              </Link>
+              <Link
+                href="https://app.suitpax.com/auth/signup"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
+              >
+                Pre-register
               </Link>
               <Link
                 href="https://pitch-suitpax.vercel.app"
@@ -111,6 +101,22 @@ export const Footer = () => {
                   <PiArrowUpRightBold className="h-3 w-3 ml-1 text-gray-400" />
                 </div>
               </Link>
+            </div>
+          </div>
+
+          {/* Columna 3: Company */}
+          <div className="flex flex-col items-start">
+            <h3 className="text-white font-medium mb-4 text-sm">Company</h3>
+            <div className="flex flex-col space-y-2 mb-6">
+              <Link href="/manifesto" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                Manifesto
+              </Link>
+              <Link
+                href="https://cal.com/team/founders/partnership"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
+              >
+                Talk to founders
+              </Link>
               <Link
                 href="https://lu.ma/suitpax"
                 target="_blank"
@@ -120,19 +126,6 @@ export const Footer = () => {
                 <PiCalendarCheckBold className="h-3.5 w-3.5" />
                 Join Suitpax Events
                 <PiArrowUpRightBold className="h-3 w-3 text-gray-400" />
-              </Link>
-              <Link
-                href="https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw"
-                className="text-gray-400 hover:text-gray-200 transition-colors text-sm flex items-center gap-1"
-              >
-                <SiSlack className="h-3.5 w-3.5" />
-                Join Slack
-              </Link>
-              <Link
-                href="https://app.suitpax.com/sign-up"
-                className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
-              >
-                Pre-register
               </Link>
               <Link
                 href="https://trust.inc/suitpax"
@@ -148,136 +141,56 @@ export const Footer = () => {
             {/* Trust badges */}
             <h3 className="text-white font-medium mb-3 text-sm">Certifications</h3>
             <div className="flex flex-col space-y-2">
-              {isMobile ? (
-                <motion.div
-                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300"
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></div>
-                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                    SOC 2 Type I
-                  </span>
-                </motion.div>
-              ) : (
-                <div className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></div>
-                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                    SOC 2 Type I
-                  </span>
-                </div>
-              )}
-
-              {isMobile ? (
-                <motion.div
-                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300"
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
-                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                    GDPR Ready
-                  </span>
-                </motion.div>
-              ) : (
-                <div className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
-                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                    GDPR Ready
-                  </span>
-                </div>
-              )}
-
-              {isMobile ? (
-                <motion.div
-                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300"
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-gray-300 mr-1.5 animate-pulse"></div>
-                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                    CCPA Compliant
-                  </span>
-                </motion.div>
-              ) : (
-                <div className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
-                  <div className="w-1.5 h-1.5 rounded-full bg-gray-300 mr-1.5 animate-pulse"></div>
-                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                    CCPA Compliant
-                  </span>
-                </div>
-              )}
-
-              {isMobile ? (
-                <motion.div
-                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300 cursor-pointer"
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  onClick={() => {
-                    const link = document.createElement("a")
-                    link.href = "/legal/suitpax-ai-dpa.pdf"
-                    link.download = "Suitpax-AI-DPA.pdf"
-                    document.body.appendChild(link)
-                    link.click()
-                    document.body.removeChild(link)
-                  }}
-                >
-                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                    DPA Suitpax AI
-                  </span>
-                </motion.div>
-              ) : (
+              {[
+                { label: "SOC 2 Type I", status: "active" },
+                { label: "GDPR Ready", status: "ready" },
+                { label: "CCPA Compliant", status: "compliant" },
+                { label: "DPA Suitpax AI", action: "download" },
+                { label: "AI Act", link: "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai" },
+              ].map((cert, index) => (
                 <div
-                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300 cursor-pointer"
-                  onClick={() => {
-                    const link = document.createElement("a")
-                    link.href = "/legal/suitpax-ai-dpa.pdf"
-                    link.download = "Suitpax-AI-DPA.pdf"
-                    document.body.appendChild(link)
-                    link.click()
-                    document.body.removeChild(link)
-                  }}
+                  key={index}
+                  className={`flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300 ${
+                    cert.action === "download" ? "cursor-pointer" : ""
+                  }`}
+                  onClick={
+                    cert.action === "download"
+                      ? () => {
+                          const link = document.createElement("a")
+                          link.href = "/legal/suitpax-ai-dpa.pdf"
+                          link.download = "Suitpax-AI-DPA.pdf"
+                          document.body.appendChild(link)
+                          link.click()
+                          document.body.removeChild(link)
+                        }
+                      : undefined
+                  }
                 >
+                  {cert.status && (
+                    <div
+                      className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                        cert.status === "active" ? "bg-emerald-500 animate-pulse" : "bg-gray-300"
+                      }`}
+                    ></div>
+                  )}
                   <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                    DPA Suitpax AI
+                    {cert.link ? (
+                      <Link href={cert.link} target="_blank" rel="noopener noreferrer">
+                        {cert.label}
+                      </Link>
+                    ) : (
+                      cert.label
+                    )}
                   </span>
                 </div>
-              )}
-
-              {isMobile ? (
-                <motion.div
-                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300"
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
-                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                    <Link
-                      href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      AI Act
-                    </Link>
-                  </span>
-                </motion.div>
-              ) : (
-                <div className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300">
-                  <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                    <Link
-                      href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      AI Act
-                    </Link>
-                  </span>
-                </div>
-              )}
+              ))}
             </div>
           </div>
 
-          {/* Columna 3: Redes sociales y copyright */}
+          {/* Columna 4: Connect with us */}
           <div className="flex flex-col items-start">
             <h3 className="text-white font-medium mb-4 text-sm">Connect with us</h3>
-            <div className="flex space-x-4 mb-6">
+            <div className="flex flex-wrap gap-3 mb-6">
               <Link href="https://twitter.com/suitpax" className="text-gray-400 hover:text-gray-200 transition-colors">
                 <SiX className="h-5 w-5" />
                 <span className="sr-only">X</span>
@@ -294,14 +207,7 @@ export const Footer = () => {
                 <span className="sr-only">GitHub</span>
               </Link>
               <Link
-                href="https://www.producthunt.com/products/suitpax-2"
-                className="text-gray-400 hover:text-gray-200 transition-colors"
-              >
-                <SiProducthunt className="h-5 w-5" />
-                <span className="sr-only">Product Hunt</span>
-              </Link>
-              <Link
-                href="https://discord.gg/suitpax" // Reemplaza con tu enlace de Discord
+                href="https://discord.gg/suitpax"
                 className="text-gray-400 hover:text-gray-200 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
