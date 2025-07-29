@@ -1,66 +1,31 @@
 "use client"
 
-import type React from "react"
-
-import { useRef, useEffect, useState } from "react"
-import Script from "next/script"
-
-interface VantaClouds2BackgroundProps {
-  children: React.ReactNode
-  className?: string
-}
-
-export default function VantaClouds2Background({ children, className = "" }: VantaClouds2BackgroundProps) {
-  const vantaRef = useRef<HTMLDivElement>(null)
-  const [vantaEffect, setVantaEffect] = useState<any>(null)
-  const [scriptsLoaded, setScriptsLoaded] = useState(false)
-
-  useEffect(() => {
-    if (!scriptsLoaded || !vantaRef.current) return
-
-    // Solo inicializar si no existe ya
-    if (!vantaEffect) {
-      // @ts-ignore - Vanta se carga globalmente
-      const effect = window.VANTA.CLOUDS2({
-        el: vantaRef.current,
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.0,
-        minWidth: 200.0,
-        scale: 1.0,
-
-        // Colores personalizados exactamente como especificados
-        backgroundColor: 0x0, // Negro
-        skyColor: 0x5ca6ca, // Azul claro
-        cloudColor: 0x334d80, // Azul oscuro
-        lightColor: 0xffffff, // Blanco
-        speed: 1,
-
-        // Usar una URL pública para la textura de ruido
-        texturePath: "https://cdn.jsdelivr.net/gh/tengbao/vanta/dist/gallery/noise.png",
-      })
-
-      setVantaEffect(effect)
-    }
-
-    return () => {
-      if (vantaEffect) vantaEffect.destroy()
-    }
-  }, [vantaEffect, scriptsLoaded])
-
-  const handleScriptsLoad = () => {
-    setScriptsLoaded(true)
-  }
-
+export default function VantaClouds2Background() {
   return (
-    <>
-      <Script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" onLoad={handleScriptsLoad} />
-      <Script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.clouds2.min.js" />
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Simple gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-sky-50 to-blue-100" />
 
-      <div ref={vantaRef} className={`${className}`}>
-        {children}
-      </div>
-    </>
+      {/* Animated cloud-like elements */}
+      <div className="absolute top-10 left-10 w-32 h-32 bg-white/30 rounded-full blur-3xl animate-pulse" />
+      <div
+        className="absolute top-32 right-20 w-24 h-24 bg-blue-100/40 rounded-full blur-2xl animate-bounce"
+        style={{ animationDelay: "1s" }}
+      />
+      <div
+        className="absolute bottom-20 left-1/4 w-40 h-40 bg-sky-100/30 rounded-full blur-3xl animate-pulse"
+        style={{ animationDelay: "2s" }}
+      />
+      <div
+        className="absolute bottom-32 right-1/3 w-28 h-28 bg-white/40 rounded-full blur-2xl animate-bounce"
+        style={{ animationDelay: "3s" }}
+      />
+
+      {/* Additional floating elements */}
+      <div
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-gradient-radial from-blue-100/20 to-transparent rounded-full blur-3xl animate-pulse"
+        style={{ animationDelay: "0.5s" }}
+      />
+    </div>
   )
 }
