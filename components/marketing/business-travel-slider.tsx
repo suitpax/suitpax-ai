@@ -252,7 +252,7 @@ const SliderMiniChat = ({ message, agentId }: { message: string; agentId: number
 // Mensajes personalizados para cada empresa
 const companyTravelMessages = {
   ElevenLabs: [
-    "Approve team expense report for Q3 offsite",
+    "Approve team expense report for Q2 offsite",
     "Book business class for 5 engineers to SXSW",
     "Update travel policy for remote employees",
     "Schedule quarterly budget review for travel dept",
@@ -559,14 +559,6 @@ export default function BusinessTravelSlider() {
                 />
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Q3 Launch Notice */}
-        <div className="text-center mt-12">
-          <div className="inline-flex items-center rounded-xl bg-gray-800 px-3 py-1.5 text-xs font-medium text-white">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse mr-2"></span>
-            Launching Q3 2024
           </div>
         </div>
       </div>

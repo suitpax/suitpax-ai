@@ -1,71 +1,61 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import type React from "react"
 
-declare global {
-  interface Window {
-    THREE: any
-    VANTA: any
-  }
+import { useRef, useEffect, useState } from "react"
+import Script from "next/script"
+
+interface VantaHaloBackgroundProps {
+  children: React.ReactNode
+  className?: string
 }
 
-export default function VantaHaloBackground() {
+export default function VantaHaloBackground({ children, className = "" }: VantaHaloBackgroundProps) {
   const vantaRef = useRef<HTMLDivElement>(null)
-  const vantaEffect = useRef<any>(null)
+  const [vantaEffect, setVantaEffect] = useState<any>(null)
+  const [scriptsLoaded, setScriptsLoaded] = useState(false)
 
   useEffect(() => {
-    if (!vantaRef.current) return
+    if (!scriptsLoaded || !vantaRef.current) return
 
-    const loadVanta = async () => {
-      // Load THREE.js
-      if (!window.THREE) {
-        const script = document.createElement("script")
-        script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
-        script.async = true
-        document.head.appendChild(script)
+    // Solo inicializar si no existe ya
+    if (!vantaEffect) {
+      // @ts-ignore - Vanta se carga globalmente
+      const effect = window.VANTA.HALO({
+        el: vantaRef.current,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.0,
+        minWidth: 200.0,
+        backgroundColor: 0xe4e5ed,
+        baseColor: 0xd2d3d7,
+        size: 0.8,
+        amplitudeFactor: 1,
+        xOffset: 0,
+        yOffset: 0,
+      })
 
-        await new Promise((resolve) => {
-          script.onload = resolve
-        })
-      }
-
-      // Load Vanta Halo
-      if (!window.VANTA?.HALO) {
-        const script = document.createElement("script")
-        script.src = "https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.halo.min.js"
-        script.async = true
-        document.head.appendChild(script)
-
-        await new Promise((resolve) => {
-          script.onload = resolve
-        })
-      }
-
-      // Initialize Vanta effect
-      if (window.VANTA?.HALO && vantaRef.current) {
-        vantaEffect.current = window.VANTA.HALO({
-          el: vantaRef.current,
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200.0,
-          minWidth: 200.0,
-          backgroundColor: 0xe4e5ed,
-          baseColor: 0xd2d3d7,
-          size: 0.8,
-          amplitudeFactor: 1.0,
-        })
-      }
+      setVantaEffect(effect)
     }
-
-    loadVanta()
 
     return () => {
-      if (vantaEffect.current) {
-        vantaEffect.current.destroy()
-      }
+      if (vantaEffect) vantaEffect.destroy()
     }
-  }, [])
+  }, [vantaEffect, scriptsLoaded])
 
-  return <div ref={vantaRef} className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }} />
+  const handleScriptsLoad = () => {
+    setScriptsLoaded(true)
+  }
+
+  return (
+    <>
+      <Script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" onLoad={handleScriptsLoad} />
+      <Script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.halo.min.js" />
+
+      <div ref={vantaRef} className={`${className}`}>
+        {children}
+      </div>
+    </>
+  )
 }

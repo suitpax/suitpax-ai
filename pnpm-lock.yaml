@@ -197,9 +197,6 @@ importers:
       sonner:
         specifier: ^1.7.1
         version: 1.7.1(react-dom@18.0.0(react@18.0.0))(react@18.0.0)
-      speech-recognition:
-        specifier: latest
-        version: 0.0.1
       tailwind-merge:
         specifier: ^2.5.5
         version: 2.5.5
@@ -2543,9 +2540,6 @@ packages:
   source-map@0.5.7:
     resolution: {integrity: sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ==}
     engines: {node: '>=0.10.0'}
-
-  speech-recognition@0.0.1:
-    resolution: {integrity: sha512-OIYftveS+jDg4T6rsRO4UIyrsD6At7jjyZF5vEoCkP0GjLTqputvspxAWCJ7o1okeFaU5/z4PcpQmHsO5OHrMg==}
 
   stackblur-canvas@2.7.0:
     resolution: {integrity: sha512-yf7OENo23AGJhBriGx0QivY5JP6Y1HbrrDI6WLt6C5auYZXlQrheoY8hD4ibekFKz1HOfE48Ww8kMWMnJD/zcQ==}
@@ -5063,8 +5057,6 @@ snapshots:
   source-map-js@1.2.1: {}
 
   source-map@0.5.7: {}
-
-  speech-recognition@0.0.1: {}
 
   stackblur-canvas@2.7.0:
     optional: true

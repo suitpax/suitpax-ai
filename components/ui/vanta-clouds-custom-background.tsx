@@ -1,33 +1,65 @@
 "use client"
 
-export default function VantaCloudsCustomBackground() {
+import type React from "react"
+
+import { useEffect, useRef, useState } from "react"
+import Script from "next/script"
+
+interface VantaCloudsCustomBackgroundProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export default function VantaCloudsCustomBackground({ children, className = "" }: VantaCloudsCustomBackgroundProps) {
+  const vantaRef = useRef<HTMLDivElement>(null)
+  const [vantaEffect, setVantaEffect] = useState<any>(null)
+  const [scriptsLoaded, setScriptsLoaded] = useState(false)
+
+  useEffect(() => {
+    if (!scriptsLoaded || !vantaRef.current) return
+
+    // Solo inicializar si no existe ya
+    if (!vantaEffect) {
+      // @ts-ignore - Vanta se carga globalmente
+      const effect = window.VANTA.CLOUDS({
+        el: vantaRef.current,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.0,
+        minWidth: 200.0,
+
+        // Colores personalizados según especificaciones
+        backgroundColor: 0xffffff,
+        skyColor: 0x68b8d7,
+        cloudColor: 0xadc1de,
+        cloudShadowColor: 0x183550,
+        sunColor: 0xff9919,
+        sunGlareColor: 0xff6633,
+        sunlightColor: 0xff9933,
+        speed: 1,
+      })
+
+      setVantaEffect(effect)
+    }
+
+    return () => {
+      if (vantaEffect) vantaEffect.destroy()
+    }
+  }, [vantaEffect, scriptsLoaded])
+
+  const handleScriptsLoad = () => {
+    setScriptsLoaded(true)
+  }
+
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Base gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-sky-100 via-blue-50 to-white" />
+    <>
+      <Script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" onLoad={handleScriptsLoad} />
+      <Script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.clouds.min.js" />
 
-      {/* Cloud-like shapes */}
-      <div className="absolute top-0 left-0 w-full h-full">
-        <div className="absolute top-16 left-16 w-48 h-32 bg-white/40 rounded-full blur-3xl transform rotate-12 animate-pulse" />
-        <div
-          className="absolute top-40 right-24 w-36 h-24 bg-sky-200/30 rounded-full blur-2xl transform -rotate-6 animate-pulse"
-          style={{ animationDelay: "1.5s" }}
-        />
-        <div
-          className="absolute bottom-32 left-32 w-52 h-36 bg-blue-100/35 rounded-full blur-3xl transform rotate-45 animate-pulse"
-          style={{ animationDelay: "3s" }}
-        />
-        <div
-          className="absolute bottom-16 right-16 w-40 h-28 bg-white/45 rounded-full blur-2xl transform -rotate-12 animate-pulse"
-          style={{ animationDelay: "2s" }}
-        />
-
-        {/* Center focal point */}
-        <div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-radial from-sky-200/15 via-blue-100/10 to-transparent rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "0.8s" }}
-        />
+      <div ref={vantaRef} className={`${className}`}>
+        {children}
       </div>
-    </div>
+    </>
   )
 }

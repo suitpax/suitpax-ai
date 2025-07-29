@@ -1,348 +1,293 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Mic, MicOff, Volume2, VolumeX, Send, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import Image from "next/image"
-import SpeechRecognition from "speech-recognition"
-
-interface Message {
-  id: string
-  type: "user" | "assistant"
-  content: string
-  timestamp: Date
-}
+import {
+  PiMicrophoneBold,
+  PiMicrophoneSlashBold,
+  PiSpeakerHighBold,
+  PiSpeakerSlashBold,
+  PiStopBold,
+  PiWaveformBold,
+  PiCircleBold,
+} from "react-icons/pi"
+import { useSpeechToText } from "@/hooks/use-speech-to-text"
+import { useAudioPlayer } from "@/hooks/use-audio-player"
 
 export default function AIVoiceAssistant() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      type: "assistant",
-      content: "Hola, soy tu asistente de viajes de IA. ¿En qué puedo ayudarte hoy?",
-      timestamp: new Date(),
-    },
-  ])
-  const [inputValue, setInputValue] = useState("")
   const [isListening, setIsListening] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [isMuted, setIsMuted] = useState(false)
+  const [currentMessage, setCurrentMessage] = useState("")
+  const [conversation, setConversation] = useState<
+    Array<{ id: string; type: "user" | "ai"; text: string; timestamp: Date }>
+  >([])
+  const [audioLevel, setAudioLevel] = useState(0)
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
-  const synthRef = useRef<SpeechSynthesis | null>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { transcript, isListening: speechListening, startListening, stopListening, resetTranscript } = useSpeechToText()
 
+  const { isPlaying, play, pause, stop } = useAudioPlayer()
+
+  // Simulate audio level for visualization
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      synthRef.current = window.speechSynthesis
-
-      if (SpeechRecognition) {
-        recognitionRef.current = new SpeechRecognition()
-        recognitionRef.current.continuous = false
-        recognitionRef.current.interimResults = false
-        recognitionRef.current.lang = "es-ES"
-
-        recognitionRef.current.onresult = (event) => {
-          const transcript = event.results[0][0].transcript
-          setInputValue(transcript)
-          setIsListening(false)
-        }
-
-        recognitionRef.current.onerror = () => {
-          setIsListening(false)
-        }
-
-        recognitionRef.current.onend = () => {
-          setIsListening(false)
-        }
-      }
+    if (isListening) {
+      const interval = setInterval(() => {
+        setAudioLevel(Math.random() * 100)
+      }, 100)
+      return () => clearInterval(interval)
+    } else {
+      setAudioLevel(0)
     }
-  }, [])
+  }, [isListening])
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
-
-  const startListening = () => {
-    if (recognitionRef.current && !isListening) {
-      setIsListening(true)
-      recognitionRef.current.start()
-    }
+  const handleStartListening = async () => {
+    setIsListening(true)
+    await startListening()
   }
 
-  const stopListening = () => {
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop()
-      setIsListening(false)
-    }
-  }
+  const handleStopListening = async () => {
+    setIsListening(false)
+    await stopListening()
 
-  const speak = (text: string) => {
-    if (synthRef.current && !isMuted) {
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = "es-ES"
-      utterance.rate = 0.9
-      utterance.pitch = 1
-
-      utterance.onstart = () => setIsSpeaking(true)
-      utterance.onend = () => setIsSpeaking(false)
-
-      synthRef.current.speak(utterance)
-    }
-  }
-
-  const stopSpeaking = () => {
-    if (synthRef.current) {
-      synthRef.current.cancel()
-      setIsSpeaking(false)
-    }
-  }
-
-  const sendMessage = async () => {
-    if (!inputValue.trim()) return
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: "user",
-      content: inputValue,
-      timestamp: new Date(),
-    }
-
-    setMessages((prev) => [...prev, userMessage])
-    setInputValue("")
-    setIsProcessing(true)
-
-    try {
-      const response = await fetch("/api/ai-chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: inputValue,
-          context: "travel_assistant",
-        }),
-      })
-
-      if (!response.ok) throw new Error("Error en la respuesta")
-
-      const data = await response.json()
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: "assistant",
-        content: data.message || "Lo siento, no pude procesar tu solicitud.",
+    if (transcript) {
+      const userMessage = {
+        id: Date.now().toString(),
+        type: "user" as const,
+        text: transcript,
         timestamp: new Date(),
       }
 
-      setMessages((prev) => [...prev, assistantMessage])
+      setConversation((prev) => [...prev, userMessage])
 
-      // Speak the response
-      speak(assistantMessage.content)
-    } catch (error) {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: "assistant",
-        content: "Lo siento, hubo un error al procesar tu solicitud. Por favor, inténtalo de nuevo.",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, errorMessage])
-    } finally {
-      setIsProcessing(false)
+      // Generate AI response with ElevenLabs
+      setTimeout(async () => {
+        const aiResponse = {
+          id: (Date.now() + 1).toString(),
+          type: "ai" as const,
+          text: "I understand you're looking for travel assistance. Let me help you with that booking right away.",
+          timestamp: new Date(),
+        }
+        setConversation((prev) => [...prev, aiResponse])
+        setIsSpeaking(true)
+
+        // Generate speech with ElevenLabs
+        try {
+          const response = await fetch("/api/elevenlabs/generate-speech", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              text: aiResponse.text,
+              agentId: "emma",
+            }),
+          })
+
+          if (response.ok) {
+            const audioBlob = await response.blob()
+            const audioUrl = URL.createObjectURL(audioBlob)
+            const audio = new Audio(audioUrl)
+            audio.play()
+
+            audio.onended = () => {
+              setIsSpeaking(false)
+              URL.revokeObjectURL(audioUrl)
+            }
+          }
+        } catch (error) {
+          console.error("Error generating speech:", error)
+          setIsSpeaking(false)
+        }
+      }, 1000)
+
+      resetTranscript()
     }
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage()
+  const toggleSpeaker = () => {
+    if (isPlaying) {
+      pause()
+    } else {
+      play()
     }
   }
 
   return (
-    <section className="py-12 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 md:py-24 bg-gray-100/50 backdrop-blur-sm">
+      <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-4">
-              Asistente de Voz IA
-            </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6">
-              Habla con tu asistente
-              <br />
-              <span className="text-gray-600">de viajes personal</span>
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">
-              Conversa naturalmente con nuestro asistente de IA. Usa tu voz o escribe para obtener ayuda instantánea con
-              tus viajes de negocios.
-            </p>
-          </motion.div>
+          <div className="inline-flex items-center rounded-xl bg-gray-200/80 backdrop-blur-sm px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-6 border border-gray-300/50">
+            <Image src="/logo/suitpax-symbol.webp" alt="Suitpax" width={12} height={12} className="mr-1.5 w-3 h-3" />
+            AI Voice Assistant
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-medium tracking-tighter leading-none mb-6 text-gray-900">
+            Speak with your
+            <br />
+            <span className="text-gray-600 font-inter">travel assistant</span>
+          </h2>
+          <p className="text-lg font-light text-gray-600 max-w-3xl mx-auto font-inter">
+            Interact naturally with our AI assistant using your voice. Plan trips, manage bookings, and get personalized
+            recommendations through natural conversation.
+          </p>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <Card className="bg-white/50 backdrop-blur-sm border border-gray-200 shadow-sm">
-            <CardContent className="p-6">
-              {/* Chat Messages */}
-              <div className="h-96 overflow-y-auto mb-6 space-y-4">
-                <AnimatePresence>
-                  {messages.map((message) => (
-                    <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
-                    >
-                      <div
-                        className={`flex items-start space-x-3 max-w-xs lg:max-w-md ${
-                          message.type === "user" ? "flex-row-reverse space-x-reverse" : ""
-                        }`}
-                      >
-                        <div className="flex-shrink-0">
-                          {message.type === "user" ? (
-                            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                              <User className="w-4 h-4 text-gray-600" />
-                            </div>
-                          ) : (
-                            <div className="w-8 h-8 bg-white rounded-xl border border-gray-200 flex items-center justify-center">
-                              <Image
-                                src="/logo/suitpax-bl-logo.webp"
-                                alt="Suitpax"
-                                width={20}
-                                height={20}
-                                className="rounded-sm"
-                              />
-                            </div>
-                          )}
-                        </div>
-                        <div
-                          className={`px-4 py-2 rounded-2xl ${
-                            message.type === "user" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-                          }`}
-                        >
-                          <p className="text-sm">{message.content}</p>
-                          <p className="text-xs opacity-60 mt-1">
-                            {message.timestamp.toLocaleTimeString("es-ES", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-
-                {isProcessing && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex justify-start"
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-white rounded-xl border border-gray-200 flex items-center justify-center">
-                        <Image
-                          src="/logo/suitpax-bl-logo.webp"
-                          alt="Suitpax"
-                          width={20}
-                          height={20}
-                          className="rounded-sm"
+          <div className="bg-white/40 backdrop-blur-md rounded-2xl border border-gray-300/50 shadow-lg p-8">
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Voice Interface */}
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="relative inline-flex items-center justify-center">
+                    {/* Audio Visualization */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {isListening && (
+                        <motion.div
+                          className="w-32 h-32 rounded-full bg-gray-300/20 backdrop-blur-sm border border-gray-400/30"
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
                         />
-                      </div>
-                      <div className="px-4 py-2 rounded-2xl bg-gray-100">
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                          <div
-                            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                            style={{ animationDelay: "0.1s" }}
-                          ></div>
-                          <div
-                            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                            style={{ animationDelay: "0.2s" }}
-                          ></div>
-                        </div>
-                      </div>
+                      )}
                     </div>
-                  </motion.div>
+
+                    {/* Main Microphone Button */}
+                    <motion.button
+                      onClick={isListening ? handleStopListening : handleStartListening}
+                      className={`relative z-10 w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-lg backdrop-blur-sm border ${
+                        isListening
+                          ? "bg-gray-700/90 hover:bg-gray-800/90 text-white border-gray-600/50"
+                          : "bg-gray-800/90 hover:bg-gray-900/90 text-white border-gray-700/50"
+                      }`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {isListening ? (
+                        <PiMicrophoneSlashBold className="w-8 h-8" />
+                      ) : (
+                        <PiMicrophoneBold className="w-8 h-8" />
+                      )}
+                    </motion.button>
+                  </div>
+
+                  <p className="mt-4 text-sm font-medium text-gray-600 font-inter">
+                    {isListening ? "Listening..." : "Tap to speak"}
+                  </p>
+                </div>
+
+                {/* Audio Level Indicator */}
+                {isListening && (
+                  <div className="flex items-center justify-center space-x-1">
+                    {[...Array(5)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="w-1 bg-gray-700/80 rounded-full"
+                        animate={{
+                          height: [4, Math.max(4, audioLevel * 0.3), 4],
+                        }}
+                        transition={{
+                          duration: 0.5,
+                          repeat: Number.POSITIVE_INFINITY,
+                          delay: i * 0.1,
+                        }}
+                      />
+                    ))}
+                  </div>
                 )}
 
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input Area */}
-              <div className="flex items-center space-x-3">
-                <div className="flex-1 relative">
-                  <Input
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Escribe tu mensaje o usa el micrófono..."
-                    className="pr-12 bg-white border-gray-200 focus:border-gray-300 focus:ring-gray-300"
-                    disabled={isProcessing}
-                  />
-                  <Button
-                    onClick={sendMessage}
-                    disabled={!inputValue.trim() || isProcessing}
-                    size="sm"
-                    className="absolute right-1 top-1 bottom-1 bg-gray-900 hover:bg-gray-800 text-white"
+                {/* Controls */}
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={toggleSpeaker}
+                    className="p-3 rounded-xl bg-gray-200/60 backdrop-blur-sm hover:bg-gray-300/60 transition-colors border border-gray-300/50"
                   >
-                    <Send className="w-4 h-4" />
-                  </Button>
+                    {isPlaying ? (
+                      <PiSpeakerSlashBold className="w-5 h-5 text-gray-700" />
+                    ) : (
+                      <PiSpeakerHighBold className="w-5 h-5 text-gray-700" />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => setConversation([])}
+                    className="p-3 rounded-xl bg-gray-200/60 backdrop-blur-sm hover:bg-gray-300/60 transition-colors border border-gray-300/50"
+                  >
+                    <PiStopBold className="w-5 h-5 text-gray-700" />
+                  </button>
                 </div>
 
-                {/* Voice Controls */}
-                <div className="flex items-center space-x-2">
-                  <Button
-                    onClick={isListening ? stopListening : startListening}
-                    disabled={isProcessing}
-                    size="sm"
-                    variant={isListening ? "destructive" : "outline"}
-                    className={`${isListening ? "animate-pulse" : ""}`}
-                  >
-                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                  </Button>
-
-                  <Button
-                    onClick={isSpeaking ? stopSpeaking : () => setIsMuted(!isMuted)}
-                    size="sm"
-                    variant="outline"
-                    className={`${isSpeaking ? "animate-pulse text-blue-600" : ""}`}
-                  >
-                    {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                  </Button>
-                </div>
+                {/* Current Transcript */}
+                {transcript && (
+                  <div className="p-4 bg-gray-100/60 backdrop-blur-sm rounded-xl border border-gray-300/50">
+                    <p className="text-sm text-gray-700 font-inter">{transcript}</p>
+                  </div>
+                )}
               </div>
 
-              {/* Status Indicators */}
-              <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-                <div className="flex items-center space-x-4">
-                  {isListening && (
-                    <span className="flex items-center space-x-1 text-red-600">
-                      <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                      <span>Escuchando...</span>
-                    </span>
+              {/* Conversation History */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium tracking-tighter text-gray-900 font-serif">Conversation</h3>
+
+                <div className="h-80 overflow-y-auto space-y-3 p-4 bg-gray-100/40 backdrop-blur-sm rounded-xl border border-gray-300/50">
+                  {conversation.length === 0 ? (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      <div className="text-center">
+                        <PiWaveformBold className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                        <p className="text-sm font-inter">Start a conversation</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <AnimatePresence>
+                      {conversation.map((message) => (
+                        <motion.div
+                          key={message.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
+                        >
+                          <div
+                            className={`max-w-xs p-3 rounded-xl backdrop-blur-sm ${
+                              message.type === "user"
+                                ? "bg-gray-800/90 text-white border border-gray-700/50"
+                                : "bg-white/60 border border-gray-300/50 text-gray-700"
+                            }`}
+                          >
+                            {message.type === "ai" && (
+                              <div className="flex items-center mb-2">
+                                <Image
+                                  src="/logo/suitpax-bl-logo.webp"
+                                  alt="Suitpax AI"
+                                  width={16}
+                                  height={16}
+                                  className="w-4 h-4 rounded-xl mr-2"
+                                />
+                                <span className="text-xs font-medium text-gray-500 font-inter">Suitpax AI</span>
+                              </div>
+                            )}
+                            <p className="text-sm font-inter">{message.text}</p>
+                            <p className="text-xs opacity-70 mt-1 font-inter">
+                              {message.timestamp.toLocaleTimeString()}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   )}
-                  {isSpeaking && (
-                    <span className="flex items-center space-x-1 text-blue-600">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                      <span>Hablando...</span>
-                    </span>
-                  )}
                 </div>
-                <span>Presiona Enter para enviar</span>
+
+                {/* AI Status */}
+                {isSpeaking && (
+                  <div className="flex items-center space-x-2 p-3 bg-gray-200/50 backdrop-blur-sm rounded-xl border border-gray-300/50">
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
+                    >
+                      <PiCircleBold className="w-3 h-3 text-gray-600" />
+                    </motion.div>
+                    <p className="text-sm text-gray-700 font-inter">AI is responding...</p>
+                  </div>
+                )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </section>

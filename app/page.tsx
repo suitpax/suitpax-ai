@@ -7,7 +7,6 @@ import CloudAIShowcase from "@/components/marketing/cloud-ai-showcase"
 import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
 import AgenticDisruption from "@/components/marketing/agentic-disruption"
 import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
-import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
 import ContactForm from "@/components/marketing/contact-form"
 import type { Metadata } from "next"
 
@@ -71,7 +70,6 @@ export default function Home() {
         <PartnersShowcase />
         <AITravelAgents />
         <BusinessTravelRevolution />
-        <AIVoiceCallingHub />
         <CloudAIShowcase />
         <AgenticDisruption />
         <AIVoiceAssistant />
