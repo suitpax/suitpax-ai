@@ -22,7 +22,7 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
     const grid = []
     // Reduce for mobile - fewer agents on smaller screens
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-    const totalAgents = isMobile ? 80 : 200 // Less agents on mobile
+    const totalAgents = isMobile ? 60 : 120 // Less agents on mobile
 
     for (let i = 0; i < totalAgents; i++) {
       // Use modulo to ensure even distribution of all agent images
@@ -58,7 +58,7 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
   return (
     <div className="relative mb-6 px-0.5">
       {/* Responsive grid with fewer columns on mobile */}
-      <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-16 lg:grid-cols-18 xl:grid-cols-20 gap-0.5">
+      <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-14 lg:grid-cols-16 xl:grid-cols-18 gap-1">
         {agentGrid.map((agent, index) => (
           <motion.div
             key={agent.id}
@@ -71,7 +71,7 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
             <AnimatePresence>
               {selectedAgent === agent.id && (
                 <motion.div
-                  className="absolute inset-0 rounded-sm z-10 pointer-events-none"
+                  className="absolute inset-0 rounded-full z-10 pointer-events-none"
                   initial={{ opacity: 0 }}
                   animate={{
                     opacity: [0.4, 0.7, 0.4],
@@ -84,30 +84,30 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
                     ease: "easeInOut",
                   }}
                   style={{
-                    background: "rgba(6, 95, 70, 0.3)",
-                    boxShadow: "0 0 8px 2px rgba(6, 95, 70, 0.2)",
+                    background: "rgba(0, 0, 0, 0.3)",
+                    boxShadow: "0 0 8px 2px rgba(0, 0, 0, 0.2)",
                   }}
                 />
               )}
             </AnimatePresence>
-            {/* Smaller inset for more compact images */}
-            <div className="absolute inset-0.5 rounded-sm overflow-hidden bg-gray-100">
+            {/* Circular bubble style like Grok */}
+            <div className="absolute inset-1 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
               <Image
                 src={agent.image || "/placeholder.svg"}
                 alt="AI Travel Agent"
                 fill
                 className="object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
-                sizes="(max-width: 768px) 15px, 20px" // Smaller on mobile
+                sizes="(max-width: 768px) 20px, 24px"
               />
             </div>
           </motion.div>
         ))}
       </div>
       <div
-        className="absolute inset-0 bg-gradient-to-t from-gray-50/95 via-transparent to-transparent pointer-events-none"
+        className="absolute inset-0 bg-gradient-to-t from-white/95 via-transparent to-transparent pointer-events-none"
         style={{
           background:
-            "linear-gradient(to top, rgba(249, 250, 251, 0.95), rgba(249, 250, 251, 0) 30%, rgba(249, 250, 251, 0))",
+            "linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0))",
         }}
       ></div>
     </div>
