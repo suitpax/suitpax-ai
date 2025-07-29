@@ -1,99 +1,65 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@/lib/supabase/server"
+import Anthropic from "@anthropic-ai/sdk"
 
-const AGENT_PERSONALITIES = {
-  1: {
-    name: "Emma",
-    role: "Executive Travel Assistant",
-    personality:
-      "Professional, warm, and highly efficient. I specialize in executive-level travel arrangements with attention to luxury and convenience.",
-    specializations: ["Executive flights", "Luxury accommodations", "VIP services", "Corporate travel policies"],
-  },
-  2: {
-    name: "Marcus",
-    role: "Corporate Travel Specialist",
-    personality:
-      "Detail-oriented and cost-conscious with extensive knowledge of corporate travel compliance and budget optimization.",
-    specializations: ["Policy compliance", "Cost optimization", "Group bookings", "Travel expense management"],
-  },
-  3: {
-    name: "Sophia",
-    role: "Concierge & VIP Services",
-    personality:
-      "Elegant and sophisticated with expertise in luxury travel experiences and personalized concierge services.",
-    specializations: ["Luxury experiences", "Fine dining reservations", "Exclusive events", "Personal concierge"],
-  },
-  4: {
-    name: "Alex",
-    role: "Tech & Innovation Guide",
-    personality: "Modern and tech-savvy, helping integrate the latest travel technology and digital solutions.",
-    specializations: ["Travel apps", "Digital integration", "Tech solutions", "Innovation consulting"],
-  },
-}
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+})
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, agentId } = await request.json()
+    const { message, agent = "sophia", context = "business_travel" } = await request.json()
 
-    if (!message || !agentId) {
-      return NextResponse.json({ error: "Message and agentId are required" }, { status: 400 })
+    if (!message || typeof message !== "string") {
+      return NextResponse.json({ error: "Message is required and must be a string" }, { status: 400 })
     }
 
-    const agent = AGENT_PERSONALITIES[agentId as keyof typeof AGENT_PERSONALITIES]
-
-    if (!agent) {
-      return NextResponse.json({ error: "Invalid agent ID" }, { status: 400 })
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error("ANTHROPIC_API_KEY is not configured")
+      return NextResponse.json({ error: "AI service is not configured", success: false }, { status: 500 })
     }
 
-    // Simulate AI processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    const systemPrompt = `You are ${agent}, an AI voice assistant for Suitpax business travel platform. You are having a voice conversation, so:
 
-    // Generate contextual responses based on the message content
-    let response = ""
+- Keep responses conversational and natural for speech
+- Be concise but helpful (2-3 sentences max for voice)
+- Use a friendly, professional tone
+- Focus on business travel: flights, hotels, expenses, policies
+- If you need clarification, ask one specific question
 
-    const lowerMessage = message.toLowerCase()
+Context: ${context}`
 
-    if (lowerMessage.includes("flight") || lowerMessage.includes("fly")) {
-      response = `I'd be happy to help you with flight arrangements! As your ${agent.role}, I can assist with finding the best flights, checking availability, and ensuring you get the most suitable options for your business travel. What's your destination and preferred travel dates?`
-    } else if (lowerMessage.includes("hotel") || lowerMessage.includes("accommodation")) {
-      response = `Excellent! I can help you find the perfect accommodation. I'll look for hotels that meet your business needs, whether you need meeting facilities, proximity to your business meetings, or specific amenities. Where will you be staying and what are your requirements?`
-    } else if (lowerMessage.includes("policy") || lowerMessage.includes("expense")) {
-      response = `I can definitely help with travel policies and expense management. I'll make sure your bookings comply with your company's travel guidelines and help streamline the expense reporting process. What specific policy questions do you have?`
-    } else if (lowerMessage.includes("change") || lowerMessage.includes("cancel")) {
-      response = `I understand you need to make changes to your booking. I can help you modify your travel arrangements while minimizing any fees and ensuring the changes work with your schedule. What would you like to change?`
-    } else if (lowerMessage.includes("restaurant") || lowerMessage.includes("dining")) {
-      response = `I'd be delighted to recommend dining options! I can suggest restaurants near your hotel or meeting locations, make reservations, and ensure they meet any dietary requirements you might have. What type of cuisine are you interested in?`
-    } else {
-      response = `Thank you for reaching out! As ${agent.name}, your ${agent.role}, I'm here to help with all your business travel needs. I specialize in ${agent.specializations.slice(0, 2).join(" and ")}. How can I assist you today?`
-    }
+    const response = await anthropic.messages.create({
+      model: "claude-3-opus-20240229",
+      max_tokens: 150,
+      temperature: 0.7,
+      system: systemPrompt,
+      messages: [
+        {
+          role: "user",
+          content: message,
+        },
+      ],
+    })
 
-    // Save conversation to database (optional)
-    try {
-      const supabase = createServerClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+    const responseText =
+      response.content[0]?.type === "text"
+        ? response.content[0].text
+        : "I'm sorry, I didn't catch that. Could you please repeat your request?"
 
-      if (user) {
-        await supabase.from("ai_conversations").insert({
-          user_id: user.id,
-          agent_id: agentId.toString(),
-          title: message.substring(0, 50) + "...",
-          messages: [
-            { role: "user", content: message, timestamp: new Date().toISOString() },
-            { role: "assistant", content: response, timestamp: new Date().toISOString() },
-          ],
-          tokens_used: Math.floor(message.length / 4) + Math.floor(response.length / 4), // Rough token estimate
-        })
-      }
-    } catch (dbError) {
-      console.error("Database error:", dbError)
-      // Continue without saving to DB
-    }
-
-    return NextResponse.json({ response })
+    return NextResponse.json({
+      success: true,
+      response: responseText,
+      agent: agent,
+    })
   } catch (error) {
-    console.error("Conversation error:", error)
-    return NextResponse.json({ error: "Failed to process conversation" }, { status: 500 })
+    console.error("Voice AI API Error:", error)
+
+    return NextResponse.json(
+      {
+        error: "I'm having trouble processing your request right now. Please try again.",
+        success: false,
+      },
+      { status: 500 },
+    )
   }
 }

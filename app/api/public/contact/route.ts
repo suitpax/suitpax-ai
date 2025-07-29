@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 
 // Brevo API configuration
-const BREVO_API_KEY = "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"
+const BREVO_API_KEY = process.env.BREVO_API_KEY
 const BREVO_API_URL = "https://api.brevo.com/v3"
 
 interface ContactFormData {
@@ -11,6 +11,17 @@ interface ContactFormData {
 }
 
 export async function POST(request: NextRequest) {
+  if (!BREVO_API_KEY) {
+    console.error("Brevo API key is not configured.")
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Server configuration error. The contact form is temporarily unavailable.",
+      },
+      { status: 500 },
+    )
+  }
+
   try {
     const body: ContactFormData = await request.json()
     const { name, email, message } = body
@@ -26,8 +37,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid email format" }, { status: 400 })
     }
 
-    // Prepare email data for Brevo
-    const emailData = {
+    // 1. Send internal notification email to Suitpax Team
+    const internalEmailData = {
       sender: {
         name: "Suitpax Contact Form",
         email: "noreply@suitpax.com",
@@ -81,24 +92,24 @@ export async function POST(request: NextRequest) {
       `,
     }
 
-    // Send email via Brevo
-    const response = await fetch(`${BREVO_API_URL}/smtp/email`, {
+    const internalEmailResponse = await fetch(`${BREVO_API_URL}/smtp/email`, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
         "api-key": BREVO_API_KEY,
       },
-      body: JSON.stringify(emailData),
+      body: JSON.stringify(internalEmailData),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error("Brevo API error:", errorData)
-      throw new Error(`Brevo API error: ${response.status}`)
+    if (!internalEmailResponse.ok) {
+      const errorData = await internalEmailResponse.json()
+      console.error("Brevo API error (Internal Email):", errorData)
+      throw new Error(`Brevo API error: ${internalEmailResponse.status}`)
     }
+    console.log("Internal contact email sent successfully.")
 
-    // Add contact to Brevo
+    // 2. Add contact to Brevo list
     const contactResponse = await fetch(`${BREVO_API_URL}/contacts`, {
       method: "POST",
       headers: {
@@ -117,7 +128,13 @@ export async function POST(request: NextRequest) {
       }),
     })
 
-    // Send confirmation email to user
+    if (!contactResponse.ok) {
+      console.warn("Brevo API warning (Add Contact):", await contactResponse.json())
+    } else {
+      console.log("Contact added/updated in Brevo successfully.")
+    }
+
+    // 3. Send confirmation email to the user
     const confirmationEmailData = {
       sender: {
         name: "Suitpax Team",
@@ -176,7 +193,6 @@ export async function POST(request: NextRequest) {
       `,
     }
 
-    // Send confirmation email
     await fetch(`${BREVO_API_URL}/smtp/email`, {
       method: "POST",
       headers: {

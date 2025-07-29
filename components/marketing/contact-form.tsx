@@ -74,7 +74,11 @@ export default function ContactForm() {
         </div>
         <h3 className="text-xl font-medium tracking-tighter mb-2">Message Sent!</h3>
         <p className="text-gray-600 text-sm mb-6">Thank you for reaching out. We'll get back to you within 24 hours.</p>
-        <Button onClick={() => setIsSubmitted(false)} variant="outline" className="bg-transparent hover:bg-gray-50">
+        <Button
+          onClick={() => setIsSubmitted(false)}
+          variant="outline"
+          className="bg-transparent hover:bg-gray-50 rounded-xl"
+        >
           Send Another Message
         </Button>
       </motion.div>
@@ -88,9 +92,9 @@ export default function ContactForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-medium tracking-tighter mb-2">Get in Touch</h2>
-        <p className="text-gray-600 text-sm">Have questions? We'd love to hear from you.</p>
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold tracking-tighter mb-2">Get in Touch</h2>
+        <p className="text-gray-600">Have questions? We'd love to hear from you.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -107,7 +111,7 @@ export default function ContactForm() {
             onChange={handleChange}
             required
             disabled={isSubmitting}
-            className="bg-white/70 border-gray-200 focus:border-gray-400 rounded-xl"
+            className="bg-white/70 border-gray-300 focus:border-black rounded-xl py-6"
             placeholder="Enter your full name"
           />
         </div>
@@ -125,7 +129,7 @@ export default function ContactForm() {
             onChange={handleChange}
             required
             disabled={isSubmitting}
-            className="bg-white/70 border-gray-200 focus:border-gray-400 rounded-xl"
+            className="bg-white/70 border-gray-300 focus:border-black rounded-xl py-6"
             placeholder="Enter your email address"
           />
         </div>
@@ -142,8 +146,8 @@ export default function ContactForm() {
             onChange={handleChange}
             required
             disabled={isSubmitting}
-            rows={4}
-            className="bg-white/70 border-gray-200 focus:border-gray-400 rounded-xl resize-none"
+            rows={5}
+            className="bg-white/70 border-gray-300 focus:border-black rounded-xl resize-none"
             placeholder="Tell us about your inquiry..."
           />
         </div>
@@ -151,7 +155,7 @@ export default function ContactForm() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-black hover:bg-gray-800 text-white rounded-xl py-3 font-medium tracking-tighter transition-colors"
+          className="w-full bg-black hover:bg-gray-800 text-white rounded-xl py-6 font-medium tracking-tighter transition-colors"
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">

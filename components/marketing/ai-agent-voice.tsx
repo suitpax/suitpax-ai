@@ -458,7 +458,7 @@ export default function AIAgentVoice() {
           >
             <div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-gray-800 shadow-2xl">
               <video autoPlay loop muted playsInline className="w-full h-full object-cover">
-                <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/supermotion_co%20%282%29-LZW6upr6wueJqrBR2IXAVsHnPh3bJs.mp4" type="video/mp4" />
+                <source src="/videos/supermotion_co.mp4" type="video/mp4" />
               </video>
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
               <div className="absolute bottom-1 left-1 right-1 text-center">
