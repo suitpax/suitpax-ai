@@ -1,364 +1,143 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
-import { useEffect, useState } from "react"
-import AIChat from "@/components/ui/ai-chat"
+import { useState, useEffect } from "react"
 
-// Actualizar el array de titleVariations para incluir los títulos específicos solicitados
-const titleVariations = [
-  "MCP-powered AI Agents for next-gen travel",
-  "AI Agents with MCP superpowers",
-  "Business travel transformed with MCP technology",
-  "AI Agents revolutionizing business travel",
-  "AI Agents with superhuman travel capabilities",
-  "AI Agents that transform how you travel",
-  "AI Agents: The ultimate travel powerhouse",
-  "AI Agents unleashing travel potential",
-  "Contextually-aware AI Agents with MCP technology",
-  "Supercharged travel agents with MCP intelligence",
-]
-
-// Subtítulos
-const subtitles = [
-  "Designed to make your journey seamless, personalized, and efficient",
-  "Handling the complexities of travel so you can focus on what matters",
-  "Intelligent assistance that adapts to your unique travel preferences",
-  "Transforming business travel with cutting-edge AI technology",
-  "Leveraging MCP technology for unprecedented contextual understanding",
-  "AI agents that maintain context across your entire travel journey",
-  "Enhanced with Model Context Protocol for superior travel intelligence",
-  "Next-generation AI with MCP capabilities for smarter travel planning",
-]
-
-// Actualizar la lista de agentes para incluir los nuevos con sus roles específicos:
-
-const agents = [
+const agentVideos = [
   {
     id: 1,
-    name: "Luna",
-    avatar: "/agents/agent-12.png",
-    role: "AI Agent",
-    description: "Coordinates travel for corporate and sports teams with personalized itineraries.",
+    name: "Emma",
+    role: "Executive Assistant",
+    videoUrl: "/videos/agent-emma.mp4",
+    specialty: "Luxury travel coordination",
   },
   {
     id: 2,
-    name: "Kahn",
-    avatar: "/agents/kahn-avatar.png",
-    role: "AI Agent",
-    description: "Organizes and prioritizes travel-related tasks to maximize productivity.",
+    name: "Marcus",
+    role: "Corporate Specialist",
+    videoUrl: "/videos/agent-marcus.mp4",
+    specialty: "Policy compliance",
   },
   {
     id: 3,
-    name: "Winter",
-    avatar: "/agents/agent-52.png",
-    role: "AI Agent",
-    description: "Manages membership programs and exclusive benefits for frequent travelers.",
+    name: "Sophia",
+    role: "VIP Concierge",
+    videoUrl: "/videos/agent-sophia.mp4",
+    specialty: "Premium experiences",
   },
   {
     id: 4,
-    name: "Sophia",
-    avatar: "/agents/agent-17.png",
-    role: "AI Agent",
-    description: "Creates personalized luxury travel experiences for executives.",
+    name: "Alex",
+    role: "Tech Guide",
+    videoUrl: "/videos/agent-alex.mp4",
+    specialty: "Digital solutions",
   },
   {
     id: 5,
-    name: "Zara",
-    avatar: "/agents/agent-21.png",
-    role: "AI Agent",
-    description: "Designs eco-friendly itineraries minimizing carbon footprint.",
+    name: "Luna",
+    role: "Global Coordinator",
+    videoUrl: "/videos/agent-luna.mp4",
+    specialty: "International travel",
   },
   {
     id: 6,
-    name: "Nova",
-    avatar: "/agents/agent-36.png",
-    role: "AI Agent",
-    description: "Specializes in seamless travel experiences with cutting-edge technology integration.",
+    name: "Kai",
+    role: "Flight Expert",
+    videoUrl: "/videos/agent-kai.mp4",
+    specialty: "Aviation logistics",
   },
-  {
-    id: 7,
-    name: "Lily",
-    avatar: "/agents/agent-56.png",
-    role: "AI Agent",
-    description: "Organizes adventure experiences and extreme sports for intrepid travelers.",
-  },
-  {
-    id: 8,
-    name: "Alex",
-    avatar: "/agents/agent-8.png",
-    role: "AI Agent",
-    description: "Leverages AI to predict travel needs and provide proactive solutions.",
-  },
-  {
-    id: 9,
-    name: "Kia",
-    avatar: "/agents/agent-9.png",
-    role: "AI Agent",
-    description: "Streamlines corporate travel processes for maximum efficiency and cost savings.",
-  },
-  {
-    id: 10,
-    name: "Jasmine",
-    avatar: "/agents/agent-38.png",
-    role: "AI Agent",
-    description: "Analyzes travel patterns to provide data-driven recommendations for businesses.",
-  },
-  {
-    id: 11,
-    name: "Noah",
-    avatar: "/agents/agent-15.png",
-    role: "AI Agent",
-    description: "Specializes in luxury accommodations and VIP travel arrangements.",
-  },
-  {
-    id: 12,
-    name: "Emma",
-    avatar: "/agents/agent-16.png",
-    role: "AI Agent",
-    description: "Expert in international business travel regulations and visa requirements.",
-  },
-  {
-    id: 13,
-    name: "Lhoe",
-    avatar: "/agents/agent-20.png",
-    role: "AI Agent",
-    description: "Manages group travel logistics and team-building experiences.",
-  },
-  {
-    id: 14,
-    name: "Ava",
-    avatar: "/agents/agent-18.png",
-    role: "AI Agent",
-    description: "Specializes in emergency travel assistance and last-minute arrangements.",
-  },
-  {
-    id: 15,
-    name: "Ethan",
-    avatar: "/agents/agent-19.png",
-    role: "AI Agent",
-    description: "Creates custom travel experiences based on personal preferences and interests.",
-  },
-]
-
-// Mini badges para categorías de viajes de negocios
-const travelCategories = [
-  "Business Travel",
-  "Automated Travel Policies",
-  "Expense Management",
-  "Corporate Rates",
-  "Team Travel",
-  "Duty of Care",
-  "Travel Analytics",
-  "Sustainability",
-  "Airport VIP Lounge",
-  "Group Bookings",
-  "24/7 Support",
-  "Travel Risk Management",
 ]
 
 export const AITravelAgents = () => {
-  const [randomTitle, setRandomTitle] = useState("")
-  const [randomSubtitle, setRandomSubtitle] = useState("")
-  const [activeAgent, setActiveAgent] = useState(7)
+  const [currentAgent, setCurrentAgent] = useState(0)
 
   useEffect(() => {
-    // Seleccionar un título aleatorio al montar el componente
-    const titleIndex = Math.floor(Math.random() * titleVariations.length)
-    setRandomTitle(titleVariations[titleIndex])
-
-    // Seleccionar un subtítulo aleatorio
-    const subtitleIndex = Math.floor(Math.random() * subtitles.length)
-    setRandomSubtitle(subtitles[subtitleIndex])
-
-    // Cycle through agents automatically for demo effect
     const interval = setInterval(() => {
-      setActiveAgent((prev) => (prev % agents.length) + 1)
+      setCurrentAgent((prev) => (prev + 1) % agentVideos.length)
     }, 3000)
 
     return () => clearInterval(interval)
   }, [])
 
   return (
-    <section className="pt-12 pb-6 bg-gray-50">
+    <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center text-center mb-12">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-4">
             <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-              Introducing Suitpax AI
+              AI Agents
             </span>
             <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
-              <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse mr-1"></span>
-              Q3 2025
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-950 animate-pulse mr-1"></span>
+              Live Preview
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
-            {randomTitle}
-          </h2>
-          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6">{randomSubtitle}</p>
 
-          {/* AI Chat Interface - Moved here */}
-          <div className="max-w-2xl w-full mx-auto mb-12">
-            <AIChat />
-          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none mb-4">
+            Meet your AI travel team
+          </h2>
+
+          <p className="text-sm font-medium text-gray-500 max-w-2xl mx-auto">
+            Specialized AI agents working 24/7 to handle every aspect of your business travel needs
+          </p>
         </div>
 
-        <div className="relative max-w-3xl mx-auto mb-16">
-          {/* Arcade-style agent selection with flow effect */}
-          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden min-h-[400px]">
-            {/* Flow effect background */}
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute -inset-1 bg-gray-200/40 blur-xl"></div>
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {agentVideos.map((agent, index) => (
               <motion.div
-                className="absolute top-0 left-0 w-full h-60 bg-gray-200/30"
-                animate={{
-                  y: [0, 100, 0],
-                  opacity: [0.1, 0.3, 0.1],
-                  scale: [1, 1.1, 1],
-                }}
-                transition={{
-                  repeat: Number.POSITIVE_INFINITY,
-                  duration: 15,
-                  ease: "easeInOut",
-                }}
-              />
-              <motion.div
-                className="absolute bottom-0 right-0 w-full h-40 bg-gray-200/20"
-                animate={{
-                  y: [0, -100, 0],
-                  opacity: [0.1, 0.4, 0.1],
-                  scale: [1, 1.3, 1],
-                  rotate: [0, 2, 0, -2, 0],
-                }}
-                transition={{
-                  repeat: Number.POSITIVE_INFINITY,
-                  duration: 15,
-                  ease: "easeInOut",
-                  delay: 2,
-                }}
-              />
-            </div>
-
-            <div className="relative z-10">
-              <h3 className="text-2xl sm:text-3xl md:text-3xl font-medium text-left tracking-tighter text-black mb-4 leading-none">
-                Groundbreaking AI Agents with MCP superpowers
-              </h3>
-              <p className="text-lg font-medium text-gray-700 tracking-tighter mb-4">
-                Transforming business travel with Model Context Protocol for enhanced intelligence
-              </p>
-
-              <p className="text-sm text-gray-600 mb-8 max-w-md">
-                Designed to revolutionize your business travel experience with MCP-powered contextual understanding,
-                personalized recommendations, and seamless journey orchestration
-              </p>
-
-              {/* Agent grid with arcade-style selection - updated to show more agents in a 5x2 grid */}
-              <div className="grid grid-cols-5 gap-2 md:gap-3">
-                {agents.map((agent) => (
-                  <motion.div
-                    key={agent.id}
-                    className={`flex flex-col items-center cursor-pointer relative ${
-                      activeAgent === agent.id ? "scale-105" : ""
-                    }`}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => setActiveAgent(agent.id)}
-                  >
-                    <div className="relative mb-2 group">
-                      {/* Highlight effect for active agent */}
-                      {activeAgent === agent.id && (
-                        <motion.div
-                          className="absolute -inset-1 rounded-xl bg-emerald-950/10"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 0.3 }}
-                          layoutId="highlight"
-                        />
-                      )}
-
-                      {/* Flow effect for active agent */}
-                      {activeAgent === agent.id && (
-                        <motion.div
-                          className="absolute -inset-3 rounded-xl bg-gray-200/40 -z-10"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{
-                            opacity: [0.4, 0.7, 0.4],
-                            scale: [0.9, 1.1, 0.9],
-                            rotate: [0, 5, 0, -5, 0],
-                          }}
-                          transition={{
-                            duration: 3,
-                            repeat: Number.POSITIVE_INFINITY,
-                            ease: "easeInOut",
-                          }}
-                        />
-                      )}
-
-                      <div
-                        className={`relative w-12 h-12 overflow-hidden rounded-xl border-2 ${
-                          activeAgent === agent.id ? "border-emerald-950/30 shadow-lg" : "border-gray-200"
-                        }`}
-                      >
-                        <Image
-                          src={agent.avatar || "/placeholder.svg"}
-                          alt={agent.name}
-                          width={48}
-                          height={48}
-                          className="w-full h-full object-cover object-center"
-                        />
-                      </div>
+                key={agent.id}
+                className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
+                  currentAgent === index ? "border-black shadow-lg scale-105" : "border-gray-200 hover:border-gray-300"
+                }`}
+                whileHover={{ scale: currentAgent === index ? 1.05 : 1.02 }}
+                onClick={() => setCurrentAgent(index)}
+              >
+                <div className="aspect-[3/4] bg-gray-100 relative cursor-pointer">
+                  {/* Placeholder for video - in production you'd use actual video files */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-8 h-8 bg-gray-400 rounded-full mx-auto mb-2 animate-pulse"></div>
+                      <div className="w-12 h-2 bg-gray-400 rounded mx-auto animate-pulse"></div>
                     </div>
-                    <h3
-                      className={`text-[10px] font-medium mb-0.5 text-center w-full ${activeAgent === agent.id ? "text-emerald-950" : "text-gray-700"}`}
-                    >
-                      {agent.name}
-                    </h3>
-                    <p className="text-[8px] text-gray-500 text-center w-full">{agent.role}</p>
-                  </motion.div>
-                ))}
-              </div>
+                  </div>
 
-              {/* Mini badges para categorías de viajes de negocios - Estilo actualizado para coincidir con AI Chat */}
-              <div className="mt-8 flex flex-wrap gap-2 justify-center">
-                {travelCategories.map((category, index) => (
-                  <motion.span
-                    key={index}
-                    className="inline-flex items-center rounded-xl border border-black/30 px-2 py-0.5 text-[10px] font-medium text-black cursor-pointer hover:bg-gray-100 transition-colors"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {category}
-                  </motion.span>
-                ))}
-              </div>
+                  {/* Agent info overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                    <h3 className="text-white text-xs font-medium">{agent.name}</h3>
+                    <p className="text-white/80 text-[10px]">{agent.role}</p>
+                  </div>
 
-              {/* Destacar algunas categorías con colores especiales */}
-              <div className="mt-3 flex flex-wrap gap-2 justify-center">
-                <motion.span
-                  className="inline-flex items-center rounded-xl border border-emerald-950/30 bg-emerald-950/5 px-2 py-0.5 text-[10px] font-medium text-emerald-950 cursor-pointer hover:bg-emerald-950/10 transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-950 mr-1"></span>
-                  MCP-Powered Intelligence
-                </motion.span>
-                <motion.span
-                  className="inline-flex items-center rounded-xl border border-black/30 px-2 py-0.5 text-[10px] font-medium text-black cursor-pointer hover:bg-gray-100 transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse mr-1"></span>
-                  Contextual Understanding
-                </motion.span>
-                <motion.span
-                  className="inline-flex items-center rounded-xl border border-black/30 px-2 py-0.5 text-[10px] font-medium text-black cursor-pointer hover:bg-gray-100 transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-black mr-1"></span>
-                  Model Context Protocol
-                </motion.span>
-              </div>
-            </div>
+                  {/* Active indicator */}
+                  {currentAgent === index && (
+                    <div className="absolute top-2 right-2">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            ))}
           </div>
+
+          {/* Current agent details */}
+          <motion.div
+            key={currentAgent}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mt-8 text-center bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+          >
+            <h3 className="text-xl font-medium tracking-tighter text-black mb-2">{agentVideos[currentAgent].name}</h3>
+            <p className="text-sm text-gray-600 mb-3">{agentVideos[currentAgent].role}</p>
+            <p className="text-xs font-medium text-gray-500">Specializing in {agentVideos[currentAgent].specialty}</p>
+
+            <div className="flex justify-center mt-4">
+              <span className="inline-flex items-center rounded-xl bg-gray-200 px-3 py-1 text-xs font-medium text-gray-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 mr-2"></span>
+                Available now
+              </span>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>
