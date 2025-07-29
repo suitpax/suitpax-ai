@@ -1,294 +1,356 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
-import {
-  PiMicrophoneBold,
-  PiMicrophoneSlashBold,
-  PiSpeakerHighBold,
-  PiSpeakerSlashBold,
-  PiStopBold,
-  PiWaveformBold,
-  PiCircleBold,
-} from "react-icons/pi"
+import { motion, AnimatePresence } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Mic, MicOff, Phone, PhoneOff, Volume2, Loader2 } from "lucide-react"
 import { useSpeechToText } from "@/hooks/use-speech-to-text"
 import { useAudioPlayer } from "@/hooks/use-audio-player"
 
+interface Message {
+  id: string
+  type: "user" | "assistant"
+  content: string
+  timestamp: Date
+}
+
 export default function AIVoiceAssistant() {
-  const [isListening, setIsListening] = useState(false)
-  const [isSpeaking, setIsSpeaking] = useState(false)
-  const [currentMessage, setCurrentMessage] = useState("")
-  const [conversation, setConversation] = useState<
-    Array<{ id: string; type: "user" | "ai"; text: string; timestamp: Date }>
-  >([])
-  const [audioLevel, setAudioLevel] = useState(0)
+  const [isCallActive, setIsCallActive] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [currentResponse, setCurrentResponse] = useState("")
 
-  const { transcript, isListening: speechListening, startListening, stopListening, resetTranscript } = useSpeechToText()
+  const { isListening, transcript, startListening, stopListening, resetTranscript, isSupported } = useSpeechToText()
 
-  const { isPlaying, play, pause, stop } = useAudioPlayer()
+  const { play, isPlaying } = useAudioPlayer()
 
-  // Simulate audio level for visualization
+  // Auto-send transcript when user stops speaking
   useEffect(() => {
-    if (isListening) {
-      const interval = setInterval(() => {
-        setAudioLevel(Math.random() * 100)
-      }, 100)
-      return () => clearInterval(interval)
-    } else {
-      setAudioLevel(0)
+    if (transcript && !isListening && isCallActive) {
+      handleSendMessage(transcript)
+      resetTranscript()
     }
-  }, [isListening])
+  }, [transcript, isListening, isCallActive])
 
-  const handleStartListening = async () => {
-    setIsListening(true)
-    await startListening()
+  const startCall = async () => {
+    setIsCallActive(true)
+    setMessages([])
+
+    // Zia's greeting
+    const greeting = "Hi! I'm Zia, your AI travel assistant. How can I help you with your business travel today?"
+
+    const greetingMessage: Message = {
+      id: Date.now().toString(),
+      type: "assistant",
+      content: greeting,
+      timestamp: new Date(),
+    }
+
+    setMessages([greetingMessage])
+
+    // Convert greeting to speech
+    try {
+      const response = await fetch("/api/elevenlabs/text-to-speech", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: greeting }),
+      })
+
+      if (response.ok) {
+        const audioBlob = await response.blob()
+        const audioUrl = URL.createObjectURL(audioBlob)
+        await play(audioUrl)
+      }
+    } catch (error) {
+      console.error("Error generating speech:", error)
+    }
   }
 
-  const handleStopListening = async () => {
-    setIsListening(false)
-    await stopListening()
+  const endCall = () => {
+    setIsCallActive(false)
+    stopListening()
+    setMessages([])
+    setCurrentResponse("")
+  }
 
-    if (transcript) {
-      const userMessage = {
-        id: Date.now().toString(),
-        type: "user" as const,
-        text: transcript,
+  const handleSendMessage = async (text: string) => {
+    if (!text.trim() || isProcessing) return
+
+    setIsProcessing(true)
+
+    // Add user message
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: "user",
+      content: text,
+      timestamp: new Date(),
+    }
+
+    setMessages((prev) => [...prev, userMessage])
+
+    try {
+      // Get AI response
+      const response = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: text,
+          context:
+            "You are Zia, a helpful AI travel assistant for business travelers. Keep responses concise and focused on travel-related topics like flights, hotels, expenses, and travel policies.",
+        }),
+      })
+
+      if (!response.ok) throw new Error("Failed to get AI response")
+
+      const data = await response.json()
+      const aiResponse = data.message || "I'm sorry, I didn't understand that. Could you please rephrase?"
+
+      // Add AI message
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "assistant",
+        content: aiResponse,
         timestamp: new Date(),
       }
 
-      setConversation((prev) => [...prev, userMessage])
+      setMessages((prev) => [...prev, aiMessage])
+      setCurrentResponse(aiResponse)
 
-      // Generate AI response with ElevenLabs
-      setTimeout(async () => {
-        const aiResponse = {
-          id: (Date.now() + 1).toString(),
-          type: "ai" as const,
-          text: "I understand you're looking for travel assistance. Let me help you with that booking right away.",
-          timestamp: new Date(),
-        }
-        setConversation((prev) => [...prev, aiResponse])
-        setIsSpeaking(true)
+      // Convert to speech
+      const speechResponse = await fetch("/api/elevenlabs/text-to-speech", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: aiResponse }),
+      })
 
-        // Generate speech with ElevenLabs
-        try {
-          const response = await fetch("/api/elevenlabs/generate-speech", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              text: aiResponse.text,
-              agentId: "emma",
-            }),
-          })
-
-          if (response.ok) {
-            const audioBlob = await response.blob()
-            const audioUrl = URL.createObjectURL(audioBlob)
-            const audio = new Audio(audioUrl)
-            audio.play()
-
-            audio.onended = () => {
-              setIsSpeaking(false)
-              URL.revokeObjectURL(audioUrl)
-            }
-          }
-        } catch (error) {
-          console.error("Error generating speech:", error)
-          setIsSpeaking(false)
-        }
-      }, 1000)
-
-      resetTranscript()
+      if (speechResponse.ok) {
+        const audioBlob = await speechResponse.blob()
+        const audioUrl = URL.createObjectURL(audioBlob)
+        await play(audioUrl)
+      }
+    } catch (error) {
+      console.error("Error processing message:", error)
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "assistant",
+        content: "I'm sorry, I'm having trouble connecting right now. Please try again.",
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
+      setIsProcessing(false)
     }
   }
 
-  const toggleSpeaker = () => {
-    if (isPlaying) {
-      pause()
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening()
     } else {
-      play()
+      startListening()
     }
   }
 
   return (
-    <section className="py-16 md:py-24 bg-gray-100/50 backdrop-blur-sm">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center rounded-xl bg-gray-200/80 backdrop-blur-sm px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-6 border border-gray-300/50">
-            <Image src="/logo/suitpax-symbol.webp" alt="Suitpax" width={12} height={12} className="mr-1.5 w-3 h-3" />
-            AI Voice Assistant
-          </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-medium tracking-tighter leading-none mb-6 text-gray-900">
-            Speak with your
-            <br />
-            <span className="text-gray-600 font-inter">travel assistant</span>
-          </h2>
-          <p className="text-lg font-light text-gray-600 max-w-3xl mx-auto font-inter">
-            Interact naturally with our AI assistant using your voice. Plan trips, manage bookings, and get personalized
-            recommendations through natural conversation.
-          </p>
+    <section className="w-full py-12 pb-6 bg-gray-50">
+      <div className="container px-4 md:px-6 mx-auto">
+        <div className="flex flex-col items-center text-center space-y-4 mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <div className="flex justify-center items-center gap-1.5 mb-4">
+              <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
+                AI Voice Assistant
+              </span>
+            </div>
+
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none max-w-4xl mx-auto mb-6 text-black">
+              Meet Zia, your AI travel assistant
+            </h2>
+
+            <p className="mt-4 text-base font-light text-gray-600 max-w-3xl mb-8">
+              Have natural voice conversations with Zia about your business travel needs. Book flights, find hotels,
+              manage expenses, and get travel policy guidance - all through voice commands.
+            </p>
+          </motion.div>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white/40 backdrop-blur-md rounded-2xl border border-gray-300/50 shadow-lg p-8">
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Voice Interface */}
-              <div className="space-y-6">
-                <div className="text-center">
-                  <div className="relative inline-flex items-center justify-center">
-                    {/* Audio Visualization */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      {isListening && (
-                        <motion.div
-                          className="w-32 h-32 rounded-full bg-gray-300/20 backdrop-blur-sm border border-gray-400/30"
-                          animate={{ scale: [1, 1.1, 1] }}
-                          transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
-                        />
-                      )}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="max-w-4xl mx-auto"
+        >
+          <div className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm">
+            {!isCallActive ? (
+              // Initial state - Show Zia
+              <div className="text-center">
+                <div className="relative inline-block mb-6">
+                  <div className="relative">
+                    <Image
+                      src="/agents/agent-5.png"
+                      alt="Zia - AI Travel Assistant"
+                      width={120}
+                      height={120}
+                      className="rounded-md mx-auto"
+                    />
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
                     </div>
-
-                    {/* Main Microphone Button */}
-                    <motion.button
-                      onClick={isListening ? handleStopListening : handleStartListening}
-                      className={`relative z-10 w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-lg backdrop-blur-sm border ${
-                        isListening
-                          ? "bg-gray-700/90 hover:bg-gray-800/90 text-white border-gray-600/50"
-                          : "bg-gray-800/90 hover:bg-gray-900/90 text-white border-gray-700/50"
-                      }`}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      {isListening ? (
-                        <PiMicrophoneSlashBold className="w-8 h-8" />
-                      ) : (
-                        <PiMicrophoneBold className="w-8 h-8" />
-                      )}
-                    </motion.button>
                   </div>
-
-                  <p className="mt-4 text-sm font-medium text-gray-600 font-inter">
-                    {isListening ? "Listening..." : "Tap to speak"}
-                  </p>
                 </div>
 
-                {/* Audio Level Indicator */}
-                {isListening && (
-                  <div className="flex items-center justify-center space-x-1">
-                    {[...Array(5)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="w-1 bg-gray-700/80 rounded-full"
-                        animate={{
-                          height: [4, Math.max(4, audioLevel * 0.3), 4],
-                        }}
-                        transition={{
-                          duration: 0.5,
-                          repeat: Number.POSITIVE_INFINITY,
-                          delay: i * 0.1,
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
+                <h3 className="text-xl font-medium tracking-tighter text-black mb-2">Zia</h3>
+                <p className="text-sm font-light text-gray-600 mb-6">AI Travel Assistant</p>
 
-                {/* Controls */}
-                <div className="flex justify-center space-x-4">
-                  <button
-                    onClick={toggleSpeaker}
-                    className="p-3 rounded-xl bg-gray-200/60 backdrop-blur-sm hover:bg-gray-300/60 transition-colors border border-gray-300/50"
-                  >
-                    {isPlaying ? (
-                      <PiSpeakerSlashBold className="w-5 h-5 text-gray-700" />
-                    ) : (
-                      <PiSpeakerHighBold className="w-5 h-5 text-gray-700" />
-                    )}
-                  </button>
+                <Button
+                  onClick={startCall}
+                  className="bg-black hover:bg-gray-800 text-white px-8 py-3 rounded-xl"
+                  disabled={!isSupported}
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Start Voice Call
+                </Button>
 
-                  <button
-                    onClick={() => setConversation([])}
-                    className="p-3 rounded-xl bg-gray-200/60 backdrop-blur-sm hover:bg-gray-300/60 transition-colors border border-gray-300/50"
-                  >
-                    <PiStopBold className="w-5 h-5 text-gray-700" />
-                  </button>
-                </div>
-
-                {/* Current Transcript */}
-                {transcript && (
-                  <div className="p-4 bg-gray-100/60 backdrop-blur-sm rounded-xl border border-gray-300/50">
-                    <p className="text-sm text-gray-700 font-inter">{transcript}</p>
-                  </div>
+                {!isSupported && (
+                  <p className="text-xs text-gray-500 mt-2">Voice recognition not supported in this browser</p>
                 )}
               </div>
-
-              {/* Conversation History */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium tracking-tighter text-gray-900 font-serif">Conversation</h3>
-
-                <div className="h-80 overflow-y-auto space-y-3 p-4 bg-gray-100/40 backdrop-blur-sm rounded-xl border border-gray-300/50">
-                  {conversation.length === 0 ? (
-                    <div className="flex items-center justify-center h-full text-gray-500">
-                      <div className="text-center">
-                        <PiWaveformBold className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm font-inter">Start a conversation</p>
+            ) : (
+              // Active call state
+              <div className="space-y-6">
+                {/* Call header */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Image src="/agents/agent-5.png" alt="Zia" width={80} height={80} className="rounded-md" />
+                    <div>
+                      <h3 className="font-medium text-black">Zia</h3>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span className="text-sm text-gray-600">Connected</span>
                       </div>
                     </div>
-                  ) : (
-                    <AnimatePresence>
-                      {conversation.map((message) => (
-                        <motion.div
-                          key={message.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
+                  </div>
+
+                  <Button onClick={endCall} variant="destructive" size="sm" className="rounded-xl">
+                    <PhoneOff className="w-4 h-4 mr-2" />
+                    End Call
+                  </Button>
+                </div>
+
+                {/* Messages */}
+                <div className="bg-white rounded-xl p-4 max-h-64 overflow-y-auto space-y-3">
+                  <AnimatePresence>
+                    {messages.map((message) => (
+                      <motion.div
+                        key={message.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
+                      >
+                        <div
+                          className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                            message.type === "user" ? "bg-black text-white" : "bg-gray-100 text-gray-900"
+                          }`}
                         >
-                          <div
-                            className={`max-w-xs p-3 rounded-xl backdrop-blur-sm ${
-                              message.type === "user"
-                                ? "bg-gray-800/90 text-white border border-gray-700/50"
-                                : "bg-white/60 border border-gray-300/50 text-gray-700"
-                            }`}
-                          >
-                            {message.type === "ai" && (
-                              <div className="flex items-center mb-2">
-                                <Image
-                                  src="/logo/suitpax-bl-logo.webp"
-                                  alt="Suitpax AI"
-                                  width={16}
-                                  height={16}
-                                  className="w-4 h-4 rounded-xl mr-2"
-                                />
-                                <span className="text-xs font-medium text-gray-500 font-inter">Suitpax AI</span>
-                              </div>
-                            )}
-                            <p className="text-sm font-inter">{message.text}</p>
-                            <p className="text-xs opacity-70 mt-1 font-inter">
-                              {message.timestamp.toLocaleTimeString()}
-                            </p>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
+                          {message.content}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+
+                  {isProcessing && (
+                    <div className="flex justify-start">
+                      <div className="bg-gray-100 px-3 py-2 rounded-lg">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      </div>
+                    </div>
                   )}
                 </div>
 
-                {/* AI Status */}
-                {isSpeaking && (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-200/50 backdrop-blur-sm rounded-xl border border-gray-300/50">
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
-                    >
-                      <PiCircleBold className="w-3 h-3 text-gray-600" />
-                    </motion.div>
-                    <p className="text-sm text-gray-700 font-inter">AI is responding...</p>
+                {/* Current transcript */}
+                {transcript && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                    <p className="text-sm text-blue-800">
+                      <span className="font-medium">You're saying:</span> {transcript}
+                    </p>
                   </div>
                 )}
+
+                {/* Voice controls */}
+                <div className="flex justify-center space-x-4">
+                  <Button
+                    onClick={toggleListening}
+                    disabled={isProcessing}
+                    className={`rounded-full w-16 h-16 ${
+                      isListening ? "bg-red-500 hover:bg-red-600 animate-pulse" : "bg-black hover:bg-gray-800"
+                    }`}
+                  >
+                    {isListening ? <MicOff className="w-6 h-6 text-white" /> : <Mic className="w-6 h-6 text-white" />}
+                  </Button>
+
+                  {isPlaying && (
+                    <div className="flex items-center space-x-2 px-4 py-2 bg-green-100 rounded-xl">
+                      <Volume2 className="w-4 h-4 text-green-600" />
+                      <span className="text-sm text-green-800">Zia is speaking...</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-center">
+                  <p className="text-xs text-gray-500">
+                    {isListening ? "Listening... Speak now" : "Click the microphone to speak"}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
-        </div>
+
+          {/* Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <Card className="bg-white/50 backdrop-blur-sm border-gray-200">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
+                  <span className="text-2xl">✈️</span>
+                </div>
+                <h3 className="text-lg font-medium tracking-tighter text-black mb-2">Flight Booking</h3>
+                <p className="text-sm font-light text-gray-600">
+                  "Book me a flight to New York next Tuesday" - Zia handles complex travel requests naturally.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/50 backdrop-blur-sm border-gray-200">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
+                  <span className="text-2xl">🏨</span>
+                </div>
+                <h3 className="text-lg font-medium tracking-tighter text-black mb-2">Hotel Search</h3>
+                <p className="text-sm font-light text-gray-600">
+                  "Find hotels near the convention center under $200" - Get personalized recommendations instantly.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/50 backdrop-blur-sm border-gray-200">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
+                  <span className="text-2xl">💳</span>
+                </div>
+                <h3 className="text-lg font-medium tracking-tighter text-black mb-2">Expense Help</h3>
+                <p className="text-sm font-light text-gray-600">
+                  "What's our meal policy for international travel?" - Get instant policy clarification.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </motion.div>
       </div>
     </section>
   )

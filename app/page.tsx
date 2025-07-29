@@ -1,14 +1,27 @@
+import dynamic from "next/dynamic"
 import Hero from "@/components/marketing/hero"
 import PartnersShowcase from "@/components/partners-showcase"
 import AITravelAgents from "@/components/marketing/ai-travel-agents"
 import BusinessTravelRevolution from "@/components/marketing/business-travel-revolution"
-import FoundersOpenLetter from "@/components/marketing/founders-open-letter"
-import CloudAIShowcase from "@/components/marketing/cloud-ai-showcase"
-import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
+import FlightBookingShowcase from "@/components/marketing/flight-booking-showcase"
+import IntegrationsShowcase from "@/components/marketing/integrations-showcase"
 import AgenticDisruption from "@/components/marketing/agentic-disruption"
 import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
+import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
 import ContactForm from "@/components/marketing/contact-form"
+import FoundersOpenLetter from "@/components/marketing/founders-open-letter"
+import Footer from "@/components/marketing/footer"
+import Navigation from "@/components/marketing/navigation"
 import type { Metadata } from "next"
+
+// Dynamic imports for performance
+const SplashScreen = dynamic(() => import("@/components/splash-screen"), {
+  ssr: false,
+})
+
+const PasswordProtection = dynamic(() => import("@/components/password-protection"), {
+  ssr: false,
+})
 
 export const metadata: Metadata = {
   title: "Suitpax | AI-Powered Business Travel Platform",
@@ -62,21 +75,29 @@ export const metadata: Metadata = {
   },
 }
 
-export default function Home() {
+export default function HomePage() {
   return (
     <>
-      <main id="main-content" className="w-full">
-        <Hero />
-        <PartnersShowcase />
-        <AITravelAgents />
-        <BusinessTravelRevolution />
-        <CloudAIShowcase />
-        <AgenticDisruption />
-        <AIVoiceAssistant />
-        <AIMeetingsAttachment />
-        <ContactForm />
-        <FoundersOpenLetter />
-      </main>
+      <SplashScreen />
+      <PasswordProtection>
+        <div className="min-h-screen bg-white">
+          <Navigation />
+          <main>
+            <Hero />
+            <PartnersShowcase />
+            <AITravelAgents />
+            <BusinessTravelRevolution />
+            <FlightBookingShowcase />
+            <IntegrationsShowcase />
+            <AgenticDisruption />
+            <AIVoiceAssistant />
+            <AIMeetingsAttachment />
+            <ContactForm />
+            <FoundersOpenLetter />
+          </main>
+          <Footer />
+        </div>
+      </PasswordProtection>
     </>
   )
 }

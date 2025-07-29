@@ -4,75 +4,23 @@ import type React from "react"
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import Image from "next/image"
-import {
-  PiPaperPlaneTiltBold,
-  PiPhoneBold,
-  PiEnvelopeBold,
-  PiMapPinBold,
-  PiClockBold,
-  PiCheckCircleBold,
-  PiWarningBold,
-} from "react-icons/pi"
-
-interface FormData {
-  name: string
-  email: string
-  company: string
-  phone: string
-  inquiryType: string
-  message: string
-}
-
-interface FormErrors {
-  [key: string]: string
-}
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 
 export default function ContactForm() {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     company: "",
-    phone: "",
-    inquiryType: "",
     message: "",
   })
-
-  const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
-  const inquiryTypes = [
-    "Sales Inquiry",
-    "Product Demo",
-    "Technical Support",
-    "Partnership",
-    "Enterprise Solutions",
-    "General Question",
-  ]
-
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {}
-
-    if (!formData.name.trim()) newErrors.name = "Name is required"
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required"
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid"
-    }
-    if (!formData.company.trim()) newErrors.company = "Company is required"
-    if (!formData.inquiryType) newErrors.inquiryType = "Please select an inquiry type"
-    if (!formData.message.trim()) newErrors.message = "Message is required"
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!validateForm()) return
-
     setIsSubmitting(true)
 
     try {
@@ -86,386 +34,143 @@ export default function ContactForm() {
 
       if (response.ok) {
         setIsSubmitted(true)
-        setFormData({
-          name: "",
-          email: "",
-          company: "",
-          phone: "",
-          inquiryType: "",
-          message: "",
-        })
-      } else {
-        throw new Error("Failed to submit form")
+        setFormData({ name: "", email: "", company: "", message: "" })
       }
     } catch (error) {
       console.error("Error submitting form:", error)
-      setErrors({ submit: "Failed to send message. Please try again." })
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }))
-    }
-  }
-
-  if (isSubmitted) {
-    return (
-      <section className="py-16 md:py-24 bg-white">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Success Message */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center lg:text-left"
-              >
-                <div className="inline-flex items-center rounded-xl bg-green-100 px-3 py-1 text-xs font-medium text-green-800 mb-6">
-                  <PiCheckCircleBold className="w-3 h-3 mr-1.5" />
-                  Message Sent Successfully
-                </div>
-
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 text-black">
-                  Thank you for
-                  <br />
-                  <span className="text-gray-600">reaching out</span>
-                </h2>
-
-                <p className="text-lg font-light text-gray-700 mb-8">
-                  We've received your message and will get back to you within 24 hours. Our team is excited to help you
-                  transform your business travel experience.
-                </p>
-
-                <button
-                  onClick={() => setIsSubmitted(false)}
-                  className="px-6 py-3 bg-gray-800 text-white rounded-xl font-medium hover:bg-gray-900 transition-colors"
-                >
-                  Send Another Message
-                </button>
-              </motion.div>
-
-              {/* Contact Info */}
-              <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-8">
-                <h3 className="text-xl font-medium tracking-tighter mb-6 text-black">Get in Touch</h3>
-
-                <div className="space-y-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                      <PiEnvelopeBold className="w-5 h-5 text-gray-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-black mb-1">Email</h4>
-                      <p className="text-gray-600">hello@suitpax.com</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                      <PiPhoneBold className="w-5 h-5 text-gray-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-black mb-1">Phone</h4>
-                      <p className="text-gray-600">+1 (555) 123-4567</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                      <PiClockBold className="w-5 h-5 text-gray-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-black mb-1">Response Time</h4>
-                      <p className="text-gray-600">Within 24 hours</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    )
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
   }
 
   return (
-    <section className="py-16 md:py-24 bg-white">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
-            <Image
-              src="/logo/suitpax-symbol.webp"
-              alt="Suitpax"
-              width={12}
-              height={12}
-              className="mr-1.5 w-3 h-3 brightness-0 invert"
-            />
-            Contact Sales
-          </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 text-black">
-            Ready to transform
-            <br />
-            <span className="text-gray-600">your business travel?</span>
-          </h2>
-          <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto">
-            Get in touch with our team to learn how Suitpax can streamline your corporate travel management and save
-            your company time and money.
-          </p>
+    <section className="w-full py-12 pb-6 bg-white">
+      <div className="container px-4 md:px-6 mx-auto">
+        <div className="flex flex-col items-center text-center space-y-4 mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <div className="flex justify-center items-center gap-1.5 mb-4">
+              <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
+                Contact
+              </span>
+            </div>
+
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none max-w-4xl mx-auto mb-6">
+              Ready to transform your business travel?
+            </h2>
+
+            <p className="mt-4 text-base font-light text-gray-600 max-w-3xl mb-8">
+              Get in touch with our team to learn how Suitpax can streamline your corporate travel management.
+            </p>
+          </motion.div>
         </div>
 
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
-            <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-8">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="max-w-2xl mx-auto"
+        >
+          <div className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm">
+            {isSubmitted ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-medium tracking-tighter text-gray-900 mb-2">Thank you for your message!</h3>
+                <p className="text-base font-light text-gray-600">We'll get back to you within 24 hours.</p>
+              </div>
+            ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-black mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium text-gray-900">
+                      Full Name
+                    </Label>
+                    <Input
                       id="name"
                       name="name"
+                      type="text"
+                      required
                       value={formData.name}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        errors.name ? "border-red-300" : "border-gray-200"
-                      } focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent`}
+                      onChange={handleChange}
+                      className="w-full"
                       placeholder="John Doe"
                     />
-                    {errors.name && (
-                      <p className="mt-1 text-xs text-red-600 flex items-center">
-                        <PiWarningBold className="w-3 h-3 mr-1" />
-                        {errors.name}
-                      </p>
-                    )}
                   </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
-                      Work Email *
-                    </label>
-                    <input
-                      type="email"
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium text-gray-900">
+                      Email Address
+                    </Label>
+                    <Input
                       id="email"
                       name="email"
+                      type="email"
+                      required
                       value={formData.email}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        errors.email ? "border-red-300" : "border-gray-200"
-                      } focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent`}
+                      onChange={handleChange}
+                      className="w-full"
                       placeholder="john@company.com"
                     />
-                    {errors.email && (
-                      <p className="mt-1 text-xs text-red-600 flex items-center">
-                        <PiWarningBold className="w-3 h-3 mr-1" />
-                        {errors.email}
-                      </p>
-                    )}
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="company" className="block text-sm font-medium text-black mb-2">
-                      Company *
-                    </label>
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      value={formData.company}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        errors.company ? "border-red-300" : "border-gray-200"
-                      } focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent`}
-                      placeholder="Acme Corp"
-                    />
-                    {errors.company && (
-                      <p className="mt-1 text-xs text-red-600 flex items-center">
-                        <PiWarningBold className="w-3 h-3 mr-1" />
-                        {errors.company}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-black mb-2">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                      placeholder="+1 (555) 123-4567"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="company" className="text-sm font-medium text-gray-900">
+                    Company
+                  </Label>
+                  <Input
+                    id="company"
+                    name="company"
+                    type="text"
+                    required
+                    value={formData.company}
+                    onChange={handleChange}
+                    className="w-full"
+                    placeholder="Your Company Name"
+                  />
                 </div>
 
-                <div>
-                  <label htmlFor="inquiryType" className="block text-sm font-medium text-black mb-2">
-                    Inquiry Type *
-                  </label>
-                  <select
-                    id="inquiryType"
-                    name="inquiryType"
-                    value={formData.inquiryType}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 rounded-xl border ${
-                      errors.inquiryType ? "border-red-300" : "border-gray-200"
-                    } focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent`}
-                  >
-                    <option value="">Select an option</option>
-                    {inquiryTypes.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.inquiryType && (
-                    <p className="mt-1 text-xs text-red-600 flex items-center">
-                      <PiWarningBold className="w-3 h-3 mr-1" />
-                      {errors.inquiryType}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-black mb-2">
-                    Message *
-                  </label>
-                  <textarea
+                <div className="space-y-2">
+                  <Label htmlFor="message" className="text-sm font-medium text-gray-900">
+                    Message
+                  </Label>
+                  <Textarea
                     id="message"
                     name="message"
-                    rows={5}
+                    required
                     value={formData.message}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 rounded-xl border ${
-                      errors.message ? "border-red-300" : "border-gray-200"
-                    } focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent resize-none`}
-                    placeholder="Tell us about your business travel needs and how we can help..."
+                    onChange={handleChange}
+                    className="w-full min-h-[120px]"
+                    placeholder="Tell us about your business travel needs..."
                   />
-                  {errors.message && (
-                    <p className="mt-1 text-xs text-red-600 flex items-center">
-                      <PiWarningBold className="w-3 h-3 mr-1" />
-                      {errors.message}
-                    </p>
-                  )}
                 </div>
 
-                {errors.submit && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                    <p className="text-sm text-red-600 flex items-center">
-                      <PiWarningBold className="w-4 h-4 mr-2" />
-                      {errors.submit}
-                    </p>
-                  </div>
-                )}
-
-                <button
+                <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full px-6 py-4 bg-gray-800 text-white rounded-xl font-medium hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="w-full bg-gray-800 hover:bg-gray-900 text-white py-3 text-base font-medium"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      Sending Message...
-                    </>
-                  ) : (
-                    <>
-                      <PiPaperPlaneTiltBold className="w-4 h-4 mr-2" />
-                      Send Message
-                    </>
-                  )}
-                </button>
-
-                <p className="text-xs text-gray-500 text-center">
-                  By submitting this form, you agree to our privacy policy and terms of service.
-                </p>
+                  {isSubmitting ? "Sending..." : "Send Message"}
+                </Button>
               </form>
-            </div>
-
-            {/* Contact Information */}
-            <div className="space-y-8">
-              <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-8">
-                <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
-                  Get in Touch
-                </div>
-
-                <h3 className="text-2xl font-medium tracking-tighter mb-6 text-black">
-                  Let's discuss your travel needs
-                </h3>
-
-                <div className="space-y-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                      <PiEnvelopeBold className="w-5 h-5 text-gray-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-black mb-1">Email Us</h4>
-                      <p className="text-gray-600 mb-1">hello@suitpax.com</p>
-                      <p className="text-xs text-gray-500">We respond within 24 hours</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                      <PiPhoneBold className="w-5 h-5 text-gray-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-black mb-1">Call Us</h4>
-                      <p className="text-gray-600 mb-1">+1 (555) 123-4567</p>
-                      <p className="text-xs text-gray-500">Mon-Fri, 9AM-6PM EST</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                      <PiMapPinBold className="w-5 h-5 text-gray-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-black mb-1">Visit Us</h4>
-                      <p className="text-gray-600 mb-1">123 Business Ave</p>
-                      <p className="text-xs text-gray-500">San Francisco, CA 94105</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-8">
-                <h3 className="text-lg font-medium tracking-tighter mb-4 text-black">Why Choose Suitpax?</h3>
-
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <PiCheckCircleBold className="w-5 h-5 text-green-500" />
-                    <span className="text-sm text-gray-700">Save up to 30% on travel costs</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <PiCheckCircleBold className="w-5 h-5 text-green-500" />
-                    <span className="text-sm text-gray-700">24/7 AI-powered support</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <PiCheckCircleBold className="w-5 h-5 text-green-500" />
-                    <span className="text-sm text-gray-700">Automated expense management</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <PiCheckCircleBold className="w-5 h-5 text-green-500" />
-                    <span className="text-sm text-gray-700">Enterprise-grade security</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )
