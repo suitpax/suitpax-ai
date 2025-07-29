@@ -57,7 +57,7 @@ const Navigation = () => {
                 href="/travel-expense-management"
                 className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
               >
-                Expense Management
+                Solutions
               </Link>
               <Link href="/pricing" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
                 Pricing
@@ -85,7 +85,7 @@ const Navigation = () => {
                 href="/auth/signup"
                 className="inline-flex items-center justify-center bg-black text-white hover:bg-gray-800 px-6 py-2 rounded-xl text-sm font-medium tracking-tighter shadow-lg transition-colors"
               >
-                Sign Up
+                Get Started
                 <RiArrowRightLine className="ml-1.5 h-4 w-4" />
               </Link>
             </div>
@@ -135,7 +135,7 @@ const Navigation = () => {
                     className="block text-base font-medium text-gray-700 hover:text-gray-900 transition-colors py-2"
                     onClick={closeMenu}
                   >
-                    Expense Management
+                    Solutions
                   </Link>
                   <Link
                     href="/pricing"
@@ -177,7 +177,7 @@ const Navigation = () => {
                     className="block w-full text-center bg-black text-white hover:bg-gray-800 py-3 px-4 rounded-xl text-base font-medium tracking-tighter shadow-lg transition-colors"
                     onClick={closeMenu}
                   >
-                    Sign Up
+                    Get Started
                   </Link>
                 </div>
               </div>

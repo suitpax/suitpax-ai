@@ -58,32 +58,32 @@ export default function TravelExpenseManagement() {
         <div className="absolute inset-0 opacity-[0.03] bg-repeat bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:20px_20px]"></div>
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-6">
+            <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
               <PiCurrencyDollarBold className="mr-1 h-3 w-3" />
-              Gestión de Gastos de Viaje
+              Travel Expense Management
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6">
-              Automatiza la gestión de
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 text-black">
+              Automate your travel
               <br />
-              <span className="text-gray-600">gastos de viaje</span>
+              <span className="text-gray-600">expense management</span>
             </h1>
             <p className="text-lg font-light text-gray-700 mb-8 max-w-3xl">
-              Transforma la manera en que tu empresa maneja los gastos de viaje con nuestra plataforma de IA que
-              automatiza el seguimiento, la aprobación y el reembolso de gastos empresariales.
+              Transform how your company handles travel expenses with our AI platform that automates tracking, approval,
+              and reimbursement of business travel expenses.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link
                 href="#connect-bank"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-black text-white font-medium transition-all hover:bg-gray-900 shadow-lg"
               >
-                Conectar banco
+                Connect Bank
                 <PiArrowRightBold className="ml-2 h-4 w-4" />
               </Link>
               <Link
                 href="#features"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-white border border-gray-200 text-black font-medium transition-all hover:bg-gray-50 shadow-sm"
               >
-                Ver características
+                View Features
               </Link>
             </div>
           </div>
@@ -92,7 +92,7 @@ export default function TravelExpenseManagement() {
             <div className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-lg">
               <Image
                 src="/business-expense.png"
-                alt="Panel de gestión de gastos de viaje"
+                alt="Travel expense management dashboard"
                 width={1200}
                 height={675}
                 className="w-full h-auto rounded-xl shadow-sm"
@@ -105,9 +105,9 @@ export default function TravelExpenseManagement() {
                   <PiTrendUpBold className="h-6 w-6 text-gray-700" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Ahorro promedio</p>
+                  <p className="text-sm font-medium text-gray-700">Average Savings</p>
                   <p className="text-2xl font-bold text-black">30%</p>
-                  <p className="text-xs text-gray-500">en gastos de viaje</p>
+                  <p className="text-xs text-gray-500">on travel expenses</p>
                 </div>
               </div>
             </div>
@@ -119,14 +119,14 @@ export default function TravelExpenseManagement() {
       <section className="py-16 bg-white" id="features">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter mb-6">
-              Optimiza tu flujo de trabajo
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter mb-6 text-black">
+              Optimize your business
               <br />
-              <span className="text-gray-600">de gastos empresariales</span>
+              <span className="text-gray-600">expense workflow</span>
             </h2>
             <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto">
-              Nuestra plataforma elimina el papeleo manual y automatiza todo el proceso desde la transacción hasta el
-              reembolso, ahorrando tiempo y reduciendo errores.
+              Our platform eliminates manual paperwork and automates the entire process from transaction to
+              reimbursement, saving time and reducing errors.
             </p>
           </div>
 
@@ -136,14 +136,14 @@ export default function TravelExpenseManagement() {
               <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
                 <PiLightningBold className="h-7 w-7 text-gray-700" />
               </div>
-              <h3 className="text-xl font-medium tracking-tighter mb-4">Captura Automática</h3>
+              <h3 className="text-xl font-medium tracking-tighter mb-4 text-black">Automatic Capture</h3>
               <p className="text-gray-700 font-light leading-relaxed">
-                Importa y categoriza automáticamente las transacciones desde tus cuentas financieras conectadas. Sin más
-                recibos perdidos o entrada manual de datos.
+                Automatically import and categorize transactions from your connected financial accounts. No more lost
+                receipts or manual data entry.
               </p>
               <div className="mt-6 flex items-center text-sm font-medium text-gray-600">
                 <PiCheckCircleBold className="h-4 w-4 mr-2 text-gray-400" />
-                Integración bancaria en tiempo real
+                Real-time bank integration
               </div>
             </div>
 
@@ -152,14 +152,14 @@ export default function TravelExpenseManagement() {
               <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
                 <PiShieldCheckBold className="h-7 w-7 text-gray-700" />
               </div>
-              <h3 className="text-xl font-medium tracking-tighter mb-4">Cumplimiento de Políticas</h3>
+              <h3 className="text-xl font-medium tracking-tighter mb-4 text-black">Policy Compliance</h3>
               <p className="text-gray-700 font-light leading-relaxed">
-                Marca automáticamente los gastos que no cumplen con las políticas de viaje de tu empresa. Mantén el
-                control y la transparencia en cada transacción.
+                Automatically flag expenses that don't comply with your company's travel policies. Maintain control and
+                transparency in every transaction.
               </p>
               <div className="mt-6 flex items-center text-sm font-medium text-gray-600">
                 <PiCheckCircleBold className="h-4 w-4 mr-2 text-gray-400" />
-                Alertas inteligentes de política
+                Smart policy alerts
               </div>
             </div>
 
@@ -168,51 +168,51 @@ export default function TravelExpenseManagement() {
               <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
                 <PiChartLineUpBold className="h-7 w-7 text-gray-700" />
               </div>
-              <h3 className="text-xl font-medium tracking-tighter mb-4">Reportes Inteligentes</h3>
+              <h3 className="text-xl font-medium tracking-tighter mb-4 text-black">Smart Reporting</h3>
               <p className="text-gray-700 font-light leading-relaxed">
-                Genera informes detallados de gastos con solo unos clics y obtén insights sobre patrones de gasto para
-                optimizar tu presupuesto de viajes.
+                Generate detailed expense reports with just a few clicks and get insights into spending patterns to
+                optimize your travel budget.
               </p>
               <div className="mt-6 flex items-center text-sm font-medium text-gray-600">
                 <PiCheckCircleBold className="h-4 w-4 mr-2 text-gray-400" />
-                Analytics avanzados incluidos
+                Advanced analytics included
               </div>
             </div>
           </div>
 
           {/* Process Flow */}
           <div className="bg-gray-50 rounded-2xl p-8 md:p-12">
-            <h3 className="text-2xl md:text-3xl font-medium tracking-tighter text-center mb-12">
-              Proceso simplificado en 4 pasos
+            <h3 className="text-2xl md:text-3xl font-medium tracking-tighter text-center mb-12 text-black">
+              Simplified process in 4 steps
             </h3>
             <div className="grid md:grid-cols-4 gap-8">
               {[
                 {
                   step: "01",
-                  title: "Conecta",
-                  description: "Vincula tus cuentas bancarias y tarjetas corporativas de forma segura",
+                  title: "Connect",
+                  description: "Link your bank accounts and corporate cards securely",
                 },
                 {
                   step: "02",
-                  title: "Viaja",
-                  description: "Realiza tus gastos de viaje normalmente, sin cambios en tu rutina",
+                  title: "Travel",
+                  description: "Make your travel expenses normally, without changing your routine",
                 },
                 {
                   step: "03",
-                  title: "Automatiza",
-                  description: "La IA categoriza y procesa automáticamente todos los gastos",
+                  title: "Automate",
+                  description: "AI automatically categorizes and processes all expenses",
                 },
                 {
                   step: "04",
-                  title: "Aprueba",
-                  description: "Revisa y aprueba los reportes generados automáticamente",
+                  title: "Approve",
+                  description: "Review and approve automatically generated reports",
                 },
               ].map((item, index) => (
                 <div key={index} className="text-center">
                   <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center mx-auto mb-4 font-bold text-lg">
                     {item.step}
                   </div>
-                  <h4 className="text-lg font-medium mb-2">{item.title}</h4>
+                  <h4 className="text-lg font-medium mb-2 text-black">{item.title}</h4>
                   <p className="text-sm text-gray-600 font-light">{item.description}</p>
                 </div>
               ))}
@@ -231,26 +231,26 @@ export default function TravelExpenseManagement() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
             <div>
-              <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-6">
+              <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
                 <PiChartLineUpBold className="mr-1 h-3 w-3" />
-                Calculadora ROI
+                ROI Calculator
               </div>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter mb-6">
-                Calcula tu ahorro
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter mb-6 text-black">
+                Calculate your potential
                 <br />
-                <span className="text-gray-600">potencial</span>
+                <span className="text-gray-600">savings</span>
               </h2>
               <p className="text-lg font-light text-gray-700 mb-8">
-                Nuestros clientes típicamente ahorran 30% en gastos de viaje a través de mejor cumplimiento de
-                políticas, procesamiento automatizado y tarifas negociadas.
+                Our clients typically save 30% on travel expenses through better policy compliance, automated
+                processing, and negotiated rates.
               </p>
 
               <ul className="space-y-4 mb-8">
                 {[
-                  "Reduce tiempo de procesamiento en 75%",
-                  "Disminuye costos de viaje hasta 30%",
-                  "Elimina 99% de errores en reportes",
-                  "Mejora satisfacción de empleados",
+                  "Reduce processing time by 75%",
+                  "Decrease travel costs up to 30%",
+                  "Eliminate 99% of reporting errors",
+                  "Improve employee satisfaction",
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <PiCheckCircleBold className="h-5 w-5 text-gray-700 mt-0.5 flex-shrink-0" />
@@ -263,7 +263,7 @@ export default function TravelExpenseManagement() {
                 href="#connect-bank"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-black text-white font-medium transition-all hover:bg-gray-900 shadow-lg"
               >
-                Comenzar ahora
+                Get Started Now
                 <PiArrowRightBold className="ml-2 h-4 w-4" />
               </Link>
             </div>
@@ -272,43 +272,41 @@ export default function TravelExpenseManagement() {
               <div className="space-y-8">
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <p className="text-sm font-medium text-gray-700">Procesamiento manual</p>
-                    <p className="text-lg font-bold text-gray-900">€28.50</p>
+                    <p className="text-sm font-medium text-gray-700">Manual processing</p>
+                    <p className="text-lg font-bold text-gray-900">$28.50</p>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div className="bg-gray-400 h-3 rounded-full" style={{ width: "100%" }}></div>
                   </div>
-                  <p className="text-xs text-gray-500">Costo promedio por reporte de gastos</p>
+                  <p className="text-xs text-gray-500">Average cost per expense report</p>
                 </div>
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <p className="text-sm font-medium text-gray-700">Con automatización Suitpax</p>
-                    <p className="text-lg font-bold text-gray-900">€7.25</p>
+                    <p className="text-sm font-medium text-gray-700">With Suitpax automation</p>
+                    <p className="text-lg font-bold text-gray-900">$7.25</p>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div className="bg-gray-700 h-3 rounded-full" style={{ width: "25%" }}></div>
                   </div>
-                  <p className="text-xs text-gray-700">75% reducción de costos</p>
+                  <p className="text-xs text-gray-700">75% cost reduction</p>
                 </div>
 
                 <div className="pt-6 border-t border-gray-200">
                   <div className="flex justify-between items-center mb-2">
-                    <p className="text-sm font-medium text-gray-700">Ahorro anual para 100 empleados</p>
-                    <p className="text-2xl font-bold text-black">€63,750</p>
+                    <p className="text-sm font-medium text-gray-700">Annual savings for 100 employees</p>
+                    <p className="text-2xl font-bold text-black">$63,750</p>
                   </div>
-                  <p className="text-xs text-gray-500">
-                    Basado en promedio de 15 reportes de gastos por empleado anualmente
-                  </p>
+                  <p className="text-xs text-gray-500">Based on average of 15 expense reports per employee annually</p>
                 </div>
 
                 <div className="bg-gray-100 rounded-xl p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <PiClockBold className="h-5 w-5 text-gray-600" />
-                    <span className="text-sm font-medium text-gray-700">Tiempo ahorrado</span>
+                    <span className="text-sm font-medium text-gray-700">Time saved</span>
                   </div>
-                  <p className="text-lg font-bold text-gray-900">1,200 horas/año</p>
-                  <p className="text-xs text-gray-500">Equivalente a 30 semanas de trabajo</p>
+                  <p className="text-lg font-bold text-gray-900">1,200 hours/year</p>
+                  <p className="text-xs text-gray-500">Equivalent to 30 weeks of work</p>
                 </div>
               </div>
             </div>
@@ -321,27 +319,27 @@ export default function TravelExpenseManagement() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter mb-6">
-              ¿Listo para transformar la gestión
+              Ready to transform your company's
               <br />
-              <span className="text-gray-400">de gastos de tu empresa?</span>
+              <span className="text-gray-400">expense management?</span>
             </h2>
             <p className="text-white/70 font-light mb-8 max-w-3xl mx-auto text-lg">
-              Únete a miles de empresas que han simplificado la gestión de gastos de viaje con Suitpax. Comienza tu
-              transformación digital hoy.
+              Join thousands of companies that have simplified travel expense management with Suitpax. Start your
+              digital transformation today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="#connect-bank"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-white text-black font-medium transition-all hover:bg-gray-100 shadow-lg"
               >
-                Conectar banco
+                Connect Bank
                 <PiArrowRightBold className="ml-2 h-4 w-4" />
               </Link>
               <Link
                 href="/pricing"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-transparent border border-white/20 text-white font-medium transition-all hover:bg-white/10"
               >
-                Ver precios
+                View Pricing
               </Link>
             </div>
           </div>
