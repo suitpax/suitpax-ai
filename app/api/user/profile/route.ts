@@ -8,6 +8,14 @@ const profileUpdateSchema = z.object({
   company: z.string().optional(),
   phone: z.string().optional(),
   timezone: z.string().optional(),
+  avatar_url: z.string().optional(),
+  job_title: z.string().optional(),
+  department: z.string().optional(),
+  employee_id: z.string().optional(),
+  manager: z.string().optional(),
+  start_date: z.string().optional(),
+  emergency_contact: z.string().optional(),
+  emergency_phone: z.string().optional(),
   preferences: z
     .object({
       seat_preference: z.string().optional(),

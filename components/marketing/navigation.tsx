@@ -1,192 +1,266 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
-import { RiMenuLine, RiCloseLine, RiArrowRightLine } from "react-icons/ri"
+import { PiCaretDownBold, PiListBold, PiXBold } from "react-icons/pi"
 
-const Navigation = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+export default function Navigation() {
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
+      setIsScrolled(window.scrollY > 20)
     }
 
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen)
-  }
+  const solutions = [
+    {
+      name: "Business Travel",
+      href: "/solutions/business-travel",
+      description: "Complete travel management platform",
+    },
+    {
+      name: "Expense Management",
+      href: "/travel-expense-management",
+      description: "Automated expense tracking and reporting",
+    },
+    {
+      name: "Travel Policies",
+      href: "/solutions/travel-policies",
+      description: "Smart policy compliance and automation",
+    },
+    {
+      name: "AI Agents",
+      href: "/solutions/ai-agents",
+      description: "24/7 intelligent travel assistance",
+    },
+  ]
 
-  const closeMenu = () => {
-    setIsOpen(false)
-  }
+  const company = [
+    {
+      name: "About",
+      href: "/about",
+      description: "Our mission and team",
+    },
+    {
+      name: "Manifesto",
+      href: "/manifesto",
+      description: "Our vision for the future",
+    },
+    {
+      name: "Careers",
+      href: "/careers",
+      description: "Join our team",
+    },
+    {
+      name: "Contact",
+      href: "/contact",
+      description: "Get in touch",
+    },
+  ]
 
   return (
-    <>
-      <motion.nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm" : "bg-transparent"
-        }`}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center" onClick={closeMenu}>
-              <Image
-                src="/logo/suitpax-bl-logo.webp"
-                alt="Suitpax"
-                width={120}
-                height={30}
-                className="h-7 w-auto"
-                priority
-              />
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
+      }`}
+    >
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <Image
+              src="/logo/suitpax-bl-logo.webp"
+              alt="Suitpax"
+              width={120}
+              height={32}
+              className="h-8 w-auto"
+              priority
+            />
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-8">
+            {/* Solutions Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setActiveDropdown("solutions")}
+              onMouseLeave={() => setActiveDropdown(null)}
+            >
+              <button className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-black transition-colors">
+                <span>Solutions</span>
+                <PiCaretDownBold className="w-3 h-3" />
+              </button>
+
+              <AnimatePresence>
+                {activeDropdown === "solutions" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl border border-gray-200 shadow-lg p-6"
+                  >
+                    <div className="space-y-4">
+                      {solutions.map((item) => (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className="block p-3 rounded-xl hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="font-medium text-black mb-1">{item.name}</div>
+                          <div className="text-xs text-gray-600">{item.description}</div>
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Company Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setActiveDropdown("company")}
+              onMouseLeave={() => setActiveDropdown(null)}
+            >
+              <button className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-black transition-colors">
+                <span>Company</span>
+                <PiCaretDownBold className="w-3 h-3" />
+              </button>
+
+              <AnimatePresence>
+                {activeDropdown === "company" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl border border-gray-200 shadow-lg p-6"
+                  >
+                    <div className="space-y-4">
+                      {company.map((item) => (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className="block p-3 rounded-xl hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="font-medium text-black mb-1">{item.name}</div>
+                          <div className="text-xs text-gray-600">{item.description}</div>
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <Link href="/pricing" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
+              Pricing
             </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link
-                href="/travel-expense-management"
-                className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-              >
-                Solutions
-              </Link>
-              <Link href="/pricing" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-                Pricing
-              </Link>
-              <Link
-                href="/manifesto"
-                className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-              >
-                Manifesto
-              </Link>
-              <Link href="/contact" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-                Contact
-              </Link>
-            </div>
-
-            {/* Desktop Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              <Link
-                href="/auth/login"
-                className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors px-4 py-2 rounded-xl hover:bg-gray-50"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="inline-flex items-center justify-center bg-black text-white hover:bg-gray-800 px-6 py-2 rounded-xl text-sm font-medium tracking-tighter shadow-lg transition-colors"
-              >
-                Get Started
-                <RiArrowRightLine className="ml-1.5 h-4 w-4" />
-              </Link>
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={toggleMenu}
-              className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
-              aria-label="Toggle menu"
-            >
-              {isOpen ? (
-                <RiCloseLine className="h-6 w-6 text-gray-700" />
-              ) : (
-                <RiMenuLine className="h-6 w-6 text-gray-700" />
-              )}
-            </button>
           </div>
-        </div>
-      </motion.nav>
 
-      {/* Mobile Navigation Overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className="fixed inset-0 z-40 md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={closeMenu} />
-
-            {/* Mobile Menu */}
-            <motion.div
-              className="absolute top-16 left-4 right-4 bg-white/95 backdrop-blur-md rounded-2xl border border-gray-200/50 shadow-xl overflow-hidden"
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
+          {/* Desktop CTA */}
+          <div className="hidden lg:flex items-center space-x-4">
+            <Link href="/auth/login" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
+              Sign In
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-medium hover:bg-gray-900 transition-colors"
             >
-              <div className="p-6 space-y-4">
-                {/* Mobile Navigation Links */}
-                <div className="space-y-3">
-                  <Link
-                    href="/travel-expense-management"
-                    className="block text-base font-medium text-gray-700 hover:text-gray-900 transition-colors py-2"
-                    onClick={closeMenu}
-                  >
-                    Solutions
-                  </Link>
-                  <Link
-                    href="/pricing"
-                    className="block text-base font-medium text-gray-700 hover:text-gray-900 transition-colors py-2"
-                    onClick={closeMenu}
-                  >
-                    Pricing
-                  </Link>
-                  <Link
-                    href="/manifesto"
-                    className="block text-base font-medium text-gray-700 hover:text-gray-900 transition-colors py-2"
-                    onClick={closeMenu}
-                  >
-                    Manifesto
-                  </Link>
-                  <Link
-                    href="/contact"
-                    className="block text-base font-medium text-gray-700 hover:text-gray-900 transition-colors py-2"
-                    onClick={closeMenu}
-                  >
-                    Contact
-                  </Link>
+              Get Started
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-2 text-gray-700 hover:text-black transition-colors"
+          >
+            {isMobileMenuOpen ? <PiXBold className="w-5 h-5" /> : <PiListBold className="w-5 h-5" />}
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden border-t border-gray-200 bg-white"
+            >
+              <div className="py-6 space-y-6">
+                {/* Mobile Solutions */}
+                <div>
+                  <div className="font-medium text-black mb-3">Solutions</div>
+                  <div className="space-y-3 pl-4">
+                    {solutions.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className="block text-sm text-gray-600 hover:text-black transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Divider */}
-                <div className="border-t border-gray-200 my-4" />
+                {/* Mobile Company */}
+                <div>
+                  <div className="font-medium text-black mb-3">Company</div>
+                  <div className="space-y-3 pl-4">
+                    {company.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className="block text-sm text-gray-600 hover:text-black transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
 
-                {/* Mobile Auth Buttons */}
-                <div className="space-y-3">
+                <Link
+                  href="/pricing"
+                  className="block font-medium text-black"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Pricing
+                </Link>
+
+                {/* Mobile CTA */}
+                <div className="pt-4 border-t border-gray-200 space-y-3">
                   <Link
                     href="/auth/login"
-                    className="block w-full text-center text-base font-medium text-gray-700 hover:text-gray-900 transition-colors py-3 px-4 rounded-xl hover:bg-gray-50"
-                    onClick={closeMenu}
+                    className="block text-center py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/auth/signup"
-                    className="block w-full text-center bg-black text-white hover:bg-gray-800 py-3 px-4 rounded-xl text-base font-medium tracking-tighter shadow-lg transition-colors"
-                    onClick={closeMenu}
+                    className="block text-center py-3 bg-gray-800 text-white rounded-xl text-sm font-medium hover:bg-gray-900 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Get Started
                   </Link>
                 </div>
               </div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+          )}
+        </AnimatePresence>
+      </div>
+    </nav>
   )
 }
-
-export default Navigation

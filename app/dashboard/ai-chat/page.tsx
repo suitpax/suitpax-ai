@@ -6,9 +6,9 @@ export default function AIChatPage() {
   return (
     <div className="container mx-auto p-6 h-full">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Chat con IA</h1>
+        <h1 className="text-3xl font-bold text-gray-900">AI Chat</h1>
         <p className="text-gray-600 mt-2">
-          Conversa con Zia, tu asistente de viajes inteligente. Puedes escribir, hablar o subir archivos.
+          Chat with Suitpax AI, your intelligent travel assistant. You can type, speak, or upload files.
         </p>
       </div>
 

@@ -11,6 +11,7 @@ import { Mic, MicOff, Paperclip, Download, Send, X } from "lucide-react"
 import { useSpeechToText } from "@/hooks/use-speech-to-text"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { generateChatPDF, formatFileSize, getFileIcon } from "@/lib/pdf-utils"
+import Image from "next/image"
 
 interface Message {
   id: string
@@ -25,7 +26,7 @@ export default function SuitpaxChat() {
       id: "1",
       role: "assistant",
       content:
-        "¡Hola! Soy Zia, tu asistente de viajes de IA. ¿En qué puedo ayudarte hoy? Puedes escribir, hablar o subir archivos.",
+        "Hello! I'm Suitpax AI, your intelligent travel assistant. How can I help you today? You can type, speak, or upload files.",
       timestamp: new Date(),
     },
   ])
@@ -44,7 +45,7 @@ export default function SuitpaxChat() {
     stopListening,
     resetTranscript,
   } = useSpeechToText({
-    language: "es-ES",
+    language: "en-US",
     continuous: false,
     interimResults: true,
   })
@@ -90,7 +91,7 @@ export default function SuitpaxChat() {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input.trim() || `[${files.length} archivo(s) adjunto(s)]`,
+      content: input.trim() || `[${files.length} file(s) attached]`,
       timestamp: new Date(),
     }
 
@@ -120,7 +121,7 @@ export default function SuitpaxChat() {
       })
 
       if (!response.ok) {
-        throw new Error("Error en la respuesta del servidor")
+        throw new Error("Server response error")
       }
 
       const data = await response.json()
@@ -128,7 +129,7 @@ export default function SuitpaxChat() {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.response || "Lo siento, no pude procesar tu solicitud.",
+        content: data.response || "I'm sorry, I couldn't process your request.",
         timestamp: new Date(),
       }
 
@@ -139,7 +140,7 @@ export default function SuitpaxChat() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "Lo siento, hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo.",
+        content: "I'm sorry, there was an error processing your message. Please try again.",
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, errorMessage])
@@ -164,7 +165,7 @@ export default function SuitpaxChat() {
 
   const handleExportPDF = async () => {
     try {
-      await generateChatPDF(messages, "Conversación Suitpax AI")
+      await generateChatPDF(messages, "Suitpax AI Conversation")
     } catch (error) {
       console.error("Error exporting PDF:", error)
     }
@@ -183,11 +184,11 @@ export default function SuitpaxChat() {
       <Card className="flex-1 flex flex-col">
         <CardHeader className="border-b">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-medium">Chat con Zia AI</CardTitle>
+            <CardTitle className="text-xl font-medium">Chat with Suitpax AI</CardTitle>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={messages.length <= 1}>
                 <Download className="h-4 w-4 mr-2" />
-                Exportar
+                Export
               </Button>
             </div>
           </div>
@@ -204,9 +205,20 @@ export default function SuitpaxChat() {
                       message.role === "user" ? "bg-black text-white" : "bg-gray-100 text-gray-900"
                     }`}
                   >
+                    {message.role === "assistant" && (
+                      <div className="flex items-center mb-2">
+                        <Image
+                          src="/logo/suitpax-bl-logo.webp"
+                          alt="Suitpax AI"
+                          width={60}
+                          height={14}
+                          className="h-3.5 w-auto rounded-xl"
+                        />
+                      </div>
+                    )}
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                     <p className="text-xs opacity-70 mt-1">
-                      {message.timestamp.toLocaleTimeString("es-ES", {
+                      {message.timestamp.toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
@@ -217,9 +229,18 @@ export default function SuitpaxChat() {
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="bg-gray-100 rounded-lg p-3">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Image
+                        src="/logo/suitpax-bl-logo.webp"
+                        alt="Suitpax AI"
+                        width={60}
+                        height={14}
+                        className="h-3.5 w-auto rounded-xl"
+                      />
+                    </div>
                     <div className="flex items-center space-x-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-                      <span className="text-sm text-gray-600">Zia está escribiendo...</span>
+                      <span className="text-sm text-gray-600">Suitpax AI is thinking...</span>
                     </div>
                   </div>
                 </div>
@@ -261,7 +282,7 @@ export default function SuitpaxChat() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder={isListening ? "Escuchando..." : "Escribe tu mensaje..."}
+                  placeholder={isListening ? "Listening..." : "Type your message..."}
                   disabled={isLoading || isListening}
                   className={isListening ? "border-red-300 bg-red-50" : ""}
                 />

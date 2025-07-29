@@ -2,349 +2,312 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import {
-  PiArrowRightBold,
-  PiChartLineUpBold,
-  PiCurrencyDollarBold,
-  PiLightningBold,
+  PiCreditCardBold,
+  PiChartBarBold,
   PiShieldCheckBold,
-  PiClockBold,
-  PiTrendUpBold,
   PiCheckCircleBold,
+  PiArrowRightBold,
+  PiCameraBold,
+  PiRobotBold,
+  PiGlobeBold,
 } from "react-icons/pi"
 
-import BankConnection from "@/components/marketing/bank-connection"
-
 export const metadata: Metadata = {
-  title: "Travel Expense Management | Suitpax - AI-Powered Business Travel Platform",
+  title: "Travel Expense Management | Suitpax - Automated Business Travel Expenses",
   description:
-    "Simplify your business travel expense management with Suitpax's AI-powered tools, automated reporting, and seamless bank integrations. Reduce costs by up to 30%.",
+    "Streamline your business travel expenses with Suitpax's AI-powered expense management platform. Automated receipt scanning, real-time reporting, and policy compliance.",
   keywords:
-    "travel expense management, business travel expenses, automated expense reporting, AI expense tracking, corporate travel costs, expense automation",
-  openGraph: {
-    title: "Travel Expense Management | Suitpax - AI-Powered Business Travel Platform",
-    description:
-      "Simplify your business travel expense management with Suitpax's AI-powered tools, automated reporting, and seamless bank integrations. Reduce costs by up to 30%.",
-    url: "https://suitpax.com/travel-expense-management",
-    siteName: "Suitpax",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Suitpax Travel Expense Management",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Travel Expense Management | Suitpax - AI-Powered Business Travel Platform",
-    description:
-      "Simplify your business travel expense management with Suitpax's AI-powered tools, automated reporting, and seamless bank integrations. Reduce costs by up to 30%.",
-    images: ["/twitter-image.png"],
-    creator: "@suitpax",
-  },
-  alternates: {
-    canonical: "https://suitpax.com/travel-expense-management",
-  },
+    "travel expense management, business travel expenses, automated expense reports, receipt scanning, corporate travel, expense tracking",
 }
 
-export default function TravelExpenseManagement() {
+export default function TravelExpenseManagementPage() {
+  const features = [
+    {
+      icon: PiCameraBold,
+      title: "Smart Receipt Scanning",
+      description:
+        "AI-powered OCR technology automatically extracts data from receipts and categorizes expenses in seconds.",
+      benefits: ["99.9% accuracy", "Multi-language support", "Instant processing"],
+    },
+    {
+      icon: PiCreditCardBold,
+      title: "Corporate Card Integration",
+      description:
+        "Seamlessly connect with major corporate credit cards for automatic transaction import and matching.",
+      benefits: ["Real-time sync", "Automatic matching", "Fraud detection"],
+    },
+    {
+      icon: PiChartBarBold,
+      title: "Advanced Analytics",
+      description: "Get detailed insights into spending patterns, budget utilization, and cost-saving opportunities.",
+      benefits: ["Custom dashboards", "Predictive analytics", "Cost optimization"],
+    },
+    {
+      icon: PiShieldCheckBold,
+      title: "Policy Compliance",
+      description: "Automated policy enforcement ensures all expenses comply with company guidelines and regulations.",
+      benefits: ["Real-time validation", "Custom rules", "Audit trails"],
+    },
+    {
+      icon: PiRobotBold,
+      title: "AI-Powered Automation",
+      description: "Intelligent automation handles routine tasks, reducing manual work by up to 90%.",
+      benefits: ["Smart categorization", "Auto-approval", "Exception handling"],
+    },
+    {
+      icon: PiGlobeBold,
+      title: "Multi-Currency Support",
+      description: "Handle international expenses with automatic currency conversion and tax calculations.",
+      benefits: ["Real-time rates", "Tax compliance", "Global reporting"],
+    },
+  ]
+
+  const stats = [
+    { value: "90%", label: "Reduction in processing time" },
+    { value: "99.9%", label: "Data accuracy rate" },
+    { value: "30%", label: "Average cost savings" },
+    { value: "24/7", label: "Automated monitoring" },
+  ]
+
+  const integrations = [
+    { name: "SAP Concur", logo: "/logos/sap-concur.png" },
+    { name: "Expensify", logo: "/logos/expensify.png" },
+    { name: "QuickBooks", logo: "/logos/quickbooks.png" },
+    { name: "NetSuite", logo: "/logos/netsuite.png" },
+    { name: "Xero", logo: "/logos/xero.png" },
+    { name: "Sage", logo: "/logos/sage.png" },
+  ]
+
   return (
-    <>
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-16 overflow-hidden bg-gray-50">
-        <div className="absolute inset-0 opacity-[0.03] bg-repeat bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:20px_20px]"></div>
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+      <section className="pt-24 pb-16 md:pb-24 bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
-              <PiCurrencyDollarBold className="mr-1 h-3 w-3" />
-              Travel Expense Management
+              <Image
+                src="/logo/suitpax-symbol.webp"
+                alt="Suitpax"
+                width={12}
+                height={12}
+                className="mr-1.5 w-3 h-3 brightness-0 invert"
+              />
+              Expense Management
             </div>
+
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 text-black">
               Automate your travel
               <br />
               <span className="text-gray-600">expense management</span>
             </h1>
-            <p className="text-lg font-light text-gray-700 mb-8 max-w-3xl">
-              Transform how your company handles travel expenses with our AI platform that automates tracking, approval,
-              and reimbursement of business travel expenses.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Link
-                href="#connect-bank"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-black text-white font-medium transition-all hover:bg-gray-900 shadow-lg"
-              >
-                Connect Bank
-                <PiArrowRightBold className="ml-2 h-4 w-4" />
-              </Link>
-              <Link
-                href="#features"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-white border border-gray-200 text-black font-medium transition-all hover:bg-gray-50 shadow-sm"
-              >
-                View Features
-              </Link>
-            </div>
-          </div>
 
-          <div className="relative w-full max-w-5xl mx-auto">
-            <div className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-lg">
-              <Image
-                src="/business-expense.png"
-                alt="Travel expense management dashboard"
-                width={1200}
-                height={675}
-                className="w-full h-auto rounded-xl shadow-sm"
-                priority
-              />
-            </div>
-            <div className="absolute -bottom-6 -right-6 bg-white/90 backdrop-blur-sm p-6 rounded-xl border border-gray-200 shadow-lg hidden md:block">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-                  <PiTrendUpBold className="h-6 w-6 text-gray-700" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-700">Average Savings</p>
-                  <p className="text-2xl font-bold text-black">30%</p>
-                  <p className="text-xs text-gray-500">on travel expenses</p>
-                </div>
-              </div>
+            <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto mb-8">
+              Transform your business travel expense process with AI-powered automation. From receipt scanning to policy
+              compliance, streamline every aspect of expense management.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/auth/signup"
+                className="px-6 py-3 bg-gray-800 text-white rounded-xl font-medium hover:bg-gray-900 transition-colors flex items-center justify-center"
+              >
+                Start Free Trial
+                <PiArrowRightBold className="w-4 h-4 ml-2" />
+              </Link>
+              <Link
+                href="/contact"
+                className="px-6 py-3 border border-gray-200 text-gray-800 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+              >
+                Schedule Demo
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Key Benefits Section */}
-      <section className="py-16 bg-white" id="features">
+      {/* Stats Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-3xl md:text-4xl font-medium tracking-tighter text-black mb-2">{stat.value}</div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 md:py-24 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter mb-6 text-black">
-              Optimize your business
+            <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
+              Key Features
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 text-black">
+              Everything you need for
+              <br />
+              <span className="text-gray-600">expense management</span>
+            </h2>
+            <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto">
+              Our comprehensive platform handles every aspect of travel expense management, from capture to reporting.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-6"
+              >
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-gray-600" />
+                </div>
+
+                <h3 className="text-xl font-medium tracking-tighter mb-3 text-black">{feature.title}</h3>
+
+                <p className="text-gray-600 mb-4 font-light">{feature.description}</p>
+
+                <div className="space-y-2">
+                  {feature.benefits.map((benefit, benefitIndex) => (
+                    <div key={benefitIndex} className="flex items-center text-sm text-gray-700">
+                      <PiCheckCircleBold className="w-4 h-4 text-green-500 mr-2" />
+                      {benefit}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Process Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
+              How It Works
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 text-black">
+              Simple, automated
               <br />
               <span className="text-gray-600">expense workflow</span>
             </h2>
-            <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto">
-              Our platform eliminates manual paperwork and automates the entire process from transaction to
-              reimbursement, saving time and reducing errors.
-            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-            {/* Benefit 1 */}
-            <div className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
-                <PiLightningBold className="h-7 w-7 text-gray-700" />
-              </div>
-              <h3 className="text-xl font-medium tracking-tighter mb-4 text-black">Automatic Capture</h3>
-              <p className="text-gray-700 font-light leading-relaxed">
-                Automatically import and categorize transactions from your connected financial accounts. No more lost
-                receipts or manual data entry.
-              </p>
-              <div className="mt-6 flex items-center text-sm font-medium text-gray-600">
-                <PiCheckCircleBold className="h-4 w-4 mr-2 text-gray-400" />
-                Real-time bank integration
-              </div>
-            </div>
-
-            {/* Benefit 2 */}
-            <div className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
-                <PiShieldCheckBold className="h-7 w-7 text-gray-700" />
-              </div>
-              <h3 className="text-xl font-medium tracking-tighter mb-4 text-black">Policy Compliance</h3>
-              <p className="text-gray-700 font-light leading-relaxed">
-                Automatically flag expenses that don't comply with your company's travel policies. Maintain control and
-                transparency in every transaction.
-              </p>
-              <div className="mt-6 flex items-center text-sm font-medium text-gray-600">
-                <PiCheckCircleBold className="h-4 w-4 mr-2 text-gray-400" />
-                Smart policy alerts
-              </div>
-            </div>
-
-            {/* Benefit 3 */}
-            <div className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
-                <PiChartLineUpBold className="h-7 w-7 text-gray-700" />
-              </div>
-              <h3 className="text-xl font-medium tracking-tighter mb-4 text-black">Smart Reporting</h3>
-              <p className="text-gray-700 font-light leading-relaxed">
-                Generate detailed expense reports with just a few clicks and get insights into spending patterns to
-                optimize your travel budget.
-              </p>
-              <div className="mt-6 flex items-center text-sm font-medium text-gray-600">
-                <PiCheckCircleBold className="h-4 w-4 mr-2 text-gray-400" />
-                Advanced analytics included
-              </div>
-            </div>
-          </div>
-
-          {/* Process Flow */}
-          <div className="bg-gray-50 rounded-2xl p-8 md:p-12">
-            <h3 className="text-2xl md:text-3xl font-medium tracking-tighter text-center mb-12 text-black">
-              Simplified process in 4 steps
-            </h3>
-            <div className="grid md:grid-cols-4 gap-8">
-              {[
-                {
-                  step: "01",
-                  title: "Connect",
-                  description: "Link your bank accounts and corporate cards securely",
-                },
-                {
-                  step: "02",
-                  title: "Travel",
-                  description: "Make your travel expenses normally, without changing your routine",
-                },
-                {
-                  step: "03",
-                  title: "Automate",
-                  description: "AI automatically categorizes and processes all expenses",
-                },
-                {
-                  step: "04",
-                  title: "Approve",
-                  description: "Review and approve automatically generated reports",
-                },
-              ].map((item, index) => (
-                <div key={index} className="text-center">
-                  <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center mx-auto mb-4 font-bold text-lg">
-                    {item.step}
-                  </div>
-                  <h4 className="text-lg font-medium mb-2 text-black">{item.title}</h4>
-                  <p className="text-sm text-gray-600 font-light">{item.description}</p>
+          <div className="max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <PiCameraBold className="w-8 h-8 text-gray-600" />
                 </div>
-              ))}
+                <h3 className="text-xl font-medium tracking-tighter mb-3 text-black">1. Capture</h3>
+                <p className="text-gray-600 font-light">
+                  Snap a photo of your receipt or connect your corporate card for automatic transaction import.
+                </p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <PiRobotBold className="w-8 h-8 text-gray-600" />
+                </div>
+                <h3 className="text-xl font-medium tracking-tighter mb-3 text-black">2. Process</h3>
+                <p className="text-gray-600 font-light">
+                  AI automatically extracts data, categorizes expenses, and checks policy compliance.
+                </p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <PiChartBarBold className="w-8 h-8 text-gray-600" />
+                </div>
+                <h3 className="text-xl font-medium tracking-tighter mb-3 text-black">3. Report</h3>
+                <p className="text-gray-600 font-light">
+                  Generate comprehensive reports and sync with your accounting system automatically.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Bank Connection Section */}
-      <div id="connect-bank">
-        <BankConnection />
-      </div>
-
-      {/* ROI Section */}
-      <section className="py-16 bg-gray-50">
+      {/* Integrations Section */}
+      <section className="py-16 md:py-24 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-            <div>
-              <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
-                <PiChartLineUpBold className="mr-1 h-3 w-3" />
-                ROI Calculator
-              </div>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter mb-6 text-black">
-                Calculate your potential
-                <br />
-                <span className="text-gray-600">savings</span>
-              </h2>
-              <p className="text-lg font-light text-gray-700 mb-8">
-                Our clients typically save 30% on travel expenses through better policy compliance, automated
-                processing, and negotiated rates.
-              </p>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
+              Integrations
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 text-black">
+              Connect with your
+              <br />
+              <span className="text-gray-600">existing tools</span>
+            </h2>
+            <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto">
+              Seamlessly integrate with popular accounting and expense management platforms.
+            </p>
+          </div>
 
-              <ul className="space-y-4 mb-8">
-                {[
-                  "Reduce processing time by 75%",
-                  "Decrease travel costs up to 30%",
-                  "Eliminate 99% of reporting errors",
-                  "Improve employee satisfaction",
-                ].map((item, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <PiCheckCircleBold className="h-5 w-5 text-gray-700 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700 font-light">{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="#connect-bank"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-black text-white font-medium transition-all hover:bg-gray-900 shadow-lg"
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 max-w-5xl mx-auto">
+            {integrations.map((integration, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl border border-gray-200 p-6 flex items-center justify-center"
               >
-                Get Started Now
-                <PiArrowRightBold className="ml-2 h-4 w-4" />
-              </Link>
-            </div>
-
-            <div className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-lg">
-              <div className="space-y-8">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm font-medium text-gray-700">Manual processing</p>
-                    <p className="text-lg font-bold text-gray-900">$28.50</p>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div className="bg-gray-400 h-3 rounded-full" style={{ width: "100%" }}></div>
-                  </div>
-                  <p className="text-xs text-gray-500">Average cost per expense report</p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm font-medium text-gray-700">With Suitpax automation</p>
-                    <p className="text-lg font-bold text-gray-900">$7.25</p>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div className="bg-gray-700 h-3 rounded-full" style={{ width: "25%" }}></div>
-                  </div>
-                  <p className="text-xs text-gray-700">75% cost reduction</p>
-                </div>
-
-                <div className="pt-6 border-t border-gray-200">
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="text-sm font-medium text-gray-700">Annual savings for 100 employees</p>
-                    <p className="text-2xl font-bold text-black">$63,750</p>
-                  </div>
-                  <p className="text-xs text-gray-500">Based on average of 15 expense reports per employee annually</p>
-                </div>
-
-                <div className="bg-gray-100 rounded-xl p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <PiClockBold className="h-5 w-5 text-gray-600" />
-                    <span className="text-sm font-medium text-gray-700">Time saved</span>
-                  </div>
-                  <p className="text-lg font-bold text-gray-900">1,200 hours/year</p>
-                  <p className="text-xs text-gray-500">Equivalent to 30 weeks of work</p>
-                </div>
+                <Image
+                  src={integration.logo || "/placeholder.svg"}
+                  alt={integration.name}
+                  width={80}
+                  height={40}
+                  className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity"
+                />
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-black text-white">
+      <section className="py-16 md:py-24 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter mb-6">
-              Ready to transform your company's
+            <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
+              Get Started Today
+            </div>
+
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 text-black">
+              Ready to automate your
               <br />
-              <span className="text-gray-400">expense management?</span>
+              <span className="text-gray-600">expense management?</span>
             </h2>
-            <p className="text-white/70 font-light mb-8 max-w-3xl mx-auto text-lg">
-              Join thousands of companies that have simplified travel expense management with Suitpax. Start your
-              digital transformation today.
+
+            <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto mb-8">
+              Join thousands of companies that have streamlined their travel expense processes with Suitpax.
             </p>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="#connect-bank"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-white text-black font-medium transition-all hover:bg-gray-100 shadow-lg"
+                href="/auth/signup"
+                className="px-8 py-4 bg-gray-800 text-white rounded-xl font-medium hover:bg-gray-900 transition-colors flex items-center justify-center"
               >
-                Connect Bank
-                <PiArrowRightBold className="ml-2 h-4 w-4" />
+                Start Free Trial
+                <PiArrowRightBold className="w-4 h-4 ml-2" />
               </Link>
               <Link
-                href="/pricing"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-transparent border border-white/20 text-white font-medium transition-all hover:bg-white/10"
+                href="/contact"
+                className="px-8 py-4 border border-gray-200 text-gray-800 rounded-xl font-medium hover:bg-gray-50 transition-colors"
               >
-                View Pricing
+                Schedule Demo
               </Link>
             </div>
+
+            <p className="text-xs text-gray-500 mt-6">No credit card required • 14-day free trial • Cancel anytime</p>
           </div>
         </div>
       </section>
-    </>
+    </div>
   )
 }

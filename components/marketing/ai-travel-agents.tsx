@@ -1,106 +1,93 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import {
-  PiPlayBold,
-  PiPauseBold,
-  PiSpeakerHighBold,
-  PiSpeakerSlashBold,
   PiStarFill,
   PiChatCircleBold,
   PiGlobeBold,
   PiCheckCircleBold,
+  PiLightningBold,
+  PiClockBold,
+  PiShieldCheckBold,
 } from "react-icons/pi"
 
 interface Agent {
   id: string
   name: string
   avatar: string
-  specialty: string
+  tagline: string
   rating: number
-  completedBookings: number
+  completedTasks: number
   languages: string[]
   status: "online" | "busy" | "offline"
-  description: string
+  capabilities: string[]
   expertise: string[]
 }
 
 export default function AITravelAgents() {
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null)
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false)
-  const [isVideoMuted, setIsVideoMuted] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const agents: Agent[] = [
     {
       id: "1",
-      name: "Sofia Martinez",
+      name: "Sofia",
       avatar: "/agents/agent-sophia.jpeg",
-      specialty: "Corporate Travel Specialist",
+      tagline: "Instant flight bookings with smart price optimization",
       rating: 4.9,
-      completedBookings: 2847,
+      completedTasks: 2847,
       languages: ["English", "Spanish", "Portuguese"],
       status: "online",
-      description: "Expert in complex multi-city business itineraries and corporate travel policies.",
-      expertise: ["Business Class Upgrades", "Group Bookings", "Travel Policy Compliance"],
+      capabilities: ["Flight Booking", "Price Alerts", "Route Planning"],
+      expertise: ["Business Class", "Group Travel", "Last-minute"],
     },
     {
       id: "2",
-      name: "Marcus Chen",
+      name: "Marcus",
       avatar: "/agents/agent-marcus.jpeg",
-      specialty: "Luxury Travel Curator",
+      tagline: "Real-time expense tracking and policy compliance",
       rating: 4.8,
-      completedBookings: 1923,
+      completedTasks: 1923,
       languages: ["English", "Mandarin", "Japanese"],
       status: "online",
-      description: "Specializes in premium accommodations and exclusive travel experiences.",
-      expertise: ["First Class Travel", "Luxury Hotels", "VIP Services"],
+      capabilities: ["Expense Reports", "Receipt Scanning", "Budget Control"],
+      expertise: ["Corporate Cards", "Tax Reports", "Approvals"],
     },
     {
       id: "3",
-      name: "Emma Thompson",
+      name: "Emma",
       avatar: "/agents/agent-emma.jpeg",
-      specialty: "International Routes Expert",
+      tagline: "24/7 travel support with voice and chat assistance",
       rating: 4.9,
-      completedBookings: 3156,
+      completedTasks: 3156,
       languages: ["English", "French", "German"],
       status: "busy",
-      description: "Master of complex international routing and visa requirements.",
-      expertise: ["Visa Processing", "Multi-Stop Routes", "Travel Documentation"],
+      capabilities: ["Voice Support", "Live Chat", "Emergency Help"],
+      expertise: ["Disruptions", "Rebooking", "Concierge"],
     },
     {
       id: "4",
-      name: "Alex Rodriguez",
-      avatar: "/agents/agent-alex.jpeg",
-      specialty: "Emergency Travel Solutions",
+      name: "Zara",
+      avatar: "/agents/agent-zara.jpeg",
+      tagline: "Smart hotel recommendations with exclusive rates",
       rating: 4.7,
-      completedBookings: 1654,
+      completedTasks: 1654,
       languages: ["English", "Spanish"],
       status: "online",
-      description: "Available 24/7 for urgent travel changes and emergency bookings.",
-      expertise: ["Last-Minute Bookings", "24/7 Support", "Travel Disruptions"],
+      capabilities: ["Hotel Search", "Rate Comparison", "Loyalty Points"],
+      expertise: ["Business Hotels", "Amenities", "Location"],
     },
   ]
 
-  const handleVideoToggle = () => {
+  useEffect(() => {
     if (videoRef.current) {
-      if (isVideoPlaying) {
-        videoRef.current.pause()
-      } else {
-        videoRef.current.play()
-      }
-      setIsVideoPlaying(!isVideoPlaying)
+      videoRef.current.play().catch(() => {
+        // Autoplay failed, which is expected in some browsers
+      })
     }
-  }
-
-  const handleVideoMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isVideoMuted
-      setIsVideoMuted(!isVideoMuted)
-    }
-  }
+  }, [])
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -119,94 +106,66 @@ export default function AITravelAgents() {
     <section className="py-16 md:py-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
+          <div className="inline-flex items-center rounded-xl bg-gray-800 px-2 py-0.5 text-[9px] font-medium text-white mb-6">
             <Image
               src="/logo/suitpax-symbol.webp"
               alt="Suitpax"
-              width={12}
-              height={12}
-              className="mr-1.5 w-3 h-3 brightness-0 invert"
+              width={10}
+              height={10}
+              className="mr-1 w-2.5 h-2.5 brightness-0 invert"
             />
-            AI Travel Agents
+            AI Agents
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 text-black">
-            Meet your dedicated
+            Your intelligent
             <br />
-            <span className="text-gray-600">travel specialists</span>
+            <span className="text-gray-600">travel assistants</span>
           </h2>
           <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto">
-            Our AI-powered travel agents combine human expertise with artificial intelligence to deliver personalized
-            travel solutions 24/7.
+            Meet our AI-powered specialists who handle every aspect of your business travel with precision and speed.
           </p>
         </div>
 
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Agent Showcase Video */}
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* AI Showcase Video */}
             <div className="lg:col-span-1">
-              <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-6 sticky top-8">
-                <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-4">
-                  Expert Specialists
+              <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-4 sticky top-8">
+                <div className="inline-flex items-center rounded-xl bg-gray-800 px-2 py-0.5 text-[9px] font-medium text-white mb-3">
+                  Live Demo
                 </div>
 
-                <div className="relative rounded-xl overflow-hidden mb-4">
+                <div className="relative rounded-xl overflow-hidden mb-3">
                   <video
                     ref={videoRef}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-40 object-cover"
                     loop
-                    muted={isVideoMuted}
+                    muted
+                    autoPlay
                     playsInline
                     poster="/agents/agent-sophia.jpeg"
                   >
                     <source src="/videos/ai-agent-demo.mp4" type="video/mp4" />
                   </video>
-
-                  {/* Video Controls */}
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <div className="flex items-center space-x-3">
-                      <button
-                        onClick={handleVideoToggle}
-                        className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors"
-                      >
-                        {isVideoPlaying ? (
-                          <PiPauseBold className="w-5 h-5 text-gray-800" />
-                        ) : (
-                          <PiPlayBold className="w-5 h-5 text-gray-800 ml-0.5" />
-                        )}
-                      </button>
-
-                      <button
-                        onClick={handleVideoMute}
-                        className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors"
-                      >
-                        {isVideoMuted ? (
-                          <PiSpeakerSlashBold className="w-4 h-4 text-gray-800" />
-                        ) : (
-                          <PiSpeakerHighBold className="w-4 h-4 text-gray-800" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
                 </div>
 
-                <h3 className="text-xl font-medium tracking-tighter mb-2 text-black">AI-Enhanced Expertise</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Watch how our AI agents combine artificial intelligence with human-like understanding to solve complex
-                  travel challenges.
+                <h3 className="text-lg font-medium tracking-tighter mb-2 text-black">AI in Action</h3>
+                <p className="text-xs text-gray-600 mb-3">
+                  Watch our AI agents process complex travel requests in real-time with human-like understanding.
                 </p>
 
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Response Time</span>
-                    <span className="font-medium text-black">&lt; 30 seconds</span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-600">Processing Speed</span>
+                    <span className="font-medium text-black">&lt; 2 seconds</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Success Rate</span>
-                    <span className="font-medium text-black">99.2%</span>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-600">Accuracy Rate</span>
+                    <span className="font-medium text-black">99.7%</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Languages</span>
-                    <span className="font-medium text-black">12+</span>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-600">Active 24/7</span>
+                    <span className="font-medium text-black">Always On</span>
                   </div>
                 </div>
               </div>
@@ -214,69 +173,67 @@ export default function AITravelAgents() {
 
             {/* Agents Grid */}
             <div className="lg:col-span-2">
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-4">
                 {agents.map((agent) => (
                   <motion.div
                     key={agent.id}
-                    className={`bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-6 cursor-pointer transition-all ${
+                    className={`bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-4 cursor-pointer transition-all ${
                       selectedAgent === agent.id ? "ring-2 ring-gray-800 shadow-lg" : "hover:shadow-md"
                     }`}
                     onClick={() => setSelectedAgent(selectedAgent === agent.id ? null : agent.id)}
-                    whileHover={{ y: -2 }}
+                    whileHover={{ y: -1 }}
                   >
-                    <div className="flex items-start space-x-4 mb-4">
+                    <div className="flex items-start space-x-3 mb-3">
                       <div className="relative">
                         <Image
                           src={agent.avatar || "/placeholder.svg"}
                           alt={agent.name}
-                          width={60}
-                          height={60}
-                          className="w-15 h-15 rounded-full object-cover"
+                          width={48}
+                          height={48}
+                          className="w-12 h-12 rounded-full object-cover"
                         />
                         <div
-                          className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${getStatusColor(agent.status)}`}
+                          className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${getStatusColor(agent.status)}`}
                         />
                       </div>
 
                       <div className="flex-1">
-                        <h3 className="text-lg font-medium tracking-tighter text-black">{agent.name}</h3>
-                        <p className="text-sm text-gray-600 mb-2">{agent.specialty}</p>
+                        <h3 className="text-base font-medium tracking-tighter text-black">{agent.name}</h3>
+                        <p className="text-xs text-gray-600 mb-2 leading-relaxed">{agent.tagline}</p>
 
-                        <div className="flex items-center space-x-4 text-xs text-gray-500">
+                        <div className="flex items-center space-x-3 text-xs text-gray-500">
                           <div className="flex items-center">
-                            <PiStarFill className="w-3 h-3 text-yellow-500 mr-1" />
+                            <PiStarFill className="w-2.5 h-2.5 text-yellow-500 mr-1" />
                             <span className="font-medium text-black">{agent.rating}</span>
                           </div>
                           <div className="flex items-center">
-                            <PiCheckCircleBold className="w-3 h-3 text-green-500 mr-1" />
-                            <span>{agent.completedBookings.toLocaleString()}</span>
+                            <PiCheckCircleBold className="w-2.5 h-2.5 text-green-500 mr-1" />
+                            <span>{agent.completedTasks.toLocaleString()}</span>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <p className="text-sm text-gray-700 mb-4">{agent.description}</p>
-
-                    {/* Expertise Tags */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {agent.expertise.map((skill, index) => (
+                    {/* Capabilities */}
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {agent.capabilities.map((capability, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700"
+                          className="inline-flex items-center rounded-lg bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700"
                         >
-                          {skill}
+                          {capability}
                         </span>
                       ))}
                     </div>
 
-                    {/* Languages */}
+                    {/* Languages & Status */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center text-xs text-gray-500">
-                        <PiGlobeBold className="w-3 h-3 mr-1" />
-                        <span>{agent.languages.join(", ")}</span>
+                        <PiGlobeBold className="w-2.5 h-2.5 mr-1" />
+                        <span>{agent.languages.slice(0, 2).join(", ")}</span>
                       </div>
 
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1">
                         <span
                           className={`text-xs font-medium capitalize ${
                             agent.status === "online"
@@ -298,30 +255,40 @@ export default function AITravelAgents() {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="mt-4 pt-4 border-t border-gray-200"
+                          className="mt-3 pt-3 border-t border-gray-200"
                         >
-                          <div className="grid grid-cols-2 gap-4 text-xs">
-                            <div>
-                              <span className="text-gray-500">Avg. Response</span>
-                              <p className="font-medium text-black">&lt; 30 seconds</p>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Availability</span>
-                              <p className="font-medium text-black">24/7</p>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Specialization</span>
-                              <p className="font-medium text-black">Business Travel</p>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Experience</span>
-                              <p className="font-medium text-black">5+ Years</p>
+                          <div className="space-y-2 mb-3">
+                            <h4 className="text-xs font-medium text-black">Specialized In:</h4>
+                            <div className="flex flex-wrap gap-1">
+                              {agent.expertise.map((skill, index) => (
+                                <span
+                                  key={index}
+                                  className="inline-flex items-center rounded-lg bg-gray-800 px-2 py-0.5 text-[9px] font-medium text-white"
+                                >
+                                  {skill}
+                                </span>
+                              ))}
                             </div>
                           </div>
 
-                          <button className="w-full mt-4 px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-medium hover:bg-gray-900 transition-colors flex items-center justify-center">
-                            <PiChatCircleBold className="w-4 h-4 mr-2" />
-                            Start Conversation
+                          <div className="grid grid-cols-3 gap-2 text-xs mb-3">
+                            <div className="text-center">
+                              <PiLightningBold className="w-3 h-3 mx-auto mb-1 text-yellow-500" />
+                              <span className="text-gray-500">Fast</span>
+                            </div>
+                            <div className="text-center">
+                              <PiClockBold className="w-3 h-3 mx-auto mb-1 text-blue-500" />
+                              <span className="text-gray-500">24/7</span>
+                            </div>
+                            <div className="text-center">
+                              <PiShieldCheckBold className="w-3 h-3 mx-auto mb-1 text-green-500" />
+                              <span className="text-gray-500">Secure</span>
+                            </div>
+                          </div>
+
+                          <button className="w-full px-3 py-2 bg-gray-800 text-white rounded-xl text-xs font-medium hover:bg-gray-900 transition-colors flex items-center justify-center">
+                            <PiChatCircleBold className="w-3 h-3 mr-1.5" />
+                            Start Working
                           </button>
                         </motion.div>
                       )}

@@ -33,7 +33,6 @@ export default function AIVoiceCallingHub() {
   const [callDuration, setCallDuration] = useState(0)
   const [voiceRecognitionActive, setVoiceRecognitionActive] = useState(false)
   const [liveTranscript, setLiveTranscript] = useState("")
-  const [callQuality, setCallQuality] = useState<"excellent" | "good" | "poor">("excellent")
 
   const { transcript, isListening, startListening, stopListening, resetTranscript } = useSpeechToText()
 
@@ -113,137 +112,116 @@ export default function AIVoiceCallingHub() {
     }
   }
 
-  const getQualityColor = (quality: string) => {
-    switch (quality) {
-      case "excellent":
-        return "text-green-600"
-      case "good":
-        return "text-yellow-600"
-      case "poor":
-        return "text-red-600"
-      default:
-        return "text-gray-600"
-    }
-  }
-
   return (
-    <section className="py-16 md:py-24 bg-black text-white">
+    <section className="py-16 md:py-24 bg-gray-50">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center rounded-xl bg-white px-2.5 py-0.5 text-[10px] font-medium text-black mb-6">
+          <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-6">
             <Image src="/logo/suitpax-symbol.webp" alt="Suitpax" width={12} height={12} className="mr-1.5 w-3 h-3" />
             AI Voice Calling Hub
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-medium tracking-tighter leading-none mb-6 text-black">
             Enterprise Voice
             <br />
-            <span className="text-gray-400">Communication Platform</span>
+            <span className="text-gray-600 font-inter">Communication Platform</span>
           </h2>
-          <p className="text-lg font-light text-gray-300 max-w-3xl mx-auto">
+          <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto font-inter">
             Advanced AI-powered voice calling with real-time transcription, voice recognition, and intelligent
             conversation analysis for business communications.
           </p>
         </div>
 
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 shadow-2xl p-8">
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* Call Interface */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Call Header */}
-                <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-xl border border-gray-700">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${isCallActive ? "bg-green-500" : "bg-gray-500"}`} />
-                    <span className="text-sm font-medium">{isCallActive ? "Call Active" : "Ready to Connect"}</span>
-                    {isCallActive && <span className="text-sm text-gray-400">{formatDuration(callDuration)}</span>}
-                  </div>
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-6">
+            {/* Call Header */}
+            <div className="flex items-center justify-between p-4 bg-gray-100/50 backdrop-blur-sm rounded-xl border border-gray-200 mb-6">
+              <div className="flex items-center space-x-3">
+                <div className={`w-3 h-3 rounded-full ${isCallActive ? "bg-green-500" : "bg-gray-400"}`} />
+                <span className="text-sm font-medium font-inter">
+                  {isCallActive ? "Call Active" : "Ready to Connect"}
+                </span>
+                {isCallActive && (
+                  <span className="text-sm text-gray-500 font-inter">{formatDuration(callDuration)}</span>
+                )}
+              </div>
 
-                  <div className="flex items-center space-x-2">
-                    <span className={`text-xs font-medium ${getQualityColor(callQuality)}`}>
-                      {callQuality.toUpperCase()}
-                    </span>
-                    <div className="flex space-x-1">
-                      {[...Array(3)].map((_, i) => (
-                        <div
-                          key={i}
-                          className={`w-1 h-3 rounded-full ${
-                            i < (callQuality === "excellent" ? 3 : callQuality === "good" ? 2 : 1)
-                              ? "bg-green-500"
-                              : "bg-gray-600"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-medium text-green-600 font-inter">EXCELLENT</span>
+                <div className="flex space-x-1">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="w-1 h-3 rounded-full bg-green-500" />
+                  ))}
                 </div>
+              </div>
+            </div>
 
-                {/* Participants Grid */}
-                <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Participants */}
+              <div className="lg:col-span-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   {participants.map((participant) => (
                     <motion.div
                       key={participant.id}
-                      className="relative p-4 bg-gray-800/30 rounded-xl border border-gray-700"
+                      className="bg-white/50 backdrop-blur-sm rounded-xl border border-gray-200 p-4 text-center"
                       animate={participant.isSpeaking ? { scale: [1, 1.02, 1] } : {}}
                       transition={{ duration: 0.5, repeat: participant.isSpeaking ? Number.POSITIVE_INFINITY : 0 }}
                     >
-                      <div className="text-center">
-                        <div className="relative inline-block mb-3">
-                          <Image
-                            src={participant.avatar || "/placeholder.svg"}
-                            alt={participant.name}
-                            width={60}
-                            height={60}
-                            className="w-15 h-15 rounded-full object-cover"
+                      <div className="relative inline-block mb-3">
+                        <Image
+                          src={participant.avatar || "/placeholder.svg"}
+                          alt={participant.name}
+                          width={48}
+                          height={48}
+                          className="w-12 h-12 rounded-xl object-cover"
+                        />
+                        <div
+                          className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+                            participant.status === "connected"
+                              ? "bg-green-500"
+                              : participant.status === "connecting"
+                                ? "bg-yellow-500"
+                                : "bg-red-500"
+                          }`}
+                        />
+                        {participant.isSpeaking && (
+                          <motion.div
+                            className="absolute inset-0 rounded-xl border-2 border-green-500"
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
                           />
-                          <div
-                            className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-900 ${
-                              participant.status === "connected"
-                                ? "bg-green-500"
-                                : participant.status === "connecting"
-                                  ? "bg-yellow-500"
-                                  : "bg-red-500"
-                            }`}
-                          />
-                          {participant.isSpeaking && (
-                            <motion.div
-                              className="absolute inset-0 rounded-full border-2 border-green-500"
-                              animate={{ scale: [1, 1.1, 1] }}
-                              transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
-                            />
-                          )}
-                        </div>
-                        <h4 className="text-sm font-medium text-white">{participant.name}</h4>
-                        <p className="text-xs text-gray-400 capitalize">{participant.status}</p>
-                        {participant.isMuted && <PiMicrophoneSlashBold className="w-3 h-3 text-red-500 mx-auto mt-1" />}
+                        )}
                       </div>
+                      <h4 className="text-sm font-medium text-gray-900 font-inter">{participant.name}</h4>
+                      <p className="text-xs text-gray-500 capitalize font-inter">{participant.status}</p>
+                      {participant.isMuted && <PiMicrophoneSlashBold className="w-3 h-3 text-red-500 mx-auto mt-1" />}
                     </motion.div>
                   ))}
                 </div>
 
                 {/* Live Transcription */}
                 {isCallActive && (
-                  <div className="p-4 bg-gray-800/30 rounded-xl border border-gray-700">
+                  <div className="bg-white/50 backdrop-blur-sm rounded-xl border border-gray-200 p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-sm font-medium text-white flex items-center">
+                      <h4 className="text-sm font-medium text-gray-900 flex items-center font-inter">
                         <PiWaveformBold className="w-4 h-4 mr-2" />
                         Live Transcription
                       </h4>
                       <button
                         onClick={toggleVoiceRecognition}
-                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors font-inter ${
                           voiceRecognitionActive
                             ? "bg-green-600 text-white"
-                            : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                         }`}
                       >
                         {voiceRecognitionActive ? "ON" : "OFF"}
                       </button>
                     </div>
-                    <div className="min-h-[80px] p-3 bg-gray-900/50 rounded-lg border border-gray-700">
+                    <div className="min-h-[60px] p-3 bg-gray-50 rounded-xl border border-gray-200">
                       {liveTranscript ? (
-                        <p className="text-sm text-gray-300">{liveTranscript}</p>
+                        <p className="text-sm text-gray-700 font-inter">{liveTranscript}</p>
                       ) : (
-                        <p className="text-sm text-gray-500 italic">
+                        <p className="text-sm text-gray-500 italic font-inter">
                           {voiceRecognitionActive ? "Listening for speech..." : "Voice recognition disabled"}
                         </p>
                       )}
@@ -252,117 +230,116 @@ export default function AIVoiceCallingHub() {
                 )}
               </div>
 
-              {/* Control Panel */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-medium tracking-tighter text-white">Call Controls</h3>
+              {/* Controls */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium tracking-tighter text-gray-900 font-serif">Call Controls</h3>
 
                 {/* Main Call Button */}
                 <div className="text-center">
                   <motion.button
                     onClick={isCallActive ? handleEndCall : handleStartCall}
-                    className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-lg ${
+                    className={`w-16 h-16 rounded-xl flex items-center justify-center transition-all shadow-lg ${
                       isCallActive
-                        ? "bg-red-600 hover:bg-red-700 text-white"
-                        : "bg-green-600 hover:bg-green-700 text-white"
+                        ? "bg-red-500 hover:bg-red-600 text-white"
+                        : "bg-green-500 hover:bg-green-600 text-white"
                     }`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    {isCallActive ? <PiPhoneSlashBold className="w-8 h-8" /> : <PiPhoneBold className="w-8 h-8" />}
+                    {isCallActive ? <PiPhoneSlashBold className="w-6 h-6" /> : <PiPhoneBold className="w-6 h-6" />}
                   </motion.button>
-                  <p className="mt-2 text-sm text-gray-400">{isCallActive ? "End Call" : "Start Call"}</p>
+                  <p className="mt-2 text-sm text-gray-600 font-inter">{isCallActive ? "End Call" : "Start Call"}</p>
                 </div>
 
-                {/* Control Buttons */}
+                {/* Control Grid */}
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setIsMuted(!isMuted)}
-                    className={`p-4 rounded-xl transition-colors ${
+                    className={`p-3 rounded-xl transition-colors ${
                       isMuted
-                        ? "bg-red-600/20 border border-red-600 text-red-400"
-                        : "bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700"
+                        ? "bg-red-100 border border-red-200 text-red-600"
+                        : "bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200"
                     }`}
                     disabled={!isCallActive}
                   >
                     {isMuted ? (
-                      <PiMicrophoneSlashBold className="w-5 h-5 mx-auto" />
+                      <PiMicrophoneSlashBold className="w-4 h-4 mx-auto" />
                     ) : (
-                      <PiMicrophoneBold className="w-5 h-5 mx-auto" />
+                      <PiMicrophoneBold className="w-4 h-4 mx-auto" />
                     )}
-                    <p className="text-xs mt-1">{isMuted ? "Unmute" : "Mute"}</p>
+                    <p className="text-xs mt-1 font-inter">{isMuted ? "Unmute" : "Mute"}</p>
                   </button>
 
                   <button
                     onClick={() => setIsSpeakerOn(!isSpeakerOn)}
-                    className={`p-4 rounded-xl transition-colors ${
+                    className={`p-3 rounded-xl transition-colors ${
                       !isSpeakerOn
-                        ? "bg-yellow-600/20 border border-yellow-600 text-yellow-400"
-                        : "bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700"
+                        ? "bg-yellow-100 border border-yellow-200 text-yellow-600"
+                        : "bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200"
                     }`}
                     disabled={!isCallActive}
                   >
                     {isSpeakerOn ? (
-                      <PiSpeakerHighBold className="w-5 h-5 mx-auto" />
+                      <PiSpeakerHighBold className="w-4 h-4 mx-auto" />
                     ) : (
-                      <PiSpeakerSlashBold className="w-5 h-5 mx-auto" />
+                      <PiSpeakerSlashBold className="w-4 h-4 mx-auto" />
                     )}
-                    <p className="text-xs mt-1">Speaker</p>
+                    <p className="text-xs mt-1 font-inter">Speaker</p>
                   </button>
 
                   <button
                     onClick={() => setIsRecording(!isRecording)}
-                    className={`p-4 rounded-xl transition-colors ${
+                    className={`p-3 rounded-xl transition-colors ${
                       isRecording
-                        ? "bg-red-600/20 border border-red-600 text-red-400"
-                        : "bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700"
+                        ? "bg-red-100 border border-red-200 text-red-600"
+                        : "bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200"
                     }`}
                     disabled={!isCallActive}
                   >
                     {isRecording ? (
-                      <PiStopBold className="w-5 h-5 mx-auto" />
+                      <PiStopBold className="w-4 h-4 mx-auto" />
                     ) : (
-                      <PiRecordBold className="w-5 h-5 mx-auto" />
+                      <PiRecordBold className="w-4 h-4 mx-auto" />
                     )}
-                    <p className="text-xs mt-1">{isRecording ? "Stop" : "Record"}</p>
+                    <p className="text-xs mt-1 font-inter">{isRecording ? "Stop" : "Record"}</p>
                   </button>
 
                   <button
                     onClick={toggleVoiceRecognition}
-                    className={`p-4 rounded-xl transition-colors ${
+                    className={`p-3 rounded-xl transition-colors ${
                       voiceRecognitionActive
-                        ? "bg-blue-600/20 border border-blue-600 text-blue-400"
-                        : "bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700"
+                        ? "bg-blue-100 border border-blue-200 text-blue-600"
+                        : "bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200"
                     }`}
                     disabled={!isCallActive}
                   >
-                    <PiWaveformBold className="w-5 h-5 mx-auto" />
-                    <p className="text-xs mt-1">Voice AI</p>
+                    <PiWaveformBold className="w-4 h-4 mx-auto" />
+                    <p className="text-xs mt-1 font-inter">Voice AI</p>
                   </button>
                 </div>
 
-                {/* Call Statistics */}
+                {/* Call Stats */}
                 {isCallActive && (
-                  <div className="p-4 bg-gray-800/30 rounded-xl border border-gray-700 space-y-3">
-                    <h4 className="text-sm font-medium text-white">Call Statistics</h4>
-
-                    <div className="space-y-2 text-xs">
+                  <div className="bg-white/50 backdrop-blur-sm rounded-xl border border-gray-200 p-4 space-y-2">
+                    <h4 className="text-sm font-medium text-gray-900 font-inter">Call Statistics</h4>
+                    <div className="space-y-1 text-xs font-inter">
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Duration:</span>
-                        <span className="text-white">{formatDuration(callDuration)}</span>
+                        <span className="text-gray-600">Duration:</span>
+                        <span className="text-gray-900">{formatDuration(callDuration)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Participants:</span>
-                        <span className="text-white">
+                        <span className="text-gray-600">Participants:</span>
+                        <span className="text-gray-900">
                           {participants.filter((p) => p.status === "connected").length}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Quality:</span>
-                        <span className={getQualityColor(callQuality)}>{callQuality}</span>
+                        <span className="text-gray-600">Quality:</span>
+                        <span className="text-green-600">Excellent</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Recording:</span>
-                        <span className={isRecording ? "text-red-400" : "text-gray-400"}>
+                        <span className="text-gray-600">Recording:</span>
+                        <span className={isRecording ? "text-red-600" : "text-gray-600"}>
                           {isRecording ? "Active" : "Inactive"}
                         </span>
                       </div>

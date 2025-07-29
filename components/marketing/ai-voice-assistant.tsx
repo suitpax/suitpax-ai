@@ -59,19 +59,45 @@ export default function AIVoiceAssistant() {
 
       setConversation((prev) => [...prev, userMessage])
 
-      // Simulate AI response
-      setTimeout(() => {
+      // Generate AI response with ElevenLabs
+      setTimeout(async () => {
         const aiResponse = {
           id: (Date.now() + 1).toString(),
           type: "ai" as const,
-          text: "I understand you're looking for travel assistance. Let me help you with that.",
+          text: "I understand you're looking for travel assistance. Let me help you with that booking right away.",
           timestamp: new Date(),
         }
         setConversation((prev) => [...prev, aiResponse])
         setIsSpeaking(true)
 
-        // Simulate speaking duration
-        setTimeout(() => setIsSpeaking(false), 3000)
+        // Generate speech with ElevenLabs
+        try {
+          const response = await fetch("/api/elevenlabs/generate-speech", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              text: aiResponse.text,
+              agentId: "emma",
+            }),
+          })
+
+          if (response.ok) {
+            const audioBlob = await response.blob()
+            const audioUrl = URL.createObjectURL(audioBlob)
+            const audio = new Audio(audioUrl)
+            audio.play()
+
+            audio.onended = () => {
+              setIsSpeaking(false)
+              URL.revokeObjectURL(audioUrl)
+            }
+          }
+        } catch (error) {
+          console.error("Error generating speech:", error)
+          setIsSpeaking(false)
+        }
       }, 1000)
 
       resetTranscript()
@@ -87,32 +113,26 @@ export default function AIVoiceAssistant() {
   }
 
   return (
-    <section className="py-16 md:py-24 bg-gray-100">
+    <section className="py-16 md:py-24 bg-gray-50">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center rounded-xl bg-gray-800 px-2.5 py-0.5 text-[10px] font-medium text-white mb-6">
-            <Image
-              src="/logo/suitpax-symbol.webp"
-              alt="Suitpax"
-              width={12}
-              height={12}
-              className="mr-1.5 w-3 h-3 brightness-0 invert"
-            />
+          <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-6">
+            <Image src="/logo/suitpax-symbol.webp" alt="Suitpax" width={12} height={12} className="mr-1.5 w-3 h-3" />
             AI Voice Assistant
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 text-black">
-            Habla con tu
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-medium tracking-tighter leading-none mb-6 text-black">
+            Speak with your
             <br />
-            <span className="text-gray-600">asistente de viajes</span>
+            <span className="text-gray-600 font-inter">travel assistant</span>
           </h2>
-          <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto">
-            Interactúa naturalmente con nuestro asistente de IA usando tu voz. Planifica viajes, gestiona reservas y
-            obtén recomendaciones personalizadas.
+          <p className="text-lg font-light text-gray-700 max-w-3xl mx-auto font-inter">
+            Interact naturally with our AI assistant using your voice. Plan trips, manage bookings, and get personalized
+            recommendations through natural conversation.
           </p>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-8">
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-8">
             <div className="grid md:grid-cols-2 gap-8">
               {/* Voice Interface */}
               <div className="space-y-6">
@@ -148,8 +168,8 @@ export default function AIVoiceAssistant() {
                     </motion.button>
                   </div>
 
-                  <p className="mt-4 text-sm font-medium text-gray-700">
-                    {isListening ? "Escuchando..." : "Toca para hablar"}
+                  <p className="mt-4 text-sm font-medium text-gray-700 font-inter">
+                    {isListening ? "Listening..." : "Tap to speak"}
                   </p>
                 </div>
 
@@ -197,21 +217,21 @@ export default function AIVoiceAssistant() {
                 {/* Current Transcript */}
                 {transcript && (
                   <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                    <p className="text-sm text-gray-700">{transcript}</p>
+                    <p className="text-sm text-gray-700 font-inter">{transcript}</p>
                   </div>
                 )}
               </div>
 
               {/* Conversation History */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium tracking-tighter text-black">Conversación</h3>
+                <h3 className="text-lg font-medium tracking-tighter text-black font-serif">Conversation</h3>
 
                 <div className="h-80 overflow-y-auto space-y-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
                   {conversation.length === 0 ? (
                     <div className="flex items-center justify-center h-full text-gray-500">
                       <div className="text-center">
                         <PiWaveformBold className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm">Inicia una conversación</p>
+                        <p className="text-sm font-inter">Start a conversation</p>
                       </div>
                     </div>
                   ) : (
@@ -230,8 +250,22 @@ export default function AIVoiceAssistant() {
                                 : "bg-white border border-gray-200 text-gray-700"
                             }`}
                           >
-                            <p className="text-sm">{message.text}</p>
-                            <p className="text-xs opacity-70 mt-1">{message.timestamp.toLocaleTimeString()}</p>
+                            {message.type === "ai" && (
+                              <div className="flex items-center mb-2">
+                                <Image
+                                  src="/logo/suitpax-bl-logo.webp"
+                                  alt="Suitpax AI"
+                                  width={16}
+                                  height={16}
+                                  className="w-4 h-4 rounded-xl mr-2"
+                                />
+                                <span className="text-xs font-medium text-gray-500 font-inter">Suitpax AI</span>
+                              </div>
+                            )}
+                            <p className="text-sm font-inter">{message.text}</p>
+                            <p className="text-xs opacity-70 mt-1 font-inter">
+                              {message.timestamp.toLocaleTimeString()}
+                            </p>
                           </div>
                         </motion.div>
                       ))}
@@ -248,7 +282,7 @@ export default function AIVoiceAssistant() {
                     >
                       <PiCircleBold className="w-3 h-3 text-blue-500" />
                     </motion.div>
-                    <p className="text-sm text-blue-700">IA está respondiendo...</p>
+                    <p className="text-sm text-blue-700 font-inter">AI is responding...</p>
                   </div>
                 )}
               </div>
