@@ -64,8 +64,8 @@
     "react-hook-form": "^7.54.0",
     "react-hot-toast": "latest",
     "react-icons": "latest",
-    "react-speech-recognition": "latest",
-    "regenerator-runtime": "latest",
+    "react-speech-recognition": "^3.10.0",
+    "regenerator-runtime": "^0.14.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1"

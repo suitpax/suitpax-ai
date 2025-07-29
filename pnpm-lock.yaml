@@ -138,10 +138,10 @@ importers:
         specifier: latest
         version: 5.5.0(react@19.0.0)
       react-speech-recognition:
-        specifier: latest
-        version: 4.0.1(react@19.0.0)
+        specifier: ^3.10.0
+        version: 3.10.0(react@19.0.0)
       regenerator-runtime:
-        specifier: latest
+        specifier: ^0.14.1
         version: 0.14.1
       tailwind-merge:
         specifier: ^2.5.5
@@ -2393,9 +2393,6 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  lodash.debounce@4.0.8:
-    resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
-
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
@@ -2757,8 +2754,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-speech-recognition@4.0.1:
-    resolution: {integrity: sha512-0fIqzLtfY8vuYA6AmJVK7qiabZx0oFKOO+rbiBgFI3COWVGREy0A+gdU16hWXmFebeyrI8JsOLYsWk6WaHUXRw==}
+  react-speech-recognition@3.10.0:
+    resolution: {integrity: sha512-EVSr4Ik8l9urwdPiK2r0+ADrLyDDrjB0qBRdUWO+w2MfwEBrj6NuRmy1GD3x7BU/V6/hab0pl8Lupen0zwlJyw==}
     peerDependencies:
       react: '>=16.8.0'
 
@@ -5631,8 +5628,6 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash.debounce@4.0.8: {}
-
   lodash.merge@4.6.2: {}
 
   loose-envify@1.4.0:
@@ -5958,9 +5953,8 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.0.0
 
-  react-speech-recognition@4.0.1(react@19.0.0):
+  react-speech-recognition@3.10.0(react@19.0.0):
     dependencies:
-      lodash.debounce: 4.0.8
       react: 19.0.0
 
   react-style-singleton@2.2.3(@types/react@19.0.0)(react@19.0.0):
