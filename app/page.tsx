@@ -3,11 +3,14 @@ import Hero from "@/components/marketing/hero"
 import PartnersShowcase from "@/components/partners-showcase"
 import AITravelAgents from "@/components/marketing/ai-travel-agents"
 import BusinessTravelRevolution from "@/components/marketing/business-travel-revolution"
+import ExpenseManagement from "@/components/marketing/expense-management"
 import FlightBookingShowcase from "@/components/marketing/flight-booking-showcase"
 import IntegrationsShowcase from "@/components/marketing/integrations-showcase"
 import AgenticDisruption from "@/components/marketing/agentic-disruption"
 import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
 import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
+import BusinessIntelligence from "@/components/marketing/business-intelligence"
+import TaskManagement from "@/components/marketing/task-management"
 import ContactForm from "@/components/marketing/contact-form"
 import FoundersOpenLetter from "@/components/marketing/founders-open-letter"
 import Footer from "@/components/marketing/footer"
@@ -24,21 +27,21 @@ const PasswordProtection = dynamic(() => import("@/components/password-protectio
 })
 
 export const metadata: Metadata = {
-  title: "Suitpax | AI-Powered Business Travel Platform",
+  title: "Suitpax | AI-Powered Business Travel Platform - October 2025 Launch",
   description:
-    "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
+    "Get exclusive early access to Suitpax, the most advanced AI-powered business travel platform launching October 2025. Limited preview spots available.",
   openGraph: {
-    title: "Suitpax | AI-Powered Business Travel Platform",
+    title: "Suitpax | AI-Powered Business Travel Platform - October 2025 Launch",
     description:
-      "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
+      "Get exclusive early access to Suitpax, the most advanced AI-powered business travel platform launching October 2025. Limited preview spots available.",
     url: "https://suitpax.com",
     siteName: "Suitpax",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image-new.png",
         width: 1200,
         height: 630,
-        alt: "Suitpax | AI-Powered Business Travel Platform",
+        alt: "Suitpax | AI-Powered Business Travel Platform - October 2025 Launch",
       },
     ],
     locale: "en_US",
@@ -46,9 +49,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Suitpax | AI-Powered Business Travel Platform",
+    title: "Suitpax | AI-Powered Business Travel Platform - October 2025 Launch",
     description:
-      "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
+      "Get exclusive early access to Suitpax, the most advanced AI-powered business travel platform launching October 2025. Limited preview spots available.",
     images: ["/twitter-image.png"],
     creator: "@suitpax",
   },
@@ -73,24 +76,37 @@ export const metadata: Metadata = {
       "es-ES": "https://suitpax.com/es-ES",
     },
   },
+  keywords: [
+    "business travel",
+    "AI travel platform",
+    "expense management",
+    "travel booking",
+    "October 2025 launch",
+    "early access",
+    "enterprise travel",
+    "travel technology",
+  ],
 }
 
 export default function HomePage() {
   return (
     <>
       <SplashScreen />
-      <PasswordProtection>
+      <PasswordProtection onUnlock={() => {}}>
         <div className="min-h-screen bg-white">
           <Navigation />
-          <main>
+          <main className="pt-20">
             <Hero />
             <PartnersShowcase />
             <AITravelAgents />
             <BusinessTravelRevolution />
+            <ExpenseManagement />
             <FlightBookingShowcase />
             <IntegrationsShowcase />
             <AgenticDisruption />
             <AIVoiceAssistant />
+            <BusinessIntelligence />
+            <TaskManagement />
             <AIMeetingsAttachment />
             <ContactForm />
             <FoundersOpenLetter />
