@@ -6,12 +6,7 @@ import Image from "next/image"
 import { Eye, EyeOff, ArrowRight, Sparkles, Calendar, Shield, Rocket } from "lucide-react"
 import { motion } from "framer-motion"
 
-interface PasswordProtectionProps {
-  onUnlock: () => void
-  children: React.ReactNode
-}
-
-export default function PasswordProtection({ onUnlock, children }: PasswordProtectionProps) {
+export default function PasswordProtection({ onUnlock }: { onUnlock: () => void }) {
   const [company, setCompany] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState(false)
@@ -19,7 +14,6 @@ export default function PasswordProtection({ onUnlock, children }: PasswordProte
   const [isAnimating, setIsAnimating] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
-  const [isUnlocked, setIsUnlocked] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const correctPassword = "mission2065"
@@ -47,18 +41,12 @@ export default function PasswordProtection({ onUnlock, children }: PasswordProte
     if (password === correctPassword) {
       setIsAnimating(true)
       setTimeout(() => {
-        setIsUnlocked(true)
         onUnlock()
       }, 1500)
     } else {
       setError(true)
       setTimeout(() => setError(false), 2000)
     }
-  }
-
-  // Si está desbloqueado, mostrar el contenido
-  if (isUnlocked) {
-    return <>{children}</>
   }
 
   const launchStats = [
