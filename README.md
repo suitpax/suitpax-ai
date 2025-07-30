@@ -1,4 +1,4 @@
-# Suitpax Landing Page
+# Suitpax AI
 
 The next-generation AI-powered business travel platform landing page built with modern web technologies.
 
