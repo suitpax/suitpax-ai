@@ -7,92 +7,203 @@ export interface Database {
         Row: {
           id: string
           email: string
-          full_name: string | null
-          company_name: string | null
-          company_domain: string | null
-          job_title: string | null
-          phone: string | null
-          plan_type: string
+          first_name: string | null
+          last_name: string | null
+          company: string | null
+          avatar_url: string | null
+          subscription_tier: "free" | "pro" | "enterprise"
           ai_tokens_used: number
           ai_tokens_limit: number
-          travel_searches_used: number
-          travel_searches_limit: number
-          onboarding_completed: boolean
-          travel_preferences: string | null
-          preferred_airline: string | null
-          preferred_hotel_chain: string | null
-          dietary_restrictions: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id: string
           email: string
-          full_name?: string | null
-          company_name?: string | null
-          company_domain?: string | null
-          job_title?: string | null
-          phone?: string | null
-          plan_type?: string
+          first_name?: string | null
+          last_name?: string | null
+          company?: string | null
+          avatar_url?: string | null
+          subscription_tier?: "free" | "pro" | "enterprise"
           ai_tokens_used?: number
           ai_tokens_limit?: number
-          travel_searches_used?: number
-          travel_searches_limit?: number
-          onboarding_completed?: boolean
-          travel_preferences?: string | null
-          preferred_airline?: string | null
-          preferred_hotel_chain?: string | null
-          dietary_restrictions?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           email?: string
-          full_name?: string | null
-          company_name?: string | null
-          company_domain?: string | null
-          job_title?: string | null
-          phone?: string | null
-          plan_type?: string
+          first_name?: string | null
+          last_name?: string | null
+          company?: string | null
+          avatar_url?: string | null
+          subscription_tier?: "free" | "pro" | "enterprise"
           ai_tokens_used?: number
           ai_tokens_limit?: number
-          travel_searches_used?: number
-          travel_searches_limit?: number
-          onboarding_completed?: boolean
-          travel_preferences?: string | null
-          preferred_airline?: string | null
-          preferred_hotel_chain?: string | null
-          dietary_restrictions?: string | null
           created_at?: string
           updated_at?: string
         }
       }
-      ai_conversations: {
+      ai_chat_logs: {
         Row: {
           id: string
           user_id: string
-          title: string
-          messages: Json
+          message: string
+          response: string
+          section: string
           tokens_used: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          message: string
+          response: string
+          section?: string
+          tokens_used?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          message?: string
+          response?: string
+          section?: string
+          tokens_used?: number
+          created_at?: string
+        }
+      }
+      travel_bookings: {
+        Row: {
+          id: string
+          user_id: string
+          booking_type: "flight" | "hotel" | "car" | "train"
+          booking_reference: string | null
+          departure_date: string | null
+          return_date: string | null
+          origin: string | null
+          destination: string | null
+          passenger_name: string | null
+          total_cost: number | null
+          currency: string
+          status: "pending" | "confirmed" | "cancelled" | "completed"
+          booking_data: Json | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          title: string
-          messages: Json
-          tokens_used?: number
+          booking_type: "flight" | "hotel" | "car" | "train"
+          booking_reference?: string | null
+          departure_date?: string | null
+          return_date?: string | null
+          origin?: string | null
+          destination?: string | null
+          passenger_name?: string | null
+          total_cost?: number | null
+          currency?: string
+          status?: "pending" | "confirmed" | "cancelled" | "completed"
+          booking_data?: Json | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           user_id?: string
-          title?: string
-          messages?: Json
-          tokens_used?: number
+          booking_type?: "flight" | "hotel" | "car" | "train"
+          booking_reference?: string | null
+          departure_date?: string | null
+          return_date?: string | null
+          origin?: string | null
+          destination?: string | null
+          passenger_name?: string | null
+          total_cost?: number | null
+          currency?: string
+          status?: "pending" | "confirmed" | "cancelled" | "completed"
+          booking_data?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      expenses: {
+        Row: {
+          id: string
+          user_id: string
+          booking_id: string | null
+          category: "flight" | "hotel" | "meals" | "transport" | "other"
+          description: string
+          amount: number
+          currency: string
+          expense_date: string
+          receipt_url: string | null
+          status: "pending" | "approved" | "rejected"
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          booking_id?: string | null
+          category: "flight" | "hotel" | "meals" | "transport" | "other"
+          description: string
+          amount: number
+          currency?: string
+          expense_date: string
+          receipt_url?: string | null
+          status?: "pending" | "approved" | "rejected"
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          booking_id?: string | null
+          category?: "flight" | "hotel" | "meals" | "transport" | "other"
+          description?: string
+          amount?: number
+          currency?: string
+          expense_date?: string
+          receipt_url?: string | null
+          status?: "pending" | "approved" | "rejected"
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      user_preferences: {
+        Row: {
+          id: string
+          user_id: string
+          preferred_airlines: string[] | null
+          preferred_hotels: string[] | null
+          seat_preference: string | null
+          meal_preference: string | null
+          notification_settings: Json
+          travel_policies: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          preferred_airlines?: string[] | null
+          preferred_hotels?: string[] | null
+          seat_preference?: string | null
+          meal_preference?: string | null
+          notification_settings?: Json
+          travel_policies?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          preferred_airlines?: string[] | null
+          preferred_hotels?: string[] | null
+          seat_preference?: string | null
+          meal_preference?: string | null
+          notification_settings?: Json
+          travel_policies?: Json
           created_at?: string
           updated_at?: string
         }

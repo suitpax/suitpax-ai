@@ -9,7 +9,6 @@ import { MdMic, MdMicOff } from "react-icons/md"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
 import { detectLanguage } from "@/lib/language-detection"
 
-// Placeholder simple para el input de voz
 const voicePlaceholder = "Speak to your AI travel assistant..."
 
 export default function CloudAIShowcase() {
@@ -20,7 +19,6 @@ export default function CloudAIShowcase() {
   const [highlightTransport, setHighlightTransport] = useState(false)
   const inputRef = useRef<HTMLDivElement>(null)
 
-  // Configuración avanzada para el reconocimiento de voz
   const {
     isListening,
     transcript,
@@ -31,9 +29,8 @@ export default function CloudAIShowcase() {
     isMicrophoneAvailable,
   } = useSpeechToText({
     onTranscriptChange: (text) => {
-      setInputText(text) // Actualización en tiempo real del input
+      setInputText(text)
 
-      // Mantener los efectos de highlight existentes
       if (text && text.length > 0) {
         setHighlightFlight(true)
         setTimeout(() => {
@@ -47,7 +44,6 @@ export default function CloudAIShowcase() {
         }, 2300)
       }
 
-      // Mantener la detección de idioma
       if (text.length > 10) {
         const detected = detectLanguage(text)
         if (detected.confidence > 0.6) {
@@ -68,10 +64,9 @@ export default function CloudAIShowcase() {
       stopListening()
     } else {
       try {
-        // Verificar permisos antes de iniciar
         await navigator.mediaDevices.getUserMedia({ audio: true })
         resetTranscript()
-        setInputText("") // Limpiar el input text también
+        setInputText("")
         startListening()
         setErrorMessage(null)
       } catch (error) {
@@ -91,7 +86,6 @@ export default function CloudAIShowcase() {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            {/* Badges centrados */}
             <div className="flex justify-center items-center gap-1.5 mb-3">
               <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
                 <Image
@@ -127,9 +121,8 @@ export default function CloudAIShowcase() {
           viewport={{ once: true }}
           className="w-full"
         >
-          <VantaCloudsBackground className="w-full min-h-[500px] md:min-h-[600px] rounded-xl flex items-center justify-center p-4 md:p-6 overflow-hidden bg-blue-50">
+          <VantaCloudsBackground className="w-full min-h-[500px] md:min-h-[600px] rounded-xl flex items-center justify-center p-4 md:p-6 overflow-hidden bg-blue-100">
             <div className="w-full max-w-3xl">
-              {/* Título y subtítulo por encima del input, estilo similar a AIVoiceAssistant */}
               <div className="text-center mb-6 md:mb-8">
                 <h3 className="inline-flex items-center rounded-xl bg-gray-800/60 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-medium text-white mb-4 shadow-sm">
                   <Image
@@ -146,14 +139,11 @@ export default function CloudAIShowcase() {
                 </h2>
               </div>
 
-              {/* Solo el input, sin la tarjeta blanca alrededor */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                {/* Input de chat con reconocimiento de voz mejorado */}
                 <div className="relative flex items-center gap-2 p-1 rounded-xl border border-gray-400 shadow-sm bg-white/90 backdrop-blur-md mb-4 md:mb-6 transition-all duration-300 hover:shadow-md">
-                  {/* Avatar del agente AI */}
                   <div className="relative w-10 h-10 overflow-hidden rounded-full border border-gray-300 ml-2">
                     <Image
-                      src="/agents/agent-12.png"
+                      src="/agents/agent-nova.jpeg"
                       alt="Suitpax AI Agent"
                       width={40}
                       height={40}
@@ -161,7 +151,6 @@ export default function CloudAIShowcase() {
                     />
                   </div>
 
-                  {/* Input de texto con reconocimiento de voz mejorado */}
                   <div ref={inputRef} className="flex-1 py-2 px-2 text-xs text-gray-900 h-10 flex items-center">
                     {inputText ? (
                       <span className="inline-block text-xs text-gray-900 font-medium">
@@ -197,7 +186,6 @@ export default function CloudAIShowcase() {
                     )}
                   </div>
 
-                  {/* Botón de micrófono con indicador de escucha mejorado */}
                   <div className="relative mr-2">
                     <button
                       onClick={toggleListening}
@@ -211,7 +199,6 @@ export default function CloudAIShowcase() {
                       {isListening ? <MdMicOff className="h-4 w-4" /> : <MdMic className="h-4 w-4" />}
                     </button>
 
-                    {/* Indicador de escucha flotante mejorado */}
                     {isListening && (
                       <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-[10px] px-2 py-1 rounded-full whitespace-nowrap animate-pulse">
                         🎤 {detectedLanguage === "en-US" ? "English" : detectedLanguage}
@@ -220,16 +207,13 @@ export default function CloudAIShowcase() {
                   </div>
                 </div>
 
-                {/* Mensajes de estado y error mejorados */}
                 <div className="flex flex-col items-center space-y-1 -mt-3 mb-3">
-                  {/* Mensaje de error */}
                   {errorMessage && (
                     <div className="text-xs text-red-400 text-center bg-red-900/20 px-3 py-1 rounded-full backdrop-blur-sm">
                       <em className="font-serif italic">{errorMessage}</em>
                     </div>
                   )}
 
-                  {/* Mensaje de soporte del navegador */}
                   {!browserSupportsSpeechRecognition && (
                     <div className="text-xs text-yellow-400 text-center bg-yellow-900/20 px-3 py-1 rounded-full backdrop-blur-sm">
                       <em className="font-serif italic">
@@ -238,7 +222,6 @@ export default function CloudAIShowcase() {
                     </div>
                   )}
 
-                  {/* Indicador de estado de micrófono */}
                   {!isMicrophoneAvailable && (
                     <div className="text-xs text-orange-400 text-center bg-orange-900/20 px-3 py-1 rounded-full backdrop-blur-sm">
                       <em className="font-serif italic">Micrófono no disponible. Permite el acceso al micrófono.</em>
@@ -246,13 +229,11 @@ export default function CloudAIShowcase() {
                   )}
                 </div>
 
-                {/* Ejemplos de itinerarios de viaje visuales y espectaculares */}
                 <div className="mb-6 space-y-3">
                   <p className="text-xs font-medium mb-2 text-center text-white">
                     <em className="font-serif italic">Your upcoming trip to San Francisco:</em>
                   </p>
 
-                  {/* British Airways Flight Card - Moderna y minimalista con efecto brillante */}
                   <div
                     className={`relative bg-gray-500/10 backdrop-blur-xl rounded-xl border overflow-hidden p-3 transition-all duration-500 ${
                       highlightFlight
@@ -260,7 +241,6 @@ export default function CloudAIShowcase() {
                         : "border-gray-400/20 shadow-sm"
                     }`}
                   >
-                    {/* Efecto de brillo que se mueve a través de la tarjeta */}
                     <AnimatePresence>
                       {highlightFlight && (
                         <motion.div
@@ -328,7 +308,6 @@ export default function CloudAIShowcase() {
                     </div>
                   </div>
 
-                  {/* Tesla Transportation Card - Moderna y minimalista con efecto brillante */}
                   <div
                     className={`relative bg-gray-500/10 backdrop-blur-xl rounded-xl border overflow-hidden p-3 transition-all duration-500 ${
                       highlightTransport
@@ -336,7 +315,6 @@ export default function CloudAIShowcase() {
                         : "border-gray-400/20 shadow-sm"
                     }`}
                   >
-                    {/* Efecto de brillo que se mueve a través de la tarjeta */}
                     <AnimatePresence>
                       {highlightTransport && (
                         <motion.div
@@ -405,7 +383,6 @@ export default function CloudAIShowcase() {
                   </div>
                 </div>
 
-                {/* Talk to founders badge */}
                 <div className="flex justify-center mt-6 mb-4">
                   <a
                     href="mailto:founders@suitpax.com"
@@ -416,7 +393,6 @@ export default function CloudAIShowcase() {
                   </a>
                 </div>
 
-                {/* "Powered by" text */}
                 <div className="mt-2 text-center">
                   <span className="text-[10px] text-gray-600">
                     <em className="font-serif italic">Powered by Suitpax Engineering</em>

@@ -18,7 +18,7 @@ import { useSpeechToText } from "@/hooks/use-speech-recognition"
 import { ELEVENLABS_VOICES } from "@/lib/elevenlabs"
 import { getSupportedLanguages, detectLanguage } from "@/lib/language-detection"
 
-// Message type
+// Tipo para los mensajes
 interface Message {
   id: string
   sender: "user" | "assistant"
@@ -29,7 +29,7 @@ interface Message {
 }
 
 export default function AIAgentVoice() {
-  // Interface states
+  // Estados para la interfaz
   const [isCallActive, setIsCallActive] = useState(false)
   const [activeTab, setActiveTab] = useState("voice")
   const [audioProgress, setAudioProgress] = useState(0)
@@ -47,11 +47,11 @@ export default function AIAgentVoice() {
   const [supportedLanguages] = useState(getSupportedLanguages())
   const [showLanguageIndicator, setShowLanguageIndicator] = useState(false)
 
-  // References
+  // Referencias
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null)
   const waveformRef = useRef<HTMLDivElement | null>(null)
 
-  // Audio recorder hook
+  // Hook para grabación de audio
   const {
     isRecording,
     audioBlob,
@@ -63,7 +63,7 @@ export default function AIAgentVoice() {
     onRecordingComplete: handleRecordingComplete,
   })
 
-  // Speech recognition hook with language detection
+  // Hook para reconocimiento de voz con detección de idioma
   const {
     isListening,
     transcript,
@@ -76,6 +76,7 @@ export default function AIAgentVoice() {
   } = useSpeechToText({
     onEnd: (finalTranscript, detectedLang) => {
       if (finalTranscript) {
+        // Crear mensaje del usuario
         const userMessage: Message = {
           id: Date.now().toString(),
           sender: "user",
@@ -85,6 +86,8 @@ export default function AIAgentVoice() {
         }
 
         setMessages((prev) => [...prev, userMessage])
+
+        // Procesar el mensaje
         processUserMessage(finalTranscript, userMessage.id, detectedLang)
       }
     },
@@ -92,7 +95,7 @@ export default function AIAgentVoice() {
     autoDetectLanguage: true,
   })
 
-  // Effect to show language indicator
+  // Efecto para mostrar el indicador de idioma
   useEffect(() => {
     if (detectedLanguage && detectedLanguage !== "en-US") {
       setShowLanguageIndicator(true)
@@ -103,9 +106,10 @@ export default function AIAgentVoice() {
     }
   }, [detectedLanguage])
 
-  // Effect to start conversation when call is activated
+  // Efecto para iniciar la conversación cuando se activa la llamada
   useEffect(() => {
     if (isCallActive && messages.length === 0) {
+      // Mensaje inicial del asistente
       const welcomeMessage = {
         id: Date.now().toString(),
         sender: "assistant" as const,
@@ -116,11 +120,11 @@ export default function AIAgentVoice() {
 
       setMessages([welcomeMessage])
 
-      // Convert welcome message to speech
+      // Convertir el mensaje de bienvenida a voz
       convertTextToSpeech(welcomeMessage.text, currentAssistant.voiceId).then((audioUrl) => {
         setMessages((prev) => prev.map((msg) => (msg.id === welcomeMessage.id ? { ...msg, audioUrl } : msg)))
 
-        // Auto-play welcome message
+        // Reproducir automáticamente el mensaje de bienvenida
         if (audioPlayerRef.current && audioUrl) {
           audioPlayerRef.current.src = audioUrl
           audioPlayerRef.current.play()
@@ -129,7 +133,7 @@ export default function AIAgentVoice() {
     }
   }, [isCallActive, messages.length, currentAssistant])
 
-  // Effect to simulate audio progress
+  // Efecto para simular progreso de audio
   useEffect(() => {
     let interval: NodeJS.Timeout
     if (isCallActive && audioPlayerRef.current) {
@@ -150,30 +154,33 @@ export default function AIAgentVoice() {
     }
   }, [isCallActive])
 
-  // Effect to animate waveform
+  // Efecto para animar el waveform
   useEffect(() => {
     if ((isRecording || isListening) && waveformRef.current) {
       const waveformBars = waveformRef.current.querySelectorAll("div[data-waveform-bar]")
 
+      // Animación más natural para las barras del waveform
       waveformBars.forEach((bar, index) => {
         const animateBar = () => {
-          const randomHeight = Math.random() * 24 + 4
+          const randomHeight = Math.random() * 24 + 4 // Entre 4px y 28px
           const htmlBar = bar as HTMLElement
           htmlBar.style.height = `${randomHeight}px`
           htmlBar.style.opacity = `${0.3 + Math.random() * 0.7}`
         }
 
+        // Diferentes intervalos para cada barra para un efecto más natural
         const interval = setInterval(animateBar, 200 + Math.random() * 300)
         return () => clearInterval(interval)
       })
     }
   }, [isRecording, isListening])
 
-  // Function to handle completed recording
+  // Función para manejar la grabación completada
   async function handleRecordingComplete(blob: Blob) {
     if (!blob) return
 
     try {
+      // Añadir mensaje del usuario con audio pendiente
       const userMessage: Message = {
         id: Date.now().toString(),
         sender: "user",
@@ -184,16 +191,19 @@ export default function AIAgentVoice() {
       setMessages((prev) => [...prev, userMessage])
       setIsProcessing(true)
 
+      // Convertir audio a texto con mejor manejo de errores
       try {
         const { text, detectedLanguage } = await convertSpeechToText(blob)
 
+        // Actualizar mensaje del usuario con el texto transcrito
         setMessages((prev) =>
           prev.map((msg) => (msg.id === userMessage.id ? { ...msg, text, language: detectedLanguage } : msg)),
         )
 
+        // Procesar el mensaje del usuario
         await processUserMessage(text, userMessage.id, detectedLanguage)
       } catch (error) {
-        console.error("Transcription error:", error)
+        console.error("Error en la transcripción:", error)
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === userMessage.id
@@ -204,12 +214,12 @@ export default function AIAgentVoice() {
         setIsProcessing(false)
       }
     } catch (error) {
-      console.error("Error processing audio:", error)
+      console.error("Error al procesar audio:", error)
       setIsProcessing(false)
     }
   }
 
-  // Update toggleRecording function to use the new hook
+  // Actualizar la función toggleRecording para usar el nuevo hook
   const toggleRecording = () => {
     if (isListening) {
       stopListening()
@@ -218,18 +228,21 @@ export default function AIAgentVoice() {
     }
   }
 
-  // Function to process user message and generate response
+  // Función para procesar el mensaje del usuario y generar respuesta
   async function processUserMessage(userText: string, userMessageId: string, detectedLang?: string) {
     setIsProcessing(true)
 
+    // Simular tiempo de procesamiento
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
+    // Si no se proporcionó un idioma detectado, intentar detectarlo del texto
     const userLanguage = detectedLang || detectLanguage(userText).speechCode
 
+    // Generar respuesta (en una app real, esto vendría de una API de IA)
     let responseText = ""
     let responseLanguage = userLanguage
 
-    // Responses in different languages based on detected language
+    // Respuestas en diferentes idiomas según el idioma detectado
     if (userLanguage === "es-ES") {
       if (
         userText.toLowerCase().includes("vuelo") ||
@@ -237,17 +250,22 @@ export default function AIAgentVoice() {
         userText.toLowerCase().includes("nueva york")
       ) {
         responseText =
-          "I found several flight options from Madrid to New York for next week. The best morning flights are with Iberia at 10:30 AM and Delta at 11:15 AM. Would you like more details on these options?"
+          "He encontrado varias opciones de vuelos desde Madrid a Nueva York para la próxima semana. Los mejores vuelos de la mañana son con Iberia a las 10:30 y Delta a las 11:15. ¿Te gustaría más detalles sobre estas opciones?"
       } else if (userText.toLowerCase().includes("hotel") || userText.toLowerCase().includes("alojamiento")) {
         responseText =
-          "I can recommend several hotels in New York based on your preferences. The Hilton Midtown and The Peninsula are excellent options for business travelers. Would you like me to book a room for you?"
+          "Puedo recomendarte varios hoteles en Nueva York según tus preferencias. El Hilton Midtown y The Peninsula son excelentes opciones para viajeros de negocios. ¿Quieres que reserve una habitación para ti?"
       } else {
         responseText =
-          "I understand you need help with your travel plans. Could you provide more details about your requirements so I can help you better?"
+          "Entiendo que necesitas ayuda con tus planes de viaje. ¿Podrías proporcionar más detalles sobre tus requisitos para que pueda ayudarte mejor?"
       }
-      responseLanguage = "en-US" // Keep responses in English
+    } else if (userLanguage === "fr-FR") {
+      responseText =
+        "Je comprends que vous avez besoin d'aide pour vos projets de voyage. Pourriez-vous me donner plus de détails sur vos besoins afin que je puisse mieux vous aider?"
+    } else if (userLanguage === "de-DE") {
+      responseText =
+        "Ich verstehe, dass Sie Hilfe bei Ihren Reiseplänen benötigen. Könnten Sie mir weitere Details zu Ihren Anforderungen mitteilen, damit ich Ihnen besser helfen kann?"
     } else {
-      // English responses by default
+      // Respuesta en inglés por defecto
       responseLanguage = "en-US"
       if (
         userText.toLowerCase().includes("flight") ||
@@ -272,6 +290,7 @@ export default function AIAgentVoice() {
       }
     }
 
+    // Crear mensaje de respuesta
     const assistantMessage: Message = {
       id: Date.now().toString(),
       sender: "assistant",
@@ -282,23 +301,26 @@ export default function AIAgentVoice() {
 
     setMessages((prev) => [...prev, assistantMessage])
 
+    // Convertir texto a voz
     try {
       const audioUrl = await convertTextToSpeech(responseText, currentAssistant.voiceId, responseLanguage)
 
+      // Actualizar mensaje con URL de audio
       setMessages((prev) => prev.map((msg) => (msg.id === assistantMessage.id ? { ...msg, audioUrl } : msg)))
 
+      // Reproducir automáticamente
       if (audioPlayerRef.current && audioUrl) {
         audioPlayerRef.current.src = audioUrl
         audioPlayerRef.current.play()
       }
     } catch (error) {
-      console.error("Error converting text to speech:", error)
+      console.error("Error al convertir texto a voz:", error)
     }
 
     setIsProcessing(false)
   }
 
-  // Function to convert speech to text using ElevenLabs API
+  // Función para convertir voz a texto usando la API de ElevenLabs con mejor manejo de errores
   async function convertSpeechToText(audioBlob: Blob): Promise<{ text: string; detectedLanguage: string }> {
     try {
       const formData = new FormData()
@@ -320,6 +342,7 @@ export default function AIAgentVoice() {
         throw new Error("No speech detected")
       }
 
+      // Detectar el idioma del texto transcrito
       const detected = detectLanguage(data.text)
 
       return {
@@ -327,12 +350,12 @@ export default function AIAgentVoice() {
         detectedLanguage: detected.speechCode,
       }
     } catch (error) {
-      console.error("Error in speech-to-text:", error)
+      console.error("Error en speech-to-text:", error)
       throw error
     }
   }
 
-  // Function to convert text to speech using ElevenLabs API
+  // Función para convertir texto a voz usando la API de ElevenLabs
   async function convertTextToSpeech(text: string, voiceId: string, language = "en-US"): Promise<string> {
     try {
       const response = await fetch("/api/elevenlabs/text-to-speech", {
@@ -350,22 +373,25 @@ export default function AIAgentVoice() {
       const audioBlob = await response.blob()
       return URL.createObjectURL(audioBlob)
     } catch (error) {
-      console.error("Error in text-to-speech:", error)
+      console.error("Error en text-to-speech:", error)
       throw error
     }
   }
 
-  // Function to start/stop call
+  // Función para iniciar/detener la llamada
   const toggleCall = () => {
     if (isCallActive) {
+      // Detener grabación si está activa
       if (isRecording) {
         stopRecording()
       }
 
+      // Detener reconocimiento de voz si está activo
       if (isListening) {
         stopListening()
       }
 
+      // Detener reproducción de audio
       if (audioPlayerRef.current) {
         audioPlayerRef.current.pause()
       }
@@ -374,13 +400,13 @@ export default function AIAgentVoice() {
     setIsCallActive(!isCallActive)
   }
 
-  // Function to get language name from code
+  // Función para obtener el nombre del idioma a partir del código
   const getLanguageName = (code: string) => {
     const language = supportedLanguages.find((lang) => lang.speechCode === code)
     return language ? language.name : "Unknown"
   }
 
-  // Function to get native language name from code
+  // Función para obtener el nombre nativo del idioma a partir del código
   const getLanguageNativeName = (code: string) => {
     const language = supportedLanguages.find((lang) => lang.speechCode === code)
     return language ? language.nativeName : "Unknown"
@@ -448,26 +474,6 @@ export default function AIAgentVoice() {
           >
             AI-Powered Voice Conversations
           </motion.h2>
-
-          {/* AI Agent Video - Small but spectacular */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 mb-8"
-          >
-            <div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-gray-800 shadow-2xl">
-              <video autoPlay loop muted playsInline className="w-full h-full object-cover">
-                <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/supermotion_co%20%282%29-LZW6upr6wueJqrBR2IXAVsHnPh3bJs.mp4" type="video/mp4" />
-              </video>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-              <div className="absolute bottom-1 left-1 right-1 text-center">
-                <span className="text-[8px] font-medium text-white bg-black/50 rounded-full px-2 py-0.5">
-                  Live AI Agent
-                </span>
-              </div>
-            </div>
-          </motion.div>
 
           <div className="max-w-5xl mx-auto w-full">
             <div className="relative bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 shadow-xl overflow-hidden">
@@ -595,7 +601,7 @@ export default function AIAgentVoice() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      {/* Language indicator */}
+                      {/* Indicador de idioma detectado */}
                       <AnimatePresence>
                         {showLanguageIndicator && (
                           <motion.div
@@ -792,6 +798,7 @@ export default function AIAgentVoice() {
                     <div className="border-t border-gray-700 p-4">
                       <div className="mb-3">
                         <div className="relative h-10 bg-gray-800 rounded-lg overflow-hidden">
+                          {/* Mejorado visualizador de ondas de audio */}
                           <div ref={waveformRef} className="absolute inset-0 flex items-center justify-center">
                             <div className="flex items-center space-x-[2px] h-full px-2">
                               {Array.from({ length: 60 }).map((_, index) => (
@@ -854,6 +861,7 @@ export default function AIAgentVoice() {
                             <PiPlayFill className="h-4 w-4 text-gray-300" />
                           </button>
 
+                          {/* Botón para mostrar idioma detectado */}
                           <button
                             className="rounded-xl p-2.5 bg-gray-700 hover:bg-gray-600 transition-colors shadow-sm"
                             onClick={() => setShowLanguageIndicator(!showLanguageIndicator)}
@@ -891,7 +899,7 @@ export default function AIAgentVoice() {
               </div>
             </div>
 
-            {/* Statistics in vertical format similar to Hero badges */}
+            {/* Estadísticas en formato vertical similar a los badges del Hero */}
             <div className="flex flex-col space-y-2 mt-8">
               <div className="inline-flex items-center rounded-xl bg-gray-800/50 backdrop-blur-sm px-3 py-1.5 text-[10px] font-medium text-gray-300 border border-gray-700 shadow-sm">
                 <div className="flex-1 flex items-center">
@@ -922,7 +930,7 @@ export default function AIAgentVoice() {
                   <div className="h-1.5 w-1.5 rounded-full bg-green-500 mr-2"></div>
                   <span>Powered by</span>
                 </div>
-                <span className="font-medium ml-2">ElevenLabs & Suitpax AI</span>
+                <span className="font-medium ml-2">Suitpax AI</span>
               </div>
             </div>
           </div>

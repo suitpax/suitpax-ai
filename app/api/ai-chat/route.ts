@@ -1,181 +1,138 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
 import Anthropic from "@anthropic-ai/sdk"
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
+  apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-// Language detection function
-function detectLanguage(text: string): "es" | "en" {
-  const spanishWords = [
-    "hola",
-    "gracias",
-    "por favor",
-    "ayuda",
-    "necesito",
-    "quiero",
-    "viaje",
-    "vuelo",
-    "hotel",
-    "reserva",
-    "precio",
-    "costo",
-    "empresa",
-    "negocio",
-    "trabajo",
-    "oficina",
-    "reunión",
-    "conferencia",
-    "cliente",
-    "proyecto",
-  ]
-  const englishWords = [
-    "hello",
-    "thanks",
-    "please",
-    "help",
-    "need",
-    "want",
-    "travel",
-    "flight",
-    "hotel",
-    "booking",
-    "price",
-    "cost",
-    "company",
-    "business",
-    "work",
-    "office",
-    "meeting",
-    "conference",
-    "client",
-    "project",
-  ]
-
-  const lowerText = text.toLowerCase()
-
-  let spanishScore = 0
-  let englishScore = 0
-
-  spanishWords.forEach((word) => {
-    if (lowerText.includes(word)) spanishScore++
-  })
-
-  englishWords.forEach((word) => {
-    if (lowerText.includes(word)) englishScore++
-  })
-
-  // If no clear language detected, default to English
-  return spanishScore > englishScore ? "es" : "en"
+interface Message {
+  role: "user" | "assistant"
+  content: string
 }
 
-// System prompts for different languages
-const systemPrompts = {
-  en: `You are Zia, Suitpax's AI travel assistant specializing in business travel. You are knowledgeable, professional, and helpful.
+const SUITPAX_SYSTEM_PROMPT = `You are Zia, an intelligent AI assistant specialized in business travel for Suitpax, the leading AI-powered business travel platform.
 
-Key information about Suitpax:
-- AI-powered business travel platform
-- Helps companies save up to 30% on travel costs
-- Offers intelligent flight booking, hotel reservations, and expense management
-- Provides 24/7 support and real-time travel updates
-- Integrates with existing business systems
-- SOC 2 certified and GDPR compliant
-- Supports 190+ countries and 100+ currencies
+CORE IDENTITY:
+- You are knowledgeable, professional, and helpful
+- You specialize in business travel, corporate policies, expense management, and travel optimization
+- You can communicate fluently in both English and Spanish, adapting to the user's language
+- You provide practical, actionable advice for business travelers and travel managers
 
-Your personality:
-- Professional yet friendly
-- Knowledgeable about business travel
-- Solution-oriented
-- Concise but thorough
-- Always helpful and positive
+CAPABILITIES:
+- Flight booking assistance and recommendations
+- Hotel reservations and accommodation advice
+- Ground transportation coordination
+- Expense tracking and management
+- Travel policy compliance guidance
+- Itinerary planning and optimization
+- Emergency travel support
+- Cost optimization strategies
+- Travel analytics and reporting
 
-Guidelines:
-- Focus on business travel solutions
-- Provide practical, actionable advice
-- Mention Suitpax features when relevant
+COMMUNICATION STYLE:
+- Professional yet approachable
+- Concise but comprehensive responses
+- Use bullet points for complex information
+- Always provide specific, actionable recommendations
+- Acknowledge when you need more information
+- Offer alternatives when possible
+
+LANGUAGE DETECTION:
+- If the user writes in Spanish, respond in Spanish
+- If the user writes in English, respond in English
+- Maintain consistency within the conversation
+
+IMPORTANT GUIDELINES:
+- Always prioritize business travel context
+- Focus on cost-effectiveness and policy compliance
+- Provide specific examples when helpful
 - Ask clarifying questions when needed
-- Keep responses conversational and engaging
-- If asked about pricing, suggest contacting the sales team for custom quotes
+- Mention Suitpax features when relevant
+- Keep responses under 200 words unless detailed explanation is needed
 
-Always respond in English and maintain a professional business tone.`,
-
-  es: `Eres Zia, el asistente de viajes con IA de Suitpax, especializado en viajes de negocios. Eres conocedor, profesional y servicial.
-
-Información clave sobre Suitpax:
-- Plataforma de viajes de negocios impulsada por IA
-- Ayuda a las empresas a ahorrar hasta un 30% en costos de viaje
-- Ofrece reservas inteligentes de vuelos, hoteles y gestión de gastos
-- Proporciona soporte 24/7 y actualizaciones de viaje en tiempo real
-- Se integra con sistemas empresariales existentes
-- Certificado SOC 2 y cumple con GDPR
-- Soporta más de 190 países y más de 100 monedas
-
-Tu personalidad:
-- Profesional pero amigable
-- Conocedor de viajes de negocios
-- Orientado a soluciones
-- Conciso pero completo
-- Siempre útil y positivo
-
-Pautas:
-- Enfócate en soluciones de viajes de negocios
-- Proporciona consejos prácticos y accionables
-- Menciona las características de Suitpax cuando sea relevante
-- Haz preguntas aclaratorias cuando sea necesario
-- Mantén las respuestas conversacionales y atractivas
-- Si preguntan sobre precios, sugiere contactar al equipo de ventas para cotizaciones personalizadas
-
-Siempre responde en español y mantén un tono profesional de negocios.`,
-}
+Remember: You represent Suitpax, so maintain professionalism while being genuinely helpful with business travel needs.`
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, conversationHistory = [] } = await request.json()
+    const supabase = createClient()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
-    if (!message || typeof message !== "string") {
-      return NextResponse.json({ error: "Message is required and must be a string" }, { status: 400 })
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Detect language
-    const language = detectLanguage(message)
-    const systemPrompt = systemPrompts[language]
+    const { message, conversationHistory = [], section = "business" } = await request.json()
 
-    // Prepare conversation for Anthropic
-    const messages = [
-      ...conversationHistory.map((msg: any) => ({
+    if (!message) {
+      return NextResponse.json({ error: "Message is required" }, { status: 400 })
+    }
+
+    // Prepare conversation history for Anthropic
+    const messages: { role: "user" | "assistant"; content: string }[] = []
+
+    // Add recent conversation history
+    conversationHistory.slice(-10).forEach((msg: Message) => {
+      messages.push({
         role: msg.role,
         content: msg.content,
-      })),
-      {
-        role: "user",
-        content: message,
-      },
-    ]
+      })
+    })
 
-    // Call Anthropic API
+    // Add current message
+    messages.push({
+      role: "user",
+      content: message,
+    })
+
+    // Add section context to system prompt
+    const sectionContext = {
+      business: "Focus on flight bookings, hotel reservations, itinerary planning, and travel arrangements.",
+      expenses: "Focus on expense tracking, receipt management, budget analysis, and cost optimization.",
+      tasks: "Focus on travel task management, checklists, reminders, and workflow organization.",
+      reporting: "Focus on travel analytics, spending reports, performance metrics, and data insights.",
+      support: "Focus on travel support, policy questions, emergency assistance, and problem resolution.",
+    }
+
+    const contextualPrompt = `${SUITPAX_SYSTEM_PROMPT}\n\nCURRENT SECTION FOCUS: ${sectionContext[section as keyof typeof sectionContext]}`
+
     const response = await anthropic.messages.create({
-      model: "claude-3-sonnet-20240229",
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: 1000,
-      system: systemPrompt,
+      temperature: 0.7,
+      system: contextualPrompt,
       messages: messages,
     })
 
-    const aiResponse = response.content[0].type === "text" ? response.content[0].text : ""
+    const responseText =
+      response.content[0].type === "text"
+        ? response.content[0].text
+        : "I apologize, but I had trouble generating a response. Could you please try again?"
+
+    // Log usage for analytics
+    try {
+      await supabase.from("ai_chat_logs").insert({
+        user_id: user.id,
+        message: message,
+        response: responseText,
+        section: section,
+        tokens_used: responseText.length,
+        created_at: new Date().toISOString(),
+      })
+    } catch (logError) {
+      console.warn("Failed to log chat interaction:", logError)
+    }
 
     return NextResponse.json({
-      response: aiResponse,
-      language: language,
-      conversationId: Date.now().toString(),
+      response: responseText,
+      timestamp: new Date().toISOString(),
+      section: section,
     })
   } catch (error) {
-    console.error("AI Chat error:", error)
-
-    return NextResponse.json(
-      {
-        error: "Sorry, I encountered an error. Please try again or contact our support team.",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
-    )
+    console.error("AI Chat API Error:", error)
+    return NextResponse.json({ error: "Failed to process your request. Please try again." }, { status: 500 })
   }
 }
