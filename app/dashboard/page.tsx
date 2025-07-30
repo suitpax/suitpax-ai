@@ -14,13 +14,18 @@ import {
   Building2,
   Sparkles,
   ArrowRight,
+  Shield,
+  Clock,
+  CheckCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { toast } from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
 interface UserData {
   id: string
+  email: string
   full_name: string | null
   company_name: string | null
   plan_type: string
@@ -43,55 +48,11 @@ interface UserProfile {
   updated_at: string
 }
 
-const recentActivity = [
-  {
-    id: 1,
-    type: "flight",
-    title: "Flight booked to London",
-    description: "LHR - Heathrow Airport",
-    time: "2 hours ago",
-    icon: Plane,
-  },
-  {
-    id: 2,
-    type: "chat",
-    title: "AI Chat session",
-    description: "Travel recommendations for Paris",
-    time: "4 hours ago",
-    icon: MessageSquare,
-  },
-  {
-    id: 3,
-    type: "expense",
-    title: "Expense submitted",
-    description: "$1,250 hotel booking",
-    time: "1 day ago",
-    icon: CreditCard,
-  },
-]
-
-const upcomingTrips = [
-  {
-    id: 1,
-    destination: "London, UK",
-    date: "Dec 15, 2024",
-    type: "Business",
-    status: "Confirmed",
-  },
-  {
-    id: 2,
-    destination: "Paris, France",
-    date: "Jan 8, 2025",
-    type: "Conference",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    destination: "Tokyo, Japan",
-    date: "Feb 20, 2025",
-    type: "Business",
-    status: "Draft",
-  },
+const ONBOARDING_STEPS = [
+  { id: 1, title: "Configurar perfil", completed: false },
+  { id: 2, title: "Añadir información de empresa", completed: false },
+  { id: 3, title: "Configurar preferencias de viaje", completed: false },
+  { id: 4, title: "Conectar métodos de pago", completed: false },
 ]
 
 export default function DashboardPage() {
@@ -99,16 +60,20 @@ export default function DashboardPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [isNewUser, setIsNewUser] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
+  const [onboardingSteps, setOnboardingSteps] = useState(ONBOARDING_STEPS)
   const supabase = createClient()
+  const router = useRouter()
 
   useEffect(() => {
-    fetchUserData()
+    checkAuthAndFetchData()
   }, [])
 
-  async function fetchUserData() {
+  async function checkAuthAndFetchData() {
     try {
       setLoading(true)
 
+      // Verificar autenticación
       const {
         data: { session },
         error: sessionError,
@@ -116,16 +81,20 @@ export default function DashboardPage() {
 
       if (sessionError) {
         console.error("Session error:", sessionError)
-        toast.error("Error loading session")
+        toast.error("Error de autenticación")
+        router.push("/auth/login")
         return
       }
 
       if (!session) {
-        console.log("No session found")
+        console.log("No hay sesión activa")
+        router.push("/auth/login")
         return
       }
 
-      // Fetch or create user data
+      setAuthChecked(true)
+
+      // Buscar usuario existente
       let { data: userData, error: userError } = await supabase
         .from("users")
         .select("*")
@@ -133,14 +102,14 @@ export default function DashboardPage() {
         .single()
 
       if (userError && userError.code === "PGRST116") {
-        // User doesn't exist, create new user
-        console.log("Creating new user...")
+        // Usuario nuevo - crear registro
+        console.log("Creando nuevo usuario...")
         setIsNewUser(true)
 
         const newUserData = {
           id: session.user.id,
-          email: session.user.email,
-          full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || null,
+          email: session.user.email!,
+          full_name: extractFullName(session.user),
           company_name: null,
           plan_type: "free",
           ai_tokens_used: 0,
@@ -158,23 +127,23 @@ export default function DashboardPage() {
           .single()
 
         if (createError) {
-          console.error("Error creating user:", createError)
-          toast.error("Error creating user profile")
+          console.error("Error creando usuario:", createError)
+          toast.error("Error al crear el perfil de usuario")
           return
         }
 
         userData = createdUser
-        toast.success("Welcome to Suitpax! 🎉")
+        toast.success("¡Bienvenido a Suitpax! 🎉")
       } else if (userError) {
-        console.error("Error fetching user:", userError)
-        toast.error("Error loading user data")
+        console.error("Error obteniendo usuario:", userError)
+        toast.error("Error al cargar datos del usuario")
         return
       }
 
       if (userData) {
         setUser(userData)
 
-        // Fetch user profile
+        // Obtener perfil adicional si existe
         const { data: profileData } = await supabase
           .from("user_profiles")
           .select("*")
@@ -183,61 +152,115 @@ export default function DashboardPage() {
 
         if (profileData) {
           setUserProfile(profileData)
+          updateOnboardingProgress(userData, profileData)
+        } else {
+          updateOnboardingProgress(userData, null)
         }
       }
     } catch (error) {
-      console.error("Error in fetchUserData:", error)
-      toast.error("Error loading dashboard data")
+      console.error("Error en checkAuthAndFetchData:", error)
+      toast.error("Error al cargar el dashboard")
+      router.push("/auth/login")
     } finally {
       setLoading(false)
     }
   }
 
-  const getUserDisplayName = () => {
+  function extractFullName(user: any): string | null {
+    return user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.display_name || null
+  }
+
+  function updateOnboardingProgress(userData: UserData, profileData: UserProfile | null) {
+    const steps = [...ONBOARDING_STEPS]
+
+    // Paso 1: Perfil básico
+    if (userData.full_name) {
+      steps[0].completed = true
+    }
+
+    // Paso 2: Información de empresa
+    if (userData.company_name || profileData?.company) {
+      steps[1].completed = true
+    }
+
+    // Paso 3: Preferencias de viaje
+    if (profileData?.travel_preferences) {
+      steps[2].completed = true
+    }
+
+    // Paso 4: Métodos de pago (simulado)
+    if (userData.plan_type !== "free") {
+      steps[3].completed = true
+    }
+
+    setOnboardingSteps(steps)
+  }
+
+  const getUserDisplayName = (): string => {
     if (user?.full_name) {
       return user.full_name.split(" ")[0]
     }
     if (userProfile?.full_name) {
       return userProfile.full_name.split(" ")[0]
     }
-    return "there"
+    return "Usuario"
   }
 
-  const getCompanyName = () => {
-    return user?.company_name || userProfile?.company || "Your Company"
+  const getCompanyName = (): string => {
+    return user?.company_name || userProfile?.company || "Tu Empresa"
   }
 
+  const getCompletedSteps = (): number => {
+    return onboardingSteps.filter((step) => step.completed).length
+  }
+
+  const getProgressPercentage = (): number => {
+    return (getCompletedSteps() / onboardingSteps.length) * 100
+  }
+
+  // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
-          <p className="text-gray-600 font-light">Loading your dashboard...</p>
+          <motion.div
+            className="w-12 h-12 border-4 border-gray-200 border-t-black rounded-full mx-auto mb-4"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+          />
+          <p className="text-gray-600 font-light">Cargando tu dashboard...</p>
+          <p className="text-xs text-gray-400 mt-2">Verificando autenticación y datos</p>
         </div>
       </div>
     )
   }
 
-  if (!user) {
+  // Auth error state
+  if (!authChecked || !user) {
     return (
-      <div className="text-center py-12">
-        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <User className="h-8 w-8 text-red-600" />
+      <div className="text-center py-16">
+        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Shield className="h-8 w-8 text-red-600" />
         </div>
-        <h3 className="text-xl font-medium tracking-tighter mb-2">Unable to load user data</h3>
-        <p className="text-gray-600 font-light mb-6">
-          There was an issue loading your profile. Please try refreshing the page.
+        <h3 className="text-2xl font-medium tracking-tighter mb-4">Acceso Restringido</h3>
+        <p className="text-gray-600 font-light mb-8 max-w-md mx-auto">
+          No tienes permisos para acceder a esta área. Por favor, inicia sesión para continuar.
         </p>
-        <Button onClick={() => window.location.reload()} className="bg-black text-white hover:bg-gray-800">
-          Refresh Page
-        </Button>
+        <div className="flex gap-4 justify-center">
+          <Button asChild className="bg-black text-white hover:bg-gray-800">
+            <Link href="/auth/login">Iniciar Sesión</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/">Volver al Inicio</Link>
+          </Button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-8">
+      {/* Header personalizado */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -245,65 +268,106 @@ export default function DashboardPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-3xl font-medium tracking-tighter text-black leading-none">
+          <h1 className="text-4xl md:text-5xl font-medium tracking-tighter text-black leading-none mb-2">
             {isNewUser ? (
               <>
-                <em className="font-serif italic">Welcome to Suitpax</em>
+                <em className="font-serif italic">¡Bienvenido a Suitpax!</em>
               </>
             ) : (
               <>
-                <em className="font-serif italic">Welcome back,</em> {getUserDisplayName()}
+                <em className="font-serif italic">Hola,</em> {getUserDisplayName()}
               </>
             )}
           </h1>
-          <div className="flex items-center gap-2 mt-2">
-            <Building2 className="h-4 w-4 text-gray-500" />
-            <p className="text-gray-600 font-light">
-              {getCompanyName()} • {user.plan_type.charAt(0).toUpperCase() + user.plan_type.slice(1)} Plan
+          <div className="flex items-center gap-3 mt-3">
+            <Building2 className="h-5 w-5 text-gray-500" />
+            <p className="text-gray-600 font-light text-lg">
+              {getCompanyName()} • Plan {user.plan_type.charAt(0).toUpperCase() + user.plan_type.slice(1)}
             </p>
             {isNewUser && (
-              <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-                New Account
+              <span className="inline-flex items-center rounded-xl bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                <CheckCircle className="h-3 w-3 mr-1" />
+                Cuenta Nueva
               </span>
             )}
+            <span className="inline-flex items-center rounded-xl bg-gray-200 px-3 py-1 text-xs font-medium text-gray-700">
+              <Clock className="h-3 w-3 mr-1" />
+              Miembro desde {new Date(user.created_at).toLocaleDateString()}
+            </span>
           </div>
         </div>
-        <div className="flex items-center space-x-3">
-          <Button asChild variant="outline" className="border-gray-200 bg-transparent">
+        <div className="flex items-center space-x-4">
+          <Button asChild variant="outline" className="border-gray-200 bg-white/50 backdrop-blur-sm">
             <Link href="/dashboard/ai-chat">
               <Sparkles className="h-4 w-4 mr-2" />
-              AI Assistant
+              Asistente IA
             </Link>
           </Button>
           <Button asChild className="bg-black text-white hover:bg-gray-800">
             <Link href="/dashboard/flights">
-              Book Flight
+              Reservar Vuelo
               <ArrowRight className="h-4 w-4 ml-2" />
             </Link>
           </Button>
         </div>
       </motion.div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Onboarding Progress - Solo para usuarios nuevos o incompletos */}
+      {(!user.onboarding_completed || getCompletedSteps() < 4) && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+          className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border border-gray-200 p-6"
         >
-          <div className="flex items-center">
-            <TrendingUp className="h-8 w-8 text-green-600" />
-            <div className="ml-4">
-              <p className="text-xs font-medium text-gray-700">AI Tokens Used</p>
-              <p className="text-2xl font-medium tracking-tighter text-gray-900">
-                {user.ai_tokens_used.toLocaleString()}
-              </p>
-              <p className="text-xs font-light text-gray-500">of {user.ai_tokens_limit.toLocaleString()}</p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-medium tracking-tighter text-gray-900">
+                <em className="font-serif italic">Configuración de Cuenta</em>
+              </h3>
+              <p className="text-sm text-gray-600 font-light">Completa tu perfil para aprovechar al máximo Suitpax</p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-gray-900">{getCompletedSteps()}/4</div>
+              <div className="text-xs text-gray-500">Completado</div>
             </div>
           </div>
-        </motion.div>
 
+          {/* Progress Bar */}
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+            <motion.div
+              className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${getProgressPercentage()}%` }}
+              transition={{ duration: 1, delay: 0.5 }}
+            />
+          </div>
+
+          {/* Steps */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {onboardingSteps.map((step, index) => (
+              <div
+                key={step.id}
+                className={`flex items-center gap-2 p-2 rounded-lg ${step.completed ? "bg-green-100" : "bg-white/50"}`}
+              >
+                <div
+                  className={`w-4 h-4 rounded-full flex items-center justify-center ${
+                    step.completed ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                >
+                  {step.completed && <CheckCircle className="h-3 w-3 text-white" />}
+                </div>
+                <span className={`text-xs font-medium ${step.completed ? "text-green-700" : "text-gray-600"}`}>
+                  {step.title}
+                </span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -311,11 +375,13 @@ export default function DashboardPage() {
           className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
         >
           <div className="flex items-center">
-            <Users className="h-8 w-8 text-blue-600" />
+            <TrendingUp className="h-8 w-8 text-blue-600" />
             <div className="ml-4">
-              <p className="text-xs font-medium text-gray-700">Travel Searches</p>
-              <p className="text-2xl font-medium tracking-tighter text-gray-900">{user.travel_searches_used}</p>
-              <p className="text-xs font-light text-gray-500">this month</p>
+              <p className="text-xs font-medium text-gray-700">Tokens IA Usados</p>
+              <p className="text-2xl font-medium tracking-tighter text-gray-900">
+                {user.ai_tokens_used.toLocaleString()}
+              </p>
+              <p className="text-xs font-light text-gray-500">de {user.ai_tokens_limit.toLocaleString()}</p>
             </div>
           </div>
         </motion.div>
@@ -327,11 +393,11 @@ export default function DashboardPage() {
           className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
         >
           <div className="flex items-center">
-            <Calendar className="h-8 w-8 text-purple-600" />
+            <Users className="h-8 w-8 text-green-600" />
             <div className="ml-4">
-              <p className="text-xs font-medium text-gray-700">Upcoming Trips</p>
-              <p className="text-2xl font-medium tracking-tighter text-gray-900">3</p>
-              <p className="text-xs font-light text-gray-500">next 30 days</p>
+              <p className="text-xs font-medium text-gray-700">Búsquedas de Viajes</p>
+              <p className="text-2xl font-medium tracking-tighter text-gray-900">{user.travel_searches_used}</p>
+              <p className="text-xs font-light text-gray-500">este mes</p>
             </div>
           </div>
         </motion.div>
@@ -343,129 +409,206 @@ export default function DashboardPage() {
           className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
         >
           <div className="flex items-center">
-            <TrendingUp className="h-8 w-8 text-green-600" />
+            <Calendar className="h-8 w-8 text-purple-600" />
             <div className="ml-4">
-              <p className="text-xs font-medium text-gray-700">Savings</p>
-              <p className="text-2xl font-medium tracking-tighter text-gray-900">$2,450</p>
-              <p className="text-xs font-light text-gray-500">this month</p>
+              <p className="text-xs font-medium text-gray-700">Próximos Viajes</p>
+              <p className="text-2xl font-medium tracking-tighter text-gray-900">0</p>
+              <p className="text-xs font-light text-gray-500">próximos 30 días</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+        >
+          <div className="flex items-center">
+            <TrendingUp className="h-8 w-8 text-orange-600" />
+            <div className="ml-4">
+              <p className="text-xs font-medium text-gray-700">Ahorros</p>
+              <p className="text-2xl font-medium tracking-tighter text-gray-900">$0</p>
+              <p className="text-xs font-light text-gray-500">este mes</p>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
-        >
-          <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-4">
-            <em className="font-serif italic">Recent Activity</em>
-          </h3>
-          <div className="space-y-4">
-            {isNewUser ? (
-              <div className="text-center py-8 text-gray-500">
-                <p className="mb-2">Welcome to Suitpax! 🎉</p>
-                <p className="text-sm font-light">
-                  Start by booking your first trip or chatting with the AI assistant.
-                </p>
+      {/* Estado Cero - Contenido principal para usuarios nuevos */}
+      {isNewUser || user.travel_searches_used === 0 ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Welcome Card */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-2xl border border-gray-200 shadow-sm"
+          >
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Sparkles className="h-8 w-8 text-white" />
               </div>
-            ) : (
-              recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <activity.icon className="h-4 w-4 text-gray-600" />
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-                    <p className="text-sm font-light text-gray-500">{activity.description}</p>
-                    <p className="text-xs font-light text-gray-400 mt-1">{activity.time}</p>
+              <h3 className="text-2xl font-medium tracking-tighter text-gray-900 mb-4">
+                <em className="font-serif italic">¡Comienza tu viaje!</em>
+              </h3>
+              <p className="text-gray-600 font-light mb-6">
+                Bienvenido a la plataforma de viajes empresariales más avanzada. Comienza explorando nuestras
+                funcionalidades principales.
+              </p>
+              <div className="space-y-3">
+                <Button asChild className="w-full bg-black text-white hover:bg-gray-800">
+                  <Link href="/dashboard/ai-chat">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Hablar con IA Assistant
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full bg-transparent">
+                  <Link href="/dashboard/flights">
+                    <Plane className="h-4 w-4 mr-2" />
+                    Buscar tu primer vuelo
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Quick Setup */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm"
+          >
+            <h3 className="text-xl font-medium tracking-tighter text-gray-900 mb-6">
+              <em className="font-serif italic">Configuración Rápida</em>
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <User className="h-5 w-5 text-gray-600" />
+                  <div>
+                    <p className="font-medium text-gray-900">Completar perfil</p>
+                    <p className="text-xs text-gray-500">Añade tu información personal</p>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </motion.div>
-
-        {/* Upcoming Trips */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
-        >
-          <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-4">
-            <em className="font-serif italic">Upcoming Trips</em>
-          </h3>
-          <div className="space-y-4">
-            {upcomingTrips.map((trip) => (
-              <div key={trip.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{trip.destination}</p>
-                  <p className="text-xs font-light text-gray-500">
-                    {trip.date} • {trip.type}
-                  </p>
-                </div>
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-xl text-[10px] font-medium ${
-                    trip.status === "Confirmed"
-                      ? "bg-green-100 text-green-800"
-                      : trip.status === "Pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {trip.status}
-                </span>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/dashboard/profile">Configurar</Link>
+                </Button>
               </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
 
-      {/* Quick Actions */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <Building2 className="h-5 w-5 text-gray-600" />
+                  <div>
+                    <p className="font-medium text-gray-900">Información de empresa</p>
+                    <p className="text-xs text-gray-500">Configura políticas de viaje</p>
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" disabled>
+                  Próximamente
+                </Button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <CreditCard className="h-5 w-5 text-gray-600" />
+                  <div>
+                    <p className="font-medium text-gray-900">Métodos de pago</p>
+                    <p className="text-xs text-gray-500">Conecta tarjetas corporativas</p>
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" disabled>
+                  Próximamente
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      ) : (
+        // Contenido para usuarios existentes con actividad
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Actividad Reciente */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+          >
+            <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-4">
+              <em className="font-serif italic">Actividad Reciente</em>
+            </h3>
+            <div className="text-center py-8 text-gray-500">
+              <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <p className="mb-2">No hay actividad reciente</p>
+              <p className="text-sm font-light">Comienza reservando tu primer viaje o chateando con la IA.</p>
+            </div>
+          </motion.div>
+
+          {/* Próximos Viajes */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+          >
+            <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-4">
+              <em className="font-serif italic">Próximos Viajes</em>
+            </h3>
+            <div className="text-center py-8 text-gray-500">
+              <Plane className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <p className="mb-2">No tienes viajes programados</p>
+              <p className="text-sm font-light mb-4">Planifica tu próximo viaje de negocios con nuestra IA.</p>
+              <Button asChild size="sm" className="bg-black text-white hover:bg-gray-800">
+                <Link href="/dashboard/flights">Planificar Viaje</Link>
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Acciones Rápidas */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.7 }}
+        transition={{ duration: 0.6, delay: 0.8 }}
         className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
       >
-        <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-4">
-          <em className="font-serif italic">Quick Actions</em>
+        <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-6">
+          <em className="font-serif italic">Acciones Rápidas</em>
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link
             href="/dashboard/flights"
-            className="flex flex-col items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
+            className="flex flex-col items-center p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200 group"
           >
-            <Plane className="h-6 w-6 text-gray-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Book Flight</span>
+            <Plane className="h-8 w-8 text-gray-600 mb-3 group-hover:text-black transition-colors" />
+            <span className="text-sm font-medium text-gray-900">Reservar Vuelo</span>
+            <span className="text-xs text-gray-500 mt-1">Búsqueda inteligente</span>
           </Link>
+
           <Link
             href="/dashboard/ai-chat"
-            className="flex flex-col items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
+            className="flex flex-col items-center p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200 group"
           >
-            <MessageSquare className="h-6 w-6 text-gray-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">AI Assistant</span>
+            <MessageSquare className="h-8 w-8 text-gray-600 mb-3 group-hover:text-black transition-colors" />
+            <span className="text-sm font-medium text-gray-900">Asistente IA</span>
+            <span className="text-xs text-gray-500 mt-1">Chat inteligente</span>
           </Link>
-          <Link
-            href="/dashboard/expenses"
-            className="flex flex-col items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
-          >
-            <CreditCard className="h-6 w-6 text-gray-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Expenses</span>
-          </Link>
+
+          <div className="flex flex-col items-center p-6 bg-gray-50 rounded-xl opacity-50 cursor-not-allowed">
+            <CreditCard className="h-8 w-8 text-gray-400 mb-3" />
+            <span className="text-sm font-medium text-gray-500">Gastos</span>
+            <span className="text-xs text-gray-400 mt-1">Próximamente</span>
+          </div>
+
           <Link
             href="/dashboard/profile"
-            className="flex flex-col items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
+            className="flex flex-col items-center p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200 group"
           >
-            <User className="h-6 w-6 text-gray-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Profile</span>
+            <User className="h-8 w-8 text-gray-600 mb-3 group-hover:text-black transition-colors" />
+            <span className="text-sm font-medium text-gray-900">Perfil</span>
+            <span className="text-xs text-gray-500 mt-1">Configuración</span>
           </Link>
         </div>
       </motion.div>
