@@ -1,374 +1,446 @@
 "use client"
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import {
-  Receipt,
-  BarChart3,
-  Zap,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  TrendingUp,
-  Users,
-  Globe,
-  Smartphone,
-  Camera,
-  FileText,
-  ArrowRight,
-} from "lucide-react"
+import { motion } from "framer-motion"
 import Image from "next/image"
+import Link from "next/link"
+import { useEffect, useState } from "react"
+import {
+  RiArrowRightLine,
+  RiCheckboxCircleFill,
+  RiPieChartFill,
+  RiWalletFill,
+  RiFileList3Fill,
+  RiMoneyDollarCircleFill,
+} from "react-icons/ri"
+import {
+  SiMastercard,
+  SiVisa,
+  SiAmericanexpress,
+  SiRevolut,
+  SiChase,
+  SiBritishairways,
+  SiDelta,
+  SiUnitedairlines,
+  SiExpensify,
+  SiSlack,
+  SiUber,
+  SiAirbnb,
+  SiZoom,
+  SiAsana,
+  SiDropbox,
+  SiAdobecreativecloud,
+  SiSalesforce,
+  SiHubspot,
+  SiMailchimp,
+  SiStripe,
+} from "react-icons/si"
 
-const tabs = [
+// Title and subtitle variations
+const titleVariations = [
+  "Expense Management 2.0: The Future of Financial Control",
+  "Revolutionizing Corporate Expense Management",
+  "Intelligent Automation for Business Finances",
+  "Total Expense Control with Advanced AI",
+  "Simplifying Enterprise Financial Management",
+]
+
+const subtitleVariations = [
+  "Intelligent automation that transforms how your company manages corporate expenses",
+  "Seamless integration between your workflows and financial management",
+  "Empowering employees with smarter, more efficient solutions",
+  "Real-time expense control with automated approvals",
+  "Complete visibility and frictionless policy compliance",
+]
+
+// Transaction data to display
+const transactions = [
   {
-    id: "capture",
-    label: "Receipt Capture",
-    icon: Camera,
-    title: "Smart Receipt Capture",
-    description: "AI-powered receipt scanning with 99.2% accuracy",
-    features: ["Instant OCR processing", "Auto-categorization", "Multi-currency support", "Duplicate detection"],
+    id: 1,
+    company: "British Airways",
+    icon: <SiBritishairways className="text-black" />,
+    category: "TRAVEL",
+    amount: "$1,250.00",
+    status: "APPROVED",
+    date: "Apr 12",
   },
   {
-    id: "approval",
-    label: "Approval Flow",
-    icon: CheckCircle,
-    title: "Automated Approvals",
-    description: "Streamlined approval workflows that save 75% of processing time",
-    features: ["Custom approval rules", "Real-time notifications", "Mobile approvals", "Audit trail tracking"],
+    id: 2,
+    company: "Slack",
+    icon: <SiSlack className="text-black" />,
+    category: "SOFTWARE",
+    amount: "$89.00",
+    status: "AUTOMATIC",
+    date: "Apr 10",
   },
   {
-    id: "analytics",
-    label: "Analytics",
-    icon: BarChart3,
-    title: "Advanced Analytics",
-    description: "Deep insights into spending patterns and cost optimization",
-    features: ["Real-time dashboards", "Spending forecasts", "Policy compliance", "Custom reports"],
+    id: 3,
+    company: "Uber",
+    icon: <SiUber className="text-black" />,
+    category: "TRANSPORT",
+    amount: "$32.50",
+    status: "IN-POLICY",
+    date: "Apr 09",
   },
   {
-    id: "integration",
-    label: "Integration",
-    icon: Zap,
-    title: "Seamless Integration",
-    description: "Connect with your existing accounting and ERP systems",
-    features: ["QuickBooks integration", "SAP Concur sync", "Xero compatibility", "API access"],
+    id: 4,
+    company: "Airbnb",
+    icon: <SiAirbnb className="text-black" />,
+    category: "LODGING",
+    amount: "$420.00",
+    status: "PENDING",
+    date: "Apr 08",
   },
 ]
 
+// Stats to display
 const stats = [
-  { label: "Time Saved", value: "75%", icon: Clock, color: "blue" },
-  { label: "Accuracy Rate", value: "99.2%", icon: CheckCircle, color: "green" },
-  { label: "Cost Reduction", value: "40%", icon: DollarSign, color: "purple" },
-  { label: "Processing Speed", value: "10x", icon: TrendingUp, color: "orange" },
+  {
+    id: 1,
+    title: "Annual Savings",
+    value: "320",
+    unit: "hours",
+    description: "Time saved on manual expense processing",
+  },
+  {
+    id: 2,
+    title: "Compliance",
+    value: "98",
+    unit: "%",
+    description: "Travel and expense policy compliance rate",
+  },
+  {
+    id: 3,
+    title: "Processing",
+    value: "2.5",
+    unit: "sec",
+    description: "Average automatic approval time",
+  },
 ]
 
-const integrations = [
-  { name: "QuickBooks", logo: "/logos/quickbooks-logo.png" },
-  { name: "Xero", logo: "/logos/xero-logo.png" },
-  { name: "SAP Concur", logo: "/logos/sap-concur-logo.png" },
-  { name: "NetSuite", logo: "/logos/netsuite-logo.png" },
-  { name: "Sage", logo: "/logos/sage-logo.png" },
-  { name: "FreshBooks", logo: "/logos/freshbooks-logo.png" },
+// Company connections for the grid
+const companyConnections = [
+  { id: 1, name: "Slack", icon: <SiSlack size={20} /> },
+  { id: 2, name: "Zoom", icon: <SiZoom size={20} /> },
+  { id: 3, name: "Asana", icon: <SiAsana size={20} /> },
+  { id: 4, name: "Dropbox", icon: <SiDropbox size={20} /> },
+  { id: 5, name: "Adobe", icon: <SiAdobecreativecloud size={20} /> },
+  { id: 6, name: "Salesforce", icon: <SiSalesforce size={20} /> },
+  { id: 7, name: "HubSpot", icon: <SiHubspot size={20} /> },
+  { id: 8, name: "Mailchimp", icon: <SiMailchimp size={20} /> },
+  { id: 9, name: "Stripe", icon: <SiStripe size={20} /> },
+  { id: 10, name: "Expensify", icon: <SiExpensify size={20} /> },
+  { id: 11, name: "Uber", icon: <SiUber size={20} /> },
+  { id: 12, name: "Airbnb", icon: <SiAirbnb size={20} /> },
 ]
 
 export default function ExpenseManagement() {
-  const [activeTab, setActiveTab] = useState("capture")
+  const [randomTitle, setRandomTitle] = useState("")
+  const [randomSubtitle, setRandomSubtitle] = useState("")
+  const [activeCard, setActiveCard] = useState(1)
 
-  const activeTabData = tabs.find((tab) => tab.id === activeTab) || tabs[0]
+  useEffect(() => {
+    // Select random title and subtitle
+    const titleIndex = Math.floor(Math.random() * titleVariations.length)
+    setRandomTitle(titleVariations[titleIndex])
+
+    const subtitleIndex = Math.floor(Math.random() * subtitleVariations.length)
+    setRandomSubtitle(subtitleVariations[subtitleIndex])
+
+    // Rotate cards every 3 seconds
+    const interval = setInterval(() => {
+      setActiveCard((prev) => (prev === 1 ? 2 : 1))
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   return (
-    <section className="py-24 bg-gradient-to-br from-white via-gray-50 to-blue-50/30 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 right-20 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-20 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl" />
-      </div>
-
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center rounded-2xl bg-green-50 px-4 py-2 text-sm font-medium text-green-700 border border-green-200">
-              <Receipt className="w-4 h-4 mr-2" />
-              Expense Management
-            </div>
+    <div className="relative py-20 overflow-hidden bg-gray-50">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex flex-col items-center text-center mb-12">
+          <div className="flex items-center gap-1.5 mb-3">
+            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
+              <Image
+                src="/logo/suitpax-bl-logo.webp"
+                alt="Suitpax"
+                width={60}
+                height={15}
+                className="h-3 w-auto mr-1"
+              />
+              Finance
+            </span>
+            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[8px] font-medium text-gray-700">
+              <span className="w-1 h-1 rounded-full bg-black animate-pulse mr-1"></span>
+              Launching Q3 2025
+            </span>
           </div>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-none mb-6 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-            Automate your expense workflow
-          </h2>
-
-          <p className="text-xl font-light text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Transform tedious expense reporting into an effortless, automated process. From receipt capture to
-            reimbursement, we've got you covered.
-          </p>
-        </motion.div>
-
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16"
-        >
-          {stats.map((stat, index) => (
-            <Card key={index} className="border-0 shadow-lg bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden">
-              <CardContent className="p-6 text-center">
-                <div
-                  className={`w-12 h-12 rounded-2xl mx-auto mb-4 flex items-center justify-center ${
-                    stat.color === "blue"
-                      ? "bg-blue-100"
-                      : stat.color === "green"
-                        ? "bg-green-100"
-                        : stat.color === "purple"
-                          ? "bg-purple-100"
-                          : "bg-orange-100"
-                  }`}
-                >
-                  <stat.icon
-                    className={`w-6 h-6 ${
-                      stat.color === "blue"
-                        ? "text-blue-600"
-                        : stat.color === "green"
-                          ? "text-green-600"
-                          : stat.color === "purple"
-                            ? "text-purple-600"
-                            : "text-orange-600"
-                    }`}
-                  />
-                </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
-                <div className="text-sm font-medium text-gray-600">{stat.label}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </motion.div>
-
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Dashboard Preview */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            viewport={{ once: true }}
-            className="relative"
+          <motion.h2
+            className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-center mb-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden">
-              <CardContent className="p-0">
-                <div className="relative">
-                  <Image
-                    src="/business-travel-dashboard.png"
-                    alt="Expense Management Dashboard"
-                    width={600}
-                    height={400}
-                    className="w-full h-auto rounded-t-3xl"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-t-3xl" />
+            Where human intuition meets AI agents to redefine corporate travel and financial control.
+          </motion.h2>
 
-                  {/* Floating Elements */}
-                  <motion.div
-                    className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg"
-                    animate={{ y: [-2, 2, -2] }}
-                    transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                  >
-                    Live Updates
-                  </motion.div>
-
-                  <motion.div
-                    className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg"
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                      <span className="text-sm font-medium text-gray-900">Processing receipts...</span>
-                    </div>
-                  </motion.div>
-                </div>
-
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Real-time Expense Dashboard</h3>
-                  <p className="text-gray-600 font-light mb-4">
-                    Monitor all expenses, approvals, and analytics in one unified interface
-                  </p>
-
-                  <div className="flex flex-wrap gap-2">
-                    {["Real-time sync", "Mobile ready", "Custom reports", "API access"].map((feature, index) => (
-                      <Badge key={index} variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
-                        {feature}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <motion.div
+            className="mt-6 mb-4 inline-flex items-center bg-black text-white px-6 py-2 rounded-xl shadow-lg"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            whileHover={{ scale: 1.05 }}
+          >
+            <span className="text-lg font-semibold tracking-tighter mr-2">LAUNCHING Q3 2025</span>
+            <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
           </motion.div>
 
-          {/* Interactive Tabs */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="space-y-8"
+          <motion.p
+            className="mt-3 text-sm font-medium text-gray-600 max-w-2xl mb-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {/* Tab Navigation */}
-            <div className="grid grid-cols-2 gap-3">
-              {tabs.map((tab) => (
-                <Button
-                  key={tab.id}
-                  variant={activeTab === tab.id ? "default" : "outline"}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`p-4 h-auto rounded-2xl transition-all duration-300 ${
-                    activeTab === tab.id
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-200"
-                      : "bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-gray-300 text-gray-700"
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <tab.icon className="w-5 h-5" />
-                    <span className="font-medium">{tab.label}</span>
-                  </div>
-                </Button>
-              ))}
+            {randomSubtitle}
+          </motion.p>
+        </div>
+
+        {/* Main section with dashboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+          {/* Left panel - Transactions */}
+          <motion.div
+            className="lg:col-span-7 bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-medium tracking-tighter">Recent Transactions</h3>
+              <span className="text-xs text-gray-500">View all</span>
             </div>
 
-            {/* Tab Content */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-xl rounded-3xl overflow-hidden">
-                  <CardContent className="p-8">
-                    <div className="flex items-start space-x-4 mb-6">
-                      <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-                        <activeTabData.icon className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{activeTabData.title}</h3>
-                        <p className="text-gray-600 font-light">{activeTabData.description}</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      {activeTabData.features.map((feature, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="flex items-center space-x-3"
-                        >
-                          <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                          </div>
-                          <span className="text-gray-700 font-medium">{feature}</span>
-                        </motion.div>
-                      ))}
-                    </div>
-
-                    <div className="mt-8 pt-6 border-t border-gray-100">
-                      <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl px-6 py-3 font-semibold shadow-lg shadow-blue-200 transition-all duration-300 hover:scale-105">
-                        Learn More
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Key Features */}
-            <div className="grid grid-cols-1 gap-4">
-              {[
-                {
-                  icon: Smartphone,
-                  title: "Mobile-First Design",
-                  description: "Capture receipts on-the-go with our mobile app",
-                },
-                {
-                  icon: Globe,
-                  title: "Multi-Currency Support",
-                  description: "Handle expenses in 150+ currencies automatically",
-                },
-                {
-                  icon: Users,
-                  title: "Team Collaboration",
-                  description: "Streamlined workflows for teams of any size",
-                },
-              ].map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 * index }}
-                  viewport={{ once: true }}
-                  className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg"
+            <div className="space-y-4">
+              {transactions.map((transaction) => (
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors"
                 >
-                  <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 bg-purple-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-                      <feature.icon className="w-5 h-5 text-purple-600" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-xl">
+                      {transaction.icon}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-1">{feature.title}</h4>
-                      <p className="text-gray-600 font-light text-sm">{feature.description}</p>
+                      <p className="font-medium text-sm">{transaction.company}</p>
+                      <p className="text-xs text-gray-500">{transaction.category}</p>
                     </div>
                   </div>
-                </motion.div>
+                  <div className="text-right">
+                    <p className="font-medium">{transaction.amount}</p>
+                    <span
+                      className={`inline-flex items-center rounded-xl px-2 py-0.5 text-[10px] font-medium ${
+                        transaction.status === "APPROVED" ||
+                        transaction.status === "AUTOMATIC" ||
+                        transaction.status === "IN-POLICY"
+                          ? "bg-gray-200 text-gray-700"
+                          : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {transaction.status === "APPROVED" && (
+                        <RiCheckboxCircleFill className="mr-1 text-gray-700" size={10} />
+                      )}
+                      {transaction.status}
+                    </span>
+                  </div>
+                </div>
               ))}
+            </div>
+          </motion.div>
+
+          {/* Right panel - Stats and cards */}
+          <motion.div
+            className="lg:col-span-5 space-y-6"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            {/* Corporate cards */}
+            <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+              <h3 className="text-lg font-medium tracking-tighter mb-4">Corporate Cards</h3>
+              <div className="relative h-44">
+                <div
+                  className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                    activeCard === 1 ? "opacity-100 z-10" : "opacity-0 z-0"
+                  }`}
+                >
+                  <Image
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/suitpax-dark-card%20%281%29-Qz0iI04gBw7gbYESiK8lQ1ofqid4nt.png"
+                    alt="Suitpax Corporate Card - Dark"
+                    width={600}
+                    height={338}
+                    className="h-full w-full object-contain rounded-xl"
+                  />
+                </div>
+                <div
+                  className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                    activeCard === 2 ? "opacity-100 z-10" : "opacity-0 z-0"
+                  }`}
+                >
+                  <Image
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/suitpax-light-card-cKzP4eYvKvq65D4SljVnd8OrHeiWAW.png"
+                    alt="Suitpax Corporate Card - Light"
+                    width={600}
+                    height={338}
+                    className="h-full w-full object-contain rounded-xl"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+              <h3 className="text-lg font-medium tracking-tighter mb-4">Key Metrics</h3>
+              <div className="grid grid-cols-3 gap-4">
+                {stats.map((stat) => (
+                  <div key={stat.id} className="text-center">
+                    <div className="text-2xl font-bold">
+                      {stat.value}
+                      <span className="text-sm font-normal">{stat.unit}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">{stat.title}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>
 
-        {/* Integrations */}
+        {/* Company connections grid */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          viewport={{ once: true }}
-          className="mt-20"
+          className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">Seamless Integrations</h3>
-            <p className="text-gray-600 font-light max-w-2xl mx-auto">
-              Connect with your existing accounting and ERP systems for a unified workflow
-            </p>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-medium tracking-tighter">Connected Services</h3>
+            <span className="text-xs text-gray-500 cursor-pointer">Manage connections</span>
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {integrations.map((integration, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 * index }}
-                viewport={{ once: true }}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {companyConnections.map((company) => (
+              <div
+                key={company.id}
+                className="bg-white p-3 rounded-xl border border-gray-200 flex items-center gap-2 hover:shadow-sm transition-shadow"
               >
-                <div className="w-12 h-12 bg-gray-100 rounded-xl mx-auto mb-3 flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-gray-600" />
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-gray-900 text-sm">{integration.name}</div>
-                </div>
-              </motion.div>
+                <div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-xl">{company.icon}</div>
+                <span className="text-sm font-medium">{company.name}</span>
+              </div>
             ))}
           </div>
         </motion.div>
+
+        {/* Features section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <motion.div
+            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-xl mb-4">
+              <RiWalletFill className="text-gray-700" size={20} />
+            </div>
+            <h3 className="text-lg font-medium tracking-tighter mb-2">Expense Control</h3>
+            <p className="text-sm text-gray-600">Set automatic limits and policies for each department and employee.</p>
+          </motion.div>
+
+          <motion.div
+            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+          >
+            <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-xl mb-4">
+              <RiFileList3Fill className="text-gray-700" size={20} />
+            </div>
+            <h3 className="text-lg font-medium tracking-tighter mb-2">AI Approvals</h3>
+            <p className="text-sm text-gray-600">
+              Automate approvals based on predefined policies and continuous learning.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+          >
+            <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-xl mb-4">
+              <RiPieChartFill className="text-gray-700" size={20} />
+            </div>
+            <h3 className="text-lg font-medium tracking-tighter mb-2">Advanced Analytics</h3>
+            <p className="text-sm text-gray-600">
+              Visualize spending patterns and get recommendations to optimize resources.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.9 }}
+          >
+            <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-xl mb-4">
+              <RiMoneyDollarCircleFill className="text-gray-700" size={20} />
+            </div>
+            <h3 className="text-lg font-medium tracking-tighter mb-2">Financial Integration</h3>
+            <p className="text-sm text-gray-600">
+              Connect with your ERP and accounting systems for frictionless reconciliation.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Integrations section */}
+        <motion.div
+          className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 1 }}
+        >
+          <h3 className="text-lg font-medium tracking-tighter mb-6 text-center">Key Integrations</h3>
+          <div className="flex flex-wrap justify-center gap-8">
+            <SiMastercard size={30} className="text-black opacity-70 hover:opacity-100 transition-opacity" />
+            <SiVisa size={30} className="text-black opacity-70 hover:opacity-100 transition-opacity" />
+            <SiAmericanexpress size={30} className="text-black opacity-70 hover:opacity-100 transition-opacity" />
+            <SiRevolut size={30} className="text-black opacity-70 hover:opacity-100 transition-opacity" />
+            <SiChase size={30} className="text-black opacity-70 hover:opacity-100 transition-opacity" />
+            <SiBritishairways size={30} className="text-black opacity-70 hover:opacity-100 transition-opacity" />
+            <SiDelta size={30} className="text-black opacity-70 hover:opacity-100 transition-opacity" />
+            <SiUnitedairlines size={30} className="text-black opacity-70 hover:opacity-100 transition-opacity" />
+            <SiExpensify size={30} className="text-black opacity-70 hover:opacity-100 transition-opacity" />
+          </div>
+        </motion.div>
+
+        {/* CTA */}
+        <div className="flex justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.1 }}
+            whileHover={{ y: -2 }}
+            whileTap={{ y: 1 }}
+          >
+            <Link
+              href="https://accounts.suitpax.com/sign-up"
+              className="inline-flex items-center justify-center bg-white text-black hover:bg-white/90 px-8 py-3 rounded-xl text-sm font-medium tracking-tighter shadow-lg w-full sm:w-auto min-w-[220px] transition-colors relative group overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center">
+                Pre-register <RiArrowRightLine className="ml-2" />
+              </span>
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-sky-300 via-white to-sky-300 opacity-30 group-hover:opacity-50 blur-xl transition-all duration-500 animate-flow-slow"></span>
+            </Link>
+          </motion.div>
+        </div>
       </div>
-    </section>
+    </div>
   )
 }

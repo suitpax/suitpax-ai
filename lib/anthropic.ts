@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk"
 const apiKey = process.env.ANTHROPIC_API_KEY
 
 if (!apiKey) {
-  console.warn("ANTHROPIC_API_KEY is not set. AI features will be disabled.")
+  throw new Error("ANTHROPIC_API_KEY is not set")
 }
 
 const anthropic = new Anthropic({
@@ -66,10 +66,6 @@ export async function generateAgentResponse(
     plan?: string
   },
 ): Promise<string> {
-  if (!anthropic.apiKey) {
-    return "My AI capabilities are currently offline. Please try again later."
-  }
-
   const agent = VOICE_AGENTS[agentId]
 
   if (!agent) {
@@ -108,7 +104,7 @@ Always respond as ${agent.name} and provide practical travel assistance.`
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-3-opus-20240229",
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: 200,
       temperature: 0.7,
       system: systemPrompt,

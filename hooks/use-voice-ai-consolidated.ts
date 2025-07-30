@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useCallback, useEffect } from "react"
-import { useSpeechToText } from "./use-speech-to-text"
+import { useSpeechToText } from "./use-speech-recognition"
 import { useAudioPlayer } from "./use-audio-player"
 
 interface Message {
@@ -99,7 +99,7 @@ export function useVoiceAIConsolidated({ agentId, onMessage, onError, onStatusCh
     setIsProcessing(true)
 
     try {
-      const response = await fetch("/api/ai-chat", {
+      const response = await fetch("/api/voice-ai/conversation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -191,7 +191,7 @@ export function useVoiceAIConsolidated({ agentId, onMessage, onError, onStatusCh
 
   const startConversation = useCallback(async () => {
     try {
-      const response = await fetch("/api/ai-chat", {
+      const response = await fetch("/api/voice-ai/conversation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

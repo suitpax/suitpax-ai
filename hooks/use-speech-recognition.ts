@@ -1,27 +1,29 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import { detectLanguage } from "@/lib/language-detection"
 
 interface SpeechRecognitionOptions {
   continuous?: boolean
   interimResults?: boolean
   language?: string
   autoDetectLanguage?: boolean
-  onTranscriptChange?: (transcript: string) => void
+  onResult?: (transcript: string, isFinal: boolean) => void
   onEnd?: (finalTranscript: string, detectedLanguage?: string) => void
   onError?: (error: string) => void
 }
 
-interface SpeechRecognitionResult {
-  transcript: string
+interface SpeechRecognitionHook {
   isListening: boolean
+  transcript: string
+  interimTranscript: string
+  detectedLanguage: string
+  error: string | null
+  browserSupportsSpeechRecognition: boolean
+  isMicrophoneAvailable: boolean
   startListening: () => void
   stopListening: () => void
   resetTranscript: () => void
-  browserSupportsSpeechRecognition: boolean
-  isMicrophoneAvailable: boolean
-  error: string | null
-  detectedLanguage: string
 }
 
 // Extend Window interface for SpeechRecognition
@@ -32,21 +34,22 @@ declare global {
   }
 }
 
-export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): SpeechRecognitionResult {
+export function useSpeechToText(options: SpeechRecognitionOptions = {}): SpeechRecognitionHook {
   const {
     continuous = false,
     interimResults = true,
     language = "en-US",
     autoDetectLanguage = false,
-    onTranscriptChange,
+    onResult,
     onEnd,
     onError,
   } = options
 
-  const [transcript, setTranscript] = useState("")
   const [isListening, setIsListening] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [transcript, setTranscript] = useState("")
+  const [interimTranscript, setInterimTranscript] = useState("")
   const [detectedLanguage, setDetectedLanguage] = useState(language)
+  const [error, setError] = useState<string | null>(null)
   const [isMicrophoneAvailable, setIsMicrophoneAvailable] = useState(true)
 
   const recognitionRef = useRef<any>(null)
@@ -64,6 +67,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
     recognitionRef.current = new SpeechRecognition()
 
     const recognition = recognitionRef.current
+
     recognition.continuous = continuous
     recognition.interimResults = interimResults
     recognition.lang = detectedLanguage
@@ -90,15 +94,27 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
       if (finalTranscript) {
         finalTranscriptRef.current = finalTranscript
         setTranscript(finalTranscript)
-        onTranscriptChange?.(finalTranscript)
-      } else if (interimTranscript) {
-        setTranscript(interimTranscript)
-        onTranscriptChange?.(interimTranscript)
+
+        // Auto-detect language if enabled
+        if (autoDetectLanguage && finalTranscript.length > 10) {
+          const detected = detectLanguage(finalTranscript)
+          if (detected.confidence > 0.6) {
+            setDetectedLanguage(detected.speechCode)
+          }
+        }
+
+        onResult?.(finalTranscript, true)
+      }
+
+      if (interimTranscript) {
+        setInterimTranscript(interimTranscript)
+        onResult?.(interimTranscript, false)
       }
     }
 
     recognition.onerror = (event: any) => {
       console.error("Speech recognition error:", event.error)
+
       let errorMessage = "Speech recognition error"
 
       switch (event.error) {
@@ -110,7 +126,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
           setIsMicrophoneAvailable(false)
           break
         case "not-allowed":
-          errorMessage = "Microphone permission denied."
+          errorMessage = "Microphone permission denied. Please allow microphone access."
           setIsMicrophoneAvailable(false)
           break
         case "network":
@@ -127,6 +143,8 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
 
     recognition.onend = () => {
       setIsListening(false)
+      setInterimTranscript("")
+
       if (finalTranscriptRef.current) {
         onEnd?.(finalTranscriptRef.current, detectedLanguage)
       }
@@ -142,7 +160,8 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
     continuous,
     interimResults,
     detectedLanguage,
-    onTranscriptChange,
+    autoDetectLanguage,
+    onResult,
     onEnd,
     onError,
   ])
@@ -158,10 +177,13 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
     try {
       // Check microphone permissions
       await navigator.mediaDevices.getUserMedia({ audio: true })
-      setError(null)
       setIsMicrophoneAvailable(true)
+      setError(null)
+
       finalTranscriptRef.current = ""
       setTranscript("")
+      setInterimTranscript("")
+
       recognitionRef.current.start()
     } catch (err) {
       console.error("Error starting speech recognition:", err)
@@ -178,21 +200,20 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
 
   const resetTranscript = useCallback(() => {
     setTranscript("")
+    setInterimTranscript("")
     finalTranscriptRef.current = ""
   }, [])
 
   return {
-    transcript,
     isListening,
+    transcript,
+    interimTranscript,
+    detectedLanguage,
+    error,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
     startListening,
     stopListening,
     resetTranscript,
-    browserSupportsSpeechRecognition,
-    isMicrophoneAvailable,
-    error,
-    detectedLanguage,
   }
 }
-
-// Export as useSpeechToText for backward compatibility
-export const useSpeechToText = useSpeechRecognition

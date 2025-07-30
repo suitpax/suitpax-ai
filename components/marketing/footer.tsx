@@ -61,7 +61,7 @@ export const Footer = () => {
               </Link>
             </div>
 
-            <p className="text-xs text-gray-500">Av. Fabraquer, 21, Alicante, Spain, 03560</p>
+            <p className="text-xs text-gray-500">2261 Market Street STE 86661 San Francisco, CA, 94114</p>
           </div>
 
           {/* Columna 2: Products & Services */}
@@ -77,7 +77,10 @@ export const Footer = () => {
               <Link href="/pricing" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Pricing
               </Link>
-              <Link href="/auth/signup" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+              <Link
+                href="https://app.suitpax.com/auth/signup"
+                className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
+              >
                 Pre-register
               </Link>
               <Link
@@ -154,7 +157,7 @@ export const Footer = () => {
                     cert.action === "download"
                       ? () => {
                           const link = document.createElement("a")
-                          link.href = "/legal/anthropic-dpa.pdf"
+                          link.href = "/legal/suitpax-ai-dpa.pdf"
                           link.download = "Suitpax-AI-DPA.pdf"
                           document.body.appendChild(link)
                           link.click()

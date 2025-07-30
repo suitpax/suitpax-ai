@@ -3,12 +3,11 @@ import PartnersShowcase from "@/components/partners-showcase"
 import AITravelAgents from "@/components/marketing/ai-travel-agents"
 import BusinessTravelRevolution from "@/components/marketing/business-travel-revolution"
 import FoundersOpenLetter from "@/components/marketing/founders-open-letter"
+import CloudAIShowcase from "@/components/marketing/cloud-ai-showcase"
 import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
 import AgenticDisruption from "@/components/marketing/agentic-disruption"
 import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
-import ExpenseManagement from "@/components/marketing/expense-management"
-import FlightBookingShowcase from "@/components/marketing/flight-booking-showcase"
-import IntegrationsShowcase from "@/components/marketing/integrations-showcase"
+import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
 import ContactForm from "@/components/marketing/contact-form"
 import type { Metadata } from "next"
 
@@ -72,9 +71,8 @@ export default function Home() {
         <PartnersShowcase />
         <AITravelAgents />
         <BusinessTravelRevolution />
-        <ExpenseManagement />
-        <FlightBookingShowcase />
-        <IntegrationsShowcase />
+        <AIVoiceCallingHub />
+        <CloudAIShowcase />
         <AgenticDisruption />
         <AIVoiceAssistant />
         <AIMeetingsAttachment />

@@ -10,10 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plane, CalendarIcon, Search, Filter, Star, Wifi, Coffee, Utensils, Loader2 } from "lucide-react"
+import { Plane, CalendarIcon, Search, Filter, Star, Wifi, Coffee, Utensils } from "lucide-react"
 import { format } from "date-fns"
+import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
-import toast from "react-hot-toast"
 
 interface FlightSearchParams {
   from: string
@@ -45,13 +45,14 @@ interface FlightResult {
   stops: number
 }
 
+// Datos de ejemplo de vuelos
 const SAMPLE_FLIGHTS: FlightResult[] = [
   {
     id: "1",
     airline: "Iberia",
     flightNumber: "IB3201",
     departure: { airport: "MAD", city: "Madrid", time: "08:30" },
-    arrival: { airport: "LHR", city: "London", time: "10:15" },
+    arrival: { airport: "LHR", city: "Londres", time: "10:15" },
     duration: "2h 45m",
     price: 245,
     class: "economy",
@@ -63,7 +64,7 @@ const SAMPLE_FLIGHTS: FlightResult[] = [
     airline: "British Airways",
     flightNumber: "BA461",
     departure: { airport: "MAD", city: "Madrid", time: "14:20" },
-    arrival: { airport: "LHR", city: "London", time: "16:05" },
+    arrival: { airport: "LHR", city: "Londres", time: "16:05" },
     duration: "2h 45m",
     price: 289,
     class: "economy",
@@ -75,7 +76,7 @@ const SAMPLE_FLIGHTS: FlightResult[] = [
     airline: "Lufthansa",
     flightNumber: "LH1110",
     departure: { airport: "MAD", city: "Madrid", time: "11:15" },
-    arrival: { airport: "LHR", city: "London", time: "15:30" },
+    arrival: { airport: "LHR", city: "Londres", time: "15:30" },
     duration: "4h 15m",
     price: 198,
     class: "economy",
@@ -85,12 +86,12 @@ const SAMPLE_FLIGHTS: FlightResult[] = [
 ]
 
 const POPULAR_DESTINATIONS = [
-  { code: "LHR", city: "London", country: "United Kingdom" },
-  { code: "CDG", city: "Paris", country: "France" },
-  { code: "FRA", city: "Frankfurt", country: "Germany" },
-  { code: "AMS", city: "Amsterdam", country: "Netherlands" },
-  { code: "ZUR", city: "Zurich", country: "Switzerland" },
-  { code: "MXP", city: "Milan", country: "Italy" },
+  { code: "LHR", city: "Londres", country: "Reino Unido" },
+  { code: "CDG", city: "París", country: "Francia" },
+  { code: "FRA", city: "Frankfurt", country: "Alemania" },
+  { code: "AMS", city: "Ámsterdam", country: "Países Bajos" },
+  { code: "ZUR", city: "Zúrich", country: "Suiza" },
+  { code: "MXP", city: "Milán", country: "Italia" },
 ]
 
 export default function FlightsPage() {
@@ -109,32 +110,31 @@ export default function FlightsPage() {
   const supabase = createClient()
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      if (session) {
-        const { data: userData } = await supabase.from("users").select("*").eq("id", session.user.id).single()
-        setUser(userData)
-      }
-    }
     fetchUser()
-  }, [supabase])
+  }, [])
+
+  const fetchUser = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    if (session) {
+      const { data: userData } = await supabase.from("users").select("*").eq("id", session.user.id).single()
+      setUser(userData)
+    }
+  }
 
   const searchFlights = async () => {
     if (!searchParams.from || !searchParams.to || !searchParams.departureDate) {
-      toast.error("Please complete all required fields.")
+      alert("Por favor, completa todos los campos obligatorios")
       return
     }
 
     setLoading(true)
-    const toastId = toast.loading("Searching for flights...")
 
-    // Simulate flight search
+    // Simular búsqueda de vuelos
     setTimeout(() => {
       setFlights(SAMPLE_FLIGHTS)
       setLoading(false)
-      toast.success(`${SAMPLE_FLIGHTS.length} flights found!`, { id: toastId })
     }, 2000)
   }
 
@@ -142,7 +142,6 @@ export default function FlightsPage() {
     if (!user) return
 
     setBookingFlight(flight.id)
-    const toastId = toast.loading("Booking flight...")
 
     try {
       const { error } = await supabase.from("flight_bookings").insert({
@@ -163,21 +162,21 @@ export default function FlightsPage() {
 
       if (error) throw error
 
-      toast.success("Flight booked successfully! A confirmation email will be sent.", { id: toastId })
+      alert("¡Vuelo reservado exitosamente! Recibirás un email de confirmación.")
 
-      // Automatically create an expense
+      // Crear gasto automáticamente
       await supabase.from("expenses").insert({
         user_id: user.id,
-        title: `Flight ${flight.departure.city} - ${flight.arrival.city}`,
+        title: `Vuelo ${flight.departure.city} - ${flight.arrival.city}`,
         description: `${flight.airline} ${flight.flightNumber}`,
         amount: flight.price,
-        category: "Transport",
+        category: "Transporte",
         expense_date: searchParams.departureDate?.toISOString().split("T")[0],
         status: "submitted",
       })
     } catch (error) {
-      console.error("Error booking flight:", error)
-      toast.error("Failed to book flight. Please try again.", { id: toastId })
+      console.error("Error al reservar vuelo:", error)
+      alert("Error al reservar el vuelo. Inténtalo de nuevo.")
     } finally {
       setBookingFlight(null)
     }
@@ -200,56 +199,61 @@ export default function FlightsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tighter">Flight Booking</h1>
-          <p className="text-gray-500 mt-1">Find and book flights for your business trips.</p>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white">
+        <div className="flex items-center space-x-3">
+          <Plane className="h-8 w-8" />
+          <div>
+            <h1 className="text-2xl font-medium tracking-tighter">Reserva de Vuelos</h1>
+            <p className="text-blue-100 mt-1">Encuentra y reserva vuelos para tus viajes de negocio</p>
+          </div>
         </div>
       </div>
 
       <Tabs defaultValue="search" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="search">Search Flights</TabsTrigger>
-          <TabsTrigger value="bookings">My Bookings</TabsTrigger>
+          <TabsTrigger value="search">Buscar Vuelos</TabsTrigger>
+          <TabsTrigger value="bookings">Mis Reservas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="search" className="space-y-6">
+          {/* Search Form */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5" />
-                Search Flights
+                Buscar Vuelos
               </CardTitle>
-              <CardDescription>Find the best flights for your business trip.</CardDescription>
+              <CardDescription>Encuentra los mejores vuelos para tu viaje de negocio</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="from">From</Label>
+                  <Label htmlFor="from">Origen</Label>
                   <Select
                     value={searchParams.from}
                     onValueChange={(value) => setSearchParams((prev) => ({ ...prev, from: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select origin" />
+                      <SelectValue placeholder="Selecciona origen" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="MAD">Madrid (MAD)</SelectItem>
                       <SelectItem value="BCN">Barcelona (BCN)</SelectItem>
-                      <SelectItem value="SVQ">Seville (SVQ)</SelectItem>
+                      <SelectItem value="SVQ">Sevilla (SVQ)</SelectItem>
                       <SelectItem value="VLC">Valencia (VLC)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="to">To</Label>
+                  <Label htmlFor="to">Destino</Label>
                   <Select
                     value={searchParams.to}
                     onValueChange={(value) => setSearchParams((prev) => ({ ...prev, to: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select destination" />
+                      <SelectValue placeholder="Selecciona destino" />
                     </SelectTrigger>
                     <SelectContent>
                       {POPULAR_DESTINATIONS.map((dest) => (
@@ -264,7 +268,7 @@ export default function FlightsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>Departure Date</Label>
+                  <Label>Fecha de salida</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -276,9 +280,9 @@ export default function FlightsPage() {
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {searchParams.departureDate ? (
-                          format(searchParams.departureDate, "PPP")
+                          format(searchParams.departureDate, "PPP", { locale: es })
                         ) : (
-                          <span>Select date</span>
+                          <span>Selecciona fecha</span>
                         )}
                       </Button>
                     </PopoverTrigger>
@@ -295,7 +299,7 @@ export default function FlightsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Return Date (optional)</Label>
+                  <Label>Fecha de regreso (opcional)</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -306,7 +310,11 @@ export default function FlightsPage() {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {searchParams.returnDate ? format(searchParams.returnDate, "PPP") : <span>Select date</span>}
+                        {searchParams.returnDate ? (
+                          format(searchParams.returnDate, "PPP", { locale: es })
+                        ) : (
+                          <span>Selecciona fecha</span>
+                        )}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -322,7 +330,7 @@ export default function FlightsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="class">Class</Label>
+                  <Label htmlFor="class">Clase</Label>
                   <Select
                     value={searchParams.class}
                     onValueChange={(value) => setSearchParams((prev) => ({ ...prev, class: value }))}
@@ -331,87 +339,104 @@ export default function FlightsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="economy">Economy</SelectItem>
+                      <SelectItem value="economy">Económica</SelectItem>
                       <SelectItem value="business">Business</SelectItem>
-                      <SelectItem value="first">First</SelectItem>
+                      <SelectItem value="first">Primera</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
-              <Button onClick={searchFlights} className="w-full bg-black hover:bg-gray-800" disabled={loading}>
+              <Button onClick={searchFlights} className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Searching...
+                    <Search className="mr-2 h-4 w-4 animate-spin" />
+                    Buscando vuelos...
                   </>
                 ) : (
                   <>
                     <Search className="mr-2 h-4 w-4" />
-                    Search Flights
+                    Buscar vuelos
                   </>
                 )}
               </Button>
             </CardContent>
           </Card>
 
+          {/* Flight Results */}
           {flights.length > 0 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold tracking-tighter">Search Results ({flights.length} flights)</h2>
+                <h2 className="text-xl font-medium tracking-tighter">
+                  Resultados de búsqueda ({flights.length} vuelos)
+                </h2>
                 <Button variant="outline" size="sm">
                   <Filter className="mr-2 h-4 w-4" />
-                  Filters
+                  Filtros
                 </Button>
               </div>
 
               {flights.map((flight) => (
                 <Card key={flight.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
+                  <CardContent className="p-6">
                     <div className="flex items-center justify-between">
-                      <div className="flex-1 space-y-3">
-                        <div className="grid grid-cols-3 items-center">
-                          <div className="text-left">
-                            <p className="text-xl font-bold">{flight.departure.time}</p>
-                            <p className="text-sm text-gray-600">{flight.departure.airport}</p>
-                          </div>
-
-                          <div className="text-center">
-                            <p className="text-sm text-gray-600">{flight.duration}</p>
-                            <div className="flex items-center justify-center space-x-2 text-gray-400">
-                              <div className="h-px bg-gray-300 flex-1"></div>
-                              <Plane className="h-4 w-4" />
-                              <div className="h-px bg-gray-300 flex-1"></div>
+                      <div className="flex-1 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className="text-center">
+                              <p className="text-2xl font-bold">{flight.departure.time}</p>
+                              <p className="text-sm text-gray-600">{flight.departure.airport}</p>
+                              <p className="text-xs text-gray-500">{flight.departure.city}</p>
                             </div>
-                            {flight.stops > 0 && <p className="text-xs text-orange-600">{flight.stops} stop(s)</p>}
+
+                            <div className="flex-1 text-center">
+                              <div className="flex items-center justify-center space-x-2">
+                                <div className="h-px bg-gray-300 flex-1"></div>
+                                <Plane className="h-4 w-4 text-gray-400" />
+                                <div className="h-px bg-gray-300 flex-1"></div>
+                              </div>
+                              <p className="text-sm text-gray-600 mt-1">{flight.duration}</p>
+                              {flight.stops > 0 && <p className="text-xs text-orange-600">{flight.stops} escala(s)</p>}
+                            </div>
+
+                            <div className="text-center">
+                              <p className="text-2xl font-bold">{flight.arrival.time}</p>
+                              <p className="text-sm text-gray-600">{flight.arrival.airport}</p>
+                              <p className="text-xs text-gray-500">{flight.arrival.city}</p>
+                            </div>
                           </div>
 
-                          <div className="text-right">
-                            <p className="text-xl font-bold">{flight.arrival.time}</p>
-                            <p className="text-sm text-gray-600">{flight.arrival.airport}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-3 border-t">
-                          <div className="flex items-center gap-4">
-                            <div className="text-left">
+                          <div className="text-right space-y-2">
+                            <div>
+                              <p className="text-2xl font-bold text-green-600">€{flight.price}</p>
                               <p className="text-sm text-gray-600">{flight.airline}</p>
                               <p className="text-xs text-gray-500">{flight.flightNumber}</p>
                             </div>
-                            <Badge variant="outline" className="text-xs capitalize">
-                              {flight.class}
-                            </Badge>
-                          </div>
-                          <div className="text-right flex items-center gap-4">
-                            <p className="text-xl font-bold text-gray-800">€{flight.price}</p>
                             <Button
                               onClick={() => bookFlight(flight)}
                               disabled={bookingFlight === flight.id}
-                              className="bg-black hover:bg-gray-800"
-                              size="sm"
+                              className="bg-green-600 hover:bg-green-700"
                             >
-                              {bookingFlight === flight.id ? "Booking..." : "Book"}
+                              {bookingFlight === flight.id ? "Reservando..." : "Reservar"}
                             </Button>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-4 pt-2 border-t">
+                          <Badge variant="outline" className="text-xs">
+                            {flight.class === "economy"
+                              ? "Económica"
+                              : flight.class === "business"
+                                ? "Business"
+                                : "Primera"}
+                          </Badge>
+                          <div className="flex items-center space-x-2">
+                            {flight.amenities.map((amenity, index) => (
+                              <div key={index} className="flex items-center space-x-1 text-gray-600">
+                                {getAmenityIcon(amenity)}
+                                <span className="text-xs capitalize">{amenity}</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -426,14 +451,14 @@ export default function FlightsPage() {
         <TabsContent value="bookings">
           <Card>
             <CardHeader>
-              <CardTitle>My Bookings</CardTitle>
-              <CardDescription>History of your flight bookings</CardDescription>
+              <CardTitle>Mis Reservas</CardTitle>
+              <CardDescription>Historial de reservas de vuelos</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
                 <Plane className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">You have no flight bookings yet</p>
-                <p className="text-sm text-gray-500 mt-1">Your bookings will appear here once you book a flight</p>
+                <p className="text-gray-600">No tienes reservas de vuelos aún</p>
+                <p className="text-sm text-gray-500 mt-1">Tus reservas aparecerán aquí una vez que reserves un vuelo</p>
               </div>
             </CardContent>
           </Card>

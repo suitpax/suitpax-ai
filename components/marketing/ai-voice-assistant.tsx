@@ -1,200 +1,93 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Mic, MicOff, Phone, PhoneOff, Volume2, VolumeX, Sparkles, Zap, Brain, MessageSquare, Play } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useSpeechToText } from "@/hooks/use-speech-to-text"
-import { useAudioPlayer } from "@/hooks/use-audio-player"
 import Image from "next/image"
+import { MdMic, MdMicOff, MdVolumeUp, MdSend, MdStop } from "react-icons/md"
+import { PiGlobeSimpleBold, PiWaveformBold } from "react-icons/pi"
+import { useSpeechToText } from "@/hooks/use-speech-recognition"
+import { detectLanguage } from "@/lib/language-detection"
 
 interface Message {
   id: string
   sender: "user" | "assistant"
   text: string
   timestamp: Date
+  language?: string
   audioUrl?: string
 }
 
-const WaveformVisualizer = ({ isActive, intensity = 0.5 }: { isActive: boolean; intensity?: number }) => (
-  <div className="flex items-center justify-center space-x-1 h-16">
-    {Array.from({ length: 32 }).map((_, index) => (
-      <motion.div
-        key={index}
-        className="w-1 bg-gradient-to-t from-blue-400 to-purple-500 rounded-full"
-        initial={{ height: 4 }}
-        animate={{
-          height: isActive ? [4, 8 + Math.random() * 32 * intensity, 4] : 4,
-          opacity: isActive ? [0.3, 0.9, 0.3] : 0.2,
-        }}
-        transition={{
-          repeat: isActive ? Number.POSITIVE_INFINITY : 0,
-          duration: 0.5 + Math.random() * 0.8,
-          ease: "easeInOut",
-        }}
-      />
-    ))}
-  </div>
-)
-
-const FloatingOrb = ({ delay = 0 }: { delay?: number }) => (
-  <motion.div
-    className="absolute w-2 h-2 bg-white/20 rounded-full"
-    initial={{
-      x: Math.random() * 400,
-      y: Math.random() * 300,
-      opacity: 0,
-    }}
-    animate={{
-      x: Math.random() * 400,
-      y: Math.random() * 300,
-      opacity: [0, 0.6, 0],
-    }}
-    transition={{
-      duration: 8 + Math.random() * 4,
-      repeat: Number.POSITIVE_INFINITY,
-      delay: delay,
-      ease: "easeInOut",
-    }}
-  />
-)
-
 export default function AIVoiceAssistant() {
-  const [isCallActive, setIsCallActive] = useState(false)
+  const [inputText, setInputText] = useState("")
   const [messages, setMessages] = useState<Message[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
-  const [currentInput, setCurrentInput] = useState("")
-  const [audioEnabled, setAudioEnabled] = useState(true)
-  const [callDuration, setCallDuration] = useState(0)
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false)
+  const [detectedLanguage, setDetectedLanguage] = useState<string>("en-US")
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [currentAgent] = useState({
+    name: "Emma",
+    role: "AI Travel Assistant",
+    image: "/agents/agent-emma.jpeg",
+  })
 
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const callStartTime = useRef<number>(0)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const waveformRef = useRef<HTMLDivElement | null>(null)
 
-  // Speech to text hook
-  const { isListening, transcript, startListening, stopListening, resetTranscript, browserSupportsSpeechRecognition } =
-    useSpeechToText({
-      onTranscriptChange: (text) => {
-        setCurrentInput(text)
-      },
-      onEnd: async (finalTranscript) => {
-        if (finalTranscript.trim()) {
-          await handleUserMessage(finalTranscript)
+  // Speech-to-text configuration
+  const {
+    isListening,
+    transcript,
+    startListening,
+    stopListening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
+  } = useSpeechToText({
+    onTranscriptChange: (text) => {
+      setInputText(text)
+
+      if (text.length > 10) {
+        const detected = detectLanguage(text)
+        if (detected.confidence > 0.6) {
+          setDetectedLanguage(detected.speechCode)
         }
-      },
-      continuous: false,
-      language: "en-US",
-    })
+      }
+    },
+    onEnd: (finalTranscript) => {
+      if (finalTranscript.trim()) {
+        setInputText(finalTranscript)
+        processUserInput(finalTranscript)
+      }
+    },
+    continuous: false,
+    language: detectedLanguage,
+    autoDetectLanguage: true,
+  })
 
-  // Audio player hook
-  const { playAudio, stopAudio, isPlaying } = useAudioPlayer()
-
-  // Call duration timer
+  // Waveform animation effect
   useEffect(() => {
-    let interval: NodeJS.Timeout
-    if (isCallActive) {
-      callStartTime.current = Date.now()
-      interval = setInterval(() => {
-        setCallDuration(Math.floor((Date.now() - callStartTime.current) / 1000))
-      }, 1000)
-    } else {
-      setCallDuration(0)
-    }
-    return () => {
-      if (interval) clearInterval(interval)
-    }
-  }, [isCallActive])
+    if (isListening && waveformRef.current) {
+      const waveformBars = waveformRef.current.querySelectorAll("[data-waveform-bar]")
 
-  // Format call duration
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-  }
+      const intervals: NodeJS.Timeout[] = []
 
-  const handleUserMessage = async (text: string) => {
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      sender: "user",
-      text: text,
-      timestamp: new Date(),
-    }
+      waveformBars.forEach((bar, index) => {
+        const animateBar = () => {
+          const randomHeight = Math.random() * 20 + 4
+          const htmlBar = bar as HTMLElement
+          htmlBar.style.height = `${randomHeight}px`
+          htmlBar.style.opacity = `${0.4 + Math.random() * 0.6}`
+        }
 
-    setMessages((prev) => [...prev, userMessage])
-    setIsProcessing(true)
-    setCurrentInput("")
-    resetTranscript()
-
-    try {
-      // Send to AI chat API
-      const response = await fetch("/api/ai-chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: text,
-          context:
-            "You are Zia, an executive travel assistant for Suitpax. Help with business travel planning, flight bookings, hotel reservations, and travel policies. Be concise and professional. Keep responses under 50 words.",
-        }),
+        const interval = setInterval(animateBar, 150 + Math.random() * 200)
+        intervals.push(interval)
       })
 
-      if (!response.ok) throw new Error("Failed to get AI response")
-
-      const aiResponse = await response.json()
-
-      // Generate speech if audio is enabled
-      let audioUrl = null
-      if (audioEnabled) {
-        try {
-          const speechResponse = await fetch("/api/elevenlabs/text-to-speech", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              text: aiResponse.message,
-              voice_id: "21m00Tcm4TlvDq8ikWAM", // Rachel voice
-            }),
-          })
-
-          if (speechResponse.ok) {
-            const audioBlob = await speechResponse.blob()
-            audioUrl = URL.createObjectURL(audioBlob)
-          }
-        } catch (error) {
-          console.error("Error generating speech:", error)
-        }
+      return () => {
+        intervals.forEach(clearInterval)
       }
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: "assistant",
-        text: aiResponse.message,
-        timestamp: new Date(),
-        audioUrl: audioUrl,
-      }
-
-      setMessages((prev) => [...prev, assistantMessage])
-
-      // Auto-play the response
-      if (audioUrl && audioEnabled) {
-        setTimeout(() => {
-          playAudio(audioUrl)
-        }, 500)
-      }
-    } catch (error) {
-      console.error("Error processing message:", error)
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: "assistant",
-        text: "I'm sorry, I'm having trouble connecting right now. Please try again.",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, errorMessage])
-    } finally {
-      setIsProcessing(false)
     }
-  }
+  }, [isListening])
 
   const toggleListening = async () => {
     if (isListening) {
@@ -203,405 +96,607 @@ export default function AIVoiceAssistant() {
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true })
         resetTranscript()
-        setCurrentInput("")
+        setInputText("")
+        setErrorMessage(null)
         startListening()
       } catch (error) {
         console.error("Error accessing microphone:", error)
+        setErrorMessage("Could not access microphone. Please check browser permissions.")
       }
     }
   }
 
-  const startCall = async () => {
-    setIsCallActive(true)
-    setMessages([])
+  const processUserInput = async (userInput: string) => {
+    setIsProcessing(true)
 
-    // Welcome message
-    const welcomeMessage: Message = {
+    // Add user message
+    const userMessage: Message = {
       id: Date.now().toString(),
-      sender: "assistant",
-      text: "Hello! I'm Zia, your AI travel assistant. How can I help you with your business travel today?",
+      sender: "user",
+      text: userInput,
       timestamp: new Date(),
+      language: detectedLanguage,
     }
 
-    setMessages([welcomeMessage])
+    setMessages((prev) => [...prev, userMessage])
 
-    // Auto-play welcome if audio is enabled
-    if (audioEnabled) {
-      try {
-        const response = await fetch("/api/elevenlabs/text-to-speech", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            text: welcomeMessage.text,
-            voice_id: "21m00Tcm4TlvDq8ikWAM",
-          }),
-        })
+    // Simulate processing time
+    await new Promise((resolve) => setTimeout(resolve, 1200))
 
-        if (response.ok) {
-          const audioBlob = await response.blob()
-          const audioUrl = URL.createObjectURL(audioBlob)
-          setTimeout(() => playAudio(audioUrl), 1000)
-        }
-      } catch (error) {
-        console.error("Error generating welcome speech:", error)
+    // Generate contextual response based on input
+    const response = generateResponse(userInput, detectedLanguage)
+
+    const assistantMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      sender: "assistant",
+      text: response.text,
+      timestamp: new Date(),
+      language: response.language,
+    }
+
+    setMessages((prev) => [...prev, assistantMessage])
+    setIsProcessing(false)
+
+    // Convert response to speech
+    await convertTextToSpeech(response.text, response.language)
+  }
+
+  const generateResponse = (input: string, language: string) => {
+    const lowerInput = input.toLowerCase()
+
+    if (language === "es-ES" || language.startsWith("es")) {
+      // Spanish responses
+      if (
+        lowerInput.includes("vuelo") ||
+        lowerInput.includes("volar") ||
+        lowerInput.includes("avión") ||
+        lowerInput.includes("aeropuerto")
+      ) {
+        const responses = [
+          "He encontrado varias opciones de vuelos para ti. Los mejores vuelos salen por la mañana con Iberia a las 10:30 y con Delta a las 11:15. Ambos cumplen con la política de viajes de tu empresa. ¿Te gustaría que proceda con la reserva?",
+          "Perfecto, puedo ayudarte con los vuelos. Tengo disponibilidad en clase business con Lufthansa a las 14:20 y Air France a las 16:45. Ambos incluyen equipaje adicional y acceso a salas VIP. ¿Cuál prefieres?",
+          "Excelente elección de destino. He verificado las restricciones de viaje y todo está en orden. Los vuelos directos están disponibles con un 15% de descuento corporativo. ¿Necesitas también hotel en el destino?",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "es-ES" }
+      } else if (
+        lowerInput.includes("hotel") ||
+        lowerInput.includes("alojamiento") ||
+        lowerInput.includes("hospedaje") ||
+        lowerInput.includes("habitación")
+      ) {
+        const responses = [
+          "Te recomiendo el Marriott del centro y el Hilton Business Center para tu estancia. Ambos ofrecen salas ejecutivas y están dentro de tu presupuesto aprobado de 300 euros por noche. ¿Quieres que reserve una habitación con salida tardía?",
+          "He encontrado opciones fantásticas. El Four Seasons tiene disponibilidad con vista al mar y el Ritz-Carlton ofrece un 20% de descuento corporativo. Ambos incluyen desayuno ejecutivo y WiFi premium. ¿Cuál te interesa más?",
+          "Perfecto, tengo varias opciones premium. El Grand Hyatt está a 5 minutos del centro de convenciones y el Westin ofrece spa incluido. Ambos tienen salas de reuniones disponibles las 24 horas. ¿Necesitas servicios adicionales?",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "es-ES" }
+      } else if (
+        lowerInput.includes("gasto") ||
+        lowerInput.includes("recibo") ||
+        lowerInput.includes("costo") ||
+        lowerInput.includes("factura")
+      ) {
+        const responses = [
+          "Categorizaré automáticamente tus gastos de viaje y los enviaré para aprobación. Tu utilización actual del presupuesto de viaje está al 78%, bien dentro de los límites de la política. Todos los recibos serán capturados y procesados digitalmente.",
+          "Excelente, he procesado todos tus recibos. Los gastos de comida están dentro del límite de 75 euros diarios y el transporte ha sido pre-aprobado. El reembolso se procesará en 2-3 días hábiles. ¿Necesitas el reporte detallado?",
+          "He sincronizado todos tus gastos con el sistema contable. Los gastos de entretenimiento requieren justificación adicional, pero todo lo demás está aprobado automáticamente. Tu tarjeta corporativa se actualizará en tiempo real.",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "es-ES" }
+      } else if (
+        lowerInput.includes("reunión") ||
+        lowerInput.includes("meeting") ||
+        lowerInput.includes("cita") ||
+        lowerInput.includes("agenda")
+      ) {
+        const responses = [
+          "He sincronizado tu itinerario de viaje con tu calendario. Tus reuniones están programadas considerando los horarios de vuelo, y he añadido tiempo de buffer para traslados al aeropuerto. ¿Quieres que envíe invitaciones a todos los participantes?",
+          "Perfecto, he coordinado todas tus reuniones. La sala de conferencias está reservada con equipo audiovisual y catering para 12 personas. He enviado recordatorios automáticos a todos los asistentes. ¿Necesitas materiales adicionales?",
+          "Excelente, he optimizado tu agenda. Las reuniones matutinas están confirmadas y he reservado tiempo para almuerzo de negocios en el restaurante del hotel. Todos los documentos están sincronizados en la nube. ¿Algún cambio de último momento?",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "es-ES" }
+      } else if (
+        lowerInput.includes("transporte") ||
+        lowerInput.includes("taxi") ||
+        lowerInput.includes("uber") ||
+        lowerInput.includes("coche")
+      ) {
+        const responses = [
+          "He organizado tu transporte completo. Un chofer ejecutivo te recogerá en el aeropuerto y estará disponible durante toda tu estancia. El vehículo incluye WiFi y estación de carga. ¿Necesitas paradas adicionales?",
+          "Perfecto, he reservado un Tesla Model S para tu traslado. El conductor habla inglés y español, conoce perfectamente la ciudad y tiene acceso a carriles VIP. El costo está pre-aprobado por tu empresa.",
+          "Excelente elección. He coordinado transporte premium con Mercedes clase E. Incluye agua, prensa internacional y clima personalizado. El conductor te contactará 30 minutos antes de cada recogida.",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "es-ES" }
+      } else if (lowerInput.includes("clima") || lowerInput.includes("tiempo") || lowerInput.includes("temperatura")) {
+        const responses = [
+          "El clima en tu destino será perfecto para viajes de negocios. Temperaturas de 22-25°C, sin lluvia prevista. Te recomiendo llevar una chaqueta ligera para las reuniones en interiores con aire acondicionado.",
+          "Excelente timing para tu viaje. El pronóstico muestra cielos despejados y temperaturas ideales. He actualizado tu lista de equipaje con recomendaciones específicas para el clima local.",
+          "El tiempo será favorable durante toda tu estancia. Temperaturas estables y sin precipitaciones. He verificado que todos tus vuelos están confirmados sin retrasos por condiciones meteorológicas.",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "es-ES" }
+      } else {
+        const responses = [
+          "Entiendo que necesitas ayuda con tus arreglos de viaje de negocios. Puedo ayudarte a reservar vuelos, hoteles, gestionar gastos y coordinar tu horario. ¿En qué aspecto específico te gustaría que te ayude?",
+          "Estoy aquí para optimizar tu experiencia de viaje corporativo. Puedo manejar reservas, políticas de empresa, reembolsos y coordinación de agenda. ¿Qué necesitas organizar primero?",
+          "Como tu asistente de viajes AI, puedo gestionar todo tu itinerario de negocios. Desde vuelos premium hasta reuniones ejecutivas y gastos corporativos. ¿Por dónde empezamos?",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "es-ES" }
+      }
+    } else {
+      // English responses
+      if (
+        lowerInput.includes("flight") ||
+        lowerInput.includes("fly") ||
+        lowerInput.includes("plane") ||
+        lowerInput.includes("airport")
+      ) {
+        const responses = [
+          "I've found several excellent flight options for you. The best morning flights are with British Airways at 10:30 AM and Lufthansa at 11:15 AM. Both comply with your company's travel policy and include priority boarding. Would you like me to proceed with the booking?",
+          "Perfect! I can help you with flights. I have business class availability with Emirates at 2:20 PM and Air France at 4:45 PM. Both include extra baggage and lounge access. Which would you prefer?",
+          "Excellent destination choice. I've verified all travel restrictions and everything is clear. Direct flights are available with a 15% corporate discount. Do you also need accommodation at your destination?",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "en-US" }
+      } else if (
+        lowerInput.includes("hotel") ||
+        lowerInput.includes("accommodation") ||
+        lowerInput.includes("stay") ||
+        lowerInput.includes("room")
+      ) {
+        const responses = [
+          "I recommend the Marriott Downtown and Hilton Business Center for your stay. Both offer executive lounges and are within your approved budget of $400 per night. Shall I reserve a room with late checkout privileges?",
+          "I've found fantastic options for you. The Four Seasons has ocean view availability and the Ritz-Carlton offers a 20% corporate discount. Both include executive breakfast and premium WiFi. Which interests you more?",
+          "Perfect! I have several premium options. The Grand Hyatt is 5 minutes from the convention center and the Westin offers complimentary spa access. Both have 24-hour meeting rooms available. Do you need additional services?",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "en-US" }
+      } else if (
+        lowerInput.includes("expense") ||
+        lowerInput.includes("receipt") ||
+        lowerInput.includes("cost") ||
+        lowerInput.includes("invoice")
+      ) {
+        const responses = [
+          "I'll automatically categorize your travel expenses and submit them for approval. Your current trip budget utilization is at 78%, well within policy limits. All receipts will be digitally captured and processed within 24 hours.",
+          "Excellent! I've processed all your receipts. Meal expenses are within the $100 daily limit and transportation has been pre-approved. Reimbursement will be processed in 2-3 business days. Do you need the detailed report?",
+          "I've synchronized all your expenses with the accounting system. Entertainment expenses require additional justification, but everything else is automatically approved. Your corporate card will be updated in real-time.",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "en-US" }
+      } else if (
+        lowerInput.includes("meeting") ||
+        lowerInput.includes("schedule") ||
+        lowerInput.includes("calendar") ||
+        lowerInput.includes("appointment")
+      ) {
+        const responses = [
+          "I've synchronized your travel itinerary with your calendar. Your meetings are scheduled around your flight times, and I've added buffer time for airport transfers. Would you like me to send calendar invites to all participants?",
+          "Perfect! I've coordinated all your meetings. The conference room is booked with AV equipment and catering for 12 people. I've sent automatic reminders to all attendees. Do you need additional materials?",
+          "Excellent! I've optimized your schedule. Morning meetings are confirmed and I've reserved time for a business lunch at the hotel restaurant. All documents are synced to the cloud. Any last-minute changes needed?",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "en-US" }
+      } else if (
+        lowerInput.includes("transport") ||
+        lowerInput.includes("taxi") ||
+        lowerInput.includes("uber") ||
+        lowerInput.includes("car")
+      ) {
+        const responses = [
+          "I've arranged your complete transportation. An executive driver will pick you up at the airport and be available throughout your stay. The vehicle includes WiFi and charging station. Do you need additional stops?",
+          "Perfect! I've booked a Tesla Model S for your transfer. The driver speaks multiple languages, knows the city perfectly, and has VIP lane access. The cost is pre-approved by your company.",
+          "Excellent choice! I've coordinated premium transport with a Mercedes E-Class. Includes water, international press, and personalized climate control. The driver will contact you 30 minutes before each pickup.",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "en-US" }
+      } else if (
+        lowerInput.includes("weather") ||
+        lowerInput.includes("climate") ||
+        lowerInput.includes("temperature")
+      ) {
+        const responses = [
+          "The weather at your destination will be perfect for business travel. Temperatures of 72-77°F with no rain expected. I recommend bringing a light jacket for air-conditioned meeting rooms.",
+          "Excellent timing for your trip! The forecast shows clear skies and ideal temperatures. I've updated your packing list with specific recommendations for the local climate.",
+          "Weather will be favorable throughout your stay. Stable temperatures with no precipitation expected. I've verified that all your flights are confirmed with no weather-related delays.",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "en-US" }
+      } else if (
+        lowerInput.includes("restaurant") ||
+        lowerInput.includes("food") ||
+        lowerInput.includes("dining") ||
+        lowerInput.includes("eat")
+      ) {
+        const responses = [
+          "I've curated a selection of top business dining venues. The Capital Grille has private dining rooms perfect for client meetings, and Nobu offers an exclusive chef's table experience. Both accommodate dietary restrictions. Which style do you prefer?",
+          "Excellent! I have reservations at Michelin-starred restaurants within walking distance of your hotel. Le Bernardin for seafood excellence and Eleven Madison Park for innovative cuisine. Both have sommelier services available.",
+          "Perfect timing! I've secured tables at the city's most prestigious business restaurants. All venues offer private dining, wine pairings, and can accommodate your company's entertainment budget. Shall I confirm the reservations?",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "en-US" }
+      } else {
+        const responses = [
+          "I understand you need assistance with your business travel arrangements. I can help you book flights, reserve hotels, manage expenses, and coordinate your schedule. What specific aspect would you like me to help you with?",
+          "I'm here to optimize your corporate travel experience. I can handle bookings, company policies, reimbursements, and schedule coordination. What would you like to organize first?",
+          "As your AI travel assistant, I can manage your entire business itinerary. From premium flights to executive meetings and corporate expenses. Where shall we start?",
+        ]
+        return { text: responses[Math.floor(Math.random() * responses.length)], language: "en-US" }
       }
     }
   }
 
-  const endCall = () => {
-    setIsCallActive(false)
+  const convertTextToSpeech = async (text: string, language = "en-US") => {
+    try {
+      const response = await fetch("/api/elevenlabs/text-to-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text,
+          voiceId: "21m00Tcm4TlvDq8ikWAM", // Rachel - Female voice
+          language,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+
+      const audioBlob = await response.blob()
+      const audioUrl = URL.createObjectURL(audioBlob)
+
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl
+        audioRef.current.play()
+        setIsPlayingAudio(true)
+      }
+    } catch (error) {
+      console.error("Error in text-to-speech:", error)
+      // Fallback to browser speech synthesis
+      if ("speechSynthesis" in window) {
+        const utterance = new SpeechSynthesisUtterance(text)
+        utterance.lang = language
+        utterance.rate = 0.9
+        utterance.pitch = 1.1
+        speechSynthesis.speak(utterance)
+      }
+    }
+  }
+
+  const handleManualSubmit = () => {
+    if (inputText.trim()) {
+      processUserInput(inputText)
+      setInputText("")
+    }
+  }
+
+  const clearConversation = () => {
     setMessages([])
-    setCurrentInput("")
-    setIsProcessing(false)
-    if (isListening) {
-      stopListening()
-    }
-    if (isPlaying) {
-      stopAudio()
-    }
+    setInputText("")
+    setErrorMessage(null)
   }
 
   return (
-    <section className="relative py-24 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0">
-        <Image src="/images/glass-cube-reflection-bg.jpg" alt="Background" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
-        {/* Floating orbs */}
-        {Array.from({ length: 12 }).map((_, i) => (
-          <FloatingOrb key={i} delay={i * 0.5} />
-        ))}
-      </div>
-
-      <div className="relative z-10 container mx-auto px-4 md:px-6">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <div className="flex justify-center items-center gap-2 mb-6">
-            <div className="inline-flex items-center rounded-2xl bg-white/10 backdrop-blur-md px-4 py-2 text-sm font-medium text-white border border-white/20">
-              <Sparkles className="w-4 h-4 mr-2 text-blue-400" />
-              Voice AI Technology
-              <div className="ml-2 w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+    <section className="w-full py-12 md:py-24 bg-gray-50">
+      <div className="container px-4 md:px-6 mx-auto">
+        <div className="flex flex-col items-center text-center space-y-4 mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <div className="flex justify-center items-center gap-1.5 mb-3">
+              <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
+                <Image
+                  src="/logo/suitpax-bl-logo.webp"
+                  alt="Suitpax"
+                  width={50}
+                  height={12}
+                  className="h-2.5 w-auto mr-1"
+                />
+                <em className="font-serif italic">Voice Intelligence</em>
+              </span>
+              <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse mr-1"></span>
+                <em className="font-serif italic">Real-time Speech</em>
+              </span>
             </div>
-          </div>
 
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-none mb-8 bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
-            Meet Zia, your AI assistant
-          </h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl mx-auto">
+              <em className="font-serif italic">Intelligent Voice Assistant</em> for Business Travel
+            </h2>
+            <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl">
+              <em className="font-serif italic">Speak naturally</em> to manage your travel, expenses, and bookings with
+              AI-powered voice recognition.
+            </p>
+            <p className="mt-2 text-xs font-light text-gray-500 max-w-2xl">
+              Real-time transcription, intelligent responses, and seamless integration with your workflow.
+            </p>
+          </motion.div>
+        </div>
 
-          <p className="text-xl font-light text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Experience the future of business travel with natural voice conversations. Book flights, manage expenses,
-            and get instant travel assistance.
-          </p>
-        </motion.div>
-
-        {/* Main Interface */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.3 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
           viewport={{ once: true }}
-          className="max-w-5xl mx-auto"
+          className="w-full max-w-4xl mx-auto"
         >
-          <div className="bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
-            <AnimatePresence mode="wait">
-              {!isCallActive ? (
-                <motion.div
-                  key="start-screen"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="p-12 text-center"
-                >
-                  {/* AI Agent Video/Avatar */}
-                  <div className="relative mb-8">
-                    <div className="relative w-48 h-48 mx-auto">
-                      {/* Placeholder for AI agent video */}
-                      <div className="w-full h-full rounded-3xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 border border-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden">
-                        <video
-                          ref={videoRef}
-                          className="w-full h-full object-cover rounded-3xl"
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                        >
-                          <source src="/videos/ai-agent-zia.mp4" type="video/mp4" />
-                          {/* Fallback to image */}
-                          <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                            <Brain className="w-16 h-16 text-white" />
-                          </div>
-                        </video>
-                      </div>
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white/80">
+              <div className="flex items-center space-x-3">
+                <Image
+                  src={currentAgent.image || "/placeholder.svg"}
+                  alt={currentAgent.name}
+                  width={40}
+                  height={40}
+                  className="rounded-xl h-10 w-10 object-cover border-2 border-gray-200"
+                />
+                <div>
+                  <h3 className="text-sm font-medium text-black">
+                    <em className="font-serif italic">{currentAgent.name}</em>
+                  </h3>
+                  <p className="text-xs text-gray-600">
+                    <em className="font-serif italic">{currentAgent.role}</em>
+                  </p>
+                </div>
+              </div>
 
-                      {/* Status indicator */}
-                      <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-green-500 rounded-2xl border-4 border-white/20 backdrop-blur-sm flex items-center justify-center">
-                        <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
-                      </div>
+              <div className="flex items-center space-x-2">
+                <div className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[8px] font-medium text-gray-700 border border-gray-200">
+                  <PiGlobeSimpleBold className="h-3 w-3 mr-1 text-gray-500" />
+                  <span>{detectedLanguage === "es-ES" ? "Español" : "English"}</span>
+                </div>
+                <div className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[8px] font-medium text-gray-700 border border-gray-200">
+                  <span className="mr-1.5">
+                    <em className="font-serif italic">AI Powered</em>
+                  </span>
+                  <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
+                </div>
+              </div>
+            </div>
 
-                      {/* Floating elements */}
+            {/* Conversation Area */}
+            <div className="h-80 overflow-y-auto p-6 bg-gradient-to-b from-white/90 to-white/70">
+              <AnimatePresence>
+                {messages.length === 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center justify-center h-full text-center"
+                  >
+                    <Image
+                      src={currentAgent.image || "/placeholder.svg"}
+                      alt={currentAgent.name}
+                      width={64}
+                      height={64}
+                      className="rounded-xl h-16 w-16 object-cover mb-4 border-2 border-gray-200"
+                    />
+                    <h3 className="text-lg font-medium text-black mb-2">
+                      <em className="font-serif italic">{currentAgent.name}</em>
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-6">
+                      <em className="font-serif italic">{currentAgent.role}</em>
+                    </p>
+                    <p className="text-xs text-gray-500 max-w-md">
+                      <em className="font-serif italic">Start speaking to {currentAgent.name}</em> about your travel
+                      needs. I can help you book flights, find hotels, manage expenses, and more.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <div className="space-y-4">
+                    {messages.map((message) => (
                       <motion.div
-                        className="absolute -top-4 -left-4 w-8 h-8 bg-blue-400/30 rounded-full backdrop-blur-sm"
-                        animate={{
-                          y: [-10, 10, -10],
-                          rotate: [0, 180, 360],
-                        }}
-                        transition={{
-                          duration: 4,
-                          repeat: Number.POSITIVE_INFINITY,
-                          ease: "easeInOut",
-                        }}
-                      />
-                      <motion.div
-                        className="absolute -bottom-4 -left-8 w-6 h-6 bg-purple-400/30 rounded-full backdrop-blur-sm"
-                        animate={{
-                          y: [10, -10, 10],
-                          x: [-5, 5, -5],
-                        }}
-                        transition={{
-                          duration: 3,
-                          repeat: Number.POSITIVE_INFINITY,
-                          ease: "easeInOut",
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <h3 className="text-4xl font-bold text-white mb-3 tracking-tight">Zia</h3>
-                  <p className="text-xl text-gray-300 font-light mb-8">Executive Travel Assistant</p>
-
-                  {/* Features */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    {[
-                      {
-                        icon: MessageSquare,
-                        title: "Natural Conversations",
-                        desc: "Speak naturally, get instant responses",
-                      },
-                      { icon: Zap, title: "Real-time Processing", desc: "Lightning-fast AI understanding" },
-                      { icon: Brain, title: "Travel Expertise", desc: "Specialized in business travel" },
-                    ].map((feature, index) => (
-                      <motion.div
-                        key={index}
+                        key={message.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 * index }}
-                        className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
-                      >
-                        <feature.icon className="w-8 h-8 text-blue-400 mb-4 mx-auto" />
-                        <h4 className="text-white font-semibold mb-2">{feature.title}</h4>
-                        <p className="text-gray-400 text-sm">{feature.desc}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  <Button
-                    onClick={startCall}
-                    size="lg"
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl px-12 py-6 text-lg font-semibold shadow-2xl shadow-blue-500/25 transition-all duration-300 hover:scale-105"
-                  >
-                    <Phone className="w-6 h-6 mr-3" />
-                    Start Voice Call
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="call-screen"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="p-8"
-                >
-                  {/* Call Header */}
-                  <div className="flex items-center justify-between mb-8 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-                    <div className="flex items-center space-x-4">
-                      <div className="relative w-16 h-16">
-                        <div className="w-full h-full rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 border border-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden">
-                          <Brain className="w-8 h-8 text-white" />
-                        </div>
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white/20" />
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-white">Zia</h3>
-                        <p className="text-gray-300">Executive Travel Assistant</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <div className="text-white font-mono text-lg">{formatDuration(callDuration)}</div>
-                        <div className="text-gray-400 text-sm">Call duration</div>
-                      </div>
-
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setAudioEnabled(!audioEnabled)}
-                        className="text-white hover:bg-white/10 rounded-xl"
-                      >
-                        {audioEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-                      </Button>
-
-                      <Button onClick={endCall} size="sm" className="bg-red-500 hover:bg-red-600 text-white rounded-xl">
-                        <PhoneOff className="w-5 h-5" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Conversation Area */}
-                  <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-6 mb-8 min-h-[400px] max-h-[500px] overflow-y-auto border border-white/10">
-                    <div className="space-y-6">
-                      {messages.map((message) => (
-                        <motion.div
-                          key={message.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
-                        >
-                          <div className={`max-w-[80%] ${message.sender === "user" ? "text-right" : "text-left"}`}>
-                            <div
-                              className={`inline-block p-4 rounded-2xl ${
-                                message.sender === "user"
-                                  ? "bg-blue-500 text-white rounded-br-lg"
-                                  : "bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-bl-lg"
-                              }`}
-                            >
-                              <p className="text-sm leading-relaxed">{message.text}</p>
-                            </div>
-                            <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
-                              <span>
-                                {message.timestamp.toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </span>
-                              {message.audioUrl && (
-                                <button
-                                  onClick={() => playAudio(message.audioUrl!)}
-                                  className="flex items-center gap-1 hover:text-white transition-colors"
-                                >
-                                  <Play className="w-3 h-3" />
-                                  Play
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-
-                      {isProcessing && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl rounded-bl-lg p-4">
-                            <div className="flex items-center space-x-2">
-                              <div className="flex space-x-1">
-                                {[0, 1, 2].map((i) => (
-                                  <motion.div
-                                    key={i}
-                                    className="w-2 h-2 bg-white/60 rounded-full"
-                                    animate={{
-                                      scale: [1, 1.2, 1],
-                                      opacity: [0.5, 1, 0.5],
-                                    }}
-                                    transition={{
-                                      duration: 1.5,
-                                      repeat: Number.POSITIVE_INFINITY,
-                                      delay: i * 0.2,
-                                    }}
-                                  />
-                                ))}
-                              </div>
-                              <span className="text-sm text-white/80">Thinking...</span>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-
-                      {currentInput && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-end">
-                          <div className="bg-blue-500/50 backdrop-blur-sm text-white rounded-2xl rounded-br-lg p-4 max-w-[80%]">
-                            <p className="text-sm opacity-80">{currentInput}</p>
-                          </div>
-                        </motion.div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Voice Controls */}
-                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                    {/* Waveform */}
-                    <div className="mb-6">
-                      <WaveformVisualizer isActive={isListening || isProcessing} intensity={isListening ? 1 : 0.3} />
-                    </div>
-
-                    {/* Controls */}
-                    <div className="flex items-center justify-center space-x-6">
-                      <Button
-                        onClick={toggleListening}
-                        disabled={isProcessing}
-                        size="lg"
-                        className={`w-20 h-20 rounded-full transition-all duration-300 ${
-                          isListening
-                            ? "bg-red-500 hover:bg-red-600 shadow-2xl shadow-red-500/50 animate-pulse"
-                            : isProcessing
-                              ? "bg-gray-600 cursor-not-allowed"
-                              : "bg-blue-500 hover:bg-blue-600 shadow-2xl shadow-blue-500/50 hover:scale-110"
+                        className={`flex items-start space-x-3 ${
+                          message.sender === "user" ? "justify-end flex-row-reverse space-x-reverse" : ""
                         }`}
                       >
-                        {isListening ? (
-                          <MicOff className="w-8 h-8 text-white" />
-                        ) : (
-                          <Mic className="w-8 h-8 text-white" />
-                        )}
-                      </Button>
-                    </div>
+                        <div className="flex-shrink-0 mt-1">
+                          <div
+                            className={`h-6 w-6 rounded-full flex items-center justify-center ${
+                              message.sender === "user" ? "bg-black" : "bg-gray-100"
+                            }`}
+                          >
+                            {message.sender === "user" ? (
+                              <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            ) : (
+                              <PiWaveformBold className="h-3 w-3 text-gray-600" />
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div
+                            className={`p-3 rounded-lg text-xs ${
+                              message.sender === "user"
+                                ? "bg-black text-white rounded-tr-none"
+                                : "bg-gray-100 text-gray-700 rounded-tl-none"
+                            }`}
+                          >
+                            <em className="font-serif italic">{message.text}</em>
+                          </div>
+                          <div
+                            className={`mt-1 flex items-center text-[10px] text-gray-500 ${
+                              message.sender === "user" ? "justify-end" : ""
+                            }`}
+                          >
+                            <span>
+                              {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </span>
+                            {message.sender === "assistant" && (
+                              <button
+                                className="ml-2 text-gray-500 hover:text-gray-700"
+                                onClick={() => convertTextToSpeech(message.text, message.language)}
+                              >
+                                <MdVolumeUp className="h-3 w-3" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
 
-                    <div className="text-center mt-4">
-                      <p className="text-white font-medium">
-                        {isListening
-                          ? "Listening... Speak now"
-                          : isProcessing
-                            ? "Processing your request..."
-                            : "Tap the microphone to speak"}
-                      </p>
-                      {!browserSupportsSpeechRecognition && (
-                        <p className="text-amber-400 text-sm mt-2">Speech recognition not supported in this browser</p>
-                      )}
+                    {isProcessing && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-start space-x-3"
+                      >
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center">
+                            <PiWaveformBold className="h-3 w-3 text-gray-600" />
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="bg-gray-100 rounded-lg rounded-tl-none p-3">
+                            <div className="flex items-center space-x-1 h-4">
+                              <motion.div
+                                animate={{ opacity: [0.4, 1, 0.4] }}
+                                transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5 }}
+                                className="flex space-x-1"
+                              >
+                                <div className="w-1 h-1 rounded-full bg-gray-400"></div>
+                                <div className="w-1 h-1 rounded-full bg-gray-400"></div>
+                                <div className="w-1 h-1 rounded-full bg-gray-400"></div>
+                              </motion.div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Input Section */}
+            <div className="p-6 border-t border-gray-200 bg-white/80">
+              {/* Waveform Visualizer */}
+              <div className="mb-4">
+                <div className="relative h-12 bg-gray-100 rounded-lg overflow-hidden">
+                  <div ref={waveformRef} className="absolute inset-0 flex items-center justify-center">
+                    <div className="flex items-center space-x-[2px] h-full px-2">
+                      {Array.from({ length: 50 }).map((_, index) => (
+                        <div
+                          key={index}
+                          data-waveform-bar
+                          className={`w-[2px] rounded-full transition-all duration-200 ${
+                            isListening ? "bg-black" : "bg-gray-400"
+                          }`}
+                          style={{ height: "4px" }}
+                        />
+                      ))}
                     </div>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
+                </div>
+              </div>
 
-        {/* Bottom Features */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          viewport={{ once: true }}
-          className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-6"
-        >
-          {[
-            { title: "Real-time Voice", desc: "Natural conversations with instant AI responses", icon: MessageSquare },
-            { title: "Travel Expertise", desc: "Specialized knowledge in business travel and bookings", icon: Brain },
-            { title: "Always Available", desc: "24/7 assistance for all your travel needs", icon: Zap },
-            { title: "Secure & Private", desc: "Enterprise-grade security for your conversations", icon: Sparkles },
-          ].map((feature, index) => (
-            <div key={index} className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center">
-              <feature.icon className="w-8 h-8 text-blue-400 mx-auto mb-4" />
-              <h4 className="text-white font-semibold mb-2">{feature.title}</h4>
-              <p className="text-gray-400 text-sm leading-relaxed">{feature.desc}</p>
+              {/* Input and Controls */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder={isListening ? "Listening..." : "Type your message or click the microphone to speak..."}
+                    className="w-full py-3 px-4 text-sm text-gray-900 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                    onKeyPress={(e) => e.key === "Enter" && handleManualSubmit()}
+                  />
+                </div>
+
+                <button
+                  onClick={toggleListening}
+                  disabled={isProcessing}
+                  className={`flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 ${
+                    isListening
+                      ? "bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30"
+                      : isProcessing
+                        ? "bg-gray-300 opacity-50 cursor-not-allowed"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-105"
+                  }`}
+                  aria-label={isListening ? "Stop listening" : "Start listening"}
+                >
+                  {isListening ? <MdMicOff className="h-5 w-5" /> : <MdMic className="h-5 w-5" />}
+                </button>
+
+                <button
+                  onClick={handleManualSubmit}
+                  disabled={!inputText.trim() || isProcessing}
+                  className="flex items-center justify-center w-12 h-12 rounded-xl bg-black text-white hover:bg-black/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <MdSend className="h-4 w-4" />
+                </button>
+
+                {messages.length > 0 && (
+                  <button
+                    onClick={clearConversation}
+                    className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                  >
+                    <MdStop className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Error Messages */}
+              {errorMessage && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-xs text-red-600">
+                    <em className="font-serif italic">{errorMessage}</em>
+                  </p>
+                </div>
+              )}
+
+              {!browserSupportsSpeechRecognition && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-xs text-yellow-700">
+                    <em className="font-serif italic">
+                      Your browser doesn't support speech recognition. Please try Chrome or Edge for the best
+                      experience.
+                    </em>
+                  </p>
+                </div>
+              )}
             </div>
-          ))}
+
+            {/* Features */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-6 bg-gray-50">
+              <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
+                <div className="text-xs font-medium text-gray-700">
+                  <em className="font-serif italic">Real-time</em>
+                </div>
+                <div className="text-[10px] text-gray-500">Transcription</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
+                <div className="text-xs font-medium text-gray-700">
+                  <em className="font-serif italic">Natural</em>
+                </div>
+                <div className="text-[10px] text-gray-500">Voice Response</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
+                <div className="text-xs font-medium text-gray-700">
+                  <em className="font-serif italic">Multi-language</em>
+                </div>
+                <div className="text-[10px] text-gray-500">Support</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
+                <div className="text-xs font-medium text-gray-700">
+                  <em className="font-serif italic">Business</em>
+                </div>
+                <div className="text-[10px] text-gray-500">Context Aware</div>
+              </div>
+            </div>
+
+            {/* Hidden audio element */}
+            <audio
+              ref={audioRef}
+              onEnded={() => setIsPlayingAudio(false)}
+              onPlay={() => setIsPlayingAudio(true)}
+              className="hidden"
+            />
+          </div>
         </motion.div>
       </div>
     </section>
