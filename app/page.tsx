@@ -1,47 +1,33 @@
-import dynamic from "next/dynamic"
 import Hero from "@/components/marketing/hero"
 import PartnersShowcase from "@/components/partners-showcase"
 import AITravelAgents from "@/components/marketing/ai-travel-agents"
 import BusinessTravelRevolution from "@/components/marketing/business-travel-revolution"
+import FoundersOpenLetter from "@/components/marketing/founders-open-letter"
+import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
+import AgenticDisruption from "@/components/marketing/agentic-disruption"
+import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
 import ExpenseManagement from "@/components/marketing/expense-management"
 import FlightBookingShowcase from "@/components/marketing/flight-booking-showcase"
 import IntegrationsShowcase from "@/components/marketing/integrations-showcase"
-import AgenticDisruption from "@/components/marketing/agentic-disruption"
-import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
-import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
-import BusinessIntelligence from "@/components/marketing/business-intelligence"
-import TaskManagement from "@/components/marketing/task-management"
 import ContactForm from "@/components/marketing/contact-form"
-import FoundersOpenLetter from "@/components/marketing/founders-open-letter"
-import Footer from "@/components/marketing/footer"
-import Navigation from "@/components/marketing/navigation"
 import type { Metadata } from "next"
 
-// Dynamic imports for performance
-const SplashScreen = dynamic(() => import("@/components/splash-screen"), {
-  ssr: false,
-})
-
-const PasswordProtection = dynamic(() => import("@/components/password-protection"), {
-  ssr: false,
-})
-
 export const metadata: Metadata = {
-  title: "Suitpax | AI-Powered Business Travel Platform - October 2025 Launch",
+  title: "Suitpax | AI-Powered Business Travel Platform",
   description:
-    "Get exclusive early access to Suitpax, the most advanced AI-powered business travel platform launching October 2025. Limited preview spots available.",
+    "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
   openGraph: {
-    title: "Suitpax | AI-Powered Business Travel Platform - October 2025 Launch",
+    title: "Suitpax | AI-Powered Business Travel Platform",
     description:
-      "Get exclusive early access to Suitpax, the most advanced AI-powered business travel platform launching October 2025. Limited preview spots available.",
+      "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
     url: "https://suitpax.com",
     siteName: "Suitpax",
     images: [
       {
-        url: "/og-image-new.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Suitpax | AI-Powered Business Travel Platform - October 2025 Launch",
+        alt: "Suitpax | AI-Powered Business Travel Platform",
       },
     ],
     locale: "en_US",
@@ -49,9 +35,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Suitpax | AI-Powered Business Travel Platform - October 2025 Launch",
+    title: "Suitpax | AI-Powered Business Travel Platform",
     description:
-      "Get exclusive early access to Suitpax, the most advanced AI-powered business travel platform launching October 2025. Limited preview spots available.",
+      "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
     images: ["/twitter-image.png"],
     creator: "@suitpax",
   },
@@ -76,44 +62,25 @@ export const metadata: Metadata = {
       "es-ES": "https://suitpax.com/es-ES",
     },
   },
-  keywords: [
-    "business travel",
-    "AI travel platform",
-    "expense management",
-    "travel booking",
-    "October 2025 launch",
-    "early access",
-    "enterprise travel",
-    "travel technology",
-  ],
 }
 
-export default function HomePage() {
+export default function Home() {
   return (
     <>
-      <SplashScreen />
-      <PasswordProtection onUnlock={() => {}}>
-        <div className="min-h-screen bg-white">
-          <Navigation />
-          <main className="pt-20">
-            <Hero />
-            <PartnersShowcase />
-            <AITravelAgents />
-            <BusinessTravelRevolution />
-            <ExpenseManagement />
-            <FlightBookingShowcase />
-            <IntegrationsShowcase />
-            <AgenticDisruption />
-            <AIVoiceAssistant />
-            <BusinessIntelligence />
-            <TaskManagement />
-            <AIMeetingsAttachment />
-            <ContactForm />
-            <FoundersOpenLetter />
-          </main>
-          <Footer />
-        </div>
-      </PasswordProtection>
+      <main id="main-content" className="w-full">
+        <Hero />
+        <PartnersShowcase />
+        <AITravelAgents />
+        <BusinessTravelRevolution />
+        <ExpenseManagement />
+        <FlightBookingShowcase />
+        <IntegrationsShowcase />
+        <AgenticDisruption />
+        <AIVoiceAssistant />
+        <AIMeetingsAttachment />
+        <ContactForm />
+        <FoundersOpenLetter />
+      </main>
     </>
   )
 }

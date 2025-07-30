@@ -265,7 +265,7 @@ export const Footer = () => {
               alt="Suitpax Technology"
               width={50}
               height={12}
-              className="h-3 w-auto opacity-50 ml-2"
+              className="h-3 w-auto opacity-50 ml-1.5"
             />
           </div>
         </div>
