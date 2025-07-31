@@ -4,10 +4,10 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { motion } from "framer-motion"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import { createClient } from "@/lib/supabase/client"
+import { PiSparkle } from "react-icons/pi"
 import toast from "react-hot-toast"
 
 export default function LoginPage() {
@@ -96,17 +96,13 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-6">
               <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-                <Image
-                  src="/logo/suitpax-bl-logo.webp"
-                  alt="Suitpax"
-                  width={60}
-                  height={16}
-                  className="mr-1.5 h-4 w-auto"
-                />
-                <em className="font-serif italic">Welcome back to your workspace</em>
+                <PiSparkle className="mr-1.5 h-3 w-3" />
+                <em className="font-serif italic">MCP-powered AI Agents</em>
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-4">Sign in</h1>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-4">
+              Welcome back
+            </h1>
             <p className="text-gray-600 font-light text-sm sm:text-base">
               <em className="font-serif italic">Continue your journey with intelligent business travel</em>
             </p>
@@ -132,7 +128,7 @@ export default function LoginPage() {
             <form onSubmit={handleLogin} className="space-y-6">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Work email
+                  Email address
                 </label>
                 <input
                   id="email"
@@ -141,7 +137,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
-                  placeholder="Enter your work email"
+                  placeholder="Enter your email"
                 />
               </div>
 
