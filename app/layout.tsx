@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { headers } from "next/headers"
 import Navigation from "@/components/marketing/navigation"
 import Footer from "@/components/marketing/footer"
 import IntercomProvider from "@/components/intercom/intercom-provider"
@@ -10,57 +11,29 @@ import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata: Metadata = {
-  title: "Suitpax | The next-gen AI traveltech",
-  description:
-    "AI-powered business travel platform with MCP-enhanced agents. Revolutionizing corporate travel with AI superpowers, intelligent expense management, and seamless booking experiences.",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-16x16.png", sizes: "16x16" },
-      { url: "/favicon-32x32.png", sizes: "32x32" },
-    ],
-    apple: "/apple-touch-icon.png",
-    shortcut: "/favicon.ico",
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://suitpax.com",
-    title: "Suitpax | The next-gen AI traveltech",
-    description:
-      "The all-in-one business travel platform with AI superpowers. MCP-enhanced AI agents, expense management, flights, hotels, and cars—everything in one place. Transforming corporate travel with intelligent automation and contextual understanding.",
-    siteName: "Suitpax",
-    images: [
-      {
-        url: "/og-image-new.png",
-        width: 1200,
-        height: 630,
-        alt: "Suitpax - Designed by humans. Powered by AI Agents",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Suitpax | The next-gen AI traveltech",
-    description:
-      "AI travel agents with MCP superpowers. Transforming business travel with intelligent automation, contextual understanding, and seamless expense management. Built for scale, designed for humans.",
-    creator: "@suitpax",
-    images: ["/og-image-new.png"],
-  },
-  keywords:
-    "AI travel agents, business travel platform, MCP technology, AI superpowers, corporate travel management, expense automation, intelligent booking, contextual AI, travel intelligence, next-gen traveltech",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "none",
-      "max-snippet": -1,
-    },
-  },
-    generator: 'v0.dev'
+// Componente para determinar si mostrar nav/footer
+function LayoutContent({ children }: { children: React.ReactNode }) {
+  const headersList = headers()
+  const pathname = headersList.get('x-pathname') || ''
+  
+  // Rutas que NO deben mostrar Navigation y Footer
+  const excludeNavAndFooter = [
+    '/dashboard',
+    '/auth'
+  ].some(path => pathname.startsWith(path))
+
+  if (excludeNavAndFooter) {
+    return <>{children}</>
+  }
+
+  // Páginas públicas con Navigation y Footer
+  return (
+    <>
+      <Navigation />
+      <main className="overflow-hidden w-full">{children}</main>
+      <Footer />
+    </>
+  )
 }
 
 export default function RootLayout({
@@ -81,9 +54,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <AppErrorBoundary>
-          <Navigation />
-          <main className="overflow-hidden w-full">{children}</main>
-          <Footer />
+          <LayoutContent>{children}</LayoutContent>
           <IntercomProvider />
           <Toaster
             position="top-right"
