@@ -1,113 +1,62 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ChartBarIcon, TrendingUpIcon, CurrencyDollarIcon, ClockIcon } from "@heroicons/react/24/outline"
-import { Card, CardContent } from "@/components/ui/card"
-
-const stats = [
-  {
-    name: "Total Spend",
-    value: "$24,580",
-    change: "+12%",
-    changeType: "increase",
-    icon: CurrencyDollarIcon,
-  },
-  {
-    name: "Trips This Month",
-    value: "8",
-    change: "+3",
-    changeType: "increase",
-    icon: TrendingUpIcon,
-  },
-  {
-    name: "Average Trip Cost",
-    value: "$3,072",
-    change: "-5%",
-    changeType: "decrease",
-    icon: ChartBarIcon,
-  },
-  {
-    name: "Hours Saved",
-    value: "42",
-    change: "+18",
-    changeType: "increase",
-    icon: ClockIcon,
-  },
-]
+import { ChartBarIcon, TrendingUpIcon, CalendarIcon, CurrencyDollarIcon } from "@heroicons/react/24/outline"
 
 export default function AnalyticsPage() {
   return (
-    <div className="space-y-6 p-4 lg:p-0">
+    <div className="p-6 space-y-8">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
         <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Analytics</h1>
-        <p className="text-gray-600 font-light">Insights into your business travel patterns</p>
+        <p className="text-gray-600 font-light">
+          <em className="font-serif italic">Insights and reports for your travel data</em>
+        </p>
       </motion.div>
 
-      {/* Stats Grid */}
+      {/* Coming Soon */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="bg-white/50 backdrop-blur-sm p-12 rounded-2xl border border-gray-200 shadow-sm text-center"
       >
-        {stats.map((stat, index) => (
-          <motion.div
-            key={stat.name}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-          >
-            <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                    <p className="text-2xl font-medium tracking-tighter text-gray-900">{stat.value}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center">
-                    <stat.icon className="h-6 w-6 text-white" />
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <span
-                    className={`text-sm font-medium ${
-                      stat.changeType === "increase" ? "text-gray-600" : "text-gray-500"
-                    }`}
-                  >
-                    {stat.change} from last month
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </motion.div>
+        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <ChartBarIcon className="h-10 w-10 text-white" />
+        </div>
+        <h2 className="text-2xl font-medium tracking-tighter mb-4">Advanced Analytics Coming Soon</h2>
+        <p className="text-gray-600 font-light max-w-md mx-auto mb-8">
+          <em className="font-serif italic">
+            We're building powerful analytics tools to help you understand your travel patterns, optimize spending, and
+            make data-driven decisions.
+          </em>
+        </p>
 
-      {/* Charts Placeholder */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-      >
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-medium tracking-tighter mb-4">Monthly Spending</h3>
-            <div className="h-64 bg-gray-100 rounded-xl flex items-center justify-center">
-              <p className="text-gray-500">Chart coming soon</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
+          <div className="p-4 bg-white/50 rounded-xl border border-gray-200">
+            <TrendingUpIcon className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+            <h3 className="font-medium tracking-tight mb-2">Spending Trends</h3>
+            <p className="text-sm text-gray-600 font-light">
+              <em className="font-serif italic">Track your expenses over time</em>
+            </p>
+          </div>
 
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-medium tracking-tighter mb-4">Travel Destinations</h3>
-            <div className="h-64 bg-gray-100 rounded-xl flex items-center justify-center">
-              <p className="text-gray-500">Chart coming soon</p>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="p-4 bg-white/50 rounded-xl border border-gray-200">
+            <CalendarIcon className="h-8 w-8 text-green-600 mx-auto mb-3" />
+            <h3 className="font-medium tracking-tight mb-2">Travel Patterns</h3>
+            <p className="text-sm text-gray-600 font-light">
+              <em className="font-serif italic">Analyze your travel frequency</em>
+            </p>
+          </div>
+
+          <div className="p-4 bg-white/50 rounded-xl border border-gray-200">
+            <CurrencyDollarIcon className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+            <h3 className="font-medium tracking-tight mb-2">Cost Optimization</h3>
+            <p className="text-sm text-gray-600 font-light">
+              <em className="font-serif italic">Find savings opportunities</em>
+            </p>
+          </div>
+        </div>
       </motion.div>
     </div>
   )

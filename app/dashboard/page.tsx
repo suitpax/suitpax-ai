@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { PaperAirplaneIcon, CreditCardIcon, UsersIcon, ClockIcon, MapPinIcon } from "@heroicons/react/24/outline"
+import {
+  PaperAirplaneIcon,
+  CreditCardIcon,
+  UsersIcon,
+  ClockIcon,
+  MapPinIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/outline"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import StatsOverview from "@/components/dashboard/stats-overview"
@@ -100,16 +107,17 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-black rounded-2xl p-4 sm:p-6 text-white"
+        className="bg-gradient-to-r from-black to-gray-800 rounded-2xl p-4 sm:p-6 text-white"
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
             <h1 className="text-xl sm:text-2xl font-medium tracking-tighter">
-              Welcome back, {user?.user_metadata?.full_name?.split(" ")[0] || user?.email?.split("@")[0]}
+              Welcome back, {user?.user_metadata?.full_name || user?.email?.split("@")[0]}
             </h1>
             <p className="text-gray-300 mt-1 text-sm sm:text-base">Ready to manage your business travel efficiently?</p>
           </div>
           <div className="flex items-center space-x-2">
+            <SparklesIcon className="h-5 w-5 sm:h-6 sm:w-6" />
             <span className="text-sm font-medium">{userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} Plan</span>
           </div>
         </div>
@@ -185,7 +193,7 @@ export default function DashboardPage() {
                 </div>
                 <div
                   className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                    trip.status === "confirmed" ? "bg-gray-200 text-gray-800" : "bg-gray-100 text-gray-600"
+                    trip.status === "confirmed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
                   }`}
                 >
                   {trip.status}
@@ -202,13 +210,13 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="bg-gray-50 rounded-2xl border border-gray-200 p-4 sm:p-6"
+          className="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl border border-emerald-200 p-4 sm:p-6"
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div>
               <h3 className="text-lg font-medium tracking-tighter text-gray-900">Unlock Premium Features</h3>
               <p className="text-sm text-gray-600 mt-1">
-                Get access to advanced analytics, priority support, and more.
+                Get access to AI Voice Agents, advanced analytics, and priority support.
               </p>
             </div>
             <Link

@@ -18,13 +18,13 @@ interface Message {
   timestamp: Date
 }
 
-export default function SuitpaxAIPage() {
+export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       role: "assistant",
       content:
-        "Hello! I'm Suitpax AI, your intelligent business travel assistant. I can help you with flight bookings, expense management, travel policies, and more. How can I assist you today?",
+        "Hello! I'm your AI travel assistant. I can help you with flight bookings, expense management, travel policies, and more. How can I assist you today?",
       timestamp: new Date(),
     },
   ])
@@ -104,7 +104,7 @@ export default function SuitpaxAIPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] max-w-4xl mx-auto p-4 lg:p-0">
+    <div className="flex flex-col h-[calc(100vh-8rem)] max-w-4xl mx-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -115,10 +115,10 @@ export default function SuitpaxAIPage() {
         <div className="flex items-center space-x-4 mb-4">
           <div className="relative">
             <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={48} height={48} className="rounded-xl" />
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-800 rounded-full border-2 border-white"></div>
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
           </div>
           <div>
-            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none">Suitpax AI</h1>
+            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none">AI Travel Assistant</h1>
             <p className="text-gray-600 font-light">Your intelligent business travel companion</p>
           </div>
         </div>

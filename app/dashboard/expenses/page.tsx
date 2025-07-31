@@ -2,39 +2,44 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { CreditCardIcon, PlusIcon, CalendarIcon, TagIcon } from "@heroicons/react/24/outline"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
+import {
+  PlusIcon,
+  MagnifyingGlassIcon,
+  DocumentArrowUpIcon,
+  CreditCardIcon,
+  CalendarIcon,
+  TagIcon,
+} from "@heroicons/react/24/outline"
+import { createClient } from "@/lib/supabase/client"
 
 const expenseCategories = ["Flight", "Hotel", "Meals", "Transportation", "Conference", "Other"]
 
 const mockExpenses = [
   {
     id: 1,
-    description: "Hotel - Hilton London",
-    amount: "$450.00",
-    date: "March 10, 2024",
-    category: "Accommodation",
-    status: "Approved",
+    title: "Flight to New York",
+    amount: 450.0,
+    category: "Flight",
+    date: "2024-01-15",
+    status: "approved",
     receipt: true,
   },
   {
     id: 2,
-    description: "Flight - JFK to LHR",
-    amount: "$1,245.00",
-    date: "March 8, 2024",
-    category: "Transportation",
-    status: "Pending",
+    title: "Hotel Manhattan",
+    amount: 280.0,
+    category: "Hotel",
+    date: "2024-01-16",
+    status: "pending",
     receipt: true,
   },
   {
     id: 3,
-    description: "Business Dinner",
-    amount: "$125.50",
-    date: "March 7, 2024",
+    title: "Client Dinner",
+    amount: 125.5,
     category: "Meals",
-    status: "Approved",
+    date: "2024-01-17",
+    status: "draft",
     receipt: false,
   },
 ]
@@ -45,27 +50,25 @@ export default function ExpensesPage() {
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [showAddForm, setShowAddForm] = useState(false)
   const [loading, setLoading] = useState(false)
+  const supabase = createClient()
 
   const filteredExpenses = expenses.filter((expense) => {
-    const matchesSearch = expense.description.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = expense.title.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = selectedCategory === "All" || expense.category === selectedCategory
     return matchesSearch && matchesCategory
   })
 
-  const totalExpenses = expenses.reduce(
-    (sum, expense) => sum + Number.parseFloat(expense.amount.replace("$", "").replace(",", "")),
-    0,
-  )
-  const pendingExpenses = expenses.filter((e) => e.status === "Pending").length
-  const approvedExpenses = expenses.filter((e) => e.status === "Approved").length
+  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
+  const pendingExpenses = expenses.filter((e) => e.status === "pending").length
+  const approvedExpenses = expenses.filter((e) => e.status === "approved").length
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Approved":
+      case "approved":
         return "bg-green-100 text-green-700 border-green-200"
-      case "Pending":
+      case "pending":
         return "bg-yellow-100 text-yellow-700 border-yellow-200"
-      case "Draft":
+      case "draft":
         return "bg-gray-100 text-gray-700 border-gray-200"
       default:
         return "bg-gray-100 text-gray-700 border-gray-200"
@@ -73,64 +76,28 @@ export default function ExpensesPage() {
   }
 
   return (
-    <div className="space-y-6 p-4 lg:p-0">
+    <div className="p-6 space-y-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0"
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
           <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Expenses</h1>
-          <p className="text-gray-600 font-light">Track and manage your business expenses</p>
+          <p className="text-gray-600 font-light">
+            <em className="font-serif italic">Track and manage your travel expenses</em>
+          </p>
         </div>
-        <Button onClick={() => setShowAddForm(!showAddForm)} className="bg-black text-white hover:bg-gray-800">
+        <button
+          onClick={() => setShowAddForm(true)}
+          className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-colors tracking-tight"
+        >
           <PlusIcon className="h-4 w-4 mr-2" />
           Add Expense
-        </Button>
+        </button>
       </motion.div>
-
-      {/* Add Expense Form */}
-      {showAddForm && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-medium tracking-tighter mb-4">Add New Expense</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                  <Input placeholder="Enter expense description" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
-                  <Input placeholder="$0.00" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
-                  <div className="relative">
-                    <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <Input type="date" className="pl-10" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                  <div className="relative">
-                    <TagIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <Input placeholder="Select category" className="pl-10" />
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-end space-x-3 mt-6">
-                <Button variant="outline" onClick={() => setShowAddForm(false)}>
-                  Cancel
-                </Button>
-                <Button className="bg-black text-white hover:bg-gray-800">Save Expense</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
 
       {/* Stats Cards */}
       <motion.div
@@ -184,8 +151,8 @@ export default function ExpensesPage() {
         className="flex flex-col sm:flex-row gap-4"
       >
         <div className="relative flex-1">
-          <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
             type="text"
             placeholder="Search expenses..."
             value={searchTerm}
@@ -212,7 +179,6 @@ export default function ExpensesPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="space-y-4"
       >
         {filteredExpenses.length === 0 ? (
           <div className="bg-white/50 backdrop-blur-sm p-12 rounded-2xl border border-gray-200 shadow-sm text-center">
@@ -227,13 +193,13 @@ export default function ExpensesPage() {
                   : "Start by adding your first expense"}
               </em>
             </p>
-            <Button
+            <button
               onClick={() => setShowAddForm(true)}
               className="inline-flex items-center px-4 py-2 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-colors tracking-tight"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
               Add Expense
-            </Button>
+            </button>
           </div>
         ) : (
           <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm divide-y divide-gray-200">
@@ -243,49 +209,42 @@ export default function ExpensesPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
+                className="p-6 hover:bg-gray-50/50 transition-colors"
               >
-                <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center">
-                          <CreditCardIcon className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">{expense.description}</div>
-                          <div className="text-sm text-gray-600">{expense.date}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-6">
-                        <div className="text-center">
-                          <div className="text-sm text-gray-500">Category</div>
-                          <div className="font-medium text-gray-900">{expense.category}</div>
-                        </div>
-
-                        <div className="text-center">
-                          <div className="text-sm text-gray-500">Amount</div>
-                          <div className="text-lg font-medium text-gray-900">{expense.amount}</div>
-                        </div>
-
-                        <div className="text-center">
-                          <div className="text-sm text-gray-500">Status</div>
-                          <div
-                            className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                              expense.status === "Approved" ? "bg-gray-200 text-gray-800" : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {expense.status}
-                          </div>
-                        </div>
-
-                        <Button size="sm" className="bg-black text-white hover:bg-gray-800">
-                          View Details
-                        </Button>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-gray-200 rounded-xl">
+                      <CreditCardIcon className="h-6 w-6 text-gray-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium tracking-tight text-gray-900">{expense.title}</h3>
+                      <div className="flex items-center space-x-4 mt-1">
+                        <span className="text-sm text-gray-600 font-light">
+                          <em className="font-serif italic">{expense.category}</em>
+                        </span>
+                        <span className="text-sm text-gray-600 font-light">
+                          {new Date(expense.date).toLocaleDateString()}
+                        </span>
+                        {expense.receipt && (
+                          <span className="inline-flex items-center text-xs text-green-600">
+                            <DocumentArrowUpIcon className="h-3 w-3 mr-1" />
+                            Receipt
+                          </span>
+                        )}
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="text-right">
+                      <p className="text-lg font-medium tracking-tighter">${expense.amount.toLocaleString()}</p>
+                      <div
+                        className={`inline-flex items-center rounded-xl px-2.5 py-0.5 text-[10px] font-medium border ${getStatusColor(expense.status)}`}
+                      >
+                        {expense.status.charAt(0).toUpperCase() + expense.status.slice(1)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
