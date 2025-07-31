@@ -4,19 +4,18 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import { createClient } from "@/lib/supabase/client"
-import { PiSparkle } from "react-icons/pi"
 import toast from "react-hot-toast"
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
   const [fullName, setFullName] = useState("")
+  const [companyName, setCompanyName] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
@@ -26,13 +25,6 @@ export default function SignUpPage() {
     e.preventDefault()
     setLoading(true)
     setError("")
-
-    if (password !== confirmPassword) {
-      setError("Passwords don't match")
-      toast.error("Passwords don't match")
-      setLoading(false)
-      return
-    }
 
     if (password.length < 6) {
       setError("Password must be at least 6 characters")
@@ -48,6 +40,7 @@ export default function SignUpPage() {
         options: {
           data: {
             full_name: fullName,
+            company_name: companyName,
           },
         },
       })
@@ -117,15 +110,21 @@ export default function SignUpPage() {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-6">
               <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-                <PiSparkle className="mr-1.5 h-3 w-3" />
-                <em className="font-serif italic">MCP-powered AI Agents</em>
+                <Image
+                  src="/logo/suitpax-bl-logo.webp"
+                  alt="Suitpax"
+                  width={60}
+                  height={16}
+                  className="mr-1.5 h-4 w-auto"
+                />
+                <em className="font-serif italic">Join thousands of business travelers</em>
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-4">
-              Create account
+              Get started
             </h1>
             <p className="text-gray-600 font-light text-sm sm:text-base">
-              <em className="font-serif italic">Join the future of intelligent business travel</em>
+              <em className="font-serif italic">Transform your business travel experience today</em>
             </p>
           </div>
 
@@ -163,8 +162,23 @@ export default function SignUpPage() {
               </div>
 
               <div>
+                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
+                  Company name
+                </label>
+                <input
+                  id="companyName"
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
+                  placeholder="Enter your company name"
+                />
+              </div>
+
+              <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email address
+                  Work email
                 </label>
                 <input
                   id="email"
@@ -173,7 +187,7 @@ export default function SignUpPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
-                  placeholder="Enter your email"
+                  placeholder="Enter your work email"
                 />
               </div>
 
@@ -189,7 +203,7 @@ export default function SignUpPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
-                    placeholder="Create a password"
+                    placeholder="Create a secure password"
                   />
                   <button
                     type="button"
@@ -197,30 +211,6 @@ export default function SignUpPage() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                   >
                     {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm password
-                </label>
-                <div className="relative">
-                  <input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
-                    placeholder="Confirm your password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-                  >
-                    {showConfirmPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                   </button>
                 </div>
               </div>
