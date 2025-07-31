@@ -1,18 +1,17 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { PiSparkle, PiAirplane, PiCalendar, PiCreditCard, PiUsers, PiChartBar, PiGlobe } from "react-icons/pi"
 
 const airlines = [
-  { name: "Delta", logo: "/placeholder.svg?height=40&width=120" },
-  { name: "American", logo: "/placeholder.svg?height=40&width=120" },
-  { name: "United", logo: "/placeholder.svg?height=40&width=120" },
-  { name: "Southwest", logo: "/placeholder.svg?height=40&width=120" },
-  { name: "JetBlue", logo: "/placeholder.svg?height=40&width=120" },
-  { name: "Alaska", logo: "/placeholder.svg?height=40&width=120" },
-  { name: "Spirit", logo: "/placeholder.svg?height=40&width=120" },
-  { name: "Frontier", logo: "/placeholder.svg?height=40&width=120" },
+  { name: "Delta", logo: "/logos/delta-logo.png" },
+  { name: "American", logo: "/logos/american-logo.png" },
+  { name: "United", logo: "/logos/united-logo.png" },
+  { name: "Southwest", logo: "/logos/southwest-logo.png" },
+  { name: "JetBlue", logo: "/logos/jetblue-logo.png" },
+  { name: "Alaska", logo: "/logos/alaska-logo.png" },
+  { name: "British Airways", logo: "/logos/british-airways-logo.png" },
+  { name: "Lufthansa", logo: "/logos/lufthansa-logo.png" },
 ]
 
 const features = [
@@ -77,10 +76,8 @@ export default function MCPFlightsAIAgents() {
             AI Flight Agents
           </h2>
           <p className="text-gray-600 font-light max-w-2xl mx-auto">
-            <em className="font-serif italic">
-              Revolutionary AI agents that understand your travel patterns, preferences, and business requirements to
-              deliver personalized flight recommendations and seamless booking experiences.
-            </em>
+            Revolutionary AI agents that understand your travel patterns, preferences, and business requirements to
+            deliver personalized flight recommendations and seamless booking experiences.
           </p>
         </motion.div>
 
@@ -130,9 +127,7 @@ export default function MCPFlightsAIAgents() {
                 </div>
                 <h3 className="font-medium tracking-tighter">{feature.title}</h3>
               </div>
-              <p className="text-gray-600 font-light text-sm">
-                <em className="font-serif italic">{feature.description}</em>
-              </p>
+              <p className="text-gray-600 font-light text-sm">{feature.description}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -147,9 +142,7 @@ export default function MCPFlightsAIAgents() {
         >
           <div className="text-center mb-6">
             <h3 className="text-xl font-medium tracking-tighter mb-2">Connected Airlines</h3>
-            <p className="text-gray-600 font-light text-sm">
-              <em className="font-serif italic">Seamlessly integrated with major airlines worldwide</em>
-            </p>
+            <p className="text-gray-600 font-light text-sm">Seamlessly integrated with major airlines worldwide</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
@@ -162,13 +155,7 @@ export default function MCPFlightsAIAgents() {
                 viewport={{ once: true }}
                 className="flex items-center justify-center p-3 bg-white rounded-xl border border-gray-200 hover:shadow-sm transition-all"
               >
-                <Image
-                  src={airline.logo || "/placeholder.svg"}
-                  alt={`${airline.name} logo`}
-                  width={80}
-                  height={30}
-                  className="h-6 w-auto opacity-70 hover:opacity-100 transition-opacity"
-                />
+                <div className="text-sm font-medium text-black">{airline.name}</div>
               </motion.div>
             ))}
           </div>
@@ -187,9 +174,7 @@ export default function MCPFlightsAIAgents() {
               Ready to transform your business travel?
             </h3>
             <p className="text-gray-600 font-light mb-6">
-              <em className="font-serif italic">
-                Join thousands of companies already using our AI-powered flight booking platform
-              </em>
+              Join thousands of companies already using our AI-powered flight booking platform
             </p>
             <button className="inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-all tracking-tight">
               <PiSparkle className="mr-2 h-4 w-4" />
