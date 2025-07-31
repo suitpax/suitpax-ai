@@ -1,0 +1,22 @@
+// components/dashboard/chat/chat-message.tsx
+import { cn } from "@/lib/utils"
+
+interface ChatMessageProps {
+  role: "user" | "assistant"
+  content: string
+}
+
+export function ChatMessage({ role, content }: ChatMessageProps) {
+  return (
+    <div
+      className={cn(
+        "p-4 rounded-xl text-sm whitespace-pre-wrap",
+        role === "user"
+          ? "bg-emerald-100 dark:bg-emerald-900/20 text-right ml-auto max-w-md"
+          : "bg-muted dark:bg-muted/40 text-left mr-auto max-w-xl"
+      )}
+    >
+      {content}
+    </div>
+  )
+}
