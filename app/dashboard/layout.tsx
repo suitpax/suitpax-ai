@@ -6,9 +6,8 @@ import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
-import Header from "@/components/dashboard/header"
-import { Toaster } from "react-hot-toast"
-import { motion } from "framer-motion"
+import { Header } from "@/components/dashboard/header"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import type { User } from "@supabase/supabase-js"
 
 export default function DashboardLayout({
@@ -18,72 +17,45 @@ export default function DashboardLayout({
 }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [userPlan, setUserPlan] = useState("free")
-  const [subscriptionStatus, setSubscriptionStatus] = useState("inactive")
-  const supabase = createClient()
   const router = useRouter()
+  const supabase = createClient()
 
   useEffect(() => {
     const getUser = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
 
-        if (!user) {
-          router.push("/auth/login")
-          return
-        }
-
-        setUser(user)
-
-        // Get user profile and subscription info
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-
-        if (profileData) {
-          setUserPlan(profileData.plan || "free")
-          setSubscriptionStatus(profileData.subscription_status || "inactive")
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error)
+      if (error || !user) {
         router.push("/auth/login")
-      } finally {
-        setLoading(false)
+        return
       }
+
+      setUser(user)
+      setLoading(false)
     }
 
     getUser()
 
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT" || !session) {
         router.push("/auth/login")
-      } else if (event === "SIGNED_IN" && session?.user) {
+      } else if (session?.user) {
         setUser(session.user)
+        setLoading(false)
       }
     })
 
     return () => subscription.unsubscribe()
-  }, [supabase, router])
-
-  const handleUserUpdate = (updatedUser: User) => {
-    setUser(updatedUser)
-  }
+  }, [supabase.auth, router])
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 border-4 border-gray-200 border-t-black rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium tracking-tight">Loading your workspace...</p>
-        </motion.div>
+        <LoadingSpinner />
       </div>
     )
   }
@@ -93,54 +65,24 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
       {/* Sidebar */}
-      <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0">
-        <Sidebar onUserUpdate={handleUserUpdate} />
+      <div className="hidden lg:flex lg:flex-shrink-0">
+        <div className="flex flex-col w-64">
+          <Sidebar />
+        </div>
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64 flex flex-col flex-1">
-        <Header user={user} userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header - Only show on non-AI chat pages */}
+        <div className="lg:hidden">
+          <Header />
+        </div>
 
-        <main className="flex-1 overflow-y-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="p-6"
-          >
-            {children}
-          </motion.div>
-        </main>
+        {/* Page content */}
+        <main className="flex-1 relative overflow-hidden">{children}</main>
       </div>
-
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: "#fff",
-            color: "#374151",
-            border: "1px solid #e5e7eb",
-            borderRadius: "12px",
-            fontSize: "14px",
-            fontWeight: "500",
-          },
-          success: {
-            iconTheme: {
-              primary: "#10b981",
-              secondary: "#fff",
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: "#ef4444",
-              secondary: "#fff",
-            },
-          },
-        }}
-      />
     </div>
   )
 }
