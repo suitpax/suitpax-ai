@@ -1,10 +1,9 @@
-"use client"
-
 import type React from "react"
-import { redirect } from "next/navigation"
-import { Sidebar } from "@/components/dashboard/sidebar"
-import { Header } from "@/components/dashboard/header"
 import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
+import Sidebar from "@/components/dashboard/sidebar"
+import Header from "@/components/dashboard/header"
+import AppErrorBoundary from "@/components/error-boundary"
 import { Toaster } from "react-hot-toast"
 
 export default async function DashboardLayout({
@@ -22,49 +21,49 @@ export default async function DashboardLayout({
     redirect("/auth/login")
   }
 
+  // Get user profile to check subscription plan
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("subscription_plan, subscription_status")
+    .eq("id", user.id)
+    .single()
+
+  const userPlan = profile?.subscription_plan || "free"
+  const subscriptionStatus = profile?.subscription_status || "inactive"
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="flex h-screen">
-        {/* Sidebar */}
-        <Sidebar />
-
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
-          <Header />
-
-          {/* Page Content */}
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto">{children}</div>
-          </main>
+      <AppErrorBoundary>
+        <div className="flex h-screen">
+          <Sidebar user={user} userPlan={userPlan} />
+          <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
+            <Header user={user} userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
+            <main className="flex-1 overflow-y-auto p-0 lg:p-6">{children}</main>
+          </div>
         </div>
-      </div>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: "#fff",
-            color: "#374151",
-            border: "1px solid #e5e7eb",
-            borderRadius: "12px",
-            fontSize: "14px",
-            fontWeight: "500",
-          },
-          success: {
-            iconTheme: {
-              primary: "#10b981",
-              secondary: "#fff",
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "#363636",
+              color: "#fff",
+              fontSize: "14px",
+              borderRadius: "8px",
             },
-          },
-          error: {
-            iconTheme: {
-              primary: "#ef4444",
-              secondary: "#fff",
+            success: {
+              style: {
+                background: "#10b981",
+              },
             },
-          },
-        }}
-      />
+            error: {
+              style: {
+                background: "#ef4444",
+              },
+            },
+          }}
+        />
+      </AppErrorBoundary>
     </div>
   )
 }

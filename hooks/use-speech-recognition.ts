@@ -26,6 +26,13 @@ interface SpeechRecognitionHook {
   resetTranscript: () => void
 }
 
+// Extend Window interface for SpeechRecognition
+declare global {
+  interface Window {
+    SpeechRecognition: any
+    webkitSpeechRecognition: any
+  }
+}
 
 export function useSpeechToText(options: SpeechRecognitionOptions = {}): SpeechRecognitionHook {
   const {
