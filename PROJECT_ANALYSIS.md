@@ -152,5 +152,5 @@ La arquitectura actual es escalable y permite agregar nuevas funcionalidades fá
 
 Ahora eliminemos los archivos innecesarios identificados:
 
-```typescriptreact file="app/api/elevenlabs/speech-to-text/route.ts" isDeleted="true"
+\`\`\`typescriptreact file="app/api/elevenlabs/speech-to-text/route.ts" isDeleted="true"
 ...deleted...

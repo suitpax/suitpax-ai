@@ -1,186 +1,161 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { PiSparkle, PiAirplane, PiCalendar, PiCreditCard, PiUsers, PiChartBar, PiGlobe } from "react-icons/pi"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Plane, Bot, Zap, Globe, Clock, Shield, ArrowRight, Sparkles } from "lucide-react"
 
-const airlines = [
-  { name: "Delta", logo: "/logos/delta-logo.png" },
-  { name: "American", logo: "/logos/american-logo.png" },
-  { name: "United", logo: "/logos/united-logo.png" },
-  { name: "Southwest", logo: "/logos/southwest-logo.png" },
-  { name: "JetBlue", logo: "/logos/jetblue-logo.png" },
-  { name: "Alaska", logo: "/logos/alaska-logo.png" },
-  { name: "British Airways", logo: "/logos/british-airways-logo.png" },
-  { name: "Lufthansa", logo: "/logos/lufthansa-logo.png" },
-]
+export function MCPFlightsAIAgents() {
+  const agents = [
+    {
+      name: "Flight Search Agent",
+      description: "Intelligent flight discovery across all airlines",
+      icon: "🔍",
+      capabilities: ["Real-time pricing", "Route optimization", "Fare predictions"],
+    },
+    {
+      name: "Booking Agent",
+      description: "Seamless reservation management",
+      icon: "✈️",
+      capabilities: ["Instant booking", "Seat selection", "Special requests"],
+    },
+    {
+      name: "Policy Agent",
+      description: "Corporate compliance automation",
+      icon: "📋",
+      capabilities: ["Policy checking", "Approval routing", "Exception handling"],
+    },
+    {
+      name: "Support Agent",
+      description: "24/7 travel assistance",
+      icon: "🎧",
+      capabilities: ["Flight changes", "Cancellations", "Emergency support"],
+    },
+  ]
 
-const features = [
-  {
-    icon: PiAirplane,
-    title: "Real-time Flight Search",
-    description: "AI-powered search across 500+ airlines with instant price comparisons and availability updates.",
-  },
-  {
-    icon: PiCalendar,
-    title: "Smart Scheduling",
-    description: "Intelligent calendar integration that suggests optimal travel times based on your business needs.",
-  },
-  {
-    icon: PiCreditCard,
-    title: "Automated Expense Tracking",
-    description: "Seamless integration with expense management systems for real-time cost tracking and reporting.",
-  },
-  {
-    icon: PiUsers,
-    title: "Team Coordination",
-    description: "Coordinate group travel with shared itineraries, budget controls, and approval workflows.",
-  },
-  {
-    icon: PiChartBar,
-    title: "Analytics & Insights",
-    description: "Comprehensive travel analytics with cost optimization recommendations and usage patterns.",
-  },
-  {
-    icon: PiGlobe,
-    title: "Global Coverage",
-    description: "Worldwide flight coverage with local currency support and international travel compliance.",
-  },
-]
+  const features = [
+    {
+      icon: Zap,
+      title: "Lightning Fast",
+      description: "Search and book flights in seconds, not minutes",
+    },
+    {
+      icon: Globe,
+      title: "Global Coverage",
+      description: "Access to airlines and routes worldwide",
+    },
+    {
+      icon: Clock,
+      title: "24/7 Available",
+      description: "AI agents work around the clock for you",
+    },
+    {
+      icon: Shield,
+      title: "Enterprise Security",
+      description: "Bank-level security for all transactions",
+    },
+  ]
 
-const stats = [
-  { label: "Airlines Connected", value: "500+" },
-  { label: "Cities Covered", value: "10,000+" },
-  { label: "AI Agents Ready", value: "24/7" },
-  { label: "Cost Optimization", value: "35%" },
-]
-
-export default function MCPFlightsAIAgents() {
   return (
-    <section className="pt-12 pb-6 mb-12">
+    <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-emerald-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-              <PiSparkle className="mr-1.5 h-3 w-3" />
-              <em className="font-serif italic">MCP-powered Flight Intelligence</em>
-            </span>
-          </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-4">
-            AI Flight Agents
-          </h2>
-          <p className="text-gray-600 font-light max-w-xl mx-auto text-sm">
-            Revolutionary AI agents that understand your travel patterns and business requirements to deliver
-            personalized flight recommendations.
+          <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-200">
+            <Bot className="h-3 w-3 mr-1" />
+            MCP Flight Agents
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">AI-Powered Flight Management</h2>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Revolutionary AI agents that handle every aspect of business flight booking and management
           </p>
         </motion.div>
 
-        {/* Stats Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12"
-        >
-          {stats.map((stat, index) => (
+        {/* AI Agents Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {agents.map((agent, index) => (
             <motion.div
-              key={stat.label}
+              key={agent.name}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 + index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm text-center"
+              transition={{ delay: index * 0.1 }}
             >
-              <div className="text-2xl md:text-3xl font-medium tracking-tighter leading-none mb-2">{stat.value}</div>
-              <div className="text-xs font-medium text-gray-600">{stat.label}</div>
+              <Card className="h-full hover:shadow-lg transition-shadow duration-300 border-0 bg-white/70 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <div className="text-4xl mb-4">{agent.icon}</div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{agent.name}</h3>
+                  <p className="text-gray-600 text-sm mb-4">{agent.description}</p>
+                  <div className="space-y-2">
+                    {agent.capabilities.map((capability, idx) => (
+                      <div key={idx} className="flex items-center text-xs text-gray-500">
+                        <Sparkles className="h-3 w-3 mr-2 text-emerald-500" />
+                        {capability}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Features Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
+              transition={{ delay: index * 0.1 }}
+              className="text-center"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-gray-200 rounded-xl">
-                  <feature.icon className="h-5 w-5 text-gray-700" />
-                </div>
-                <h3 className="font-medium tracking-tighter">{feature.title}</h3>
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-lg mb-4">
+                <feature.icon className="h-6 w-6 text-emerald-600" />
               </div>
-              <p className="text-gray-600 font-light text-sm">{feature.description}</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+              <p className="text-sm text-gray-600">{feature.description}</p>
             </motion.div>
           ))}
-        </motion.div>
-
-        {/* Airlines Slider */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
-        >
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-medium tracking-tighter mb-2">Connected Airlines</h3>
-            <p className="text-gray-600 font-light text-sm">Seamlessly integrated with major airlines worldwide</p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-            {airlines.map((airline, index) => (
-              <motion.div
-                key={airline.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.3 + index * 0.05 }}
-                viewport={{ once: true }}
-                className="flex items-center justify-center p-3 bg-white rounded-xl border border-gray-200 hover:shadow-sm transition-all"
-              >
-                <div className="text-sm font-medium text-black">{airline.name}</div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        </div>
 
         {/* CTA Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
-          className="text-center mt-12"
+          className="text-center"
         >
-          <div className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm max-w-2xl mx-auto">
-            <h3 className="text-2xl md:text-3xl font-medium tracking-tighter leading-none mb-4">
-              Ready to transform your business travel?
-            </h3>
-            <p className="text-gray-600 font-light mb-6 text-sm">
-              Experience the future of AI-powered flight booking and management
-            </p>
-            <button className="inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-all tracking-tight">
-              <PiSparkle className="mr-2 h-4 w-4" />
-              Start Free Trial
-            </button>
-          </div>
+          <Card className="bg-gradient-to-r from-emerald-500 to-blue-600 border-0 text-white">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-bold mb-4">Ready to Transform Your Business Travel?</h3>
+              <p className="text-emerald-100 mb-6 max-w-2xl mx-auto">
+                Join the future of business travel with AI agents that work 24/7 to optimize your flights, ensure policy
+                compliance, and provide exceptional support.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white text-white hover:bg-white/10 bg-transparent"
+                >
+                  <Plane className="mr-2 h-4 w-4" />
+                  See Demo
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
     </section>

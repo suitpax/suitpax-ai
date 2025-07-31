@@ -1,136 +1,121 @@
-export interface PlanLimits {
-  aiRequestsPerMonth: number
-  flightSearchesPerMonth: number
+export interface SubscriptionLimits {
+  messagesPerMonth: number
+  voiceMinutesPerMonth: number
   expenseReportsPerMonth: number
   teamMembers: number
-  analyticsRetention: number // days
-  prioritySupport: boolean
-  customIntegrations: boolean
-  advancedAnalytics: boolean
+  apiCallsPerDay: number
+  features: string[]
 }
 
-export const PLAN_LIMITS: Record<string, PlanLimits> = {
+export const SUBSCRIPTION_LIMITS: Record<string, SubscriptionLimits> = {
   free: {
-    aiRequestsPerMonth: 50,
-    flightSearchesPerMonth: 10,
+    messagesPerMonth: 50,
+    voiceMinutesPerMonth: 10,
     expenseReportsPerMonth: 5,
-    teamMembers: 3,
-    analyticsRetention: 30,
-    prioritySupport: false,
-    customIntegrations: false,
-    advancedAnalytics: false,
+    teamMembers: 1,
+    apiCallsPerDay: 100,
+    features: ["basic_chat", "flight_search", "basic_expense_tracking"],
   },
-  premium: {
-    aiRequestsPerMonth: 500,
-    flightSearchesPerMonth: 100,
-    expenseReportsPerMonth: 50,
+  starter: {
+    messagesPerMonth: 500,
+    voiceMinutesPerMonth: 60,
+    expenseReportsPerMonth: 25,
+    teamMembers: 5,
+    apiCallsPerDay: 1000,
+    features: [
+      "advanced_chat",
+      "flight_booking",
+      "hotel_search",
+      "expense_management",
+      "basic_analytics",
+      "email_support",
+    ],
+  },
+  professional: {
+    messagesPerMonth: 2000,
+    voiceMinutesPerMonth: 300,
+    expenseReportsPerMonth: 100,
     teamMembers: 25,
-    analyticsRetention: 365,
-    prioritySupport: true,
-    customIntegrations: false,
-    advancedAnalytics: true,
+    apiCallsPerDay: 5000,
+    features: [
+      "full_chat_access",
+      "advanced_booking",
+      "policy_compliance",
+      "advanced_analytics",
+      "team_management",
+      "priority_support",
+      "api_access",
+    ],
   },
   enterprise: {
-    aiRequestsPerMonth: -1, // unlimited
-    flightSearchesPerMonth: -1, // unlimited
+    messagesPerMonth: -1, // unlimited
+    voiceMinutesPerMonth: -1, // unlimited
     expenseReportsPerMonth: -1, // unlimited
     teamMembers: -1, // unlimited
-    analyticsRetention: -1, // unlimited
-    prioritySupport: true,
-    customIntegrations: true,
-    advancedAnalytics: true,
+    apiCallsPerDay: -1, // unlimited
+    features: [
+      "unlimited_access",
+      "custom_integrations",
+      "dedicated_support",
+      "custom_policies",
+      "advanced_security",
+      "sso_integration",
+      "custom_branding",
+    ],
   },
 }
 
-export async function checkUsageLimits(
-  userId: string,
-  plan: string,
-  action: string,
-): Promise<{
-  allowed: boolean
-  remaining?: number
-  limit?: number
-  message?: string
-}> {
-  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free
+export interface UsageStats {
+  messagesUsed: number
+  voiceMinutesUsed: number
+  expenseReportsUsed: number
+  apiCallsToday: number
+  resetDate: Date
+}
 
-  // This would typically check against a database
-  // For now, we'll return a mock response
+export class SubscriptionManager {
+  static checkLimit(
+    subscription: string,
+    limitType: keyof SubscriptionLimits,
+    currentUsage: number,
+  ): { allowed: boolean; remaining: number; limit: number } {
+    const limits = SUBSCRIPTION_LIMITS[subscription]
+    if (!limits) {
+      throw new Error(`Invalid subscription type: ${subscription}`)
+    }
 
-  switch (action) {
-    case "ai_request":
-      if (limits.aiRequestsPerMonth === -1) {
-        return { allowed: true, message: "Unlimited requests available" }
-      }
-      // Mock current usage - in real implementation, query database
-      const currentAiUsage = 25 // This would come from database
-      const remaining = limits.aiRequestsPerMonth - currentAiUsage
+    const limit = limits[limitType] as number
 
-      return {
-        allowed: remaining > 0,
-        remaining: Math.max(0, remaining),
-        limit: limits.aiRequestsPerMonth,
-        message:
-          remaining > 0
-            ? `${remaining} AI requests remaining this month`
-            : "Monthly AI request limit reached. Upgrade to continue.",
-      }
+    // -1 means unlimited
+    if (limit === -1) {
+      return { allowed: true, remaining: -1, limit: -1 }
+    }
 
-    case "flight_search":
-      if (limits.flightSearchesPerMonth === -1) {
-        return { allowed: true, message: "Unlimited searches available" }
-      }
-      const currentFlightUsage = 5
-      const flightRemaining = limits.flightSearchesPerMonth - currentFlightUsage
+    const remaining = Math.max(0, limit - currentUsage)
+    const allowed = currentUsage < limit
 
-      return {
-        allowed: flightRemaining > 0,
-        remaining: Math.max(0, flightRemaining),
-        limit: limits.flightSearchesPerMonth,
-        message:
-          flightRemaining > 0
-            ? `${flightRemaining} flight searches remaining this month`
-            : "Monthly flight search limit reached. Upgrade to continue.",
-      }
+    return { allowed, remaining, limit }
+  }
 
-    default:
-      return { allowed: true }
+  static hasFeature(subscription: string, feature: string): boolean {
+    const limits = SUBSCRIPTION_LIMITS[subscription]
+    return limits?.features.includes(feature) || false
+  }
+
+  static getUpgradeMessage(subscription: string, limitType: string): string {
+    const messages = {
+      free: "Upgrade to Starter plan to get more messages and advanced features.",
+      starter: "Upgrade to Professional plan for unlimited access and team features.",
+      professional: "Contact us for Enterprise features and custom solutions.",
+    }
+
+    return messages[subscription as keyof typeof messages] || "Contact support for upgrade options."
+  }
+
+  static calculateUsagePercentage(used: number, limit: number): number {
+    if (limit === -1) return 0 // unlimited
+    return Math.min(100, (used / limit) * 100)
   }
 }
 
-export function getPlanFeatures(plan: string): string[] {
-  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free
-  const features: string[] = []
-
-  if (limits.aiRequestsPerMonth === -1) {
-    features.push("Unlimited AI requests")
-  } else {
-    features.push(`${limits.aiRequestsPerMonth} AI requests per month`)
-  }
-
-  if (limits.flightSearchesPerMonth === -1) {
-    features.push("Unlimited flight searches")
-  } else {
-    features.push(`${limits.flightSearchesPerMonth} flight searches per month`)
-  }
-
-  if (limits.teamMembers === -1) {
-    features.push("Unlimited team members")
-  } else {
-    features.push(`Up to ${limits.teamMembers} team members`)
-  }
-
-  if (limits.prioritySupport) {
-    features.push("Priority support")
-  }
-
-  if (limits.advancedAnalytics) {
-    features.push("Advanced analytics")
-  }
-
-  if (limits.customIntegrations) {
-    features.push("Custom integrations")
-  }
-
-  return features
-}
+export default SubscriptionManager
