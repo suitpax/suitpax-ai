@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk"
+import { getAgentPrompt } from "./ai/system-prompts"
 
 const apiKey = process.env.ANTHROPIC_API_KEY
 
@@ -72,39 +73,11 @@ export async function generateAgentResponse(
     throw new Error(`Agent ${agentId} not found`)
   }
 
-  const systemPrompt = `You are ${agent.name}, a ${agent.role} at Suitpax.
-
-PERSONALITY: ${agent.personality}
-
-SPECIALIZATIONS: ${agent.specializations.join(", ")}
-
-COMMUNICATION STYLE: ${agent.communicationStyle}
-
-CONTEXT:
-${
-  userContext
-    ? `
-- User: ${userContext.name || "User"}
-- Company: ${userContext.company || "Company"}  
-- Plan: ${userContext.plan || "Free"}
-`
-    : ""
-}
-
-GUIDELINES:
-1. Keep responses conversational and natural for voice interaction
-2. Responses should be 2-4 sentences maximum for voice calls
-3. Be helpful, actionable, and stay in character
-4. Focus on business travel assistance
-5. If asked about actual bookings, explain this is a demo but describe what you would normally do
-6. Use your specializations to provide expert advice
-7. Maintain your unique communication style
-
-Always respond as ${agent.name} and provide practical travel assistance.`
+  const systemPrompt = getAgentPrompt(agentId, userContext ? JSON.stringify(userContext) : undefined)
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-5-sonnet-20241022", // Using the latest Claude model
       max_tokens: 200,
       temperature: 0.7,
       system: systemPrompt,
