@@ -8,7 +8,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
+import { EyeIcon, EyeSlashIcon, UserIcon, LockClosedIcon } from "@heroicons/react/24/outline"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -37,6 +37,7 @@ export default function LoginPage() {
 
       if (data.user) {
         router.push("/dashboard")
+        router.refresh()
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.")
@@ -83,9 +84,7 @@ export default function LoginPage() {
               className="h-12 w-auto mx-auto"
             />
           </Link>
-          <h2 className="mt-6 text-3xl font-medium tracking-tighter text-black">
-            <em className="font-serif italic">Welcome back</em>
-          </h2>
+          <h2 className="mt-6 text-3xl font-medium tracking-tighter text-black leading-none">Welcome back</h2>
           <p className="mt-2 text-sm text-gray-600 font-light">
             Sign in to your Suitpax account to continue your business travel journey
           </p>
@@ -101,33 +100,41 @@ export default function LoginPage() {
         >
           <form className="space-y-6" onSubmit={handleLogin}>
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-50 border border-red-200 rounded-xl p-3"
+              >
                 <p className="text-sm text-red-600 font-medium">{error}</p>
-              </div>
+              </motion.div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
-                <em className="font-serif italic">Email address</em>
+              <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-2">
+                Email address
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none block w-full px-3 py-3 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light bg-white/80 backdrop-blur-sm"
-                placeholder="Enter your email"
-              />
+              <div className="relative">
+                <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200 bg-white/80 font-light"
+                  placeholder="Enter your email"
+                />
+              </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-black mb-2">
-                <em className="font-serif italic">Password</em>
+              <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-2">
+                Password
               </label>
               <div className="relative">
+                <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   id="password"
                   name="password"
@@ -136,7 +143,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-3 pr-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light bg-white/80 backdrop-blur-sm"
+                  className="w-full pl-10 pr-12 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200 bg-white/80 font-light"
                   placeholder="Enter your password"
                 />
                 <button
@@ -145,9 +152,9 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                    <EyeSlashIcon className="h-4 w-4 text-gray-400" />
                   ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-400" />
+                    <EyeIcon className="h-4 w-4 text-gray-400" />
                   )}
                 </button>
               </div>
@@ -159,19 +166,19 @@ export default function LoginPage() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
+                  className="h-4 w-4 text-gray-200 focus:ring-gray-200 border-gray-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-600 font-light">
-                  <em className="font-serif italic">Remember me</em>
+                <label htmlFor="remember-me" className="ml-2 block text-xs font-medium text-gray-700">
+                  Remember me
                 </label>
               </div>
 
-              <div className="text-sm">
+              <div className="text-xs">
                 <Link
                   href="/auth/forgot-password"
-                  className="font-medium text-black hover:text-gray-700 transition-colors"
+                  className="font-medium text-gray-700 hover:text-black transition-colors"
                 >
-                  <em className="font-serif italic">Forgot your password?</em>
+                  Forgot password?
                 </Link>
               </div>
             </div>
@@ -180,15 +187,15 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 {isLoading ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    <em className="font-serif italic">Signing in...</em>
+                    Signing in...
                   </div>
                 ) : (
-                  <em className="font-serif italic">Sign in</em>
+                  "Sign in"
                 )}
               </button>
             </div>
@@ -198,10 +205,8 @@ export default function LoginPage() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-200" />
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500 font-light">
-                    <em className="font-serif italic">Or continue with</em>
-                  </span>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-white text-gray-500 font-medium">Or continue with</span>
                 </div>
               </div>
 
@@ -210,9 +215,9 @@ export default function LoginPage() {
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={isLoading}
-                  className="w-full inline-flex justify-center py-3 px-4 border border-gray-200 rounded-xl bg-white/80 backdrop-blur-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full inline-flex justify-center py-3 px-4 border border-gray-200 rounded-xl bg-white/80 backdrop-blur-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                     <path
                       fill="currentColor"
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -230,7 +235,7 @@ export default function LoginPage() {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                     />
                   </svg>
-                  <em className="font-serif italic">Sign in with Google</em>
+                  Sign in with Google
                 </button>
               </div>
             </div>
@@ -238,10 +243,10 @@ export default function LoginPage() {
 
           <div className="mt-6">
             <div className="text-center">
-              <span className="text-sm text-gray-600 font-light">
-                <em className="font-serif italic">Don't have an account?</em>{" "}
-                <Link href="/auth/signup" className="font-medium text-black hover:text-gray-700 transition-colors">
-                  <em className="font-serif italic">Sign up</em>
+              <span className="text-xs font-medium text-gray-700">
+                Don't have an account?{" "}
+                <Link href="/auth/signup" className="text-black hover:text-gray-800 transition-colors">
+                  Sign up
                 </Link>
               </span>
             </div>

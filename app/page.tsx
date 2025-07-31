@@ -8,7 +8,6 @@ import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
 import AgenticDisruption from "@/components/marketing/agentic-disruption"
 import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
 import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
-import SuitpaxHubMap from "@/components/marketing/suitpax-hub-map"
 import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
 import ContactForm from "@/components/marketing/contact-form"
 import type { Metadata } from "next"
@@ -75,7 +74,6 @@ export default function Home() {
         <BusinessTravelRevolution />
         <AIVoiceCallingHub />
         <MCPFlightsAIAgents />
-        <SuitpaxHubMap />
         <CloudAIShowcase />
         <AgenticDisruption />
         <AIVoiceAssistant />

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
-import { CheckCircle, ArrowRight, Plane, Users, Settings, Building2, User } from "lucide-react"
+import { CheckCircle, ArrowRight, Plane, Settings, Building2, User } from "lucide-react"
 import { motion } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "react-hot-toast"
@@ -19,7 +19,6 @@ interface OnboardingStep {
   icon: React.ReactNode
   completed: boolean
   action?: string
-  href?: string
 }
 
 interface OnboardingProps {
@@ -32,10 +31,11 @@ export function Onboarding({ onComplete, user, isNewUser = false }: OnboardingPr
   const [currentStep, setCurrentStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [profileData, setProfileData] = useState({
-    full_name: user?.full_name || "",
-    company: user?.company_name || "",
-    job_title: "",
-    phone: "",
+    first_name: user?.first_name || "",
+    last_name: user?.last_name || "",
+    company: user?.company || "",
+    job_title: user?.job_title || "",
+    phone: user?.phone || "",
   })
 
   const supabase = createClient()
@@ -47,7 +47,7 @@ export function Onboarding({ onComplete, user, isNewUser = false }: OnboardingPr
       description: "Add your personal and company details",
       icon: <User className="h-5 w-5" />,
       completed: false,
-      action: "Complete Profile",
+      action: "Save Profile",
     },
     {
       id: "preferences",
@@ -55,23 +55,15 @@ export function Onboarding({ onComplete, user, isNewUser = false }: OnboardingPr
       description: "Configure your default travel settings",
       icon: <Settings className="h-5 w-5" />,
       completed: false,
-      action: "Set Preferences",
+      action: "Save Preferences",
     },
     {
-      id: "team",
-      title: "Invite your team (Optional)",
-      description: "Add team members to manage travel together",
-      icon: <Users className="h-5 w-5" />,
-      completed: false,
-      action: "Skip for now",
-    },
-    {
-      id: "first-trip",
-      title: "Explore AI features",
-      description: "Try our AI-powered travel assistant",
+      id: "complete",
+      title: "You're all set!",
+      description: "Start using Suitpax for your business travel",
       icon: <Plane className="h-5 w-5" />,
       completed: false,
-      action: "Try AI Assistant",
+      action: "Get Started",
     },
   ])
 
@@ -83,36 +75,26 @@ export function Onboarding({ onComplete, user, isNewUser = false }: OnboardingPr
   }
 
   const handleProfileSubmit = async () => {
-    if (!profileData.full_name.trim()) {
-      toast.error("Please enter your full name")
+    if (!profileData.first_name.trim()) {
+      toast.error("Please enter your first name")
       return
     }
 
     setLoading(true)
     try {
-      // Update user table
-      const { error: userError } = await supabase
+      const { error } = await supabase
         .from("users")
         .update({
-          full_name: profileData.full_name,
-          company_name: profileData.company,
+          first_name: profileData.first_name,
+          last_name: profileData.last_name,
+          company: profileData.company,
+          job_title: profileData.job_title,
+          phone: profileData.phone,
           updated_at: new Date().toISOString(),
         })
         .eq("id", user.id)
 
-      if (userError) throw userError
-
-      // Create or update user profile
-      const { error: profileError } = await supabase.from("user_profiles").upsert({
-        user_id: user.id,
-        full_name: profileData.full_name,
-        company: profileData.company,
-        job_title: profileData.job_title,
-        phone: profileData.phone,
-        updated_at: new Date().toISOString(),
-      })
-
-      if (profileError) throw profileError
+      if (error) throw error
 
       markStepCompleted("profile")
       setCurrentStep(1)
@@ -128,24 +110,19 @@ export function Onboarding({ onComplete, user, isNewUser = false }: OnboardingPr
   const handlePreferencesSubmit = async () => {
     setLoading(true)
     try {
-      const defaultPreferences = {
-        seat_preference: "aisle",
-        meal_preference: "standard",
-        hotel_preference: "business",
-        notification_preferences: {
-          email: true,
-          sms: false,
-          push: true,
-        },
-      }
-
       const { error } = await supabase
-        .from("user_profiles")
+        .from("users")
         .update({
-          travel_preferences: defaultPreferences,
+          seat_preference: "aisle",
+          meal_preference: "standard",
+          notification_settings: {
+            email: true,
+            sms: false,
+            push: true,
+          },
           updated_at: new Date().toISOString(),
         })
-        .eq("user_id", user.id)
+        .eq("id", user.id)
 
       if (error) throw error
 
@@ -160,6 +137,32 @@ export function Onboarding({ onComplete, user, isNewUser = false }: OnboardingPr
     }
   }
 
+  const handleComplete = async () => {
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({
+          onboarding_completed: true,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", user.id)
+
+      if (error) throw error
+
+      markStepCompleted("complete")
+      toast.success("Welcome to Suitpax!")
+      setTimeout(() => {
+        onComplete?.()
+      }, 1000)
+    } catch (error) {
+      console.error("Error completing onboarding:", error)
+      toast.error("Error completing setup")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleStepAction = async (step: OnboardingStep) => {
     switch (step.id) {
       case "profile":
@@ -168,18 +171,8 @@ export function Onboarding({ onComplete, user, isNewUser = false }: OnboardingPr
       case "preferences":
         await handlePreferencesSubmit()
         break
-      case "team":
-        // Skip team invitation for now
-        markStepCompleted("team")
-        setCurrentStep(3)
-        toast.success("You can invite team members later from the Team section")
-        break
-      case "first-trip":
-        // Mark as completed and finish onboarding
-        markStepCompleted("first-trip")
-        setTimeout(() => {
-          onComplete?.()
-        }, 1000)
+      case "complete":
+        await handleComplete()
         break
     }
   }
@@ -214,13 +207,22 @@ export function Onboarding({ onComplete, user, isNewUser = false }: OnboardingPr
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="full_name">Full Name *</Label>
+                <Label htmlFor="first_name">First Name *</Label>
                 <Input
-                  id="full_name"
-                  value={profileData.full_name}
-                  onChange={(e) => setProfileData((prev) => ({ ...prev, full_name: e.target.value }))}
-                  placeholder="Enter your full name"
+                  id="first_name"
+                  value={profileData.first_name}
+                  onChange={(e) => setProfileData((prev) => ({ ...prev, first_name: e.target.value }))}
+                  placeholder="Enter your first name"
                   required
+                />
+              </div>
+              <div>
+                <Label htmlFor="last_name">Last Name</Label>
+                <Input
+                  id="last_name"
+                  value={profileData.last_name}
+                  onChange={(e) => setProfileData((prev) => ({ ...prev, last_name: e.target.value }))}
+                  placeholder="Enter your last name"
                 />
               </div>
               <div>
@@ -241,7 +243,7 @@ export function Onboarding({ onComplete, user, isNewUser = false }: OnboardingPr
                   placeholder="Your job title"
                 />
               </div>
-              <div>
+              <div className="md:col-span-2">
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
                   id="phone"
@@ -283,6 +285,17 @@ export function Onboarding({ onComplete, user, isNewUser = false }: OnboardingPr
                 <p className="text-xs text-gray-600">Email & Push enabled</p>
               </div>
             </div>
+          </div>
+        )
+
+      case "complete":
+        return (
+          <div className="text-center py-4">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+            <h3 className="text-lg font-medium tracking-tighter mb-2">Ready to go!</h3>
+            <p className="text-gray-600 text-sm">Your Suitpax account is now fully configured.</p>
           </div>
         )
 

@@ -116,7 +116,7 @@ export default function ContactForm() {
           <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-6">
             <em className="font-serif italic">Contact Us</em>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-none mb-6">
             <em className="font-serif italic">Let's Transform Your</em>
             <br />
             <span className="text-gray-700">Business Travel</span>

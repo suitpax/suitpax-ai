@@ -116,7 +116,7 @@ export const Navigation = () => {
                 asChild
                 className="hidden lg:flex h-7 text-xs font-medium tracking-tighter rounded-full bg-gray-100 text-black hover:bg-gray-200 px-3 py-1 shadow-sm min-w-[70px] items-center gap-1"
               >
-                <Link href="https://app.suitpax.com/auth/login">Login</Link>
+                <Link href="/auth/login">Login</Link>
               </Button>
 
               {/* Sign Up Button */}
@@ -124,7 +124,7 @@ export const Navigation = () => {
                 asChild
                 className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
               >
-                <Link href="https://app.suitpax.com/auth/signup">
+                <Link href="/auth/signup">
                   Sign Up
                   <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
                 </Link>
@@ -217,7 +217,7 @@ export const Navigation = () => {
                   <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Account</h4>
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
-                      href="https://app.suitpax.com/auth/login"
+                      href="/auth/login"
                       className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -226,7 +226,7 @@ export const Navigation = () => {
                   </div>
                   <div className="py-2 border-b border-gray-200/30">
                     <Link
-                      href="https://app.suitpax.com/auth/signup"
+                      href="/auth/signup"
                       className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >

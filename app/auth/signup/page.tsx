@@ -8,7 +8,14 @@ import Link from "next/link"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  UserIcon,
+  EnvelopeIcon,
+  BuildingOfficeIcon,
+  LockClosedIcon,
+} from "@heroicons/react/24/outline"
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -109,14 +116,12 @@ export default function SignupPage() {
             transition={{ duration: 0.6 }}
             className="bg-white/50 backdrop-blur-sm py-8 px-4 shadow-sm border border-gray-200 sm:rounded-2xl sm:px-10 text-center"
           >
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-gray-200 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-medium tracking-tighter text-black mb-4">
-              <em className="font-serif italic">Check your email</em>
-            </h2>
+            <h2 className="text-2xl font-medium tracking-tighter text-black mb-4 leading-none">Check your email</h2>
             <p className="text-sm text-gray-600 font-light mb-6">
               We've sent you a confirmation link at <strong>{formData.email}</strong>. Please check your email and click
               the link to activate your account.
@@ -125,7 +130,7 @@ export default function SignupPage() {
               href="/auth/login"
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-white bg-black hover:bg-gray-800 transition-colors"
             >
-              <em className="font-serif italic">Back to Sign In</em>
+              Back to Sign In
             </Link>
           </motion.div>
         </div>
@@ -151,9 +156,7 @@ export default function SignupPage() {
               className="h-12 w-auto mx-auto"
             />
           </Link>
-          <h2 className="mt-6 text-3xl font-medium tracking-tighter text-black">
-            <em className="font-serif italic">Create your account</em>
-          </h2>
+          <h2 className="mt-6 text-3xl font-medium tracking-tighter text-black leading-none">Create your account</h2>
           <p className="mt-2 text-sm text-gray-600 font-light">
             Join thousands of business travelers who trust Suitpax for their travel needs
           </p>
@@ -169,81 +172,98 @@ export default function SignupPage() {
         >
           <form className="space-y-6" onSubmit={handleSignup}>
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-50 border border-red-200 rounded-xl p-3"
+              >
                 <p className="text-sm text-red-600 font-medium">{error}</p>
-              </div>
+              </motion.div>
             )}
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-black mb-2">
-                  <em className="font-serif italic">First name</em>
+                <label htmlFor="firstName" className="block text-xs font-medium text-gray-700 mb-2">
+                  First name
                 </label>
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  required
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-3 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light bg-white/80 backdrop-blur-sm"
-                  placeholder="John"
-                />
+                <div className="relative">
+                  <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    required
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200 bg-white/80 font-light"
+                    placeholder="John"
+                  />
+                </div>
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-black mb-2">
-                  <em className="font-serif italic">Last name</em>
+                <label htmlFor="lastName" className="block text-xs font-medium text-gray-700 mb-2">
+                  Last name
                 </label>
+                <div className="relative">
+                  <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    required
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200 bg-white/80 font-light"
+                    placeholder="Doe"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-2">
+                Email address
+              </label>
+              <div className="relative">
+                <EnvelopeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
                   required
-                  value={formData.lastName}
+                  value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-3 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light bg-white/80 backdrop-blur-sm"
-                  placeholder="Doe"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200 bg-white/80 font-light"
+                  placeholder="john@company.com"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
-                <em className="font-serif italic">Email address</em>
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="appearance-none block w-full px-3 py-3 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light bg-white/80 backdrop-blur-sm"
-                placeholder="john@company.com"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="company" className="block text-sm font-medium text-black mb-2">
-                <em className="font-serif italic">Company</em>
-              </label>
-              <input
-                id="company"
-                name="company"
-                type="text"
-                value={formData.company}
-                onChange={handleChange}
-                className="appearance-none block w-full px-3 py-3 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light bg-white/80 backdrop-blur-sm"
-                placeholder="Your Company"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-black mb-2">
-                <em className="font-serif italic">Password</em>
+              <label htmlFor="company" className="block text-xs font-medium text-gray-700 mb-2">
+                Company
               </label>
               <div className="relative">
+                <BuildingOfficeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  id="company"
+                  name="company"
+                  type="text"
+                  value={formData.company}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200 bg-white/80 font-light"
+                  placeholder="Your Company"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   id="password"
                   name="password"
@@ -252,7 +272,7 @@ export default function SignupPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-3 pr-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light bg-white/80 backdrop-blur-sm"
+                  className="w-full pl-10 pr-12 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200 bg-white/80 font-light"
                   placeholder="Create a password"
                 />
                 <button
@@ -261,19 +281,20 @@ export default function SignupPage() {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                    <EyeSlashIcon className="h-4 w-4 text-gray-400" />
                   ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-400" />
+                    <EyeIcon className="h-4 w-4 text-gray-400" />
                   )}
                 </button>
               </div>
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-black mb-2">
-                <em className="font-serif italic">Confirm password</em>
+              <label htmlFor="confirmPassword" className="block text-xs font-medium text-gray-700 mb-2">
+                Confirm password
               </label>
               <div className="relative">
+                <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -282,7 +303,7 @@ export default function SignupPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-3 pr-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light bg-white/80 backdrop-blur-sm"
+                  className="w-full pl-10 pr-12 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200 bg-white/80 font-light"
                   placeholder="Confirm your password"
                 />
                 <button
@@ -291,9 +312,9 @@ export default function SignupPage() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                    <EyeSlashIcon className="h-4 w-4 text-gray-400" />
                   ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-400" />
+                    <EyeIcon className="h-4 w-4 text-gray-400" />
                   )}
                 </button>
               </div>
@@ -303,15 +324,15 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 {isLoading ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    <em className="font-serif italic">Creating account...</em>
+                    Creating account...
                   </div>
                 ) : (
-                  <em className="font-serif italic">Create account</em>
+                  "Create account"
                 )}
               </button>
             </div>
@@ -321,10 +342,8 @@ export default function SignupPage() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-200" />
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500 font-light">
-                    <em className="font-serif italic">Or continue with</em>
-                  </span>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-white text-gray-500 font-medium">Or continue with</span>
                 </div>
               </div>
 
@@ -333,9 +352,9 @@ export default function SignupPage() {
                   type="button"
                   onClick={handleGoogleSignup}
                   disabled={isLoading}
-                  className="w-full inline-flex justify-center py-3 px-4 border border-gray-200 rounded-xl bg-white/80 backdrop-blur-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full inline-flex justify-center py-3 px-4 border border-gray-200 rounded-xl bg-white/80 backdrop-blur-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                     <path
                       fill="currentColor"
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -353,7 +372,7 @@ export default function SignupPage() {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                     />
                   </svg>
-                  <em className="font-serif italic">Sign up with Google</em>
+                  Sign up with Google
                 </button>
               </div>
             </div>
@@ -361,10 +380,10 @@ export default function SignupPage() {
 
           <div className="mt-6">
             <div className="text-center">
-              <span className="text-sm text-gray-600 font-light">
-                <em className="font-serif italic">Already have an account?</em>{" "}
-                <Link href="/auth/login" className="font-medium text-black hover:text-gray-700 transition-colors">
-                  <em className="font-serif italic">Sign in</em>
+              <span className="text-xs font-medium text-gray-700">
+                Already have an account?{" "}
+                <Link href="/auth/login" className="text-black hover:text-gray-800 transition-colors">
+                  Sign in
                 </Link>
               </span>
             </div>
@@ -372,16 +391,14 @@ export default function SignupPage() {
 
           <div className="mt-4 text-center">
             <p className="text-xs text-gray-500 font-light">
-              <em className="font-serif italic">
-                By creating an account, you agree to our{" "}
-                <Link href="/terms" className="underline hover:text-gray-700">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link href="/privacy" className="underline hover:text-gray-700">
-                  Privacy Policy
-                </Link>
-              </em>
+              By creating an account, you agree to our{" "}
+              <Link href="/terms" className="underline hover:text-gray-700">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="underline hover:text-gray-700">
+                Privacy Policy
+              </Link>
             </p>
           </div>
         </motion.div>
