@@ -1,263 +1,252 @@
-"use client"
 
-import { useState, useRef, useCallback, useEffect } from "react"
-import { useSpeechToText } from "./use-speech-recognition"
-import { useAudioPlayer } from "./use-audio-player"
+import { useState, useRef, useCallback } from 'react'
 
-interface Message {
+interface VoiceMessage {
   id: string
-  role: "user" | "assistant"
+  type: 'user' | 'agent'
   content: string
-  timestamp: Date
   audioUrl?: string
-  language?: string
+  timestamp: Date
 }
 
-interface VoiceAIOptions {
+interface UseVoiceAIProps {
   agentId: string
-  onMessage?: (message: Message) => void
-  onError?: (error: string) => void
-  onStatusChange?: (status: "idle" | "listening" | "processing" | "speaking") => void
+  onMessage?: (message: VoiceMessage) => void
+  onError?: (error: Error) => void
+  onStatusChange?: (status: string) => void
 }
 
-export function useVoiceAIConsolidated({ agentId, onMessage, onError, onStatusChange }: VoiceAIOptions) {
-  // Estados
-  const [messages, setMessages] = useState<Message[]>([])
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [status, setStatus] = useState<"idle" | "listening" | "processing" | "speaking">("idle")
+export function useVoiceAIConsolidated({
+  agentId,
+  onMessage,
+  onError,
+  onStatusChange
+}: UseVoiceAIProps) {
+  const [messages, setMessages] = useState<VoiceMessage[]>([])
+  const [status, setStatus] = useState<'idle' | 'listening' | 'processing' | 'speaking'>('idle')
+  const [transcript, setTranscript] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [audioState, setAudioState] = useState({ isPlaying: false })
+  
+  const audioPlayerRef = useRef<HTMLAudioElement>(null)
+  const recognitionRef = useRef<any>(null)
 
-  // Referencias
-  const audioPlayerRef = useRef<HTMLAudioElement | null>(null)
+  // Inicializar Speech Recognition
+  const browserSupportsSpeechRecognition = typeof window !== 'undefined' && 
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
 
-  // Hooks
-  const { audioState, playAudio, pauseAudio, stopAudio } = useAudioPlayer()
-  const {
-    isListening,
-    transcript,
-    startListening,
-    stopListening,
-    resetTranscript,
-    error: speechError,
-    browserSupportsSpeechRecognition,
-    detectedLanguage,
-  } = useSpeechToText({
-    continuous: false,
-    autoDetectLanguage: true,
-    onEnd: handleSpeechEnd,
-  })
+  const initializeSpeechRecognition = useCallback(() => {
+    if (!browserSupportsSpeechRecognition) return null
 
-  // Efectos
-  useEffect(() => {
-    audioPlayerRef.current = new Audio()
-    return () => {
-      if (audioPlayerRef.current) {
-        audioPlayerRef.current.pause()
-        audioPlayerRef.current = null
-      }
-    }
-  }, [])
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    const recognition = new SpeechRecognition()
+    
+    recognition.continuous = false
+    recognition.interimResults = false
+    recognition.lang = 'en-US'
 
-  useEffect(() => {
-    const newStatus = isListening
-      ? "listening"
-      : isProcessing
-        ? "processing"
-        : audioState.isPlaying
-          ? "speaking"
-          : "idle"
-
-    setStatus(newStatus)
-    onStatusChange?.(newStatus)
-  }, [isListening, isProcessing, audioState.isPlaying, onStatusChange])
-
-  // Manejadores
-  async function handleSpeechEnd(finalTranscript: string, detectedLang?: string) {
-    if (finalTranscript.trim()) {
-      const userMessage: Message = {
+    recognition.onresult = async (event) => {
+      const speechResult = event.results[0][0].transcript
+      setTranscript(speechResult)
+      
+      // Crear mensaje del usuario
+      const userMessage: VoiceMessage = {
         id: Date.now().toString(),
-        role: "user",
-        content: finalTranscript,
-        timestamp: new Date(),
-        language: detectedLang,
+        type: 'user',
+        content: speechResult,
+        timestamp: new Date()
       }
-
-      addMessage(userMessage)
-      await processUserMessage(finalTranscript, userMessage.id, detectedLang)
-      resetTranscript()
+      
+      setMessages(prev => [...prev, userMessage])
+      onMessage?.(userMessage)
+      
+      // Procesar con Anthropic + ElevenLabs
+      await processVoiceInput(speechResult)
     }
-  }
 
-  const addMessage = useCallback(
-    (message: Message) => {
-      setMessages((prev) => [...prev, message])
-      onMessage?.(message)
-    },
-    [onMessage],
-  )
+    recognition.onerror = (event) => {
+      setError(`Speech recognition error: ${event.error}`)
+      onError?.(new Error(event.error))
+      setStatus('idle')
+    }
 
-  async function processUserMessage(userText: string, messageId: string, detectedLang?: string) {
-    setIsProcessing(true)
+    return recognition
+  }, [browserSupportsSpeechRecognition, onMessage, onError])
 
+  // Procesar entrada de voz (Anthropic + ElevenLabs)
+  const processVoiceInput = async (userInput: string) => {
     try {
-      const response = await fetch("/api/voice-ai/conversation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      setStatus('processing')
+      onStatusChange?.('processing')
+      
+      // 1. Obtener respuesta de Anthropic
+      const conversationResponse = await fetch('/api/voice-ai/conversation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: userText,
-          agentId,
-          conversationHistory: messages.map((msg) => ({
-            role: msg.role,
-            content: msg.content,
-          })),
+          transcript: userInput,
+          context: `Agent: ${agentId}`,
         }),
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to get AI response")
+      if (!conversationResponse.ok) {
+        throw new Error('Failed to get AI response')
       }
 
-      const { response: aiResponse } = await response.json()
+      // 2. Leer el stream de Anthropic
+      const reader = conversationResponse.body?.getReader()
+      const decoder = new TextDecoder()
+      let aiResponseText = ''
 
-      const assistantMessage: Message = {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: aiResponse,
-        timestamp: new Date(),
-        language: detectedLang || "en-US",
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          
+          const chunk = decoder.decode(value)
+          aiResponseText += chunk
+        }
       }
 
-      addMessage(assistantMessage)
-      await generateAndPlaySpeech(aiResponse, assistantMessage.id)
-    } catch (error) {
-      console.error("Error processing message:", error)
-      onError?.(error instanceof Error ? error.message : "Unknown error")
+      // 3. Limpiar la respuesta (remover caracteres de control)
+      const cleanResponse = aiResponseText
+        .replace(/data: /g, '')
+        .replace(/\n\n/g, '')
+        .replace(/\[DONE\]/g, '')
+        .trim()
 
-      const errorMessage: Message = {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: "I apologize, but I'm having trouble processing your request. Please try again.",
-        timestamp: new Date(),
+      if (!cleanResponse) {
+        throw new Error('Empty response from AI')
       }
 
-      addMessage(errorMessage)
-    } finally {
-      setIsProcessing(false)
-    }
-  }
-
-  async function generateAndPlaySpeech(text: string, messageId: string) {
-    try {
-      const response = await fetch("/api/elevenlabs/text-to-speech", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      // 4. Generar audio con ElevenLabs
+      setStatus('speaking')
+      onStatusChange?.('speaking')
+      
+      const ttsResponse = await fetch('/api/elevenlabs/generate-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text,
-          voiceId: getVoiceIdForAgent(agentId),
-          language: detectedLanguage || "en-US",
+          text: cleanResponse,
+          agentId: agentId,
         }),
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to generate speech")
+      if (!ttsResponse.ok) {
+        throw new Error('Failed to generate speech')
       }
 
-      const audioBlob = await response.blob()
+      // 5. Crear URL del audio
+      const audioBlob = await ttsResponse.blob()
       const audioUrl = URL.createObjectURL(audioBlob)
 
-      // Actualizar mensaje con URL de audio
-      setMessages((prev) => prev.map((msg) => (msg.id === messageId ? { ...msg, audioUrl } : msg)))
-
-      // Reproducir automáticamente
-      if (audioPlayerRef.current) {
-        audioPlayerRef.current.src = audioUrl
-        await audioPlayerRef.current.play()
+      // 6. Crear mensaje del agente
+      const agentMessage: VoiceMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'agent',
+        content: cleanResponse,
+        audioUrl: audioUrl,
+        timestamp: new Date()
       }
-    } catch (error) {
-      console.error("Error generating speech:", error)
-      onError?.("Failed to generate speech")
+
+      setMessages(prev => [...prev, agentMessage])
+      onMessage?.(agentMessage)
+
+      // 7. Reproducir audio automáticamente
+      await playMessage(agentMessage)
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+      setError(errorMessage)
+      onError?.(new Error(errorMessage))
+      setStatus('idle')
+      onStatusChange?.('idle')
     }
   }
 
-  function getVoiceIdForAgent(agentId: string): string {
-    const voiceMap: Record<string, string> = {
-      emma: "EXAVITQu4vr4xnSDxMaL", // Sarah
-      marcus: "VR6AewLTigWG4xSOukaG", // Josh
-      sophia: "21m00Tcm4TlvDq8ikWAM", // Rachel
-      alex: "29vD33N1CtxCmqQRPOHJ", // Drew
+  // Controles de grabación
+  const startListening = useCallback(() => {
+    if (!recognitionRef.current) {
+      recognitionRef.current = initializeSpeechRecognition()
     }
-    return voiceMap[agentId] || voiceMap.emma
-  }
+    
+    if (recognitionRef.current) {
+      setStatus('listening')
+      onStatusChange?.('listening')
+      setError(null)
+      recognitionRef.current.start()
+    }
+  }, [initializeSpeechRecognition, onStatusChange])
 
-  const startConversation = useCallback(async () => {
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop()
+      setStatus('idle')
+      onStatusChange?.('idle')
+    }
+  }, [onStatusChange])
+
+  // Controles de audio
+  const playMessage = async (message: VoiceMessage) => {
+    if (!message.audioUrl || !audioPlayerRef.current) return
+
     try {
-      const response = await fetch("/api/voice-ai/conversation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          agentId,
-          isWelcome: true,
-        }),
-      })
-
-      if (response.ok) {
-        const { response: welcomeText } = await response.json()
-
-        const welcomeMessage: Message = {
-          id: Date.now().toString(),
-          role: "assistant",
-          content: welcomeText,
-          timestamp: new Date(),
-        }
-
-        addMessage(welcomeMessage)
-        await generateAndPlaySpeech(welcomeText, welcomeMessage.id)
+      setAudioState({ isPlaying: true })
+      audioPlayerRef.current.src = message.audioUrl
+      await audioPlayerRef.current.play()
+      
+      audioPlayerRef.current.onended = () => {
+        setAudioState({ isPlaying: false })
+        setStatus('idle')
+        onStatusChange?.('idle')
       }
-    } catch (error) {
-      console.error("Error starting conversation:", error)
-      onError?.("Failed to start conversation")
+    } catch (err) {
+      setError('Failed to play audio')
+      setAudioState({ isPlaying: false })
+      setStatus('idle')
+      onStatusChange?.('idle')
     }
-  }, [agentId, addMessage])
+  }
 
-  const clearConversation = useCallback(() => {
+  const pauseAudio = () => {
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause()
+      setAudioState({ isPlaying: false })
+    }
+  }
+
+  // Funciones de control
+  const startConversation = async () => {
     setMessages([])
-    stopAudio()
-    stopListening()
-    resetTranscript()
-  }, [stopAudio, stopListening, resetTranscript])
+    setError(null)
+    setStatus('idle')
+  }
 
-  const playMessage = useCallback(
-    (messageId: string) => {
-      const message = messages.find((m) => m.id === messageId)
-      if (message?.audioUrl && audioPlayerRef.current) {
-        audioPlayerRef.current.src = message.audioUrl
-        audioPlayerRef.current.play()
-      }
-    },
-    [messages],
-  )
+  const clearConversation = () => {
+    setMessages([])
+    setTranscript('')
+    setError(null)
+    setStatus('idle')
+    
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause()
+      audioPlayerRef.current.src = ''
+    }
+  }
 
   return {
-    // Estado
     messages,
     status,
-    isProcessing,
     transcript,
-    detectedLanguage,
     audioState,
-    error: speechError,
+    error,
     browserSupportsSpeechRecognition,
-
-    // Acciones
     startListening,
     stopListening,
     startConversation,
     clearConversation,
     playMessage,
     pauseAudio,
-    stopAudio,
-
-    // Referencias
     audioPlayerRef,
   }
 }
