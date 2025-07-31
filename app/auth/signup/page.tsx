@@ -12,7 +12,6 @@ import Image from "next/image"
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("")
-  const [companyName, setCompanyName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -33,7 +32,6 @@ export default function SignupPage() {
         options: {
           data: {
             full_name: fullName,
-            company_name: companyName,
           },
         },
       })
@@ -51,19 +49,19 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-100/20 via-transparent to-transparent"></div>
       </div>
 
-      <div className="relative z-10">
+      <div className="relative z-10 w-full max-w-md mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="sm:mx-auto sm:w-full sm:max-w-md"
+          className="text-center mb-8"
         >
           <div className="flex justify-center mb-6">
             <div className="inline-flex items-center rounded-xl bg-white/80 backdrop-blur-sm px-3 py-1.5 border border-gray-200 shadow-sm">
@@ -75,15 +73,15 @@ export default function SignupPage() {
                 className="h-5 w-auto mr-2"
               />
               <span className="text-xs font-medium text-gray-700">
-                <em className="font-serif italic">Join thousands of business travelers</em>
+                <em className="font-serif italic">Unlock your superpowers</em>
               </span>
             </div>
           </div>
 
-          <h2 className="text-center text-4xl md:text-5xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
+          <h2 className="text-center text-3xl md:text-4xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
             Get started
           </h2>
-          <p className="text-center text-gray-600 font-light">Create your business travel account</p>
+          <p className="text-center text-gray-600 font-light text-sm">Create your business travel account</p>
         </motion.div>
 
         {/* Form */}
@@ -91,10 +89,9 @@ export default function SignupPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
         >
-          <div className="bg-white/50 backdrop-blur-sm py-8 px-6 shadow-sm rounded-2xl border border-gray-200 sm:px-10">
-            <form className="space-y-6" onSubmit={handleSignup}>
+          <div className="bg-white/50 backdrop-blur-sm py-6 px-6 shadow-sm rounded-2xl border border-gray-200">
+            <form className="space-y-5" onSubmit={handleSignup}>
               {error && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
@@ -117,22 +114,6 @@ export default function SignupPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="John Doe"
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light transition-all"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Company Name
-                </label>
-                <input
-                  id="companyName"
-                  name="companyName"
-                  type="text"
-                  required
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder="Acme Corporation"
                   className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light transition-all"
                 />
               </div>
@@ -180,7 +161,7 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              <div>
+              <div className="pt-2">
                 <button
                   type="submit"
                   disabled={loading}
@@ -190,7 +171,7 @@ export default function SignupPage() {
                 </button>
               </div>
 
-              <div className="text-center">
+              <div className="text-center pt-2">
                 <span className="text-sm text-gray-600 font-light">Already have an account? </span>
                 <Link
                   href="/auth/login"
@@ -208,7 +189,7 @@ export default function SignupPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-8 text-center"
+          className="mt-6 text-center"
         >
           <Link
             href="/"

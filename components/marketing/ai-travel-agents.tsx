@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import AIChat from "@/components/ui/ai-chat"
+import Link from "next/link"
 
 // Actualizar el array de titleVariations para incluir los títulos específicos solicitados
 const titleVariations = [
@@ -19,16 +20,14 @@ const titleVariations = [
   "Supercharged travel agents with MCP intelligence",
 ]
 
-// Subtítulos
+// Subtítulos más realistas y pequeños
 const subtitles = [
-  "Designed to make your journey seamless, personalized, and efficient",
-  "Handling the complexities of travel so you can focus on what matters",
-  "Intelligent assistance that adapts to your unique travel preferences",
-  "Transforming business travel with cutting-edge AI technology",
-  "Leveraging MCP technology for unprecedented contextual understanding",
-  "AI agents that maintain context across your entire travel journey",
-  "Enhanced with Model Context Protocol for superior travel intelligence",
-  "Next-generation AI with MCP capabilities for smarter travel planning",
+  "Experience the future of business travel with AI-powered assistance",
+  "Intelligent travel management designed for modern businesses",
+  "Transform your travel workflow with cutting-edge AI technology",
+  "Next-generation travel intelligence at your fingertips",
+  "Revolutionizing business travel one journey at a time",
+  "Smart travel solutions powered by advanced AI",
 ]
 
 // Actualizar la lista de agentes para incluir los nuevos con sus roles específicos:
@@ -152,15 +151,17 @@ export const AITravelAgents = () => {
             <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
               Introducing Suitpax AI
             </span>
-            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
-              <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse mr-1"></span>
-              Q3 2025
-            </span>
+            <Link href="/auth/signup">
+              <span className="inline-flex items-center rounded-xl bg-black px-2.5 py-0.5 text-[9px] font-medium text-white hover:bg-gray-800 transition-colors cursor-pointer">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse mr-1"></span>
+                Try superpowers
+              </span>
+            </Link>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
             {randomTitle}
           </h2>
-          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6">{randomSubtitle}</p>
+          <p className="mt-4 text-[10px] sm:text-xs font-light text-gray-500 max-w-xl mb-6">{randomSubtitle}</p>
 
           {/* AI Chat Interface - Moved here */}
           <div className="max-w-2xl w-full mx-auto mb-12">

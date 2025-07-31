@@ -2,37 +2,44 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { PaperAirplaneIcon, UserIcon, SparklesIcon } from "@heroicons/react/24/outline"
+import { useState, useEffect, useRef } from "react"
+import { motion } from "framer-motion"
+import { Send, Mic, MicOff, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
+import { useSpeechToText } from "@/hooks/use-speech-to-text"
 
 interface Message {
   id: string
   content: string
   role: "user" | "assistant"
   timestamp: Date
-  isTyping?: boolean
 }
 
-export default function SuitpaxAIPage() {
+export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: "welcome",
-      content:
-        "Hello! I'm your Suitpax AI assistant. I'm here to help you with all your business travel needs - from finding the best flights and hotels to managing expenses and travel policies. What would you like to explore today?",
+      id: "1",
+      content: "Hello! I'm your AI travel assistant. How can I help you plan your next business trip?",
       role: "assistant",
       timestamp: new Date(),
     },
   ])
   const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [user, setUser] = useState<any>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
-  const messagesContainerRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
+
+  const { isListening, transcript, startListening, stopListening, resetTranscript, browserSupportsSpeechRecognition } =
+    useSpeechToText({
+      onTranscriptChange: (text) => {
+        setInput(text)
+      },
+      continuous: true,
+    })
 
   useEffect(() => {
     const getUser = async () => {
@@ -44,46 +51,16 @@ export default function SuitpaxAIPage() {
     getUser()
   }, [supabase])
 
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-      })
-    }
-  }
-
   useEffect(() => {
-    const timer = setTimeout(() => {
-      scrollToBottom()
-    }, 100)
-    return () => clearTimeout(timer)
+    scrollToBottom()
   }, [messages])
 
-  const typeMessage = (messageId: string, content: string) => {
-    let index = 0
-    const interval = setInterval(() => {
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === messageId
-            ? {
-                ...msg,
-                content: content.slice(0, index + 1),
-                isTyping: index < content.length - 1,
-              }
-            : msg,
-        ),
-      )
-      index++
-      if (index >= content.length) {
-        clearInterval(interval)
-      }
-    }, 20)
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!input.trim() || isLoading) return
+  const handleSend = async () => {
+    if (!input.trim() || loading) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -94,12 +71,7 @@ export default function SuitpaxAIPage() {
 
     setMessages((prev) => [...prev, userMessage])
     setInput("")
-    setIsLoading(true)
-
-    // Auto-resize textarea
-    if (inputRef.current) {
-      inputRef.current.style.height = "auto"
-    }
+    setLoading(true)
 
     try {
       const response = await fetch("/api/ai-chat", {
@@ -109,267 +81,196 @@ export default function SuitpaxAIPage() {
         },
         body: JSON.stringify({
           message: userMessage.content,
-          context: "business_travel",
-          history: messages.slice(-5),
+          history: messages,
         }),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to get AI response")
+        throw new Error("Failed to get response")
       }
 
       const data = await response.json()
 
-      const assistantMessageId = (Date.now() + 1).toString()
       const assistantMessage: Message = {
-        id: assistantMessageId,
-        content: "",
+        id: (Date.now() + 1).toString(),
+        content: data.response,
         role: "assistant",
         timestamp: new Date(),
-        isTyping: true,
       }
 
       setMessages((prev) => [...prev, assistantMessage])
-
-      // Start typing effect after a brief delay
-      setTimeout(() => {
-        typeMessage(
-          assistantMessageId,
-          data.response || "I apologize, but I'm having trouble responding right now. Please try again.",
-        )
-      }, 500)
-
-      // Log the chat if user is authenticated
-      if (user) {
-        await supabase.from("ai_chat_logs").insert({
-          user_id: user.id,
-          message: userMessage.content,
-          response: data.response,
-          context_type: "business_travel",
-          tokens_used: data.tokens_used || 0,
-        })
-      }
     } catch (error) {
       console.error("Error sending message:", error)
-      const errorMessageId = (Date.now() + 1).toString()
       const errorMessage: Message = {
-        id: errorMessageId,
-        content: "",
+        id: (Date.now() + 1).toString(),
+        content: "Sorry, I encountered an error. Please try again.",
         role: "assistant",
         timestamp: new Date(),
-        isTyping: true,
       }
       setMessages((prev) => [...prev, errorMessage])
-
-      setTimeout(() => {
-        typeMessage(
-          errorMessageId,
-          "I'm sorry, I encountered an error while processing your request. Please try again in a moment.",
-        )
-      }, 500)
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(e)
+      handleSend()
     }
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value)
-
-    // Auto-resize textarea
-    const textarea = e.target
-    textarea.style.height = "auto"
-    textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px"
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening()
+    } else {
+      resetTranscript()
+      setInput("")
+      startListening()
+    }
   }
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  }
-
-  const suggestedQuestions = [
-    "Find me flights to London for next week",
-    "How do I submit an expense report?",
-    "What's our company travel policy?",
-    "Book a hotel in San Francisco",
-    "Show me my travel analytics",
-    "Help me plan a business trip to Tokyo",
-  ]
 
   return (
-    <div className="flex flex-col h-[calc(100vh-2rem)] bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-      {/* Header - Fixed */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-4 sm:px-6">
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="bg-white/50 backdrop-blur-sm border-b border-gray-200 p-4 lg:p-6"
+      >
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="relative w-10 h-10 bg-white rounded-md border border-gray-200 flex items-center justify-center overflow-hidden shadow-sm">
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 rounded-md overflow-hidden border border-gray-200 bg-white">
               <Image
-                src="/logo/suitpax-bl-logo.webp"
+                src="/agents/agent-nova.jpeg"
                 alt="Suitpax AI"
-                width={28}
-                height={28}
-                className="object-contain"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
               />
             </div>
             <div>
-              <h1 className="text-lg font-medium tracking-tighter text-gray-900">Suitpax AI</h1>
-              <p className="text-xs text-gray-500">Your intelligent travel assistant</p>
+              <h1 className="text-xl md:text-2xl font-medium tracking-tighter">
+                <em className="font-serif italic">Suitpax AI</em>
+              </h1>
+              <p className="text-xs md:text-sm text-gray-600 font-light">Your intelligent travel assistant</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1 text-xs text-gray-500">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="hidden sm:inline">Online</span>
-            </div>
-          </div>
+          <span className="inline-flex items-center rounded-xl bg-emerald-950/10 px-2.5 py-0.5 text-[10px] font-medium text-emerald-950">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-950 animate-pulse mr-1"></span>
+            Online
+          </span>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Messages Container - Scrollable */}
-      <div
-        ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 space-y-4"
-        style={{ scrollBehavior: "smooth" }}
-      >
-        {messages.length === 1 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-8">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-200">
-              <SparklesIcon className="h-8 w-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Welcome to Suitpax AI</h3>
-            <p className="text-gray-600 text-sm max-w-md mx-auto mb-6">
-              I'm here to help you with all your business travel needs. Try asking me something!
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-w-4xl mx-auto">
-              {suggestedQuestions.map((question, index) => (
-                <button
-                  key={index}
-                  onClick={() => setInput(question)}
-                  className="p-4 text-left bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition-all duration-200 text-sm group hover:shadow-sm"
-                >
-                  <span className="font-medium text-gray-900 group-hover:text-black">{question}</span>
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        <AnimatePresence mode="popLayout">
-          {messages.slice(1).map((message) => (
-            <motion.div
-              key={message.id}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
+        {messages.map((message, index) => (
+          <motion.div
+            key={message.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: index * 0.1 }}
+            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-4 py-3 ${
+                message.role === "user"
+                  ? "bg-black text-white"
+                  : "bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"
+              }`}
             >
-              <div
-                className={`flex items-start space-x-3 max-w-[85%] sm:max-w-[75%] lg:max-w-[65%] ${
-                  message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
-                }`}
-              >
-                {/* Avatar */}
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.role === "user" ? "bg-black" : "bg-white border border-gray-200 shadow-sm rounded-md"
-                  }`}
-                >
-                  {message.role === "user" ? (
-                    <UserIcon className="h-4 w-4 text-white" />
-                  ) : (
+              {message.role === "assistant" && (
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
                     <Image
-                      src="/logo/suitpax-bl-logo.webp"
-                      alt="Suitpax AI"
-                      width={16}
-                      height={16}
-                      className="object-contain"
+                      src="/agents/agent-nova.jpeg"
+                      alt="AI"
+                      width={24}
+                      height={24}
+                      className="w-full h-full object-cover"
                     />
-                  )}
-                </div>
-
-                {/* Message bubble */}
-                <div
-                  className={`rounded-2xl px-4 py-3 shadow-sm ${
-                    message.role === "user" ? "bg-black text-white" : "bg-gray-50 text-gray-900 border border-gray-200"
-                  }`}
-                >
-                  <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                    {message.content}
-                    {message.isTyping && <span className="inline-block w-0.5 h-4 bg-current ml-1 animate-pulse"></span>}
                   </div>
-                  <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
-                    {formatTime(message.timestamp)}
-                  </p>
+                  <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-
-        {/* Loading indicator */}
-        {isLoading && (
+              )}
+              <p className="text-sm font-light leading-relaxed">{message.content}</p>
+              <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
+                {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+        {loading && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-            <div className="flex items-start space-x-3 max-w-[85%] sm:max-w-[75%] lg:max-w-[65%]">
-              <div className="w-8 h-8 rounded-md bg-white border border-gray-200 shadow-sm flex items-center justify-center">
-                <SparklesIcon className="h-4 w-4 text-gray-600 animate-pulse" />
-              </div>
-              <div className="bg-gray-50 border border-gray-200 shadow-sm rounded-2xl px-4 py-3">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                    style={{ animationDelay: "0.1s" }}
-                  ></div>
-                  <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                    style={{ animationDelay: "0.2s" }}
-                  ></div>
+            <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-4 py-3 max-w-xs">
+              <div className="flex items-center space-x-2 mb-2">
+                <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
+                  <Image
+                    src="/agents/agent-nova.jpeg"
+                    alt="AI"
+                    width={24}
+                    height={24}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
+                <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
+                <span className="text-sm text-gray-600 font-light">Thinking...</span>
               </div>
             </div>
           </motion.div>
         )}
-
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area - Fixed */}
-      <div className="flex-shrink-0 bg-white border-t border-gray-200 px-4 py-4 sm:px-6">
-        <form onSubmit={handleSubmit} className="relative">
-          <div className="relative flex items-end">
-            <textarea
-              ref={inputRef}
+      {/* Input */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="bg-white/50 backdrop-blur-sm border-t border-gray-200 p-4 lg:p-6"
+      >
+        <div className="flex items-center space-x-3 max-w-4xl mx-auto">
+          <div className="flex-1 relative">
+            <Input
               value={input}
-              onChange={handleInputChange}
+              onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me anything about your business travel..."
-              disabled={isLoading}
-              rows={1}
-              className="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-all resize-none overflow-hidden"
-              style={{ minHeight: "48px", maxHeight: "120px" }}
+              placeholder="Ask me about flights, hotels, or travel planning..."
+              className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light"
+              disabled={loading}
             />
-            <button
-              type="submit"
-              disabled={!input.trim() || isLoading}
-              className="absolute right-2 bottom-2 p-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center"
-            >
-              <PaperAirplaneIcon className="h-4 w-4" />
-            </button>
+            {browserSupportsSpeechRecognition && (
+              <button
+                onClick={toggleListening}
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-colors ${
+                  isListening
+                    ? "text-red-500 bg-red-50 hover:bg-red-100"
+                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </button>
+            )}
           </div>
-        </form>
-        <p className="text-xs text-gray-500 mt-2 text-center">
-          Suitpax AI can make mistakes. Please verify important information.
-        </p>
-      </div>
+          <Button
+            onClick={handleSend}
+            disabled={!input.trim() || loading}
+            className="bg-black text-white hover:bg-gray-800 px-4 py-3 rounded-xl"
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          </Button>
+        </div>
+        {isListening && (
+          <div className="text-center mt-2">
+            <span className="text-xs text-blue-600 font-medium animate-pulse">🎤 Listening... speak now</span>
+          </div>
+        )}
+      </motion.div>
     </div>
   )
 }
