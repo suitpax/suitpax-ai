@@ -3,24 +3,24 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   HomeIcon,
-  PaperAirplaneIcon,
   CreditCardIcon,
   ChartBarIcon,
   UsersIcon,
   CalendarIcon,
   MapPinIcon,
-  Cog6ToothIcon,
   ChatBubbleLeftRightIcon,
   MicrophoneIcon,
-  ChevronLeftIcon,
+  CogIcon,
+  PlusIcon,
+  ChevronDownIcon,
   ChevronRightIcon,
-  SparklesIcon,
+  AirplaneIcon,
 } from "@heroicons/react/24/outline"
 import type { User } from "@supabase/supabase-js"
-import Image from "next/image"
 
 interface SidebarProps {
   user: User
@@ -29,132 +29,209 @@ interface SidebarProps {
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
-  { name: "Flights", href: "/dashboard/flights", icon: PaperAirplaneIcon },
+  { name: "Flights", href: "/dashboard/flights", icon: AirplaneIcon },
   { name: "Expenses", href: "/dashboard/expenses", icon: CreditCardIcon },
   { name: "Analytics", href: "/dashboard/analytics", icon: ChartBarIcon },
   { name: "Team", href: "/dashboard/team", icon: UsersIcon },
   { name: "Calendar", href: "/dashboard/calendar", icon: CalendarIcon },
   { name: "Locations", href: "/dashboard/locations", icon: MapPinIcon },
-  { name: "AI Chat", href: "/dashboard/ai-chat", icon: ChatBubbleLeftRightIcon },
-  { name: "Voice AI", href: "/dashboard/voice-ai", icon: MicrophoneIcon, premium: true },
-  { name: "Settings", href: "/dashboard/settings", icon: Cog6ToothIcon },
 ]
 
+const aiFeatures = [
+  { name: "AI Chat", href: "/dashboard/ai-chat", icon: ChatBubbleLeftRightIcon },
+  { name: "Voice AI", href: "/dashboard/voice-ai", icon: MicrophoneIcon },
+]
+
+const bottomNavigation = [{ name: "Settings", href: "/dashboard/settings", icon: CogIcon }]
+
 export default function Sidebar({ user, userPlan = "free" }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
+  const [businessTravelOpen, setBusinessTravelOpen] = useState(true)
+  const [aiAgentsOpen, setAiAgentsOpen] = useState(true)
 
   const isPremium = userPlan === "premium" || userPlan === "enterprise"
 
   return (
-    <motion.div
-      animate={{ width: collapsed ? 80 : 280 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="bg-white border-r border-gray-200 flex flex-col"
-    >
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <AnimatePresence mode="wait">
-            {!collapsed && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-                className="flex items-center space-x-2"
-              >
-                <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={120} height={28} className="h-7 w-auto" />
-                <div className="inline-flex items-center rounded-lg bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700">
-                  <SparklesIcon className="mr-1 h-2.5 w-2.5" />
-                  <em className="font-serif italic">Beta</em>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-          >
-            {collapsed ? <ChevronRightIcon className="h-4 w-4" /> : <ChevronLeftIcon className="h-4 w-4" />}
-          </button>
-        </div>
+    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white border-r border-gray-200 px-6 py-4">
+      {/* Logo */}
+      <div className="flex h-16 shrink-0 items-center">
+        <Image className="h-8 w-auto" src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={120} height={32} />
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href
-          const isLocked = item.premium && !isPremium
+      <nav className="flex flex-1 flex-col">
+        <ul role="list" className="flex flex-1 flex-col gap-y-7">
+          <li>
+            <ul role="list" className="-mx-2 space-y-1">
+              {/* Dashboard Home */}
+              <li>
+                <Link
+                  href="/dashboard"
+                  className={`group flex gap-x-3 rounded-xl p-3 text-sm font-medium leading-6 transition-colors ${
+                    pathname === "/dashboard"
+                      ? "bg-gray-50 text-black"
+                      : "text-gray-700 hover:text-black hover:bg-gray-50"
+                  }`}
+                >
+                  <HomeIcon className="h-5 w-5 shrink-0" />
+                  Dashboard
+                </Link>
+              </li>
 
-          return (
-            <Link
-              key={item.name}
-              href={isLocked ? "#" : item.href}
-              className={`
-                flex items-center px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200
-                ${
-                  isActive
-                    ? "bg-black text-white shadow-lg"
-                    : isLocked
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-black"
-                }
-                ${collapsed ? "justify-center" : ""}
-              `}
-              onClick={isLocked ? (e) => e.preventDefault() : undefined}
-            >
-              <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
-
-              <AnimatePresence mode="wait">
-                {!collapsed && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex items-center justify-between w-full"
+              {/* Business Travel Section */}
+              <li>
+                <div>
+                  <button
+                    onClick={() => setBusinessTravelOpen(!businessTravelOpen)}
+                    className="flex w-full items-center gap-x-3 rounded-xl p-3 text-left text-sm font-medium leading-6 text-gray-700 hover:text-black hover:bg-gray-50 transition-colors"
                   >
-                    <span>{item.name}</span>
-                    {isLocked && (
-                      <div className="inline-flex items-center rounded-md bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
-                        Pro
-                      </div>
+                    {businessTravelOpen ? (
+                      <ChevronDownIcon className="h-4 w-4 shrink-0" />
+                    ) : (
+                      <ChevronRightIcon className="h-4 w-4 shrink-0" />
                     )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </Link>
-          )
-        })}
-      </nav>
+                    Business Travel
+                  </button>
+                  <AnimatePresence>
+                    {businessTravelOpen && (
+                      <motion.ul
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="mt-1 px-2 space-y-1"
+                      >
+                        {navigation.slice(1).map((item) => (
+                          <li key={item.name}>
+                            <Link
+                              href={item.href}
+                              className={`group flex gap-x-3 rounded-lg p-2 pl-8 text-sm leading-6 transition-colors ${
+                                pathname === item.href
+                                  ? "bg-gray-50 text-black font-medium"
+                                  : "text-gray-600 hover:text-black hover:bg-gray-50"
+                              }`}
+                            >
+                              <item.icon className="h-4 w-4 shrink-0" />
+                              {item.name}
+                              {!isPremium && item.name !== "Flights" && (
+                                <span className="ml-auto inline-flex items-center rounded-md bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600">
+                                  Pro
+                                </span>
+                              )}
+                            </Link>
+                          </li>
+                        ))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </li>
 
-      {/* User Profile */}
-      <div className="p-4 border-t border-gray-200">
-        <div className={`flex items-center ${collapsed ? "justify-center" : "space-x-3"}`}>
-          <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-sm font-medium">{user.email?.charAt(0).toUpperCase()}</span>
-          </div>
+              {/* AI Agents Section */}
+              <li>
+                <div>
+                  <button
+                    onClick={() => setAiAgentsOpen(!aiAgentsOpen)}
+                    className="flex w-full items-center gap-x-3 rounded-xl p-3 text-left text-sm font-medium leading-6 text-gray-700 hover:text-black hover:bg-gray-50 transition-colors"
+                  >
+                    {aiAgentsOpen ? (
+                      <ChevronDownIcon className="h-4 w-4 shrink-0" />
+                    ) : (
+                      <ChevronRightIcon className="h-4 w-4 shrink-0" />
+                    )}
+                    AI Agents
+                    <span className="ml-auto inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-700">
+                      Beta
+                    </span>
+                  </button>
+                  <AnimatePresence>
+                    {aiAgentsOpen && (
+                      <motion.ul
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="mt-1 px-2 space-y-1"
+                      >
+                        {aiFeatures.map((item) => (
+                          <li key={item.name}>
+                            <Link
+                              href={item.href}
+                              className={`group flex gap-x-3 rounded-lg p-2 pl-8 text-sm leading-6 transition-colors ${
+                                pathname === item.href
+                                  ? "bg-gray-50 text-black font-medium"
+                                  : "text-gray-600 hover:text-black hover:bg-gray-50"
+                              }`}
+                            >
+                              <item.icon className="h-4 w-4 shrink-0" />
+                              {item.name}
+                              {!isPremium && (
+                                <span className="ml-auto inline-flex items-center rounded-md bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600">
+                                  Pro
+                                </span>
+                              )}
+                            </Link>
+                          </li>
+                        ))}
 
-          <AnimatePresence mode="wait">
-            {!collapsed && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="flex-1 min-w-0"
-              >
+                        {/* Create Agent Button */}
+                        <li>
+                          <button
+                            className="group flex w-full gap-x-3 rounded-lg p-2 pl-8 text-sm leading-6 text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
+                            disabled={!isPremium}
+                          >
+                            <PlusIcon className="h-4 w-4 shrink-0" />
+                            Create Agent
+                            {!isPremium && (
+                              <span className="ml-auto inline-flex items-center rounded-md bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600">
+                                Pro
+                              </span>
+                            )}
+                          </button>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </li>
+            </ul>
+          </li>
+
+          {/* Bottom Navigation */}
+          <li className="mt-auto">
+            <ul role="list" className="-mx-2 space-y-1">
+              {bottomNavigation.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className={`group flex gap-x-3 rounded-xl p-3 text-sm font-medium leading-6 transition-colors ${
+                      pathname === item.href
+                        ? "bg-gray-50 text-black"
+                        : "text-gray-700 hover:text-black hover:bg-gray-50"
+                    }`}
+                  >
+                    <item.icon className="h-5 w-5 shrink-0" />
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            {/* User Profile */}
+            <div className="mt-6 flex items-center gap-x-4 px-3 py-3 text-sm font-medium leading-6 text-gray-900 bg-gray-50 rounded-xl">
+              <div className="h-8 w-8 rounded-full bg-black flex items-center justify-center">
+                <span className="text-white text-sm font-medium">{user.email?.charAt(0).toUpperCase()}</span>
+              </div>
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
                   {user.user_metadata?.full_name || user.email?.split("@")[0]}
                 </p>
-                <p className="text-xs text-gray-500 capitalize">{userPlan} plan</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </motion.div>
+                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </div>
   )
 }

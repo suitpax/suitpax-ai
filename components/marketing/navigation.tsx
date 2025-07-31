@@ -5,167 +5,225 @@ import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
-import { PiSparkle } from "react-icons/pi"
+import { useMediaQuery } from "@/hooks/use-media-query"
+import { createClient } from "@/lib/supabase/client"
+import type { User } from "@supabase/supabase-js"
+import { FaTwitter, FaLinkedin, FaGithub, FaDiscord } from "react-icons/fa"
 
-const navigation = [
-  { name: "Product", href: "#product" },
+const navigationItems = [
   { name: "Pricing", href: "/pricing" },
+  { name: "Manifesto", href: "/manifesto" },
   { name: "Talk to founder", href: "/contact" },
 ]
 
+const socialLinks = [
+  { name: "Twitter", href: "https://twitter.com/suitpax", icon: FaTwitter },
+  { name: "LinkedIn", href: "https://linkedin.com/company/suitpax", icon: FaLinkedin },
+  { name: "GitHub", href: "https://github.com/suitpax", icon: FaGithub },
+  { name: "Discord", href: "https://discord.gg/suitpax", icon: FaDiscord },
+]
+
 export default function Navigation() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const isMobile = useMediaQuery("(max-width: 768px)")
+  const supabase = createClient()
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      setUser(user)
+      setLoading(false)
     }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+
+    getUser()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase.auth])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+  }
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white/80 backdrop-blur-xl border-b border-gray-200/50" : "bg-transparent"
-      }`}
-    >
-      <nav className="flex items-center justify-between p-6 lg:px-8 max-w-7xl mx-auto" aria-label="Global">
-        <div className="flex lg:flex-1">
-          <Link href="/" className="-m-1.5 p-1.5">
-            <span className="sr-only">Suitpax</span>
-            <Image
-              className="h-8 w-auto"
-              src="/logo/suitpax-bl-logo.webp"
-              alt="Suitpax"
-              width={120}
-              height={32}
-              priority
-            />
-          </Link>
-        </div>
-
-        <div className="flex lg:hidden">
-          <button
-            type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
-            onClick={() => setMobileMenuOpen(true)}
-          >
-            <span className="sr-only">Open main menu</span>
-            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-          </button>
-        </div>
-
-        <div className="hidden lg:flex lg:gap-x-12">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="text-sm font-medium leading-6 text-gray-900 hover:text-gray-600 transition-colors"
-            >
-              {item.name}
+    <>
+      {/* Floating Header */}
+      <motion.nav
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed top-4 left-4 right-4 z-50 bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-lg"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14">
+            {/* Logo */}
+            <Link href="/" className="flex items-center">
+              <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={100} height={24} className="h-6 w-auto" />
             </Link>
-          ))}
-        </div>
 
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
-          <Link
-            href="/auth/login"
-            className="text-sm font-medium leading-6 text-gray-900 hover:text-gray-600 transition-colors"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/auth/signup"
-            className="rounded-xl bg-black px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black transition-colors"
-          >
-            Get started
-          </Link>
-        </div>
-      </nav>
-
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm lg:hidden"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10"
-            >
-              <div className="flex items-center justify-between">
-                <Link href="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="sr-only">Suitpax</span>
-                  <Image
-                    className="h-8 w-auto"
-                    src="/logo/suitpax-bl-logo.webp"
-                    alt="Suitpax"
-                    width={120}
-                    height={32}
-                  />
-                </Link>
-                <button
-                  type="button"
-                  className="-m-2.5 rounded-md p-2.5 text-gray-700"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <span className="sr-only">Close menu</span>
-                  <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+            {/* Desktop Navigation */}
+            {!isMobile && (
+              <div className="hidden md:flex items-center space-x-6">
+                {navigationItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="text-xs font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
               </div>
+            )}
 
-              <div className="mt-6 flow-root">
-                <div className="-my-6 divide-y divide-gray-500/10">
-                  <div className="space-y-2 py-6">
-                    <div className="flex items-center gap-2 px-3 py-2">
-                      <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-                        <PiSparkle className="mr-1.5 h-3 w-3" />
-                        <em className="font-serif italic">MCP-powered AI Agents</em>
-                      </span>
-                    </div>
-                    {navigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-medium leading-7 text-gray-900 hover:bg-gray-50 transition-colors"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                  <div className="py-6 space-y-2">
+            {/* Social Links & Auth */}
+            <div className="flex items-center space-x-3">
+              {/* Social Links - Desktop Only */}
+              {!isMobile && (
+                <div className="hidden md:flex items-center space-x-2">
+                  {socialLinks.map((social) => (
+                    <Link
+                      key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-600 hover:text-black transition-colors"
+                    >
+                      <social.icon className="h-3 w-3" />
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Auth Buttons */}
+              {loading ? (
+                <div className="w-16 h-6 bg-gray-200 animate-pulse rounded-lg"></div>
+              ) : user ? (
+                <div className="flex items-center space-x-2">
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-black hover:bg-gray-800 rounded-lg transition-colors tracking-tight"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="text-xs font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  {/* Login solo en desktop */}
+                  {!isMobile && (
                     <Link
                       href="/auth/login"
-                      className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-medium leading-7 text-gray-900 hover:bg-gray-50 transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-xs font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
                     >
-                      Log in
+                      Log In
                     </Link>
+                  )}
+                  <Link
+                    href="/auth/signup"
+                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-black hover:bg-gray-800 rounded-lg transition-colors tracking-tight"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+
+              {/* Mobile menu button */}
+              {isMobile && (
+                <button
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="p-1.5 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors"
+                >
+                  {isOpen ? <XMarkIcon className="h-4 w-4" /> : <Bars3Icon className="h-4 w-4" />}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.nav>
+
+      {/* Mobile Navigation Menu */}
+      <AnimatePresence>
+        {isOpen && isMobile && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="fixed top-20 left-4 right-4 z-40 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-xl md:hidden"
+          >
+            <div className="px-4 py-6 space-y-4">
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className="block text-sm font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+                >
+                  {item.name}
+                </Link>
+              ))}
+
+              {/* Social Links - Mobile */}
+              <div className="pt-4 border-t border-gray-200">
+                <p className="text-xs font-medium text-gray-900 mb-3">Follow us</p>
+                <div className="flex items-center space-x-4">
+                  {socialLinks.map((social) => (
                     <Link
-                      href="/auth/signup"
-                      className="-mx-3 block rounded-lg bg-black px-3 py-2.5 text-base font-medium leading-7 text-white hover:bg-gray-800 transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
+                      key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-600 hover:text-black transition-colors"
                     >
-                      Get started
+                      <social.icon className="h-4 w-4" />
                     </Link>
-                  </div>
+                  ))}
                 </div>
               </div>
-            </motion.div>
-          </>
+
+              {/* Auth buttons en móvil si no hay usuario */}
+              {!loading && !user && (
+                <div className="pt-4 border-t border-gray-200 space-y-3">
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full text-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors tracking-tight"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full text-center px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-xl transition-colors tracking-tight"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </header>
+
+      {/* Mobile backdrop */}
+      {isOpen && isMobile && (
+        <div className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm md:hidden" onClick={() => setIsOpen(false)} />
+      )}
+    </>
   )
 }

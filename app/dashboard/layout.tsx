@@ -35,12 +35,26 @@ export default async function DashboardLayout({
     <div className="min-h-screen bg-gray-50">
       <AppErrorBoundary>
         <div className="flex h-screen">
-          <Sidebar user={user} userPlan={userPlan} />
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <Header user={user} userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
-            <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          {/* Sidebar - Hidden on mobile, visible on desktop */}
+          <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0">
+            <Sidebar user={user} userPlan={userPlan} />
+          </div>
+
+          {/* Main content area */}
+          <div className="flex-1 flex flex-col lg:pl-64">
+            {/* Header */}
+            <div className="sticky top-0 z-40">
+              <Header user={user} userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
+            </div>
+
+            {/* Main content */}
+            <main className="flex-1 overflow-y-auto">
+              <div className="px-4 sm:px-6 lg:px-8 py-6">{children}</div>
+            </main>
           </div>
         </div>
+
+        {/* Toast notifications */}
         <Toaster
           position="top-right"
           toastOptions={{
@@ -49,7 +63,8 @@ export default async function DashboardLayout({
               background: "#363636",
               color: "#fff",
               fontSize: "14px",
-              borderRadius: "8px",
+              borderRadius: "12px",
+              padding: "12px 16px",
             },
             success: {
               style: {
