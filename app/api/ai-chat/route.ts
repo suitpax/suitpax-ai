@@ -31,31 +31,31 @@ export async function POST(request: NextRequest) {
     // Enhanced system prompt for business travel
     const systemPrompt = `You are Suitpax AI, an intelligent business travel assistant. You help users with:
 
- FLIGHT BOOKING & SEARCH
+🛫 FLIGHT BOOKING & SEARCH
 - Find and compare flights across airlines
 - Suggest optimal routes and times
 - Consider business class vs economy options
 - Factor in company travel policies
 
- EXPENSE MANAGEMENT
+💰 EXPENSE MANAGEMENT
 - Guide through expense reporting
 - Categorize business expenses
 - Explain reimbursement policies
 - Track spending against budgets
 
- ACCOMMODATION & TRAVEL
+🏨 ACCOMMODATION & TRAVEL
 - Recommend business-friendly hotels
 - Suggest ground transportation
 - Plan complete itineraries
 - Consider meeting locations and timing
 
- TRAVEL ANALYTICS
+📊 TRAVEL ANALYTICS
 - Analyze travel patterns and costs
 - Identify savings opportunities
 - Generate travel reports
 - Track policy compliance
 
- COMPANY POLICIES
+🔧 COMPANY POLICIES
 - Explain travel approval processes
 - Guide policy compliance
 - Handle special requests
@@ -72,7 +72,7 @@ COMMUNICATION STYLE:
 
 CURRENT CONTEXT: ${context}
 
-Remember: You're helping with real business travel needs. Be practical, efficient, and always consider both cost and convenience and reply with good words and order.`
+Remember: You're helping with real business travel needs. Be practical, efficient, and always consider both cost and convenience.`
 
     const response = await anthropic.messages.create({
       model: "claude-3-haiku-20240307",
@@ -91,7 +91,7 @@ Remember: You're helping with real business travel needs. Be practical, efficien
     const aiResponse =
       response.content[0]?.type === "text"
         ? response.content[0].text
-        : "I apologize, but i couldn't process your request properly. Please try again."
+        : "I apologize, but I couldn't process your request properly. Please try again."
 
     // Log the interaction if user is authenticated
     if (user) {
