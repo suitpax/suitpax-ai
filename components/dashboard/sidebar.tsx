@@ -9,12 +9,8 @@ import {
   PaperAirplaneIcon,
   CreditCardIcon,
   ChartBarIcon,
-  UsersIcon,
-  CalendarIcon,
-  MapPinIcon,
-  Cog6ToothIcon,
   ChatBubbleLeftRightIcon,
-  MicrophoneIcon,
+  Cog6ToothIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   SparklesIcon,
@@ -34,11 +30,7 @@ const navigation = [
   { name: "Flights", href: "/dashboard/flights", icon: PaperAirplaneIcon },
   { name: "Expenses", href: "/dashboard/expenses", icon: CreditCardIcon },
   { name: "Analytics", href: "/dashboard/analytics", icon: ChartBarIcon },
-  { name: "Team", href: "/dashboard/team", icon: UsersIcon },
-  { name: "Calendar", href: "/dashboard/calendar", icon: CalendarIcon },
-  { name: "Locations", href: "/dashboard/locations", icon: MapPinIcon },
-  { name: "AI Chat", href: "/dashboard/ai-chat", icon: ChatBubbleLeftRightIcon },
-  { name: "Voice AI", href: "/dashboard/voice-ai", icon: MicrophoneIcon, premium: true },
+  { name: "Suitpax AI", href: "/dashboard/ai-chat", icon: ChatBubbleLeftRightIcon },
   { name: "Settings", href: "/dashboard/settings", icon: Cog6ToothIcon },
 ]
 
@@ -118,24 +110,16 @@ export default function Sidebar({ user, userPlan = "free" }: SidebarProps) {
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {navigation.map((item) => {
           const isActive = pathname === item.href
-          const isLocked = item.premium && !isPremium
 
           return (
             <Link
               key={item.name}
-              href={isLocked ? "#" : item.href}
+              href={item.href}
               className={`
                 flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                ${
-                  isActive
-                    ? "bg-black text-white shadow-lg"
-                    : isLocked
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-black"
-                }
+                ${isActive ? "bg-black text-white shadow-lg" : "text-gray-700 hover:bg-gray-100 hover:text-black"}
                 ${collapsed ? "justify-center" : ""}
               `}
-              onClick={isLocked ? (e) => e.preventDefault() : undefined}
             >
               <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
 
@@ -149,11 +133,6 @@ export default function Sidebar({ user, userPlan = "free" }: SidebarProps) {
                     className="flex items-center justify-between w-full"
                   >
                     <span>{item.name}</span>
-                    {isLocked && (
-                      <div className="inline-flex items-center rounded-md bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
-                        Pro
-                      </div>
-                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -179,7 +158,7 @@ export default function Sidebar({ user, userPlan = "free" }: SidebarProps) {
                 className="flex-1 min-w-0"
               >
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {user.user_metadata?.full_name || user.email?.split("@")[0]}
+                  {user.user_metadata?.full_name?.split(" ")[0] || user.email?.split("@")[0]}
                 </p>
                 <p className="text-xs text-gray-500 capitalize">{userPlan} plan</p>
               </motion.div>
