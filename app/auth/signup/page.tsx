@@ -7,8 +7,14 @@ import { motion } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
+import { ArrowLeftIcon, EyeIcon, EyeSlashIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import Image from "next/image"
+
+interface PasswordStrength {
+  score: number
+  feedback: string[]
+  isValid: boolean
+}
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("")
@@ -18,11 +24,68 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
+    score: 0,
+    feedback: [],
+    isValid: false,
+  })
   const router = useRouter()
   const supabase = createClient()
 
+  const checkPasswordStrength = (pwd: string): PasswordStrength => {
+    const feedback: string[] = []
+    let score = 0
+
+    if (pwd.length >= 8) {
+      score += 1
+    } else {
+      feedback.push("At least 8 characters")
+    }
+
+    if (/[A-Z]/.test(pwd)) {
+      score += 1
+    } else {
+      feedback.push("One uppercase letter")
+    }
+
+    if (/[a-z]/.test(pwd)) {
+      score += 1
+    } else {
+      feedback.push("One lowercase letter")
+    }
+
+    if (/\d/.test(pwd)) {
+      score += 1
+    } else {
+      feedback.push("One number")
+    }
+
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) {
+      score += 1
+    } else {
+      feedback.push("One special character")
+    }
+
+    return {
+      score,
+      feedback,
+      isValid: score >= 4,
+    }
+  }
+
+  const handlePasswordChange = (pwd: string) => {
+    setPassword(pwd)
+    setPasswordStrength(checkPasswordStrength(pwd))
+  }
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!passwordStrength.isValid) {
+      setError("Please create a stronger password")
+      return
+    }
+
     setLoading(true)
     setError("")
 
@@ -48,6 +111,18 @@ export default function SignupPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const getStrengthColor = (score: number) => {
+    if (score <= 2) return "bg-red-500"
+    if (score <= 3) return "bg-yellow-500"
+    return "bg-green-500"
+  }
+
+  const getStrengthText = (score: number) => {
+    if (score <= 2) return "Weak"
+    if (score <= 3) return "Medium"
+    return "Strong"
   }
 
   return (
@@ -80,10 +155,10 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <h2 className="text-center text-4xl md:text-5xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
+          <h2 className="text-center text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
             Get started
           </h2>
-          <p className="text-center text-gray-600 font-light">Create your business travel account</p>
+          <p className="text-center text-gray-600 font-light text-sm">Create your business travel account</p>
         </motion.div>
 
         {/* Form */}
@@ -166,7 +241,7 @@ export default function SignupPage() {
                     autoComplete="new-password"
                     required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
                     placeholder="Create a strong password"
                     className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light transition-all pr-12"
                   />
@@ -178,15 +253,68 @@ export default function SignupPage() {
                     {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                   </button>
                 </div>
+
+                {/* Password Strength Indicator */}
+                {password && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="mt-3"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium text-gray-600">Password strength</span>
+                      <span
+                        className={`text-xs font-medium ${
+                          passwordStrength.score <= 2
+                            ? "text-red-600"
+                            : passwordStrength.score <= 3
+                              ? "text-yellow-600"
+                              : "text-green-600"
+                        }`}
+                      >
+                        {getStrengthText(passwordStrength.score)}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${getStrengthColor(passwordStrength.score)}`}
+                        style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
+                      ></div>
+                    </div>
+                    {passwordStrength.feedback.length > 0 && (
+                      <div className="space-y-1">
+                        {passwordStrength.feedback.map((item, index) => (
+                          <div key={index} className="flex items-center text-xs text-gray-600">
+                            <XMarkIcon className="h-3 w-3 text-red-500 mr-2" />
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {passwordStrength.isValid && (
+                      <div className="flex items-center text-xs text-green-600">
+                        <CheckIcon className="h-3 w-3 mr-2" />
+                        Password meets security requirements
+                      </div>
+                    )}
+                  </motion.div>
+                )}
               </div>
 
               <div>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
+                  disabled={loading || !passwordStrength.isValid}
+                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
                 >
-                  {loading ? "Creating account..." : "Create account"}
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Creating account...
+                    </>
+                  ) : (
+                    "Create account"
+                  )}
                 </button>
               </div>
 

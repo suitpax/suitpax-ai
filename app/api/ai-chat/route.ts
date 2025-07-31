@@ -1,15 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
-import { streamText } from "ai"
-import { anthropic } from "@ai-sdk/anthropic"
+import Anthropic from "@anthropic-ai/sdk"
+import { createServerClient } from "@/lib/supabase/server"
+import { getContextualPrompt } from "@/lib/ai/system-prompts"
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+})
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const { messages, context } = await request.json()
 
+    // Get user from Supabase
+    const supabase = await createServerClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
@@ -18,36 +21,74 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { messages } = await request.json()
+    // Get user profile to check plan
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan, ai_requests_used, ai_requests_limit")
+      .eq("id", user.id)
+      .single()
 
-    if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json({ error: "Messages array is required" }, { status: 400 })
+    // Check usage limits
+    if (profile && profile.ai_requests_used >= profile.ai_requests_limit) {
+      return NextResponse.json(
+        {
+          error: "AI request limit reached. Please upgrade your plan.",
+          upgrade_required: true,
+        },
+        { status: 429 },
+      )
     }
 
-    const result = await streamText({
-      model: anthropic("claude-3-haiku-20240307"),
-      messages: [
-        {
-          role: "system",
-          content: `You are Suitpax AI, a helpful travel assistant for business travelers. You help with:
-          - Flight bookings and recommendations
-          - Hotel suggestions
-          - Travel policy compliance
-          - Expense management
-          - Travel itinerary planning
-          - Local recommendations for business travelers
-          
-          Always be professional, concise, and focused on business travel needs. If asked about non-travel topics, politely redirect to travel-related assistance.`,
-        },
-        ...messages,
-      ],
+    // Generate response using Claude 4 Opus
+    const systemPrompt = getContextualPrompt(context || "general business travel assistance", profile?.plan || "free")
+
+    const response = await anthropic.messages.create({
+      model: "claude-3-5-sonnet-20241022", // Latest Claude model
+      max_tokens: 1000,
       temperature: 0.7,
-      maxTokens: 1000,
+      system: systemPrompt,
+      messages: messages.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content,
+      })),
     })
 
-    return result.toAIStreamResponse()
+    const assistantMessage =
+      response.content[0].type === "text"
+        ? response.content[0].text
+        : "I apologize, but I had trouble generating a response."
+
+    // Update usage count
+    if (profile) {
+      await supabase
+        .from("profiles")
+        .update({ ai_requests_used: profile.ai_requests_used + 1 })
+        .eq("id", user.id)
+    }
+
+    // Log the conversation
+    await supabase.from("ai_chat_logs").insert({
+      user_id: user.id,
+      messages: [...messages, { role: "assistant", content: assistantMessage }],
+      context: context || "general",
+      model_used: "claude-3-5-sonnet-20241022",
+    })
+
+    return NextResponse.json({
+      message: assistantMessage,
+      usage: {
+        requests_used: (profile?.ai_requests_used || 0) + 1,
+        requests_limit: profile?.ai_requests_limit || 50,
+        plan: profile?.plan || "free",
+      },
+    })
   } catch (error) {
-    console.error("AI Chat error:", error)
-    return NextResponse.json({ error: "Failed to process chat request" }, { status: 500 })
+    console.error("AI Chat API Error:", error)
+    return NextResponse.json(
+      {
+        error: "Failed to generate response. Please try again.",
+      },
+      { status: 500 },
+    )
   }
 }

@@ -17,11 +17,11 @@ interface AgentGridProps {
 export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: AgentGridProps) {
   const [agentGrid, setAgentGrid] = useState<any[]>([])
 
-  // Function to generate the agent grid
+  // Function to generate the agent grid - reducido para mejor diseño
   const generateAgentGrid = () => {
     const grid = []
-    // Aumentar el número de agentes para hacer la grid más densa
-    const totalAgents = 200 // Aumentado de 130 a 200
+    // Reducido de 200 a 150 para quitar una fila horizontal
+    const totalAgents = 150
 
     for (let i = 0; i < totalAgents; i++) {
       // Use modulo to ensure even distribution of all agent images
@@ -56,8 +56,8 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
 
   return (
     <div className="relative mb-6 px-0.5">
-      {/* Aumentar columnas para hacer la grid más densa y compacta */}
-      <div className="grid grid-cols-12 sm:grid-cols-14 md:grid-cols-16 lg:grid-cols-18 xl:grid-cols-20 gap-0.5">
+      {/* Grid optimizada para diseño uniforme */}
+      <div className="grid grid-cols-10 sm:grid-cols-12 md:grid-cols-15 lg:grid-cols-18 xl:grid-cols-20 gap-0.5">
         {agentGrid.map((agent, index) => (
           <motion.div
             key={agent.id}
@@ -89,14 +89,14 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
                 />
               )}
             </AnimatePresence>
-            {/* Reducir el inset para hacer las imágenes más pequeñas y compactas */}
+            {/* Diseño optimizado para uniformidad */}
             <div className="absolute inset-0.5 rounded-sm overflow-hidden bg-gray-100">
               <Image
                 src={agent.image || "/placeholder.svg"}
                 alt="AI Travel Agent"
                 fill
                 className="object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
-                sizes="20px" // Reducido de 30px a 20px
+                sizes="18px" // Optimizado para el nuevo grid
               />
             </div>
           </motion.div>
