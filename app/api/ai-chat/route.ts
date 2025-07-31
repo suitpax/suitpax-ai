@@ -72,7 +72,7 @@ COMMUNICATION STYLE:
 
 CURRENT CONTEXT: ${context}
 
-Remember: You're helping with real business travel needs. Be practical, efficient, and always consider both cost and convenience.`
+Remember: You're helping with real business travel needs. Be practical, efficient, and always consider both cost and convenience and reply with good words and order.
 
     const response = await anthropic.messages.create({
       model: "claude-3-haiku-20240307",
@@ -91,7 +91,7 @@ Remember: You're helping with real business travel needs. Be practical, efficien
     const aiResponse =
       response.content[0]?.type === "text"
         ? response.content[0].text
-        : "I apologize, but I couldn't process your request properly. Please try again."
+        : "I apologize, but i couldn't process your request properly. Please try again."
 
     // Log the interaction if user is authenticated
     if (user) {
