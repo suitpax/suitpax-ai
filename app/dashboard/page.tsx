@@ -87,9 +87,9 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 p-4 lg:p-0">
         <div className="h-8 bg-gray-200 rounded-lg animate-pulse"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="h-32 bg-gray-200 rounded-xl animate-pulse"></div>
           ))}
@@ -101,23 +101,23 @@ export default function DashboardPage() {
   const isPremium = userPlan === "premium" || userPlan === "enterprise"
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 lg:p-0">
       {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-gradient-to-r from-black to-gray-800 rounded-2xl p-6 text-white"
+        className="bg-gradient-to-r from-black to-gray-800 rounded-2xl p-4 sm:p-6 text-white"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
-            <h1 className="text-2xl font-medium tracking-tighter">
+            <h1 className="text-xl sm:text-2xl font-medium tracking-tighter">
               Welcome back, {user?.user_metadata?.full_name || user?.email?.split("@")[0]}
             </h1>
-            <p className="text-gray-300 mt-1">Ready to manage your business travel efficiently?</p>
+            <p className="text-gray-300 mt-1 text-sm sm:text-base">Ready to manage your business travel efficiently?</p>
           </div>
           <div className="flex items-center space-x-2">
-            <SparklesIcon className="h-6 w-6" />
+            <SparklesIcon className="h-5 w-5 sm:h-6 sm:w-6" />
             <span className="text-sm font-medium">{userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} Plan</span>
           </div>
         </div>
@@ -129,13 +129,13 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <QuickActions userPlan={userPlan} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Recent Activity */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="bg-white rounded-2xl border border-gray-200 p-6"
+          className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6"
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-medium tracking-tighter">Recent Activity</h2>
@@ -168,7 +168,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-white rounded-2xl border border-gray-200 p-6"
+          className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6"
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-medium tracking-tighter">Upcoming Trips</h2>
@@ -210,9 +210,9 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl border border-emerald-200 p-6"
+          className="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl border border-emerald-200 p-4 sm:p-6"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div>
               <h3 className="text-lg font-medium tracking-tighter text-gray-900">Unlock Premium Features</h3>
               <p className="text-sm text-gray-600 mt-1">
@@ -221,7 +221,7 @@ export default function DashboardPage() {
             </div>
             <Link
               href="/pricing"
-              className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center justify-center px-4 py-2 bg-black text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors"
             >
               Upgrade Now
             </Link>
