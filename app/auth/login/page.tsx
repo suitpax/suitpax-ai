@@ -4,11 +4,10 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { motion } from "framer-motion"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import { createClient } from "@/lib/supabase/client"
-import { PiSparkle } from "react-icons/pi"
+import { PiSparkle, PiArrowRight } from "react-icons/pi"
 import toast from "react-hot-toast"
 
 export default function LoginPage() {
@@ -75,50 +74,71 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gray-50">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-200/40 via-transparent to-transparent"></div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-br from-gray-200/30 to-transparent rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-300/20 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-emerald-100/10 to-gray-200/10 rounded-full blur-2xl animate-pulse delay-500"></div>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="w-full max-w-md"
-        >
+      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md">
           {/* Header */}
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-block mb-6">
-              <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={140} height={36} className="h-9 w-auto" />
-            </Link>
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-8"
+          >
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="inline-flex items-center rounded-xl bg-gray-200 px-3 py-1 text-xs font-medium text-gray-700"
+              >
                 <PiSparkle className="mr-1.5 h-3 w-3" />
                 <em className="font-serif italic">MCP-powered AI Agents</em>
-              </span>
+              </motion.div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Welcome back</h1>
-            <p className="text-gray-600 font-light">
-              <em className="font-serif italic">Designed to make your journey seamless</em>
-            </p>
-          </div>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="text-3xl sm:text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-3"
+            >
+              Welcome back to the <em className="font-serif italic text-emerald-950">future</em>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="text-sm font-medium text-gray-500"
+            >
+              <em className="font-serif italic">Sign in to continue your journey</em>
+            </motion.p>
+          </motion.div>
 
           {/* Form */}
-          <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 sm:p-8 shadow-xl shadow-gray-200/20"
+          >
             {error && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-2xl text-red-700 text-sm"
               >
                 {error}
               </motion.div>
             )}
 
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-5">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email address
@@ -129,7 +149,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light"
+                  className="w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300/50 focus:border-transparent transition-all font-light text-sm"
                   placeholder="Enter your email"
                 />
               </div>
@@ -145,13 +165,13 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light"
+                    className="w-full px-4 py-3.5 pr-12 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300/50 focus:border-transparent transition-all font-light text-sm"
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                   </button>
@@ -161,39 +181,53 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <Link
                   href="/auth/forgot-password"
-                  className="text-sm text-gray-600 hover:text-black transition-colors font-light"
+                  className="text-sm text-gray-500 hover:text-black transition-colors font-light"
                 >
                   <em className="font-serif italic">Forgot password?</em>
                 </Link>
               </div>
 
-              <button
+              <motion.button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-black text-white font-medium rounded-xl hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-3.5 px-4 bg-black text-white font-medium rounded-2xl hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight flex items-center justify-center group"
               >
-                {loading ? "Signing in..." : "Sign in"}
-              </button>
+                {loading ? (
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                    Signing in...
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    Sign in
+                    <PiArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                )}
+              </motion.button>
             </form>
 
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
+                  <div className="w-full border-t border-gray-200/50" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500 font-light">
+                  <span className="px-3 bg-white/70 text-gray-500 font-light">
                     <em className="font-serif italic">Or continue with</em>
                   </span>
                 </div>
               </div>
 
-              <button
+              <motion.button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="mt-4 w-full py-3 px-4 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight flex items-center justify-center"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="mt-4 w-full py-3.5 px-4 bg-white/80 backdrop-blur-sm border border-gray-200/50 text-gray-700 font-medium rounded-2xl hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-300/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight flex items-center justify-center"
               >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -212,17 +246,37 @@ export default function LoginPage() {
                   />
                 </svg>
                 Continue with Google
-              </button>
+              </motion.button>
             </div>
 
-            <p className="mt-6 text-center text-sm text-gray-600 font-light">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="mt-6 text-center text-sm text-gray-500 font-light"
+            >
               <em className="font-serif italic">Don't have an account?</em>{" "}
-              <Link href="/auth/signup" className="text-black hover:text-gray-800 font-medium transition-colors">
+              <Link href="/auth/signup" className="text-black hover:text-gray-700 font-medium transition-colors">
                 Sign up
               </Link>
-            </p>
-          </div>
-        </motion.div>
+            </motion.p>
+          </motion.div>
+
+          {/* Back to Home */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="text-center mt-6"
+          >
+            <Link
+              href="/"
+              className="inline-flex items-center text-sm text-gray-500 hover:text-black transition-colors font-light"
+            >
+              ← <em className="font-serif italic ml-1">Back to home</em>
+            </Link>
+          </motion.div>
+        </div>
       </div>
     </div>
   )

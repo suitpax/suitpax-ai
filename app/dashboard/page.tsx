@@ -1,70 +1,68 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import {
-  AirplaneIcon,
-  ChartBarIcon,
+  PaperAirplaneIcon,
+  CreditCardIcon,
   UsersIcon,
-  CalendarIcon,
-  ArrowTrendingUpIcon,
   ClockIcon,
-  CheckCircleIcon,
-  ChatBubbleLeftRightIcon,
-  MicrophoneIcon,
-  ArrowRightIcon,
+  MapPinIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
+import StatsOverview from "@/components/dashboard/stats-overview"
+import QuickActions from "@/components/dashboard/quick-actions"
 import Link from "next/link"
 
-const stats = [
-  { name: "Total Trips", value: "24", change: "+12%", icon: AirplaneIcon, color: "bg-blue-50 text-blue-600" },
-  { name: "This Month", value: "$12,450", change: "+8%", icon: ChartBarIcon, color: "bg-green-50 text-green-600" },
-  { name: "Team Members", value: "8", change: "+2", icon: UsersIcon, color: "bg-purple-50 text-purple-600" },
-  { name: "Upcoming", value: "3", change: "Next 7 days", icon: CalendarIcon, color: "bg-orange-50 text-orange-600" },
-]
-
-const quickActions = [
+const recentActivities = [
   {
-    name: "Book Flight",
-    icon: AirplaneIcon,
-    href: "/dashboard/flights",
-    description: "Find and book your next trip",
-    color: "bg-blue-50 text-blue-600 border-blue-100",
+    id: 1,
+    type: "flight",
+    title: "Flight to London booked",
+    description: "LHR - Departing March 15, 2024",
+    time: "2 hours ago",
+    icon: PaperAirplaneIcon,
   },
   {
-    name: "AI Chat",
-    icon: ChatBubbleLeftRightIcon,
-    href: "/dashboard/ai-chat",
-    description: "Get travel assistance",
-    color: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    id: 2,
+    type: "expense",
+    title: "Hotel expense submitted",
+    description: "$450 - Hilton London",
+    time: "4 hours ago",
+    icon: CreditCardIcon,
   },
   {
-    name: "Voice AI",
-    icon: MicrophoneIcon,
-    href: "/dashboard/voice-ai",
-    description: "Voice-powered travel planning",
-    color: "bg-purple-50 text-purple-600 border-purple-100",
-  },
-  {
-    name: "Analytics",
-    icon: ChartBarIcon,
-    href: "/dashboard/analytics",
-    description: "View travel insights",
-    color: "bg-orange-50 text-orange-600 border-orange-100",
+    id: 3,
+    type: "team",
+    title: "New team member added",
+    description: "Sarah Johnson joined the team",
+    time: "1 day ago",
+    icon: UsersIcon,
   },
 ]
 
-const recentActivity = [
-  { id: 1, action: "Flight booked", details: "SFO → NYC", time: "2 hours ago", status: "completed" },
-  { id: 2, action: "Expense submitted", details: "$245 hotel", time: "4 hours ago", status: "pending" },
-  { id: 3, action: "Trip approved", details: "London business trip", time: "1 day ago", status: "completed" },
-  { id: 4, action: "AI chat session", details: "Travel policy questions", time: "2 days ago", status: "completed" },
+const upcomingTrips = [
+  {
+    id: 1,
+    destination: "London, UK",
+    date: "March 15, 2024",
+    type: "Business",
+    status: "confirmed",
+  },
+  {
+    id: 2,
+    destination: "Tokyo, Japan",
+    date: "April 2, 2024",
+    type: "Conference",
+    status: "pending",
+  },
 ]
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
+  const [userPlan, setUserPlan] = useState("free")
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
@@ -74,218 +72,162 @@ export default function DashboardPage() {
         data: { user },
       } = await supabase.auth.getUser()
       setUser(user)
+
+      if (user) {
+        const { data: profile } = await supabase.from("profiles").select("subscription_plan").eq("id", user.id).single()
+
+        setUserPlan(profile?.subscription_plan || "free")
+      }
+
       setLoading(false)
     }
 
     getUser()
-  }, [supabase.auth])
-
-  const getUserDisplayName = (user: User | null) => {
-    if (!user) return "User"
-    return user.user_metadata?.full_name || user.email?.split("@")[0] || "User"
-  }
-
-  const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return "Good morning"
-    if (hour < 18) return "Good afternoon"
-    return "Good evening"
-  }
+  }, [supabase])
 
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-        </div>
+        <div className="h-8 bg-gray-200 rounded-lg animate-pulse"></div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-24 bg-gray-200 rounded-xl animate-pulse"></div>
+            <div key={i} className="h-32 bg-gray-200 rounded-xl animate-pulse"></div>
           ))}
         </div>
       </div>
     )
   }
 
+  const isPremium = userPlan === "premium" || userPlan === "enterprise"
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="mb-8"
+        className="bg-gradient-to-r from-black to-gray-800 rounded-2xl p-6 text-white"
       >
-        <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">
-          {getGreeting()}, {getUserDisplayName(user)}
-        </h1>
-        <p className="text-gray-600 font-light">
-          <em className="font-serif italic">Ready to plan your next business trip?</em>
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-medium tracking-tighter">
+              Welcome back, {user?.user_metadata?.full_name || user?.email?.split("@")[0]}
+            </h1>
+            <p className="text-gray-300 mt-1">Ready to manage your business travel efficiently?</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <SparklesIcon className="h-6 w-6" />
+            <span className="text-sm font-medium">{userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} Plan</span>
+          </div>
+        </div>
       </motion.div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <motion.div
-            key={stat.name}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-700 uppercase tracking-wide">{stat.name}</p>
-                <p className="text-2xl font-medium text-black mt-1">{stat.value}</p>
-                <p className="text-xs text-green-600 mt-1">{stat.change}</p>
-              </div>
-              <div className={`w-12 h-12 ${stat.color} rounded-xl flex items-center justify-center`}>
-                <stat.icon className="h-6 w-6" />
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+      {/* Stats Overview */}
+      <StatsOverview userPlan={userPlan} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Quick Actions */}
-        <div className="lg:col-span-2">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
-          >
-            <h3 className="text-lg font-medium tracking-tighter text-black mb-6">
-              <em className="font-serif italic">Quick Actions</em>
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {quickActions.map((action, index) => (
-                <motion.div
-                  key={action.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + index * 0.1 }}
-                >
-                  <Link
-                    href={action.href}
-                    className={`block p-4 rounded-xl border ${action.color} hover:shadow-md transition-all duration-200 group`}
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <action.icon className="h-6 w-6" />
-                      <ArrowRightIcon className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                    <h4 className="font-medium tracking-tight text-black mb-1">{action.name}</h4>
-                    <p className="text-xs text-gray-600 font-light">
-                      <em className="font-serif italic">{action.description}</em>
-                    </p>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+      {/* Quick Actions */}
+      <QuickActions userPlan={userPlan} />
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
-        <div className="lg:col-span-1">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-medium tracking-tighter text-black">
-                <em className="font-serif italic">Recent Activity</em>
-              </h3>
-              <Link
-                href="/dashboard/analytics"
-                className="text-xs font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
-              >
-                View all
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {recentActivity.map((activity, index) => (
-                <motion.div
-                  key={activity.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                  className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="bg-white rounded-2xl border border-gray-200 p-6"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-medium tracking-tighter">Recent Activity</h2>
+            <Link href="/dashboard/analytics" className="text-sm text-gray-500 hover:text-black transition-colors">
+              View all
+            </Link>
+          </div>
+
+          <div className="space-y-4">
+            {recentActivities.map((activity) => (
+              <div key={activity.id} className="flex items-start space-x-3">
+                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <activity.icon className="h-4 w-4 text-gray-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                  <p className="text-xs text-gray-500">{activity.description}</p>
+                </div>
+                <div className="flex items-center text-xs text-gray-400">
+                  <ClockIcon className="h-3 w-3 mr-1" />
+                  {activity.time}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Upcoming Trips */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="bg-white rounded-2xl border border-gray-200 p-6"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-medium tracking-tighter">Upcoming Trips</h2>
+            <Link href="/dashboard/flights" className="text-sm text-gray-500 hover:text-black transition-colors">
+              View all
+            </Link>
+          </div>
+
+          <div className="space-y-4">
+            {upcomingTrips.map((trip) => (
+              <div key={trip.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                    <MapPinIcon className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{trip.destination}</p>
+                    <p className="text-xs text-gray-500">
+                      {trip.date} • {trip.type}
+                    </p>
+                  </div>
+                </div>
+                <div
+                  className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                    trip.status === "confirmed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                  }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className={`w-2 h-2 rounded-full ${
-                        activity.status === "completed" ? "bg-green-500" : "bg-yellow-500"
-                      }`}
-                    />
-                    <div>
-                      <p className="text-sm font-medium text-black">{activity.action}</p>
-                      <p className="text-xs text-gray-600 font-light">
-                        <em className="font-serif italic">{activity.details}</em>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500">{activity.time}</span>
-                    {activity.status === "completed" ? (
-                      <CheckCircleIcon className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <ClockIcon className="h-4 w-4 text-yellow-500" />
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+                  {trip.status}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </div>
 
-      {/* Travel Insights */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-medium tracking-tighter text-black">
-            <em className="font-serif italic">Travel Insights</em>
-          </h3>
-          <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-            AI Powered
+      {/* Upgrade CTA for free users */}
+      {!isPremium && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl border border-emerald-200 p-6"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-medium tracking-tighter text-gray-900">Unlock Premium Features</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Get access to AI Voice Agents, advanced analytics, and priority support.
+              </p>
+            </div>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors"
+            >
+              Upgrade Now
+            </Link>
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-gray-50 rounded-xl">
-            <ArrowTrendingUpIcon className="h-6 w-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-black mb-1">Cost Savings</p>
-            <p className="text-2xl font-medium text-green-600 mb-1">$2,340</p>
-            <p className="text-xs text-gray-600 font-light">
-              <em className="font-serif italic">vs last month</em>
-            </p>
-          </div>
-          <div className="text-center p-4 bg-gray-50 rounded-xl">
-            <ClockIcon className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-black mb-1">Avg Trip Time</p>
-            <p className="text-2xl font-medium text-blue-600 mb-1">3.2 days</p>
-            <p className="text-xs text-gray-600 font-light">
-              <em className="font-serif italic">optimal duration</em>
-            </p>
-          </div>
-          <div className="text-center p-4 bg-gray-50 rounded-xl">
-            <CheckCircleIcon className="h-6 w-6 text-purple-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-black mb-1">Policy Compliance</p>
-            <p className="text-2xl font-medium text-purple-600 mb-1">94%</p>
-            <p className="text-xs text-gray-600 font-light">
-              <em className="font-serif italic">team average</em>
-            </p>
-          </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
     </div>
   )
 }

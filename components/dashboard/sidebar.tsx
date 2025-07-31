@@ -3,11 +3,11 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   HomeIcon,
-  AirplaneIcon,
+  PaperAirplaneIcon,
+  CreditCardIcon,
   ChartBarIcon,
   UsersIcon,
   CalendarIcon,
@@ -15,137 +15,146 @@ import {
   Cog6ToothIcon,
   ChatBubbleLeftRightIcon,
   MicrophoneIcon,
-  ChevronDownIcon,
-  UserCircleIcon,
-  ArrowRightOnRectangleIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline"
-import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
-import toast from "react-hot-toast"
+import Image from "next/image"
 
-const navigationItems = [
-  { name: "Overview", href: "/dashboard", icon: HomeIcon },
-  { name: "Flights", href: "/dashboard/flights", icon: AirplaneIcon },
-  { name: "AI Chat", href: "/dashboard/ai-chat", icon: ChatBubbleLeftRightIcon },
-  { name: "Voice AI", href: "/dashboard/voice-ai", icon: MicrophoneIcon },
+interface SidebarProps {
+  user: User
+  userPlan?: string
+}
+
+const navigation = [
+  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
+  { name: "Flights", href: "/dashboard/flights", icon: PaperAirplaneIcon },
+  { name: "Expenses", href: "/dashboard/expenses", icon: CreditCardIcon },
   { name: "Analytics", href: "/dashboard/analytics", icon: ChartBarIcon },
   { name: "Team", href: "/dashboard/team", icon: UsersIcon },
   { name: "Calendar", href: "/dashboard/calendar", icon: CalendarIcon },
   { name: "Locations", href: "/dashboard/locations", icon: MapPinIcon },
+  { name: "AI Chat", href: "/dashboard/ai-chat", icon: ChatBubbleLeftRightIcon },
+  { name: "Voice AI", href: "/dashboard/voice-ai", icon: MicrophoneIcon, premium: true },
   { name: "Settings", href: "/dashboard/settings", icon: Cog6ToothIcon },
 ]
 
-interface SidebarProps {
-  user: User
-}
-
-export default function Sidebar({ user }: SidebarProps) {
+export default function Sidebar({ user, userPlan = "free" }: SidebarProps) {
+  const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const supabase = createClient()
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut()
-      toast.success("Signed out successfully")
-      window.location.href = "/"
-    } catch (error) {
-      toast.error("Error signing out")
-    }
-  }
-
-  const getUserInitials = (user: User) => {
-    if (user.user_metadata?.full_name) {
-      return user.user_metadata.full_name
-        .split(" ")
-        .map((name: string) => name[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    }
-    return user.email?.slice(0, 2).toUpperCase() || "U"
-  }
-
-  const getUserDisplayName = (user: User) => {
-    return user.user_metadata?.full_name || user.email?.split("@")[0] || "User"
-  }
+  const isPremium = userPlan === "premium" || userPlan === "enterprise"
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-      {/* Logo */}
-      <div className="p-6 border-b border-gray-200">
-        <Link href="/dashboard" className="flex items-center space-x-2">
-          <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={100} height={24} className="h-6 w-auto" />
-          <div className="inline-flex items-center rounded-lg bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700">
-            Dashboard
-          </div>
-        </Link>
+    <motion.div
+      animate={{ width: collapsed ? 80 : 280 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="bg-white border-r border-gray-200 flex flex-col"
+    >
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <AnimatePresence mode="wait">
+            {!collapsed && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="flex items-center space-x-2"
+              >
+                <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={120} height={28} className="h-7 w-auto" />
+                <div className="inline-flex items-center rounded-lg bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700">
+                  <SparklesIcon className="mr-1 h-2.5 w-2.5" />
+                  <em className="font-serif italic">Beta</em>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            {collapsed ? <ChevronRightIcon className="h-4 w-4" /> : <ChevronLeftIcon className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
-        {navigationItems.map((item) => {
+        {navigation.map((item) => {
           const isActive = pathname === item.href
+          const isLocked = item.premium && !isPremium
+
           return (
             <Link
               key={item.name}
-              href={item.href}
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-colors ${
-                isActive ? "bg-gray-100 text-black" : "text-gray-600 hover:text-black hover:bg-gray-50"
-              }`}
+              href={isLocked ? "#" : item.href}
+              className={`
+                flex items-center px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200
+                ${
+                  isActive
+                    ? "bg-black text-white shadow-lg"
+                    : isLocked
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-black"
+                }
+                ${collapsed ? "justify-center" : ""}
+              `}
+              onClick={isLocked ? (e) => e.preventDefault() : undefined}
             >
-              <item.icon className="mr-3 h-5 w-5" />
-              {item.name}
+              <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
+
+              <AnimatePresence mode="wait">
+                {!collapsed && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center justify-between w-full"
+                  >
+                    <span>{item.name}</span>
+                    {isLocked && (
+                      <div className="inline-flex items-center rounded-md bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
+                        Pro
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </Link>
           )
         })}
       </nav>
 
-      {/* User Menu */}
+      {/* User Profile */}
       <div className="p-4 border-t border-gray-200">
-        <div className="relative">
-          <button
-            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-black hover:bg-gray-50 rounded-xl transition-colors"
-          >
-            <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-xs font-medium mr-3">
-              {getUserInitials(user)}
-            </div>
-            <div className="flex-1 text-left">
-              <div className="text-sm font-medium text-black truncate">{getUserDisplayName(user)}</div>
-              <div className="text-xs text-gray-500 truncate">{user.email}</div>
-            </div>
-            <ChevronDownIcon className={`h-4 w-4 transition-transform ${isUserMenuOpen ? "rotate-180" : ""}`} />
-          </button>
+        <div className={`flex items-center ${collapsed ? "justify-center" : "space-x-3"}`}>
+          <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-sm font-medium">{user.email?.charAt(0).toUpperCase()}</span>
+          </div>
 
-          <AnimatePresence>
-            {isUserMenuOpen && (
+          <AnimatePresence mode="wait">
+            {!collapsed && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-xl shadow-lg py-2"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+                className="flex-1 min-w-0"
               >
-                <Link
-                  href="/dashboard/profile"
-                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50"
-                  onClick={() => setIsUserMenuOpen(false)}
-                >
-                  <UserCircleIcon className="mr-3 h-4 w-4" />
-                  Profile
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="w-full flex items-center px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50"
-                >
-                  <ArrowRightOnRectangleIcon className="mr-3 h-4 w-4" />
-                  Sign Out
-                </button>
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user.user_metadata?.full_name || user.email?.split("@")[0]}
+                </p>
+                <p className="text-xs text-gray-500 capitalize">{userPlan} plan</p>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

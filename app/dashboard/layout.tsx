@@ -21,13 +21,23 @@ export default async function DashboardLayout({
     redirect("/auth/login")
   }
 
+  // Get user profile to check subscription plan
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("subscription_plan, subscription_status")
+    .eq("id", user.id)
+    .single()
+
+  const userPlan = profile?.subscription_plan || "free"
+  const subscriptionStatus = profile?.subscription_status || "inactive"
+
   return (
     <div className="min-h-screen bg-gray-50">
       <AppErrorBoundary>
         <div className="flex h-screen">
-          <Sidebar user={user} />
+          <Sidebar user={user} userPlan={userPlan} />
           <div className="flex-1 flex flex-col overflow-hidden">
-            <Header user={user} />
+            <Header user={user} userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
             <main className="flex-1 overflow-y-auto p-6">{children}</main>
           </div>
         </div>
