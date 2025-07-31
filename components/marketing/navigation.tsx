@@ -9,13 +9,6 @@ import { useMediaQuery } from "@/hooks/use-media-query"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 
-const navigationItems = [
-  { name: "Solutions", href: "/solutions" },
-  { name: "Pricing", href: "/pricing" },
-  { name: "Manifesto", href: "/manifesto" },
-  { name: "Contact", href: "/contact" },
-]
-
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
@@ -58,22 +51,7 @@ export default function Navigation() {
             <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={120} height={32} className="h-8 w-auto" />
           </Link>
 
-          {/* Desktop Navigation */}
-          {!isMobile && (
-            <div className="hidden md:flex items-center space-x-8">
-              {navigationItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-sm font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {/* Auth Buttons */}
+          {/* Right side - Simple design like before */}
           <div className="flex items-center space-x-4">
             {loading ? (
               <div className="w-20 h-8 bg-gray-200 animate-pulse rounded-xl"></div>
@@ -94,12 +72,6 @@ export default function Navigation() {
               </div>
             ) : (
               <div className="flex items-center space-x-3">
-                <Link
-                  href="/auth/login"
-                  className="text-sm font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
-                >
-                  Log In
-                </Link>
                 <Link
                   href="/auth/signup"
                   className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-xl transition-colors tracking-tight"
@@ -132,16 +104,34 @@ export default function Navigation() {
             className="md:hidden bg-white border-t border-gray-200"
           >
             <div className="px-4 py-6 space-y-4">
-              {navigationItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className="block text-base font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
-                >
-                  {item.name}
-                </Link>
-              ))}
+              <Link
+                href="/solutions"
+                onClick={() => setIsOpen(false)}
+                className="block text-base font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+              >
+                Solutions
+              </Link>
+              <Link
+                href="/pricing"
+                onClick={() => setIsOpen(false)}
+                className="block text-base font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+              >
+                Pricing
+              </Link>
+              <Link
+                href="/manifesto"
+                onClick={() => setIsOpen(false)}
+                className="block text-base font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+              >
+                Manifesto
+              </Link>
+              <Link
+                href="/contact"
+                onClick={() => setIsOpen(false)}
+                className="block text-base font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+              >
+                Contact
+              </Link>
 
               {!loading && !user && (
                 <div className="pt-4 border-t border-gray-200 space-y-3">
