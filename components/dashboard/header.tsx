@@ -1,13 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { MagnifyingGlassIcon, BellIcon, Bars3Icon } from "@heroicons/react/24/outline"
+import { MagnifyingGlassIcon, BellIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import type { User } from "@supabase/supabase-js"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
+import { toast } from "react-hot-toast"
 
 interface HeaderProps {
   user: User
@@ -19,20 +20,45 @@ export default function Header({ user, userPlan = "free", subscriptionStatus = "
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [isSigningOut, setIsSigningOut] = useState(false)
   const supabase = createClient()
   const router = useRouter()
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/")
+    setIsSigningOut(true)
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        toast.error("Error signing out")
+      } else {
+        toast.success("Signed out successfully")
+        router.push("/")
+        router.refresh()
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred")
+    } finally {
+      setIsSigningOut(false)
+      setShowUserMenu(false)
+    }
   }
 
   const isPremium = userPlan === "premium" || userPlan === "enterprise"
   const isActive = subscriptionStatus === "active"
 
+  const getPlanColor = () => {
+    if (isPremium && isActive) return "bg-emerald-100 text-emerald-800 border-emerald-200"
+    if (userPlan === "basic") return "bg-blue-100 text-blue-800 border-blue-200"
+    return "bg-gray-100 text-gray-800 border-gray-200"
+  }
+
+  const getPlanDisplayName = () => {
+    return userPlan.charAt(0).toUpperCase() + userPlan.slice(1)
+  }
+
   return (
     <>
-      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200/50 px-4 sm:px-6 lg:px-8 py-4 sticky top-0 z-30">
         <div className="flex items-center justify-between">
           {/* Mobile menu button and logo */}
           <div className="flex items-center lg:hidden">
@@ -54,7 +80,7 @@ export default function Header({ user, userPlan = "free", subscriptionStatus = "
                 placeholder="Search flights, expenses, or team members..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-all duration-200 placeholder-gray-500"
               />
             </div>
           </div>
@@ -73,11 +99,9 @@ export default function Header({ user, userPlan = "free", subscriptionStatus = "
 
             {/* Plan Badge */}
             <div
-              className={`hidden sm:inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium ${
-                isPremium && isActive ? "bg-emerald-100 text-emerald-800" : "bg-gray-100 text-gray-800"
-              }`}
+              className={`hidden sm:inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium border ${getPlanColor()}`}
             >
-              {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)}
+              {getPlanDisplayName()}
               {isPremium && isActive && <span className="ml-1.5 w-2 h-2 bg-emerald-500 rounded-full"></span>}
             </div>
 
@@ -104,55 +128,71 @@ export default function Header({ user, userPlan = "free", subscriptionStatus = "
 
               <AnimatePresence>
                 {showUserMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50"
-                  >
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-900">
-                        {user.user_metadata?.full_name || user.email?.split("@")[0]}
-                      </p>
-                      <p className="text-xs text-gray-500">{user.email}</p>
-                    </div>
+                  <>
+                    {/* Backdrop */}
+                    <div className="fixed inset-0 z-10" onClick={() => setShowUserMenu(false)} />
 
-                    <Link
-                      href="/dashboard/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                      onClick={() => setShowUserMenu(false)}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-20"
                     >
-                      Profile Settings
-                    </Link>
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-medium text-gray-900">
+                          {user.user_metadata?.full_name || user.email?.split("@")[0]}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                        <div
+                          className={`inline-flex items-center rounded-lg px-2 py-1 text-xs font-medium border mt-2 ${getPlanColor()}`}
+                        >
+                          {getPlanDisplayName()} Plan
+                          {isPremium && isActive && (
+                            <span className="ml-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                          )}
+                        </div>
+                      </div>
 
-                    <Link
-                      href="/dashboard/settings"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      Account Settings
-                    </Link>
+                      <div className="py-1">
+                        <Link
+                          href="/dashboard/profile"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          Profile Settings
+                        </Link>
 
-                    {!isPremium && (
-                      <Link
-                        href="/pricing"
-                        className="block px-4 py-2 text-sm text-emerald-700 hover:bg-emerald-50 transition-colors"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        Upgrade Plan
-                      </Link>
-                    )}
+                        <Link
+                          href="/dashboard/settings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          Account Settings
+                        </Link>
 
-                    <div className="border-t border-gray-100 mt-2 pt-2">
-                      <button
-                        onClick={handleSignOut}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors"
-                      >
-                        Sign Out
-                      </button>
-                    </div>
-                  </motion.div>
+                        {!isPremium && (
+                          <Link
+                            href="/pricing"
+                            className="block px-4 py-2 text-sm text-emerald-700 hover:bg-emerald-50 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            Upgrade Plan
+                          </Link>
+                        )}
+                      </div>
+
+                      <div className="border-t border-gray-100 pt-1">
+                        <button
+                          onClick={handleSignOut}
+                          disabled={isSigningOut}
+                          className="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isSigningOut ? "Signing out..." : "Sign Out"}
+                        </button>
+                      </div>
+                    </motion.div>
+                  </>
                 )}
               </AnimatePresence>
             </div>
@@ -190,7 +230,7 @@ export default function Header({ user, userPlan = "free", subscriptionStatus = "
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-xl lg:hidden"
             >
               {/* Mobile Sidebar Content */}
               <div className="flex h-full flex-col">
@@ -206,9 +246,7 @@ export default function Header({ user, userPlan = "free", subscriptionStatus = "
                     onClick={() => setShowMobileMenu(false)}
                     className="p-2 text-gray-500 hover:text-gray-700 rounded-lg"
                   >
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <XMarkIcon className="h-6 w-6" />
                   </button>
                 </div>
 
@@ -241,7 +279,7 @@ export default function Header({ user, userPlan = "free", subscriptionStatus = "
                       className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
                       onClick={() => setShowMobileMenu(false)}
                     >
-                      AI Chat
+                      Suitpax AI
                     </Link>
                     <Link
                       href="/dashboard/settings"
@@ -255,7 +293,7 @@ export default function Header({ user, userPlan = "free", subscriptionStatus = "
 
                 {/* Mobile user info */}
                 <div className="border-t border-gray-200 p-6">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 mb-4">
                     <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center">
                       <span className="text-white text-sm font-medium">{user.email?.charAt(0).toUpperCase()}</span>
                     </div>
@@ -267,15 +305,30 @@ export default function Header({ user, userPlan = "free", subscriptionStatus = "
                     </div>
                   </div>
 
+                  <div
+                    className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium border mb-4 ${getPlanColor()}`}
+                  >
+                    {getPlanDisplayName()} Plan
+                    {isPremium && isActive && <span className="ml-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>}
+                  </div>
+
                   {!isPremium && (
                     <Link
                       href="/pricing"
-                      className="mt-4 block w-full text-center px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-lg transition-colors"
+                      className="block w-full text-center px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-lg transition-colors mb-3"
                       onClick={() => setShowMobileMenu(false)}
                     >
                       Upgrade to Pro
                     </Link>
                   )}
+
+                  <button
+                    onClick={handleSignOut}
+                    disabled={isSigningOut}
+                    className="block w-full text-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSigningOut ? "Signing out..." : "Sign Out"}
+                  </button>
                 </div>
               </div>
             </motion.div>

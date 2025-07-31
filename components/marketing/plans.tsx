@@ -100,6 +100,7 @@ const pricingPlans = [
     agentImage: "/agents/agent-sophia.jpeg",
     communityImages: ["/community/jordan-burgess.webp", "/community/bec-ferguson.webp"],
     bgGradient: "from-gray-50 to-gray-100",
+    ctaLink: "/auth/signup",
   },
   {
     id: "basic",
@@ -126,6 +127,7 @@ const pricingPlans = [
     agentImage: "/agents/agent-emma.jpeg",
     communityImages: ["/community/kelsey-lowe.webp", "/community/brianna-ware.webp", "/community/harriet-rojas.jpg"],
     bgGradient: "from-gray-50 to-gray-100",
+    ctaLink: "/auth/signup",
   },
   {
     id: "pro",
@@ -158,6 +160,7 @@ const pricingPlans = [
       "/community/isobel-fuller.webp",
     ],
     bgGradient: "from-gray-50 to-gray-100",
+    ctaLink: "mailto:hello@suitpax.com",
   },
   {
     id: "enterprise",
@@ -194,6 +197,7 @@ const pricingPlans = [
       "/community/scott-clayton.webp",
     ],
     bgGradient: "from-gray-50 to-gray-100",
+    ctaLink: "mailto:hello@suitpax.com",
   },
 ]
 
@@ -502,12 +506,8 @@ export const Plans = () => {
 
               <div className="mt-3">
                 <Link
-                  href={
-                    plan.id === "enterprise" || plan.id === "pro"
-                      ? "mailto:hello@suitpax.com"
-                      : "https://app.suitpax.com/sign-up"
-                  }
-                  className={`w-full py-1.5 px-3 rounded-xl text-center text-[9px] sm:text-[10px] font-medium transition-colors ${
+                  href={plan.ctaLink}
+                  className={`w-full py-1.5 px-3 rounded-xl text-center text-[9px] sm:text-[10px] font-medium transition-colors block ${
                     plan.popular
                       ? "bg-black text-white hover:bg-gray-800"
                       : "bg-transparent border border-black text-black hover:bg-gray-100"
