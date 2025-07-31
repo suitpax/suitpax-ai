@@ -50,8 +50,8 @@ const features = [
 const stats = [
   { label: "Airlines Connected", value: "500+" },
   { label: "Cities Covered", value: "10,000+" },
-  { label: "AI Agents Ready", value: "24/7" },
-  { label: "Cost Optimization", value: "35%" },
+  { label: "Bookings Processed", value: "2M+" },
+  { label: "Cost Savings", value: "35%" },
 ]
 
 export default function MCPFlightsAIAgents() {
@@ -75,9 +75,9 @@ export default function MCPFlightsAIAgents() {
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-4">
             AI Flight Agents
           </h2>
-          <p className="text-gray-600 font-light max-w-xl mx-auto text-sm">
-            Revolutionary AI agents that understand your travel patterns and business requirements to deliver
-            personalized flight recommendations.
+          <p className="text-gray-600 font-light max-w-2xl mx-auto">
+            Revolutionary AI agents that understand your travel patterns, preferences, and business requirements to
+            deliver personalized flight recommendations and seamless booking experiences.
           </p>
         </motion.div>
 
@@ -173,8 +173,8 @@ export default function MCPFlightsAIAgents() {
             <h3 className="text-2xl md:text-3xl font-medium tracking-tighter leading-none mb-4">
               Ready to transform your business travel?
             </h3>
-            <p className="text-gray-600 font-light mb-6 text-sm">
-              Experience the future of AI-powered flight booking and management
+            <p className="text-gray-600 font-light mb-6">
+              Join thousands of companies already using our AI-powered flight booking platform
             </p>
             <button className="inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-all tracking-tight">
               <PiSparkle className="mr-2 h-4 w-4" />

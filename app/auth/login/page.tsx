@@ -72,10 +72,10 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <h2 className="text-center text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
+          <h2 className="text-center text-4xl md:text-5xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
             Sign in
           </h2>
-          <p className="text-center text-gray-600 font-light text-sm">Access your business travel dashboard</p>
+          <p className="text-center text-gray-600 font-light">Access your business travel dashboard</p>
         </motion.div>
 
         {/* Form */}
@@ -155,16 +155,9 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
                 >
-                  {loading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      Signing in...
-                    </>
-                  ) : (
-                    "Sign in"
-                  )}
+                  {loading ? "Signing in..." : "Sign in"}
                 </button>
               </div>
 
