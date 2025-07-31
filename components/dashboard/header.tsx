@@ -241,3 +241,19 @@ export default function Header({
                 <DropdownMenuItem className="text-purple-600 focus:text-purple-700 focus:bg-purple-50">
                   <Crown className="h-4 w-4 mr-2" />
                   Upgrade to Pro
+                </DropdownMenuItem>
+              </>
+            )}
+
+            <DropdownMenuSeparator />
+            
+            <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-700 focus:bg-red-50">
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
+  )
+}
