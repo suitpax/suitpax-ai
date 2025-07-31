@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@ai-sdk/anthropic':
         specifier: latest
-        version: 2.0.0(zod@3.24.1)
+        version: 2.0.0(zod@4.0.0-beta.20250409T222615)
       '@anthropic-ai/sdk':
         specifier: latest
         version: 0.57.0
@@ -130,7 +130,7 @@ importers:
         version: 0.5.15(tailwindcss@3.4.17)
       ai:
         specifier: latest
-        version: 5.0.0(zod@3.24.1)
+        version: 5.0.0(zod@4.0.0-beta.20250409T222615)
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.5.0)
@@ -228,8 +228,8 @@ importers:
         specifier: latest
         version: 1.1.2(@types/react-dom@18.0.0)(@types/react@18.0.0)(react-dom@18.0.0(react@18.0.0))(react@18.0.0)
       zod:
-        specifier: ^3.23.8
-        version: 3.24.1
+        specifier: ^4.0.0-beta.2
+        version: 4.0.0-beta.20250409T222615
     devDependencies:
       '@types/multer':
         specifier: ^1.4.11
@@ -1559,6 +1559,9 @@ packages:
     resolution: {integrity: sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g==}
     cpu: [x64]
     os: [win32]
+
+  '@zod/core@0.1.2':
+    resolution: {integrity: sha512-Vnreu3lo9QplERRtIWM+JZ1lEZibYF7Ig7ioqMugS/SYLASUMID4hX8xGKoSNrponVV4MK1ViajZ5lrKOG/V8A==}
 
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
@@ -3890,30 +3893,30 @@ packages:
     peerDependencies:
       zod: ^3.24.1
 
-  zod@3.24.1:
-    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
+  zod@4.0.0-beta.20250409T222615:
+    resolution: {integrity: sha512-4xU6qHpx3DDCpSrC7XuowyZ0/mPAKEx+UkEV8A7z456l//ti8AegZnDdKUL9U4zwK+ix9ijvoflrrR7zFNkIjA==}
 
 snapshots:
 
-  '@ai-sdk/anthropic@2.0.0(zod@3.24.1)':
+  '@ai-sdk/anthropic@2.0.0(zod@4.0.0-beta.20250409T222615)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
-      '@ai-sdk/provider-utils': 3.0.0(zod@3.24.1)
-      zod: 3.24.1
+      '@ai-sdk/provider-utils': 3.0.0(zod@4.0.0-beta.20250409T222615)
+      zod: 4.0.0-beta.20250409T222615
 
-  '@ai-sdk/gateway@1.0.0(zod@3.24.1)':
+  '@ai-sdk/gateway@1.0.0(zod@4.0.0-beta.20250409T222615)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
-      '@ai-sdk/provider-utils': 3.0.0(zod@3.24.1)
-      zod: 3.24.1
+      '@ai-sdk/provider-utils': 3.0.0(zod@4.0.0-beta.20250409T222615)
+      zod: 4.0.0-beta.20250409T222615
 
-  '@ai-sdk/provider-utils@3.0.0(zod@3.24.1)':
+  '@ai-sdk/provider-utils@3.0.0(zod@4.0.0-beta.20250409T222615)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
       '@standard-schema/spec': 1.0.0
       eventsource-parser: 3.0.3
-      zod: 3.24.1
-      zod-to-json-schema: 3.24.6(zod@3.24.1)
+      zod: 4.0.0-beta.20250409T222615
+      zod-to-json-schema: 3.24.6(zod@4.0.0-beta.20250409T222615)
 
   '@ai-sdk/provider@2.0.0':
     dependencies:
@@ -5317,6 +5320,8 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
+  '@zod/core@0.1.2': {}
+
   abbrev@1.1.1:
     optional: true
 
@@ -5341,13 +5346,13 @@ snapshots:
       - supports-color
     optional: true
 
-  ai@5.0.0(zod@3.24.1):
+  ai@5.0.0(zod@4.0.0-beta.20250409T222615):
     dependencies:
-      '@ai-sdk/gateway': 1.0.0(zod@3.24.1)
+      '@ai-sdk/gateway': 1.0.0(zod@4.0.0-beta.20250409T222615)
       '@ai-sdk/provider': 2.0.0
-      '@ai-sdk/provider-utils': 3.0.0(zod@3.24.1)
+      '@ai-sdk/provider-utils': 3.0.0(zod@4.0.0-beta.20250409T222615)
       '@opentelemetry/api': 1.9.0
-      zod: 3.24.1
+      zod: 4.0.0-beta.20250409T222615
 
   ajv@6.12.6:
     dependencies:
@@ -7952,8 +7957,10 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod-to-json-schema@3.24.6(zod@3.24.1):
+  zod-to-json-schema@3.24.6(zod@4.0.0-beta.20250409T222615):
     dependencies:
-      zod: 3.24.1
+      zod: 4.0.0-beta.20250409T222615
 
-  zod@3.24.1: {}
+  zod@4.0.0-beta.20250409T222615:
+    dependencies:
+      '@zod/core': 0.1.2

@@ -1,2 +1,2 @@
-# This file ensures the apps directory is tracked by git
-# This directory will contain the main application when we restructure the project
+# This file ensures the apps directory is tracked by Git
+# This directory will contain our applications in the monorepo structure

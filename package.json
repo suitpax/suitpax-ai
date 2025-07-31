@@ -82,7 +82,7 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "latest",
-    "zod": "^3.23.8"
+    "zod": "^4.0.0-beta.2"
   },
   "devDependencies": {
     "@types/multer": "^1.4.11",
