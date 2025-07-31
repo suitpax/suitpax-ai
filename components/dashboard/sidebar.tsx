@@ -27,6 +27,7 @@ import {
   ComputerDesktopIcon,
   PlusIcon,
   CheckIcon,
+  BuildingOffice2Icon,
 } from "@heroicons/react/24/outline"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -39,6 +40,7 @@ import { Separator } from "@/components/ui/separator"
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
   { name: "Flights", href: "/dashboard/flights", icon: PaperAirplaneIcon },
+  { name: "Hotels", href: "/dashboard/hotels", icon: BuildingOffice2Icon },
   { name: "Expenses", href: "/dashboard/expenses", icon: CreditCardIcon },
   { name: "Analytics", href: "/dashboard/analytics", icon: ChartBarIcon },
   { name: "Calendar", href: "/dashboard/calendar", icon: CalendarIcon },

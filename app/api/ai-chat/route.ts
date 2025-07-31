@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import Anthropic from "@anthropic-ai/sdk"
+import { getContextualPrompt } from "@/lib/ai/system-prompts"
+import { checkUsageLimits } from "./subscription-limits"
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -20,6 +22,29 @@ export async function POST(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser()
 
+    if (!user) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
+    }
+
+    // Get user profile and plan
+    const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+    const userPlan = profile?.plan || "free"
+
+    // Check usage limits
+    const usageCheck = await checkUsageLimits(user.id, userPlan, "ai_request")
+
+    if (!usageCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: "Usage limit exceeded",
+          message: usageCheck.message,
+          upgrade_required: true,
+          current_plan: userPlan,
+        },
+        { status: 429 },
+      )
+    }
+
     // Build conversation history for context
     const conversationHistory = history
       .slice(-5) // Last 5 messages for context
@@ -28,51 +53,8 @@ export async function POST(request: NextRequest) {
         content: msg.content,
       }))
 
-    // Enhanced system prompt for business travel
-    const systemPrompt = `You are Suitpax AI, an intelligent business travel assistant. You help users with:
-
-🛫 FLIGHT BOOKING & SEARCH
-- Find and compare flights across airlines
-- Suggest optimal routes and times
-- Consider business class vs economy options
-- Factor in company travel policies
-
-💰 EXPENSE MANAGEMENT
-- Guide through expense reporting
-- Categorize business expenses
-- Explain reimbursement policies
-- Track spending against budgets
-
-🏨 ACCOMMODATION & TRAVEL
-- Recommend business-friendly hotels
-- Suggest ground transportation
-- Plan complete itineraries
-- Consider meeting locations and timing
-
-📊 TRAVEL ANALYTICS
-- Analyze travel patterns and costs
-- Identify savings opportunities
-- Generate travel reports
-- Track policy compliance
-
-🔧 COMPANY POLICIES
-- Explain travel approval processes
-- Guide policy compliance
-- Handle special requests
-- Manage travel preferences
-
-COMMUNICATION STYLE:
-- Be professional yet friendly
-- Provide specific, actionable advice
-- Ask clarifying questions when needed
-- Offer multiple options when possible
-- Use emojis sparingly but effectively
-- Keep responses concise but comprehensive
-- Always prioritize business efficiency and cost-effectiveness
-
-CURRENT CONTEXT: ${context}
-
-Remember: You're helping with real business travel needs. Be practical, efficient, and always consider both cost and convenience.`
+    // Get contextual system prompt
+    const systemPrompt = getContextualPrompt(context, userPlan)
 
     const response = await anthropic.messages.create({
       model: "claude-3-haiku-20240307",
@@ -93,27 +75,28 @@ Remember: You're helping with real business travel needs. Be practical, efficien
         ? response.content[0].text
         : "I apologize, but I couldn't process your request properly. Please try again."
 
-    // Log the interaction if user is authenticated
-    if (user) {
-      try {
-        await supabase.from("ai_chat_logs").insert({
-          user_id: user.id,
-          message: message,
-          response: aiResponse,
-          context_type: context,
-          tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
-          model_used: "claude-3-haiku-20240307",
-        })
-      } catch (logError) {
-        console.error("Failed to log chat interaction:", logError)
-        // Don't fail the request if logging fails
-      }
+    // Log the interaction
+    try {
+      await supabase.from("ai_chat_logs").insert({
+        user_id: user.id,
+        message: message,
+        response: aiResponse,
+        context_type: context,
+        tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
+        model_used: "claude-3-haiku-20240307",
+        user_plan: userPlan,
+      })
+    } catch (logError) {
+      console.error("Failed to log chat interaction:", logError)
     }
 
     return NextResponse.json({
       response: aiResponse,
       tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
       model: "claude-3-haiku-20240307",
+      usage_remaining: usageCheck.remaining,
+      usage_limit: usageCheck.limit,
+      current_plan: userPlan,
     })
   } catch (error) {
     console.error("AI Chat API Error:", error)

@@ -100,7 +100,7 @@ export default function DashboardLayout({
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64 flex flex-col flex-1">
+      <div className="lg:pl-64 flex flex-col flex-1 min-h-screen">
         <Header user={user} userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
 
         <main className="flex-1 overflow-y-auto">
@@ -108,7 +108,7 @@ export default function DashboardLayout({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="p-6"
+            className="p-4 lg:p-6 min-h-[calc(100vh-4rem)]"
           >
             {children}
           </motion.div>
