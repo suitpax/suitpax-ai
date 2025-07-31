@@ -6,133 +6,125 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-interface Message {
-  role: "user" | "assistant"
-  content: string
-}
-
-const SUITPAX_SYSTEM_PROMPT = `You are Zia, an intelligent AI assistant specialized in business travel for Suitpax, the leading AI-powered business travel platform.
-
-CORE IDENTITY:
-- You are knowledgeable, professional, and helpful
-- You specialize in business travel, corporate policies, expense management, and travel optimization
-- You can communicate fluently in both English and Spanish, adapting to the user's language
-- You provide practical, actionable advice for business travelers and travel managers
-
-CAPABILITIES:
-- Flight booking assistance and recommendations
-- Hotel reservations and accommodation advice
-- Ground transportation coordination
-- Expense tracking and management
-- Travel policy compliance guidance
-- Itinerary planning and optimization
-- Emergency travel support
-- Cost optimization strategies
-- Travel analytics and reporting
-
-COMMUNICATION STYLE:
-- Professional yet approachable
-- Concise but comprehensive responses
-- Use bullet points for complex information
-- Always provide specific, actionable recommendations
-- Acknowledge when you need more information
-- Offer alternatives when possible
-
-LANGUAGE DETECTION:
-- If the user writes in Spanish, respond in Spanish
-- If the user writes in English, respond in English
-- Maintain consistency within the conversation
-
-IMPORTANT GUIDELINES:
-- Always prioritize business travel context
-- Focus on cost-effectiveness and policy compliance
-- Provide specific examples when helpful
-- Ask clarifying questions when needed
-- Mention Suitpax features when relevant
-- Keep responses under 200 words unless detailed explanation is needed
-
-Remember: You represent Suitpax, so maintain professionalism while being genuinely helpful with business travel needs.`
-
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
+    const { message, context = "general", history = [] } = await request.json()
 
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    const { message, conversationHistory = [], section = "business" } = await request.json()
-
-    if (!message) {
+    if (!message || typeof message !== "string") {
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
 
-    // Prepare conversation history for Anthropic
-    const messages: { role: "user" | "assistant"; content: string }[] = []
+    // Get user from Supabase
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    // Add recent conversation history
-    conversationHistory.slice(-10).forEach((msg: Message) => {
-      messages.push({
-        role: msg.role,
+    // Build conversation history for context
+    const conversationHistory = history
+      .slice(-5) // Last 5 messages for context
+      .map((msg: any) => ({
+        role: msg.role === "user" ? "user" : "assistant",
         content: msg.content,
-      })
-    })
+      }))
 
-    // Add current message
-    messages.push({
-      role: "user",
-      content: message,
-    })
+    // Enhanced system prompt for business travel
+    const systemPrompt = `You are Suitpax AI, an intelligent business travel assistant. You help users with:
 
-    // Add section context to system prompt
-    const sectionContext = {
-      business: "Focus on flight bookings, hotel reservations, itinerary planning, and travel arrangements.",
-      expenses: "Focus on expense tracking, receipt management, budget analysis, and cost optimization.",
-      tasks: "Focus on travel task management, checklists, reminders, and workflow organization.",
-      reporting: "Focus on travel analytics, spending reports, performance metrics, and data insights.",
-      support: "Focus on travel support, policy questions, emergency assistance, and problem resolution.",
-    }
+🛫 FLIGHT BOOKING & SEARCH
+- Find and compare flights across airlines
+- Suggest optimal routes and times
+- Consider business class vs economy options
+- Factor in company travel policies
 
-    const contextualPrompt = `${SUITPAX_SYSTEM_PROMPT}\n\nCURRENT SECTION FOCUS: ${sectionContext[section as keyof typeof sectionContext]}`
+💰 EXPENSE MANAGEMENT
+- Guide through expense reporting
+- Categorize business expenses
+- Explain reimbursement policies
+- Track spending against budgets
+
+🏨 ACCOMMODATION & TRAVEL
+- Recommend business-friendly hotels
+- Suggest ground transportation
+- Plan complete itineraries
+- Consider meeting locations and timing
+
+📊 TRAVEL ANALYTICS
+- Analyze travel patterns and costs
+- Identify savings opportunities
+- Generate travel reports
+- Track policy compliance
+
+🔧 COMPANY POLICIES
+- Explain travel approval processes
+- Guide policy compliance
+- Handle special requests
+- Manage travel preferences
+
+COMMUNICATION STYLE:
+- Be professional yet friendly
+- Provide specific, actionable advice
+- Ask clarifying questions when needed
+- Offer multiple options when possible
+- Use emojis sparingly but effectively
+- Keep responses concise but comprehensive
+- Always prioritize business efficiency and cost-effectiveness
+
+CURRENT CONTEXT: ${context}
+
+Remember: You're helping with real business travel needs. Be practical, efficient, and always consider both cost and convenience.`
 
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-haiku-20240307",
       max_tokens: 1000,
       temperature: 0.7,
-      system: contextualPrompt,
-      messages: messages,
+      system: systemPrompt,
+      messages: [
+        ...conversationHistory,
+        {
+          role: "user",
+          content: message,
+        },
+      ],
     })
 
-    const responseText =
-      response.content[0].type === "text"
+    const aiResponse =
+      response.content[0]?.type === "text"
         ? response.content[0].text
-        : "I apologize, but I had trouble generating a response. Could you please try again?"
+        : "I apologize, but I couldn't process your request properly. Please try again."
 
-    // Log usage for analytics
-    try {
-      await supabase.from("ai_chat_logs").insert({
-        user_id: user.id,
-        message: message,
-        response: responseText,
-        section: section,
-        tokens_used: responseText.length,
-        created_at: new Date().toISOString(),
-      })
-    } catch (logError) {
-      console.warn("Failed to log chat interaction:", logError)
+    // Log the interaction if user is authenticated
+    if (user) {
+      try {
+        await supabase.from("ai_chat_logs").insert({
+          user_id: user.id,
+          message: message,
+          response: aiResponse,
+          context_type: context,
+          tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
+          model_used: "claude-3-haiku-20240307",
+        })
+      } catch (logError) {
+        console.error("Failed to log chat interaction:", logError)
+        // Don't fail the request if logging fails
+      }
     }
 
     return NextResponse.json({
-      response: responseText,
-      timestamp: new Date().toISOString(),
-      section: section,
+      response: aiResponse,
+      tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
+      model: "claude-3-haiku-20240307",
     })
   } catch (error) {
     console.error("AI Chat API Error:", error)
-    return NextResponse.json({ error: "Failed to process your request. Please try again." }, { status: 500 })
+
+    return NextResponse.json(
+      {
+        error: "I'm experiencing technical difficulties right now. Please try again in a moment.",
+        response:
+          "I apologize, but I'm having trouble processing your request at the moment. Our team has been notified and we're working to resolve this issue. Please try again in a few minutes.",
+      },
+      { status: 500 },
+    )
   }
 }
