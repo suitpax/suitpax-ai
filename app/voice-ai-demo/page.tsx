@@ -1,409 +1,347 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { VoiceAIProvider, type VoiceCommand } from "@/contexts/voice-ai-context"
-import VoiceControlPanel from "@/components/voice-ai/voice-control-panel"
-import { ConversationInterface } from "@/components/voice-ai/conversation-interface"
-import { useVoiceAIConsolidated } from "@/hooks/use-voice-ai-consolidated"
-import { AgentCard } from "@/components/shared/agent-card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { PiMicrophoneFill, PiSpeakerHighFill, PiRobotFill, PiPhoneFill } from "react-icons/pi"
+import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
+import Link from "next/link"
+import { MicrophoneIcon, SpeakerWaveIcon, StopIcon, PlayIcon, ArrowLeftIcon } from "@heroicons/react/24/outline"
+import { PiSparkle } from "react-icons/pi"
 
-// Agentes disponibles para Voice AI
-const VOICE_AGENTS = [
+interface Agent {
+  id: string
+  name: string
+  role: string
+  avatar: string
+  status: "available" | "busy" | "offline"
+  specialties: string[]
+}
+
+interface Message {
+  id: string
+  type: "user" | "agent"
+  content: string
+  timestamp: Date
+  audioUrl?: string
+}
+
+const agents: Agent[] = [
   {
-    id: "emma",
-    name: "Emma",
-    role: "Executive Travel Assistant",
-    image: "/agents/agent-emma.jpeg",
-    rating: 4.9,
-    callsToday: 127,
-    languages: ["English", "Spanish", "French"],
-    specialty: "Luxury business travel and VIP services with attention to executive-level arrangements",
-    accent: "Professional American",
-    voice: "Warm, Professional",
-    status: "available" as const,
+    id: "sophia",
+    name: "Sophia",
+    role: "Senior Travel Coordinator",
+    avatar: "/agents/agent-sophia.jpeg",
+    status: "available",
+    specialties: ["Flight Booking", "Hotel Reservations", "Itinerary Planning"],
   },
   {
     id: "marcus",
     name: "Marcus",
-    role: "Corporate Travel Specialist",
-    image: "/agents/agent-marcus.jpeg",
-    rating: 4.8,
-    callsToday: 89,
-    languages: ["English", "German", "Dutch"],
-    specialty: "Policy compliance and cost optimization for corporate travel programs",
-    accent: "British Professional",
-    voice: "Authoritative, Clear",
-    status: "available" as const,
+    role: "Expense Management Specialist",
+    avatar: "/agents/agent-marcus.jpeg",
+    status: "available",
+    specialties: ["Expense Reports", "Policy Compliance", "Budget Analysis"],
   },
   {
-    id: "sophia",
-    name: "Sophia",
-    role: "Concierge & VIP Services",
-    image: "/agents/agent-sophia.jpeg",
-    rating: 5.0,
-    callsToday: 64,
-    languages: ["English", "French", "Italian"],
-    specialty: "Luxury experiences, fine dining reservations, and exclusive concierge services",
-    accent: "Elegant European",
-    voice: "Sophisticated, Refined",
-    status: "busy" as const,
+    id: "emma",
+    name: "Emma",
+    role: "Corporate Travel Advisor",
+    avatar: "/agents/agent-emma.jpeg",
+    status: "busy",
+    specialties: ["Group Travel", "Executive Assistance", "Travel Policies"],
   },
   {
     id: "alex",
     name: "Alex",
-    role: "Tech & Innovation Guide",
-    image: "/agents/agent-alex.jpeg",
-    rating: 4.7,
-    callsToday: 156,
-    languages: ["English", "Spanish", "Portuguese"],
-    specialty: "Travel technology integration and digital solutions for modern travelers",
-    accent: "Casual American",
-    voice: "Enthusiastic, Modern",
-    status: "available" as const,
+    role: "AI Travel Intelligence",
+    avatar: "/agents/agent-alex.jpeg",
+    status: "available",
+    specialties: ["Route Optimization", "Cost Analysis", "Predictive Insights"],
   },
 ]
 
-// Comandos de voz para la demo
-const DEMO_COMMANDS: VoiceCommand[] = [
-  {
-    phrase: "buscar vuelo",
-    action: () => console.log("🔍 Buscando vuelos disponibles..."),
-    description: "Busca vuelos disponibles",
-  },
-  {
-    phrase: "reservar hotel",
-    action: () => console.log("🏨 Buscando hoteles..."),
-    description: "Busca hoteles disponibles",
-  },
-  {
-    phrase: "mostrar itinerario",
-    action: () => console.log("📅 Mostrando itinerario..."),
-    description: "Muestra tu itinerario actual",
-  },
-  {
-    phrase: "ayuda",
-    action: () => console.log("❓ Mostrando ayuda..."),
-    description: "Muestra la ayuda disponible",
-  },
-  {
-    phrase: "llamar agente",
-    action: () => console.log("📞 Conectando con agente..."),
-    description: "Conecta con un agente humano",
-  },
+const quickCommands = [
+  "Book a flight to New York next week",
+  "Show me my expense report for this month",
+  "Find hotels near the conference center",
+  "What's my travel budget remaining?",
+  "Reschedule my meeting for tomorrow",
 ]
 
 export default function VoiceAIDemoPage() {
-  const [selectedAgent, setSelectedAgent] = useState(VOICE_AGENTS[0])
-  const [isCallActive, setIsCallActive] = useState(false)
-  const [callDuration, setCallDuration] = useState(0)
-  const [error, setError] = useState<string | null>(null)
+  const [selectedAgent, setSelectedAgent] = useState<Agent>(agents[0])
+  const [messages, setMessages] = useState<Message[]>([])
+  const [isRecording, setIsRecording] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null)
 
-  // Hook consolidado para Voice AI
-  const {
-    messages,
-    status,
-    transcript,
-    detectedLanguage,
-    audioState,
-    startListening,
-    stopListening,
-    startConversation,
-    clearConversation,
-    playMessage,
-    pauseAudio,
-    stopAudio,
-    browserSupportsSpeechRecognition,
-  } = useVoiceAIConsolidated({
-    agentId: selectedAgent.id,
-    onMessage: (message) => {
-      console.log("New message:", message)
-    },
-    onError: (error) => {
-      setError(error)
-      setTimeout(() => setError(null), 5000)
-    },
-    onStatusChange: (newStatus) => {
-      console.log("Status changed:", newStatus)
-    },
-  })
-
-  // Timer para la duración de la llamada
   useEffect(() => {
-    let interval: NodeJS.Timeout
-    if (isCallActive) {
-      interval = setInterval(() => {
-        setCallDuration((prev) => prev + 1)
-      }, 1000)
-    }
-    return () => {
-      if (interval) clearInterval(interval)
-    }
-  }, [isCallActive])
+    // Initialize with welcome message
+    setMessages([
+      {
+        id: "welcome",
+        type: "agent",
+        content: `Hi! I'm ${selectedAgent.name}, your ${selectedAgent.role}. I'm here to help you with ${selectedAgent.specialties.join(", ").toLowerCase()}. How can I assist you today?`,
+        timestamp: new Date(),
+      },
+    ])
+  }, [selectedAgent])
 
-  // Formatear duración de llamada
-  const formatCallDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+  const handleStartRecording = () => {
+    setIsRecording(true)
+    // Simulate recording - in real app, this would use Web Speech API
+    setTimeout(() => {
+      setIsRecording(false)
+      handleUserMessage("I need to book a flight to San Francisco for next Tuesday")
+    }, 3000)
   }
 
-  // Iniciar llamada
-  const handleStartCall = async () => {
-    try {
-      setIsCallActive(true)
-      setCallDuration(0)
-      setError(null)
-      await startConversation()
-    } catch (error) {
-      setError("Error al iniciar la llamada")
-      setIsCallActive(false)
+  const handleStopRecording = () => {
+    setIsRecording(false)
+  }
+
+  const handleUserMessage = (content: string) => {
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: "user",
+      content,
+      timestamp: new Date(),
     }
+
+    setMessages((prev) => [...prev, userMessage])
+
+    // Simulate AI response
+    setTimeout(() => {
+      const agentResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "agent",
+        content: getAgentResponse(content, selectedAgent),
+        timestamp: new Date(),
+        audioUrl: "/audio/sample-response.mp3", // In real app, this would be generated
+      }
+      setMessages((prev) => [...prev, agentResponse])
+    }, 1500)
   }
 
-  // Terminar llamada
-  const handleEndCall = () => {
-    setIsCallActive(false)
-    setCallDuration(0)
-    stopAudio()
-    stopListening()
-    clearConversation()
-  }
-
-  // Seleccionar agente
-  const handleAgentSelect = (agent: (typeof VOICE_AGENTS)[0]) => {
-    if (!isCallActive) {
-      setSelectedAgent(agent)
-      clearConversation()
+  const getAgentResponse = (userInput: string, agent: Agent): string => {
+    const responses = {
+      sophia:
+        "I'd be happy to help you book that flight to San Francisco. Let me check available options for next Tuesday. I'm finding several flights with good prices and convenient times. Would you prefer morning or afternoon departure?",
+      marcus:
+        "I can help you with that expense report. Let me pull up your recent transactions and categorize them according to your company's travel policy. I see some items that need receipts - shall I send you reminders?",
+      emma: "For your corporate travel needs, I recommend booking through our preferred partners for better rates and policy compliance. Let me coordinate the details and ensure everything aligns with your company guidelines.",
+      alex: "Based on your travel patterns and current market data, I can optimize your route and suggest cost-effective alternatives. The AI analysis shows potential savings of 15% if you're flexible with timing.",
     }
-  }
-
-  // Verificar soporte del navegador
-  if (!browserSupportsSpeechRecognition) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <PiMicrophoneFill className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <CardTitle className="text-xl font-medium tracking-tighter">Navegador No Compatible</CardTitle>
-            <CardDescription>
-              Tu navegador no soporta reconocimiento de voz. Por favor, usa Chrome, Edge o Safari.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
+      responses[agent.id as keyof typeof responses] ||
+      "I'm here to help with your travel needs. Could you provide more specific details about what you're looking for?"
     )
+  }
+
+  const handlePlayAudio = (message: Message) => {
+    if (currentAudio) {
+      currentAudio.pause()
+      setCurrentAudio(null)
+      setIsPlaying(false)
+    }
+
+    if (message.audioUrl) {
+      const audio = new Audio(message.audioUrl)
+      audio.onplay = () => setIsPlaying(true)
+      audio.onended = () => {
+        setIsPlaying(false)
+        setCurrentAudio(null)
+      }
+      audio.play()
+      setCurrentAudio(audio)
+    }
+  }
+
+  const handleQuickCommand = (command: string) => {
+    handleUserMessage(command)
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-black">
-                Voice AI Demo
-              </h1>
-              <p className="text-gray-600 font-light mt-2">
-                Experimenta el futuro de los asistentes de viaje con IA conversacional
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Badge variant="outline" className="text-emerald-950 border-emerald-950">
-                <PiRobotFill className="w-3 h-3 mr-1" />
-                AI Powered
-              </Badge>
-              {isCallActive && (
-                <Badge variant="default" className="bg-red-500">
-                  <PiPhoneFill className="w-3 h-3 mr-1 animate-pulse" />
-                  En llamada {formatCallDuration(callDuration)}
-                </Badge>
-              )}
+      <div className="bg-white border-b border-gray-200 px-4 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Link href="/" className="flex items-center text-gray-600 hover:text-black">
+              <ArrowLeftIcon className="h-5 w-5 mr-2" />
+              Back to Home
+            </Link>
+            <div className="h-6 w-px bg-gray-200" />
+            <div className="flex items-center space-x-2">
+              <h1 className="text-xl font-medium tracking-tighter text-black">Voice AI Demo</h1>
+              <div className="inline-flex items-center rounded-lg bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700">
+                <PiSparkle className="mr-1 h-2.5 w-2.5" />
+                <em className="font-serif italic">Live Demo</em>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Panel de Agentes */}
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Agent Selection */}
           <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-medium tracking-tighter">Selecciona tu Agente AI</CardTitle>
-                <CardDescription>Cada agente tiene especialidades y personalidades únicas</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {VOICE_AGENTS.map((agent) => (
-                  <AgentCard
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+              <h3 className="text-sm font-medium text-black mb-4">Choose Your AI Agent</h3>
+              <div className="space-y-3">
+                {agents.map((agent) => (
+                  <button
                     key={agent.id}
-                    agent={agent}
-                    onSelect={handleAgentSelect}
-                    isSelected={selectedAgent.id === agent.id}
-                    showDetails={true}
-                  />
+                    onClick={() => setSelectedAgent(agent)}
+                    className={`w-full p-3 rounded-xl border transition-all ${
+                      selectedAgent.id === agent.id
+                        ? "border-black bg-gray-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="relative">
+                        <Image
+                          src={agent.avatar || "/placeholder.svg"}
+                          alt={agent.name}
+                          width={32}
+                          height={32}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                        <div
+                          className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
+                            agent.status === "available"
+                              ? "bg-green-500"
+                              : agent.status === "busy"
+                                ? "bg-yellow-500"
+                                : "bg-gray-400"
+                          }`}
+                        />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="text-xs font-medium text-black">{agent.name}</p>
+                        <p className="text-[10px] text-gray-600">{agent.role}</p>
+                      </div>
+                    </div>
+                  </button>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Panel de Control de Voz */}
-            <div className="mt-6">
-              <VoiceAIProvider
-                initialVoiceId={selectedAgent.id}
-                initialLanguage="es-ES"
-                enableLogging={true}
-                commands={DEMO_COMMANDS}
-              >
-                <VoiceControlPanel className="w-full" />
-              </VoiceAIProvider>
+              {/* Agent Details */}
+              <div className="mt-4 p-3 bg-gray-50 rounded-xl">
+                <p className="text-xs font-medium text-black mb-2">Specialties</p>
+                <div className="flex flex-wrap gap-1">
+                  {selectedAgent.specialties.map((specialty) => (
+                    <span
+                      key={specialty}
+                      className="inline-flex items-center rounded-md bg-gray-200 px-1.5 py-0.5 text-[9px] font-medium text-gray-700"
+                    >
+                      {specialty}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Commands */}
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 mt-4">
+              <h3 className="text-sm font-medium text-black mb-3">Quick Commands</h3>
+              <div className="space-y-2">
+                {quickCommands.map((command, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleQuickCommand(command)}
+                    className="w-full text-left p-2 text-xs text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    "{command}"
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Interfaz Principal */}
-          <div className="lg:col-span-2">
-            <Card className="h-full">
-              <CardHeader className="border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Image
-                      src={selectedAgent.image || "/placeholder.svg"}
-                      alt={selectedAgent.name}
-                      width={48}
-                      height={48}
-                      className="rounded-xl object-cover"
-                    />
-                    <div>
-                      <CardTitle className="text-lg font-medium tracking-tighter">{selectedAgent.name}</CardTitle>
-                      <CardDescription>{selectedAgent.role}</CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {detectedLanguage === "es-ES" ? "Español" : "English"}
-                    </Badge>
-                    <div
-                      className={`w-3 h-3 rounded-full ${
-                        selectedAgent.status === "available"
-                          ? "bg-green-400"
-                          : selectedAgent.status === "busy"
-                            ? "bg-orange-400"
-                            : "bg-gray-400"
-                      }`}
-                    />
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="p-6">
-                {!isCallActive ? (
-                  /* Estado Inicial */
-                  <div className="text-center py-12">
-                    <motion.div
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="mb-8"
-                    >
-                      <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <PiMicrophoneFill className="w-12 h-12 text-gray-400" />
-                      </div>
-                      <h3 className="text-xl font-medium tracking-tighter mb-2">Listo para conversar</h3>
-                      <p className="text-gray-600 font-light mb-6">
-                        Haz clic en "Iniciar Llamada" para comenzar a hablar con {selectedAgent.name}
-                      </p>
-                    </motion.div>
-
-                    <Button
-                      onClick={handleStartCall}
-                      size="lg"
-                      className="bg-emerald-950 hover:bg-emerald-900 text-white"
-                      disabled={selectedAgent.status !== "available"}
-                    >
-                      <PiPhoneFill className="w-5 h-5 mr-2" />
-                      Iniciar Llamada
-                    </Button>
-
-                    {selectedAgent.status !== "available" && (
-                      <p className="text-sm text-orange-600 mt-2">
-                        {selectedAgent.name} está ocupado. Intenta con otro agente.
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  /* Interfaz de Conversación Activa */
-                  <ConversationInterface
-                    messages={messages}
-                    status={status}
-                    transcript={transcript}
-                    agentName={selectedAgent.name}
-                    onStartListening={startListening}
-                    onStopListening={stopListening}
-                    onEndCall={handleEndCall}
-                    onPlayMessage={playMessage}
-                    onPauseAudio={pauseAudio}
-                    error={error}
-                    isAudioPlaying={audioState.isPlaying}
+          {/* Chat Interface */}
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm h-[600px] flex flex-col">
+              {/* Chat Header */}
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center space-x-3">
+                  <Image
+                    src={selectedAgent.avatar || "/placeholder.svg"}
+                    alt={selectedAgent.name}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full object-cover"
                   />
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Información Adicional */}
-        <div className="mt-12 grid md:grid-cols-3 gap-6">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <PiMicrophoneFill className="w-8 h-8 text-emerald-950 mx-auto mb-3" />
-              <h3 className="font-medium tracking-tighter mb-2">Reconocimiento de Voz</h3>
-              <p className="text-sm text-gray-600 font-light">
-                Tecnología avanzada de speech-to-text con detección automática de idioma
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6 text-center">
-              <PiSpeakerHighFill className="w-8 h-8 text-emerald-950 mx-auto mb-3" />
-              <h3 className="font-medium tracking-tighter mb-2">Síntesis de Voz</h3>
-              <p className="text-sm text-gray-600 font-light">Voces naturales y expresivas powered by ElevenLabs AI</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6 text-center">
-              <PiRobotFill className="w-8 h-8 text-emerald-950 mx-auto mb-3" />
-              <h3 className="font-medium tracking-tighter mb-2">IA Conversacional</h3>
-              <p className="text-sm text-gray-600 font-light">
-                Agentes especializados con personalidades únicas y conocimiento experto
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Comandos Disponibles */}
-        <div className="mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-medium tracking-tighter">Comandos de Voz Disponibles</CardTitle>
-              <CardDescription>Prueba estos comandos durante tu conversación</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {DEMO_COMMANDS.map((command, index) => (
-                  <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <code className="text-sm font-medium text-emerald-950">"{command.phrase}"</code>
-                    {command.description && <p className="text-xs text-gray-600 mt-1">{command.description}</p>}
+                  <div>
+                    <h3 className="text-sm font-medium text-black">{selectedAgent.name}</h3>
+                    <p className="text-xs text-gray-600">{selectedAgent.role}</p>
                   </div>
-                ))}
+                  <div
+                    className={`ml-auto w-2 h-2 rounded-full ${
+                      selectedAgent.status === "available"
+                        ? "bg-green-500"
+                        : selectedAgent.status === "busy"
+                          ? "bg-yellow-500"
+                          : "bg-gray-400"
+                    }`}
+                  />
+                </div>
               </div>
-            </CardContent>
-          </Card>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <AnimatePresence>
+                  {messages.map((message) => (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      <div
+                        className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+                          message.type === "user" ? "bg-black text-white" : "bg-gray-100 text-black"
+                        }`}
+                      >
+                        <p className="text-sm">{message.content}</p>
+                        {message.audioUrl && message.type === "agent" && (
+                          <button
+                            onClick={() => handlePlayAudio(message)}
+                            className="mt-2 flex items-center space-x-2 text-xs text-gray-600 hover:text-black"
+                          >
+                            {isPlaying ? <StopIcon className="h-3 w-3" /> : <PlayIcon className="h-3 w-3" />}
+                            <span>Play Audio</span>
+                          </button>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+
+              {/* Voice Controls */}
+              <div className="p-4 border-t border-gray-200">
+                <div className="flex items-center justify-center space-x-4">
+                  <button
+                    onClick={isRecording ? handleStopRecording : handleStartRecording}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                      isRecording ? "bg-red-500 text-white animate-pulse" : "bg-black text-white hover:bg-gray-800"
+                    }`}
+                  >
+                    {isRecording ? <StopIcon className="h-6 w-6" /> : <MicrophoneIcon className="h-6 w-6" />}
+                  </button>
+                  <div className="text-center">
+                    <p className="text-xs font-medium text-black">{isRecording ? "Listening..." : "Tap to speak"}</p>
+                    <p className="text-[10px] text-gray-600">Voice-powered AI assistance</p>
+                  </div>
+                  <button className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center transition-colors">
+                    <SpeakerWaveIcon className="h-6 w-6" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
