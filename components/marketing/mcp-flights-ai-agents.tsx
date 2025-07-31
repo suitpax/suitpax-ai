@@ -14,30 +14,39 @@ const agents = [
 const airlines = [
   {
     name: "American Airlines",
-    logo: "https://cdn.brandfetch.io/aa.com/w/512/h/78/theme/light/logo?c=1idU-l8vdm7C5__3dci",
+    logo: "/placeholder.svg?height=40&width=120&text=American+Airlines",
   },
-  { name: "KLM", logo: "https://cdn.brandfetch.io/klm.com/w/512/h/69/logo?c=1idU-l8vdm7C5__3dci" },
+  {
+    name: "KLM",
+    logo: "/placeholder.svg?height=40&width=120&text=KLM",
+  },
   {
     name: "Japan Airlines",
-    logo: "https://cdn.brandfetch.io/jal.com/w/512/h/49/theme/light/logo?c=1idU-l8vdm7C5__3dci",
+    logo: "/placeholder.svg?height=40&width=120&text=JAL",
   },
   {
     name: "Qatar Airways",
-    logo: "https://cdn.brandfetch.io/qatarairways.com/w/512/h/144/theme/light/logo?c=1idU-l8vdm7C5__3dci",
+    logo: "/placeholder.svg?height=40&width=120&text=Qatar+Airways",
   },
   {
     name: "British Airways",
-    logo: "https://cdn.brandfetch.io/britishairways.com/w/512/h/80/logo?c=1idU-l8vdm7C5__3dci",
+    logo: "/placeholder.svg?height=40&width=120&text=British+Airways",
   },
-  { name: "Southwest", logo: "https://cdn.brandfetch.io/southwest.com/w/512/h/78/logo?c=1idU-l8vdm7C5__3dci" },
-  { name: "Iberia", logo: "https://cdn.brandfetch.io/iberia.com/w/512/h/114/theme/light/logo?c=1idU-l8vdm7C5__3dci" },
+  {
+    name: "Southwest",
+    logo: "/placeholder.svg?height=40&width=120&text=Southwest",
+  },
+  {
+    name: "Iberia",
+    logo: "/placeholder.svg?height=40&width=120&text=Iberia",
+  },
   {
     name: "Air Canada",
-    logo: "https://cdn.brandfetch.io/aircanada.com/w/512/h/67/theme/light/logo?c=1idU-l8vdm7C5__3dci",
+    logo: "/placeholder.svg?height=40&width=120&text=Air+Canada",
   },
   {
     name: "Emirates",
-    logo: "https://cdn.brandfetch.io/emirates.com/w/512/h/95/theme/light/logo?c=1idU-l8vdm7C5__3dci",
+    logo: "/placeholder.svg?height=40&width=120&text=Emirates",
   },
 ]
 
@@ -150,7 +159,7 @@ export default function MCPFlightsAIAgents() {
           </div>
         </motion.div>
 
-        {/* Airlines Slider */}
+        {/* Airlines Slider with Black Logos */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -171,7 +180,7 @@ export default function MCPFlightsAIAgents() {
                     alt={airline.name}
                     width={120}
                     height={40}
-                    className="h-8 w-auto object-contain"
+                    className="h-8 w-auto object-contain filter brightness-0"
                   />
                 </div>
               ))}
