@@ -2,14 +2,15 @@ import Hero from "@/components/marketing/hero"
 import PartnersShowcase from "@/components/partners-showcase"
 import AITravelAgents from "@/components/marketing/ai-travel-agents"
 import BusinessTravelRevolution from "@/components/marketing/business-travel-revolution"
+import AIHotelBooking from "@/components/marketing/ai-hotel-booking"
+import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
+import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
+import ContactForm from "@/components/marketing/contact-form"
 import FoundersOpenLetter from "@/components/marketing/founders-open-letter"
 import CloudAIShowcase from "@/components/marketing/cloud-ai-showcase"
 import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
 import AgenticDisruption from "@/components/marketing/agentic-disruption"
 import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
-import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
-import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
-import ContactForm from "@/components/marketing/contact-form"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -72,6 +73,7 @@ export default function Home() {
         <PartnersShowcase />
         <AITravelAgents />
         <BusinessTravelRevolution />
+        <AIHotelBooking />
         <AIVoiceCallingHub />
         <MCPFlightsAIAgents />
         <CloudAIShowcase />
