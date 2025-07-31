@@ -1,25 +1,18 @@
 import { ChatAnthropic } from "@langchain/anthropic"
-import { ChatOpenAI } from "@langchain/openai"
 import { PromptTemplate } from "@langchain/core/prompts"
 import { StringOutputParser } from "@langchain/core/output_parsers"
 import { RunnableSequence } from "@langchain/core/runnables"
 
-// Initialize AI models
+// Initialize Anthropic AI model
 export const anthropicModel = new ChatAnthropic({
   model: "claude-3-5-sonnet-20241022",
   temperature: 0.7,
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
-export const openaiModel = new ChatOpenAI({
-  model: "gpt-4o",
-  temperature: 0.7,
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 // Travel Assistant Prompt Templates
 export const travelAssistantPrompt = PromptTemplate.fromTemplate(`
-You are Suitpax AI, an expert business travel assistant. You help users with:
+You are Suitpax AI, an expert business travel assistant powered by Claude. You help users with:
 - Flight bookings and recommendations
 - Hotel reservations
 - Expense management
@@ -38,7 +31,7 @@ Response:
 `)
 
 export const expenseAnalysisPrompt = PromptTemplate.fromTemplate(`
-You are analyzing business travel expenses. Here's the expense data:
+You are analyzing business travel expenses using advanced AI. Here's the expense data:
 {expenseData}
 
 User's travel policy: {travelPolicy}
@@ -54,7 +47,7 @@ Analysis:
 `)
 
 export const flightRecommendationPrompt = PromptTemplate.fromTemplate(`
-You are helping find the best flight options. Here are the search criteria:
+You are helping find the best flight options using AI-powered analysis. Here are the search criteria:
 - From: {origin}
 - To: {destination}
 - Departure: {departureDate}
@@ -76,7 +69,7 @@ Provide flight recommendations considering:
 Recommendations:
 `)
 
-// Create chains
+// Create chains using Anthropic
 export const travelAssistantChain = RunnableSequence.from([
   travelAssistantPrompt,
   anthropicModel,
