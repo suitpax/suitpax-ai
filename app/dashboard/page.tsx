@@ -440,4 +440,26 @@ export default function DashboardPage() {
       >
         <div className="bg-gradient-to-r from-black to-gray-800 rounded-2xl p-6 text-white">
           <div className="flex items-center justify-between">
-            <div cl
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                <MessageSquare className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium tracking-tight">Need Help?</h3>
+                <p className="text-sm text-gray-300">
+                  Chat with Zia, your AI travel assistant, for instant help with bookings and travel questions.
+                </p>
+              </div>
+            </div>
+            <Button asChild variant="secondary" className="bg-white text-black hover:bg-gray-100">
+              <Link href="/dashboard/ai-chat">
+                Chat with Zia
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
