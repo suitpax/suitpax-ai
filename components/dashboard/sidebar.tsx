@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
@@ -9,13 +9,15 @@ import {
   PaperAirplaneIcon,
   CreditCardIcon,
   ChartBarIcon,
-  ChatBubbleLeftRightIcon,
+  UsersIcon,
+  CalendarIcon,
+  MapPinIcon,
   Cog6ToothIcon,
+  ChatBubbleLeftRightIcon,
+  MicrophoneIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   SparklesIcon,
-  Bars3Icon,
-  XMarkIcon,
 } from "@heroicons/react/24/outline"
 import type { User } from "@supabase/supabase-js"
 import Image from "next/image"
@@ -30,41 +32,26 @@ const navigation = [
   { name: "Flights", href: "/dashboard/flights", icon: PaperAirplaneIcon },
   { name: "Expenses", href: "/dashboard/expenses", icon: CreditCardIcon },
   { name: "Analytics", href: "/dashboard/analytics", icon: ChartBarIcon },
-  { name: "Suitpax AI", href: "/dashboard/ai-chat", icon: ChatBubbleLeftRightIcon },
+  { name: "Team", href: "/dashboard/team", icon: UsersIcon },
+  { name: "Calendar", href: "/dashboard/calendar", icon: CalendarIcon },
+  { name: "Locations", href: "/dashboard/locations", icon: MapPinIcon },
+  { name: "AI Chat", href: "/dashboard/ai-chat", icon: ChatBubbleLeftRightIcon },
+  { name: "Voice AI", href: "/dashboard/voice-ai", icon: MicrophoneIcon, premium: true },
   { name: "Settings", href: "/dashboard/settings", icon: Cog6ToothIcon },
 ]
 
 export default function Sidebar({ user, userPlan = "free" }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
 
   const isPremium = userPlan === "premium" || userPlan === "enterprise"
 
-  // Handle responsive behavior
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setMobileOpen(false)
-      }
-      if (window.innerWidth < 768) {
-        setCollapsed(false)
-      }
-    }
-
-    window.addEventListener("resize", handleResize)
-    handleResize()
-
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setMobileOpen(false)
-  }, [pathname])
-
-  const SidebarContent = () => (
-    <>
+  return (
+    <motion.div
+      animate={{ width: collapsed ? 80 : 280 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="bg-white border-r border-gray-200 flex flex-col"
+    >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
@@ -86,40 +73,37 @@ export default function Sidebar({ user, userPlan = "free" }: SidebarProps) {
             )}
           </AnimatePresence>
 
-          <div className="flex items-center space-x-2">
-            {/* Mobile close button */}
-            <button
-              onClick={() => setMobileOpen(false)}
-              className="lg:hidden p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-            >
-              <XMarkIcon className="h-4 w-4" />
-            </button>
-
-            {/* Desktop collapse button */}
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              className="hidden lg:block p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-            >
-              {collapsed ? <ChevronRightIcon className="h-4 w-4" /> : <ChevronLeftIcon className="h-4 w-4" />}
-            </button>
-          </div>
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            {collapsed ? <ChevronRightIcon className="h-4 w-4" /> : <ChevronLeftIcon className="h-4 w-4" />}
+          </button>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+      <nav className="flex-1 p-4 space-y-2">
         {navigation.map((item) => {
           const isActive = pathname === item.href
+          const isLocked = item.premium && !isPremium
 
           return (
             <Link
               key={item.name}
-              href={item.href}
+              href={isLocked ? "#" : item.href}
               className={`
-                flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                ${isActive ? "bg-black text-white shadow-lg" : "text-gray-700 hover:bg-gray-100 hover:text-black"}
+                flex items-center px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200
+                ${
+                  isActive
+                    ? "bg-black text-white shadow-lg"
+                    : isLocked
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-black"
+                }
                 ${collapsed ? "justify-center" : ""}
               `}
+              onClick={isLocked ? (e) => e.preventDefault() : undefined}
             >
               <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
 
@@ -133,6 +117,11 @@ export default function Sidebar({ user, userPlan = "free" }: SidebarProps) {
                     className="flex items-center justify-between w-full"
                   >
                     <span>{item.name}</span>
+                    {isLocked && (
+                      <div className="inline-flex items-center rounded-md bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
+                        Pro
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -158,7 +147,7 @@ export default function Sidebar({ user, userPlan = "free" }: SidebarProps) {
                 className="flex-1 min-w-0"
               >
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {user.user_metadata?.full_name?.split(" ")[0] || user.email?.split("@")[0]}
+                  {user.user_metadata?.full_name || user.email?.split("@")[0]}
                 </p>
                 <p className="text-xs text-gray-500 capitalize">{userPlan} plan</p>
               </motion.div>
@@ -166,56 +155,6 @@ export default function Sidebar({ user, userPlan = "free" }: SidebarProps) {
           </AnimatePresence>
         </div>
       </div>
-    </>
-  )
-
-  return (
-    <>
-      {/* Mobile menu button */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white border border-gray-200 shadow-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-      >
-        <Bars3Icon className="h-5 w-5" />
-      </button>
-
-      {/* Mobile overlay */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50"
-            onClick={() => setMobileOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Mobile sidebar */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ x: -280 }}
-            animate={{ x: 0 }}
-            exit={{ x: -280 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="lg:hidden fixed left-0 top-0 z-50 w-80 h-full bg-white border-r border-gray-200 flex flex-col"
-          >
-            <SidebarContent />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Desktop sidebar */}
-      <motion.div
-        animate={{ width: collapsed ? 80 : 280 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="hidden lg:flex bg-white border-r border-gray-200 flex-col"
-      >
-        <SidebarContent />
-      </motion.div>
-    </>
+    </motion.div>
   )
 }
