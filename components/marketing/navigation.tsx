@@ -206,9 +206,16 @@ export default function Navigation() {
                 </div>
               </div>
 
-              {/* Solo Sign Up en móvil si no hay usuario */}
+              {/* Auth buttons en móvil si no hay usuario */}
               {!loading && !user && (
-                <div className="pt-4 border-t border-gray-200">
+                <div className="pt-4 border-t border-gray-200 space-y-3">
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full text-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors tracking-tight"
+                  >
+                    Log In
+                  </Link>
                   <Link
                     href="/auth/signup"
                     onClick={() => setIsOpen(false)}
