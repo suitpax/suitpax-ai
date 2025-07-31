@@ -1,98 +1,276 @@
 "use client"
-import { motion, AnimatePresence } from "framer-motion"
-import { SparklesIcon, UserIcon, Cog6ToothIcon, PaperAirplaneIcon, MicrophoneIcon, StopIcon } from "@heroicons/react/24/outline"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { PromptInput, PromptInputTextarea, PromptInputActions, PromptInputAction } from '@/components/ui/prompt-input'
-import { useState, useEffect, useRef } from "react"
-// ... otros imports
 
-export default function SuitpaxChatPage() {
-  // estados y lógica...
+import type React from "react"
+
+import { useState, useEffect, useRef } from "react"
+import { motion } from "framer-motion"
+import { Send, Mic, MicOff, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { createClient } from "@/lib/supabase/client"
+import Image from "next/image"
+import { useSpeechToText } from "@/hooks/use-speech-to-text"
+
+interface Message {
+  id: string
+  content: string
+  role: "user" | "assistant"
+  timestamp: Date
+}
+
+export default function AIChatPage() {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "1",
+      content: "Hello! I'm your AI travel assistant. How can I help you plan your next business trip?",
+      role: "assistant",
+      timestamp: new Date(),
+    },
+  ])
+  const [input, setInput] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const supabase = createClient()
+
+  const { isListening, transcript, startListening, stopListening, resetTranscript, browserSupportsSpeechRecognition } =
+    useSpeechToText({
+      onTranscriptChange: (text) => {
+        setInput(text)
+      },
+      continuous: true,
+    })
+
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    getUser()
+  }, [supabase])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  const handleSend = async () => {
+    if (!input.trim() || loading) return
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: input.trim(),
+      role: "user",
+      timestamp: new Date(),
+    }
+
+    setMessages((prev) => [...prev, userMessage])
+    setInput("")
+    setLoading(true)
+
+    try {
+      const response = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: userMessage.content,
+          history: messages,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to get response")
+      }
+
+      const data = await response.json()
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: data.response,
+        role: "assistant",
+        timestamp: new Date(),
+      }
+
+      setMessages((prev) => [...prev, assistantMessage])
+    } catch (error) {
+      console.error("Error sending message:", error)
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "Sorry, I encountered an error. Please try again.",
+        role: "assistant",
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening()
+    } else {
+      resetTranscript()
+      setInput("")
+      startListening()
+    }
+  }
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-gray-900">
-      <motion.header className="bg-gradient-to-r from-grat-200 to-white p-6 rounded-b-2xl shadow-md">
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="bg-white/50 backdrop-blur-sm border-b border-gray-200 p-4 lg:p-6"
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-              <SparklesIcon className="h-6 w-6 text-blue-600 text-purple-600" />
+            <div className="w-10 h-10 rounded-md overflow-hidden border border-gray-200 bg-white">
+              <Image
+                src="/agents/agent-nova.jpeg"
+                alt="Suitpax AI"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
-              <h1 className="text-2xl font-serif italic text-white">Suitpax AI</h1>
-              <p className="text-sm text-purple-100">Your intelligent travel assistant</p>
+              <h1 className="text-xl md:text-2xl font-medium tracking-tighter">
+                <em className="font-serif italic">Suitpax AI</em>
+              </h1>
+              <p className="text-xs md:text-sm text-gray-600 font-light">Your intelligent travel assistant</p>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <Badge className="bg-white/30 text-white border-white/50">
-              <span className="inline-block w-2 h-2 bg-white rounded-full animate-pulse mr-1" />
-              Online
-            </Badge>
-            <Button variant="outline" size="sm" className="border-white text-white">
-              <Cog6ToothIcon className="h-4 w-4 mr-2" /> Settings
-            </Button>
-          </div>
+          <span className="inline-flex items-center rounded-xl bg-emerald-950/10 px-2.5 py-0.5 text-[10px] font-medium text-emerald-950">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-950 animate-pulse mr-1"></span>
+            Online
+          </span>
         </div>
-      </motion.header>
+      </motion.div>
 
-      <div className="flex-1 flex overflow-hidden">
-        <aside className="hidden lg:block w-80 bg-white dark:bg-gray-800 p-6 border-r dark:border-gray-700">
-          {/* Quick Prompts adaptados al estilo */}
-        </aside>
-
-        <section className="flex flex-col flex-1">
-          <div className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-800 space-y-6">
-            <AnimatePresence>
-              {messages.map(msg => (
-                <motion.div key={msg.id} className={`flex ${msg.role==='user'?'justify-end':'justify-start'}`}>
-                  <div className="flex items-start space-x-3 max-w-2xl">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role==='assistant'?'bg-gradient-to-r from-blue-600 to-purple-600':'bg-gray-700'}`}>
-                      {msg.role === 'assistant'
-                        ? <SparklesIcon className="h-5 w-5 text-white" />
-                        : <UserIcon className="h-5 w-5 text-white" />}
-                    </div>
-                    <div className={`rounded-2xl px-6 py-4 ${msg.role==='assistant'?'bg-white dark:bg-gray-700 border dark:border-gray-600 text-gray-900 dark:text-gray-100 shadow-sm':'bg-gray-900 text-white'}`}>
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                      <p className="text-xs mt-3 text-gray-500 dark:text-gray-400">{formatTime(msg.timestamp)}</p>
-                    </div>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
+        {messages.map((message, index) => (
+          <motion.div
+            key={message.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: index * 0.1 }}
+            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-4 py-3 ${
+                message.role === "user"
+                  ? "bg-black text-white"
+                  : "bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"
+              }`}
+            >
+              {message.role === "assistant" && (
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
+                    <Image
+                      src="/agents/agent-nova.jpeg"
+                      alt="AI"
+                      width={24}
+                      height={24}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            {isLoading && /* indicador de carga adaptado */}
-          </div>
-
-          <div className="bg-white dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 p-6">
-            <PromptInput>
-              <PromptInputTextarea
-                ref={inputRef}
-                value={input}
-                onChange={...}
-                placeholder="Ask me anything about your travel..."
-                disabled={isLoading}
-                className="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-              />
-              <PromptInputActions>
-                {browserSupportsSpeechRecognition && (
-                  <PromptInputAction tooltip={isListening ? "Stop recording" : "Use voice input"}>
-                    <Button variant="ghost" size="sm" onClick={toggleVoiceInput} className={isListening ? "text-red-600" : "text-gray-400"}>
-                      {isListening ? <StopIcon /> : <MicrophoneIcon />}
-                    </Button>
-                  </PromptInputAction>
-                )}
-                <PromptInputAction tooltip="Send">
-                  <Button type="submit" disabled={!input.trim() || isLoading}>
-                    <PaperAirplaneIcon className="h-4 w-4" />
-                  </Button>
-                </PromptInputAction>
-              </PromptInputActions>
-            </PromptInput>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-4 text-center">
-              Suitpax AI can make mistakes. Please verify important travel information.
-            </p>
-          </div>
-        </section>
+                  <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
+                </div>
+              )}
+              <p className="text-sm font-light leading-relaxed">{message.content}</p>
+              <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
+                {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+        {loading && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
+            <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-4 py-3 max-w-xs">
+              <div className="flex items-center space-x-2 mb-2">
+                <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
+                  <Image
+                    src="/agents/agent-nova.jpeg"
+                    alt="AI"
+                    width={24}
+                    height={24}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
+                <span className="text-sm text-gray-600 font-light">Thinking...</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+        <div ref={messagesEndRef} />
       </div>
+
+      {/* Input */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="bg-white/50 backdrop-blur-sm border-t border-gray-200 p-4 lg:p-6"
+      >
+        <div className="flex items-center space-x-3 max-w-4xl mx-auto">
+          <div className="flex-1 relative">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask me about flights, hotels, or travel planning..."
+              className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light"
+              disabled={loading}
+            />
+            {browserSupportsSpeechRecognition && (
+              <button
+                onClick={toggleListening}
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-colors ${
+                  isListening
+                    ? "text-red-500 bg-red-50 hover:bg-red-100"
+                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </button>
+            )}
+          </div>
+          <Button
+            onClick={handleSend}
+            disabled={!input.trim() || loading}
+            className="bg-black text-white hover:bg-gray-800 px-4 py-3 rounded-xl"
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          </Button>
+        </div>
+        {isListening && (
+          <div className="text-center mt-2">
+            <span className="text-xs text-blue-600 font-medium animate-pulse">🎤 Listening... speak now</span>
+          </div>
+        )}
+      </motion.div>
     </div>
   )
 }
