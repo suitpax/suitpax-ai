@@ -1,8 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
-import { streamText } from "ai"
-import { anthropic } from "@ai-sdk/anthropic"
+import Anthropic from "@anthropic-ai/sdk"
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+})
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,32 +27,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Transcript is required" }, { status: 400 })
     }
 
-    const result = await streamText({
-      model: anthropic("claude-3-haiku-20240307"),
+    const response = await anthropic.messages.create({
+      model: "claude-3-haiku-20240307",
+      max_tokens: 500,
+      temperature: 0.8,
+      system: `You are Suitpax Voice AI, a conversational travel assistant. You're designed for voice interactions, so:
+      - Keep responses concise and natural for speech
+      - Use a friendly, professional tone
+      - Ask clarifying questions when needed
+      - Focus on actionable travel assistance
+      - Avoid long lists or complex formatting
+      
+      You help with flight bookings, hotel recommendations, travel policies, and general business travel assistance.
+      
+      Context: ${context || "No additional context provided"}`,
       messages: [
-        {
-          role: "system",
-          content: `You are Suitpax Voice AI, a conversational travel assistant. You're designed for voice interactions, so:
-          - Keep responses concise and natural for speech
-          - Use a friendly, professional tone
-          - Ask clarifying questions when needed
-          - Focus on actionable travel assistance
-          - Avoid long lists or complex formatting
-          
-          You help with flight bookings, hotel recommendations, travel policies, and general business travel assistance.
-          
-          Context: ${context || "No additional context provided"}`,
-        },
         {
           role: "user",
           content: transcript,
         },
       ],
-      temperature: 0.8,
-      maxTokens: 500,
     })
 
-    return result.toAIStreamResponse()
+    const aiResponse = response.content[0]?.type === "text" 
+      ? response.content[0].text 
+      : "I apologize, but I couldn't process your request properly. Please try again."
+
+    return NextResponse.json({
+      response: aiResponse,
+      tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
+    })
   } catch (error) {
     console.error("Voice AI error:", error)
     return NextResponse.json({ error: "Failed to process voice request" }, { status: 500 })
