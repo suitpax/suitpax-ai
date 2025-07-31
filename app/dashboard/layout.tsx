@@ -6,7 +6,6 @@ import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/sidebar"
-import Header from "@/components/dashboard/header"
 import { Toaster } from "react-hot-toast"
 import { motion } from "framer-motion"
 import type { User } from "@supabase/supabase-js"
@@ -101,14 +100,12 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className="lg:pl-64 flex flex-col flex-1">
-        <Header user={user} userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
-
         <main className="flex-1 overflow-y-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="p-6"
+            className="p-4 sm:p-6"
           >
             {children}
           </motion.div>

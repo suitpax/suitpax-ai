@@ -199,7 +199,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6 p-4 lg:p-0">
+      <div className="space-y-6">
         <div className="h-32 bg-gray-200 rounded-2xl animate-pulse"></div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {[...Array(4)].map((_, i) => (
@@ -214,18 +214,18 @@ export default function DashboardPage() {
   const firstName = user?.user_metadata?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "User"
 
   return (
-    <div className="space-y-6 p-4 lg:p-0">
+    <div className="space-y-6">
       {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-black rounded-2xl p-4 sm:p-6 text-white"
+        className="bg-black rounded-2xl p-6 text-white"
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
-            <h1 className="text-xl sm:text-2xl font-medium tracking-tighter">Welcome back, {firstName}</h1>
-            <p className="text-gray-300 mt-1 text-sm sm:text-base">
+            <h1 className="text-2xl sm:text-3xl font-medium tracking-tighter">Welcome back, {firstName}</h1>
+            <p className="text-gray-300 mt-1 text-base">
               {userStats.total_flights === 0 && userStats.total_expenses === 0
                 ? "Ready to start your business travel journey?"
                 : "Here's your travel overview"}
@@ -242,9 +242,9 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6"
       >
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Flights</p>
@@ -256,7 +256,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Expenses</p>
@@ -268,7 +268,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Pending</p>
@@ -280,7 +280,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">This Month</p>
@@ -300,7 +300,7 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6"
+        className="bg-white rounded-2xl border border-gray-200 p-6"
       >
         <h2 className="text-lg font-medium tracking-tighter mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -351,7 +351,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6"
+          className="bg-white rounded-2xl border border-gray-200 p-6"
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-medium tracking-tighter">Recent Activity</h2>
@@ -398,7 +398,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6"
+          className="bg-white rounded-2xl border border-gray-200 p-6"
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-medium tracking-tighter">Upcoming Trips</h2>
@@ -461,7 +461,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="bg-gray-50 rounded-2xl border border-gray-200 p-4 sm:p-6"
+          className="bg-gray-50 rounded-2xl border border-gray-200 p-6"
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div>
