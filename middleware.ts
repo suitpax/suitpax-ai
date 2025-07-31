@@ -3,55 +3,77 @@ import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const hostname = request.headers.get('host')
+  const hostname = request.headers.get('host') || ''
+  
+  // Verificar si es el subdominio app (más flexible)
+  const isAppSubdomain = hostname.includes('app.suitpax.com') || 
+                        hostname.startsWith('app.') ||
+                        (process.env.NODE_ENV === 'development' && hostname.includes('localhost:3001'))
 
-  // Specific logic for app.suitpax.com
-  if (hostname === 'app.suitpax.com') {
-    // Allowed routes on the app subdomain
-    const allowedAppPaths = ['/login', '/signup', '/dashboard', '/api']
+  // Rutas que siempre deben permitirse (static files, Next.js internals)
+  const isStaticRoute = 
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/static") ||
+    pathname.startsWith("/favicon") ||
+    pathname.includes(".") || // Cualquier archivo con extensión
+    pathname.startsWith("/api/health") || // Health check endpoint
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml"
+
+  // Si es una ruta estática, siempre permitir
+  if (isStaticRoute) {
+    return NextResponse.next()
+  }
+
+  // Lógica específica para app.suitpax.com
+  if (isAppSubdomain) {
+    // Rutas permitidas en el subdominio app
+    const allowedAppPaths = ['/login', '/signup', '/dashboard', '/api', '/auth']
     const isAllowedAppPath = allowedAppPaths.some(path => pathname.startsWith(path))
     
-    // Allow static files and Next.js files
-    if (
-      pathname.startsWith("/_next") ||
-      pathname.startsWith("/favicon") ||
-      pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico)$/)
-    ) {
-      return NextResponse.next()
-    }
-    
-    // If root path, redirect to login
+    // Si es la ruta raíz, redirigir a login
     if (pathname === '/') {
-      return NextResponse.redirect(new URL('/login', request.url))
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      return NextResponse.redirect(url)
     }
     
-    // If not an allowed path, redirect to login
+    // Si no es una ruta permitida, redirigir a login
     if (!isAllowedAppPath) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      // Evitar loops infinitos
+      if (pathname !== '/login') {
+        return NextResponse.redirect(url)
+      }
     }
     
     return NextResponse.next()
   }
 
-  // Original logic for suitpax.com (main domain)
-  // Allow all public and static routes
-  if (
-    pathname.startsWith("/api/public") ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon") ||
-    pathname === "/" ||
-    pathname.startsWith("/manifesto") ||
-    pathname.startsWith("/pricing") ||
-    pathname.startsWith("/travel-expense-management") ||
-    pathname.startsWith("/contact") ||
-    pathname.startsWith("/solutions") ||
-    pathname.startsWith("/public") ||
-    pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico)$/)
-  ) {
+  // Lógica para el dominio principal (suitpax.com)
+  const publicPaths = [
+    "/",
+    "/manifesto",
+    "/pricing",
+    "/travel-expense-management",
+    "/contact",
+    "/solutions",
+    "/public",
+    "/api/public"
+  ]
+  
+  const isPublicPath = publicPaths.some(path => 
+    pathname === path || pathname.startsWith(path + "/")
+  )
+
+  if (isPublicPath) {
     return NextResponse.next()
   }
 
-  // Allow all auth and dashboard routes locally
+  // Para rutas protegidas en el dominio principal
+  // Aquí podrías agregar lógica de autenticación si es necesario
+  
   return NextResponse.next()
 }
 
@@ -60,9 +82,16 @@ export const config = {
     /*
      * Match all request paths except for the ones starting with:
      * - _next/static (static files)
-     * - _next/image (image optimization files)  
+     * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - public folder
      */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    {
+      source: "/((?!_next/static|_next/image|favicon.ico|public).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
   ],
 }
