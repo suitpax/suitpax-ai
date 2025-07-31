@@ -36,9 +36,9 @@ export default async function DashboardLayout({
       <AppErrorBoundary>
         <div className="flex h-screen">
           <Sidebar user={user} userPlan={userPlan} />
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
             <Header user={user} userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
-            <main className="flex-1 overflow-y-auto p-6">{children}</main>
+            <main className="flex-1 overflow-y-auto p-0 lg:p-6">{children}</main>
           </div>
         </div>
         <Toaster

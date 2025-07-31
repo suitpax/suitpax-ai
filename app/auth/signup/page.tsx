@@ -8,16 +8,14 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import { createClient } from "@/lib/supabase/client"
-import { PiSparkle } from "react-icons/pi"
 import toast from "react-hot-toast"
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
   const [fullName, setFullName] = useState("")
+  const [companyName, setCompanyName] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
@@ -27,13 +25,6 @@ export default function SignUpPage() {
     e.preventDefault()
     setLoading(true)
     setError("")
-
-    if (password !== confirmPassword) {
-      setError("Passwords don't match")
-      toast.error("Passwords don't match")
-      setLoading(false)
-      return
-    }
 
     if (password.length < 6) {
       setError("Password must be at least 6 characters")
@@ -49,6 +40,7 @@ export default function SignUpPage() {
         options: {
           data: {
             full_name: fullName,
+            company_name: companyName,
           },
         },
       })
@@ -100,10 +92,14 @@ export default function SignUpPage() {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gray-50">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-200/40 via-transparent to-transparent"></div>
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-20 right-10 w-72 h-72 bg-gray-200/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-10 w-96 h-96 bg-gray-200/30 rounded-full blur-3xl"></div>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
+      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -112,23 +108,33 @@ export default function SignUpPage() {
         >
           {/* Header */}
           <div className="text-center mb-8">
-            <Link href="/" className="inline-block mb-6">
-              <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={140} height={36} className="h-9 w-auto" />
-            </Link>
-            <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="flex items-center justify-center gap-2 mb-6">
               <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-                <PiSparkle className="mr-1.5 h-3 w-3" />
-                <em className="font-serif italic">MCP-powered AI Agents</em>
+                <Image
+                  src="/logo/suitpax-bl-logo.webp"
+                  alt="Suitpax"
+                  width={60}
+                  height={16}
+                  className="mr-1.5 h-4 w-auto"
+                />
+                <em className="font-serif italic">Join thousands of business travelers</em>
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Create account</h1>
-            <p className="text-gray-600 font-light">
-              <em className="font-serif italic">Join the future of business travel</em>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-4">
+              Get started
+            </h1>
+            <p className="text-gray-600 font-light text-sm sm:text-base">
+              <em className="font-serif italic">Transform your business travel experience today</em>
             </p>
           </div>
 
           {/* Form */}
-          <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm"
+          >
             {error && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -139,7 +145,7 @@ export default function SignUpPage() {
               </motion.div>
             )}
 
-            <form onSubmit={handleSignUp} className="space-y-6">
+            <form onSubmit={handleSignUp} className="space-y-5">
               <div>
                 <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
                   Full name
@@ -150,14 +156,29 @@ export default function SignUpPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light"
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
                   placeholder="Enter your full name"
                 />
               </div>
 
               <div>
+                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
+                  Company name
+                </label>
+                <input
+                  id="companyName"
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
+                  placeholder="Enter your company name"
+                />
+              </div>
+
+              <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email address
+                  Work email
                 </label>
                 <input
                   id="email"
@@ -165,8 +186,8 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light"
-                  placeholder="Enter your email"
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
+                  placeholder="Enter your work email"
                 />
               </div>
 
@@ -181,8 +202,8 @@ export default function SignUpPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light"
-                    placeholder="Create a password"
+                    className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
+                    placeholder="Create a secure password"
                   />
                   <button
                     type="button"
@@ -194,34 +215,10 @@ export default function SignUpPage() {
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm password
-                </label>
-                <div className="relative">
-                  <input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light"
-                    placeholder="Confirm your password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-                  >
-                    {showConfirmPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-                  </button>
-                </div>
-              </div>
-
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-black text-white font-medium rounded-xl hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
+                className="w-full py-3 px-4 bg-black text-white font-medium rounded-xl hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight text-sm sm:text-base"
               >
                 {loading ? "Creating account..." : "Create account"}
               </button>
@@ -242,7 +239,7 @@ export default function SignUpPage() {
               <button
                 onClick={handleGoogleSignUp}
                 disabled={loading}
-                className="mt-4 w-full py-3 px-4 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight flex items-center justify-center"
+                className="mt-4 w-full py-3 px-4 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight flex items-center justify-center text-sm sm:text-base"
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path
@@ -272,7 +269,19 @@ export default function SignUpPage() {
                 Sign in
               </Link>
             </p>
-          </div>
+          </motion.div>
+
+          {/* Back to Home */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-center mt-8"
+          >
+            <Link href="/" className="text-sm text-gray-500 hover:text-black transition-colors font-light">
+              <em className="font-serif italic">← Back to home</em>
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </div>

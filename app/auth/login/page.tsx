@@ -8,7 +8,6 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import { createClient } from "@/lib/supabase/client"
-import { PiSparkle } from "react-icons/pi"
 import toast from "react-hot-toast"
 
 export default function LoginPage() {
@@ -79,10 +78,14 @@ export default function LoginPage() {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gray-50">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-200/40 via-transparent to-transparent"></div>
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-gray-200/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-gray-200/30 rounded-full blur-3xl"></div>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
+      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -91,23 +94,31 @@ export default function LoginPage() {
         >
           {/* Header */}
           <div className="text-center mb-8">
-            <Link href="/" className="inline-block mb-6">
-              <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={140} height={36} className="h-9 w-auto" />
-            </Link>
-            <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="flex items-center justify-center gap-2 mb-6">
               <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-                <PiSparkle className="mr-1.5 h-3 w-3" />
-                <em className="font-serif italic">MCP-powered AI Agents</em>
+                <Image
+                  src="/logo/suitpax-bl-logo.webp"
+                  alt="Suitpax"
+                  width={60}
+                  height={16}
+                  className="mr-1.5 h-4 w-auto"
+                />
+                <em className="font-serif italic">Welcome back to your workspace</em>
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Welcome back</h1>
-            <p className="text-gray-600 font-light">
-              <em className="font-serif italic">Designed to make your journey seamless</em>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-4">Sign in</h1>
+            <p className="text-gray-600 font-light text-sm sm:text-base">
+              <em className="font-serif italic">Continue your journey with intelligent business travel</em>
             </p>
           </div>
 
           {/* Form */}
-          <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm"
+          >
             {error && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -121,7 +132,7 @@ export default function LoginPage() {
             <form onSubmit={handleLogin} className="space-y-6">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email address
+                  Work email
                 </label>
                 <input
                   id="email"
@@ -129,8 +140,8 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light"
-                  placeholder="Enter your email"
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
+                  placeholder="Enter your work email"
                 />
               </div>
 
@@ -145,7 +156,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light"
+                    className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all font-light text-sm sm:text-base"
                     placeholder="Enter your password"
                   />
                   <button
@@ -170,7 +181,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-black text-white font-medium rounded-xl hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
+                className="w-full py-3 px-4 bg-black text-white font-medium rounded-xl hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight text-sm sm:text-base"
               >
                 {loading ? "Signing in..." : "Sign in"}
               </button>
@@ -191,7 +202,7 @@ export default function LoginPage() {
               <button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="mt-4 w-full py-3 px-4 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight flex items-center justify-center"
+                className="mt-4 w-full py-3 px-4 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight flex items-center justify-center text-sm sm:text-base"
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path
@@ -221,7 +232,19 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
-          </div>
+          </motion.div>
+
+          {/* Back to Home */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-center mt-8"
+          >
+            <Link href="/" className="text-sm text-gray-500 hover:text-black transition-colors font-light">
+              <em className="font-serif italic">← Back to home</em>
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </div>
