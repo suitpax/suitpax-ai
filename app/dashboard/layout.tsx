@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { Sidebar } from "@/components/dashboard/sidebar"
-import Header from "@/components/dashboard/header"
+import { Sidebar } from "@/components/dashboard/enhanced-sidebar"
+import Header from "@/components/dashboard/enhanced-header"
 import { Toaster } from "react-hot-toast"
 import { motion } from "framer-motion"
+import { Loader2 } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 export default function DashboardLayout({
@@ -111,7 +111,7 @@ export default function DashboardLayout({
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <div className="w-16 h-16 border-4 border-gray-200 border-t-black rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 font-medium tracking-tight">Loading your workspace...</p>
         </motion.div>
       </div>
