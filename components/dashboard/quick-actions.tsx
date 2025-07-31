@@ -4,11 +4,7 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { PaperAirplaneIcon, PlusIcon, ChatBubbleLeftRightIcon, ChartBarIcon } from "@heroicons/react/24/outline"
 
-interface QuickActionsProps {
-  userPlan: string
-}
-
-export default function QuickActions({ userPlan }: QuickActionsProps) {
+export function QuickActions() {
   const actions = [
     {
       title: "Book Flight",
@@ -16,6 +12,7 @@ export default function QuickActions({ userPlan }: QuickActionsProps) {
       href: "/dashboard/flights",
       icon: PaperAirplaneIcon,
       primary: true,
+      color: "bg-blue-50 text-blue-700 hover:bg-blue-100",
     },
     {
       title: "Add Expense",
@@ -23,6 +20,7 @@ export default function QuickActions({ userPlan }: QuickActionsProps) {
       href: "/dashboard/expenses",
       icon: PlusIcon,
       primary: false,
+      color: "bg-green-50 text-green-700 hover:bg-green-100",
     },
     {
       title: "Ask Suitpax AI",
@@ -30,6 +28,7 @@ export default function QuickActions({ userPlan }: QuickActionsProps) {
       href: "/dashboard/ai-chat",
       icon: ChatBubbleLeftRightIcon,
       primary: false,
+      color: "bg-purple-50 text-purple-700 hover:bg-purple-100",
     },
     {
       title: "View Analytics",
@@ -37,6 +36,7 @@ export default function QuickActions({ userPlan }: QuickActionsProps) {
       href: "/dashboard/analytics",
       icon: ChartBarIcon,
       primary: false,
+      color: "bg-orange-50 text-orange-700 hover:bg-orange-100",
     },
   ]
 
@@ -58,23 +58,14 @@ export default function QuickActions({ userPlan }: QuickActionsProps) {
           >
             <Link
               href={action.href}
-              className="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group h-full"
+              className={`
+                flex items-center p-4 rounded-xl transition-all duration-200 group h-full
+                ${action.primary 
+                  ? "bg-gray-900 text-white hover:bg-gray-800" 
+                  : action.color
+                }
+              `}
             >
               <div
-                className={`w-10 h-10 rounded-lg flex items-center justify-center mr-3 transition-colors ${
-                  action.primary ? "bg-black group-hover:bg-gray-800" : "bg-gray-200 group-hover:bg-gray-300"
-                }`}
-              >
-                <action.icon className={`h-5 w-5 ${action.primary ? "text-white" : "text-gray-600"}`} />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900">{action.title}</p>
-                <p className="text-xs text-gray-500">{action.description}</p>
-              </div>
-            </Link>
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
-  )
-}
+                className={`
+                  w-10 h-10 rounded-lg
