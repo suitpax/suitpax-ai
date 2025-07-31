@@ -68,4 +68,25 @@ export function QuickActions() {
             >
               <div
                 className={`
-                  w-10 h-10 rounded-lg
+                  w-10 h-10 rounded-lg flex items-center justify-center mr-3 transition-colors
+                  ${action.primary 
+                    ? "bg-white/20" 
+                    : "bg-white"
+                  }
+                `}
+              >
+                <action.icon className={`h-5 w-5 ${action.primary ? "text-white" : ""}`} />
+              </div>
+              <div>
+                <p className="text-sm font-medium">{action.title}</p>
+                <p className={`text-xs ${action.primary ? "text-gray-300" : "text-gray-600"}`}>
+                  {action.description}
+                </p>
+              </div>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
