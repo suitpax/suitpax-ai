@@ -1,0 +1,51 @@
+// components/dashboard/chat/chat-input.tsx
+"use client"
+
+import {
+  PromptInput,
+  PromptInputActions,
+  PromptInputAction,
+  PromptInputTextarea,
+} from "@/components/ui/prompt-input"
+import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import { Mic, Send } from "lucide-react"
+
+export function ChatInput({ onSend }: { onSend: (message: string) => void }) {
+  const [message, setMessage] = useState("")
+
+  const handleSubmit = () => {
+    if (message.trim()) {
+      onSend(message.trim())
+      setMessage("")
+    }
+  }
+
+  return (
+    <PromptInput>
+      <PromptInputTextarea
+        placeholder="Escribe tu mensaje para Suitpax AI..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault()
+            handleSubmit()
+          }
+        }}
+      />
+      <PromptInputActions>
+        <PromptInputAction tooltip="Talk (Coming soon..)">
+          <Button variant="ghost" size="icon">
+            <Mic className="w-4 h-4" />
+          </Button>
+        </PromptInputAction>
+        <PromptInputAction tooltip="Enviar">
+          <Button onClick={handleSubmit} variant="default" size="icon">
+            <Send className="w-4 h-4" />
+          </Button>
+        </PromptInputAction>
+      </PromptInputActions>
+    </PromptInput>
+  )
+}
