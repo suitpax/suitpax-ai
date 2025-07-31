@@ -1,57 +1,50 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Users, Plus, UserPlus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { UsersIcon, PlusIcon, UserPlusIcon } from "@heroicons/react/24/outline"
 
 export default function TeamPage() {
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex items-center justify-between"
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 className="text-3xl font-medium tracking-tighter text-black leading-none">Team Management</h1>
-          <p className="text-gray-600 font-light mt-1">Manage your team members and their travel permissions</p>
+          <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Team</h1>
+          <p className="text-gray-600 font-light">
+            <em className="font-serif italic">Manage your team members and permissions</em>
+          </p>
         </div>
-        <Button className="bg-black text-white hover:bg-gray-800">
-          <UserPlus className="h-4 w-4 mr-2" />
+        <button className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-colors tracking-tight">
+          <UserPlusIcon className="h-4 w-4 mr-2" />
           Invite Member
-        </Button>
+        </button>
       </motion.div>
 
-      {/* Zero State */}
+      {/* Empty State */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
+        className="bg-white/50 backdrop-blur-sm p-12 rounded-2xl border border-gray-200 shadow-sm text-center"
       >
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-medium tracking-tighter">Team Members</CardTitle>
-            <CardDescription>Manage who can access and book travel on behalf of your organization</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-2">No team members yet</h3>
-              <p className="text-gray-600 font-light mb-6">
-                Invite team members to collaborate on business travel bookings and expense management.
-              </p>
-              <Button className="bg-black text-white hover:bg-gray-800">
-                <Plus className="h-4 w-4 mr-2" />
-                Invite Your First Team Member
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+          <UsersIcon className="h-8 w-8 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium tracking-tight text-gray-900 mb-2">No team members yet</h3>
+        <p className="text-gray-600 font-light mb-6">
+          <em className="font-serif italic">
+            Invite your colleagues to collaborate on travel planning and expense management
+          </em>
+        </p>
+        <button className="inline-flex items-center px-4 py-2 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-colors tracking-tight">
+          <PlusIcon className="h-4 w-4 mr-2" />
+          Invite First Member
+        </button>
       </motion.div>
     </div>
   )

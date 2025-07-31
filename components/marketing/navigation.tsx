@@ -1,309 +1,170 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { PiDotsNineBold, PiDotsSixBold, PiArrowUpRightBold } from "react-icons/pi"
-import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
-import { cn } from "@/lib/utils"
+import { motion, AnimatePresence } from "framer-motion"
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
+import { useMediaQuery } from "@/hooks/use-media-query"
+import { createClient } from "@/lib/supabase/client"
+import type { User } from "@supabase/supabase-js"
 
-export const Navigation = () => {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
-  const buttonRef = useRef<HTMLButtonElement>(null)
-  const pathname = usePathname()
+const navigationItems = [
+  { name: "Solutions", href: "/solutions" },
+  { name: "Pricing", href: "/pricing" },
+  { name: "Manifesto", href: "/manifesto" },
+  { name: "Contact", href: "/contact" },
+]
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+export default function Navigation() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const isMobile = useMediaQuery("(max-width: 768px)")
+  const supabase = createClient()
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isMobileMenuOpen &&
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node)
-      ) {
-        setIsMobileMenuOpen(false)
-      }
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      setUser(user)
+      setLoading(false)
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [isMobileMenuOpen])
+    getUser()
 
-  // Helper function to check if a link is active
-  const isActive = (path: string) => {
-    if (path === "/") {
-      return pathname === path
-    }
-    return pathname.startsWith(path)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase.auth])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
   }
 
   return (
-    <div className="w-full flex justify-center pt-2 py-2 px-4 z-50 fixed top-0 left-0">
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:p-4 focus:bg-white focus:text-black focus:rounded-md"
-      >
-        Skip to main content
-      </a>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={120} height={32} className="h-8 w-auto" />
+          </Link>
 
-      <header
-        className={`flex flex-col w-full max-w-6xl rounded-xl backdrop-blur-md bg-white/85 border border-black/5 transition-all duration-300 mb-6 ${
-          isScrolled ? "shadow-lg border-black/10" : ""
-        } ${isMobileMenuOpen ? "!bg-white/85 !rounded-xl !border-black/10" : ""}`}
-      >
-        <div className="w-full px-4 py-1">
-          <div className="relative flex items-center justify-between">
-            {/* Logo */}
-            <Link href="/" className="flex items-center">
-              <span className="sr-only">Suitpax</span>
-              <Image
-                src="/logo/suitpax-bl-logo.webp"
-                alt="Suitpax"
-                width={120}
-                height={25}
-                priority
-                className="h-6 w-auto"
-              />
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex lg:items-center lg:justify-center lg:space-x-6 absolute left-1/2 -translate-x-1/2">
-              <Link
-                href="/manifesto"
-                className={cn(
-                  "px-2.5 py-1.5 text-sm hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors",
-                  isActive("/manifesto") ? "text-black bg-black/5 font-semibold" : "text-black",
-                )}
-              >
-                Manifesto
-              </Link>
-              <Link
-                href="/pricing"
-                className={cn(
-                  "px-2.5 py-1.5 text-sm hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors",
-                  isActive("/pricing") ? "text-black bg-black/5 font-semibold" : "text-black",
-                )}
-              >
-                Pricing
-              </Link>
-              <Link
-                href="https://cal.com/team/founders/partnership"
-                className="px-2.5 py-1.5 text-sm text-black hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors"
-              >
-                Talk to founders
-              </Link>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center space-x-2">
-              {/* Login Button - Desktop */}
-              <Button
-                asChild
-                className="hidden lg:flex h-7 text-xs font-medium tracking-tighter rounded-full bg-gray-100 text-black hover:bg-gray-200 px-3 py-1 shadow-sm min-w-[70px] items-center gap-1"
-              >
-                <Link href="/auth/login">Login</Link>
-              </Button>
-
-              {/* Sign Up Button */}
-              <Button
-                asChild
-                className="h-7 text-xs font-medium tracking-tighter rounded-full bg-black text-white hover:bg-black/80 px-3 py-1 shadow-sm min-w-[90px] flex items-center gap-1"
-              >
-                <Link href="/auth/signup">
-                  Sign Up
-                  <PiArrowUpRightBold className="h-2.5 w-2.5 text-white/80" />
+          {/* Desktop Navigation */}
+          {!isMobile && (
+            <div className="hidden md:flex items-center space-x-8">
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-sm font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+                >
+                  {item.name}
                 </Link>
-              </Button>
-
-              {/* Mobile Menu Button */}
-              <button
-                type="button"
-                ref={buttonRef}
-                className="lg:hidden inline-flex items-center justify-center rounded-md p-1.5 text-black bg-gray-100 border border-black/10 backdrop-blur-md"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-expanded={isMobileMenuOpen}
-              >
-                <span className="sr-only">{isMobileMenuOpen ? "Close menu" : "Open menu"}</span>
-                <div className={`transition-transform duration-200 ${isMobileMenuOpen ? "rotate-180" : ""}`}>
-                  {isMobileMenuOpen ? <PiDotsSixBold size={18} /> : <PiDotsNineBold size={18} />}
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Menu - Simplified */}
-          {isMobileMenuOpen && (
-            <div ref={menuRef} className="lg:hidden overflow-hidden transition-all duration-300 ease-in-out">
-              <nav className="mt-6 border-t border-gray-200/30 pt-4">
-                <div className="px-0">
-                  <div className="py-2 border-b border-gray-200/30">
-                    <Link
-                      href="/manifesto"
-                      className={cn(
-                        "flex items-center w-full py-1 text-lg font-medium tracking-tighter hover:bg-black/5 rounded-md transition-colors",
-                        isActive("/manifesto") ? "text-black bg-black/5 font-semibold" : "text-black",
-                      )}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Manifesto
-                    </Link>
-                  </div>
-                  <div className="py-2 border-b border-gray-200/30">
-                    <Link
-                      href="/pricing"
-                      className={cn(
-                        "flex items-center w-full py-1 text-lg font-medium tracking-tighter hover:bg-black/5 rounded-md transition-colors",
-                        isActive("/pricing") ? "text-black bg-black/5 font-semibold" : "text-black",
-                      )}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Pricing
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="px-0 mt-2">
-                  <div className="py-2 border-b border-gray-200/30">
-                    <Link
-                      href="https://cal.com/team/founders/partnership"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Talk to founders
-                    </Link>
-                  </div>
-
-                  {/* Suitpax Deck Link */}
-                  <div className="py-2 border-b border-gray-200/30">
-                    <Link
-                      href="https://pitch-suitpax.vercel.app"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <div className="flex items-center">
-                        <Image
-                          src="/logo/suitpax-bl-logo.webp"
-                          alt="Suitpax"
-                          width={70}
-                          height={18}
-                          className="h-4 w-auto mr-1"
-                        />
-                        <span className="font-serif italic text-sm">Deck</span>
-                        <PiArrowUpRightBold className="h-3 w-3 ml-1 text-gray-500" />
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Account Section - Mobile Only */}
-                <div className="px-0 mt-4">
-                  <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Account</h4>
-                  <div className="py-2 border-b border-gray-200/30">
-                    <Link
-                      href="/auth/login"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Sign In
-                    </Link>
-                  </div>
-                  <div className="py-2 border-b border-gray-200/30">
-                    <Link
-                      href="/auth/signup"
-                      className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Create Account
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Social Icons - Mobile Only */}
-                <div className="mt-4 px-0">
-                  <div className="flex justify-start space-x-4 py-2">
-                    <Link href="https://twitter.com/suitpax" className="text-gray-500 hover:text-black">
-                      <SiX className="h-4 w-4" />
-                      <span className="sr-only">X</span>
-                    </Link>
-                    <Link href="https://linkedin.com/company/suitpax" className="text-gray-500 hover:text-black">
-                      <SiLinkedin className="h-4 w-4" />
-                      <span className="sr-only">LinkedIn</span>
-                    </Link>
-                    <Link href="https://github.com/suitpax" className="text-gray-500 hover:text-black">
-                      <SiGithub className="h-4 w-4" />
-                      <span className="sr-only">GitHub</span>
-                    </Link>
-                    <Link href="https://instagram.com/suitpax" className="text-gray-500 hover:text-black">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4"
-                      >
-                        <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
-                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
-                      </svg>
-                      <span className="sr-only">Instagram</span>
-                    </Link>
-                    <Link
-                      href="https://www.crunchbase.com/organization/suitpax"
-                      className="text-gray-500 hover:text-black"
-                    >
-                      <SiCrunchbase className="h-4 w-4" />
-                      <span className="sr-only">Crunchbase</span>
-                    </Link>
-                    <Link href="mailto:hello@suitpax.com" className="text-gray-500 hover:text-black">
-                      <SiGmail className="h-4 w-4" />
-                      <span className="sr-only">Email</span>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Contact Badge - Mobile Only */}
-                <div className="mt-6 px-0 pb-4">
-                  <div className="flex flex-col items-start space-y-2">
-                    <a
-                      href="mailto:hello@suitpax.com"
-                      className="inline-flex items-center px-3 py-1.5 bg-transparent border border-black rounded-md text-xs font-medium text-black hover:bg-black/5 transition-colors"
-                    >
-                      Send feedback
-                    </a>
-                    <p className="text-[10px] text-gray-500">
-                      Feel free to contact us directly with your ideas and feedback. We'd love to hear from you!
-                    </p>
-                  </div>
-                </div>
-              </nav>
+              ))}
             </div>
           )}
+
+          {/* Auth Buttons */}
+          <div className="flex items-center space-x-4">
+            {loading ? (
+              <div className="w-20 h-8 bg-gray-200 animate-pulse rounded-xl"></div>
+            ) : user ? (
+              <div className="flex items-center space-x-3">
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-xl transition-colors tracking-tight"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="text-sm font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <Link
+                  href="/auth/login"
+                  className="text-sm font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-xl transition-colors tracking-tight"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile menu button */}
+            {isMobile && (
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-2 rounded-md text-gray-700 hover:text-black hover:bg-gray-100 transition-colors"
+              >
+                {isOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
+              </button>
+            )}
+          </div>
         </div>
-      </header>
-    </div>
+      </div>
+
+      {/* Mobile Navigation Menu */}
+      <AnimatePresence>
+        {isOpen && isMobile && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-white border-t border-gray-200"
+          >
+            <div className="px-4 py-6 space-y-4">
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className="block text-base font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+                >
+                  {item.name}
+                </Link>
+              ))}
+
+              {!loading && !user && (
+                <div className="pt-4 border-t border-gray-200 space-y-3">
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setIsOpen(false)}
+                    className="block text-base font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full text-center px-4 py-2 text-base font-medium text-white bg-black hover:bg-gray-800 rounded-xl transition-colors tracking-tight"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
   )
 }
-
-export default Navigation
