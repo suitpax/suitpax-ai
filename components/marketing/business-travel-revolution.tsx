@@ -166,7 +166,7 @@ export default function BusinessTravelRevolution() {
             </span>
             <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[8px] font-medium text-gray-700">
               <span className="w-1 h-1 rounded-full bg-black animate-pulse mr-1"></span>
-              Coming Q2 2025
+              Coming Q3 2025
             </span>
           </div>
 
