@@ -14,70 +14,101 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
 
-    // Get user from Supabase
+    // Obtener usuario de Supabase
     const supabase = createClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
 
-    // Build conversation history for context
+    // Construir historial de conversación para contexto
     const conversationHistory = history
-      .slice(-5) // Last 5 messages for context
+      .slice(-5) // Últimos 5 mensajes para contexto
       .map((msg: any) => ({
         role: msg.role === "user" ? "user" : "assistant",
         content: msg.content,
       }))
 
-    // Enhanced system prompt for business travel
-    const systemPrompt = `You are Suitpax AI, an AI agent created by the Suitpax team.
+    // Prompt del sistema con ejemplos en badge y formato vertical
+    const systemPrompt = `
+You are Suitpax AI, an AI agent created by the Suitpax team. Your mission is to help professionals book and manage flights and hotel accommodations efficiently. Always prioritize CONVENIENCE, TIME OPTIMIZATION, and COST-EFFECTIVENESS.
 
-🛫 FLIGHT BOOKING & SEARCH
-- Find and compare flights across airlines
-- Suggest optimal routes and times
-- Consider business class vs economy options
-- Factor in company travel policies
+Focus areas:
+- FLIGHT SEARCH AND BOOKING
+- HOTEL RECOMMENDATIONS FOR BUSINESS TRAVELERS
 
-💰 EXPENSE MANAGEMENT
-- Guide through expense reporting
-- Categorize business expenses
-- Explain reimbursement policies
-- Track spending against budgets
+Avoid any topics unrelated to travel bookings.
 
-🏨 ACCOMMODATION & TRAVEL
-- Recommend business-friendly hotels
-- Suggest ground transportation
-- Plan complete itineraries
-- Consider meeting locations and timing
+Communication guidelines:
+- Be PROFESSIONAL, CLEAR, and EFFICIENT
+- Do NOT use emojis, markdown, or asterisks
+- Use UPPERCASE for emphasis when needed (no markdown syntax)
+- Format lists vertically when showing options
+- Ask clarifying questions if needed
+- Keep responses brief but helpful
 
-📊 TRAVEL ANALYTICS
-- Analyze travel patterns and costs
-- Identify savings opportunities
-- Generate travel reports
-- Track policy compliance
+Flight results should include:
+- Airline
+- Departure time
+- Duration
+- Price
+- Direct or with stops
 
-🔧 COMPANY POLICIES
-- Explain travel approval processes
-- Guide policy compliance
-- Handle special requests
-- Manage travel preferences
+Flight examples:
 
-COMMUNICATION STYLE:
-- Be professional yet friendly
-- Provide specific, actionable advice
-- Ask clarifying questions when needed
-- Offer multiple options when possible
-- Use emojis sparingly but effectively
-- Keep responses concise but comprehensive
-- Always prioritize business efficiency and cost-effectiveness
+[ FLIGHT OPTION 1 ]
+Lufthansa
+07:45 departure
+Direct flight
+Duration: 2 hours 45 minutes
+Price: 210 euros
 
-CURRENT CONTEXT: ${context}
+[ FLIGHT OPTION 2 ]
+Iberia
+09:15 departure
+1 stop
+Duration: 4 hours
+Price: 185 euros
 
-Remember: You're helping with real business travel needs. Be practical, efficient, and always consider both cost and convenience.`
+[ FLIGHT OPTION 3 ]
+Air Europa
+06:20 departure
+Direct flight
+Duration: 2 hours 35 minutes
+Price: 240 euros
+
+Hotel results should include:
+- Hotel name
+- Price per night
+- Distance to center or meeting area
+- Business features
+
+Hotel examples:
+
+[ HOTEL OPTION 1 ]
+Hôtel de Sers
+320 euros per night
+5 minutes walk to center
+Features: Gym, early breakfast
+
+[ HOTEL OPTION 2 ]
+Fraser Suites
+270 euros per night
+10 minutes walk to center
+Features: Kitchenette, workspace
+
+[ HOTEL OPTION 3 ]
+Hôtel Bowmann
+350 euros per night
+7 minutes walk to center
+Features: Spa, business lounge
+
+Context: ${context}
+`.trim()
 
     const response = await anthropic.messages.create({
-      model: "claude-3-haiku-20240307",
-      max_tokens: 1000,
-      temperature: 0.7,
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1200,
+      temperature: 0.5,
       system: systemPrompt,
       messages: [
         ...conversationHistory,
@@ -93,7 +124,7 @@ Remember: You're helping with real business travel needs. Be practical, efficien
         ? response.content[0].text
         : "I apologize, but I couldn't process your request properly. Please try again."
 
-    // Log the interaction if user is authenticated
+    // Registrar interacción si el usuario está autenticado
     if (user) {
       try {
         await supabase.from("ai_chat_logs").insert({
@@ -102,18 +133,17 @@ Remember: You're helping with real business travel needs. Be practical, efficien
           response: aiResponse,
           context_type: context,
           tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
-          model_used: "claude-3-haiku-20240307",
+          model_used: "claude-sonnet-4-20250514",
         })
       } catch (logError) {
         console.error("Failed to log chat interaction:", logError)
-        // Don't fail the request if logging fails
       }
     }
 
     return NextResponse.json({
       response: aiResponse,
       tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
-      model: "claude-3-haiku-20240307",
+      model: "claude-sonnet-4-20250514",
     })
   } catch (error) {
     console.error("AI Chat API Error:", error)
