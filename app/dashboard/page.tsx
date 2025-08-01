@@ -438,7 +438,7 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
       >
-        <div className="bg-gradient-to-r from-black to-gray-200 rounded-2xl p-6 text-blacl">
+        <div className="bg-gray-200 rounded-2xl p-6 text-black">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
