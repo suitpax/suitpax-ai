@@ -4,12 +4,11 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Send, Mic, MicOff, Loader2 } from "lucide-react"
+import { Send, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
-import { useSpeechToText } from "@/hooks/use-speech-to-text"
 
 interface Message {
   id: string
@@ -64,14 +63,6 @@ export default function AIChatPage() {
   const [user, setUser] = useState<any>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
-
-  const { isListening, transcript, startListening, stopListening, resetTranscript, browserSupportsSpeechRecognition } =
-    useSpeechToText({
-      onTranscriptChange: (text) => {
-        setInput(text)
-      },
-      continuous: true,
-    })
 
   useEffect(() => {
     const getUser = async () => {
@@ -152,16 +143,6 @@ export default function AIChatPage() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       handleSend()
-    }
-  }
-
-  const toggleListening = () => {
-    if (isListening) {
-      stopListening()
-    } else {
-      resetTranscript()
-      setInput("")
-      startListening()
     }
   }
 
@@ -284,27 +265,15 @@ export default function AIChatPage() {
         className="bg-white/50 backdrop-blur-sm border-t border-gray-200 p-4 lg:p-6"
       >
         <div className="flex items-center space-x-3 max-w-4xl mx-auto">
-          <div className="flex-1 relative">
+          <div className="flex-1">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me about flights, hotels, or travel planning..."
-              className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light"
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light"
               disabled={loading}
             />
-            {browserSupportsSpeechRecognition && (
-              <button
-                onClick={toggleListening}
-                className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-colors ${
-                  isListening
-                    ? "text-red-500 bg-red-50 hover:bg-red-100"
-                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </button>
-            )}
           </div>
           <Button
             onClick={handleSend}
@@ -314,12 +283,7 @@ export default function AIChatPage() {
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </div>
-        {isListening && (
-          <div className="text-center mt-2">
-            <span className="text-xs text-blue-600 font-medium animate-pulse">🎤 Listening... speak now</span>
-          </div>
-        )}
-      </div>
+      </motion.div>
     </div>
   )
 }
