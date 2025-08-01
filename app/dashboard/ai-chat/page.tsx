@@ -4,49 +4,18 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Loader2 } from "lucide-react"
-import { PiArrowRight } from "react-icons/pi"
+import { Send, Mic, MicOff, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
+import { useSpeechToText } from "@/hooks/use-speech-to-text"
 
 interface Message {
   id: string
   content: string
   role: "user" | "assistant"
   timestamp: Date
-}
-
-// Componente para el efecto typing
-const TypingText: React.FC<{ text: string; speed?: number; onComplete?: () => void }> = ({ 
-  text, 
-  speed = 50, 
-  onComplete 
-}) => {
-  const [displayedText, setDisplayedText] = useState("")
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  useEffect(() => {
-    if (currentIndex < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayedText(prev => prev + text[currentIndex])
-        setCurrentIndex(prev => prev + 1)
-      }, speed)
-
-      return () => clearTimeout(timer)
-    } else if (onComplete) {
-      onComplete()
-    }
-  }, [currentIndex, text, speed, onComplete])
-
-  useEffect(() => {
-    // Reset cuando cambia el texto
-    setDisplayedText("")
-    setCurrentIndex(0)
-  }, [text])
-
-  return <span>{displayedText}</span>
 }
 
 export default function AIChatPage() {
@@ -60,10 +29,17 @@ export default function AIChatPage() {
   ])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
-  const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
+
+  const { isListening, transcript, startListening, stopListening, resetTranscript, browserSupportsSpeechRecognition } =
+    useSpeechToText({
+      onTranscriptChange: (text) => {
+        setInput(text)
+      },
+      continuous: true,
+    })
 
   useEffect(() => {
     const getUser = async () => {
@@ -122,9 +98,7 @@ export default function AIChatPage() {
         timestamp: new Date(),
       }
 
-      // Agregar el mensaje y activar el efecto typing
       setMessages((prev) => [...prev, assistantMessage])
-      setTypingMessageId(assistantMessage.id)
     } catch (error) {
       console.error("Error sending message:", error)
       const errorMessage: Message = {
@@ -134,7 +108,6 @@ export default function AIChatPage() {
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, errorMessage])
-      setTypingMessageId(errorMessage.id)
     } finally {
       setLoading(false)
     }
@@ -147,8 +120,14 @@ export default function AIChatPage() {
     }
   }
 
-  const handleTypingComplete = () => {
-    setTypingMessageId(null)
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening()
+    } else {
+      resetTranscript()
+      setInput("")
+      startListening()
+    }
   }
 
   return (
@@ -164,7 +143,7 @@ export default function AIChatPage() {
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 rounded-md overflow-hidden border border-gray-200 bg-white">
               <Image
-                src="/agents/agent-2.png"
+                src="/agents/agent-nova.jpeg"
                 alt="Suitpax AI"
                 width={40}
                 height={40}
@@ -206,7 +185,7 @@ export default function AIChatPage() {
                 <div className="flex items-center space-x-2 mb-2">
                   <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
                     <Image
-                      src="/agents/agent-2.png"
+                      src="/agents/agent-nova.jpeg"
                       alt="AI"
                       width={24}
                       height={24}
@@ -216,17 +195,7 @@ export default function AIChatPage() {
                   <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
                 </div>
               )}
-              <p className="text-sm font-light leading-relaxed">
-                {message.role === "assistant" && typingMessageId === message.id ? (
-                  <TypingText 
-                    text={message.content} 
-                    speed={30} 
-                    onComplete={handleTypingComplete}
-                  />
-                ) : (
-                  message.content
-                )}
-              </p>
+              <p className="text-sm font-light leading-relaxed">{message.content}</p>
               <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
                 {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </p>
@@ -239,7 +208,7 @@ export default function AIChatPage() {
               <div className="flex items-center space-x-2 mb-2">
                 <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
                   <Image
-                    src="/agents/agent-2.png"
+                    src="/agents/agent-nova.jpeg"
                     alt="AI"
                     width={24}
                     height={24}
@@ -275,19 +244,32 @@ export default function AIChatPage() {
               className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light"
               disabled={loading}
             />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim() || loading}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 rounded-full transition-colors hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
-              ) : (
-                <PiArrowRight className="h-4 w-4 text-gray-600" />
-              )}
-            </button>
+            {browserSupportsSpeechRecognition && (
+              <button
+                onClick={toggleListening}
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-colors ${
+                  isListening
+                    ? "text-red-500 bg-red-50 hover:bg-red-100"
+                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </button>
+            )}
           </div>
+          <Button
+            onClick={handleSend}
+            disabled={!input.trim() || loading}
+            className="bg-black text-white hover:bg-gray-800 px-4 py-3 rounded-xl"
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          </Button>
         </div>
+        {isListening && (
+          <div className="text-center mt-2">
+            <span className="text-xs text-blue-600 font-medium animate-pulse"> Listening... speak now</span>
+          </div>
+        )}
       </motion.div>
     </div>
   )
