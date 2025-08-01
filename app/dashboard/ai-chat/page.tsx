@@ -182,7 +182,7 @@ export default function AIChatPage() {
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 rounded-md overflow-hidden border border-gray-200 bg-white">
               <Image
-                src="/agents/agent-nova.jpeg"
+                src="/agents/agent-2.png"
                 alt="Suitpax AI"
                 width={40}
                 height={40}
@@ -224,7 +224,7 @@ export default function AIChatPage() {
                 <div className="flex items-center space-x-2 mb-2">
                   <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
                     <Image
-                      src="/agents/agent-nova.jpeg"
+                      src="/agents/agent-2.png"
                       alt="AI"
                       width={24}
                       height={24}
@@ -257,7 +257,7 @@ export default function AIChatPage() {
               <div className="flex items-center space-x-2 mb-2">
                 <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
                   <Image
-                    src="/agents/agent-nova.jpeg"
+                    src="/agents/agent-2.png"
                     alt="AI"
                     width={24}
                     height={24}
@@ -316,7 +316,7 @@ export default function AIChatPage() {
         </div>
         {isListening && (
           <div className="text-center mt-2">
-            <span className="text-xs text-blue-600 font-medium animate-pulse"> Listening... speak now</span>
+            <span className="text-xs text-blue-600 font-medium animate-pulse">🎤 Listening... speak now</span>
           </div>
         )}
       </div>
