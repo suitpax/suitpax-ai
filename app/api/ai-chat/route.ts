@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       }))
 
     // Enhanced system prompt for business travel
-    const systemPrompt = `You are Suitpax AI, a professional business travel assistant. Follow these communication guidelines:
+    const systemPrompt = `You are Suitpax AI, an AI agent created by the Suitpax team.:
 
 ## CORE CAPABILITIES:
 **FLIGHT BOOKING & SEARCH**
