@@ -4,7 +4,8 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Send, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
+import { PiArrowRight } from "react-icons/pi"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
@@ -265,23 +266,27 @@ export default function AIChatPage() {
         className="bg-white/50 backdrop-blur-sm border-t border-gray-200 p-4 lg:p-6"
       >
         <div className="flex items-center space-x-3 max-w-4xl mx-auto">
-          <div className="flex-1">
+          <div className="flex-1 relative">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me about flights, hotels, or travel planning..."
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light"
+              className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light"
               disabled={loading}
             />
+            <button
+              onClick={handleSend}
+              disabled={!input.trim() || loading}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 rounded-full transition-colors hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
+              ) : (
+                <PiArrowRight className="h-4 w-4 text-gray-600" />
+              )}
+            </button>
           </div>
-          <Button
-            onClick={handleSend}
-            disabled={!input.trim() || loading}
-            className="bg-black text-white hover:bg-gray-800 px-4 py-3 rounded-xl"
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </Button>
         </div>
       </motion.div>
     </div>
