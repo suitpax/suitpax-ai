@@ -1,8 +1,8 @@
-# Suitpax Landing Page
+# Suitpax AI
 
 The next-generation AI-powered business travel platform landing page built with modern web technologies.
 
-## 🚀 Features
+## Features
 
 - **AI Voice Assistant** - Real-time speech recognition and natural language processing
 - **Modern Design** - Clean, professional interface with smooth animations
@@ -11,7 +11,7 @@ The next-generation AI-powered business travel platform landing page built with 
 - **Performance First** - Optimized for Core Web Vitals and fast loading
 - **Accessibility** - WCAG compliant with proper ARIA labels
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Framework**: Next.js 14 (App Router)
 - **Styling**: Tailwind CSS + shadcn/ui
@@ -20,7 +20,7 @@ The next-generation AI-powered business travel platform landing page built with 
 - **TypeScript**: Full type safety
 - **Deployment**: Vercel
 
-## 📁 Project Structure
+## Project Structure
 
 \`\`\`
 suitpax-landing/
@@ -33,7 +33,7 @@ suitpax-landing/
 └── docs/                   # Documentation
 \`\`\`
 
-## 🚀 Getting Started
+## Getting Started
 
 1. **Clone the repository**
    \`\`\`bash
@@ -67,7 +67,7 @@ suitpax-landing/
 - **Bundle Size**: Minimized with tree shaking and code splitting
 - **Images**: Optimized with Next.js Image component
 
-## 🎨 Design System
+##  Design System
 
 ### Colors
 - **Primary**: Gray-based palette
