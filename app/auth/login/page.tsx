@@ -72,7 +72,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <h2 className="text-center text-4xl md:text-5xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
+<h2 className="text-center text-3xl md:text-4xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
             Sign in
           </h2>
           <p className="text-center text-gray-600 font-light">Access your business travel dashboard</p>
