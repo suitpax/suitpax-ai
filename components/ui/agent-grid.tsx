@@ -17,19 +17,17 @@ interface AgentGridProps {
 export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: AgentGridProps) {
   const [agentGrid, setAgentGrid] = useState<any[]>([])
 
-  // Function to generate the agent grid
+  // Función para generar la grid de agentes
   const generateAgentGrid = () => {
     const grid = []
-    // Aumentar el número de agentes para hacer la grid más densa
-    const totalAgents = 200 // Aumentado de 130 a 200
+    const totalAgents = 200 // Número fijo para la densidad
 
     for (let i = 0; i < totalAgents; i++) {
-      // Use modulo to ensure even distribution of all agent images
       const agentIndex = i % agents.length
       const agent = agents[agentIndex]
 
       grid.push({
-        id: `agent-${i}`, // Asegurar IDs únicos si se repiten agentes
+        id: `agent-${i}`, // ID único
         image: agent.image,
       })
     }
@@ -45,9 +43,9 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
 
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
-  }, [agents]) // Dependencia en agents para regenerar si cambian
+  }, [agents])
 
-  // Function to handle agent selection
+  // Manejar selección de agente
   const handleAgentSelect = (agentId: string) => {
     if (onAgentSelect) {
       onAgentSelect(agentId)
@@ -56,15 +54,15 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
 
   return (
     <div className="relative mb-6 px-0.5">
-      {/* Aumentar columnas para hacer la grid más densa y compacta */}
-      <div className="grid grid-cols-12 sm:grid-cols-14 md:grid-cols-16 lg:grid-cols-18 xl:grid-cols-20 gap-0.5">
+      {/* Grid fija de 12 columnas con ancho máximo para que no crezca */}
+      <div className="grid grid-cols-12 gap-0.5 max-w-[360px] mx-auto">
         {agentGrid.map((agent, index) => (
           <motion.div
             key={agent.id}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2, delay: index * 0.001 }}
-            className="aspect-square relative cursor-pointer"
+            className="aspect-square relative cursor-pointer max-w-[30px]"
             onClick={() => handleAgentSelect(agent.id)}
           >
             <AnimatePresence>
@@ -89,14 +87,13 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
                 />
               )}
             </AnimatePresence>
-            {/* Reducir el inset para hacer las imágenes más pequeñas y compactas */}
             <div className="absolute inset-0.5 rounded-sm overflow-hidden bg-gray-100">
               <Image
                 src={agent.image || "/placeholder.svg"}
                 alt="AI Travel Agent"
                 fill
                 className="object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
-                sizes="20px" // Reducido de 30px a 20px
+                sizes="30px"
               />
             </div>
           </motion.div>
