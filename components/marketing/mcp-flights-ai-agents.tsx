@@ -5,11 +5,11 @@ import { PiSparkle, PiAirplane, PiCalendar, PiCreditCard, PiUsers, PiChartBar, P
 
 const airlines = [
   { name: "Delta", logo: "/logos/delta-logo.png" },
-  { name: "American", logo: "/logos/american-logo.png" },
-  { name: "United", logo: "/logos/united-logo.png" },
+  { name: "American Airlines", logo: "/logos/american-logo.png" },
+  { name: "United Airlines", logo: "/logos/united-logo.png" },
   { name: "Southwest", logo: "/logos/southwest-logo.png" },
   { name: "JetBlue", logo: "/logos/jetblue-logo.png" },
-  { name: "Alaska", logo: "/logos/alaska-logo.png" },
+  { name: "Alaskan Airlines", logo: "/logos/alaska-logo.png" },
   { name: "British Airways", logo: "/logos/british-airways-logo.png" },
   { name: "Lufthansa", logo: "/logos/lufthansa-logo.png" },
 ]
@@ -49,8 +49,8 @@ const features = [
 
 const stats = [
   { label: "Airlines Connected", value: "500+" },
-  { label: "Cities Covered", value: "10,000+" },
-  { label: "Bookings Processed", value: "2M+" },
+  { label: "Cities Covered", value: "8,000+" },
+  { label: "Bookings Processed", value: "0+" },
   { label: "Cost Savings", value: "35%" },
 ]
 
@@ -72,7 +72,7 @@ export default function MCPFlightsAIAgents() {
               <em className="font-serif italic">MCP-powered Flight Intelligence</em>
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-4">
+          <h2 className="text-2xl md:text-2xl lg:text-2xl font-medium tracking-tighter leading-none mb-4">
             AI Flight Agents
           </h2>
           <p className="text-gray-600 font-light max-w-2xl mx-auto">
@@ -173,12 +173,12 @@ export default function MCPFlightsAIAgents() {
             <h3 className="text-2xl md:text-3xl font-medium tracking-tighter leading-none mb-4">
               Ready to transform your business travel?
             </h3>
-            <p className="text-gray-600 font-light mb-6">
-              Join thousands of companies already using our AI-powered flight booking platform
+            <p className="text-gray-600 font-medium tracking-tighter mb-6">
+              Business travel is broken
             </p>
             <button className="inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-all tracking-tight">
               <PiSparkle className="mr-2 h-4 w-4" />
-              Start Free Trial
+              Get a demo
             </button>
           </div>
         </motion.div>
