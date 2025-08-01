@@ -18,6 +18,37 @@ interface Message {
   timestamp: Date
 }
 
+// Componente para el efecto typing
+const TypingText: React.FC<{ text: string; speed?: number; onComplete?: () => void }> = ({ 
+  text, 
+  speed = 50, 
+  onComplete 
+}) => {
+  const [displayedText, setDisplayedText] = useState("")
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayedText(prev => prev + text[currentIndex])
+        setCurrentIndex(prev => prev + 1)
+      }, speed)
+
+      return () => clearTimeout(timer)
+    } else if (onComplete) {
+      onComplete()
+    }
+  }, [currentIndex, text, speed, onComplete])
+
+  useEffect(() => {
+    // Reset cuando cambia el texto
+    setDisplayedText("")
+    setCurrentIndex(0)
+  }, [text])
+
+  return <span>{displayedText}</span>
+}
+
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -29,6 +60,7 @@ export default function AIChatPage() {
   ])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
@@ -98,7 +130,9 @@ export default function AIChatPage() {
         timestamp: new Date(),
       }
 
+      // Agregar el mensaje y activar el efecto typing
       setMessages((prev) => [...prev, assistantMessage])
+      setTypingMessageId(assistantMessage.id)
     } catch (error) {
       console.error("Error sending message:", error)
       const errorMessage: Message = {
@@ -108,6 +142,7 @@ export default function AIChatPage() {
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, errorMessage])
+      setTypingMessageId(errorMessage.id)
     } finally {
       setLoading(false)
     }
@@ -128,6 +163,10 @@ export default function AIChatPage() {
       setInput("")
       startListening()
     }
+  }
+
+  const handleTypingComplete = () => {
+    setTypingMessageId(null)
   }
 
   return (
@@ -195,7 +234,17 @@ export default function AIChatPage() {
                   <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
                 </div>
               )}
-              <p className="text-sm font-light leading-relaxed">{message.content}</p>
+              <p className="text-sm font-light leading-relaxed">
+                {message.role === "assistant" && typingMessageId === message.id ? (
+                  <TypingText 
+                    text={message.content} 
+                    speed={30} 
+                    onComplete={handleTypingComplete}
+                  />
+                ) : (
+                  message.content
+                )}
+              </p>
               <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
                 {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </p>
@@ -267,10 +316,10 @@ export default function AIChatPage() {
         </div>
         {isListening && (
           <div className="text-center mt-2">
-            <span className="text-xs text-blue-600 font-medium animate-pulse">🎤 Listening... speak now</span>
+            <span className="text-xs text-blue-600 font-medium animate-pulse"> Listening... speak now</span>
           </div>
         )}
-      </motion.div>
+      </div>
     </div>
   )
 }
