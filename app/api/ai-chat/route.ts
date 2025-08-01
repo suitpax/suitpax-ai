@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import Anthropic from "@anthropic-ai/sdk"
+// Agrega una librería simple para detectar idioma (opcional)
+// import franc from "franc" // ejemplo, si quieres
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -14,6 +16,44 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
 
+    // Detección básica de idioma (ejemplo simple, mejor librería para producción)
+    // const langCode = franc(message)
+    // let language = "English"
+    // if (langCode === "spa") language = "Spanish"
+    // else if (langCode === "fra") language = "French"
+    // ...
+
+    // Aquí para simplificar, usaremos un prompt que le pide al modelo detectar y responder en el mismo idioma
+    // Actualizamos el systemPrompt:
+
+    const systemPrompt = `
+You are Suitpax AI, an AI assistant created by the Suitpax team specialized in flight and hotel bookings.
+Your mission is to help professionals book flights and hotels efficiently.
+Always be PROFESSIONAL, CLEAR, and BRIEF.
+Detect the language of the user's message and respond in that language.
+Do NOT use emojis, markdown, or asterisks.
+Use UPPERCASE only for emphasis when necessary.
+Format lists vertically when showing options.
+Avoid topics unrelated to travel bookings.
+Ask clarifying questions if needed.
+Keep responses SHORT and to the point.
+
+Flight results include:
+- Airline
+- Departure time
+- Duration
+- Price
+- Direct or with stops
+
+Hotel results include:
+- Hotel name
+- Price per night
+- Distance to center or meeting area
+- Business features
+
+Context: ${context}
+`.trim()
+
     // Obtener usuario de Supabase
     const supabase = createClient()
     const {
@@ -22,93 +62,16 @@ export async function POST(request: NextRequest) {
 
     // Construir historial de conversación para contexto
     const conversationHistory = history
-      .slice(-5) // Últimos 5 mensajes para contexto
+      .slice(-5)
       .map((msg: any) => ({
         role: msg.role === "user" ? "user" : "assistant",
         content: msg.content,
       }))
 
-    // Prompt del sistema con ejemplos en badge y formato vertical
-    const systemPrompt = `
-You are Suitpax AI, an AI agent created by the Suitpax team. Your mission is to help professionals book and manage flights and hotel accommodations efficiently. Always prioritize CONVENIENCE, TIME OPTIMIZATION, and COST-EFFECTIVENESS.
-
-Focus areas:
-- FLIGHT SEARCH AND BOOKING
-- HOTEL RECOMMENDATIONS FOR BUSINESS TRAVELERS
-
-Avoid any topics unrelated to travel bookings.
-
-Communication guidelines:
-- Be PROFESSIONAL, CLEAR, and EFFICIENT
-- Do NOT use emojis, markdown, or asterisks
-- Use UPPERCASE for emphasis when needed (no markdown syntax)
-- Format lists vertically when showing options
-- Ask clarifying questions if needed
-- Keep responses brief but helpful
-
-Flight results should include:
-- Airline
-- Departure time
-- Duration
-- Price
-- Direct or with stops
-
-Flight examples:
-
-[ FLIGHT OPTION 1 ]
-Lufthansa
-07:45 departure
-Direct flight
-Duration: 2 hours 45 minutes
-Price: 210 euros
-
-[ FLIGHT OPTION 2 ]
-Iberia
-09:15 departure
-1 stop
-Duration: 4 hours
-Price: 185 euros
-
-[ FLIGHT OPTION 3 ]
-Air Europa
-06:20 departure
-Direct flight
-Duration: 2 hours 35 minutes
-Price: 240 euros
-
-Hotel results should include:
-- Hotel name
-- Price per night
-- Distance to center or meeting area
-- Business features
-
-Hotel examples:
-
-[ HOTEL OPTION 1 ]
-Hôtel de Sers
-320 euros per night
-5 minutes walk to center
-Features: Gym, early breakfast
-
-[ HOTEL OPTION 2 ]
-Fraser Suites
-270 euros per night
-10 minutes walk to center
-Features: Kitchenette, workspace
-
-[ HOTEL OPTION 3 ]
-Hôtel Bowmann
-350 euros per night
-7 minutes walk to center
-Features: Spa, business lounge
-
-Context: ${context}
-`.trim()
-
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 1200,
-      temperature: 0.5,
+      max_tokens: 600, // reduce tokens para respuestas más cortas
+      temperature: 0.3, // menos creativo para respuestas concretas
       system: systemPrompt,
       messages: [
         ...conversationHistory,
@@ -121,7 +84,7 @@ Context: ${context}
 
     const aiResponse =
       response.content[0]?.type === "text"
-        ? response.content[0].text
+        ? response.content[0].text.trim()
         : "I apologize, but I couldn't process your request properly. Please try again."
 
     // Registrar interacción si el usuario está autenticado
