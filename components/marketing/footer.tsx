@@ -207,7 +207,7 @@ export const Footer = () => {
                 <span className="sr-only">GitHub</span>
               </Link>
               <Link
-                href="https://discord.gg/suitpax"
+                href="https://discord.gg/aPG7Sqst"
                 className="text-gray-400 hover:text-gray-200 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
