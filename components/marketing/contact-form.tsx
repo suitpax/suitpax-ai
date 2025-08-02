@@ -116,12 +116,12 @@ export default function ContactForm() {
           <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-6">
             <em className="font-serif italic">Contact Us</em>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-none mb-6">
+          <h2 className="text-2xl md:text-2xl lg:text-2xl font-medium tracking-tighter leading-none mb-6">
             <em className="font-serif italic">Let's Transform Your</em>
             <br />
             <span className="text-gray-700">Business Travel</span>
           </h2>
-          <p className="text-lg font-light text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm font-light tracking-tighter text-gray-600 max-w-2xl mx-auto">
             Ready to revolutionize your company's travel management? Get in touch with our team to discover how Suitpax
             can help you save time and money.
           </p>
@@ -144,28 +144,28 @@ export default function ContactForm() {
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-gray-200 rounded-full mt-2 flex-shrink-0"></div>
                   <p className="text-gray-600 font-light">
-                    <strong className="font-medium">AI-Powered Intelligence:</strong> Smart recommendations that learn
+                    <strong className="font-mediun text-sm">AI-Powered Intelligence:</strong> Smart recommendations that learn
                     from your travel patterns
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-gray-200 rounded-full mt-2 flex-shrink-0"></div>
                   <p className="text-gray-600 font-light">
-                    <strong className="font-medium">Guaranteed Savings:</strong> Reduce travel costs by up to 30% with
+                    <strong className="font-medium text-sm">Guaranteed Savings:</strong> Reduce travel costs by up to 30% with
                     optimized booking
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-gray-200 rounded-full mt-2 flex-shrink-0"></div>
                   <p className="text-gray-600 font-light">
-                    <strong className="font-medium">24/7 Support:</strong> Round-the-clock assistance for all your
+                    <strong className="font-medium text-sm">24/7 Support:</strong> Round-the-clock assistance for all your
                     travel needs
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-gray-200 rounded-full mt-2 flex-shrink-0"></div>
                   <p className="text-gray-600 font-light">
-                    <strong className="font-medium">Enterprise Security:</strong> SOC 2 certified with enterprise-grade
+                    <strong className="font-medium text-sm">Enterprise Security:</strong> SOC 2 certified with enterprise-grade
                     data protection
                   </p>
                 </div>
