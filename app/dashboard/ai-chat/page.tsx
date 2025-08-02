@@ -418,4 +418,4 @@ export default function AIChatPage() {
       </motion.div>
     </div>
   )
-}
+} 
