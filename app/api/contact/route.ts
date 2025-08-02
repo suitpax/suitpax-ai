@@ -2,16 +2,13 @@ import { type NextRequest, NextResponse } from "next/server"
 import * as brevo from "@getbrevo/brevo"
 import { z } from "zod"
 
+// Schema sincronizado con el formulario del frontend
 const contactSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   company: z.string().optional(),
   subject: z.string().min(1, "Subject is required"),
   message: z.string().min(10, "Message must be at least 10 characters"),
-  phone: z.string().optional(),
-  companySize: z.string().optional(),
-  industry: z.string().optional(),
-  preferredContact: z.enum(["email", "phone", "video"]).optional(),
 })
 
 export async function POST(request: NextRequest) {
@@ -19,9 +16,21 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = contactSchema.parse(body)
 
+    // Verificar que la API key de Brevo esté configurada
+    if (!process.env.BREVO_API_KEY) {
+      console.error("BREVO_API_KEY no está configurada")
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Server configuration error. Please try again later or contact us directly at hello@suitpax.com",
+        },
+        { status: 500 },
+      )
+    }
+
     // Initialize Brevo API
     const apiInstance = new brevo.TransactionalEmailsApi()
-    apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY!)
+    apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY)
 
     // Prepare email content
     const emailContent = `
@@ -30,10 +39,6 @@ export async function POST(request: NextRequest) {
       <p><strong>Email:</strong> ${validatedData.email}</p>
       <p><strong>Company:</strong> ${validatedData.company || "Not provided"}</p>
       <p><strong>Subject:</strong> ${validatedData.subject}</p>
-      <p><strong>Phone:</strong> ${validatedData.phone || "Not provided"}</p>
-      <p><strong>Company Size:</strong> ${validatedData.companySize || "Not provided"}</p>
-      <p><strong>Industry:</strong> ${validatedData.industry || "Not provided"}</p>
-      <p><strong>Preferred Contact:</strong> ${validatedData.preferredContact || "email"}</p>
       
       <h3>Message:</h3>
       <p>${validatedData.message.replace(/\n/g, "<br>")}</p>
@@ -91,7 +96,7 @@ export async function POST(request: NextRequest) {
     // Add to Brevo contacts for marketing (optional)
     try {
       const contactsApi = new brevo.ContactsApi()
-      contactsApi.setApiKey(brevo.ContactsApiApiKeys.apiKey, process.env.BREVO_API_KEY!)
+      contactsApi.setApiKey(brevo.ContactsApiApiKeys.apiKey, process.env.BREVO_API_KEY)
 
       const createContact = new brevo.CreateContact()
       createContact.email = validatedData.email
@@ -99,9 +104,6 @@ export async function POST(request: NextRequest) {
         FIRSTNAME: validatedData.name.split(" ")[0],
         LASTNAME: validatedData.name.split(" ").slice(1).join(" ") || "",
         COMPANY: validatedData.company || "",
-        PHONE: validatedData.phone || "",
-        INDUSTRY: validatedData.industry || "",
-        COMPANY_SIZE: validatedData.companySize || "",
         CONTACT_SOURCE: "Website Contact Form",
         CONTACT_SUBJECT: validatedData.subject,
       }
