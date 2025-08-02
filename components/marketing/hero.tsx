@@ -113,9 +113,9 @@ const getBadgeMessage = () => {
 
   // Random selection for other times
   const messages = [
-    "Launching at the end of Q2 2025.",
+    "Launching October 2025.",
     "Our AI Agents are at the gym...",
-    "Join our waitlist in the meantime.",
+    "Building the AI context...",
     "The next-gen of traveltech.",
   ]
 
@@ -208,7 +208,7 @@ const cities = [
   "Gothenburg",
   "Malmö",
   "Tampere",
-  "Aarhus",
+  "Manchester",
   "Odense",
   "Bergen",
   "Stavanger",
@@ -286,7 +286,7 @@ export const Hero = () => {
         <FadeContainer className="relative flex flex-col items-center justify-center container px-4 md:px-6 mx-auto">
           <Badge
             text={badgeMessage}
-            href={badgeMessage === "Join our waitlist in the meantime." ? "https://app.suitpax.com/sign-up" : "#"}
+            href={badgeMessage === "Pre-register." ? "https://app.suitpax.com/sign-up" : "#"}
             className="bg-white text-black hover:bg-gray-100 transition-colors"
           />
 
@@ -316,14 +316,14 @@ export const Hero = () => {
                 asChild
                 className="rounded-xl bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
-                <Link href="/manifesto">Read our manifesto</Link>
+                <Link href="/manifesto">Read the manifesto</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 className="rounded-xl bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
-                <Link href="https://cal.com/team/founders/partnership">Talk to founders</Link>
+                <Link href="https://cal.com/team/founders/partnership">Invest in Suitpax- Let's talk</Link>
               </Button>
             </div>
           </div>
