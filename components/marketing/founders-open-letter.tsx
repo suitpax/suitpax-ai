@@ -162,7 +162,7 @@ export default function FoundersOpenLetter() {
               <span className="text-white/60">|</span>
               <span className="text-white/60">Founder & CEO</span>
               <span className="text-white/60">|</span>
-              <span className="text-white/60">January 2025</span>
+              <span className="text-white/60">2025</span>
             </div>
           </motion.div>
         </div>
