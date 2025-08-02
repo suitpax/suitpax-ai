@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import {
   Plane,
@@ -18,9 +18,9 @@ import {
   Plus,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
-import type { User } from "@supabase/supabase-js"
 import Link from "next/link"
 
+// Mover interfaces fuera del componente
 interface DashboardStats {
   totalTrips: number
   totalSavings: number
@@ -37,6 +37,15 @@ interface RecentActivity {
   status: "completed" | "pending" | "cancelled"
 }
 
+interface User {
+  id: string
+  email?: string
+  created_at: string
+  user_metadata?: {
+    full_name?: string
+  }
+}
+
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -49,44 +58,8 @@ export default function DashboardPage() {
   })
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
 
-  const supabase = createClient()
-
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const {
-          data: { user },
-          error,
-        } = await supabase.auth.getUser()
-
-        if (error) {
-          console.error("Error getting user:", error)
-          return
-        }
-
-        if (user) {
-          setUser(user)
-
-          // Check if user is new (created in the last 24 hours)
-          const userCreatedAt = new Date(user.created_at)
-          const now = new Date()
-          const hoursDiff = (now.getTime() - userCreatedAt.getTime()) / (1000 * 60 * 60)
-          setIsNewUser(hoursDiff < 24)
-
-          // Load user-specific data
-          await loadDashboardData(user.id, hoursDiff < 24)
-        }
-      } catch (error) {
-        console.error("Error in getUser:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    getUser()
-  }, [])
-
-  const loadDashboardData = async (userId: string, isNew: boolean) => {
+  // Memoizar la función para evitar recreaciones innecesarias
+  const loadDashboardData = useCallback(async (userId: string, isNew: boolean) => {
     try {
       if (isNew) {
         // New user - show welcome data
@@ -107,22 +80,24 @@ export default function DashboardPage() {
           },
         ])
       } else {
-        // Existing user - show realistic data
-        setStats({
+        // Existing user - generar datos una sola vez
+        const statsData = {
           totalTrips: Math.floor(Math.random() * 50) + 10,
           totalSavings: Math.floor(Math.random() * 10000) + 2000,
           upcomingTrips: Math.floor(Math.random() * 5) + 1,
           activeBookings: Math.floor(Math.random() * 3) + 1,
-        })
+        }
+        setStats(statsData)
 
-        // Generate realistic recent activity
+        // Generate realistic recent activity con timestamps fijos
+        const now = Date.now()
         const activities: RecentActivity[] = [
           {
             id: "1",
             type: "flight",
             title: "Flight to San Francisco",
             description: "SFO departure confirmed for tomorrow",
-            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+            timestamp: new Date(now - 2 * 60 * 60 * 1000),
             status: "completed",
           },
           {
@@ -130,7 +105,7 @@ export default function DashboardPage() {
             type: "hotel",
             title: "Hotel Booking Confirmed",
             description: "Hilton San Francisco Union Square",
-            timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
+            timestamp: new Date(now - 5 * 60 * 60 * 1000),
             status: "completed",
           },
           {
@@ -138,7 +113,7 @@ export default function DashboardPage() {
             type: "expense",
             title: "Expense Report Submitted",
             description: "Q4 Business Travel Expenses",
-            timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+            timestamp: new Date(now - 24 * 60 * 60 * 1000),
             status: "pending",
           },
         ]
@@ -147,8 +122,58 @@ export default function DashboardPage() {
     } catch (error) {
       console.error("Error loading dashboard data:", error)
     }
-  }
+  }, [])
 
+  useEffect(() => {
+    let isMounted = true
+    
+    const getUser = async () => {
+      try {
+        const supabase = createClient() // Crear cliente dentro del useEffect
+        
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser()
+
+        if (error) {
+          console.error("Error getting user:", error)
+          return
+        }
+
+        if (user && isMounted) {
+          setUser(user)
+
+          // Check if user is new (created in the last 24 hours)
+          const userCreatedAt = new Date(user.created_at)
+          const now = new Date()
+          const hoursDiff = (now.getTime() - userCreatedAt.getTime()) / (1000 * 60 * 60)
+          const newUser = hoursDiff < 24
+          setIsNewUser(newUser)
+
+          // Load user-specific data
+          await loadDashboardData(user.id, newUser)
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.error("Error in getUser:", error)
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    getUser()
+    
+    // Cleanup function
+    return () => {
+      isMounted = false
+    }
+  }, [loadDashboardData])
+
+  // Mover quickActions fuera del render para evitar recreaciones
   const quickActions = [
     {
       icon: Plane,
