@@ -4,11 +4,16 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Loader2 } from "lucide-react"
-import { PiArrowRight } from "react-icons/pi"
-import { Input } from "@/components/ui/input"
+import { Loader2, ArrowUp, Paperclip, X, Square } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
+import {
+  PromptInput,
+  PromptInputAction,
+  PromptInputActions,
+  PromptInputTextarea,
+} from "@/components/prompt-kit/prompt-input"
 
 interface Message {
   id: string
@@ -61,7 +66,9 @@ export default function AIChatPage() {
   const [loading, setLoading] = useState(false)
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
+  const [files, setFiles] = useState<File[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -82,6 +89,20 @@ export default function AIChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const newFiles = Array.from(event.target.files)
+      setFiles((prev) => [...prev, ...newFiles])
+    }
+  }
+
+  const handleRemoveFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index))
+    if (uploadInputRef?.current) {
+      uploadInputRef.current.value = ""
+    }
+  }
+
   const handleSend = async () => {
     if (!input.trim() || loading) return
 
@@ -94,6 +115,7 @@ export default function AIChatPage() {
 
     setMessages((prev) => [...prev, userMessage])
     setInput("")
+    setFiles([])
     setLoading(true)
 
     try {
@@ -136,13 +158,6 @@ export default function AIChatPage() {
       setTypingMessageId(errorMessage.id)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
     }
   }
 
@@ -257,35 +272,86 @@ export default function AIChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
+      {/* Input con PromptInput */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
         className="bg-white/50 backdrop-blur-sm border-t border-gray-200 p-4 lg:p-6"
       >
-        <div className="flex items-center space-x-3 max-w-4xl mx-auto">
-          <div className="flex-1 relative">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask me about flights, hotels, or travel planning..."
-              className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light"
+        <div className="max-w-4xl mx-auto">
+          <PromptInput
+            value={input}
+            onValueChange={setInput}
+            isLoading={loading}
+            onSubmit={handleSend}
+            className="w-full bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200"
+          >
+            {/* Archivos adjuntos */}
+            {files.length > 0 && (
+              <div className="flex flex-wrap gap-2 pb-2">
+                {files.map((file, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-100 flex items-center gap-2 rounded-lg px-3 py-2 text-sm"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <Paperclip className="size-4 text-gray-600" />
+                    <span className="max-w-[120px] truncate text-gray-700">{file.name}</span>
+                    <button
+                      onClick={() => handleRemoveFile(index)}
+                      className="hover:bg-gray-200 rounded-full p-1 transition-colors"
+                    >
+                      <X className="size-4 text-gray-600" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <PromptInputTextarea 
+              placeholder="Ask me about flights, hotels, or travel planning..." 
+              className="text-gray-900 placeholder-gray-500 font-light"
               disabled={loading}
             />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim() || loading}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 rounded-full transition-colors hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
-              ) : (
-                <PiArrowRight className="h-4 w-4 text-gray-600" />
-              )}
-            </button>
-          </div>
+
+            <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
+              <PromptInputAction tooltip="Attach files">
+                <label
+                  htmlFor="file-upload"
+                  className="hover:bg-gray-100 flex h-8 w-8 cursor-pointer items-center justify-center rounded-2xl transition-colors"
+                >
+                  <input
+                    ref={uploadInputRef}
+                    type="file"
+                    multiple
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <Paperclip className="text-gray-600 size-5" />
+                </label>
+              </PromptInputAction>
+
+              <PromptInputAction
+                tooltip={loading ? "Stop generation" : "Send message"}
+              >
+                <Button
+                  variant="default"
+                  size="icon"
+                  className="h-8 w-8 rounded-full bg-black hover:bg-gray-800 text-white"
+                  onClick={handleSend}
+                  disabled={!input.trim() || loading}
+                >
+                  {loading ? (
+                    <Square className="size-4 fill-current" />
+                  ) : (
+                    <ArrowUp className="size-4" />
+                  )}
+                </Button>
+              </PromptInputAction>
+            </PromptInputActions>
+          </PromptInput>
         </div>
       </motion.div>
     </div>
