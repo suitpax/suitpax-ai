@@ -69,10 +69,10 @@ export const Footer = () => {
             <h3 className="text-white font-medium mb-4 text-sm">Products</h3>
             <div className="flex flex-col space-y-2 mb-6">
               <Link
-                href="/travel-expense-management"
+                href="/auth/sign-up"
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
               >
-                Expense Management
+                Business Travel
               </Link>
               <Link href="/pricing" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Pricing
@@ -169,7 +169,7 @@ export const Footer = () => {
                   {cert.status && (
                     <div
                       className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                        cert.status === "active" ? "bg-emerald-500 animate-pulse" : "bg-gray-300"
+                        cert.status === "active" ? "bg-emerald-300 animate-pulse" : "bg-gray-300"
                       }`}
                     ></div>
                   )}
