@@ -61,7 +61,7 @@ export const Footer = () => {
               </Link>
             </div>
 
-            <p className="text-xs text-gray-500">2261 Market Street STE 86661 San Francisco, CA, 94114</p>
+            <p className="text-xs text-gray-500">Av. Fabraquer 21, El Campello-Muchavista, VC, Spain, 03560</p>
           </div>
 
           {/* Columna 2: Products & Services */}
@@ -115,7 +115,7 @@ export const Footer = () => {
                 href="https://cal.com/team/founders/partnership"
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
               >
-                Talk to founders
+                Talk to founder
               </Link>
               <Link
                 href="https://lu.ma/suitpax"
