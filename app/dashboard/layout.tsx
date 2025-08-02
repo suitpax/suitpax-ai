@@ -8,7 +8,7 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import Header from "@/components/dashboard/header"
 import { Toaster } from "react-hot-toast"
 import { motion } from "framer-motion"
-import { Loader2 } from "lucide-react"
+import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 export default function DashboardLayout({
@@ -23,15 +23,16 @@ export default function DashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  
+
   const supabase = createClient()
   const router = useRouter()
 
   // Check if mobile on mount and window resize
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024)
-      if (window.innerWidth < 1024) {
+      const mobile = window.innerWidth < 1024
+      setIsMobile(mobile)
+      if (mobile) {
         setSidebarCollapsed(true)
       }
     }
@@ -111,7 +112,7 @@ export default function DashboardLayout({
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <div className="w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 font-medium tracking-tight">Loading your workspace...</p>
         </motion.div>
       </div>
@@ -139,11 +140,11 @@ export default function DashboardLayout({
       <div
         className={`
           ${isMobile 
-            ? `fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out ${
+            ? `fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${
                 mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`
-            : `hidden lg:flex transition-all duration-300 ${
-                sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'
+            : `relative transition-all duration-300 ${
+                sidebarCollapsed ? 'w-16' : 'w-64'
               }`
           }
         `}
@@ -157,20 +158,38 @@ export default function DashboardLayout({
       </div>
 
       {/* Main content */}
-      <div className={`
-        flex flex-col flex-1 min-w-0 
-        ${!isMobile && !sidebarCollapsed ? 'lg:ml-64' : ''}
-        ${!isMobile && sidebarCollapsed ? 'lg:ml-16' : ''}
-      `}>
-        <Header 
-          user={user} 
-          userPlan={userPlan} 
-          subscriptionStatus={subscriptionStatus}
-          onToggleSidebar={toggleSidebar}
-          isMobile={isMobile}
-          sidebarCollapsed={sidebarCollapsed}
-        />
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        {/* Mobile Header with Menu Button */}
+        {isMobile && (
+          <div className="lg:hidden">
+            <div className="flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200">
+              <button
+                type="button"
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500"
+                onClick={toggleSidebar}
+              >
+                <span className="sr-only">Open sidebar</span>
+                <Menu className="h-6 w-6" aria-hidden="true" />
+              </button>
+              <div className="text-lg font-semibold text-gray-900">Suitpax</div>
+              <div className="w-10"></div> {/* Spacer for centering */}
+            </div>
+          </div>
+        )}
 
+        {/* Desktop Header */}
+        {!isMobile && (
+          <Header 
+            user={user} 
+            userPlan={userPlan} 
+            subscriptionStatus={subscriptionStatus}
+            onToggleSidebar={toggleSidebar}
+            isMobile={isMobile}
+            sidebarCollapsed={sidebarCollapsed}
+          />
+        )}
+
+        {/* Main content area */}
         <main className="flex-1 overflow-y-auto bg-gray-50">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -197,13 +216,13 @@ export default function DashboardLayout({
           },
           success: {
             iconTheme: {
-              primary: "#10b981",
+              primary: "#374151",
               secondary: "#fff",
             },
           },
           error: {
             iconTheme: {
-              primary: "#ef4444",
+              primary: "#374151",
               secondary: "#fff",
             },
           },
