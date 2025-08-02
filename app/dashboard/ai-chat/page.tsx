@@ -20,12 +20,19 @@ import {
   ChatContainerScrollAnchor,
 } from "@/components/prompt-kit/chat-container"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
+import {
+  Reasoning,
+  ReasoningTrigger,
+  ReasoningContent,
+  ReasoningResponse,
+} from "@/components/prompt-kit/reasoning"
 
 interface Message {
   id: string
   content: string
   role: "user" | "assistant"
   timestamp: Date
+  reasoning?: string // Para el proceso de pensamiento real del AI
 }
 
 // Componente para el efecto typing
@@ -73,6 +80,7 @@ export default function AIChatPage() {
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const [files, setFiles] = useState<File[]>([])
+  const [showReasoning, setShowReasoning] = useState(true) // Toggle para activar/desactivar razonamiento
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
@@ -124,6 +132,8 @@ export default function AIChatPage() {
         body: JSON.stringify({
           message: userMessage.content,
           history: messages,
+          context: "travel_booking", // Contexto específico para Suitpax
+          includeReasoning: showReasoning, // Incluir razonamiento si está activado
         }),
       })
 
@@ -138,6 +148,7 @@ export default function AIChatPage() {
         content: data.response,
         role: "assistant",
         timestamp: new Date(),
+        reasoning: data.reasoning, // Razonamiento real del API
       }
 
       // Agregar el mensaje y activar el efecto typing
@@ -150,6 +161,7 @@ export default function AIChatPage() {
         content: "Sorry, I encountered an error. Please try again.",
         role: "assistant",
         timestamp: new Date(),
+        reasoning: showReasoning ? "An error occurred while processing the request. The system attempted to maintain connection and provide a helpful response despite technical difficulties." : undefined,
       }
       setMessages((prev) => [...prev, errorMessage])
       setTypingMessageId(errorMessage.id)
@@ -189,10 +201,30 @@ export default function AIChatPage() {
               <p className="text-xs md:text-sm text-gray-600 font-light">Your intelligent travel assistant</p>
             </div>
           </div>
-          <span className="inline-flex items-center rounded-xl bg-emerald-950/10 px-2.5 py-0.5 text-[10px] font-medium text-emerald-950">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-950 animate-pulse mr-1"></span>
-            Online
-          </span>
+          
+          <div className="flex items-center space-x-3">
+            {/* Toggle para razonamiento */}
+            <div className="flex items-center space-x-2">
+              <label className="text-xs text-gray-600">AI Reasoning</label>
+              <button
+                onClick={() => setShowReasoning(!showReasoning)}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                  showReasoning ? 'bg-emerald-950' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                    showReasoning ? 'translate-x-5' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            
+            <span className="inline-flex items-center rounded-xl bg-emerald-950/10 px-2.5 py-0.5 text-[10px] font-medium text-emerald-950">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-950 animate-pulse mr-1"></span>
+              Online
+            </span>
+          </div>
         </div>
       </motion.div>
 
@@ -229,6 +261,27 @@ export default function AIChatPage() {
                       <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
                     </div>
                   )}
+
+                  {/* Reasoning section - solo para mensajes del asistente con razonamiento */}
+                  {message.role === "assistant" && message.reasoning && (
+                    <div className="mb-3">
+                      <Reasoning>
+                        <ReasoningTrigger className="text-xs text-gray-500 hover:text-gray-700">
+                          <span>🧠 View AI reasoning</span>
+                        </ReasoningTrigger>
+                        <ReasoningContent>
+                          <div className="text-xs text-gray-600 leading-relaxed whitespace-pre-line bg-gray-50 rounded-lg p-3 border border-gray-100">
+                            <ReasoningResponse
+                              text={message.reasoning}
+                              className="text-xs text-gray-700"
+                            />
+                          </div>
+                        </ReasoningContent>
+                      </Reasoning>
+                    </div>
+                  )}
+
+                  {/* Main message content */}
                   <p className="text-sm font-light leading-relaxed">
                     {message.role === "assistant" && typingMessageId === message.id ? (
                       <TypingText 
@@ -264,7 +317,9 @@ export default function AIChatPage() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
-                    <span className="text-sm text-gray-600 font-light">Thinking...</span>
+                    <span className="text-sm text-gray-600 font-light">
+                      {showReasoning ? "Analyzing and thinking..." : "Thinking..."}
+                    </span>
                   </div>
                 </div>
               </motion.div>
