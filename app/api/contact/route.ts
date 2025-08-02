@@ -8,7 +8,7 @@ const contactSchema = z.object({
   email: z.string().email("Invalid email address"),
   company: z.string().optional(),
   subject: z.string().min(1, "Subject is required"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
+  message: z.string().min(5, "Message must be at least 5 characters"),
 })
 
 export async function POST(request: NextRequest) {
