@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Send, CheckCircle, AlertCircle, User, Mail, Building, MessageSquare, Loader2 } from "lucide-react"
+import { ArrowRight, CheckCircle, AlertCircle, User, Mail, Building, MessageSquare, Loader2 } from "lucide-react"
 
 interface FormData {
   name: string
@@ -330,12 +330,12 @@ export default function ContactForm() {
                 {status.type === "loading" ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Sending...
+                    <em className="font-serif italic">Sending...</em>
                   </>
                 ) : (
                   <>
                     <em className="font-serif italic">Send Message</em>
-                    <Send className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
                   </>
                 )}
               </button>
