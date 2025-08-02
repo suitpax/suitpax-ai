@@ -160,25 +160,23 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         {/* Mobile Header with Menu Button */}
-        {isMobile && (
-          <div className="lg:hidden">
-            <div className="flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200">
-              <button
-                type="button"
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500"
-                onClick={toggleSidebar}
-              >
-                <span className="sr-only">Open sidebar</span>
-                <Menu className="h-6 w-6" aria-hidden="true" />
-              </button>
-              <div className="text-lg font-semibold text-gray-900">Suitpax</div>
-              <div className="w-10"></div> {/* Spacer for centering */}
-            </div>
+        <div className="lg:hidden">
+          <div className="flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200">
+            <button
+              type="button"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500"
+              onClick={toggleSidebar}
+            >
+              <span className="sr-only">Open sidebar</span>
+              <Menu className="h-6 w-6" aria-hidden="true" />
+            </button>
+            <div className="text-lg font-semibold text-gray-900">Suitpax</div>
+            <div className="w-10"></div> {/* Spacer for centering */}
           </div>
-        )}
+        </div>
 
         {/* Desktop Header */}
-        {!isMobile && (
+        <div className="hidden lg:block">
           <Header 
             user={user} 
             userPlan={userPlan} 
@@ -187,7 +185,7 @@ export default function DashboardLayout({
             isMobile={isMobile}
             sidebarCollapsed={sidebarCollapsed}
           />
-        )}
+        </div>
 
         {/* Main content area */}
         <main className="flex-1 overflow-y-auto bg-gray-50">
