@@ -14,6 +14,12 @@ import {
   PromptInputActions,
   PromptInputTextarea,
 } from "@/components/prompt-kit/prompt-input"
+import {
+  ChatContainerRoot,
+  ChatContainerContent,
+  ChatContainerScrollAnchor,
+} from "@/components/prompt-kit/chat-container"
+import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 
 interface Message {
   id: string
@@ -67,7 +73,6 @@ export default function AIChatPage() {
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const [files, setFiles] = useState<File[]>([])
-  const messagesEndRef = useRef<HTMLDivElement>(null)
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
@@ -80,14 +85,6 @@ export default function AIChatPage() {
     }
     getUser()
   }, [supabase])
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -172,7 +169,7 @@ export default function AIChatPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-white/50 backdrop-blur-sm border-b border-gray-200 p-4 lg:p-6"
+        className="bg-white/50 backdrop-blur-sm border-b border-gray-200 p-4 lg:p-6 flex-shrink-0"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -199,77 +196,87 @@ export default function AIChatPage() {
         </div>
       </motion.div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
-        {messages.map((message, index) => (
-          <motion.div
-            key={message.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
-            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`${
-                message.role === "user"
-                  ? "max-w-sm md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-xl px-6 py-2.5 bg-black text-white"
-                  : "max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-4 py-3 bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"
-              }`}
-            >
-              {message.role === "assistant" && (
-                <div className="flex items-center space-x-2 mb-2">
-                  <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
-                    <Image
-                      src="/agents/agent-2.png"
-                      alt="AI"
-                      width={24}
-                      height={24}
-                      className="w-full h-full object-cover"
-                    />
+      {/* Chat Container */}
+      <div className="flex-1 relative">
+        <ChatContainerRoot className="h-full">
+          <ChatContainerContent className="p-4 lg:p-6 space-y-4">
+            {messages.map((message, index) => (
+              <motion.div
+                key={message.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`${
+                    message.role === "user"
+                      ? "max-w-sm md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-xl px-6 py-2.5 bg-black text-white"
+                      : "max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-4 py-3 bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"
+                  }`}
+                >
+                  {message.role === "assistant" && (
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
+                        <Image
+                          src="/agents/agent-2.png"
+                          alt="AI"
+                          width={24}
+                          height={24}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
+                    </div>
+                  )}
+                  <p className="text-sm font-light leading-relaxed">
+                    {message.role === "assistant" && typingMessageId === message.id ? (
+                      <TypingText 
+                        text={message.content} 
+                        speed={30} 
+                        onComplete={handleTypingComplete}
+                      />
+                    ) : (
+                      message.content
+                    )}
+                  </p>
+                  <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
+                    {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+            
+            {loading && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
+                <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-4 py-3 max-w-xs">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
+                      <Image
+                        src="/agents/agent-2.png"
+                        alt="AI"
+                        width={24}
+                        height={24}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
                   </div>
-                  <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
+                  <div className="flex items-center space-x-2">
+                    <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
+                    <span className="text-sm text-gray-600 font-light">Thinking...</span>
+                  </div>
                 </div>
-              )}
-              <p className="text-sm font-light leading-relaxed">
-                {message.role === "assistant" && typingMessageId === message.id ? (
-                  <TypingText 
-                    text={message.content} 
-                    speed={30} 
-                    onComplete={handleTypingComplete}
-                  />
-                ) : (
-                  message.content
-                )}
-              </p>
-              <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
-                {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-              </p>
-            </div>
-          </motion.div>
-        ))}
-        {loading && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-            <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-4 py-3 max-w-xs">
-              <div className="flex items-center space-x-2 mb-2">
-                <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
-                  <Image
-                    src="/agents/agent-2.png"
-                    alt="AI"
-                    width={24}
-                    height={24}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
-                <span className="text-sm text-gray-600 font-light">Thinking...</span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-        <div ref={messagesEndRef} />
+              </motion.div>
+            )}
+          </ChatContainerContent>
+          
+          {/* Scroll Anchor para auto-scroll */}
+          <ChatContainerScrollAnchor />
+          
+          {/* Scroll Button flotante */}
+          <ScrollButton className="bottom-24 right-6" />
+        </ChatContainerRoot>
       </div>
 
       {/* Input con PromptInput */}
@@ -277,7 +284,7 @@ export default function AIChatPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="bg-white/50 backdrop-blur-sm border-t border-gray-200 p-4 lg:p-6"
+        className="bg-white/50 backdrop-blur-sm border-t border-gray-200 p-4 lg:p-6 flex-shrink-0"
       >
         <div className="max-w-4xl mx-auto">
           <PromptInput
