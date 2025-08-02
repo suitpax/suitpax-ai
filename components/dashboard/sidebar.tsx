@@ -37,7 +37,7 @@ const navigation = [
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
   { name: "Locations", href: "/dashboard/locations", icon: MapPin },
-  { name: "Suitpax AI", href: "/dashboard/ai-chat", icon: MessageSquare },
+  { name: "AI Chat", href: "/dashboard/ai-chat", icon: MessageSquare },
   { name: "Voice AI", href: "/dashboard/voice-ai", icon: Mic },
 ]
 
@@ -91,9 +91,9 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
   }
 
   return (
-    <aside
+    <div
       className={cn(
-        "flex flex-col bg-white border-r border-gray-200 h-full",
+        "flex flex-col bg-white border-r border-gray-200 h-full shadow-xl lg:shadow-none",
         isMobile ? "w-64" : isCollapsed ? "w-16" : "w-64"
       )}
     >
@@ -240,6 +240,6 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
           </div>
         )}
       </div>
-    </aside>
+    </div>
   )
 }
