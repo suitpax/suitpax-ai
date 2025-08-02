@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
 
-    // Sistema prompt base
+    // Sistema prompt base (tu prompt original)
     const baseSystemPrompt = `
 You are Suitpax AI, an AI assistant created by the Suitpax team specialized in flight and hotel bookings.
 Your mission is to help professionals book flights and hotels efficiently.
@@ -133,7 +133,7 @@ Context: ${context}
       aiResponse = "I apologize, but I couldn't process your request properly. Please try again."
     }
 
-    // Registrar interacción si el usuario está autenticado
+    // Registrar interacción si el usuario está autenticado - CON NUEVAS COLUMNAS
     if (user) {
       try {
         await supabase.from("ai_chat_logs").insert({
@@ -143,7 +143,8 @@ Context: ${context}
           context_type: context,
           tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
           model_used: "claude-sonnet-4-20250514",
-          reasoning_included: includeReasoning,
+          reasoning_included: includeReasoning, // ← NUEVA COLUMNA
+          reasoning_content: reasoning || null, // ← NUEVA COLUMNA
         })
       } catch (logError) {
         console.error("Failed to log chat interaction:", logError)
