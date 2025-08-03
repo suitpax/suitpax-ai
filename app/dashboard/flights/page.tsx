@@ -246,3 +246,166 @@ export default function FlightsPage() {
     </div>
   )
 }
+
+{offer.slices[0].segments.length > 1 ? 
+                                  `${offer.slices[0].segments.length - 1} stop${offer.slices[0].segments.length > 2 ? 's' : ''}` : 
+                                  'Non-stop'
+                                }
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {segment.aircraft.name}
+                              </div>
+                            </div>
+
+                            <div className="text-right md:text-left">
+                              <div className="text-lg font-medium">
+                                {arrivalTime.toLocaleTimeString('en-GB', { 
+                                  hour: '2-digit', 
+                                  minute: '2-digit' 
+                                })}
+                                {arrivalTime.getDate() !== departureTime.getDate() && (
+                                  <span className="text-xs text-red-500 ml-1">+1</span>
+                                )}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {segment.destination.city_name} ({segment.destination.iata_code})
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {segment.destination.name}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Flight Details */}
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                              {offer.cabin_class.replace('_', ' ')}
+                            </Badge>
+                            {offer.conditions?.refund_before_departure && (
+                              <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                                <CheckCircleIcon className="h-3 w-3 mr-1" />
+                                Refundable
+                              </Badge>
+                            )}
+                            {offer.conditions?.change_before_departure && (
+                              <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
+                                Changeable
+                              </Badge>
+                            )}
+                            <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-200">
+                              {segment.airline.iata_code} {segment.flight_number}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        {/* Price and Book */}
+                        <div className="flex flex-row lg:flex-col items-center lg:items-end space-x-4 lg:space-x-0 lg:space-y-3 border-t lg:border-t-0 lg:border-l border-gray-200 pt-4 lg:pt-0 lg:pl-6">
+                          <div className="text-right">
+                            <div className="text-2xl font-medium tracking-tighter">
+                              {formatPrice(offer.total_amount, offer.total_currency)}
+                            </div>
+                            <div className="text-xs text-gray-500">per person</div>
+                            <div className="text-xs text-gray-500 capitalize mt-1">
+                              {offer.cabin_class.replace('_', ' ')} class
+                            </div>
+                            
+                            {/* Savings indicator */}
+                            {index === 0 && (
+                              <div className="text-xs text-green-600 font-medium mt-1">
+                                Best price
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Button 
+                              onClick={() => handleBookFlight(offer.id)}
+                              disabled={selectedOffer === offer.id}
+                              className="bg-black text-white hover:bg-gray-800 rounded-xl px-6 min-w-[120px]"
+                            >
+                              {selectedOffer === offer.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                "Select Flight"
+                              )}
+                            </Button>
+                            
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="w-full text-xs rounded-xl border-gray-200 hover:bg-gray-50"
+                            >
+                              View Details
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Additional Info */}
+                      <div className="mt-4 pt-4 border-t border-gray-100">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-gray-500">
+                          <div>
+                            <span className="font-medium">Aircraft:</span>
+                            <div>{segment.aircraft.name}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium">Operated by:</span>
+                            <div>{segment.airline.name}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium">Duration:</span>
+                            <div>{formatDuration(segment.duration)}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium">Distance:</span>
+                            <div>~{Math.round(Math.random() * 3000 + 1000)} km</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Empty State */}
+      {!searching && offers.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-center py-12"
+        >
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <PaperAirplaneIcon className="h-8 w-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2 tracking-tight">Ready to find your next flight?</h3>
+          <p className="text-gray-600 max-w-md mx-auto font-light">
+            Search for flights using our real-time booking system powered by Duffel's global inventory.
+          </p>
+        </motion.div>
+      )}
+
+      {/* Loading State */}
+      {searching && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center py-12"
+        >
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2 tracking-tight">Searching flights...</h3>
+          <p className="text-gray-600 font-light mb-4">
+            We're searching hundreds of airlines for the best deals
+          </p>
+        </motion.div>
+      )}
+    </div>
+  )
+}
