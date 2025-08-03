@@ -357,7 +357,7 @@ export default function FlightsPage() {
   cabinClass: searchParams.cabinClass
 }
 
-      const response = await fetch('/api/duffel/search', {
+      const response = await fetch('/api/duffel/flight-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(searchData)
@@ -392,45 +392,66 @@ export default function FlightsPage() {
   const applyFilters = useCallback((offersToFilter: DuffelOffer[]) => {
     let filtered = [...offersToFilter]
 
-    // Filtro por precio máximo
-    if (filters.maxPrice < 5000) {
-      filtered = filtered.filter(offer => 
-        parseFloat(offer.total_amount) <= filters.maxPrice
-      )
-    }
+  // Filtro por precio
+if (filters.priceRange[1] < 5000) {
+  filtered = filtered.filter(offer => {
+    const price = parseFloat(offer.total_amount)
+    return price >= filters.priceRange[0] && price <= filters.priceRange[1]
+  })
+}
 
-    // Filtro por aerolíneas
-    if (filters.airlines.length > 0) {
-      filtered = filtered.filter(offer => {
-        const airline = offer.slices[0]?.segments[0]?.airline?.iata_code
-        return airline && filters.airlines.includes(airline)
-      })
-    }
+// Filtro por aerolíneas
+if (filters.airlines.length > 0) {
+  filtered = filtered.filter(offer => {
+    const airline = offer.slices[0]?.segments[0]?.airline?.iata_code
+    return airline && filters.airlines.includes(airline)
+  })
+}
 
-    // Filtro por paradas
-    if (filters.maxStops !== "any") {
-      const maxStops = parseInt(filters.maxStops)
-      filtered = filtered.filter(offer => {
-        const stops = (offer.slices[0]?.segments?.length || 1) - 1
-        return stops <= maxStops
-      })
-    }
+// Filtro por paradas
+if (filters.directOnly) {
+  filtered = filtered.filter(offer => {
+    const stops = (offer.slices[0]?.segments?.length || 1) - 1
+    return stops === 0
+  })
+} else if (filters.maxStops < 3) {
+  filtered = filtered.filter(offer => {
+    const stops = (offer.slices[0]?.segments?.length || 1) - 1
+    return stops <= filters.maxStops
+  })
+}
 
-    // Filtro por hora de salida
-    if (filters.departureTime !== "any") {
-      filtered = filtered.filter(offer => {
-        const departureTime = new Date(offer.slices[0]?.segments[0]?.departing_at)
-        const hour = departureTime.getHours()
-        
-        switch (filters.departureTime) {
-          case "morning": return hour >= 6 && hour < 12
-          case "afternoon": return hour >= 12 && hour < 18
-          case "evening": return hour >= 18 && hour < 24
-          case "night": return hour >= 0 && hour < 6
-          default: return true
-        }
-      })
-    }
+// Filtro por hora de salida
+if (filters.departureTime.length > 0) {
+  filtered = filtered.filter(offer => {
+    const departureTime = new Date(offer.slices[0]?.segments[0]?.departing_at)
+    const hour = departureTime.getHours()
+    
+    return filters.departureTime.some(timeSlot => {
+      switch (timeSlot) {
+        case "early-morning": return hour >= 5 && hour < 8
+        case "morning": return hour >= 8 && hour < 12
+        case "afternoon": return hour >= 12 && hour < 18
+        case "evening": return hour >= 18 && hour < 22
+        case "night": return hour >= 22 || hour < 5
+        default: return true
+      }
+    })
+  })
+}
+
+// Filtros adicionales
+if (filters.refundable) {
+  filtered = filtered.filter(offer => 
+    offer.conditions?.refund_before_departure?.allowed === true
+  )
+}
+
+if (filters.changeable) {
+  filtered = filtered.filter(offer => 
+    offer.conditions?.change_before_departure?.allowed === true
+  )
+}
 
     return filtered
   }, [filters])
