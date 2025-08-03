@@ -13,6 +13,7 @@
     "@anthropic-ai/sdk": "latest",
     "@emotion/is-prop-valid": "^1.3.1",
     "@emotion/react": "latest",
+    "@duffel/api@4.13.0",
     "@getbrevo/brevo": "latest",
     "@heroicons/react": "latest",
     "@hookform/resolvers": "^3.9.1",
