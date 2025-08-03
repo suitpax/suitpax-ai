@@ -129,17 +129,17 @@ const featureCategories = [
 // Helper function to render feature value
 const renderFeatureValue = (value: boolean | string) => {
   if (value === true) {
-    return <Check className="h-4 w-4 text-emerald-400" />
+    return <Check className="h-5 w-5 text-white" />
   } else if (value === false) {
-    return <X className="h-4 w-4 text-gray-600" />
+    return <X className="h-5 w-5 text-gray-500" />
   } else {
-    return <span className="text-xs font-medium text-white">{value}</span>
+    return <span className="text-sm font-medium text-white">{value}</span>
   }
 }
 
 export function ComparePlans() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>("AI Tokens & Usage")
-  const [isAnnual, setIsAnnual] = useState(false)
+  const [isAnnual, setIsAnnual] = useState(true) // Cambiado a true por defecto
 
   const toggleCategory = (category: string) => {
     if (expandedCategory === category) {
@@ -151,36 +151,36 @@ export function ComparePlans() {
 
   return (
     <TooltipProvider>
-      <section className="py-12 sm:py-16 bg-black">
+      <section className="py-16 md:py-24 bg-black">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div
-            className="text-center mb-8 sm:mb-12"
+            className="text-center mb-12 md:mb-16"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter text-white leading-none">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-white leading-tight mb-4">
               Compare all features
             </h2>
-            <p className="mt-3 text-sm text-gray-400">Detailed comparison of all features across our plans</p>
-            <div className="flex justify-center mt-6">
-              <div className="flex items-center bg-gray-800 p-1 rounded-full">
+            <p className="text-base text-gray-400 mb-8">Detailed comparison of all features across our plans</p>
+            <div className="flex justify-center">
+              <div className="flex items-center bg-gray-900 p-1 rounded-full border border-gray-800">
                 <button
                   onClick={() => setIsAnnual(false)}
-                  className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
-                    !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-400"
+                  className={`px-6 py-2 text-sm font-medium rounded-full transition-all ${
+                    !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-white"
                   }`}
                 >
                   Monthly
                 </button>
                 <button
                   onClick={() => setIsAnnual(true)}
-                  className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
-                    isAnnual ? "bg-white shadow-sm text-black" : "text-gray-400"
+                  className={`px-6 py-2 text-sm font-medium rounded-full transition-all ${
+                    isAnnual ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-white"
                   }`}
                 >
                   Annual
-                  <span className="ml-1 inline-flex items-center rounded-full bg-emerald-500 px-2 py-0.5 text-[9px] font-medium text-black">
+                  <span className="ml-2 inline-flex items-center rounded-full bg-white px-2 py-0.5 text-xs font-medium text-black">
                     Save 20%
                   </span>
                 </button>
@@ -189,48 +189,49 @@ export function ComparePlans() {
           </motion.div>
 
           <motion.div
-            className="overflow-x-auto rounded-xl border border-gray-800 shadow-2xl bg-gray-900"
+            className="overflow-x-auto rounded-2xl border border-gray-800 shadow-2xl bg-gray-900"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="min-w-[800px]">
+            <div className="min-w-[900px]">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-gray-800 bg-gray-900">
-                    <th className="py-4 px-4 text-left w-1/5"></th>
-                    <th className="py-4 px-4 text-center w-1/5">
+                    <th className="py-6 px-6 text-left w-1/5"></th>
+                    <th className="py-6 px-6 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium text-white">Free</span>
-                        <span className="text-xs text-gray-400">€0</span>
-                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-gray-600 px-3 py-0.5 text-[10px] font-medium text-gray-300">
+                        <span className="text-lg font-medium text-white mb-1">Free</span>
+                        <span className="text-sm text-gray-400 mb-2">€0</span>
+                        <span className="inline-flex items-center rounded-full bg-gray-800 border border-gray-700 px-4 py-1 text-xs font-medium text-gray-300">
                           Free
                         </span>
                       </div>
                     </th>
-                    <th className="py-4 px-4 text-center w-1/5 bg-gray-800">
-                      <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium text-white">Basic</span>
-                        <span className="text-xs text-gray-400">{isAnnual ? "€39/month" : "€49/month"}</span>
-                        <span className="mt-1 inline-flex items-center rounded-full bg-white px-4 py-0.5 text-[10px] font-medium text-black">
+                    <th className="py-6 px-6 text-center w-1/5 bg-gray-800/50 relative">
+                      <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-lg"></div>
+                      <div className="relative flex flex-col items-center">
+                        <span className="text-lg font-medium text-white mb-1">Basic</span>
+                        <span className="text-sm text-gray-400 mb-2">{isAnnual ? "€39/month" : "€49/month"}</span>
+                        <span className="inline-flex items-center rounded-full bg-white px-4 py-1 text-xs font-medium text-black">
                           Most Popular
                         </span>
                       </div>
                     </th>
-                    <th className="py-4 px-4 text-center w-1/5">
+                    <th className="py-6 px-6 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium text-white">Pro</span>
-                        <span className="text-xs text-gray-400">{isAnnual ? "€71/month" : "€89/month"}</span>
-                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-gray-600 px-3 py-0.5 text-[10px] font-medium text-gray-300">
+                        <span className="text-lg font-medium text-white mb-1">Pro</span>
+                        <span className="text-sm text-gray-400 mb-2">{isAnnual ? "€71/month" : "€89/month"}</span>
+                        <span className="inline-flex items-center rounded-full bg-gray-800 border border-gray-700 px-4 py-1 text-xs font-medium text-gray-300">
                           Advanced
                         </span>
                       </div>
                     </th>
-                    <th className="py-4 px-4 text-center w-1/5">
+                    <th className="py-6 px-6 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium text-white">Enterprise</span>
-                        <span className="text-xs text-gray-400">Custom pricing</span>
-                        <span className="mt-1 inline-flex items-center rounded-full bg-transparent border border-gray-600 px-3 py-0.5 text-[10px] font-medium text-gray-300">
+                        <span className="text-lg font-medium text-white mb-1">Enterprise</span>
+                        <span className="text-sm text-gray-400 mb-2">Custom pricing</span>
+                        <span className="inline-flex items-center rounded-full bg-gray-800 border border-gray-700 px-4 py-1 text-xs font-medium text-gray-300">
                           Enterprise
                         </span>
                       </div>
@@ -241,16 +242,16 @@ export function ComparePlans() {
                   {featureCategories.map((category, categoryIndex) => (
                     <React.Fragment key={category.name}>
                       <tr
-                        className={`border-b border-gray-800 cursor-pointer hover:bg-gray-800/50 ${
+                        className={`border-b border-gray-800 cursor-pointer hover:bg-gray-800/50 transition-colors ${
                           expandedCategory === category.name ? "bg-gray-800/50" : ""
                         }`}
                         onClick={() => toggleCategory(category.name)}
                       >
-                        <td colSpan={6} className="py-3 px-4">
+                        <td colSpan={6} className="py-4 px-6">
                           <div className="flex items-center justify-between">
-                            <span className="font-medium text-sm text-white">{category.name}</span>
+                            <span className="font-medium text-base text-white">{category.name}</span>
                             <svg
-                              className={`w-4 h-4 transition-transform text-gray-400 ${expandedCategory === category.name ? "rotate-180" : ""}`}
+                              className={`w-5 h-5 transition-transform text-gray-400 ${expandedCategory === category.name ? "rotate-180" : ""}`}
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -269,30 +270,30 @@ export function ComparePlans() {
                         category.features.map((feature, index) => (
                           <motion.tr
                             key={`${category.name}-${index}`}
-                            className={`border-b border-gray-800 ${index % 2 === 1 ? "bg-gray-800/30" : ""}`}
+                            className={`border-b border-gray-800 ${index % 2 === 1 ? "bg-gray-800/20" : ""}`}
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: index * 0.05 }}
                           >
-                            <td className="py-3 px-4">
+                            <td className="py-4 px-6">
                               <div className="flex items-center">
-                                <span className="text-xs sm:text-sm font-medium text-white">{feature.name}</span>
+                                <span className="text-sm font-medium text-white">{feature.name}</span>
                                 <Tooltip>
                                   <TooltipTrigger>
-                                    <HelpCircle className="h-3 w-3 text-gray-500 ml-1 cursor-help" />
+                                    <HelpCircle className="h-4 w-4 text-gray-500 ml-2 cursor-help hover:text-gray-400 transition-colors" />
                                   </TooltipTrigger>
-                                  <TooltipContent className="bg-gray-800 text-white border-gray-700">
+                                  <TooltipContent className="bg-gray-800 text-white border-gray-700 max-w-xs">
                                     {feature.description}
                                   </TooltipContent>
                                 </Tooltip>
                               </div>
                             </td>
-                            <td className="py-3 px-4 text-center">{renderFeatureValue(feature.free)}</td>
-                            <td className="py-3 px-4 text-center bg-gray-800/30">
+                            <td className="py-4 px-6 text-center">{renderFeatureValue(feature.free)}</td>
+                            <td className="py-4 px-6 text-center bg-gray-800/20">
                               {renderFeatureValue(feature.basic)}
                             </td>
-                            <td className="py-3 px-4 text-center">{renderFeatureValue(feature.pro)}</td>
-                            <td className="py-3 px-4 text-center">{renderFeatureValue(feature.enterprise)}</td>
+                            <td className="py-4 px-6 text-center">{renderFeatureValue(feature.pro)}</td>
+                            <td className="py-4 px-6 text-center">{renderFeatureValue(feature.enterprise)}</td>
                           </motion.tr>
                         ))}
                     </React.Fragment>
@@ -303,20 +304,20 @@ export function ComparePlans() {
           </motion.div>
 
           <motion.div
-            className="mt-12 text-center"
+            className="mt-16 text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <p className="text-sm text-gray-400 mb-2">Need help choosing the right plan for your business?</p>
+            <p className="text-base text-gray-400 mb-4">Need help choosing the right plan for your business?</p>
             {isAnnual && (
-              <p className="text-xs text-emerald-400 font-medium mb-3">
+              <p className="text-sm text-white font-medium mb-6 bg-gray-800 inline-block px-4 py-2 rounded-full">
                 Annual plans include a 20% discount compared to monthly billing
               </p>
             )}
             <a
               href="mailto:hello@suitpax.com"
-              className="inline-flex items-center text-sm font-medium bg-white text-black rounded-xl px-5 py-2.5 hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center text-sm font-medium bg-white text-black rounded-xl px-8 py-3 hover:bg-gray-100 transition-colors"
             >
               Talk to our sales team
               <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
