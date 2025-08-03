@@ -11,22 +11,19 @@ import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
-// Componente para determinar si mostrar nav/footer
+// 🔧 Componente que controla la visibilidad de Navigation y Footer
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const headersList = headers()
-  const pathname = headersList.get('x-pathname') || ''
-  
-  // Rutas que NO deben mostrar Navigation y Footer
-  const excludeNavAndFooter = [
-    '/dashboard',
-    '/auth'
-  ].some(path => pathname.startsWith(path))
+  const pathname = headersList.get("x-pathname") || ""
+
+  const excludeNavAndFooter = ["/dashboard", "/auth"].some((path) =>
+    pathname.startsWith(path)
+  )
 
   if (excludeNavAndFooter) {
     return <>{children}</>
   }
 
-  // Páginas públicas con Navigation y Footer
   return (
     <>
       <Navigation />
@@ -36,11 +33,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="scroll-smooth">
       <head>
