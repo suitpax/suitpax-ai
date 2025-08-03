@@ -70,7 +70,7 @@ export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm your AI travel assistant. How can I help you plan your next business trip?",
+      content: "Hello! I'm the AI Agent from Suitpax. How can I help you plan your next business trip?",
       role: "assistant",
       timestamp: new Date(),
     },
@@ -198,7 +198,7 @@ export default function AIChatPage() {
               <h1 className="text-xl md:text-2xl font-medium tracking-tighter">
                 <em className="font-serif italic">Suitpax AI</em>
               </h1>
-              <p className="text-xs md:text-sm text-gray-600 font-light">Your intelligent travel assistant</p>
+              <p className="text-xs md:text-sm text-gray-600 font-light">Try the superpowers</p>
             </div>
           </div>
           
@@ -209,7 +209,7 @@ export default function AIChatPage() {
               <button
                 onClick={() => setShowReasoning(!showReasoning)}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                  showReasoning ? 'bg-emerald-950' : 'bg-gray-300'
+                  showReasoning ? 'bg-emerald-400' : 'bg-gray-300'
                 }`}
               >
                 <span
@@ -252,7 +252,7 @@ export default function AIChatPage() {
                       <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
                         <Image
                           src="/agents/agent-2.png"
-                          alt="AI"
+                          alt="Suitpax AI"
                           width={24}
                           height={24}
                           className="w-full h-full object-cover"
@@ -266,11 +266,11 @@ export default function AIChatPage() {
                   {message.role === "assistant" && message.reasoning && (
                     <div className="mb-3">
                       <Reasoning>
-                        <ReasoningTrigger className="text-xs text-gray-500 hover:text-gray-700">
-                          <span>🧠 View AI reasoning</span>
+                        <ReasoningTrigger className="text-xs text-gray-300 hover:text-gray-500">
+                          <span>View AI logic</span>
                         </ReasoningTrigger>
                         <ReasoningContent>
-                          <div className="text-xs text-gray-600 leading-relaxed whitespace-pre-line bg-gray-50 rounded-lg p-3 border border-gray-100">
+                          <div className="text-xs text-gray-600 leading-relaxed whitespace-pre-line bg-gray-50 rounded-lg p-2 border border-gray-100">
                             <ReasoningResponse
                               text={message.reasoning}
                               className="text-xs text-gray-700"
@@ -307,7 +307,7 @@ export default function AIChatPage() {
                     <div className="w-6 h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
                       <Image
                         src="/agents/agent-2.png"
-                        alt="AI"
+                        alt="Suitpax AI"
                         width={24}
                         height={24}
                         className="w-full h-full object-cover"
