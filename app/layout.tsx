@@ -13,8 +13,31 @@ const inter = Inter({ subsets: ["latin"] })
 
 // Componente que controla la visibilidad de Navigation y Footer
 function LayoutContent({ children }: { children: React.ReactNode }) {
+  // Obtener el pathname del header
   const headersList = headers()
-  const pathname = headersList.get("x-pathname") || ""
+  const pathname = headersList.get("x-url") || ""
+  
+  // También intentar con otros headers que Next.js puede enviar
+  const referer = headersList.get("referer") || ""
+  const host = headersList.get("host") || ""
+  
+  // Extraer pathname de la URL si está disponible
+  let currentPath = pathname
+  if (!currentPath && referer) {
+    try {
+      const url = new URL(referer)
+      currentPath = url.pathname
+    } catch (e) {
+      currentPath = ""
+    }
+  }
+
+  console.log("Headers debug:", {
+    pathname: headersList.get("x-url"),
+    referer: headersList.get("referer"),
+    host: headersList.get("host"),
+    allHeaders: Object.fromEntries(headersList.entries())
+  })
 
   // Rutas donde NO queremos mostrar Navigation y Footer
   const excludeNavAndFooter = [
@@ -22,8 +45,11 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     "/auth/login", 
     "/auth/signup",
     "/auth/forgot-password",
-    "/auth/reset-password"
-  ].some((path) => pathname.startsWith(path))
+    "/auth/reset-password",
+    "/auth"
+  ].some((path) => currentPath.startsWith(path))
+
+  console.log("Current path:", currentPath, "Exclude nav/footer:", excludeNavAndFooter)
 
   if (excludeNavAndFooter) {
     return <>{children}</>
