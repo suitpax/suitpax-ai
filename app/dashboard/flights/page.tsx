@@ -763,10 +763,169 @@ if (filters.changeable) {
 ="flex items-center justify-between mb-6">
 
 <FlightFilters
-  offers={offers}
-  filters={filters}
-  onFiltersChange={setFilters}
-  isOpen={showFiltersPanel}
-  onClose={() => setShowFiltersPanel(false)}
-/>
+  if (userLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    )
+  }
 
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Find Flights</h1>
+          <p className="text-gray-600 mt-2">Search and book flights for your business travel</p>
+        </div>
+
+        {/* Search Form */}
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div>
+                <Label>From</Label>
+                <Input
+                  value={searchParams.origin}
+                  onChange={(e) => {
+                    setSearchParams(prev => ({ ...prev, origin: e.target.value }))
+                    searchAirports(e.target.value, 'origin')
+                    setShowOriginResults(true)
+                  }}
+                  placeholder="Origin airport"
+                />
+              </div>
+              
+              <div>
+                <Label>To</Label>
+                <Input
+                  value={searchParams.destination}
+                  onChange={(e) => {
+                    setSearchParams(prev => ({ ...prev, destination: e.target.value }))
+                    searchAirports(e.target.value, 'destination')
+                    setShowDestinationResults(true)
+                  }}
+                  placeholder="Destination airport"
+                />
+              </div>
+              
+              <div>
+                <Label>Departure</Label>
+                <Input
+                  type="date"
+                  value={searchParams.departureDate}
+                  onChange={(e) => setSearchParams(prev => ({ ...prev, departureDate: e.target.value }))}
+                />
+              </div>
+              
+              <div>
+                <Label>Passengers</Label>
+                <Select 
+                  value={searchParams.passengers.toString()} 
+                  onValueChange={(value) => setSearchParams(prev => ({ ...prev, passengers: parseInt(value) }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1,2,3,4,5,6,7,8,9].map(num => (
+                      <SelectItem key={num} value={num.toString()}>{num} passenger{num > 1 ? 's' : ''}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="flex gap-4">
+              <Button 
+                onClick={searchFlights} 
+                disabled={searching}
+                className="bg-blue-600 text-white hover:bg-blue-700"
+              >
+                {searching ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Searching...
+                  </>
+                ) : (
+                  <>
+                    <MagnifyingGlassIcon className="h-4 w-4 mr-2" />
+                    Search Flights
+                  </>
+                )}
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                onClick={() => setShowFiltersPanel(true)}
+              >
+                <FunnelIcon className="h-4 w-4 mr-2" />
+                Filters
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Results */}
+        {filteredOffers.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">
+                {filteredOffers.length} flights found
+              </h2>
+            </div>
+            
+            {filteredOffers.map((offer) => (
+              <Card key={offer.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="text-lg font-semibold">
+                        {offer.slices[0]?.segments[0]?.airline?.name || 'Airline'}
+                      </div>
+                      <div className="text-gray-600">
+                        {offer.slices[0]?.segments[0]?.origin?.iata_code} → {offer.slices[0]?.segments[0]?.destination?.iata_code}
+                      </div>
+                    </div>
+                    
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {offer.total_currency} {offer.total_amount}
+                      </div>
+                      <Button 
+                        onClick={() => handleBookFlight(offer.id)}
+                        className="mt-2 bg-blue-600 text-white hover:bg-blue-700"
+                      >
+                        Book Flight
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* No results */}
+        {offers.length === 0 && !searching && (
+          <div className="text-center py-12">
+            <PaperAirplaneIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No flights searched yet</h3>
+            <p className="text-gray-600">Enter your travel details and search for flights</p>
+          </div>
+        )}
+      </div>
+
+      {/* Components */}
+      <PassengerForm />
+      <FlightFilters
+        offers={offers}
+        filters={filters}
+        onFiltersChange={setFilters}
+        isOpen={showFiltersPanel}
+        onClose={() => setShowFiltersPanel(false)}
+      />
+    </div>
+  )
+}
