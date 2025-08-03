@@ -5,6 +5,15 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hostname = request.headers.get('host') || ''
   
+  // Crear respuesta y agregar headers personalizados
+  const response = NextResponse.next()
+  
+  // Pasar el pathname actual como header
+  response.headers.set('x-url', pathname)
+  response.headers.set('x-pathname', pathname)
+  
+  console.log("Middleware - Setting pathname header:", pathname)
+  
   // Verificar si es el subdominio app (más flexible)
   const isAppSubdomain = hostname.includes('app.suitpax.com') || 
                         hostname.startsWith('app.') ||
@@ -22,7 +31,7 @@ export function middleware(request: NextRequest) {
 
   // Si es una ruta estática, siempre permitir
   if (isStaticRoute) {
-    return NextResponse.next()
+    return response
   }
 
   // Lógica específica para app.suitpax.com
@@ -48,7 +57,7 @@ export function middleware(request: NextRequest) {
       }
     }
     
-    return NextResponse.next()
+    return response
   }
 
   // Lógica para el dominio principal (suitpax.com)
@@ -68,13 +77,11 @@ export function middleware(request: NextRequest) {
   )
 
   if (isPublicPath) {
-    return NextResponse.next()
+    return response
   }
 
   // Para rutas protegidas en el dominio principal
-  // Aquí podrías agregar lógica de autenticación si es necesario
-  
-  return NextResponse.next()
+  return response
 }
 
 export const config = {
