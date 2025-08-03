@@ -24,7 +24,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
 
+// Interfaces existentes...
 interface DuffelAirport {
   id: string
   name: string
@@ -57,21 +60,29 @@ interface DuffelOffer {
     refund_before_departure?: any
   }
 }
-// Popular airports for quick selection
-const popularAirports = [
-  { code: "JFK", name: "New York JFK", city: "New York" },
-  { code: "LHR", name: "London Heathrow", city: "London" },
-  { code: "CDG", name: "Paris Charles de Gaulle", city: "Paris" },
-  { code: "DXB", name: "Dubai International", city: "Dubai" },
-  { code: "LAX", name: "Los Angeles", city: "Los Angeles" },
-  { code: "SFO", name: "San Francisco", city: "San Francisco" },
-  { code: "NRT", name: "Tokyo Narita", city: "Tokyo" },
-  { code: "SIN", name: "Singapore Changi", city: "Singapore" },
-  { code: "FRA", name: "Frankfurt", city: "Frankfurt" },
-  { code: "AMS", name: "Amsterdam Schiphol", city: "Amsterdam" },
-]
+
+// Nueva interface para pasajeros
+interface PassengerData {
+  title: string
+  given_name: string
+  family_name: string
+  born_on: string
+  email: string
+  phone_number: string
+  type: 'adult' | 'child' | 'infant_without_seat'
+  index: number
+}
+
+// Nueva interface para filtros
+interface SearchFilters {
+  maxPrice: number
+  airlines: string[]
+  maxStops: string
+  departureTime: string
+}
 
 export default function FlightsPage() {
+  // Estados existentes...
   const [searchParams, setSearchParams] = useState({
     origin: "JFK",
     destination: "LHR", 
@@ -86,634 +97,463 @@ export default function FlightsPage() {
   const [loading, setLoading] = useState(false)
   const [searching, setSearching] = useState(false)
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null)
+  
+  // NUEVOS ESTADOS - Agregar después de los existentes
   const [user, setUser] = useState<any>(null)
-  const [showFilters, setShowFilters] = useState(false)
-
-const [searchResults, setSearchResults] = useState({
-    origin: [] as DuffelAirport[],
-    destination: [] as DuffelAirport[]
-  })
-  const [searchQuery, setSearchQuery] = useState({
-    origin: "",
-    destination: ""
-  })
-  const [filters, setFilters] = useState({
+  const [showPassengerForm, setShowPassengerForm] = useState(false)
+  const [passengerData, setPassengerData] = useState<PassengerData[]>([])
+  const [selectedOfferForBooking, setSelectedOfferForBooking] = useState<string | null>(null)
+  const [showFiltersPanel, setShowFiltersPanel] = useState(false)
+  const [savedSearches, setSavedSearches] = useState<any[]>([])
+  const [filters, setFilters] = useState<SearchFilters>({
     maxPrice: 5000,
-    airlines: [] as string[],
+    airlines: [],
     maxStops: "any",
     departureTime: "any"
   })
-  const [toastMessage, setToastMessage] = useState<{type: 'success' | 'error', message: string} | null>(null)
 
-// Toast functionality
-  const showToast = (type: 'success' | 'error', message: string) => {
-    setToastMessage({ type, message })
-    setTimeout(() => setToastMessage(null), 5000)
-  }
+  const supabase = createClient()
+  const router = useRouter()
 
-// Search airports function
-  const searchAirports = async (query: string, type: 'origin' | 'destination') => {
-    if (query.length < 2) {
-      setSearchResults(prev => ({ ...prev, [type]: [] }))
-      return
-    }
+  // Estados existentes continúan...
+  const [searchResults, setSearchResults] = useState({
+    origin: [] as DuffelAirport[],
+    destination: [] as DuffelAirport[]
+  })
+  // ... resto de estados existentes
 
-    try {
-      const response = await fetch(`/api/duffel/airports?q=${encodeURIComponent(query)}`)
-      const data = await response.json()
+// Agregar después de los useEffects existentes
 
-      if (data.success) {
-        setSearchResults(prev => ({ ...prev, [type]: data.airports }))
-      }
-    } catch (error) {
-      console.error('Airport search error:', error)
+// Nuevo useEffect para obtener usuario
+useEffect(() => {
+  const getUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    setUser(user)
+    if (user) {
+      loadSavedSearches(user.id)
     }
   }
+  getUser()
+}, [])
 
-// Debounce airport search
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchQuery.origin) searchAirports(searchQuery.origin, 'origin')
-    }, 300)
-    return () => clearTimeout(timeoutId)
-  }, [searchQuery.origin])
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchQuery.destination) searchAirports(searchQuery.destination, 'destination')
-    }, 300)
-    return () => clearTimeout(timeoutId)
-  }, [searchQuery.destination])
-
-const handleSearch = async () => {
-    if (!searchParams.origin || !searchParams.destination || !searchParams.departureDate) {
-      showToast('error', "Please fill in all required fields")
-      return
-    }
-
-    if (searchParams.tripType === "round_trip" && !searchParams.returnDate) {
-      showToast('error', "Please select a return date for round trip")
-      return
-    }
-
-    setSearching(true)
-    setOffers([])
-
-    try {
-      const searchData = {
-        origin: searchParams.origin,
-        destination: searchParams.destination,
-        departureDate: searchParams.departureDate,
-        returnDate: searchParams.tripType === "round_trip" ? searchParams.returnDate : undefined,
-        passengers: searchParams.passengers,
-        cabinClass: searchParams.cabinClass
-      }
-
-      const response = await fetch("/api/duffel/flight-search", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(searchData),
-      })
-
-      const data = await response.json()
-
-      if (data.success && data.offers) {
-        setOffers(data.offers)
-        showToast('success', `Found ${data.offers.length} flight options`)
-      } else {
-        showToast('error', data.error || "No flights found")
-      }
-    } catch (error) {
-      console.error("Search error:", error)
-      showToast('error', "Error searching flights. Please try again.")
-    } finally {
-      setSearching(false)
-    }
+// Función para cargar búsquedas guardadas
+const loadSavedSearches = async (userId: string) => {
+  try {
+    const { data } = await supabase
+      .from('saved_searches')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(5)
+    
+    setSavedSearches(data || [])
+  } catch (error) {
+    console.error('Error loading saved searches:', error)
   }
+}
+
+// Función para guardar búsqueda
+const saveSearch = async () => {
+  if (!user) return
+
+  try {
+    await supabase.from('saved_searches').insert({
+      user_id: user.id,
+      search_params: searchParams,
+      name: `${searchParams.origin} → ${searchParams.destination}`,
+      created_at: new Date().toISOString()
+    })
+    
+    showToast('success', "Search saved successfully")
+    loadSavedSearches(user.id)
+  } catch (error) {
+    console.error('Error saving search:', error)
+    showToast('error', "Failed to save search")
+  }
+}
+
+// REEMPLAZAR la función handleBookFlight existente con esta nueva versión
 
 const handleBookFlight = async (offerId: string) => {
-    if (!user) {
-      showToast('error', "Please log in to book flights")
-      return
+  if (!user) {
+    showToast('error', "Please log in to book flights")
+    router.push('/auth/login')
+    return
+  }
+
+  const offer = offers.find(o => o.id === offerId)
+  if (!offer) return
+
+  // Configurar datos de pasajeros basado en la cantidad
+  const initialPassengers: PassengerData[] = Array.from({ length: searchParams.passengers }, (_, index) => ({
+    title: 'Mr',
+    given_name: '',
+    family_name: '',
+    born_on: '',
+    email: user.email || '',
+    phone_number: '',
+    type: 'adult' as const,
+    index
+  }))
+
+  setPassengerData(initialPassengers)
+  setSelectedOfferForBooking(offerId)
+  setShowPassengerForm(true)
+}
+
+// Función para procesar la reserva real
+const processBooking = async () => {
+  if (!selectedOfferForBooking || !passengerData.length) return
+
+  // Validar datos de pasajeros
+  const isValid = passengerData.every(p => 
+    p.given_name && p.family_name && p.born_on && p.email
+  )
+
+  if (!isValid) {
+    showToast('error', "Please fill in all passenger information")
+    return
+  }
+
+  setLoading(true)
+
+  try {
+    const bookingData = {
+      offerId: selectedOfferForBooking,
+      passengers: passengerData.map(p => ({
+        title: p.title,
+        given_name: p.given_name,
+        family_name: p.family_name,
+        born_on: p.born_on,
+        email: p.email,
+        phone_number: p.phone_number,
+        type: p.type
+      }))
     }
 
-    setSelectedOffer(offerId)
-    const offer = offers.find(o => o.id === offerId)
-    
-    if (!offer) return
+    const response = await fetch('/api/duffel/booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookingData)
+    })
 
-    try {
-      // Simulate booking process
-      showToast('success', "Flight booking initiated! Processing...")
+    const data = await response.json()
+
+    if (data.success) {
+      showToast('success', `Flight booked successfully! Reference: ${data.order.booking_reference}`)
+      setShowPassengerForm(false)
+      setSelectedOfferForBooking(null)
       
-      setTimeout(() => {
-        showToast('success', "Flight booked successfully!")
-        setSelectedOffer(null)
-      }, 3000)
-
-    } catch (error) {
-      console.error("Booking error:", error)
-      showToast('error', "Error booking flight. Please try again.")
-      setSelectedOffer(null)
+      // Redirigir a página de confirmación o dashboard
+      router.push(`/dashboard/bookings/${data.order.id}`)
+    } else {
+      showToast('error', data.error || "Booking failed")
     }
+  } catch (error) {
+    console.error("Booking error:", error)
+    showToast('error', "Error processing booking. Please try again.")
+  } finally {
+    setLoading(false)
+  }
+}
+
+// Función para aplicar filtros - Agregar después de las funciones existentes
+const applyFilters = (filteredOffers: DuffelOffer[]) => {
+  let filtered = [...filteredOffers]
+
+  // Filtro por precio máximo
+  if (filters.maxPrice < 5000) {
+    filtered = filtered.filter(offer => 
+      parseFloat(offer.total_amount) <= filters.maxPrice
+    )
   }
 
-const swapLocations = () => {
-    setSearchParams(prev => ({
-      ...prev,
-      origin: prev.destination,
-      destination: prev.origin
-    }))
-  }
-const formatDuration = (duration: string) => {
-    // Convert ISO 8601 duration to readable format
-    const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/)
-    if (!match) return duration
-    
-    const hours = match[1] || "0"
-    const minutes = match[2] || "0"
-    
-    if (hours === "0") return `${minutes}m`
-    if (minutes === "0") return `${hours}h`
-    return `${hours}h ${minutes}m`
+  // Filtro por aerolíneas
+  if (filters.airlines.length > 0) {
+    filtered = filtered.filter(offer => {
+      const airline = offer.slices[0]?.segments[0]?.airline?.iata_code
+      return filters.airlines.includes(airline)
+    })
   }
 
-  const formatPrice = (amount: string, currency: string) => {
-    const price = parseFloat(amount)
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency
-    }).format(price)
+  // Filtro por paradas
+  if (filters.maxStops !== "any") {
+    const maxStops = parseInt(filters.maxStops)
+    filtered = filtered.filter(offer => {
+      const stops = offer.slices[0]?.segments?.length - 1 || 0
+      return stops <= maxStops
+    })
   }
 
-  const getAirportOption = (code: string) => {
-    return popularAirports.find(airport => airport.code === code) || 
-           { code, name: code, city: code }
+  // Filtro por hora de salida
+  if (filters.departureTime !== "any") {
+    filtered = filtered.filter(offer => {
+      const departureTime = new Date(offer.slices[0]?.segments[0]?.departing_at)
+      const hour = departureTime.getHours()
+      
+      switch (filters.departureTime) {
+        case "morning": return hour >= 6 && hour < 12
+        case "afternoon": return hour >= 12 && hour < 18
+        case "evening": return hour >= 18 && hour < 24
+        case "night": return hour >= 0 && hour < 6
+        default: return true
+      }
+    })
   }
 
-return (
-    <div className="space-y-6 max-w-7xl mx-auto p-4">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
-            toastMessage.type === 'success' 
-              ? 'bg-green-50 text-green-800 border border-green-200' 
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
-        >
-          <div className="flex items-center space-x-2">
-            {toastMessage.type === 'success' ? (
-              <CheckCircleIcon className="h-5 w-5" />
-            ) : (
-              <ExclamationTriangleIcon className="h-5 w-5" />
-            )}
-            <span>{toastMessage.message}</span>
-            <button onClick={() => setToastMessage(null)}>
-              <XMarkIcon className="h-4 w-4" />
-            </button>
-          </div>
-        </motion.div>
-      )}
+  return filtered
+}
 
-{/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }} 
-        animate={{ opacity: 1, y: 0 }} 
-        transition={{ duration: 0.6 }}
-        className="flex items-center justify-between"
-      >
+// Componente de formulario de pasajeros - Agregar antes del return principal
+const PassengerForm = () => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+  >
+    <div className="bg-white rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Flights</h1>
-          <p className="text-gray-600 font-light">Search and book business travel flights</p>
+          <h2 className="text-xl font-medium tracking-tighter">Passenger Information</h2>
+          <p className="text-sm text-gray-600">Enter details for all passengers</p>
         </div>
+        <button
+          onClick={() => setShowPassengerForm(false)}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          <XMarkIcon className="h-6 w-6" />
+        </button>
+      </div>
+
+      <div className="space-y-6">
+        {passengerData.map((passenger, index) => (
+          <div key={index} className="border border-gray-200 rounded-xl p-4">
+            <h3 className="text-lg font-medium mb-4">Passenger {index + 1}</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label>Title</Label>
+                <Select
+                  value={passenger.title}
+                  onValueChange={(value) => {
+                    const updated = [...passengerData]
+                    updated[index].title = value
+                    setPassengerData(updated)
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Mr">Mr</SelectItem>
+                    <SelectItem value="Mrs">Mrs</SelectItem>
+                    <SelectItem value="Ms">Ms</SelectItem>
+                    <SelectItem value="Dr">Dr</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>First Name</Label>
+                <Input
+                  value={passenger.given_name}
+                  onChange={(e) => {
+                    const updated = [...passengerData]
+                    updated[index].given_name = e.target.value
+                    setPassengerData(updated)
+                  }}
+                  placeholder="First name"
+                />
+              </div>
+
+              <div>
+                <Label>Last Name</Label>
+                <Input
+                  value={passenger.family_name}
+                  onChange={(e) => {
+                    const updated = [...passengerData]
+                    updated[index].family_name = e.target.value
+                    setPassengerData(updated)
+                  }}
+                  placeholder="Last name"
+                />
+              </div>
+
+              <div>
+                <Label>Date of Birth</Label>
+                <Input
+                  type="date"
+                  value={passenger.born_on}
+                  onChange={(e) => {
+                    const updated = [...passengerData]
+                    updated[index].born_on = e.target.value
+                    setPassengerData(updated)
+                  }}
+                />
+              </div>
+
+              <div>
+                <Label>Email</Label>
+                <Input
+                  type="email"
+                  value={passenger.email}
+                  onChange={(e) => {
+                    const updated = [...passengerData]
+                    updated[index].email = e.target.value
+                    setPassengerData(updated)
+                  }}
+                  placeholder="Email address"
+                />
+              </div>
+
+              <div>
+                <Label>Phone Number</Label>
+                <Input
+                  value={passenger.phone_number}
+                  onChange={(e) => {
+                    const updated = [...passengerData]
+                    updated[index].phone_number = e.target.value
+                    setPassengerData(updated)
+                  }}
+                  placeholder="Phone number"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex gap-3 mt-6">
         <Button
-          onClick={() => setShowFilters(!showFilters)}
+          onClick={() => setShowPassengerForm(false)}
           variant="outline"
-          className="rounded-xl border-gray-200 hover:bg-gray-50"
+          className="flex-1"
         >
-          <FunnelIcon className="h-4 w-4 mr-2" />
-          Filters
+          Cancel
         </Button>
-      </motion.div>
-{/* Search Form */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
-          <CardContent className="p-6">
-            {/* Trip Type */}
-            <div className="flex space-x-4 mb-6">
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="tripType"
-                  value="one_way"
-                  checked={searchParams.tripType === "one_way"}
-                  onChange={(e) => setSearchParams(prev => ({ ...prev, tripType: e.target.value }))}
-                  className="mr-2"
-                />
-                <span className="text-sm font-medium">One way</span>
-              </label>
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="tripType"
-                  value="round_trip"
-                  checked={searchParams.tripType === "round_trip"}
-                  onChange={(e) => setSearchParams(prev => ({ ...prev, tripType: e.target.value }))}
-                  className="mr-2"
-                />
-                <span className="text-sm font-medium">Round trip</span>
-              </label>
-            </div>
-{/* Search Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {/* Origin */}
-              <div className="relative">
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">From</Label>
-                <div className="relative">
-                  <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Select 
-                    value={searchParams.origin} 
-                    onValueChange={(value) => setSearchParams(prev => ({ ...prev, origin: value }))}
-                  >
-                    <SelectTrigger className="pl-10 rounded-xl border-gray-200">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {popularAirports.map((airport) => (
-                        <SelectItem key={airport.code} value={airport.code}>
-                          <div>
-                            <div className="font-medium">{airport.city}</div>
-                            <div className="text-sm text-gray-500">{airport.name} ({airport.code})</div>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Swap Button */}
-              <div className="flex items-end pb-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={swapLocations}
-                  className="rounded-xl border-gray-200 hover:bg-gray-50"
-                >
-                  <ArrowsRightLeftIcon className="h-4 w-4" />
-                </Button>
-              </div>
-{/* Destination */}
-              <div className="relative">
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">To</Label>
-                <div className="relative">
-                  <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Select 
-                    value={searchParams.destination} 
-                    onValueChange={(value) => setSearchParams(prev => ({ ...prev, destination: value }))}
-                  >
-                    <SelectTrigger className="pl-10 rounded-xl border-gray-200">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {popularAirports.map((airport) => (
-                        <SelectItem key={airport.code} value={airport.code}>
-                          <div>
-                            <div className="font-medium">{airport.city}</div>
-                            <div className="text-sm text-gray-500">{airport.name} ({airport.code})</div>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Departure Date */}
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">Departure</Label>
-                <div className="relative">
-                  <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Input
-                    type="date"
-                    value={searchParams.departureDate}
-                    onChange={(e) => setSearchParams(prev => ({ ...prev, departureDate: e.target.value }))}
-                    className="pl-10 rounded-xl border-gray-200"
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                </div>
-              </div>
-
-              {/* Return Date */}
-              {searchParams.tripType === "round_trip" && (
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">Return</Label>
-                  <div className="relative">
-                    <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <Input
-                      type="date"
-                      value={searchParams.returnDate}
-                      onChange={(e) => setSearchParams(prev => ({ ...prev, returnDate: e.target.value }))}
-                      className="pl-10 rounded-xl border-gray-200"
-                      min={searchParams.departureDate}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-{/* Additional Options */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">Passengers</Label>
-                <Select 
-                  value={searchParams.passengers.toString()} 
-                  onValueChange={(value) => setSearchParams(prev => ({ ...prev, passengers: parseInt(value) }))}
-                >
-                  <SelectTrigger className="rounded-xl border-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[1,2,3,4,5,6,7,8,9].map(num => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num} {num === 1 ? 'Passenger' : 'Passengers'}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">Cabin Class</Label>
-                <Select 
-                  value={searchParams.cabinClass} 
-                  onValueChange={(value) => setSearchParams(prev => ({ ...prev, cabinClass: value }))}
-                >
-                  <SelectTrigger className="rounded-xl border-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="economy">Economy</SelectItem>
-                    <SelectItem value="premium_economy">Premium Economy</SelectItem>
-                    <SelectItem value="business">Business</SelectItem>
-                    <SelectItem value="first">First Class</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-end">
-                <Button 
-                  onClick={handleSearch}
-                  disabled={searching}
-                  className="w-full bg-black text-white hover:bg-gray-800 rounded-xl"
-                >
-                  {searching ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <MagnifyingGlassIcon className="h-4 w-4 mr-2" />
-                  )}
-                  {searching ? "Searching..." : "Search Flights"}
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-{/* Search Results */}
-      {offers.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="space-y-4"
+        <Button
+          onClick={processBooking}
+          disabled={loading}
+          className="flex-1 bg-black text-white hover:bg-gray-800"
         >
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-medium tracking-tighter">Available Flights</h2>
-            <Badge className="bg-gray-200 text-gray-700 border-gray-200">
-              {offers.length} flight{offers.length !== 1 ? 's' : ''} found
-            </Badge>
-          </div>
+          {loading ? "Processing..." : "Confirm Booking"}
+        </Button>
+      </div>
+    </div>
+  </motion.div>
+)
 
-          <div className="space-y-4">
-            {offers.map((offer, index) => {
-              const segment = offer.slices[0]?.segments[0]
-              if (!segment) return null
+// Panel de filtros - Agregar después del componente PassengerForm
+const FiltersPanel = () => (
+  showFiltersPanel && (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      className="fixed right-0 top-0 h-full w-80 bg-white shadow-lg z-40 p-6"
+    >
+      <h3 className="text-lg font-medium mb-4">Filter Results</h3>
+      
+      <div className="space-y-6">
+        <div>
+          <Label>Max Price: ${filters.maxPrice}</Label>
+          <input
+            type="range"
+            min="100"
+            max="5000"
+            step="50"
+            value={filters.maxPrice}
+            onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: parseInt(e.target.value) }))}
+            className="w-full"
+          />
+        </div>
 
-              const departureTime = new Date(segment.departing_at)
-              const arrivalTime = new Date(segment.arriving_at)
-              
-              return (
-                <motion.div
-                  key={offer.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-                >
-                  <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        <div>
+          <Label>Max Stops</Label>
+          <Select
+            value={filters.maxStops}
+            onValueChange={(value) => setFilters(prev => ({ ...prev, maxStops: value }))}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any</SelectItem>
+              <SelectItem value="0">Non-stop</SelectItem>
+              <SelectItem value="1">1 stop</SelectItem>
+              <SelectItem value="2">2+ stops</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-{/* Flight Info */}
-                        <div className="flex-1 space-y-3">
-                          <div className="flex items-center space-x-2">
-                            <PaperAirplaneIcon className="h-5 w-5 text-gray-600" />
-                            <span className="font-medium">{segment.airline.name}</span>
-                            <Badge className="bg-gray-200 text-gray-700 border-gray-200 text-xs">
-                              {segment.flight_number}
-                            </Badge>
-                          </div>
+        <div>
+          <Label>Departure Time</Label>
+          <Select
+            value={filters.departureTime}
+            onValueChange={(value) => setFilters(prev => ({ ...prev, departureTime: value }))}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any time</SelectItem>
+              <SelectItem value="morning">Morning (6-12)</SelectItem>
+              <SelectItem value="afternoon">Afternoon (12-18)</SelectItem>
+              <SelectItem value="evening">Evening (18-24)</SelectItem>
+              <SelectItem value="night">Night (0-6)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                              <div className="text-lg font-medium">
-                                {departureTime.toLocaleTimeString('en-GB', { 
-                                  hour: '2-digit', 
-                                  minute: '2-digit' 
-                                })}
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {segment.origin.city_name} ({segment.origin.iata_code})
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {segment.origin.name}
-                              </div>
-                            </div>
-
-                            <div className="text-center">
-                              <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                                <ClockIcon className="h-4 w-4" />
-                                <span>{formatDuration(segment.duration)}</span>
-                              </div>
-                              <div className="text-xs text-gray-500 mt-1">
-                                {offer.slices[0].segments.length > 1 ? 
-                                  `${offer.slices[0].segments.length - 1} stop${offer.slices[0].segments.length > 2 ? 's' : ''}` : 
-                                  'Non-stop'
-                                }
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {segment.aircraft.name}
-                              </div>
-                            </div>
-
-                            <div className="text-right md:text-left">
-                              <div className="text-lg font-medium">
-                                {arrivalTime.toLocaleTimeString('en-GB', { 
-                                  hour: '2-digit', 
-                                  minute: '2-digit' 
-                                })}
-                                {arrivalTime.getDate() !== departureTime.getDate() && (
-                                  <span className="text-xs text-red-500 ml-1">+1</span>
-                                )}
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {segment.destination.city_name} ({segment.destination.iata_code})
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {segment.destination.name}
-                              </div>
-                            </div>
-                          </div>
-
-{/* Flight Details */}
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                              {offer.cabin_class.replace('_', ' ')}
-                            </Badge>
-                            {offer.conditions?.refund_before_departure && (
-                              <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                                <CheckCircleIcon className="h-3 w-3 mr-1" />
-                                Refundable
-                              </Badge>
-                            )}
-                            {offer.conditions?.change_before_departure && (
-                              <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
-                                Changeable
-                              </Badge>
-                            )}
-                            <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-200">
-                              {segment.airline.iata_code} {segment.flight_number}
-                            </Badge>
-                          </div>
-                        </div>
-
-{/* Price and Book */}
-                        <div className="flex flex-row lg:flex-col items-center lg:items-end space-x-4 lg:space-x-0 lg:space-y-3 border-t lg:border-t-0 lg:border-l border-gray-200 pt-4 lg:pt-0 lg:pl-6">
-                          <div className="text-right">
-                            <div className="text-2xl font-medium tracking-tighter">
-                              {formatPrice(offer.total_amount, offer.total_currency)}
-                            </div>
-                            <div className="text-xs text-gray-500">per person</div>
-                            <div className="text-xs text-gray-500 capitalize mt-1">
-                              {offer.cabin_class.replace('_', ' ')} class
-                            </div>
-                            
-                            {/* Savings indicator */}
-                            {index === 0 && (
-                              <div className="text-xs text-green-600 font-medium mt-1">
-                                Best price
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Button 
-                              onClick={() => handleBookFlight(offer.id)}
-                              disabled={selectedOffer === offer.id}
-                              className="bg-black text-white hover:bg-gray-800 rounded-xl px-6 min-w-[120px]"
-                            >
-                              {selectedOffer === offer.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                "Select Flight"
-                              )}
-                            </Button>
-                            
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className="w-full text-xs rounded-xl border-gray-200 hover:bg-gray-50"
-                            >
-                              View Details
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-
-{/* Additional Info */}
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-gray-500">
-                          <div>
-                            <span className="font-medium">Aircraft:</span>
-                            <div>{segment.aircraft.name}</div>
-                          </div>
-                          <div>
-                            <span className="font-medium">Operated by:</span>
-                            <div>{segment.airline.name}</div>
-                          </div>
-                          <div>
-                            <span className="font-medium">Duration:</span>
-                            <div>{formatDuration(segment.duration)}</div>
-                          </div>
-                          <div>
-                            <span className="font-medium">Distance:</span>
-                            <div>~{Math.round(Math.random() * 3000 + 1000)} km</div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )
-            })}
-          </div>
-        </motion.div>
-      )}
-{/* Empty State */}
-      {!searching && offers.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-center py-12"
+        <Button
+          onClick={() => setShowFiltersPanel(false)}
+          className="w-full bg-black text-white hover:bg-gray-800"
         >
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <PaperAirplaneIcon className="h-8 w-8 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2 tracking-tight">Ready to find your next flight?</h3>
-          <p className="text-gray-600 max-w-md mx-auto font-light">
-            Search for flights using our real-time booking system powered by Duffel's global inventory.
-          </p>
-        </motion.div>
-      )}
+          Apply Filters
+        </Button>
+      </div>
+    </motion.div>
+  )
+)
 
-      {/* Loading State */}
-      {searching && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center py-12"
-        >
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2 tracking-tight">Searching flights...</h3>
-          <p className="text-gray-600 font-light mb-4">
-            We're searching hundreds of airlines for the best deals
-          </p>
-        </motion.div>
+// REEMPLAZAR el botón de filtros existente en el header con:
+<div className="flex items-center space-x-2">
+  <Button
+    onClick={() => setShowFiltersPanel(!showFiltersPanel)}
+    variant="outline"
+    className="rounded-xl border-gray-200 hover:bg-gray-50"
+  >
+    <FunnelIcon className="h-4 w-4 mr-2" />
+    Filters
+  </Button>
+  {user && (
+    <Button
+      onClick={saveSearch}
+      variant="outline"
+      className="rounded-xl border-gray-200 hover:bg-gray-50"
+    >
+      Save Search
+    </Button>
+  )}
+</div>
+
+// AGREGAR al final del JSX, justo antes del cierre del div principal:
+
+      {/* Passenger Form Modal */}
+      {showPassengerForm && <PassengerForm />}
+
+      {/* Filters Panel */}
+      <FiltersPanel />
+
+      {/* Backdrop for filters */}
+      {showFiltersPanel && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-25 z-30"
+          onClick={() => setShowFiltersPanel(false)}
+        />
       )}
     </div>
   )
 }
+
