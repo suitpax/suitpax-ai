@@ -336,13 +336,13 @@ export default function FlightsPage() {
 
     try {
       const searchData = {
-        origin: searchParams.origin,
-        destination: searchParams.destination,
-        departure_date: searchParams.departureDate,
-        return_date: searchParams.tripType === 'round_trip' ? searchParams.returnDate : undefined,
-        passengers: Array.from({ length: searchParams.passengers }, () => ({ type: 'adult' })),
-        cabin_class: searchParams.cabinClass
-      }
+  origin: searchParams.origin,
+  destination: searchParams.destination,
+  departureDate: searchParams.departureDate,
+  returnDate: searchParams.tripType === 'round_trip' ? searchParams.returnDate : undefined,
+  passengers: searchParams.passengers,
+  cabinClass: searchParams.cabinClass
+}
 
       const response = await fetch('/api/duffel/search', {
         method: 'POST',
