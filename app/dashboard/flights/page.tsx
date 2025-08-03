@@ -18,9 +18,10 @@ import {
   XMarkIcon,
   BookmarkIcon,
   HeartIcon,
+  ChevronDownIcon
 } from "@heroicons/react/24/outline"
 import { HeartIcon as HeartSolidIcon, BookmarkIcon as BookmarkSolidIcon } from "@heroicons/react/24/solid"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
