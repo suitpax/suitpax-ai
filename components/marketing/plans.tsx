@@ -389,7 +389,7 @@ export const Plans = () => {
             </span>
             <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
-              Updated Q2 2025
+              Updated Q4 2025
             </span>
           </div>
 
@@ -522,4 +522,18 @@ export const Plans = () => {
                 </Link>
               </div>
             </motion.div>
+          ))}
+        </div>
+
+        {/* Mission and Values */}
+        <MissionValues />
+
+        {/* FAQ Section */}
+        <FAQ items={defaultFAQItems} />
+      </div>
+    </section>
+  )
+}
+
+export default Plans
    
