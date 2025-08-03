@@ -739,27 +739,13 @@ export default function FlightsPage() {
     </AnimatePresence>
   )
 
-// Panel de filtros
-  const FiltersPanel = () => (
-    <AnimatePresence>
-      {showFiltersPanel && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-25 z-30"
-            onClick={() => setShowFiltersPanel(false)}
-          />
-          
-          {/* Panel */}
-          <motion.div
-            initial={{ opacity: 0, x: 320 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 320 }}
-            className="fixed right-0 top-0 h-full w-80 bg-white shadow-lg z-40 overflow-y-auto"
-          >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
+="flex items-center justify-between mb-6">
+
+<FlightFilters
+  offers={offers}
+  filters={filters}
+  onFiltersChange={setFilters}
+  isOpen={showFiltersPanel}
+  onClose={() => setShowFiltersPanel(false)}
+/>
 
