@@ -121,7 +121,7 @@ const pricingPlans = [
       "Basic CRM integration",
     ],
     cta: "Start 14-day trial",
-    badge: "Starter",
+    badge: "Most Popular",
     popular: true,
     agentImage: "/agents/agent-emma.jpeg",
     communityImages: ["/community/kelsey-lowe.webp", "/community/brianna-ware.webp", "/community/harriet-rojas.jpg"],
@@ -254,8 +254,8 @@ const MiniChat = ({ planId }: { planId: string }) => {
   }, [typedText, isDeleting, currentPlaceholder, placeholders])
 
   return (
-    <div className="relative flex items-center gap-1 p-1 rounded-lg border border-gray-300 bg-white shadow-sm text-[9px] sm:text-[10px] mt-3">
-      <div className="relative w-5 h-5 sm:w-6 sm:h-6 overflow-hidden rounded-full border border-gray-300 ml-1">
+    <div className="relative flex items-center gap-1 p-2 rounded-lg border border-gray-300 bg-white shadow-sm text-xs mt-3">
+      <div className="relative w-6 h-6 overflow-hidden rounded-full border border-gray-300 ml-1">
         <Image
           src={getAgentImage() || "/placeholder.svg"}
           alt="Agent"
@@ -264,7 +264,7 @@ const MiniChat = ({ planId }: { planId: string }) => {
           className="w-full h-full object-cover object-center"
         />
       </div>
-      <div className="flex-1 py-1 px-1 text-[9px] sm:text-[10px] text-gray-500 h-5 sm:h-6 flex items-center overflow-hidden">
+      <div className="flex-1 py-1 px-1 text-xs text-gray-500 h-6 flex items-center overflow-hidden">
         <span className="inline-block truncate">
           {typedText}
           {!isDeleting && (
@@ -295,12 +295,12 @@ const CommunityCarousel = ({ images }: { images: string[] }) => {
 
   return (
     <div className="mt-3 relative">
-      <p className="text-[9px] sm:text-[10px] text-gray-500 mb-1">Team members using this plan:</p>
+      <p className="text-xs text-gray-500 mb-2">Team members using this plan:</p>
       <div className="flex -space-x-2 overflow-hidden" ref={carouselRef}>
         {images.map((image, index) => (
           <motion.div
             key={index}
-            className={`relative w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-white overflow-hidden ${
+            className={`relative w-7 h-7 rounded-full border border-white overflow-hidden ${
               index === currentIndex ? "z-10" : ""
             }`}
             animate={{ scale: index === currentIndex ? 1.1 : 1 }}
@@ -316,7 +316,7 @@ const CommunityCarousel = ({ images }: { images: string[] }) => {
           </motion.div>
         ))}
         {images.length > 5 && (
-          <div className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-200 border border-white flex items-center justify-center text-[8px] sm:text-[9px] font-medium text-gray-600">
+          <div className="relative w-7 h-7 rounded-full bg-gray-200 border border-white flex items-center justify-center text-xs font-medium text-gray-600">
             +{images.length - 5}
           </div>
         )}
@@ -328,28 +328,28 @@ const CommunityCarousel = ({ images }: { images: string[] }) => {
 // Testimonial Component
 const MissionValues = () => {
   return (
-    <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm mt-12 mb-16">
-      <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-4 text-center">
+    <div className="bg-gray-50 rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm mt-16 mb-20">
+      <h3 className="text-2xl md:text-3xl font-medium tracking-tight text-black mb-6 text-center">
         Our Mission and Values
       </h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
-          <h4 className="text-sm font-medium mb-2">Constant Innovation</h4>
-          <p className="text-xs text-gray-600">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <h4 className="text-lg font-medium mb-3">Constant Innovation</h4>
+          <p className="text-sm text-gray-600 leading-relaxed">
             We are committed to redefining business travel management with cutting-edge technology and user-centered
             solutions.
           </p>
         </div>
-        <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
-          <h4 className="text-sm font-medium mb-2">Efficiency and Simplicity</h4>
-          <p className="text-xs text-gray-600">
+        <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <h4 className="text-lg font-medium mb-3">Efficiency and Simplicity</h4>
+          <p className="text-sm text-gray-600 leading-relaxed">
             We believe technology should simplify, not complicate. Our solutions eliminate friction at every stage of
             the travel process.
           </p>
         </div>
-        <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
-          <h4 className="text-sm font-medium mb-2">Sustainability</h4>
-          <p className="text-xs text-gray-600">
+        <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <h4 className="text-lg font-medium mb-3">Sustainability</h4>
+          <p className="text-sm text-gray-600 leading-relaxed">
             We are committed to responsible travel practices that minimize environmental impact while maximizing value
             for our customers.
           </p>
@@ -362,7 +362,7 @@ const MissionValues = () => {
 export const Plans = () => {
   const [randomTitle, setRandomTitle] = useState("")
   const [randomSubtitle, setRandomSubtitle] = useState("")
-  const [isAnnual, setIsAnnual] = useState(false)
+  const [isAnnual, setIsAnnual] = useState(true) // Cambiado a true por defecto
 
   useEffect(() => {
     // Seleccionar un título aleatorio al montar el componente
@@ -375,15 +375,15 @@ export const Plans = () => {
   }, [])
 
   return (
-    <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-gray-50">
+    <section className="py-12 md:py-20 bg-gradient-to-b from-white to-gray-50">
       <div className="container mx-auto px-4 md:px-6">
         <motion.div
-          className="flex flex-col items-center justify-center text-center mb-12 sm:mb-16"
+          className="flex flex-col items-center justify-center text-center mb-12 md:mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex flex-wrap items-center justify-center gap-3 mb-4 sm:mb-6 bg-gray-50 px-3 py-2 rounded-full">
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-4 sm:mb-6 bg-gray-50 px-3 py-2 rounded-full">
             <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
               Suitpax Pricing
             </span>
@@ -393,29 +393,29 @@ export const Plans = () => {
             </span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-black leading-tight max-w-4xl mb-4">
             {randomTitle}
           </h2>
-          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6 sm:mb-8">{randomSubtitle}</p>
+          <p className="text-sm md:text-base font-medium text-gray-600 max-w-2xl mb-8">{randomSubtitle}</p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
-            <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="inline-flex items-center rounded-lg bg-transparent border border-gray-200 px-3 py-1 text-xs text-gray-600">
               <span className="font-medium">Flexible Solutions</span>
             </div>
-            <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
+            <div className="inline-flex items-center rounded-lg bg-transparent border border-gray-200 px-3 py-1 text-xs text-gray-600">
               <span className="font-medium">Artificial Intelligence</span>
             </div>
-            <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
+            <div className="inline-flex items-center rounded-lg bg-transparent border border-gray-200 px-3 py-1 text-xs text-gray-600">
               <span className="font-medium">Scalability</span>
             </div>
           </div>
         </motion.div>
 
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-12">
           <div className="flex items-center bg-gray-100 p-1 rounded-full">
             <button
               onClick={() => setIsAnnual(false)}
-              className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
+              className={`px-6 py-2 text-sm font-medium rounded-full transition-all ${
                 !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
               }`}
             >
@@ -423,184 +423,103 @@ export const Plans = () => {
             </button>
             <button
               onClick={() => setIsAnnual(true)}
-              className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
+              className={`px-6 py-2 text-sm font-medium rounded-full transition-all ${
                 isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
               }`}
             >
               Annual
-              <span className="ml-1 inline-flex items-center rounded-full bg-black px-2 py-0.5 text-[9px] font-medium text-white">
+              <span className="ml-2 inline-flex items-center rounded-full bg-black px-2 py-0.5 text-xs font-medium text-white">
                 Save 20%
               </span>
             </button>
           </div>
         </div>
 
-        {/* Grid modificado para 2x2 en pantallas grandes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
+        {/* Grid mejorado para móviles */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto mb-12">
           {pricingPlans.map((plan, index) => (
             <motion.div
               key={plan.id}
-              className={`relative overflow-hidden bg-gradient-to-br ${plan.bgGradient} border border-black rounded-xl p-3 sm:p-4 flex flex-col h-full ${
-                plan.popular ? "border-2 shadow-lg" : "border shadow-sm"
+              className={`relative overflow-hidden bg-gradient-to-br ${plan.bgGradient} border rounded-2xl p-6 flex flex-col min-h-[500px] ${
+                plan.popular ? "border-2 border-black shadow-xl scale-105" : "border-gray-200 shadow-sm"
               }`}
               whileHover={{
                 y: -4,
-                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                boxShadow: "0 20px 40px -12px rgba(0, 0, 0, 0.15)",
                 transition: { duration: 0.2 },
               }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              {/* Diseño más compacto */}
-              <div className="mb-2 sm:mb-3 flex items-start justify-between">
+              {/* Header */}
+              <div className="mb-6 flex items-start justify-between">
                 <div>
-                  <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">{plan.name}</h3>
-                  <p className="text-[9px] sm:text-[10px] text-gray-600 mt-0.5 line-clamp-2">{plan.description}</p>
+                  <h3 className="text-xl md:text-2xl font-medium tracking-tight text-black">{plan.name}</h3>
+                  <p className="text-sm text-gray-600 mt-2 leading-relaxed">{plan.description}</p>
                 </div>
                 {plan.badge && (
-                  <span className="inline-flex items-center rounded-xl bg-transparent border border-black px-2 py-0.5 text-[8px] sm:text-[9px] font-medium text-black">
+                  <span className={`inline-flex items-center rounded-xl px-3 py-1 text-xs font-medium ${
+                    plan.popular 
+                      ? "bg-black text-white" 
+                      : "bg-transparent border border-gray-300 text-gray-700"
+                  }`}>
                     {plan.badge}
                   </span>
                 )}
               </div>
 
-              <div className="mb-2 sm:mb-3">
+              {/* Pricing */}
+              <div className="mb-6">
                 <div className="flex items-baseline">
-                  <span className="text-2xl sm:text-3xl font-medium tracking-tighter text-black">
+                  <span className="text-3xl md:text-4xl font-medium tracking-tight text-black">
                     {isAnnual ? plan.annualPrice : plan.price}
                   </span>
-                  <span className="text-[9px] sm:text-[10px] text-gray-500 ml-1">
+                  <span className="text-sm text-gray-500 ml-2">
                     /{isAnnual ? plan.annualPeriod : plan.period}
                   </span>
                 </div>
               </div>
 
-              {/* Features más compactas */}
-              <ul className="space-y-1 mb-3 sm:mb-4 flex-grow">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start">
+              {/* Features */}
+              <ul className="space-y-3 mb-6 flex-grow">
+                {plan.features.map((feature, featureIndex) => (
+                  <li key={featureIndex} className="flex items-start">
                     <svg
-                      className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-950 mt-0.5 mr-1.5 flex-shrink-0"
+                      className="w-4 h-4 text-emerald-600 mt-0.5 mr-3 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <span className="text-[9px] sm:text-[10px] font-medium text-gray-700">{feature}</span>
+                    <span className="text-sm font-medium text-gray-700">{feature}</span>
                   </li>
                 ))}
               </ul>
 
-              {/* Mini Chat UI con agente específico */}
+              {/* Mini Chat UI */}
               <MiniChat planId={plan.id} />
 
-              {/* Community Carousel - solo para planes no beta */}
-              {plan.id !== "beta" && plan.communityImages && <CommunityCarousel images={plan.communityImages} />}
+              {/* Community Carousel */}
+              {plan.communityImages && <CommunityCarousel images={plan.communityImages} />}
 
-              <div className="mt-3">
+              {/* CTA Button */}
+              <div className="mt-6">
                 <Link
                   href={
                     plan.id === "enterprise" || plan.id === "pro"
                       ? "mailto:hello@suitpax.com"
-                      : "https://app.suitpax.com/sign-up"
+                      : "/auth/signup"
                   }
-                  className={`w-full py-1.5 px-3 rounded-xl text-center text-[9px] sm:text-[10px] font-medium transition-colors ${
+                  className={`w-full py-3 px-4 rounded-xl text-center text-sm font-medium transition-colors block ${
                     plan.popular
                       ? "bg-black text-white hover:bg-gray-800"
-                      : "bg-transparent border border-black text-black hover:bg-gray-100"
+                      : "bg-transparent border-2 border-black text-black hover:bg-gray-50"
                   }`}
                 >
                   {plan.cta}
                 </Link>
               </div>
             </motion.div>
-          ))}
-        </div>
-
-        <div className="flex justify-center mt-12">
-          <CounterBadge />
-        </div>
-
-        <motion.div
-          className="mt-16 sm:mt-20"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-6 text-center">
-            AI Token Usage {isAnnual ? "(Annual Plans)" : "(Monthly Plans)"}
-          </h3>
-          <div className="grid grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
-            <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-1/5 rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Free</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">5K tokens</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-1/3 rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Basic</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">15K tokens</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-1/2 rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Pro</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">25K tokens</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full bg-gray-200 h-1 mb-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-950 h-1 w-full rounded-full"></div>
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium">Enterprise</p>
-              <p className="text-[8px] sm:text-[10px] text-gray-500">Unlimited</p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Mission and Values Section */}
-        <MissionValues />
-
-        {/* FAQ Section */}
-        <FAQ items={defaultFAQItems} />
-
-        <motion.div
-          className="mt-16 sm:mt-20 text-center max-w-2xl mx-auto bg-gray-50 p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
-          <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-2">Need a custom solution?</h3>
-          <p className="text-xs sm:text-sm text-gray-600 mb-5">
-            Our enterprise plans are tailored to your specific business travel needs. Contact our sales team to learn
-            more about how we can customize a solution for your organization.
-          </p>
-          <Link
-            href="mailto:hello@suitpax.com"
-            className="inline-flex items-center text-xs sm:text-sm font-medium bg-black text-white px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors"
-          >
-            Contact our sales team
-            <svg
-              className="w-4 h-4 ml-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-            </svg>
-          </Link>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-export default Plans
+   
