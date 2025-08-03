@@ -11,14 +11,19 @@ import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
-// 🔧 Componente que controla la visibilidad de Navigation y Footer
+// Componente que controla la visibilidad de Navigation y Footer
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const headersList = headers()
   const pathname = headersList.get("x-pathname") || ""
 
-  const excludeNavAndFooter = ["/dashboard", "/auth"].some((path) =>
-    pathname.startsWith(path)
-  )
+  // Rutas donde NO queremos mostrar Navigation y Footer
+  const excludeNavAndFooter = [
+    "/dashboard",
+    "/auth/login", 
+    "/auth/signup",
+    "/auth/forgot-password",
+    "/auth/reset-password"
+  ].some((path) => pathname.startsWith(path))
 
   if (excludeNavAndFooter) {
     return <>{children}</>
