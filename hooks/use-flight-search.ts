@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { flightCache, useSmartCache } from '@/lib/cache-manager'
 
 interface SearchParams {
   origin: string
@@ -32,9 +33,24 @@ interface UseFlightSearchReturn {
   getCacheStats: () => { size: number; hits: number; misses: number }
 }
 
-// Cache con TTL de 5 minutos para búsquedas de vuelos
-const CACHE_TTL = 5 * 60 * 1000 // 5 minutos
-const MAX_CACHE_SIZE = 50 // Máximo 50 búsquedas en cache
+interface CachedResult {
+  key: string
+  data: any
+  timestamp: number
+  expiresAt: number
+}
+
+interface UseFlightSearchReturn {
+  search: (params: SearchParams) => Promise<any>
+  isLoading: boolean
+  error: string | null
+  offers: any[]
+  requestId: string | null
+  searchMetadata: any
+  clearCache: () => void
+  getCacheStats: () => { size: number; hits: number; misses: number; hitRate: number }
+  prefetchPopularRoutes: () => Promise<void>
+}
 
 export function useFlightSearch(): UseFlightSearchReturn {
   const [isLoading, setIsLoading] = useState(false)
@@ -43,46 +59,23 @@ export function useFlightSearch(): UseFlightSearchReturn {
   const [requestId, setRequestId] = useState<string | null>(null)
   const [searchMetadata, setSearchMetadata] = useState<any>(null)
 
-  // Cache management
-  const cacheRef = useRef<Map<string, CachedResult>>(new Map())
-  const cacheStatsRef = useRef({ hits: 0, misses: 0 })
+  // Usar cache inteligente
+  const { cache, getStats, clear: clearSmartCache, prefetchPopularRoutes } = useSmartCache()
+  
   const activeRequestRef = useRef<AbortController | null>(null)
   const rateLimitRef = useRef<{ lastRequest: number; requestCount: number }>({
     lastRequest: 0,
     requestCount: 0
   })
 
-  // Limpiar cache expirado cada 30 segundos
+  // Limpiar requests activos al desmontar
   useEffect(() => {
-    const cleanupInterval = setInterval(() => {
-      const now = Date.now()
-      const cache = cacheRef.current
-      
-      for (const [key, result] of cache.entries()) {
-        if (now > result.expiresAt) {
-          cache.delete(key)
-        }
+    return () => {
+      if (activeRequestRef.current) {
+        activeRequestRef.current.abort()
       }
-    }, 30000)
-
-    return () => clearInterval(cleanupInterval)
+    }
   }, [])
-
-  const generateCacheKey = (params: SearchParams): string => {
-    // Crear una clave única basada en los parámetros de búsqueda
-    const keyParts = [
-      params.origin,
-      params.destination,
-      params.departureDate,
-      params.returnDate || '',
-      params.passengers.toString(),
-      params.cabinClass,
-      JSON.stringify(params.loyaltyProgrammes || []),
-      params.corporateDiscounts ? 'corp' : 'std'
-    ]
-    
-    return keyParts.join('|')
-  }
 
   const checkRateLimit = (): boolean => {
     const now = Date.now()
@@ -148,41 +141,6 @@ export function useFlightSearch(): UseFlightSearchReturn {
     return null
   }
 
-  const getCachedResult = (cacheKey: string): any | null => {
-    const cached = cacheRef.current.get(cacheKey)
-    
-    if (!cached) {
-      cacheStatsRef.current.misses++
-      return null
-    }
-
-    if (Date.now() > cached.expiresAt) {
-      cacheRef.current.delete(cacheKey)
-      cacheStatsRef.current.misses++
-      return null
-    }
-
-    cacheStatsRef.current.hits++
-    return cached.data
-  }
-
-  const setCachedResult = (cacheKey: string, data: any): void => {
-    const cache = cacheRef.current
-    
-    // Limpiar cache si está lleno
-    if (cache.size >= MAX_CACHE_SIZE) {
-      const oldestKey = Array.from(cache.keys())[0]
-      cache.delete(oldestKey)
-    }
-
-    cache.set(cacheKey, {
-      key: cacheKey,
-      data,
-      timestamp: Date.now(),
-      expiresAt: Date.now() + CACHE_TTL
-    })
-  }
-
   const search = useCallback(async (params: SearchParams) => {
     // Cancelar request anterior si existe
     if (activeRequestRef.current) {
@@ -207,14 +165,16 @@ export function useFlightSearch(): UseFlightSearchReturn {
         return null
       }
 
-      // Verificar cache
-      const cacheKey = generateCacheKey(params)
-      const cachedResult = getCachedResult(cacheKey)
+      // Verificar cache inteligente
+      const cachedResult = cache.getSearchResult(params)
       
       if (cachedResult) {
         setOffers(cachedResult.offers || [])
         setRequestId(cachedResult.request_id)
-        setSearchMetadata(cachedResult.search_metadata)
+        setSearchMetadata({
+          ...cachedResult.search_metadata,
+          cached: true
+        })
         setIsLoading(false)
         return cachedResult
       }
@@ -233,14 +193,12 @@ export function useFlightSearch(): UseFlightSearchReturn {
         cabinClass: params.cabinClass,
         loyaltyProgrammes: params.loyaltyProgrammes || [],
         corporateDiscounts: params.corporateDiscounts || false,
-        // Añadir configuraciones de mejores prácticas
+        // Configuraciones optimizadas
         maxConnections: 2,
         preferDirectFlights: true,
-        includeNearbyAirports: false, // Puede configurarse según preferencias
-        flexibleDates: false, // Para implementar en futuras versiones
-        sortBy: 'price', // price, duration, departure_time
+        includeNearbyAirports: false,
+        sortBy: 'price',
         currency: 'USD',
-        // Timeout más largo para búsquedas complejas
         timeout: 30000
       }
 
@@ -264,8 +222,8 @@ export function useFlightSearch(): UseFlightSearchReturn {
         throw new Error(data.error || "Search failed")
       }
 
-      // Guardar en cache
-      setCachedResult(cacheKey, data)
+      // Guardar en cache inteligente
+      cache.setSearchResult(params, data, 'flight')
 
       // Actualizar estado
       setOffers(data.offers || [])
@@ -299,29 +257,15 @@ export function useFlightSearch(): UseFlightSearchReturn {
       setIsLoading(false)
       activeRequestRef.current = null
     }
-  }, [])
+  }, [cache])
 
   const clearCache = useCallback(() => {
-    cacheRef.current.clear()
-    cacheStatsRef.current = { hits: 0, misses: 0 }
-  }, [])
+    clearSmartCache()
+  }, [clearSmartCache])
 
   const getCacheStats = useCallback(() => {
-    return {
-      size: cacheRef.current.size,
-      hits: cacheStatsRef.current.hits,
-      misses: cacheStatsRef.current.misses
-    }
-  }, [])
-
-  // Cleanup al desmontar
-  useEffect(() => {
-    return () => {
-      if (activeRequestRef.current) {
-        activeRequestRef.current.abort()
-      }
-    }
-  }, [])
+    return getStats()
+  }, [getStats])
 
   return {
     search,
@@ -331,6 +275,7 @@ export function useFlightSearch(): UseFlightSearchReturn {
     requestId,
     searchMetadata,
     clearCache,
-    getCacheStats
+    getCacheStats,
+    prefetchPopularRoutes
   }
 }
