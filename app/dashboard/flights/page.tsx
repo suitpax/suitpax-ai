@@ -143,13 +143,18 @@ export default function FlightsPage() {
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([])
   const [favoriteOffers, setFavoriteOffers] = useState<string[]>([])
   
-  // Estados de filtros
-  const [filters, setFilters] = useState<SearchFilters>({
-    maxPrice: 5000,
-    airlines: [],
-    maxStops: "any",
-    departureTime: "any"
-  })
+  const [filters, setFilters] = useState<FlightFiltersState>({
+  priceRange: [0, 5000],
+  maxStops: 3,
+  airlines: [],
+  departureTime: [],
+  arrivalTime: [],
+  duration: [0, 1440],
+  cabinClass: [],
+  refundable: false,
+  changeable: false,
+  directOnly: false
+})
 
   // Estados de búsqueda de aeropuertos
   const [searchResults, setSearchResults] = useState({
