@@ -78,11 +78,17 @@ interface PassengerData {
   index: number
 }
 
-interface SearchFilters {
-  maxPrice: number
+interface FlightFiltersState {
+  priceRange: [number, number]
+  maxStops: number
   airlines: string[]
-  maxStops: string
-  departureTime: string
+  departureTime: string[]
+  arrivalTime: string[]
+  duration: [number, number]
+  cabinClass: string[]
+  refundable: boolean
+  changeable: boolean
+  directOnly: boolean
 }
 
 interface SavedSearch {
