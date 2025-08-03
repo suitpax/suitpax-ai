@@ -760,7 +760,6 @@ if (filters.changeable) {
     </AnimatePresence>
   )
 
-="flex items-center justify-between mb-6">
 
 <FlightFilters
   if (userLoading) {
