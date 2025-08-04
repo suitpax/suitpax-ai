@@ -68,8 +68,6 @@
     "next": "14.2.16",
     "next-themes": "latest",
     "pdf-lib": "^1.17.1",
-    "form-data": "latest",
-    "markdown-it": "latest"
     "react": "^18",
     "react-day-picker": "latest",
     "react-dom": "^18",
