@@ -21,11 +21,15 @@ import {
   X,
   User,
   Building,
+  Mail,
+  VideoIcon as Meeting
 } from "lucide-react"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 
 const navigation = [
@@ -33,12 +37,17 @@ const navigation = [
   { name: "Flights", href: "/dashboard/flights", icon: Plane },
   { name: "Hotels", href: "/dashboard/hotels", icon: Hotel },
   { name: "Expenses", href: "/dashboard/expenses", icon: CreditCard },
-  { name: "Team", href: "/dashboard/team", icon: Users },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
+  { name: "Mail", href: "/dashboard/mail", icon: Mail },
+  { name: "Meetings", href: "/dashboard/meetings", icon: Meeting },
   { name: "Locations", href: "/dashboard/locations", icon: MapPin },
-  { name: "AI Chat", href: "/dashboard/ai-chat", icon: MessageSquare },
-  { name: "Voice AI", href: "/dashboard/voice-ai", icon: Mic },
+  { name: "Team", href: "/dashboard/team", icon: Users },
+]
+
+const aiNavigation = [
+  { name: "AI Chat", href: "/dashboard/ai-chat", icon: MessageSquare, badge: "AI" },
+  { name: "Voice AI", href: "/dashboard/voice-ai", icon: Mic, badge: "NEW" },
 ]
 
 const settingsNavigation = [
@@ -54,8 +63,16 @@ interface SidebarProps {
   onCloseMobile: () => void
 }
 
+interface UserProfile {
+  full_name?: string
+  avatar_url?: string
+  company?: string
+  job_title?: string
+}
+
 export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: SidebarProps) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -66,6 +83,21 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
       if (user) {
         setUser(user)
         onUserUpdate?.(user)
+        
+        // Get user profile
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name, avatar_url, company, job_title")
+            .eq("id", user.id)
+            .single()
+
+          if (profile) {
+            setUserProfile(profile)
+          }
+        } catch (error) {
+          console.error("Error fetching profile:", error)
+        }
       }
     }
     getUser()
@@ -80,9 +112,14 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
     }
   }
 
-  const getUserDisplayName = () => {
+  const getDisplayName = () => {
     if (!user) return "User"
-    return user.user_metadata?.full_name || user.email?.split("@")[0] || "User"
+    return userProfile?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "User"
+  }
+
+  const getInitials = () => {
+    const name = getDisplayName()
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
   }
 
   const getUserEmail = () => {
@@ -104,9 +141,21 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
             <Image 
               src="/logo/suitpax-bl-logo.webp" 
               alt="Suitpax" 
-              width={120} 
-              height={32} 
-              className="h-8 w-auto" 
+              width={100} 
+              height={28} 
+              className="h-7 w-auto" 
+            />
+          </Link>
+        )}
+        
+        {isCollapsed && !isMobile && (
+          <Link href="/dashboard" className="flex items-center justify-center w-full">
+            <Image 
+              src="/logo/suitpax-symbol-2.png" 
+              alt="Suitpax" 
+              width={24} 
+              height={24} 
+              className="h-6 w-6" 
             />
           </Link>
         )}
@@ -135,82 +184,181 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={isMobile ? onCloseMobile : undefined}
-              className={cn(
-                "group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 relative",
-                isActive 
-                  ? "bg-gray-900 text-white shadow-sm" 
-                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
-                (isCollapsed && !isMobile) && "justify-center px-2"
-              )}
-              title={(isCollapsed && !isMobile) ? item.name : ""}
-            >
-              <item.icon 
-                className={cn(
-                  "flex-shrink-0 h-5 w-5", 
-                  (isCollapsed && !isMobile) ? "mx-auto" : "mr-3"
-                )} 
-                aria-hidden="true" 
-              />
-              {(!isCollapsed || isMobile) && <span>{item.name}</span>}
-              
-              {/* Active indicator */}
-              {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full" />
-              )}
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* Settings Section */}
-      <div className="border-t border-gray-200 p-3 flex-shrink-0">
-        <nav className="space-y-1 mb-3">
-          {settingsNavigation.map((item) => {
-            const isActive = pathname.startsWith(item.href)
+        {/* Main Navigation */}
+        <div className="space-y-1">
+          {navigation.map((item) => {
+            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={isMobile ? onCloseMobile : undefined}
                 className={cn(
-                  "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
+                  "group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 relative",
                   isActive 
-                    ? "bg-gray-100 text-gray-900" 
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                    ? "bg-gray-900 text-white shadow-sm" 
+                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
                   (isCollapsed && !isMobile) && "justify-center px-2"
                 )}
                 title={(isCollapsed && !isMobile) ? item.name : ""}
               >
                 <item.icon 
                   className={cn(
-                    "flex-shrink-0 h-4 w-4", 
+                    "flex-shrink-0 h-5 w-5", 
                     (isCollapsed && !isMobile) ? "mx-auto" : "mr-3"
                   )} 
                   aria-hidden="true" 
                 />
                 {(!isCollapsed || isMobile) && <span>{item.name}</span>}
+                
+                {/* Active indicator */}
+                {isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full" />
+                )}
               </Link>
             )
           })}
+        </div>
+
+        {/* AI Section */}
+        {(!isCollapsed || isMobile) && (
+          <div className="pt-4">
+            <div className="px-3 mb-2">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                AI Assistance
+              </h3>
+            </div>
+            <div className="space-y-1">
+              {aiNavigation.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={isMobile ? onCloseMobile : undefined}
+                    className={cn(
+                      "group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                      isActive 
+                        ? "bg-gray-900 text-white shadow-sm" 
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    )}
+                  >
+                    <div className="flex items-center">
+                      <item.icon className="flex-shrink-0 h-5 w-5 mr-3" aria-hidden="true" />
+                      <span>{item.name}</span>
+                    </div>
+                    {item.badge && (
+                      <Badge 
+                        variant="secondary" 
+                        className={cn(
+                          "text-xs px-1.5 py-0.5 h-5",
+                          isActive 
+                            ? "bg-white/20 text-white border-white/20" 
+                            : "bg-gray-200 text-gray-600"
+                        )}
+                      >
+                        {item.badge}
+                      </Badge>
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Collapsed AI icons */}
+        {(isCollapsed && !isMobile) && (
+          <div className="pt-4 space-y-1">
+            {aiNavigation.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "group flex items-center justify-center px-2 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 relative",
+                    isActive 
+                      ? "bg-gray-900 text-white shadow-sm" 
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  )}
+                  title={item.name}
+                >
+                  <item.icon className="h-5 w-5" aria-hidden="true" />
+                  {item.badge && (
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full" />
+                  )}
+                </Link>
+              )
+            })}
+          </div>
+        )}
+      </nav>
+
+      {/* Settings Section */}
+      <div className="border-t border-gray-200 p-3 flex-shrink-0">
+        {/* Settings Navigation */}
+        <nav className="space-y-1 mb-3">
+          {(!isCollapsed || isMobile) ? (
+            settingsNavigation.map((item) => {
+              const isActive = pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={isMobile ? onCloseMobile : undefined}
+                  className={cn(
+                    "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
+                    isActive 
+                      ? "bg-gray-100 text-gray-900" 
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  )}
+                >
+                  <item.icon className="flex-shrink-0 h-4 w-4 mr-3" aria-hidden="true" />
+                  <span>{item.name}</span>
+                </Link>
+              )
+            })
+          ) : (
+            settingsNavigation.map((item) => {
+              const isActive = pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "group flex items-center justify-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200",
+                    isActive 
+                      ? "bg-gray-100 text-gray-900" 
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  )}
+                  title={item.name}
+                >
+                  <item.icon className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              )
+            })
+          )}
         </nav>
 
         {/* User Profile & Sign Out */}
         {(!isCollapsed || isMobile) && (
           <div className="border-t border-gray-100 pt-3">
-            <div className="px-3 py-2 mb-2">
-              <p className="text-xs font-medium text-gray-900 truncate">
-                {getUserDisplayName()}
-              </p>
-              <p className="text-xs text-gray-500 truncate">
-                {getUserEmail()}
-              </p>
+            <div className="flex items-center space-x-3 px-3 py-2 mb-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} />
+                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
+                  {getInitials()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-gray-900 truncate">
+                  {getDisplayName()}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {userProfile?.company || getUserEmail()}
+                </p>
+              </div>
             </div>
             
             <Button
@@ -226,7 +374,15 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
 
         {/* Collapsed state user profile */}
         {(isCollapsed && !isMobile) && (
-          <div className="border-t border-gray-100 pt-3">
+          <div className="border-t border-gray-100 pt-3 space-y-2">
+            <div className="flex justify-center">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} />
+                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
+                  {getInitials()}
+                </AvatarFallback>
+              </Avatar>
+            </div>
             <Button
               onClick={handleSignOut}
               variant="ghost"
