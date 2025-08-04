@@ -10,7 +10,6 @@ import {
   ChevronDown,
   Settings,
   LogOut,
-  Zap,
   Crown,
   Command,
   Plus,
@@ -20,10 +19,12 @@ import {
   CreditCard,
   BarChart3,
   Globe,
-  Sun,
-  Moon,
   HelpCircle,
-  Sparkles
+  Sparkles,
+  Star,
+  TrendingUp,
+  Clock,
+  DollarSign
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -56,6 +57,7 @@ import { cn } from "@/lib/utils"
 import Image from "next/image"
 import Link from "next/link"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface HeaderProps {
   user: SupabaseUser
@@ -66,24 +68,44 @@ interface HeaderProps {
   sidebarCollapsed: boolean
 }
 
+interface UserProfile {
+  full_name?: string
+  avatar_url?: string
+  company?: string
+  job_title?: string
+}
+
+interface TravelStats {
+  thisMonth: {
+    flights: number
+    savings: number
+    expenses: number
+  }
+  pending: {
+    bookings: number
+    approvals: number
+  }
+  streak: number
+}
+
 const getPageTitle = (pathname: string) => {
-  const routes: Record<string, { title: string; description?: string }> = {
-    '/dashboard': { title: 'Dashboard', description: 'Overview and quick actions' },
-    '/dashboard/flights': { title: 'Flights', description: 'Search and book business flights' },
-    '/dashboard/expenses': { title: 'Expenses', description: 'Track and manage travel expenses' },
-    '/dashboard/analytics': { title: 'Analytics', description: 'Travel insights and reports' },
-    '/dashboard/calendar': { title: 'Calendar', description: 'Schedule and manage trips' },
-    '/dashboard/locations': { title: 'Locations', description: 'Saved places and destinations' },
-    '/dashboard/team': { title: 'Team', description: 'Manage team members' },
-    '/dashboard/mail': { title: 'Mail', description: 'Travel communications' },
-    '/dashboard/meetings': { title: 'Meetings', description: 'Schedule and join meetings' },
-    '/dashboard/ai-chat': { title: 'Suitpax AI', description: 'AI-powered travel assistant' },
-    '/dashboard/voice-ai': { title: 'Voice AI', description: 'Voice-powered assistance' },
-    '/dashboard/settings': { title: 'Settings', description: 'Account and preferences' },
-    '/dashboard/profile': { title: 'Profile', description: 'Personal information' },
+  const routes: Record<string, { title: string; description?: string; icon?: any }> = {
+    '/dashboard': { title: 'Dashboard', description: 'Your travel command center', icon: BarChart3 },
+    '/dashboard/flights': { title: 'Flights', description: 'Search and book business flights', icon: Calendar },
+    '/dashboard/expenses': { title: 'Expenses', description: 'Track and manage travel expenses', icon: CreditCard },
+    '/dashboard/analytics': { title: 'Analytics', description: 'Travel insights and reports', icon: TrendingUp },
+    '/dashboard/calendar': { title: 'Calendar', description: 'Schedule and manage trips', icon: Calendar },
+    '/dashboard/locations': { title: 'Locations', description: 'Saved places and destinations', icon: Globe },
+    '/dashboard/team': { title: 'Team', description: 'Manage team members', icon: User },
+    '/dashboard/mail': { title: 'Mail', description: 'Travel communications', icon: MessageSquare },
+    '/dashboard/meetings': { title: 'Meetings', description: 'Schedule and join meetings', icon: Calendar },
+    '/dashboard/ai-chat': { title: 'AI Assistant', description: 'Your intelligent travel companion', icon: MessageSquare },
+    '/dashboard/voice-ai': { title: 'Voice AI', description: 'Voice-powered assistance', icon: MessageSquare },
+    '/dashboard/settings': { title: 'Settings', description: 'Account and preferences', icon: Settings },
+    '/dashboard/profile': { title: 'Profile', description: 'Personal information', icon: User },
   }
   
-  return routes[pathname] || { title: 'Dashboard', description: 'Overview and quick actions' }
+  return routes[pathname] || { title: 'Dashboard', description: 'Your travel command center', icon: BarChart3 }
 }
 
 const quickActions = [
@@ -103,28 +125,72 @@ export default function Header({
   sidebarCollapsed 
 }: HeaderProps) {
   const pathname = usePathname()
-  const [userProfile, setUserProfile] = useState<any>(null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [travelStats, setTravelStats] = useState<TravelStats>({
+    thisMonth: { flights: 0, savings: 0, expenses: 0 },
+    pending: { bookings: 0, approvals: 0 },
+    streak: 0
+  })
   const [notifications, setNotifications] = useState([
-    { id: 1, title: "Flight confirmed to NYC", time: "2 min ago", type: "booking" },
-    { id: 2, title: "Expense report approved", time: "1 hour ago", type: "expense" },
-    { id: 3, title: "Team meeting reminder", time: "3 hours ago", type: "meeting" },
+    { 
+      id: 1, 
+      title: "Flight confirmation received", 
+      message: "NYC trip confirmed for next week",
+      time: "2 min ago", 
+      type: "booking",
+      unread: true 
+    },
+    { 
+      id: 2, 
+      title: "Expense report approved", 
+      message: "$1,250 approved by finance team",
+      time: "1 hour ago", 
+      type: "expense",
+      unread: true 
+    },
+    { 
+      id: 3, 
+      title: "Meeting reminder", 
+      message: "Q4 budget review in 30 minutes",
+      time: "3 hours ago", 
+      type: "meeting",
+      unread: false 
+    },
   ])
   const [commandOpen, setCommandOpen] = useState(false)
-  const [theme, setTheme] = useState("light")
   const supabase = createClient()
 
   const pageInfo = getPageTitle(pathname)
+  const unreadCount = notifications.filter(n => n.unread).length
 
   useEffect(() => {
     const getUserProfile = async () => {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single()
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url, company, job_title")
+          .eq("id", user.id)
+          .single()
 
-      if (profile) {
-        setUserProfile(profile)
+        if (profile) {
+          setUserProfile(profile)
+        }
+
+        // Mock travel stats - replace with real data
+        setTravelStats({
+          thisMonth: {
+            flights: Math.floor(Math.random() * 5) + 1,
+            savings: Math.floor(Math.random() * 1000) + 200,
+            expenses: Math.floor(Math.random() * 10) + 3
+          },
+          pending: {
+            bookings: Math.floor(Math.random() * 3),
+            approvals: Math.floor(Math.random() * 2)
+          },
+          streak: Math.floor(Math.random() * 30) + 5
+        })
+      } catch (error) {
+        console.error("Error fetching user profile:", error)
       }
     }
 
@@ -148,79 +214,87 @@ export default function Header({
     await supabase.auth.signOut()
   }
 
+  const markNotificationAsRead = (id: number) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, unread: false } : n))
+  }
+
   const getPlanBadge = () => {
-    switch (userPlan.toLowerCase()) {
+    const plan = userPlan?.toLowerCase() || 'free'
+    
+    switch (plan) {
       case 'pro':
         return (
-          <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 text-xs">
+          <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 text-xs font-medium">
             <Crown className="h-3 w-3 mr-1" />
             Pro
           </Badge>
         )
       case 'enterprise':
         return (
-          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 text-xs">
+          <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 text-xs font-medium">
             <Sparkles className="h-3 w-3 mr-1" />
             Enterprise
           </Badge>
         )
+      case 'team':
+        return (
+          <Badge className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-0 text-xs font-medium">
+            <Star className="h-3 w-3 mr-1" />
+            Team
+          </Badge>
+        )
       default:
         return (
-          <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200 text-xs">
+          <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 text-xs font-medium">
             Free
           </Badge>
         )
     }
   }
 
-  const getTravelStats = () => {
-    // Mock data - replace with real data
-    return {
-      thisMonth: { flights: 3, savings: 420 },
-      pending: { expenses: 2, approvals: 1 }
-    }
+  const getDisplayName = () => {
+    return userProfile?.full_name || user.email?.split('@')[0] || 'User'
   }
 
-  const stats = getTravelStats()
+  const getInitials = () => {
+    const name = getDisplayName()
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  }
 
   return (
     <>
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 lg:px-6 py-3 sticky top-0 z-40">
+      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 lg:px-6 py-3 sticky top-0 z-40">
         <div className="flex items-center justify-between">
           {/* Left Section */}
           <div className="flex items-center space-x-4">
-            {/* Sidebar Toggle + Logo */}
-            <div className="flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onToggleSidebar}
-                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-                aria-label={isMobile ? "Open menu" : "Toggle sidebar"}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-
-              {/* Logo in rounded square */}
-              <div className="bg-gray-900 rounded-xl p-2 flex items-center justify-center">
-                <Image
-                  src="/logo/suitpax-bl-logo.webp"
-                  alt="Suitpax"
-                  width={80}
-                  height={20}
-                  className="h-4 w-auto brightness-0 invert"
-                />
-              </div>
-            </div>
+            {/* Sidebar Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleSidebar}
+              className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+              aria-label={isMobile ? "Open menu" : "Toggle sidebar"}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
 
             {/* Page Info */}
             <div className="hidden sm:block">
-              <h1 className="text-lg font-medium text-gray-900 tracking-tight">
-                {pageInfo.title}
-              </h1>
-              {pageInfo.description && (
-                <p className="text-xs text-gray-500 mt-0.5">{pageInfo.description}</p>
-              )}
+              <div className="flex items-center space-x-3">
+                {pageInfo.icon && (
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <pageInfo.icon className="h-4 w-4 text-gray-600" />
+                  </div>
+                )}
+                <div>
+                  <h1 className="text-lg font-semibold text-gray-900 tracking-tight">
+                    {pageInfo.title}
+                  </h1>
+                  {pageInfo.description && (
+                    <p className="text-xs text-gray-500 mt-0.5">{pageInfo.description}</p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -228,11 +302,11 @@ export default function Header({
           <div className="hidden lg:flex flex-1 max-w-lg mx-8">
             <Button
               variant="outline"
-              className="w-full justify-start text-sm text-gray-500 border-gray-200 hover:bg-gray-50"
+              className="w-full justify-start text-sm text-gray-500 border-gray-200 hover:bg-gray-50 rounded-xl h-9"
               onClick={() => setCommandOpen(true)}
             >
               <Search className="h-4 w-4 mr-2" />
-              Search or ask AI...
+              Search anything or ask AI...
               <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-gray-100 px-1.5 font-mono text-[10px] font-medium text-gray-600 opacity-100 ml-auto">
                 <span className="text-xs">⌘</span>K
               </kbd>
@@ -240,17 +314,23 @@ export default function Header({
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center space-x-2">
-            {/* Quick Stats */}
-            <div className="hidden xl:flex items-center space-x-4 mr-4 text-xs">
-              <div className="flex items-center space-x-1 text-gray-600">
-                <span className="font-medium">{stats.thisMonth.flights}</span>
-                <span>flights this month</span>
+          <div className="flex items-center space-x-3">
+            {/* Travel Stats - Hidden on mobile */}
+            <div className="hidden xl:flex items-center space-x-6 mr-4">
+              <div className="flex items-center space-x-1 text-xs">
+                <Calendar className="h-3.5 w-3.5 text-blue-600" />
+                <span className="font-semibold text-gray-900">{travelStats.thisMonth.flights}</span>
+                <span className="text-gray-600">trips</span>
               </div>
-              <div className="w-px h-4 bg-gray-300" />
-              <div className="flex items-center space-x-1 text-green-600">
-                <span className="font-medium">${stats.thisMonth.savings}</span>
-                <span>saved</span>
+              <div className="flex items-center space-x-1 text-xs">
+                <DollarSign className="h-3.5 w-3.5 text-green-600" />
+                <span className="font-semibold text-gray-900">${travelStats.thisMonth.savings}</span>
+                <span className="text-gray-600">saved</span>
+              </div>
+              <div className="flex items-center space-x-1 text-xs">
+                <TrendingUp className="h-3.5 w-3.5 text-purple-600" />
+                <span className="font-semibold text-gray-900">{travelStats.streak}</span>
+                <span className="text-gray-600">day streak</span>
               </div>
             </div>
 
@@ -258,14 +338,31 @@ export default function Header({
             {getPlanBadge()}
 
             {/* Quick Actions */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="hidden md:flex items-center space-x-1 rounded-xl border-gray-200 hover:bg-gray-50"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="text-xs">Quick</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="hidden md:flex items-center space-x-1 rounded-xl border-gray-200 hover:bg-gray-50 h-9"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="text-xs">Quick</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {quickActions.map((action) => (
+                  <DropdownMenuItem key={action.name} asChild>
+                    <Link href={action.href} className="cursor-pointer">
+                      <span className="mr-2">{action.icon}</span>
+                      {action.name}
+                      <CommandShortcut>{action.shortcut}</CommandShortcut>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Notifications */}
             <DropdownMenu>
@@ -273,15 +370,15 @@ export default function Header({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors h-9 w-9"
                 >
-                  <Bell className="h-5 w-5 text-gray-600" />
-                  {notifications.length > 0 && (
+                  <Bell className="h-4 w-4 text-gray-600" />
+                  {unreadCount > 0 && (
                     <Badge 
                       variant="destructive" 
-                      className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+                      className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-red-500 hover:bg-red-500"
                     >
-                      {notifications.length}
+                      {unreadCount}
                     </Badge>
                   )}
                 </Button>
@@ -289,22 +386,41 @@ export default function Header({
               <DropdownMenuContent align="end" className="w-80">
                 <DropdownMenuLabel className="flex items-center justify-between">
                   Notifications
-                  <Button variant="ghost" size="sm" className="text-xs h-auto p-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-xs h-auto p-1 hover:bg-gray-100"
+                    onClick={() => setNotifications(prev => prev.map(n => ({ ...n, unread: false })))}
+                  >
                     Mark all read
                   </Button>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {notifications.map((notification) => (
-                  <DropdownMenuItem key={notification.id} className="flex items-start space-x-3 p-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                      <p className="text-xs text-gray-500">{notification.time}</p>
+                <div className="max-h-64 overflow-y-auto">
+                  {notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={cn(
+                        "flex items-start space-x-3 p-3 hover:bg-gray-50 cursor-pointer border-l-2 transition-colors",
+                        notification.unread ? "border-l-blue-500 bg-blue-50/30" : "border-l-transparent"
+                      )}
+                      onClick={() => markNotificationAsRead(notification.id)}
+                    >
+                      <div className={cn(
+                        "w-2 h-2 rounded-full mt-2 flex-shrink-0",
+                        notification.type === 'booking' ? "bg-blue-500" :
+                        notification.type === 'expense' ? "bg-green-500" : "bg-purple-500"
+                      )} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{notification.title}</p>
+                        <p className="text-xs text-gray-600 mt-0.5">{notification.message}</p>
+                        <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+                      </div>
                     </div>
-                  </DropdownMenuItem>
-                ))}
+                  ))}
+                </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-center text-sm text-gray-500">
+                <DropdownMenuItem className="text-center text-sm text-gray-500 justify-center">
                   View all notifications
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -315,21 +431,22 @@ export default function Header({
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center space-x-2 p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="flex items-center space-x-2 p-2 rounded-xl hover:bg-gray-100 transition-colors h-9"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {user.email?.charAt(0).toUpperCase() || 'U'}
-                    </span>
-                  </div>
+                  <Avatar className="h-7 w-7">
+                    <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} />
+                    <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
+                      {getInitials()}
+                    </AvatarFallback>
+                  </Avatar>
                   {!isMobile && (
                     <div className="hidden lg:flex items-center space-x-2">
                       <div className="text-left">
                         <p className="text-sm font-medium text-gray-900">
-                          {userProfile?.full_name || user.email?.split('@')[0] || 'User'}
+                          {getDisplayName()}
                         </p>
-                        <p className="text-xs text-gray-500 capitalize">
-                          {userPlan} Plan
+                        <p className="text-xs text-gray-500">
+                          {userProfile?.company || 'Personal Account'}
                         </p>
                       </div>
                       <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -338,17 +455,46 @@ export default function Header({
                 </Button>
               </DropdownMenuTrigger>
               
-              <DropdownMenuContent align="end" className="w-64">
-                <div className="px-3 py-2">
-                  <p className="text-sm font-medium text-gray-900">
-                    {userProfile?.full_name || user.email?.split('@')[0] || 'User'}
-                  </p>
-                  <p className="text-xs text-gray-500">{user.email}</p>
-                  <div className="mt-2 flex items-center space-x-2">
+              <DropdownMenuContent align="end" className="w-72">
+                <div className="px-4 py-3">
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} />
+                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium">
+                        {getInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {getDisplayName()}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      {userProfile?.job_title && (
+                        <p className="text-xs text-gray-400 truncate">{userProfile.job_title}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
                     {getPlanBadge()}
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs capitalize">
                       {subscriptionStatus}
                     </Badge>
+                  </div>
+                  
+                  {/* Travel Stats in menu for mobile */}
+                  <div className="xl:hidden mt-3 flex items-center justify-between text-xs border-t pt-3">
+                    <div className="text-center">
+                      <p className="font-semibold text-gray-900">{travelStats.thisMonth.flights}</p>
+                      <p className="text-gray-500">Trips</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-semibold text-gray-900">${travelStats.thisMonth.savings}</p>
+                      <p className="text-gray-500">Saved</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-semibold text-gray-900">{travelStats.streak}</p>
+                      <p className="text-gray-500">Streak</p>
+                    </div>
                   </div>
                 </div>
                 
@@ -357,98 +503,17 @@ export default function Header({
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard/profile" className="cursor-pointer">
-                      <User className="h-4 w-4 mr-2" />
-                      Profile
+                      <User className="h-4 w-4 mr-3" />
+                      Profile & Account
                     </Link>
                   </DropdownMenuItem>
                   
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard/settings" className="cursor-pointer">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
+                      <Settings className="h-4 w-4 mr-3" />
+                      Settings & Preferences
                     </Link>
                   </DropdownMenuItem>
 
                   <DropdownMenuItem>
-                    <HelpCircle className="h-4 w-4 mr-2" />
-                    Help & Support
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-
-                {userPlan === 'free' && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-purple-600 focus:text-purple-700 focus:bg-purple-50">
-                      <Crown className="h-4 w-4 mr-2" />
-                      Upgrade to Pro
-                      <CommandShortcut>⚡</CommandShortcut>
-                    </DropdownMenuItem>
-                  </>
-                )}
-
-                <DropdownMenuSeparator />
-                
-                <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-700 focus:bg-red-50">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        {/* Mobile Search */}
-        {isMobile && (
-          <div className="mt-3 sm:hidden">
-            <Button
-              variant="outline"
-              className="w-full justify-start text-sm text-gray-500 border-gray-200"
-              onClick={() => setCommandOpen(true)}
-            >
-              <Search className="h-4 w-4 mr-2" />
-              Search or ask AI...
-            </Button>
-          </div>
-        )}
-      </header>
-
-      {/* Command Dialog */}
-      <Dialog open={commandOpen} onOpenChange={setCommandOpen}>
-        <DialogContent className="p-0 max-w-[600px]">
-          <CommandDialog>
-            <CommandInput placeholder="Search flights, expenses, or ask AI..." />
-            <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup heading="Quick Actions">
-                {quickActions.map((action) => (
-                  <CommandItem key={action.name} asChild>
-                    <Link href={action.href} onClick={() => setCommandOpen(false)}>
-                      <span className="mr-2">{action.icon}</span>
-                      {action.name}
-                      <CommandShortcut>{action.shortcut}</CommandShortcut>
-                    </Link>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-              <CommandSeparator />
-              <CommandGroup heading="AI Assistance">
-                <CommandItem>
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Ask Suitpax AI
-                </CommandItem>
-                <CommandItem>
-                  <Calculator className="mr-2 h-4 w-4" />
-                  Calculate travel costs
-                </CommandItem>
-                <CommandItem>
-                  <BarChart3 className="mr-2 h-4 w-4" />
-                  Generate expense report
-                </CommandItem>
-              </CommandGroup>
-            </CommandList>
-          </CommandDialog>
-        </DialogContent>
-      </Dialog>
-    </>
-  )
-}
+                    <HelpCirc
