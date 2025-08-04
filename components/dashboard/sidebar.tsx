@@ -106,7 +106,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
               alt="Suitpax" 
               width={120} 
               height={32} 
-              className="h-6 w-auto" 
+              className="h-8 w-auto" 
             />
           </Link>
         )}
