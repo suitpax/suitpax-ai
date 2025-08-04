@@ -4,12 +4,10 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Loader2, ArrowUp, Paperclip, X, Square } from "lucide-react"
+import { Loader2, ArrowUp, Paperclip, X, Square, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
-import jsPDF from "jspdf"
-import "jspdf-autotable"
 import {
   PromptInput,
   PromptInputAction,
@@ -22,12 +20,7 @@ import {
   ChatContainerScrollAnchor,
 } from "@/components/prompt-kit/chat-container"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
-import {
-  Reasoning,
-  ReasoningTrigger,
-  ReasoningContent,
-  ReasoningResponse,
-} from "@/components/prompt-kit/reasoning"
+import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@/components/prompt-kit/reasoning"
 
 interface Message {
   id: string
@@ -77,6 +70,7 @@ export default function AIChatPage() {
   ])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const [files, setFiles] = useState<File[]>([])
@@ -192,33 +186,45 @@ export default function AIChatPage() {
     setTypingMessageId(null)
   }
 
-  async function generateAndDownloadPDF() {
-    if (loading) return
-    setLoading(true)
+  const generateAndDownloadPDF = async () => {
+    if (pdfLoading || messages.length === 0) return
+
+    setPdfLoading(true)
     try {
-      const doc = new jsPDF()
-
-      doc.setFontSize(18)
-      doc.text("Suitpax AI Chat", 14, 22)
-
-      const rows = messages
-        .filter((m) => m.role === "assistant")
-        .map((m) => [m.timestamp.toLocaleString(), m.content])
-
-      ;(doc as any).autoTable({
-        head: [["Timestamp", "Message"]],
-        body: rows,
-        startY: 30,
-        styles: { fontSize: 11 },
-        headStyles: { fillColor: [22, 160, 133] },
+      const response = await fetch("/api/generate-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: messages,
+          title: "Suitpax AI Chat Export",
+          userInfo: {
+            email: user?.email,
+            name: user?.user_metadata?.full_name,
+          },
+        }),
       })
 
-      doc.save("suitpax-ai-chat.pdf")
+      if (!response.ok) {
+        throw new Error("Failed to generate PDF")
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.style.display = "none"
+      a.href = url
+      a.download = `suitpax-ai-chat-${new Date().toISOString().split("T")[0]}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
     } catch (error) {
-      console.error(error)
-      alert("Error generating PDF")
+      console.error("Error generating PDF:", error)
+      alert("Error generating PDF. Please try again.")
     } finally {
-      setLoading(false)
+      setPdfLoading(false)
     }
   }
 
@@ -415,22 +421,41 @@ export default function AIChatPage() {
               />
 
               <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
-                <PromptInputAction tooltip="Attach files">
-                  <label
-                    htmlFor="file-upload"
-                    className="hover:bg-gray-100 flex h-7 w-7 sm:h-8 sm:w-8 cursor-pointer items-center justify-center rounded-2xl transition-colors"
-                  >
-                    <input
-                      ref={uploadInputRef}
-                      type="file"
-                      multiple
-                      onChange={handleFileChange}
-                      className="hidden"
-                      id="file-upload"
-                    />
-                    <Paperclip className="text-gray-600 size-4 sm:size-5" />
-                  </label>
-                </PromptInputAction>
+                <div className="flex items-center gap-2">
+                  <PromptInputAction tooltip="Attach files">
+                    <label
+                      htmlFor="file-upload"
+                      className="hover:bg-gray-100 flex h-7 w-7 sm:h-8 sm:w-8 cursor-pointer items-center justify-center rounded-2xl transition-colors"
+                    >
+                      <input
+                        ref={uploadInputRef}
+                        type="file"
+                        multiple
+                        onChange={handleFileChange}
+                        className="hidden"
+                        id="file-upload"
+                      />
+                      <Paperclip className="text-gray-600 size-4 sm:size-5" />
+                    </label>
+                  </PromptInputAction>
+
+                  <PromptInputAction tooltip="Download chat as PDF">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={generateAndDownloadPDF}
+                      disabled={pdfLoading || messages.length === 0}
+                      className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm bg-white hover:bg-gray-50 border-gray-200"
+                    >
+                      {pdfLoading ? (
+                        <Loader2 className="size-3 sm:size-4 animate-spin mr-1" />
+                      ) : (
+                        <Download className="size-3 sm:size-4 mr-1" />
+                      )}
+                      PDF
+                    </Button>
+                  </PromptInputAction>
+                </div>
 
                 <PromptInputAction tooltip={loading ? "Stop generation" : "Send message"}>
                   <Button
@@ -445,12 +470,6 @@ export default function AIChatPage() {
                     ) : (
                       <ArrowUp className="size-3 sm:size-4" />
                     )}
-                  </Button>
-                </PromptInputAction>
-
-                <PromptInputAction tooltip="Download chat as PDF">
-                  <Button variant="outline" size="sm" onClick={generateAndDownloadPDF} disabled={loading || messages.length === 0}>
-                    Download PDF
                   </Button>
                 </PromptInputAction>
               </PromptInputActions>

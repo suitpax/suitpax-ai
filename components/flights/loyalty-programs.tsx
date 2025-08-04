@@ -475,4 +475,3 @@ export function LoyaltyProgramsManager({
                           </div>
                           <Button
                             variant="ghost"
-         

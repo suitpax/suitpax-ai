@@ -4,15 +4,15 @@
 
 ### Install missing NPM dependencies:
 
-```bash
+\`\`\`bash
 npm install @radix-ui/react-slider @radix-ui/react-checkbox
-```
+\`\`\`
 
 ## 🔧 Environment Variables Configuration
 
 Add to your `.env.local` file:
 
-```env
+\`\`\`env
 # Duffel API Configuration
 DUFFEL_API_KEY=your_duffel_api_key_here
 DUFFEL_ENVIRONMENT=test  # Change to 'production' in production
@@ -25,11 +25,11 @@ BREVO_API_KEY=your_brevo_api_key_here
 
 # Anthropic API (for AI chat)
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
-```
+\`\`\`
 
 ## 🗂️ Implemented File Structure
 
-```
+\`\`\`
 app/
 ├── api/
 │   └── duffel/
@@ -54,7 +54,7 @@ components/
 
 lib/
 └── cache-manager.ts                   ✅ Smart cache system
-```
+\`\`\`
 
 ## 🚀 Implemented Features
 
@@ -89,7 +89,7 @@ lib/
 
 The system includes a configurable smart cache:
 
-```typescript
+\`\`\`typescript
 // Default configuration in lib/cache-manager.ts
 const cacheConfig = {
   maxSize: 50,                    // Maximum 50 searches
@@ -98,7 +98,7 @@ const cacheConfig = {
   compressionThreshold: 5000,     // Compress > 5KB
   persistToLocalStorage: true     // Persist to localStorage
 }
-```
+\`\`\`
 
 ## 🎯 Implemented Best Practices
 
@@ -125,7 +125,7 @@ const cacheConfig = {
 ## 🐛 Debugging and Development
 
 ### Debug Variables
-```typescript
+\`\`\`typescript
 // In development, enable detailed logs
 if (process.env.NODE_ENV === 'development') {
   console.log('Search completed:', {
@@ -135,7 +135,7 @@ if (process.env.NODE_ENV === 'development') {
     searchDuration: result.search_metadata?.search_duration_ms
   })
 }
-```
+\`\`\`
 
 ### Performance Dashboard
 - Only visible in development or for admins
@@ -209,7 +209,7 @@ if (process.env.NODE_ENV === 'development') {
 ## 🔧 Configuration Options
 
 ### Cache Tuning
-```typescript
+\`\`\`typescript
 // Adjust cache settings based on usage patterns
 export const flightCache = new SmartCache({
   maxSize: 100,               // Increase for high-traffic sites
@@ -217,10 +217,10 @@ export const flightCache = new SmartCache({
   compressionThreshold: 2000,  // Lower for better compression
   persistToLocalStorage: false // Disable for privacy-focused apps
 })
-```
+\`\`\`
 
 ### Search Optimization
-```typescript
+\`\`\`typescript
 // Customize search parameters
 const searchData = {
   maxConnections: 1,          // Direct flights only
@@ -230,7 +230,7 @@ const searchData = {
   currency: 'EUR',            // Localize currency
   timeout: 15000              // Faster timeout
 }
-```
+\`\`\`
 
 ## 🧪 Testing
 
@@ -244,13 +244,13 @@ const searchData = {
 - [ ] Performance dashboard visibility
 
 ### Automated Testing
-```bash
+\`\`\`bash
 # Install testing dependencies
 npm install --save-dev @testing-library/react @testing-library/jest-dom
 
 # Run tests
 npm test
-```
+\`\`\`
 
 ## 📞 Support & Troubleshooting
 
