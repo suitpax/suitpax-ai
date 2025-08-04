@@ -1,8 +1,13 @@
 "use client"
 
+import { Card } from "@/components/ui/card"
+
+import { Button } from "@/components/ui/button"
+
 import { cn } from "@/lib/utils"
-import { ChevronDown, ChevronRight } from "lucide-react"
-import React, { createContext, useContext, useState } from "react"
+import { Brain, ChevronDown, ChevronRight } from "lucide-react"
+import type React from "react"
+import { createContext, useContext, useState } from "react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -108,67 +113,36 @@ export function ReasoningContent({ children, className, ...props }: ReasoningCon
 }
 
 // Componente para mostrar texto con efecto de streaming (simplificado)
-export type ReasoningResponseProps = {
-  text: string | AsyncIterable<string>
-  className?: string
-  onComplete?: () => void
-} & React.HTMLAttributes<HTMLDivElement>
+interface ReasoningResponseProps {
+  reasoning: string
+}
 
-export function ReasoningResponse({ text, className, onComplete, ...props }: ReasoningResponseProps) {
-  const [displayedText, setDisplayedText] = React.useState("")
-  const [isComplete, setIsComplete] = React.useState(false)
+export const ReasoningResponse: React.FC<ReasoningResponseProps> = ({ reasoning }) => {
+  const [isOpen, setIsOpen] = useState(false)
 
-  React.useEffect(() => {
-    if (typeof text === "string") {
-      setDisplayedText(text)
-      setIsComplete(true)
-      onComplete?.()
-      return
-    }
-
-    // Para AsyncIterable (streaming)
-    let isCancelled = false
-    setDisplayedText("")
-    setIsComplete(false)
-
-    async function processStream() {
-      try {
-        for await (const chunk of text) {
-          if (isCancelled) break
-          setDisplayedText((prev) => prev + chunk)
-        }
-        if (!isCancelled) {
-          setIsComplete(true)
-          onComplete?.()
-        }
-      } catch (error) {
-        console.error("Error processing reasoning stream:", error)
-        if (!isCancelled) {
-          setIsComplete(true)
-          onComplete?.()
-        }
-      }
-    }
-
-    processStream()
-
-    return () => {
-      isCancelled = true
-    }
-  }, [text, onComplete])
+  if (!reasoning) return null
 
   return (
-    <div
-      className={cn(
-        "prose prose-gray prose-xs max-w-none prose-headings:font-medium prose-headings:tracking-tighter prose-h1:text-sm prose-h2:text-xs prose-h3:text-xs prose-p:text-xs prose-p:leading-relaxed prose-p:mb-2 prose-ul:text-xs prose-ul:mb-2 prose-ol:text-xs prose-ol:mb-2 prose-li:mb-0.5 prose-strong:font-medium prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono prose-pre:bg-gray-100 prose-pre:border prose-pre:border-gray-200 prose-pre:rounded prose-pre:p-2 prose-pre:text-xs prose-blockquote:border-l-2 prose-blockquote:border-gray-300 prose-blockquote:pl-2 prose-blockquote:italic prose-table:text-xs prose-th:font-medium prose-th:px-2 prose-th:py-1 prose-td:px-2 prose-td:py-1",
-        className,
-      )}
-      {...props}
-    >
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-        {displayedText}
-        {!isComplete && <span className="animate-pulse">|</span>}
-      </ReactMarkdown>
-    </div>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+        >
+          <Brain className="h-3 w-3 mr-1" />
+          AI Reasoning
+          {isOpen ? <ChevronDown className="h-3 w-3 ml-1" /> : <ChevronRight className="h-3 w-3 ml-1" />}
+        </Button>
+      </CollapsibleTrigger>
+
+      <CollapsibleContent>
+        <Card className="mt-2 p-3 bg-gray-50/50 border-gray-200">
+          <div className="prose prose-xs max-w-none text-gray-700">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{reasoning}</ReactMarkdown>
+          </div>
+        </Card>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }

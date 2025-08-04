@@ -1,37 +1,24 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { generateChatPDF } from "@/lib/pdf-generator"
+import { generatePDF } from "@/lib/pdf-generator"
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, title, userInfo } = await request.json()
+    const { content, reasoning } = await request.json()
 
-    if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json({ error: "Messages array is required" }, { status: 400 })
+    if (!content) {
+      return NextResponse.json({ error: "Content is required" }, { status: 400 })
     }
 
-    // Generate PDF
-    const pdf = generateChatPDF({
-      messages: messages.map((msg: any) => ({
-        ...msg,
-        timestamp: new Date(msg.timestamp),
-      })),
-      title,
-      userInfo,
-    })
+    const pdfBuffer = await generatePDF(content, reasoning)
 
-    // Convert to buffer
-    const pdfBuffer = Buffer.from(pdf.output("arraybuffer"))
-
-    // Return PDF as response
     return new NextResponse(pdfBuffer, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="suitpax-ai-chat-${new Date().toISOString().split("T")[0]}.pdf"`,
-        "Content-Length": pdfBuffer.length.toString(),
+        "Content-Disposition": `attachment; filename="suitpax-ai-response-${Date.now()}.pdf"`,
       },
     })
   } catch (error) {
-    console.error("Error generating PDF:", error)
+    console.error("PDF Generation Error:", error)
     return NextResponse.json({ error: "Failed to generate PDF" }, { status: 500 })
   }
 }

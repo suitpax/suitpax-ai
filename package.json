@@ -10,7 +10,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/xai": "latest",
     "@anthropic-ai/sdk": "latest",
     "@duffel/api": "latest",
     "@emotion/is-prop-valid": "latest",
@@ -38,7 +37,6 @@
     "@radix-ui/react-scroll-area": "latest",
     "@radix-ui/react-select": "latest",
     "@radix-ui/react-separator": "latest",
-    "@radix-ui/react-sheet": "^1.1.0",
     "@radix-ui/react-slider": "latest",
     "@radix-ui/react-slot": "latest",
     "@radix-ui/react-switch": "latest",
@@ -47,7 +45,7 @@
     "@radix-ui/react-toggle": "latest",
     "@radix-ui/react-toggle-group": "latest",
     "@radix-ui/react-tooltip": "latest",
-    "@react-pdf/renderer": "latest",
+    "@react-pdf/renderer": "^4.0.0",
     "@supabase/auth-helpers-nextjs": "latest",
     "@supabase/supabase-js": "latest",
     "@tailwindcss/typography": "^0.5.15",
@@ -55,7 +53,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/sharp": "^0.32.0",
-    "ai": "latest",
+    "ai": "^4.0.12",
     "axios": "latest",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -66,11 +64,10 @@
     "framer-motion": "latest",
     "html-pdf-node": "^1.0.8",
     "input-otp": "latest",
-    "jspdf": "latest",
     "lucide-react": "^0.454.0",
     "next": "15.2.4",
     "next-themes": "latest",
-    "puppeteer": "^23.9.0",
+    "puppeteer": "latest",
     "react": "^19",
     "react-day-picker": "latest",
     "react-dom": "^19",
@@ -86,8 +83,7 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.6.3",
-    "vaul": "latest",
-    "zod": "latest"
+    "vaul": "latest"
   },
   "devDependencies": {
     "@types/eslint": "^9.6.1",
