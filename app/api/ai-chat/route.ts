@@ -72,7 +72,7 @@ Always write your answers using well-structured Markdown, strictly following the
 - Use **numbered lists** for sequential or procedural items.
 - Use **bullet points** for unordered lists, features, options, or summaries, with each on a separate line.
 - Present tables in Markdown with clear and descriptive headers, including units or currency where relevant.
-- Enclose all code, commands, and configurations within fenced code blocks with language tags (e.g., \`\`\`typescript, \`\`\`bash, \`\`\`json).
+- Enclose all code, commands, and configurations within fenced code blocks with language tags (e.g`\`\`typescript\`, \`\`\`bash\`, \`\`\`json).
 - Highlight key insights and terms inside lists or paragraphs using **bold text**.
 - Organize content vertically and avoid packing multiple ideas in the same line or paragraph.
 - Write concise paragraphs focused on one main idea.
