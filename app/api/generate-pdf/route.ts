@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server"
-import { generatePDF } from "@/lib/generatePDF" // Ajusta la ruta
+import { generatePDF } from "@/lib/generatePDF"
 
 export async function POST(request: NextRequest) {
   try {
