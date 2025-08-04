@@ -1,252 +1,240 @@
-import type React from "react"
-import { Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer"
 
-// Registrar fuentes personalizadas si es necesario
-// Font.register({
-//   family: 'Inter',
-//   src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2'
-// })
+import React from 'react'
+import { Document, Page, Text, View, StyleSheet, Font, pdf } from '@react-pdf/renderer'
 
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: "column",
-    backgroundColor: "#ffffff",
-    padding: 30,
-    fontFamily: "Helvetica",
-  },
-  header: {
-    marginBottom: 20,
-    paddingBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-    borderBottomStyle: "solid",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#111827",
-    marginBottom: 5,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: "#6b7280",
-    fontWeight: "normal",
-  },
-  messageContainer: {
-    marginBottom: 15,
-    padding: 12,
-    backgroundColor: "#f9fafb",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderStyle: "solid",
-  },
-  userMessage: {
-    backgroundColor: "#111827",
-    color: "#ffffff",
-  },
-  assistantMessage: {
-    backgroundColor: "#ffffff",
-    borderColor: "#e5e7eb",
-  },
-  messageHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  messageRole: {
-    fontSize: 10,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  userRole: {
-    color: "#ffffff",
-  },
-  assistantRole: {
-    color: "#374151",
-  },
-  timestamp: {
-    fontSize: 9,
-    color: "#9ca3af",
-  },
-  messageContent: {
-    fontSize: 11,
-    lineHeight: 1.5,
-    color: "#374151",
-  },
-  userContent: {
-    color: "#ffffff",
-  },
-  reasoning: {
-    marginTop: 8,
-    padding: 8,
-    backgroundColor: "#f3f4f6",
-    borderRadius: 4,
-    borderLeftWidth: 3,
-    borderLeftColor: "#10b981",
-    borderLeftStyle: "solid",
-  },
-  reasoningTitle: {
-    fontSize: 9,
-    fontWeight: "bold",
-    color: "#065f46",
-    marginBottom: 4,
-    textTransform: "uppercase",
-  },
-  reasoningContent: {
-    fontSize: 9,
-    color: "#374151",
-    lineHeight: 1.4,
-  },
-  footer: {
-    marginTop: 30,
-    paddingTop: 15,
-    borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
-    borderTopStyle: "solid",
-    textAlign: "center",
-  },
-  footerText: {
-    fontSize: 9,
-    color: "#9ca3af",
-  },
-  stats: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-    padding: 15,
-    backgroundColor: "#f9fafb",
-    borderRadius: 8,
-  },
-  statItem: {
-    alignItems: "center",
-  },
-  statNumber: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#111827",
-  },
-  statLabel: {
-    fontSize: 10,
-    color: "#6b7280",
-    marginTop: 2,
-  },
+// Registrar fuentes (opcional)
+Font.register({
+  family: 'Inter',
+  fonts: [
+    { src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2' },
+    { src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fAZ9hiA.woff2', fontWeight: 'bold' }
+  ]
 })
 
-interface Message {
-  id: string
-  content: string
-  role: "user" | "assistant"
-  timestamp: Date
-  reasoning?: string
-}
+// Estilos
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: 'column',
+    backgroundColor: '#ffffff',
+    padding: 40,
+    fontFamily: 'Inter'
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 30,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb'
+  },
+  logo: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000000'
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#111827',
+    marginBottom: 20
+  },
+  subtitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#374151',
+    marginTop: 15,
+    marginBottom: 8
+  },
+  text: {
+    fontSize: 11,
+    color: '#4b5563',
+    lineHeight: 1.5,
+    marginBottom: 8
+  },
+  section: {
+    marginBottom: 20
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 30,
+    left: 40,
+    right: 40,
+    textAlign: 'center',
+    fontSize: 8,
+    color: '#9ca3af',
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+    paddingTop: 10
+  }
+})
 
+// Interfaces
 interface PDFData {
-  messages: Message[]
-  title?: string
-  userInfo?: {
-    name?: string
-    email?: string
+  title: string
+  type: 'travel_itinerary' | 'expense_report' | 'booking_confirmation' | 'general'
+  content: {
+    sections: Array<{
+      title: string
+      items: Array<{
+        label: string
+        value: string
+      }>
+    }>
+    notes?: string[]
+  }
+  metadata: {
+    generatedBy: string
+    generatedAt: Date
+    userEmail?: string
+    bookingReference?: string
   }
 }
 
-const PDFDocument: React.FC<{ data: PDFData }> = ({ data }) => {
-  const { messages, title = "Suitpax AI Chat Export", userInfo } = data
-
-  const userMessages = messages.filter((m) => m.role === "user").length
-  const assistantMessages = messages.filter((m) => m.role === "assistant").length
-  const totalMessages = messages.length
-
-  const exportDate = new Date().toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>
-            Exportado el {exportDate}
-            {userInfo?.email && ` • ${userInfo.email}`}
+// Componente del documento PDF
+const SuitpaxDocument: React.FC<{ data: PDFData }> = ({ data }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.header}>
+        <Text style={styles.logo}>Suitpax</Text>
+        <View>
+          <Text style={{ fontSize: 10, color: '#6b7280' }}>
+            Generated: {data.metadata.generatedAt.toLocaleDateString()}
           </Text>
+          {data.metadata.bookingReference && (
+            <Text style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }}>
+              Ref: {data.metadata.bookingReference}
+            </Text>
+          )}
         </View>
+      </View>
 
-        {/* Stats */}
-        <View style={styles.stats}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{totalMessages}</Text>
-            <Text style={styles.statLabel}>Total Mensajes</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{userMessages}</Text>
-            <Text style={styles.statLabel}>Preguntas</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{assistantMessages}</Text>
-            <Text style={styles.statLabel}>Respuestas IA</Text>
-          </View>
-        </View>
+      <Text style={styles.title}>{data.title}</Text>
 
-        {/* Messages */}
-        {messages.map((message, index) => (
-          <View
-            key={message.id}
-            style={[styles.messageContainer, message.role === "user" ? styles.userMessage : styles.assistantMessage]}
-          >
-            <View style={styles.messageHeader}>
-              <Text style={[styles.messageRole, message.role === "user" ? styles.userRole : styles.assistantRole]}>
-                {message.role === "user" ? "Usuario" : "Suitpax AI"}
+      {data.content.sections.map((section, index) => (
+        <View key={index} style={styles.section}>
+          <Text style={styles.subtitle}>{section.title}</Text>
+          {section.items.map((item, itemIndex) => (
+            <View key={itemIndex} style={{ flexDirection: 'row', marginBottom: 4 }}>
+              <Text style={[styles.text, { fontWeight: 'bold', width: '40%' }]}>
+                {item.label}:
               </Text>
-              <Text style={styles.timestamp}>
-                {message.timestamp.toLocaleTimeString("es-ES", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+              <Text style={[styles.text, { width: '60%' }]}>
+                {item.value}
               </Text>
             </View>
-
-            <Text style={[styles.messageContent, message.role === "user" ? styles.userContent : {}]}>
-              {message.content}
-            </Text>
-
-            {/* AI Reasoning */}
-            {message.reasoning && (
-              <View style={styles.reasoning}>
-                <Text style={styles.reasoningTitle}>Razonamiento IA</Text>
-                <Text style={styles.reasoningContent}>{message.reasoning}</Text>
-              </View>
-            )}
-          </View>
-        ))}
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Generado por Suitpax AI • Business Travel Platform</Text>
-          <Text style={styles.footerText}>
-            Este documento contiene información confidencial de tu conversación con nuestro asistente de IA
-          </Text>
+          ))}
         </View>
-      </Page>
-    </Document>
-  )
+      ))}
+
+      {data.content.notes && data.content.notes.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.subtitle}>Important Notes</Text>
+          {data.content.notes.map((note, noteIndex) => (
+            <Text key={noteIndex} style={[styles.text, { marginLeft: 10 }]}>
+              • {note}
+            </Text>
+          ))}
+        </View>
+      )}
+
+      <Text style={styles.footer}>
+        Generated by Suitpax AI Travel Platform • {data.metadata.generatedBy} • suitpax.com
+      </Text>
+    </Page>
+  </Document>
+)
+
+// Función principal para generar PDF
+export async function generateTravelPDF(data: PDFData): Promise<Buffer> {
+  try {
+    const pdfBuffer = await pdf(<SuitpaxDocument data={data} />).toBuffer()
+    return pdfBuffer
+  } catch (error) {
+    console.error('Error generating PDF:', error)
+    throw new Error('Failed to generate PDF')
+  }
 }
 
-export const generatePDF = async (data: PDFData): Promise<Buffer> => {
-  try {
-    const doc = <PDFDocument data={data} />
-    const asPdf = pdf(doc)
-    const buffer = await asPdf.toBuffer()
-    return buffer
-  } catch (error) {
-    console.error("Error generating PDF:", error)
-    throw new Error("Failed to generate PDF")
+// Funciones helper para diferentes tipos de documentos
+export function createTravelItineraryData(
+  bookingData: any,
+  userEmail: string
+): PDFData {
+  return {
+    title: 'Travel Itinerary',
+    type: 'travel_itinerary',
+    content: {
+      sections: [
+        {
+          title: 'Traveler Information',
+          items: [
+            { label: 'Name', value: bookingData.passengerName || 'Not specified' },
+            { label: 'Email', value: userEmail },
+            { label: 'Booking Reference', value: bookingData.bookingReference || 'TBD' }
+          ]
+        },
+        {
+          title: 'Flight Details',
+          items: [
+            { label: 'From', value: bookingData.origin || 'Not specified' },
+            { label: 'To', value: bookingData.destination || 'Not specified' },
+            { label: 'Departure Date', value: bookingData.departureDate || 'Not specified' },
+            { label: 'Return Date', value: bookingData.returnDate || 'One way' },
+            { label: 'Passengers', value: bookingData.passengers?.toString() || '1' },
+            { label: 'Class', value: bookingData.cabinClass || 'Economy' }
+          ]
+        }
+      ],
+      notes: [
+        'Please arrive at the airport at least 2 hours before departure',
+        'Check visa requirements for your destination',
+        'Carry valid identification documents'
+      ]
+    },
+    metadata: {
+      generatedBy: 'Suitpax AI Assistant',
+      generatedAt: new Date(),
+      userEmail,
+      bookingReference: bookingData.bookingReference
+    }
+  }
+}
+
+export function createExpenseReportData(
+  expenses: any[],
+  userEmail: string,
+  period: string
+): PDFData {
+  const totalAmount = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0)
+  
+  return {
+    title: `Expense Report - ${period}`,
+    type: 'expense_report',
+    content: {
+      sections: [
+        {
+          title: 'Summary',
+          items: [
+            { label: 'Total Expenses', value: `$${totalAmount.toFixed(2)}` },
+            { label: 'Number of Items', value: expenses.length.toString() },
+            { label: 'Period', value: period },
+            { label: 'Status', value: 'Pending Review' }
+          ]
+        },
+        {
+          title: 'Expenses',
+          items: expenses.map((exp, index) => ({
+            label: `${index + 1}. ${exp.description || 'Expense'}`,
+            value: `$${(exp.amount || 0).toFixed(2)} - ${exp.category || 'Other'}`
+          }))
+        }
+      ]
+    },
+    metadata: {
+      generatedBy: 'Suitpax Expense Manager',
+      generatedAt: new Date(),
+      userEmail
+    }
   }
 }
