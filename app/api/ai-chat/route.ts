@@ -1,429 +1,173 @@
-"use client"
+import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
+import Anthropic from "@anthropic-ai/sdk"
 
-import type React from "react"
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+})
 
-import { useState, useEffect, useRef } from "react"
-import { motion } from "framer-motion"
-import { Loader2, ArrowUp, Paperclip, X, Square } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { createClient } from "@/lib/supabase/client"
-import Image from "next/image"
-import {
-  PromptInput,
-  PromptInputAction,
-  PromptInputActions,
-  PromptInputTextarea,
-} from "@/components/prompt-kit/prompt-input"
-import {
-  ChatContainerRoot,
-  ChatContainerContent,
-  ChatContainerScrollAnchor,
-} from "@/components/prompt-kit/chat-container"
-import { ScrollButton } from "@/components/prompt-kit/scroll-button"
-import {
-  Reasoning,
-  ReasoningTrigger,
-  ReasoningContent,
-  ReasoningResponse,
-} from "@/components/prompt-kit/reasoning"
+// Función para generar el prompt de razonamiento
+function createReasoningPrompt(message: string, context: string): string {
+  return `
+Please analyze the user's travel request and provide your reasoning process before your final response.
 
-interface Message {
-  id: string
-  content: string
-  role: "user" | "assistant"
-  timestamp: Date
-  reasoning?: string // Para el proceso de pensamiento real del AI
+User message: "${message}"
+Context: ${context}
+
+First, show your thinking process in <thinking> tags, analyzing:
+1. What type of travel service is being requested
+2. Key information needed from the user
+3. Best approach to help them
+4. Relevant considerations (budget, business travel needs, etc.)
+5. How to structure your response for maximum helpfulness
+
+Then provide your main response.
+
+Example format:
+<thinking>
+The user is asking about flights. I need to:
+1. Identify if this is a specific search or general inquiry
+2. Gather key details: departure/destination, dates, preferences
+3. Consider business travel context from Suitpax
+4. Provide structured response with clear next steps
+5. Keep response professional and concise as per Suitpax guidelines
+</thinking>
+
+[Your main response here]
+`.trim()
 }
 
-// Componente para el efecto typing
-const TypingText: React.FC<{ text: string; speed?: number; onComplete?: () => void }> = ({ 
-  text, 
-  speed = 50, 
-  onComplete 
-}) => {
-  const [displayedText, setDisplayedText] = useState("")
-  const [currentIndex, setCurrentIndex] = useState(0)
+export async function POST(request: NextRequest) {
+  try {
+    const { message, context = "general", history = [], includeReasoning = false } = await request.json()
 
-  useEffect(() => {
-    if (currentIndex < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayedText(prev => prev + text[currentIndex])
-        setCurrentIndex(prev => prev + 1)
-      }, speed)
-
-      return () => clearTimeout(timer)
-    } else if (onComplete) {
-      onComplete()
-    }
-  }, [currentIndex, text, speed, onComplete])
-
-  useEffect(() => {
-    // Reset cuando cambia el texto
-    setDisplayedText("")
-    setCurrentIndex(0)
-  }, [text])
-
-  return <span>{displayedText}</span>
-}
-
-export default function AIChatPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      content: "Hello! I'm the AI Agent from Suitpax. How can I help you plan your next business trip?",
-      role: "assistant",
-      timestamp: new Date(),
-    },
-  ])
-  const [input, setInput] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
-  const [user, setUser] = useState<any>(null)
-  const [files, setFiles] = useState<File[]>([])
-  const [showReasoning, setShowReasoning] = useState(true) // Toggle para activar/desactivar razonamiento
-  const uploadInputRef = useRef<HTMLInputElement>(null)
-  const supabase = createClient()
-
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
-    }
-    getUser()
-  }, [supabase])
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const newFiles = Array.from(event.target.files)
-      setFiles((prev) => [...prev, ...newFiles])
-    }
-  }
-
-  const handleRemoveFile = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index))
-    if (uploadInputRef?.current) {
-      uploadInputRef.current.value = ""
-    }
-  }
-
-  const handleSend = async () => {
-    if (!input.trim() || loading) return
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: input.trim(),
-      role: "user",
-      timestamp: new Date(),
+    if (!message || typeof message !== "string") {
+      return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
 
-    setMessages((prev) => [...prev, userMessage])
-    setInput("")
-    setFiles([])
-    setLoading(true)
+    // Sistema prompt base (tu prompt original)
+    const baseSystemPrompt = `
+You are Suitpax AI, an AI assistant created by the Suitpax team specialized in flight and hotel bookings.
+Your mission is to help professionals book flights and hotels efficiently.
+Always be PROFESSIONAL, CLEAR, and BRIEF.
+Detect the language of the user's message and respond in that language.
+Do NOT use emojis, markdown, or asterisks in your main response.
+Use UPPERCASE only for emphasis when necessary.
+Format lists vertically when showing options.
+Avoid topics unrelated to travel bookings.
+Ask clarifying questions if needed.
+Keep responses SHORT and to the point.
 
-    try {
-      const response = await fetch("/api/ai-chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+Flight results include:
+- Airline
+- Departure time
+- Duration
+- Price
+- Direct or with stops
+
+Hotel results include:
+- Hotel name
+- Price per night
+- Distance to center or meeting area
+- Business features
+
+Context: ${context}
+`.trim()
+
+    // Obtener usuario de Supabase
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    // Construir historial de conversación para contexto
+    const conversationHistory = history
+      .slice(-5)
+      .map((msg: any) => ({
+        role: msg.role === "user" ? "user" : "assistant",
+        content: msg.content,
+      }))
+
+    // Decidir el prompt basado en si se solicita razonamiento
+    const finalPrompt = includeReasoning 
+      ? createReasoningPrompt(message, context)
+      : message
+
+    const finalSystemPrompt = includeReasoning
+      ? baseSystemPrompt + "\n\nWhen requested, show your thinking process in <thinking> tags before your main response."
+      : baseSystemPrompt
+
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: includeReasoning ? 1000 : 600, // Más tokens si incluye razonamiento
+      temperature: 0.3,
+      system: finalSystemPrompt,
+      messages: [
+        ...conversationHistory,
+        {
+          role: "user",
+          content: finalPrompt,
         },
-        body: JSON.stringify({
-          message: userMessage.content,
-          history: messages,
-          context: "travel_booking", // Contexto específico para Suitpax
-          includeReasoning: showReasoning, // Incluir razonamiento si está activado
-        }),
-      })
+      ],
+    })
 
-      if (!response.ok) {
-        throw new Error("Failed to get response")
+    let aiResponse = ""
+    let reasoning = ""
+
+    if (response.content[0]?.type === "text") {
+      const fullResponse = response.content[0].text.trim()
+      
+      if (includeReasoning && fullResponse.includes('<thinking>')) {
+        // Extraer el razonamiento y la respuesta principal
+        const thinkingMatch = fullResponse.match(/<thinking>(.*?)<\/thinking>/s)
+        if (thinkingMatch) {
+          reasoning = thinkingMatch[1].trim()
+          aiResponse = fullResponse.replace(/<thinking>.*?<\/thinking>/s, '').trim()
+        } else {
+          aiResponse = fullResponse
+        }
+      } else {
+        aiResponse = fullResponse
       }
-
-      const data = await response.json()
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: data.response,
-        role: "assistant",
-        timestamp: new Date(),
-        reasoning: data.reasoning, // Razonamiento real del API
-      }
-
-      // Agregar el mensaje y activar el efecto typing
-      setMessages((prev) => [...prev, assistantMessage])
-      setTypingMessageId(assistantMessage.id)
-    } catch (error) {
-      console.error("Error sending message:", error)
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "Sorry, I encountered an error. Please try again.",
-        role: "assistant",
-        timestamp: new Date(),
-        reasoning: showReasoning ? "An error occurred while processing the request. The system attempted to maintain connection and provide a helpful response despite technical difficulties." : undefined,
-      }
-      setMessages((prev) => [...prev, errorMessage])
-      setTypingMessageId(errorMessage.id)
-    } finally {
-      setLoading(false)
+    } else {
+      aiResponse = "I apologize, but I couldn't process your request properly. Please try again."
     }
+
+    // Registrar interacción si el usuario está autenticado - CON NUEVAS COLUMNAS
+    if (user) {
+      try {
+        await supabase.from("ai_chat_logs").insert({
+          user_id: user.id,
+          message: message,
+          response: aiResponse,
+          context_type: context,
+          tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
+          model_used: "claude-sonnet-4-20250514",
+          reasoning_included: includeReasoning, // ← NUEVA COLUMNA
+          reasoning_content: reasoning || null, // ← NUEVA COLUMNA
+        })
+      } catch (logError) {
+        console.error("Failed to log chat interaction:", logError)
+      }
+    }
+
+    return NextResponse.json({
+      response: aiResponse,
+      reasoning: reasoning || undefined, // Solo incluir si hay razonamiento
+      tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
+      model: "claude-sonnet-4-20250514",
+    })
+  } catch (error) {
+    console.error("AI Chat API Error:", error)
+
+    return NextResponse.json(
+      {
+        error: "I'm experiencing technical difficulties right now. Please try again in a moment.",
+        response:
+          "I apologize, but I'm having trouble processing your request at the moment. Our team has been notified and we're working to resolve this issue. Please try again in a few minutes.",
+        reasoning: includeReasoning ? "Error occurred while processing the request. The system is attempting to provide a helpful fallback response while technical issues are resolved." : undefined,
+      },
+      { status: 500 },
+    )
   }
-
-  const handleTypingComplete = () => {
-    setTypingMessageId(null)
-  }
-
-  return (
-    <div className="fixed inset-0 flex flex-col bg-gray-50 overflow-hidden">
-      {/* Header - Altura fija responsive */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="bg-white/50 backdrop-blur-sm border-b border-gray-200 flex-shrink-0"
-        style={{ height: 'auto', minHeight: '4rem' }}
-      >
-        <div className="p-3 sm:p-4 lg:p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3 sm:space-x-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-                <Image
-                  src="/agents/agent-2.png"
-                  alt="Suitpax AI"
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h1 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tighter truncate">
-                  <em className="font-serif italic">Suitpax AI</em>
-                </h1>
-                <p className="text-xs md:text-sm text-gray-600 font-light hidden sm:block">
-                  Try the superpowers
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
-              {/* Toggle para razonamiento */}
-              <div className="flex items-center space-x-1 sm:space-x-2">
-                <label className="text-xs text-gray-600 hidden sm:inline">AI Reasoning</label>
-                <button
-                  onClick={() => setShowReasoning(!showReasoning)}
-                  className={`relative inline-flex h-4 w-7 sm:h-5 sm:w-9 items-center rounded-full transition-colors ${
-                    showReasoning ? 'bg-emerald-400' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-2.5 w-2.5 sm:h-3 sm:w-3 transform rounded-full bg-white transition-transform ${
-                      showReasoning ? 'translate-x-3.5 sm:translate-x-5' : 'translate-x-0.5 sm:translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-              
-              <span className="inline-flex items-center rounded-xl bg-emerald-950/10 px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-medium text-emerald-950">
-                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-emerald-950 animate-pulse mr-1"></span>
-                Online
-              </span>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Chat Container - Altura dinámica */}
-      <div className="flex-1 min-h-0">
-        <ChatContainerRoot className="h-full">
-          <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4">
-            {messages.map((message, index) => (
-              <motion.div
-                key={message.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`${
-                    message.role === "user"
-                      ? "max-w-[85%] sm:max-w-sm md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-xl px-4 sm:px-6 py-2 sm:py-2.5 bg-black text-white"
-                      : "max-w-[90%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"
-                  }`}
-                >
-                  {message.role === "assistant" && (
-                    <div className="flex items-center space-x-2 mb-2">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-                        <Image
-                          src="/agents/agent-2.png"
-                          alt="Suitpax AI"
-                          width={24}
-                          height={24}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
-                    </div>
-                  )}
-
-                  {/* Reasoning section - solo para mensajes del asistente con razonamiento */}
-                  {message.role === "assistant" && message.reasoning && (
-                    <div className="mb-3">
-                      <Reasoning>
-                        <ReasoningTrigger className="text-xs text-gray-300 hover:text-gray-500">
-                          <span>View AI logic</span>
-                        </ReasoningTrigger>
-                        <ReasoningContent>
-                          <div className="text-xs text-gray-600 leading-relaxed whitespace-pre-line bg-gray-50 rounded-lg p-2 border border-gray-100">
-                            <ReasoningResponse
-                              text={message.reasoning}
-                              className="text-xs text-gray-700"
-                            />
-                          </div>
-                        </ReasoningContent>
-                      </Reasoning>
-                    </div>
-                  )}
-
-                  {/* Main message content */}
-                  <p className="text-sm font-light leading-relaxed break-words">
-                    {message.role === "assistant" && typingMessageId === message.id ? (
-                      <TypingText 
-                        text={message.content} 
-                        speed={30} 
-                        onComplete={handleTypingComplete}
-                      />
-                    ) : (
-                      message.content
-                    )}
-                  </p>
-                  <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
-                    {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-            
-            {loading && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-                <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 max-w-[90%] sm:max-w-xs">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
-                      <Image
-                        src="/agents/agent-2.png"
-                        alt="Suitpax AI"
-                        width={24}
-                        height={24}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
-                    <span className="text-sm text-gray-600 font-light">
-                      {showReasoning ? "Analyzing and thinking..." : "Thinking..."}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </ChatContainerContent>
-          
-          {/* Scroll Anchor para auto-scroll */}
-          <ChatContainerScrollAnchor />
-          
-          {/* Scroll Button flotante */}
-          <ScrollButton className="bottom-20 sm:bottom-24 right-4 sm:right-6" />
-        </ChatContainerRoot>
-      </div>
-
-      {/* Input con PromptInput - Altura fija responsive */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="bg-white/50 backdrop-blur-sm border-t border-gray-200 flex-shrink-0"
-        style={{ minHeight: '4rem' }}
-      >
-        <div className="p-3 sm:p-4 lg:p-6">
-          <div className="max-w-4xl mx-auto">
-            <PromptInput
-              value={input}
-              onValueChange={setInput}
-              isLoading={loading}
-              onSubmit={handleSend}
-              className="w-full bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200"
-            >
-              {/* Archivos adjuntos */}
-              {files.length > 0 && (
-                <div className="flex flex-wrap gap-2 pb-2">
-                  {files.map((file, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-100 flex items-center gap-2 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm"
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <Paperclip className="size-3 sm:size-4 text-gray-600" />
-                      <span className="max-w-[80px] sm:max-w-[120px] truncate text-gray-700">{file.name}</span>
-                      <button
-                        onClick={() => handleRemoveFile(index)}
-                        className="hover:bg-gray-200 rounded-full p-1 transition-colors"
-                      >
-                        <X className="size-3 sm:size-4 text-gray-600" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <PromptInputTextarea 
-                placeholder="Ask me about flights, hotels, or travel planning..." 
-                className="text-gray-900 placeholder-gray-500 font-light text-sm sm:text-base"
-                disabled={loading}
-              />
-
-              <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
-                <PromptInputAction tooltip="Attach files">
-                  <label
-                    htmlFor="file-upload"
-                    className="hover:bg-gray-100 flex h-7 w-7 sm:h-8 sm:w-8 cursor-pointer items-center justify-center rounded-2xl transition-colors"
-                  >
-                    <input
-                      ref={uploadInputRef}
-                      type="file"
-                      multiple
-                      onChange={handleFileChange}
-                      className="hidden"
-                      id="file-upload"
-                    />
-                    <Paperclip className="text-gray-600 size-4 sm:size-5" />
-                  </label>
-                </PromptInputAction>
-
-                <PromptInputAction
-                  tooltip={loading ? "Stop generation" : "Send message"}
-                >
-                  <Button
-                    variant="default"
-                    size="icon"
-                    className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-black hover:bg-gray-800 text-white"
-                    onClick={handleSend}
-                    disabled={!input.trim() || loading}
-                  >
-                    {loading ? (
-                      <Square className="size-3 sm:size-4 fill-current" />
-                    ) : (
-                      <ArrowUp className="size-3 sm:size-4" />
-                    )}
-                  </Button>
-                </PromptInputAction>
-              </PromptInputActions>
-            </PromptInput>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  )
 }
