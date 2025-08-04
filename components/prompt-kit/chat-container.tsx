@@ -116,7 +116,90 @@ const ChatMessage: React.FC<{ message: Message; isTyping?: boolean }> = ({ messa
             {isTyping ? (
               <TypingText text={message.content} />
             ) : (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  // Customizar componentes para mejor styling
+                  h1: ({ children }) => (
+                    <h1 className="text-lg font-bold text-gray-900 mb-3 mt-2">{children}</h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className="text-base font-semibold text-gray-800 mb-2 mt-2">{children}</h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className="text-sm font-semibold text-gray-700 mb-2 mt-2">{children}</h3>
+                  ),
+                  p: ({ children }) => (
+                    <p className="text-sm text-gray-700 mb-2 leading-relaxed">{children}</p>
+                  ),
+                  ul: ({ children }) => (
+                    <ul className="list-disc list-inside text-sm text-gray-700 mb-3 space-y-1 pl-2">
+                      {children}
+                    </ul>
+                  ),
+                  ol: ({ children }) => (
+                    <ol className="list-decimal list-inside text-sm text-gray-700 mb-3 space-y-1 pl-2">
+                      {children}
+                    </ol>
+                  ),
+                  li: ({ children }) => <li className="text-sm leading-relaxed">{children}</li>,
+                  strong: ({ children }) => (
+                    <strong className="font-semibold text-gray-900">{children}</strong>
+                  ),
+                  em: ({ children }) => <em className="italic text-gray-700">{children}</em>,
+                  code: ({ children }) => (
+                    <code className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs font-mono border">
+                      {children}
+                    </code>
+                  ),
+                  pre: ({ children }) => (
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-xs font-mono overflow-x-auto mb-3 border">
+                      {children}
+                    </pre>
+                  ),
+                  blockquote: ({ children }) => (
+                    <blockquote className="border-l-4 border-emerald-500 pl-4 my-3 text-gray-600 italic bg-emerald-50 py-2 rounded-r">
+                      {children}
+                    </blockquote>
+                  ),
+                  a: ({ href, children }) => (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-600 hover:text-emerald-700 underline font-medium"
+                    >
+                      {children}
+                    </a>
+                  ),
+                  table: ({ children }) => (
+                    <div className="overflow-x-auto mb-3">
+                      <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+                        {children}
+                      </table>
+                    </div>
+                  ),
+                  thead: ({ children }) => (
+                    <thead className="bg-gray-50">{children}</thead>
+                  ),
+                  tbody: ({ children }) => (
+                    <tbody className="bg-white divide-y divide-gray-200">{children}</tbody>
+                  ),
+                  tr: ({ children }) => (
+                    <tr className="hover:bg-gray-50">{children}</tr>
+                  ),
+                  th: ({ children }) => (
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                      {children}
+                    </th>
+                  ),
+                  td: ({ children }) => (
+                    <td className="px-4 py-2 text-sm text-gray-900 border-b">{children}</td>
+                  ),
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
             )}
           </div>
 
@@ -126,7 +209,7 @@ const ChatMessage: React.FC<{ message: Message; isTyping?: boolean }> = ({ messa
                 variant="ghost"
                 size="sm"
                 onClick={() => copyToClipboard(message.content)}
-                className="h-8 px-2 text-xs"
+                className="h-8 px-2 text-xs hover:bg-gray-100"
               >
                 <Copy className="h-3 w-3 mr-1" />
                 Copy
@@ -135,7 +218,7 @@ const ChatMessage: React.FC<{ message: Message; isTyping?: boolean }> = ({ messa
                 variant="ghost"
                 size="sm"
                 onClick={() => downloadAsPDF(message.content, message.reasoning)}
-                className="h-8 px-2 text-xs"
+                className="h-8 px-2 text-xs hover:bg-gray-100"
               >
                 <Download className="h-3 w-3 mr-1" />
                 PDF
@@ -213,6 +296,24 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ messages, isLoadin
                 I'm here to help you with business travel, expense management, and any questions you might have. What
                 can I assist you with today?
               </p>
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
+                <div className="bg-gray-50 p-4 rounded-lg text-left">
+                  <div className="font-medium text-gray-900 mb-1">✈️ Flight Search</div>
+                  <div className="text-sm text-gray-600">"Find flights from NYC to London next week"</div>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg text-left">
+                  <div className="font-medium text-gray-900 mb-1">💰 Expense Help</div>
+                  <div className="text-sm text-gray-600">"Help me track my travel expenses"</div>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg text-left">
+                  <div className="font-medium text-gray-900 mb-1">🏨 Hotel Booking</div>
+                  <div className="text-sm text-gray-600">"Recommend business hotels in Paris"</div>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg text-left">
+                  <div className="font-medium text-gray-900 mb-1">📋 Travel Policy</div>
+                  <div className="text-sm text-gray-600">"What's our company travel policy?"</div>
+                </div>
+              </div>
             </div>
           ) : (
             messages.map((message) => <ChatMessage key={message.id} message={message} />)
