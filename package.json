@@ -64,7 +64,7 @@
     "html-pdf-node": "^1.0.8",
     "input-otp": "latest",
     "lucide-react": "^0.454.0",
-    "next": "14.2.16",
+    "next": "14.2.30",
     "next-themes": "latest",
     "puppeteer": "^23.0.0",
     "react": "^18",
