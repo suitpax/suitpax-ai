@@ -184,12 +184,11 @@ export default function AIChatPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="flex flex-col h-screen">
       <PageHeader title="Suitpax AI" description="Your intelligent business travel assistant" />
+
       <div className="flex-1 overflow-hidden">
-        <ChatContainer className="h-full">
-          {/* Chat messages and other components can be added here if needed */}
-        </ChatContainer>
+        <ChatContainer className="h-full" />
       </div>
     </div>
   )

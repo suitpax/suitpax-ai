@@ -7,57 +7,77 @@ const anthropic = new Anthropic({
 
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json()
+    const { messages } = await request.json()
 
-    if (!message) {
-      return NextResponse.json({ error: "Message is required" }, { status: 400 })
+    if (!messages || !Array.isArray(messages)) {
+      return NextResponse.json({ error: "Messages array is required" }, { status: 400 })
     }
 
-    const systemPrompt = `You are Suitpax AI, an intelligent and friendly business travel assistant. You help users with:
+    const systemPrompt = `You are Suitpax AI, a friendly and intelligent business travel assistant. You help users with:
 
 - Flight bookings and travel planning
-- Hotel reservations and accommodations
 - Expense management and reporting
-- Travel analytics and insights
-- AI-powered recommendations
+- Travel policy compliance
+- Hotel and accommodation recommendations
+- Ground transportation options
+- Travel document requirements
+- Business travel best practices
+- Cost optimization strategies
 
-Your personality:
-- Start responses with "Hey!" to be friendly and approachable
-- Be professional but conversational
-- Use emojis sparingly but effectively
-- Provide actionable advice
-- Be concise but thorough
-- Show expertise in business travel
+Always respond in a helpful, professional, and conversational tone. Start responses with "Hey!" to be friendly. Provide practical, actionable advice and ask follow-up questions when appropriate to better assist the user.
 
-Always format your responses in clean markdown for better readability. Use headers, lists, and emphasis where appropriate.`
+When providing reasoning, structure your thoughts clearly and explain your decision-making process step by step.`
 
     const response = await anthropic.messages.create({
       model: "claude-3-5-sonnet-20241022",
-      max_tokens: 1000,
+      max_tokens: 2000,
       temperature: 0.7,
       system: systemPrompt,
-      messages: [
-        {
-          role: "user",
-          content: message,
-        },
-      ],
+      messages: messages.map((msg: any) => ({
+        role: msg.role === "user" ? "user" : "assistant",
+        content: msg.content,
+      })),
     })
 
-    const content = response.content[0]
-    if (content.type !== "text") {
-      throw new Error("Unexpected response type")
+    const content = response.content[0]?.type === "text" ? response.content[0].text : ""
+
+    // Generate reasoning for complex queries
+    const shouldIncludeReasoning = messages[messages.length - 1]?.content?.length > 50
+    let reasoning = ""
+
+    if (shouldIncludeReasoning) {
+      const reasoningResponse = await anthropic.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 500,
+        temperature: 0.3,
+        system:
+          "Explain your reasoning process for the previous response. Be concise but thorough in explaining your thought process.",
+        messages: [
+          ...messages.map((msg: any) => ({
+            role: msg.role === "user" ? "user" : "assistant",
+            content: msg.content,
+          })),
+          {
+            role: "assistant",
+            content: content,
+          },
+          {
+            role: "user",
+            content: "Please explain your reasoning process for this response.",
+          },
+        ],
+      })
+
+      reasoning = reasoningResponse.content[0]?.type === "text" ? reasoningResponse.content[0].text : ""
     }
 
-    // Simple reasoning for demonstration
-    const reasoning = `I analyzed the user's request: "${message.substring(0, 50)}..." and provided a helpful response focused on business travel assistance. I maintained a friendly but professional tone while ensuring the information is actionable and relevant to their needs.`
-
     return NextResponse.json({
-      response: content.text,
-      reasoning: reasoning,
+      content,
+      reasoning: reasoning || undefined,
+      timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    console.error("Error in AI chat:", error)
-    return NextResponse.json({ error: "Failed to process request" }, { status: 500 })
+    console.error("AI Chat API Error:", error)
+    return NextResponse.json({ error: "Failed to process chat request" }, { status: 500 })
   }
 }
