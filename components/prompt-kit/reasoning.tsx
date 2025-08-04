@@ -1,55 +1,55 @@
 "use client"
 
-import { useState } from "react"
-import { ChevronDown, ChevronRight, Brain } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Brain } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
 interface ReasoningResponseProps {
   reasoning: string
+  className?: string
 }
 
-export function ReasoningResponse({ reasoning }: ReasoningResponseProps) {
-  const [isOpen, setIsOpen] = useState(false)
-
-  if (!reasoning) return null
-
+export function ReasoningResponse({ reasoning, className }: ReasoningResponseProps) {
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-        >
-          <Brain className="w-3 h-3 mr-1" />
-          {isOpen ? (
-            <>
-              <ChevronDown className="w-3 h-3 mr-1" />
-              Hide reasoning
-            </>
-          ) : (
-            <>
-              <ChevronRight className="w-3 h-3 mr-1" />
-              Show reasoning
-            </>
-          )}
-        </Button>
-      </CollapsibleTrigger>
+    <Card className={`p-3 bg-gray-50 border-gray-200 ${className}`}>
+      <div className="flex items-center gap-2 mb-2">
+        <Brain className="h-4 w-4 text-emerald-950" />
+        <Badge variant="outline" className="text-xs">
+          AI Reasoning
+        </Badge>
+      </div>
 
-      <CollapsibleContent className="mt-2">
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-          <div className="flex items-center gap-2 mb-2">
-            <Brain className="w-4 h-4 text-emerald-600" />
-            <span className="text-sm font-medium text-gray-700">AI Reasoning Process</span>
-          </div>
-          <div className="prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-strong:text-gray-800 prose-code:text-emerald-600 prose-code:bg-white prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-white prose-pre:border prose-blockquote:border-l-emerald-400 prose-blockquote:bg-white prose-blockquote:pl-3 prose-ul:text-gray-600 prose-ol:text-gray-600 prose-li:text-gray-600">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{reasoning}</ReactMarkdown>
-          </div>
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
+      <div className="prose prose-sm max-w-none text-gray-700">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            h1: ({ children }) => <h1 className="text-sm font-semibold mb-1">{children}</h1>,
+            h2: ({ children }) => <h2 className="text-sm font-semibold mb-1">{children}</h2>,
+            h3: ({ children }) => <h3 className="text-xs font-semibold mb-1">{children}</h3>,
+            p: ({ children }) => <p className="text-xs mb-1 last:mb-0 leading-relaxed">{children}</p>,
+            ul: ({ children }) => <ul className="list-disc pl-3 mb-1 text-xs">{children}</ul>,
+            ol: ({ children }) => <ol className="list-decimal pl-3 mb-1 text-xs">{children}</ol>,
+            li: ({ children }) => <li className="mb-0.5">{children}</li>,
+            code: ({ children, className }) => {
+              const isInline = !className
+              return isInline ? (
+                <code className="bg-gray-200 px-1 py-0.5 rounded text-xs font-mono">{children}</code>
+              ) : (
+                <code className="block bg-gray-200 p-2 rounded text-xs font-mono overflow-x-auto">{children}</code>
+              )
+            },
+            blockquote: ({ children }) => (
+              <blockquote className="border-l-2 border-gray-300 pl-2 italic mb-1 text-xs">{children}</blockquote>
+            ),
+            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+            em: ({ children }) => <em className="italic">{children}</em>,
+          }}
+        >
+          {reasoning}
+        </ReactMarkdown>
+      </div>
+    </Card>
   )
 }

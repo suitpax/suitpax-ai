@@ -3,14 +3,15 @@
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Copy, Download, User, Bot } from "lucide-react"
-import { toast } from "sonner"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { ChevronDown, ChevronUp, User, Download, Copy, Check } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { ReasoningResponse } from "./reasoning"
 import { PromptInput } from "./prompt-input"
+import { ReasoningResponse } from "./reasoning"
 
 interface Message {
   id: string
@@ -24,7 +25,6 @@ interface ChatContainerProps {
   className?: string
 }
 
-// Typing animation component
 const TypingText = ({ text, onComplete }: { text: string; onComplete?: () => void }) => {
   const [displayedText, setDisplayedText] = useState("")
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -44,128 +44,160 @@ const TypingText = ({ text, onComplete }: { text: string; onComplete?: () => voi
   return <span>{displayedText}</span>
 }
 
-// Loading indicator component
-const ChatLoadingIndicator = () => (
-  <div className="flex items-center space-x-2 text-gray-500">
-    <div className="flex space-x-1">
-      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+const ChatLoadingIndicator = () => {
+  const [dots, setDots] = useState("")
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => {
+        if (prev === "...") return ""
+        return prev + "."
+      })
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="flex items-center space-x-2 text-gray-500">
+      <div className="flex space-x-1">
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+      </div>
+      <span>Suitpax AI is thinking{dots}</span>
     </div>
-    <span className="text-sm">Suitpax AI is thinking...</span>
-  </div>
-)
+  )
+}
 
-// Chat message component
 const ChatMessage = ({ message, isTyping = false }: { message: Message; isTyping?: boolean }) => {
-  const isUser = message.role === "user"
+  const [copied, setCopied] = useState(false)
+  const [showReasoning, setShowReasoning] = useState(false)
 
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      toast.success("Copied to clipboard!")
-    } catch (err) {
-      toast.error("Failed to copy to clipboard")
-    }
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(message.content)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
-  const downloadAsPDF = async (content: string, reasoning?: string) => {
+  const handleDownloadPDF = async () => {
     try {
       const response = await fetch("/api/generate-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content, reasoning }),
+        body: JSON.stringify({
+          content: message.content,
+          reasoning: message.reasoning,
+          timestamp: message.timestamp,
+        }),
       })
 
-      if (!response.ok) throw new Error("Failed to generate PDF")
-
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.style.display = "none"
-      a.href = url
-      a.download = `suitpax-ai-response-${Date.now()}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-      toast.success("PDF downloaded successfully!")
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.style.display = "none"
+        a.href = url
+        a.download = `suitpax-ai-response-${message.id}.pdf`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      }
     } catch (error) {
-      toast.error("Failed to download PDF")
+      console.error("Error downloading PDF:", error)
     }
   }
 
   return (
-    <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"} mb-6`}>
-      {!isUser && (
+    <div className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+      {message.role === "assistant" && (
         <Avatar className="w-8 h-8 mt-1">
-          <AvatarImage src="/agents/agent-kai-new.png" alt="Suitpax AI" />
-          <AvatarFallback>
-            <Bot className="w-4 h-4" />
-          </AvatarFallback>
+          <AvatarImage src="/logo/suitpax-symbol.webp" alt="Suitpax AI" />
+          <AvatarFallback className="bg-emerald-950 text-white text-xs">AI</AvatarFallback>
         </Avatar>
       )}
 
-      <div className={`max-w-[80%] ${isUser ? "order-first" : ""}`}>
-        <div
-          className={`rounded-2xl px-4 py-3 ${
-            isUser ? "bg-emerald-950 text-white ml-auto" : "bg-white border border-gray-200"
+      <div className={`max-w-[80%] ${message.role === "user" ? "order-first" : ""}`}>
+        <Card
+          className={`p-4 ${
+            message.role === "user" ? "bg-emerald-950 text-white ml-auto" : "bg-white border border-gray-200"
           }`}
         >
-          {isUser ? (
-            <p className="text-sm leading-relaxed">{message.content}</p>
-          ) : (
-            <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-code:text-emerald-700 prose-code:bg-emerald-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-blockquote:border-l-emerald-500 prose-blockquote:bg-emerald-50 prose-blockquote:pl-4 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:text-gray-700">
-              {isTyping ? (
-                <TypingText text={message.content} />
-              ) : (
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
-              )}
+          {message.role === "assistant" && (
+            <div className="flex items-center justify-between mb-2">
+              <Badge variant="secondary" className="text-xs">
+                Suitpax AI
+              </Badge>
+              <div className="flex gap-1">
+                <Button variant="ghost" size="sm" onClick={handleCopy} className="h-6 w-6 p-0">
+                  {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={handleDownloadPDF} className="h-6 w-6 p-0">
+                  <Download className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
           )}
-        </div>
 
-        {/* Reasoning section for AI messages */}
-        {!isUser && message.reasoning && (
-          <div className="mt-3">
-            <ReasoningResponse reasoning={message.reasoning} />
+          <div className={`prose prose-sm max-w-none ${message.role === "user" ? "prose-invert" : ""}`}>
+            {isTyping ? (
+              <TypingText text={message.content} />
+            ) : (
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  h1: ({ children }) => <h1 className="text-lg font-semibold mb-2">{children}</h1>,
+                  h2: ({ children }) => <h2 className="text-base font-semibold mb-2">{children}</h2>,
+                  h3: ({ children }) => <h3 className="text-sm font-semibold mb-1">{children}</h3>,
+                  p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                  ul: ({ children }) => <ul className="list-disc pl-4 mb-2">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal pl-4 mb-2">{children}</ol>,
+                  li: ({ children }) => <li className="mb-1">{children}</li>,
+                  code: ({ children, className }) => {
+                    const isInline = !className
+                    return isInline ? (
+                      <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{children}</code>
+                    ) : (
+                      <code className="block bg-gray-100 p-2 rounded text-sm font-mono overflow-x-auto">
+                        {children}
+                      </code>
+                    )
+                  },
+                  blockquote: ({ children }) => (
+                    <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-2">{children}</blockquote>
+                  ),
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+            )}
           </div>
-        )}
 
-        {/* Action buttons for AI messages */}
-        {!isUser && !isTyping && (
-          <div className="flex items-center gap-2 mt-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => copyToClipboard(message.content)}
-              className="h-8 px-2 text-xs text-gray-500 hover:text-gray-700"
-            >
-              <Copy className="w-3 h-3 mr-1" />
-              Copy
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => downloadAsPDF(message.content, message.reasoning)}
-              className="h-8 px-2 text-xs text-gray-500 hover:text-gray-700"
-            >
-              <Download className="w-3 h-3 mr-1" />
-              PDF
-            </Button>
-            <Badge variant="secondary" className="text-xs">
-              {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </Badge>
-          </div>
-        )}
+          {message.reasoning && (
+            <Collapsible open={showReasoning} onOpenChange={setShowReasoning}>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="mt-2 p-0 h-auto text-xs text-gray-500 hover:text-gray-700">
+                  <span className="mr-1">View reasoning</span>
+                  {showReasoning ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2">
+                <ReasoningResponse reasoning={message.reasoning} />
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+        </Card>
+
+        <div className="text-xs text-gray-500 mt-1 px-1">{message.timestamp.toLocaleTimeString()}</div>
       </div>
 
-      {isUser && (
+      {message.role === "user" && (
         <Avatar className="w-8 h-8 mt-1">
-          <AvatarFallback>
-            <User className="w-4 h-4" />
+          <AvatarFallback className="bg-gray-200">
+            <User className="h-4 w-4" />
           </AvatarFallback>
         </Avatar>
       )}
@@ -178,31 +210,41 @@ export function ChatContainer({ className }: ChatContainerProps) {
     {
       id: "1",
       role: "assistant",
-      content:
-        "Hey! I'm Suitpax AI, your intelligent business travel assistant. I'm here to help you with flight bookings, expense management, travel policies, and any other business travel needs you might have. What can I help you with today?",
+      content: `Hey there! 👋 I'm **Suitpax AI**, your intelligent business travel assistant.
+
+I'm here to help you with:
+- ✈️ **Flight bookings** and travel planning
+- 🏨 **Hotel reservations** and accommodations  
+- 💼 **Expense management** and reporting
+- 📊 **Travel analytics** and insights
+- 🤖 **AI-powered recommendations**
+
+What can I help you with today?`,
       timestamp: new Date(),
     },
   ])
   const [isLoading, setIsLoading] = useState(false)
-  const [isTyping, setIsTyping] = useState(false)
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector("[data-radix-scroll-area-viewport]")
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight
+      }
+    }
   }
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages, isLoading, isTyping])
+  }, [messages, isLoading])
 
   const handleSendMessage = async (content: string) => {
-    if (!content.trim()) return
-
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: content.trim(),
+      content,
       timestamp: new Date(),
     }
 
@@ -215,85 +257,78 @@ export function ChatContainer({ className }: ChatContainerProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          messages: [...messages, userMessage].map((msg) => ({
-            role: msg.role,
-            content: msg.content,
-          })),
-        }),
+        body: JSON.stringify({ message: content }),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to get response from AI")
+        throw new Error("Failed to get response")
       }
 
       const data = await response.json()
 
-      setIsLoading(false)
-      setIsTyping(true)
-
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.content,
+        content: data.response,
         reasoning: data.reasoning,
         timestamp: new Date(),
       }
 
       setMessages((prev) => [...prev, assistantMessage])
+      setTypingMessageId(assistantMessage.id)
 
-      // Stop typing animation after content is fully displayed
+      // Remove typing effect after message is complete
       setTimeout(
         () => {
-          setIsTyping(false)
+          setTypingMessageId(null)
         },
-        data.content.length * 20 + 500,
+        data.response.length * 20 + 1000,
       )
     } catch (error) {
+      console.error("Error sending message:", error)
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "Sorry, I encountered an error. Please try again.",
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
       setIsLoading(false)
-      toast.error("Failed to send message. Please try again.")
-      console.error("Chat error:", error)
     }
   }
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
-      {/* Chat messages */}
-      <ScrollArea className="flex-1 px-4" ref={scrollAreaRef}>
-        <div className="py-6">
-          {messages.map((message, index) => (
-            <ChatMessage
-              key={message.id}
-              message={message}
-              isTyping={isTyping && index === messages.length - 1 && message.role === "assistant"}
-            />
+      <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
+        <div className="space-y-6 max-w-4xl mx-auto">
+          {messages.map((message) => (
+            <ChatMessage key={message.id} message={message} isTyping={typingMessageId === message.id} />
           ))}
-
           {isLoading && (
-            <div className="flex gap-3 justify-start mb-6">
-              <Avatar className="w-8 h-8 mt-1">
-                <AvatarImage src="/agents/agent-kai-new.png" alt="Suitpax AI" />
-                <AvatarFallback>
-                  <Bot className="w-4 h-4" />
-                </AvatarFallback>
-              </Avatar>
-              <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3">
-                <ChatLoadingIndicator />
+            <div className="flex justify-start">
+              <div className="flex gap-3">
+                <Avatar className="w-8 h-8 mt-1">
+                  <AvatarImage src="/logo/suitpax-symbol.webp" alt="Suitpax AI" />
+                  <AvatarFallback className="bg-emerald-950 text-white text-xs">AI</AvatarFallback>
+                </Avatar>
+                <Card className="p-4 bg-white border border-gray-200">
+                  <ChatLoadingIndicator />
+                </Card>
               </div>
             </div>
           )}
-
-          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 
-      {/* Input area */}
-      <div className="border-t border-gray-200 p-4">
-        <PromptInput
-          onSend={handleSendMessage}
-          disabled={isLoading}
-          placeholder="Ask me anything about business travel..."
-        />
+      <div className="border-t bg-white p-4">
+        <div className="max-w-4xl mx-auto">
+          <PromptInput
+            onSubmit={handleSendMessage}
+            disabled={isLoading}
+            placeholder="Ask me anything about business travel..."
+          />
+        </div>
       </div>
     </div>
   )
