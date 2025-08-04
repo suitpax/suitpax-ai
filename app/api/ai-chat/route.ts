@@ -22,10 +22,50 @@ export async function POST(request: NextRequest) {
 - Travel rewards and loyalty programs
 - Corporate travel best practices
 
-Always start your responses with "Hey!" to maintain a friendly, approachable tone while remaining professional and helpful. Be concise but thorough in your responses.`
+RESPONSE FORMATTING GUIDELINES:
+- Always start your responses with "Hey!" to maintain a friendly, approachable tone
+- Use proper markdown formatting for better readability:
+  - **Bold text** for important points and headings
+  - *Italics* for emphasis
+  - \`code\` for specific terms, codes, or technical details
+  - Use bullet points (-) for lists
+  - Use numbered lists (1.) for step-by-step instructions
+  - Use > for important tips or notes (blockquotes)
+  - Use tables when displaying flight information, prices, or comparisons
+  - Use ## for section headings when organizing longer responses
+
+CONTENT GUIDELINES:
+- Be concise but thorough in your responses
+- Always provide actionable next steps when possible
+- For flight information, include details like airlines, prices, duration
+- For expenses, mention receipt requirements and approval processes
+- For hotels, consider location, amenities, and business traveler needs
+- Always specify currency when mentioning prices
+- Include relevant policy reminders when applicable
+
+EXAMPLE RESPONSE STRUCTURE:
+"Hey! I'd be happy to help you with [topic].
+
+## Key Information
+- **Important point 1**
+- **Important point 2**
+
+## Recommendations
+1. First recommendation with details
+2. Second recommendation
+
+> **Pro tip**: Include a helpful insider tip here
+
+## Next Steps
+- Action item 1
+- Action item 2
+
+Let me know if you need any clarification or have other questions!"
+
+Keep responses professional yet friendly, and always focus on practical business travel solutions.`
 
     const response = await anthropic.messages.create({
-      model: "claude-3-sonnet-20240229",
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: 1000,
       temperature: 0.7,
       system: systemPrompt,
@@ -40,7 +80,15 @@ Always start your responses with "Hey!" to maintain a friendly, approachable ton
     const aiResponse =
       response.content[0]?.type === "text"
         ? response.content[0].text
-        : "Sorry, I encountered an error processing your request."
+        : "Hey! I'm sorry, but I encountered an error processing your request. Please try asking your question again."
+
+    // Log successful interaction for monitoring
+    console.log("AI Chat - Success:", {
+      messageLength: message.length,
+      responseLength: aiResponse.length,
+      timestamp: new Date().toISOString(),
+      hasMarkdown: aiResponse.includes('**') || aiResponse.includes('##') || aiResponse.includes('>')
+    })
 
     return NextResponse.json({
       response: aiResponse,
@@ -48,6 +96,17 @@ Always start your responses with "Hey!" to maintain a friendly, approachable ton
     })
   } catch (error) {
     console.error("AI Chat API Error:", error)
-    return NextResponse.json({ error: "Failed to process your request" }, { status: 500 })
+    
+    // Return a user-friendly error message that matches the AI tone
+    const errorMessage = error instanceof Error 
+      ? `Hey! I'm having some technical difficulties right now. Error: ${error.message}`
+      : "Hey! I encountered an unexpected error. Please try asking your question again."
+
+    return NextResponse.json({ 
+      error: "Failed to process your request",
+      response: `${errorMessage}
+
+If this problem continues, please contact our support team. I'm usually much better at helping with your business travel needs! 😊`
+    }, { status: 500 })
   }
 }
