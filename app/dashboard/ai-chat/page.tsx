@@ -18,6 +18,8 @@ import {
   ChatContainerRoot,
   ChatContainerContent,
   ChatContainerScrollAnchor,
+  ChatMessage,
+  ChatLoadingIndicator,
 } from "@/components/prompt-kit/chat-container"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@/components/prompt-kit/reasoning"
@@ -30,40 +32,11 @@ interface Message {
   reasoning?: string // Para el proceso de pensamiento real del AI
 }
 
-const TypingText: React.FC<{ text: string; speed?: number; onComplete?: () => void }> = ({
-  text,
-  speed = 50,
-  onComplete,
-}) => {
-  const [displayedText, setDisplayedText] = useState("")
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  useEffect(() => {
-    if (currentIndex < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayedText((prev) => prev + text[currentIndex])
-        setCurrentIndex((prev) => prev + 1)
-      }, speed)
-
-      return () => clearTimeout(timer)
-    } else if (onComplete) {
-      onComplete()
-    }
-  }, [currentIndex, text, speed, onComplete])
-
-  useEffect(() => {
-    setDisplayedText("")
-    setCurrentIndex(0)
-  }, [text])
-
-  return <span>{displayedText}</span>
-}
-
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm the AI Agent from Suitpax. How can I help you plan your next business trip?",
+      content: "Hey! I'm your AI assistant from Suitpax. How can I help you plan your next business trip?",
       role: "assistant",
       timestamp: new Date(),
     },
@@ -292,79 +265,31 @@ export default function AIChatPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
-                <div
-                  className={`${
-                    message.role === "user"
-                      ? "max-w-[85%] sm:max-w-sm md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-xl px-4 sm:px-6 py-2 sm:py-2.5 bg-black text-white"
-                      : "max-w-[90%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"
-                  }`}
-                >
-                  {message.role === "assistant" && (
-                    <div className="flex items-center space-x-2 mb-2">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-                        <Image
-                          src="/agents/agent-2.png"
-                          alt="Suitpax AI"
-                          width={24}
-                          height={24}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
-                    </div>
-                  )}
-
-                  {message.role === "assistant" && message.reasoning && (
-                    <div className="mb-3">
-                      <Reasoning>
-                        <ReasoningTrigger className="text-xs text-gray-300 hover:text-gray-500">
-                          <span>View AI logic</span>
-                        </ReasoningTrigger>
-                        <ReasoningContent>
-                          <ReasoningResponse text={message.reasoning} className="text-xs text-gray-700" />
-                        </ReasoningContent>
-                      </Reasoning>
-                    </div>
-                  )}
-
-                  <div className="prose prose-sm max-w-none prose-headings:font-medium prose-headings:tracking-tighter prose-h1:text-base prose-h2:text-sm prose-h3:text-sm prose-p:text-sm prose-p:font-light prose-p:leading-relaxed prose-p:mb-2 prose-ul:text-sm prose-ul:mb-2 prose-ol:text-sm prose-ol:mb-2 prose-li:mb-0.5 prose-strong:font-medium prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono prose-pre:bg-gray-100 prose-pre:border prose-pre:border-gray-200 prose-pre:rounded prose-pre:p-2 prose-pre:text-xs prose-blockquote:border-l-2 prose-blockquote:border-gray-300 prose-blockquote:pl-2 prose-blockquote:italic prose-table:text-sm prose-th:font-medium prose-th:px-2 prose-th:py-1 prose-td:px-2 prose-td:py-1">
-                    {message.role === "assistant" && typingMessageId === message.id ? (
-                      <TypingText text={message.content} speed={30} onComplete={handleTypingComplete} />
-                    ) : (
-                      message.content
-                    )}
+                {message.role === "assistant" && message.reasoning && (
+                  <div className="mb-3 max-w-[90%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl">
+                    <Reasoning>
+                      <ReasoningTrigger className="text-xs text-gray-500 hover:text-gray-700">
+                        <span>View AI logic</span>
+                      </ReasoningTrigger>
+                      <ReasoningContent>
+                        <ReasoningResponse text={message.reasoning} className="text-xs text-gray-700" />
+                      </ReasoningContent>
+                    </Reasoning>
                   </div>
-                  <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
-                    {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                  </p>
-                </div>
+                )}
+
+                <ChatMessage
+                  message={message}
+                  isTyping={typingMessageId === message.id}
+                  onTypingComplete={handleTypingComplete}
+                />
               </motion.div>
             ))}
 
             {loading && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-                <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 max-w-[90%] sm:max-w-xs">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
-                      <Image
-                        src="/agents/agent-2.png"
-                        alt="Suitpax AI"
-                        width={24}
-                        height={24}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
-                    <span className="text-sm text-gray-600 font-light">
-                      {showReasoning ? "Analyzing and thinking..." : "Thinking..."}
-                    </span>
-                  </div>
-                </div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                <ChatLoadingIndicator showReasoning={showReasoning} />
               </motion.div>
             )}
           </ChatContainerContent>

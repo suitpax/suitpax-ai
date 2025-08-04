@@ -1,5 +1,6 @@
 import type React from "react"
-import { Document, Page, Text, View, StyleSheet, Font, pdf } from "@react-pdf/renderer"
+import jsPDF from "jspdf"
+import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer"
 
 // Register fonts for better typography
 Font.register({
@@ -129,11 +130,21 @@ interface Message {
   content: string
   role: "user" | "assistant"
   timestamp: Date
+  reasoning?: string
 }
 
 interface PDFDocumentProps {
   messages: Message[]
   title: string
+  userInfo?: {
+    email?: string
+    name?: string
+  }
+}
+
+interface PDFOptions {
+  messages: Message[]
+  title?: string
   userInfo?: {
     email?: string
     name?: string
@@ -209,6 +220,12 @@ const PDFDocument: React.FC<PDFDocumentProps> = ({ messages, title, userInfo }) 
             <Text style={[styles.messageContent, message.role === "user" && styles.userMessageContent]}>
               {cleanMarkdown(message.content)}
             </Text>
+            {message.reasoning && (
+              <View style={styles.messageContainer}>
+                <Text style={styles.messageRole}>AI Reasoning:</Text>
+                <Text style={styles.messageContent}>{cleanMarkdown(message.reasoning)}</Text>
+              </View>
+            )}
           </View>
         ))}
 
@@ -223,12 +240,135 @@ const PDFDocument: React.FC<PDFDocumentProps> = ({ messages, title, userInfo }) 
   )
 }
 
-export async function generateChatPDF(
-  messages: Message[],
-  title: string,
-  userInfo?: { email?: string; name?: string },
-): Promise<Buffer> {
-  const doc = <PDFDocument messages={messages} title={title} userInfo={userInfo} />
-  const pdfBuffer = await pdf(doc).toBuffer()
-  return pdfBuffer
+export function generateChatPDF({ messages, title = "Suitpax AI Chat", userInfo }: PDFOptions): jsPDF {
+  const doc = new jsPDF()
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const margin = 20
+  const maxWidth = pageWidth - margin * 2
+  let yPosition = margin
+
+  // Helper function to add new page if needed
+  const checkPageBreak = (neededHeight: number) => {
+    if (yPosition + neededHeight > pageHeight - margin) {
+      doc.addPage()
+      yPosition = margin
+    }
+  }
+
+  // Helper function to wrap text
+  const wrapText = (text: string, maxWidth: number, fontSize: number) => {
+    doc.setFontSize(fontSize)
+    return doc.splitTextToSize(text, maxWidth)
+  }
+
+  // Header
+  doc.setFontSize(20)
+  doc.setFont("helvetica", "bold")
+  doc.text(title, margin, yPosition)
+  yPosition += 15
+
+  // User info if provided
+  if (userInfo?.name || userInfo?.email) {
+    doc.setFontSize(10)
+    doc.setFont("helvetica", "normal")
+    doc.setTextColor(100, 100, 100)
+    if (userInfo.name) {
+      doc.text(`User: ${userInfo.name}`, margin, yPosition)
+      yPosition += 8
+    }
+    if (userInfo.email) {
+      doc.text(`Email: ${userInfo.email}`, margin, yPosition)
+      yPosition += 8
+    }
+    yPosition += 5
+  }
+
+  // Date
+  doc.setFontSize(10)
+  doc.setTextColor(100, 100, 100)
+  doc.text(`Generated: ${new Date().toLocaleString()}`, margin, yPosition)
+  yPosition += 20
+
+  // Messages
+  messages.forEach((message, index) => {
+    // Check if we need a new page
+    checkPageBreak(30)
+
+    // Message header
+    doc.setFontSize(12)
+    doc.setFont("helvetica", "bold")
+    doc.setTextColor(0, 0, 0)
+
+    const roleText = message.role === "user" ? "You" : "Suitpax AI"
+    const timestamp = message.timestamp.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+
+    doc.text(`${roleText} - ${timestamp}`, margin, yPosition)
+    yPosition += 10
+
+    // Message content
+    doc.setFontSize(10)
+    doc.setFont("helvetica", "normal")
+    doc.setTextColor(40, 40, 40)
+
+    // Clean markdown from content for PDF
+    const cleanContent = message.content
+      .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold markdown
+      .replace(/\*(.*?)\*/g, "$1") // Remove italic markdown
+      .replace(/`(.*?)`/g, "$1") // Remove code markdown
+      .replace(/#{1,6}\s/g, "") // Remove headers
+      .replace(/^\s*[-*+]\s/gm, "• ") // Convert lists to bullets
+      .replace(/^\s*\d+\.\s/gm, "• ") // Convert numbered lists to bullets
+
+    const wrappedContent = wrapText(cleanContent, maxWidth, 10)
+
+    wrappedContent.forEach((line: string) => {
+      checkPageBreak(8)
+      doc.text(line, margin, yPosition)
+      yPosition += 6
+    })
+
+    // Add reasoning if present
+    if (message.reasoning) {
+      yPosition += 5
+      checkPageBreak(20)
+
+      doc.setFontSize(9)
+      doc.setFont("helvetica", "italic")
+      doc.setTextColor(100, 100, 100)
+      doc.text("AI Reasoning:", margin, yPosition)
+      yPosition += 8
+
+      const cleanReasoning = message.reasoning
+        .replace(/\*\*(.*?)\*\*/g, "$1")
+        .replace(/\*(.*?)\*/g, "$1")
+        .replace(/`(.*?)`/g, "$1")
+
+      const wrappedReasoning = wrapText(cleanReasoning, maxWidth - 10, 9)
+
+      wrappedReasoning.forEach((line: string) => {
+        checkPageBreak(6)
+        doc.text(line, margin + 10, yPosition)
+        yPosition += 5
+      })
+    }
+
+    yPosition += 15 // Space between messages
+  })
+
+  // Footer
+  const totalPages = doc.getNumberOfPages()
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i)
+    doc.setFontSize(8)
+    doc.setTextColor(150, 150, 150)
+    doc.text(`Page ${i} of ${totalPages} - Generated by Suitpax AI`, pageWidth / 2, pageHeight - 10, {
+      align: "center",
+    })
+  }
+
+  return doc
 }

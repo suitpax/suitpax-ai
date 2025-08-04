@@ -1,12 +1,13 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import type React from "react"
-import { createContext, useContext, useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, ChevronRight } from "lucide-react"
+import React, { createContext, useContext, useState } from "react"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
+// Context para el componente Reasoning
 type ReasoningContextType = {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
@@ -14,7 +15,7 @@ type ReasoningContextType = {
 
 const ReasoningContext = createContext<ReasoningContextType | null>(null)
 
-export function useReasoning() {
+function useReasoning() {
   const context = useContext(ReasoningContext)
   if (!context) {
     throw new Error("useReasoning must be used within a Reasoning component")
@@ -25,66 +26,137 @@ export function useReasoning() {
 export type ReasoningProps = {
   children: React.ReactNode
   className?: string
-} & React.HTMLAttributes<HTMLDivElement>
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+} & React.ComponentProps<typeof Collapsible>
 
-export function Reasoning({ children, className, ...props }: ReasoningProps) {
-  const [isOpen, setIsOpen] = useState(false)
+export function Reasoning({ children, className, open, onOpenChange, ...props }: ReasoningProps) {
+  const [internalOpen, setInternalOpen] = useState(false)
+
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? open : internalOpen
+
+  const setIsOpen = (newOpen: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(newOpen)
+    } else {
+      setInternalOpen(newOpen)
+    }
+  }
+
+  const contextValue: ReasoningContextType = {
+    isOpen,
+    setIsOpen,
+  }
 
   return (
-    <ReasoningContext.Provider value={{ isOpen, setIsOpen }}>
-      <div className={cn("w-full", className)} {...props}>
+    <ReasoningContext.Provider value={contextValue}>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} className={cn("w-full", className)} {...props}>
         {children}
-      </div>
+      </Collapsible>
     </ReasoningContext.Provider>
   )
 }
 
 export type ReasoningTriggerProps = {
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
-} & React.ButtonHTMLAttributes<HTMLButtonElement>
+} & React.ComponentProps<typeof CollapsibleTrigger>
 
 export function ReasoningTrigger({ children, className, ...props }: ReasoningTriggerProps) {
-  const { isOpen, setIsOpen } = useReasoning()
+  const { isOpen } = useReasoning()
 
   return (
-    <button
-      onClick={() => setIsOpen(!isOpen)}
-      className={cn("flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors", className)}
+    <CollapsibleTrigger
+      className={cn(
+        "flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors",
+        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm",
+        "py-1 px-2 -mx-2", // Add padding and negative margin for better click area
+        className,
+      )}
       {...props}
     >
-      {children}
-      <ChevronDown className={cn("h-3 w-3 transition-transform", isOpen && "rotate-180")} />
-    </button>
+      {isOpen ? (
+        <ChevronDown className="h-4 w-4 transition-transform" />
+      ) : (
+        <ChevronRight className="h-4 w-4 transition-transform" />
+      )}
+      {children || <span className="font-medium">{isOpen ? "Hide reasoning" : "Show reasoning"}</span>}
+    </CollapsibleTrigger>
   )
 }
 
 export type ReasoningContentProps = {
   children: React.ReactNode
   className?: string
-} & React.HTMLAttributes<HTMLDivElement>
+} & React.ComponentProps<typeof CollapsibleContent>
 
 export function ReasoningContent({ children, className, ...props }: ReasoningContentProps) {
-  const { isOpen } = useReasoning()
-
-  if (!isOpen) return null
-
   return (
-    <div
-      className={cn("mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600", className)}
+    <CollapsibleContent
+      className={cn(
+        "mt-2 space-y-2 overflow-hidden transition-all",
+        "border-l-2 border-muted pl-4 ml-2",
+        "text-sm text-muted-foreground",
+        className,
+      )}
       {...props}
     >
       {children}
-    </div>
+    </CollapsibleContent>
   )
 }
 
+// Componente para mostrar texto con efecto de streaming (simplificado)
 export type ReasoningResponseProps = {
-  text: string
+  text: string | AsyncIterable<string>
   className?: string
+  onComplete?: () => void
 } & React.HTMLAttributes<HTMLDivElement>
 
-export function ReasoningResponse({ text, className, ...props }: ReasoningResponseProps) {
+export function ReasoningResponse({ text, className, onComplete, ...props }: ReasoningResponseProps) {
+  const [displayedText, setDisplayedText] = React.useState("")
+  const [isComplete, setIsComplete] = React.useState(false)
+
+  React.useEffect(() => {
+    if (typeof text === "string") {
+      setDisplayedText(text)
+      setIsComplete(true)
+      onComplete?.()
+      return
+    }
+
+    // Para AsyncIterable (streaming)
+    let isCancelled = false
+    setDisplayedText("")
+    setIsComplete(false)
+
+    async function processStream() {
+      try {
+        for await (const chunk of text) {
+          if (isCancelled) break
+          setDisplayedText((prev) => prev + chunk)
+        }
+        if (!isCancelled) {
+          setIsComplete(true)
+          onComplete?.()
+        }
+      } catch (error) {
+        console.error("Error processing reasoning stream:", error)
+        if (!isCancelled) {
+          setIsComplete(true)
+          onComplete?.()
+        }
+      }
+    }
+
+    processStream()
+
+    return () => {
+      isCancelled = true
+    }
+  }, [text, onComplete])
+
   return (
     <div
       className={cn(
@@ -93,7 +165,10 @@ export function ReasoningResponse({ text, className, ...props }: ReasoningRespon
       )}
       {...props}
     >
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        {displayedText}
+        {!isComplete && <span className="animate-pulse">|</span>}
+      </ReactMarkdown>
     </div>
   )
 }

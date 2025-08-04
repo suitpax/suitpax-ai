@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/xai": "latest",
     "@anthropic-ai/sdk": "latest",
     "@duffel/api": "latest",
     "@emotion/is-prop-valid": "latest",
@@ -54,7 +55,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/sharp": "^0.32.0",
-    "ai": "^4.0.12",
+    "ai": "latest",
     "axios": "latest",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -65,6 +66,7 @@
     "framer-motion": "latest",
     "html-pdf-node": "^1.0.8",
     "input-otp": "latest",
+    "jspdf": "latest",
     "lucide-react": "^0.454.0",
     "next": "15.2.4",
     "next-themes": "latest",
@@ -84,7 +86,8 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.6.3",
-    "vaul": "latest"
+    "vaul": "latest",
+    "zod": "latest"
   },
   "devDependencies": {
     "@types/eslint": "^9.6.1",
