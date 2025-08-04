@@ -1,37 +1,52 @@
-import { Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer"
-import { createElement } from "react"
+import type React from "react"
+import { Document, Page, Text, View, StyleSheet, Font, pdf } from "@react-pdf/renderer"
+
+// Register fonts for better typography
+Font.register({
+  family: "Inter",
+  fonts: [
+    { src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" },
+    {
+      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fAZ9hiA.woff2",
+      fontWeight: 500,
+    },
+    {
+      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.woff2",
+      fontWeight: 600,
+    },
+  ],
+})
 
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
     backgroundColor: "#ffffff",
     padding: 40,
-    fontFamily: "Helvetica",
+    fontFamily: "Inter",
   },
   header: {
     marginBottom: 30,
     paddingBottom: 20,
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#000000",
+    fontSize: 24,
+    fontWeight: 600,
+    color: "#111827",
     marginBottom: 8,
-    letterSpacing: -1,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 12,
     color: "#6b7280",
-    marginBottom: 15,
-    fontWeight: "normal",
+    fontWeight: 300,
   },
   statsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 15,
-    padding: 15,
+    marginBottom: 30,
+    padding: 16,
     backgroundColor: "#f9fafb",
     borderRadius: 8,
     borderWidth: 1,
@@ -40,66 +55,53 @@ const styles = StyleSheet.create({
   statItem: {
     alignItems: "center",
   },
-  statValue: {
+  statNumber: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#000000",
+    fontWeight: 600,
+    color: "#111827",
+    marginBottom: 4,
   },
   statLabel: {
     fontSize: 10,
     color: "#6b7280",
-    marginTop: 3,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
+    fontWeight: 500,
   },
-  messagesContainer: {
-    flex: 1,
-    marginTop: 25,
-  },
-  messageBlock: {
+  messageContainer: {
     marginBottom: 20,
     padding: 16,
+    backgroundColor: "#ffffff",
     borderRadius: 12,
     borderWidth: 1,
+    borderColor: "#e5e7eb",
   },
   userMessage: {
-    backgroundColor: "#f3f4f6",
-    borderColor: "#e5e7eb",
-    alignSelf: "flex-end",
-    maxWidth: "75%",
-  },
-  assistantMessage: {
-    backgroundColor: "#ffffff",
-    borderColor: "#e5e7eb",
-    alignSelf: "flex-start",
-    maxWidth: "85%",
+    backgroundColor: "#111827",
+    borderColor: "#374151",
   },
   messageHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 8,
   },
   messageRole: {
-    fontSize: 11,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  userRole: {
-    color: "#3b82f6",
-  },
-  assistantRole: {
-    color: "#059669",
+    fontSize: 10,
+    fontWeight: 500,
+    color: "#6b7280",
+    marginRight: 8,
   },
   messageTime: {
     fontSize: 9,
     color: "#9ca3af",
+    fontWeight: 400,
   },
   messageContent: {
     fontSize: 11,
     lineHeight: 1.5,
-    color: "#1f2937",
+    color: "#374151",
+    fontWeight: 300,
+  },
+  userMessageContent: {
+    color: "#ffffff",
   },
   footer: {
     marginTop: 30,
@@ -108,143 +110,125 @@ const styles = StyleSheet.create({
     borderTopColor: "#e5e7eb",
     alignItems: "center",
   },
-  brandText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#000000",
-    marginBottom: 5,
-    letterSpacing: -0.5,
-  },
   footerText: {
     fontSize: 10,
     color: "#6b7280",
     textAlign: "center",
-    marginBottom: 3,
+    fontWeight: 400,
+  },
+  footerBrand: {
+    fontSize: 12,
+    color: "#111827",
+    fontWeight: 600,
+    marginBottom: 4,
   },
 })
 
-interface ChatPDFProps {
-  messages: Array<{
-    id: string
-    role: "user" | "assistant"
-    content: string
-    timestamp?: Date
-  }>
-  title: string
-  stats: {
-    totalMessages: number
-    userMessages: number
-    assistantMessages: number
-    exportDate: string
-  }
-  userEmail: string
+interface Message {
+  id: string
+  content: string
+  role: "user" | "assistant"
+  timestamp: Date
 }
 
-const ChatPDFDocument = ({ messages, title, stats, userEmail }: ChatPDFProps) =>
-  createElement(
-    Document,
-    {},
-    createElement(
-      Page,
-      { size: "A4", style: styles.page },
-      // Header
-      createElement(
-        View,
-        { style: styles.header },
-        createElement(Text, { style: styles.title }, title),
-        createElement(Text, { style: styles.subtitle }, `Exportado por: ${userEmail}`),
-        createElement(Text, { style: styles.subtitle }, stats.exportDate),
-        createElement(
-          View,
-          { style: styles.statsContainer },
-          createElement(
-            View,
-            { style: styles.statItem },
-            createElement(Text, { style: styles.statValue }, stats.totalMessages.toString()),
-            createElement(Text, { style: styles.statLabel }, "Total Mensajes"),
-          ),
-          createElement(
-            View,
-            { style: styles.statItem },
-            createElement(Text, { style: styles.statValue }, stats.userMessages.toString()),
-            createElement(Text, { style: styles.statLabel }, "Tus Mensajes"),
-          ),
-          createElement(
-            View,
-            { style: styles.statItem },
-            createElement(Text, { style: styles.statValue }, stats.assistantMessages.toString()),
-            createElement(Text, { style: styles.statLabel }, "Respuestas IA"),
-          ),
-        ),
-      ),
-      // Messages
-      createElement(
-        View,
-        { style: styles.messagesContainer },
-        ...messages.map((message, index) =>
-          createElement(
-            View,
-            {
-              key: message.id || index,
-              style: [styles.messageBlock, message.role === "user" ? styles.userMessage : styles.assistantMessage],
-            },
-            createElement(
-              View,
-              { style: styles.messageHeader },
-              createElement(
-                Text,
-                { style: [styles.messageRole, message.role === "user" ? styles.userRole : styles.assistantRole] },
-                message.role === "user" ? "Usuario" : "Suitpax AI",
-              ),
-              message.timestamp &&
-                createElement(
-                  Text,
-                  { style: styles.messageTime },
-                  message.timestamp.toLocaleTimeString("es-ES", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }),
-                ),
-            ),
-            createElement(
-              Text,
-              { style: styles.messageContent },
-              // Limpiar markdown básico para PDF
-              message.content
-                .replace(/\*\*(.*?)\*\*/g, "$1") // Bold
-                .replace(/\*(.*?)\*/g, "$1") // Italic
-                .replace(/`(.*?)`/g, "$1") // Code
-                .replace(/#{1,6}\s/g, "") // Headers
-                .replace(/^\s*[-*+]\s/gm, "• ") // List items
-                .replace(/^\s*\d+\.\s/gm, "• ") // Numbered lists
-                .replace(/\[([^\]]+)\]$$[^)]+$$/g, "$1"), // Links
-            ),
-          ),
-        ),
-      ),
-      // Footer
-      createElement(
-        View,
-        { style: styles.footer },
-        createElement(Text, { style: styles.brandText }, "SUITPAX AI"),
-        createElement(Text, { style: styles.footerText }, "Business Travel & Expense Management Platform"),
-        createElement(
-          Text,
-          { style: styles.footerText },
-          "Este documento contiene información confidencial de tu conversación con Suitpax AI",
-        ),
-        createElement(Text, { style: styles.footerText }, "Para más información visita suitpax.com"),
-      ),
-    ),
-  )
-
-export async function generateChatPDF(props: ChatPDFProps): Promise<Buffer> {
-  try {
-    const doc = ChatPDFDocument(props)
-    const pdfBuffer = await pdf(doc).toBuffer()
-    return pdfBuffer
-  } catch (error) {
-    console.error("Error generando PDF:", error)
-    throw new Error("Failed to generate PDF")
+interface PDFDocumentProps {
+  messages: Message[]
+  title: string
+  userInfo?: {
+    email?: string
+    name?: string
   }
+}
+
+// Clean markdown from message content for PDF
+function cleanMarkdown(text: string): string {
+  return text
+    .replace(/#{1,6}\s/g, "") // Remove headers
+    .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold
+    .replace(/\*(.*?)\*/g, "$1") // Remove italic
+    .replace(/`(.*?)`/g, "$1") // Remove inline code
+    .replace(/```[\s\S]*?```/g, "[Code block]") // Replace code blocks
+    .replace(/\[([^\]]+)\]$$[^)]+$$/g, "$1") // Remove links, keep text
+    .replace(/^\s*[-*+]\s/gm, "• ") // Convert list items to bullets
+    .replace(/^\s*\d+\.\s/gm, "• ") // Convert numbered lists to bullets
+    .trim()
+}
+
+const PDFDocument: React.FC<PDFDocumentProps> = ({ messages, title, userInfo }) => {
+  const totalMessages = messages.length
+  const userMessages = messages.filter((m) => m.role === "user").length
+  const aiMessages = messages.filter((m) => m.role === "assistant").length
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>
+            Generated on{" "}
+            {new Date().toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+            {userInfo?.email && ` • ${userInfo.email}`}
+          </Text>
+        </View>
+
+        {/* Statistics */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{totalMessages}</Text>
+            <Text style={styles.statLabel}>Total Messages</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{userMessages}</Text>
+            <Text style={styles.statLabel}>Your Messages</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{aiMessages}</Text>
+            <Text style={styles.statLabel}>AI Responses</Text>
+          </View>
+        </View>
+
+        {/* Messages */}
+        {messages.map((message, index) => (
+          <View key={message.id} style={[styles.messageContainer, message.role === "user" && styles.userMessage]}>
+            <View style={styles.messageHeader}>
+              <Text style={styles.messageRole}>{message.role === "user" ? "You" : "Suitpax AI"}</Text>
+              <Text style={styles.messageTime}>
+                {message.timestamp.toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Text>
+            </View>
+            <Text style={[styles.messageContent, message.role === "user" && styles.userMessageContent]}>
+              {cleanMarkdown(message.content)}
+            </Text>
+          </View>
+        ))}
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerBrand}>Suitpax</Text>
+          <Text style={styles.footerText}>Your AI-powered business travel assistant</Text>
+          <Text style={styles.footerText}>This conversation was exported from Suitpax AI Chat</Text>
+        </View>
+      </Page>
+    </Document>
+  )
+}
+
+export async function generateChatPDF(
+  messages: Message[],
+  title: string,
+  userInfo?: { email?: string; name?: string },
+): Promise<Buffer> {
+  const doc = <PDFDocument messages={messages} title={title} userInfo={userInfo} />
+  const pdfBuffer = await pdf(doc).toBuffer()
+  return pdfBuffer
 }
