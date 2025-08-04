@@ -18,7 +18,8 @@ interface PageHeaderProps {
   children?: React.ReactNode
 }
 
-export default function PageHeader({
+export function PageHeader({
+
   title,
   subtitle,
   description,
