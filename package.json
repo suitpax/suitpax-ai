@@ -10,8 +10,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.57.0",
-    "@duffel/api": "^4.15.0",
+    "@ai-sdk/anthropic": "^1.2.12",
+    "@anthropic-ai/sdk": "latest",
+    "@duffel/api": "latest",
     "@getbrevo/brevo": "^3.0.1",
     "@heroicons/react": "^2.2.0",
     "@intercom/messenger-js-sdk": "^0.0.14",
