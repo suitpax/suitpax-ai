@@ -54,15 +54,15 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
 
   return (
     <div className="relative mb-6 px-0.5">
-      {/* Grid fija de 12 columnas con ancho máximo para que no crezca */}
-      <div className="grid grid-cols-12 gap-0.5 max-w-[360px] mx-auto">
+      {/* Grid fija de 12 columnas con tamaños responsivos */}
+      <div className="grid grid-cols-12 gap-0.5 max-w-[360px] md:max-w-[480px] mx-auto">
         {agentGrid.map((agent, index) => (
           <motion.div
             key={agent.id}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2, delay: index * 0.001 }}
-            className="aspect-square relative cursor-pointer max-w-[30px]"
+            className="aspect-square relative cursor-pointer max-w-[30px] md:max-w-[40px]"
             onClick={() => handleAgentSelect(agent.id)}
           >
             <AnimatePresence>
@@ -93,7 +93,7 @@ export default function AgentGrid({ agents, onAgentSelect, selectedAgent }: Agen
                 alt="AI Travel Agent"
                 fill
                 className="object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
-                sizes="30px"
+                sizes="(max-width: 768px) 30px, 40px"
               />
             </div>
           </motion.div>
