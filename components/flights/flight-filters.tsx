@@ -404,7 +404,7 @@ export default function FlightFilters({
                     <div className="space-y-2">
                       <Label className="text-xs text-gray-600">Maximum stops: {tempFilters.maxStops}</Label>
                       <Slider
-                        value={[tempFilters.maxStops]}
+                        value={[tempFilters.maxStops, tempFilters.maxStops]}
                         onValueChange={(value) => updateFilter('maxStops', value[0])}
                         min={0}
                         max={3}
@@ -537,25 +537,29 @@ export default function FlightFilters({
               </div>
 
               {/* Footer Actions */}
-              <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 space-y-3">
-                <div className="flex space-x-3">
-                  <Button
-                    variant="outline"
-                    onClick={resetFilters}
-                    className="flex-1"
-                  >
-                    Reset
-</Button>
-              <Button
-                onClick={applyFilters}
-                className="flex-1 bg-black text-white hover:bg-gray-800"
-              >
-                Apply Filters
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
+<div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 space-y-3">
+  <div className="flex space-x-3">
+    <Button
+      variant="outline"
+      onClick={resetFilters}
+      className="flex-1"
+    >
+      Reset
+    </Button>
+    <Button
+      onClick={applyFilters}
+      className="flex-1"
+    >
+      Apply
+    </Button>
+  </div>
+</div>
+</div> {/* Cierra el panel */}
+</motion.div> {/* Cierra el motion panel */}
+</>
+)}
+</AnimatePresence>
+);
 }
+
+    
