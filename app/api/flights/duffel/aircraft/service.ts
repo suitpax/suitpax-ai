@@ -2,7 +2,7 @@ import { Duffel } from "@duffel/api";
 import { Aircraft, AircraftListResponse } from "./types";
 
 const duffel = new Duffel({
-  token: process.env.DUFFEL_API_KEY!,
+  token: ((globalThis as any)?.process?.env?.DUFFEL_API_KEY as string | undefined) ?? "",
   environment: "test",
 });
 

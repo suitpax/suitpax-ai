@@ -1,10 +1,10 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
-import Anthropic from "@anthropic-ai/sdk"
+import { type NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-})
+  apiKey: ((globalThis as any)?.process?.env?.ANTHROPIC_API_KEY as string | undefined) ?? "",
+});
 
 // Función para generar el prompt de razonamiento
 function createReasoningPrompt(message: string, context: string): string {
@@ -439,12 +439,13 @@ Context: ${context}
     // Registrar interacción si el usuario está autenticado - CON NUEVAS COLUMNAS
     if (user) {
       try {
+        const tokensUsed = (response.usage?.input_tokens ?? 0) + (response.usage?.output_tokens ?? 0)
         await supabase.from("ai_chat_logs").insert({
           user_id: user.id,
           message: message,
           response: aiResponse,
           context_type: context,
-          tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
+          tokens_used: tokensUsed,
           model_used: "claude-sonnet-4-20250514",
           reasoning_included: includeReasoning, // ← NUEVA COLUMNA
           reasoning_content: reasoning || null, // ← NUEVA COLUMNA
@@ -454,10 +455,11 @@ Context: ${context}
       }
     }
 
+    const tokensUsed = (response.usage?.input_tokens ?? 0) + (response.usage?.output_tokens ?? 0)
     return NextResponse.json({
       response: aiResponse,
       reasoning: reasoning || undefined, // Solo incluir si hay razonamiento
-      tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
+      tokens_used: tokensUsed,
       model: "claude-sonnet-4-20250514",
     })
   } catch (error) {
@@ -468,7 +470,6 @@ Context: ${context}
         error: "I'm experiencing technical difficulties right now. Please try again in a moment.",
         response:
           "I apologize, but I'm having trouble processing your request at the moment. Our team has been notified and we're working to resolve this issue. Please try again in a few minutes.",
-        reasoning: includeReasoning ? "Error occurred while processing the request. The system is attempting to provide a helpful fallback response while technical issues are resolved." : undefined,
       },
       { status: 500 },
     )
