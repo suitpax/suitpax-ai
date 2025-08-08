@@ -4,63 +4,55 @@ import type { NextRequest } from "next/server"
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hostname = request.headers.get('host') || ''
-  
-  // Crear respuesta y agregar headers personalizados
+
   const response = NextResponse.next()
-  
-  // Pasar el pathname actual como header
+
   response.headers.set('x-url', pathname)
   response.headers.set('x-pathname', pathname)
-  
-  console.log("Middleware - Setting pathname header:", pathname)
-  
-  // Verificar si es el subdominio app (más flexible)
-  const isAppSubdomain = hostname.includes('app.suitpax.com') || 
-                        hostname.startsWith('app.') ||
-                        (process.env.NODE_ENV === 'development' && hostname.includes('localhost:3001'))
 
-  // Rutas que siempre deben permitirse (static files, Next.js internals)
-  const isStaticRoute = 
+  if (process.env.NODE_ENV === 'development') {
+    console.log("Middleware - Setting pathname header:", pathname)
+  }
+
+  const isAppSubdomain =
+    hostname.includes('app.suitpax.com') ||
+    hostname.startsWith('app.') ||
+    hostname.includes('localhost')
+
+  const isStaticRoute =
     pathname.startsWith("/_next") ||
     pathname.startsWith("/static") ||
     pathname.startsWith("/favicon") ||
-    pathname.includes(".") || // Cualquier archivo con extensión
-    pathname.startsWith("/api/health") || // Health check endpoint
+    pathname.includes(".") ||
+    pathname.startsWith("/api/health") ||
     pathname === "/robots.txt" ||
     pathname === "/sitemap.xml"
 
-  // Si es una ruta estática, siempre permitir
   if (isStaticRoute) {
     return response
   }
 
-  // Lógica específica para app.suitpax.com
   if (isAppSubdomain) {
-    // Rutas permitidas en el subdominio app
     const allowedAppPaths = ['/login', '/signup', '/dashboard', '/api', '/auth']
     const isAllowedAppPath = allowedAppPaths.some(path => pathname.startsWith(path))
-    
-    // Si es la ruta raíz, redirigir a login
+
     if (pathname === '/') {
       const url = request.nextUrl.clone()
       url.pathname = '/login'
       return NextResponse.redirect(url)
     }
-    
-    // Si no es una ruta permitida, redirigir a login
+
     if (!isAllowedAppPath) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'
-      // Evitar loops infinitos
       if (pathname !== '/login') {
         return NextResponse.redirect(url)
       }
     }
-    
+
     return response
   }
 
-  // Lógica para el dominio principal (suitpax.com)
   const publicPaths = [
     "/",
     "/manifesto",
@@ -71,8 +63,8 @@ export function middleware(request: NextRequest) {
     "/public",
     "/api/public"
   ]
-  
-  const isPublicPath = publicPaths.some(path => 
+
+  const isPublicPath = publicPaths.some(path =>
     pathname === path || pathname.startsWith(path + "/")
   )
 
@@ -80,19 +72,11 @@ export function middleware(request: NextRequest) {
     return response
   }
 
-  // Para rutas protegidas en el dominio principal
   return response
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
     {
       source: "/((?!_next/static|_next/image|favicon.ico|public).*)",
       missing: [

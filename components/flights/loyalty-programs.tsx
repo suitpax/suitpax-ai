@@ -10,7 +10,7 @@ import {
   UserIcon,
   ChevronDownIcon,
   InformationCircleIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline"
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid"
 import { Badge } from "@/components/ui/badge"
@@ -26,7 +26,7 @@ interface LoyaltyProgram {
   airline_name: string
   account_number: string
   tier?: string
-  type: 'personal' | 'corporate'
+  type: "personal" | "corporate"
 }
 
 interface CorporateContract {
@@ -46,29 +46,29 @@ interface LoyaltyProgramsProps {
 
 // Aerolíneas principales con programas de lealtad
 const MAJOR_AIRLINES = [
-  { code: 'AA', name: 'American Airlines', program: 'AAdvantage' },
-  { code: 'UA', name: 'United Airlines', program: 'MileagePlus' },
-  { code: 'DL', name: 'Delta Air Lines', program: 'SkyMiles' },
-  { code: 'BA', name: 'British Airways', program: 'Executive Club' },
-  { code: 'LH', name: 'Lufthansa', program: 'Miles & More' },
-  { code: 'AF', name: 'Air France', program: 'Flying Blue' },
-  { code: 'KL', name: 'KLM', program: 'Flying Blue' },
-  { code: 'IB', name: 'Iberia', program: 'Iberia Plus' },
-  { code: 'VS', name: 'Virgin Atlantic', program: 'Flying Club' },
-  { code: 'EK', name: 'Emirates', program: 'Skywards' },
-  { code: 'QR', name: 'Qatar Airways', program: 'Privilege Club' },
-  { code: 'SQ', name: 'Singapore Airlines', program: 'KrisFlyer' },
-  { code: 'CX', name: 'Cathay Pacific', program: 'Asia Miles' },
-  { code: 'JL', name: 'Japan Airlines', program: 'JAL Mileage Bank' },
-  { code: 'NH', name: 'ANA', program: 'ANA Mileage Club' }
+  { code: "AA", name: "American Airlines", program: "AAdvantage" },
+  { code: "UA", name: "United Airlines", program: "MileagePlus" },
+  { code: "DL", name: "Delta Air Lines", program: "SkyMiles" },
+  { code: "BA", name: "British Airways", program: "Executive Club" },
+  { code: "LH", name: "Lufthansa", program: "Miles & More" },
+  { code: "AF", name: "Air France", program: "Flying Blue" },
+  { code: "KL", name: "KLM", program: "Flying Blue" },
+  { code: "IB", name: "Iberia", program: "Iberia Plus" },
+  { code: "VS", name: "Virgin Atlantic", program: "Flying Club" },
+  { code: "EK", name: "Emirates", program: "Skywards" },
+  { code: "QR", name: "Qatar Airways", program: "Privilege Club" },
+  { code: "SQ", name: "Singapore Airlines", program: "KrisFlyer" },
+  { code: "CX", name: "Cathay Pacific", program: "Asia Miles" },
+  { code: "JL", name: "Japan Airlines", program: "JAL Mileage Bank" },
+  { code: "NH", name: "ANA", program: "ANA Mileage Club" },
 ]
 
-const TIER_LEVELS = ['Basic', 'Silver', 'Gold', 'Platinum', 'Diamond']
+const TIER_LEVELS = ["Basic", "Silver", "Gold", "Platinum", "Diamond"]
 
-export function LoyaltyProgramsManager({ 
-  onProgramsChange, 
+export function LoyaltyProgramsManager({
+  onProgramsChange,
   onCorporateContractsChange,
-  className = "" 
+  className = "",
 }: LoyaltyProgramsProps) {
   const [programs, setPrograms] = useState<LoyaltyProgram[]>([])
   const [corporateContracts, setCorporateContracts] = useState<CorporateContract[]>([])
@@ -78,30 +78,29 @@ export function LoyaltyProgramsManager({
 
   // Estado para nuevo programa personal
   const [newProgram, setNewProgram] = useState({
-    airline_iata_code: '',
-    account_number: '',
-    tier: ''
+    airline_iata_code: "",
+    account_number: "",
+    tier: "",
   })
 
   // Estado para nuevo contrato corporativo
   const [newCorporate, setNewCorporate] = useState({
-    airline_iata_code: '',
-    contract_name: '',
-    discount_percentage: 0
+    airline_iata_code: "",
+    contract_name: "",
+    discount_percentage: 0,
   })
 
   useEffect(() => {
-    // Cargar programas guardados del localStorage
-    const savedPrograms = localStorage.getItem('suitpax_loyalty_programs')
-    const savedContracts = localStorage.getItem('suitpax_corporate_contracts')
-    
+    const savedPrograms = typeof window !== "undefined" ? localStorage.getItem("suitpax_loyalty_programs") : null
+    const savedContracts = typeof window !== "undefined" ? localStorage.getItem("suitpax_corporate_contracts") : null
+
     if (savedPrograms) {
       try {
         const parsed = JSON.parse(savedPrograms)
         setPrograms(parsed)
         onProgramsChange?.(parsed)
       } catch (error) {
-        console.error('Error loading loyalty programs:', error)
+        console.error("Error loading loyalty programs:", error)
       }
     }
 
@@ -111,27 +110,31 @@ export function LoyaltyProgramsManager({
         setCorporateContracts(parsed)
         onCorporateContractsChange?.(parsed)
       } catch (error) {
-        console.error('Error loading corporate contracts:', error)
+        console.error("Error loading corporate contracts:", error)
       }
     }
   }, [onProgramsChange, onCorporateContractsChange])
 
   const savePrograms = (updatedPrograms: LoyaltyProgram[]) => {
     setPrograms(updatedPrograms)
-    localStorage.setItem('suitpax_loyalty_programs', JSON.stringify(updatedPrograms))
+    if (typeof window !== "undefined") {
+      localStorage.setItem("suitpax_loyalty_programs", JSON.stringify(updatedPrograms))
+    }
     onProgramsChange?.(updatedPrograms)
   }
 
   const saveCorporateContracts = (updatedContracts: CorporateContract[]) => {
     setCorporateContracts(updatedContracts)
-    localStorage.setItem('suitpax_corporate_contracts', JSON.stringify(updatedContracts))
+    if (typeof window !== "undefined") {
+      localStorage.setItem("suitpax_corporate_contracts", JSON.stringify(updatedContracts))
+    }
     onCorporateContractsChange?.(updatedContracts)
   }
 
   const addLoyaltyProgram = () => {
     if (!newProgram.airline_iata_code || !newProgram.account_number) return
 
-    const airline = MAJOR_AIRLINES.find(a => a.code === newProgram.airline_iata_code)
+    const airline = MAJOR_AIRLINES.find((a) => a.code === newProgram.airline_iata_code)
     if (!airline) return
 
     const program: LoyaltyProgram = {
@@ -139,19 +142,19 @@ export function LoyaltyProgramsManager({
       airline_iata_code: newProgram.airline_iata_code,
       airline_name: airline.name,
       account_number: newProgram.account_number,
-      tier: newProgram.tier || 'Basic',
-      type: 'personal'
+      tier: newProgram.tier || "Basic",
+      type: "personal",
     }
 
     savePrograms([...programs, program])
-    setNewProgram({ airline_iata_code: '', account_number: '', tier: '' })
+    setNewProgram({ airline_iata_code: "", account_number: "", tier: "" })
     setShowAddProgram(false)
   }
 
   const addCorporateContract = () => {
     if (!newCorporate.airline_iata_code || !newCorporate.contract_name) return
 
-    const airline = MAJOR_AIRLINES.find(a => a.code === newCorporate.airline_iata_code)
+    const airline = MAJOR_AIRLINES.find((a) => a.code === newCorporate.airline_iata_code)
     if (!airline) return
 
     const contract: CorporateContract = {
@@ -160,25 +163,20 @@ export function LoyaltyProgramsManager({
       airline_name: airline.name,
       contract_name: newCorporate.contract_name,
       discount_percentage: newCorporate.discount_percentage,
-      benefits: [
-        'Priority booking',
-        'Flexible cancellation',
-        'Dedicated support',
-        'Bulk booking discounts'
-      ]
+      benefits: ["Priority booking", "Flexible cancellation", "Dedicated support", "Bulk booking discounts"],
     }
 
     saveCorporateContracts([...corporateContracts, contract])
-    setNewCorporate({ airline_iata_code: '', contract_name: '', discount_percentage: 0 })
+    setNewCorporate({ airline_iata_code: "", contract_name: "", discount_percentage: 0 })
     setShowAddCorporate(false)
   }
 
   const removeProgram = (id: string) => {
-    savePrograms(programs.filter(p => p.id !== id))
+    savePrograms(programs.filter((p) => p.id !== id))
   }
 
   const removeCorporateContract = (id: string) => {
-    saveCorporateContracts(corporateContracts.filter(c => c.id !== id))
+    saveCorporateContracts(corporateContracts.filter((c) => c.id !== id))
   }
 
   const getTierIcon = (tier: string) => {
@@ -190,15 +188,15 @@ export function LoyaltyProgramsManager({
 
   const getTierColor = (tier: string) => {
     switch (tier) {
-      case 'Diamond':
-      case 'Platinum':
-        return 'bg-purple-50 text-purple-700 border-purple-200'
-      case 'Gold':
-        return 'bg-yellow-50 text-yellow-700 border-yellow-200'
-      case 'Silver':
-        return 'bg-gray-50 text-gray-700 border-gray-300'
+      case "Diamond":
+      case "Platinum":
+        return "bg-purple-50 text-purple-700 border-purple-200"
+      case "Gold":
+        return "bg-yellow-50 text-yellow-700 border-yellow-200"
+      case "Silver":
+        return "bg-gray-50 text-gray-700 border-gray-300"
       default:
-        return 'bg-blue-50 text-blue-700 border-blue-200'
+        return "bg-blue-50 text-blue-700 border-blue-200"
     }
   }
 
@@ -222,32 +220,24 @@ export function LoyaltyProgramsManager({
                 {totalPrograms}
               </Badge>
             )}
-            <ChevronDownIcon 
-              className={`h-3 w-3 ml-2 transition-transform ${
-                isExpanded ? 'rotate-180' : ''
-              }`} 
-            />
+            <ChevronDownIcon className={`h-3 w-3 ml-2 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
           </Button>
         </div>
 
         {totalPrograms > 0 && (
           <div className="flex items-center space-x-2">
             {programs.slice(0, 3).map((program) => (
-              <Badge 
+              <Badge
                 key={program.id}
-                variant="outline" 
-                className={`text-xs ${getTierColor(program.tier || 'Basic')}`}
+                variant="outline"
+                className={`text-xs ${getTierColor(program.tier || "Basic")}`}
               >
-                {getTierIcon(program.tier || 'Basic')}
+                {getTierIcon(program.tier || "Basic")}
                 <span className="ml-1">{program.airline_iata_code}</span>
               </Badge>
             ))}
             {corporateContracts.slice(0, 2).map((contract) => (
-              <Badge 
-                key={contract.id}
-                variant="outline" 
-                className="text-xs bg-green-50 text-green-700 border-green-200"
-              >
+              <Badge key={contract.id} variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
                 <BuildingOfficeIcon className="h-3 w-3 mr-1" />
                 {contract.airline_iata_code}
               </Badge>
@@ -281,7 +271,7 @@ export function LoyaltyProgramsManager({
                   Add your frequent flyer accounts and corporate contracts to unlock better prices and benefits.
                 </p>
               </CardHeader>
-              
+
               <CardContent className="space-y-6">
                 {/* Programas personales */}
                 <div className="space-y-3">
@@ -290,12 +280,7 @@ export function LoyaltyProgramsManager({
                       <UserIcon className="h-4 w-4 mr-2" />
                       Personal Programs
                     </h4>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowAddProgram(true)}
-                      className="text-xs"
-                    >
+                    <Button variant="outline" size="sm" onClick={() => setShowAddProgram(true)} className="text-xs">
                       <PlusIcon className="h-3 w-3 mr-1" />
                       Add Program
                     </Button>
@@ -304,26 +289,20 @@ export function LoyaltyProgramsManager({
                   {programs.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {programs.map((program) => (
-                        <div key={program.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div
+                          key={program.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                        >
                           <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 bg-white rounded-lg border border-gray-200 flex items-center justify-center">
-                              <span className="text-xs font-medium text-gray-700">
-                                {program.airline_iata_code}
-                              </span>
+                              <span className="text-xs font-medium text-gray-700">{program.airline_iata_code}</span>
                             </div>
                             <div>
-                              <div className="text-sm font-medium text-gray-900">
-                                {program.airline_name}
-                              </div>
-                              <div className="text-xs text-gray-600">
-                                {program.account_number}
-                              </div>
-                              <Badge 
-                                variant="outline" 
-                                className={`text-xs mt-1 ${getTierColor(program.tier || 'Basic')}`}
-                              >
-                                {getTierIcon(program.tier || 'Basic')}
-                                <span className="ml-1">{program.tier || 'Basic'}</span>
+                              <div className="text-sm font-medium text-gray-900">{program.airline_name}</div>
+                              <div className="text-xs text-gray-600">{program.account_number}</div>
+                              <Badge variant="outline" className={`text-xs mt-1 ${getTierColor(program.tier || "Basic")}`}>
+                                {getTierIcon(program.tier || "Basic")}
+                                <span className="ml-1">{program.tier || "Basic"}</span>
                               </Badge>
                             </div>
                           </div>
@@ -358,9 +337,9 @@ export function LoyaltyProgramsManager({
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div>
                               <Label className="text-xs font-medium text-gray-700">Airline</Label>
-                              <Select 
+                              <Select
                                 value={newProgram.airline_iata_code}
-                                onValueChange={(value) => setNewProgram(prev => ({ ...prev, airline_iata_code: value }))}
+                                onValueChange={(value) => setNewProgram((prev) => ({ ...prev, airline_iata_code: value }))}
                               >
                                 <SelectTrigger className="text-sm">
                                   <SelectValue placeholder="Select airline" />
@@ -374,24 +353,21 @@ export function LoyaltyProgramsManager({
                                 </SelectContent>
                               </Select>
                             </div>
-                            
+
                             <div>
                               <Label className="text-xs font-medium text-gray-700">Account Number</Label>
                               <Input
                                 type="text"
                                 value={newProgram.account_number}
-                                onChange={(e) => setNewProgram(prev => ({ ...prev, account_number: e.target.value }))}
+                                onChange={(e) => setNewProgram((prev) => ({ ...prev, account_number: e.target.value }))}
                                 placeholder="Enter account number"
                                 className="text-sm"
                               />
                             </div>
-                            
+
                             <div>
                               <Label className="text-xs font-medium text-gray-700">Tier Level</Label>
-                              <Select 
-                                value={newProgram.tier}
-                                onValueChange={(value) => setNewProgram(prev => ({ ...prev, tier: value }))}
-                              >
+                              <Select value={newProgram.tier} onValueChange={(value) => setNewProgram((prev) => ({ ...prev, tier: value }))}>
                                 <SelectTrigger className="text-sm">
                                   <SelectValue placeholder="Select tier" />
                                 </SelectTrigger>
@@ -405,22 +381,12 @@ export function LoyaltyProgramsManager({
                               </Select>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center justify-end space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setShowAddProgram(false)}
-                              className="text-xs"
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => setShowAddProgram(false)} className="text-xs">
                               Cancel
                             </Button>
-                            <Button
-                              size="sm"
-                              onClick={addLoyaltyProgram}
-                              disabled={!newProgram.airline_iata_code || !newProgram.account_number}
-                              className="text-xs"
-                            >
+                            <Button size="sm" onClick={addLoyaltyProgram} disabled={!newProgram.airline_iata_code || !newProgram.account_number} className="text-xs">
                               <CheckCircleIcon className="h-3 w-3 mr-1" />
                               Add Program
                             </Button>
@@ -438,12 +404,7 @@ export function LoyaltyProgramsManager({
                       <BuildingOfficeIcon className="h-4 w-4 mr-2" />
                       Corporate Contracts
                     </h4>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowAddCorporate(true)}
-                      className="text-xs"
-                    >
+                    <Button variant="outline" size="sm" onClick={() => setShowAddCorporate(true)} className="text-xs">
                       <PlusIcon className="h-3 w-3 mr-1" />
                       Add Contract
                     </Button>
@@ -452,20 +413,17 @@ export function LoyaltyProgramsManager({
                   {corporateContracts.length > 0 ? (
                     <div className="space-y-3">
                       {corporateContracts.map((contract) => (
-                        <div key={contract.id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div
+                          key={contract.id}
+                          className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200"
+                        >
                           <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 bg-white rounded-lg border border-green-200 flex items-center justify-center">
-                              <span className="text-xs font-medium text-green-700">
-                                {contract.airline_iata_code}
-                              </span>
+                              <span className="text-xs font-medium text-green-700">{contract.airline_iata_code}</span>
                             </div>
                             <div>
-                              <div className="text-sm font-medium text-gray-900">
-                                {contract.contract_name}
-                              </div>
-                              <div className="text-xs text-gray-600">
-                                {contract.airline_name}
-                              </div>
+                              <div className="text-sm font-medium text-gray-900">{contract.contract_name}</div>
+                              <div className="text-xs text-gray-600">{contract.airline_name}</div>
                               {contract.discount_percentage && (
                                 <Badge variant="outline" className="text-xs mt-1 bg-green-100 text-green-700 border-green-300">
                                   {contract.discount_percentage}% discount
@@ -475,3 +433,105 @@ export function LoyaltyProgramsManager({
                           </div>
                           <Button
                             variant="ghost"
+                            size="sm"
+                            onClick={() => removeCorporateContract(contract.id)}
+                            className="text-red-500 hover:text-red-700 p-1 h-auto"
+                          >
+                            <TrashIcon className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 bg-green-50 rounded-lg border border-green-200">
+                      <BuildingOfficeIcon className="h-8 w-8 text-green-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600">No corporate contracts added yet</p>
+                    </div>
+                  )}
+
+                  {/* Formulario para agregar contrato corporativo */}
+                  <AnimatePresence>
+                    {showAddCorporate && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="p-4 bg-green-50 border border-green-200 rounded-lg"
+                      >
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                              <Label className="text-xs font-medium text-gray-700">Airline</Label>
+                              <Select
+                                value={newCorporate.airline_iata_code}
+                                onValueChange={(value) => setNewCorporate((prev) => ({ ...prev, airline_iata_code: value }))}
+                              >
+                                <SelectTrigger className="text-sm">
+                                  <SelectValue placeholder="Select airline" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {MAJOR_AIRLINES.map((airline) => (
+                                    <SelectItem key={airline.code} value={airline.code}>
+                                      {airline.code} - {airline.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div>
+                              <Label className="text-xs font-medium text-gray-700">Contract Name</Label>
+                              <Input
+                                type="text"
+                                value={newCorporate.contract_name}
+                                onChange={(e) => setNewCorporate((prev) => ({ ...prev, contract_name: e.target.value }))}
+                                placeholder="Enter contract name"
+                                className="text-sm"
+                              />
+                            </div>
+
+                            <div>
+                              <Label className="text-xs font-medium text-gray-700">Discount %</Label>
+                              <Input
+                                type="number"
+                                value={newCorporate.discount_percentage}
+                                onChange={(e) =>
+                                  setNewCorporate((prev) => ({ ...prev, discount_percentage: Number(e.target.value) || 0 }))
+                                }
+                                placeholder="0"
+                                className="text-sm"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-end space-x-2">
+                            <Button variant="ghost" size="sm" onClick={() => setShowAddCorporate(false)} className="text-xs">
+                              Cancel
+                            </Button>
+                            <Button size="sm" onClick={addCorporateContract} disabled={!newCorporate.airline_iata_code || !newCorporate.contract_name} className="text-xs">
+                              <CheckCircleIcon className="h-3 w-3 mr-1" />
+                              Add Contract
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Nota informativa */}
+                <div className="flex items-start gap-2 text-xs text-gray-600">
+                  <InformationCircleIcon className="h-4 w-4 mt-0.5" />
+                  <p>
+                    Suitpax uses your personal and corporate loyalty information to unlock better fares and benefits when
+                    available. This information is stored locally in your browser and can be removed at any time.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
