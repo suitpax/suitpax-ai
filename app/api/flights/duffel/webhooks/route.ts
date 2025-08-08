@@ -335,3 +335,61 @@ async function handleServiceUpdate(supabase: any, serviceData: any) {
   } catch (error) {
     console.error(`Error handling service update for ${serviceData.id}:`, error);
     throw error;
+  }
+}
+
+/**
+ * Maneja actualizaciones de solicitudes de cambio de orden
+ */
+async function handleOrderChangeUpdate(supabase: any, changeData: any) {
+  try {
+    // Actualizar el estado de la solicitud de cambio en nuestra base de datos
+    const { data: existingChange } = await supabase
+      .from("order_changes")
+      .select("*")
+      .eq("duffel_change_request_id", changeData.id)
+      .single();
+    
+    if (existingChange) {
+      await supabase
+        .from("order_changes")
+        .update({
+          status: changeData.status,
+          updated_at: new Date().toISOString(),
+          confirmation_data: changeData
+        })
+        .eq("duffel_change_request_id", changeData.id);
+      
+      console.log(`Updated change request ${changeData.id} to status: ${changeData.status}`);
+      
+      // Si el cambio se ha confirmado, actualizar la orden principal
+      if (changeData.status === 'confirmed' && changeData.order) {
+        await supabase
+          .from("flight_bookings")
+          .update({
+            status: mapDuffelStatus(changeData.order.status),
+            updated_at: new Date().toISOString(),
+            metadata: {
+              ...existingChange.original_data,
+              last_change: {
+                id: changeData.id,
+                type: existingChange.change_type,
+                confirmed_at: new Date().toISOString(),
+                status: 'confirmed'
+              },
+              updated_order: changeData.order
+            }
+          })
+          .eq("duffel_order_id", existingChange.order_id);
+        
+        console.log(`Updated order ${existingChange.order_id} with change request data`);
+      }
+    } else {
+      // La solicitud de cambio no está en nuestra base de datos
+      console.log(`Received update for unknown change request: ${changeData.id}`);
+    }
+  } catch (error) {
+    console.error(`Error handling order change update for ${changeData.id}:`, error);
+    throw error;
+  }
+}
