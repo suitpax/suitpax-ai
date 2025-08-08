@@ -143,28 +143,14 @@ export const Footer = () => {
             <div className="flex flex-col space-y-2">
               {[
                 { label: "SOC 2 Type I", status: "active" },
+                { label: "ISO 27001", status: "active" },
                 { label: "GDPR Ready", status: "ready" },
                 { label: "CCPA Compliant", status: "compliant" },
-                { label: "DPA Suitpax AI", action: "download" },
                 { label: "AI Act", link: "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai" },
               ].map((cert, index) => (
                 <div
                   key={index}
-                  className={`flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300 ${
-                    cert.action === "download" ? "cursor-pointer" : ""
-                  }`}
-                  onClick={
-                    cert.action === "download"
-                      ? () => {
-                          const link = document.createElement("a")
-                          link.href = "/legal/suitpax-ai-dpa.pdf"
-                          link.download = "Suitpax-AI-DPA.pdf"
-                          document.body.appendChild(link)
-                          link.click()
-                          document.body.removeChild(link)
-                        }
-                      : undefined
-                  }
+                  className="flex items-center bg-transparent px-3 py-1.5 rounded-lg shadow-sm border border-gray-600/30 group hover:border-gray-500/30 transition-colors duration-300"
                 >
                   {cert.status && (
                     <div
