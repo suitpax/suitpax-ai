@@ -42,6 +42,8 @@ export const createDuffelClient = (options?: {
   return client;
 };
 
+// ... [Todo tu código existente se mantiene igual] ...
+
 /**
  * Manejo estandarizado de errores de Duffel con más detalle
  */
@@ -454,3 +456,13 @@ export interface BaggageService {
   passenger_id?: string;
   segment_id?: string;
 }
+
+// ✅ SOLUCIÓN: Exportar instancia por defecto para compatibilidad
+/**
+ * Instancia por defecto del cliente Duffel para compatibilidad con rutas existentes
+ * Usar createDuffelClient() para casos más avanzados
+ */
+export const duffel = createDuffelClient();
+
+// Export por defecto también para compatibilidad
+export default duffel;
