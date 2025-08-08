@@ -1,19 +1,5 @@
 
-```markdown
-<div align="center">
-  <img src="public/logo.png" alt="Suitpax AI Logo" width="200"/>
-  <h1>Suitpax AI</h1>
-  <p>Next-Generation AI-Powered Business Travel Assistant</p>
-
-  [![Next.js](https://img.shields.io/badge/Next.js-14.2.16-black)](https://nextjs.org/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue)](https://www.typescriptlang.org/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4.17-38B2AC)](https://tailwindcss.com/)
-  [![License](https://img.shields.io/badge/License-Private-red)]()
-</div>
-
----
-
-## Overview
+ Overview
 
 Suitpax AI is a cutting-edge business travel management platform that leverages artificial intelligence to revolutionize corporate travel planning and execution. Our platform combines natural language processing, voice assistance, and intelligent automation to provide a seamless travel management experience.
 
@@ -225,38 +211,4 @@ For support, email support@suitpax.com or join our Slack channel.
 </div>
 ```
 
-This improved README includes:
-
-1. **Professional Structure**:
-   - Clear hierarchy of information
-   - Comprehensive sections
-   - Easy navigation
-
-2. **Detailed Technical Information**:
-   - Complete tech stack
-   - Project structure
-   - Setup instructions
-   - Development guidelines
-
-3. **Visual Elements**:
-   - Centered logo
-   - Status badges
-   - Clean formatting
-   - Professional layout
-
-4. **Security & Compliance**:
-   - Security measures
-   - Compliance information
-   - Best practices
-
-5. **Developer Experience**:
-   - Clear contribution guidelines
-   - Testing instructions
-   - Deployment process
-   - API documentation
-
-6. **Performance & Monitoring**:
-   - Analytics integration
-   - Error tracking
-   - Performance metrics
 
