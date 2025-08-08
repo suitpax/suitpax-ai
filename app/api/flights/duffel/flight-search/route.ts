@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { Duffel } from "@duffel/api"
-
-const duffel = new Duffel({
-  token: process.env.DUFFEL_API_KEY!,
-  environment: 'test'
-})
+import { createDuffelClient, handleDuffelError } from "@/lib/duffel-config"
 
 export async function POST(request: NextRequest) {
   try {
+    const duffel = createDuffelClient();
+    
     const {
       origin,
       destination,
@@ -17,13 +14,45 @@ export async function POST(request: NextRequest) {
       cabinClass
     } = await request.json()
 
+    // Validaciones mejoradas
     if (!origin || !destination || !departureDate || !passengers) {
       return NextResponse.json({
         success: false,
-        error: "Missing required fields"
+        error: "Missing required fields: origin, destination, departureDate, passengers"
       }, { status: 400 })
     }
 
+    // Validar códigos IATA
+    if (origin.length !== 3 || destination.length !== 3) {
+      return NextResponse.json({
+        success: false,
+        error: "Origin and destination must be valid 3-letter IATA codes"
+      }, { status: 400 })
+    }
+
+    // Validar fechas
+    const departure = new Date(departureDate)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    if (departure < today) {
+      return NextResponse.json({
+        success: false,
+        error: "Departure date cannot be in the past"
+      }, { status: 400 })
+    }
+
+    if (returnDate) {
+      const returnDateObj = new Date(returnDate)
+      if (returnDateObj <= departure) {
+        return NextResponse.json({
+          success: false,
+          error: "Return date must be after departure date"
+        }, { status: 400 })
+      }
+    }
+
+    // Construir slices
     const slices = [
       {
         origin,
@@ -40,110 +69,32 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Construir pasajeros
     const passengerArray = Array(passengers).fill({ type: "adult" })
 
+    // Realizar búsqueda
     const offerRequest = await duffel.offerRequests.create({
       slices,
       passengers: passengerArray,
-      cabin_class: cabinClass || "economy"
+      cabin_class: cabinClass || "economy",
+      max_connections: 2
     })
+
+    const offers = offerRequest.data.offers || []
 
     return NextResponse.json({
       success: true,
-      offers: offerRequest.data.offers || [],
-      request_id: offerRequest.data.id
+      offers,
+      request_id: offerRequest.data.id,
+      search_metadata: {
+        total_offers: offers.length,
+        search_params: { origin, destination, departureDate, returnDate, passengers, cabinClass },
+        environment: process.env.NODE_ENV
+      }
     })
 
   } catch (error) {
-    console.error("Duffel API Error:", error)
-    return NextResponse.json({
-      success: false,
-      error: "Failed to search flights"
-    }, { status: 500 })
-  }
-}
-
-// app/api/flights/duffel/booking/route.ts (CORREGIDO)
-export async function POST(request: NextRequest) {
-  try {
-    const {
-      offerId,
-      passengers
-    } = await request.json()
-
-    if (!offerId || !passengers) {
-      return NextResponse.json({
-        success: false,
-        error: "Offer ID and passengers required"
-      }, { status: 400 })
-    }
-
-    // Primero obtener la oferta actualizada
-    const offer = await duffel.offers.get(offerId)
-
-    const order = await duffel.orders.create({
-      selected_offers: [offerId],
-      passengers: passengers.map((passenger: any) => ({
-        id: passenger.id,
-        phone_number: passenger.phone_number,
-        email: passenger.email,
-        born_on: passenger.born_on,
-        title: passenger.title,
-        gender: passenger.gender,
-        family_name: passenger.family_name,
-        given_name: passenger.given_name
-      })),
-      payments: [{
-        type: "balance",
-        currency: offer.data.total_currency,
-        amount: offer.data.total_amount
-      }]
-    })
-
-    return NextResponse.json({
-      success: true,
-      order: order.data
-    })
-
-  } catch (error) {
-    console.error("Booking Error:", error)
-    return NextResponse.json({
-      success: false,
-      error: "Failed to create booking"
-    }, { status: 500 })
-  }
-}
-
-// app/api/flights/route.ts (SIMPLIFICADO)
-import { NextRequest, NextResponse } from "next/server";
-
-export async function POST(req: NextRequest) {
-  const params = await req.json();
-
-  try {
-    // Usar fetch interno para llamar al endpoint de Duffel
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    
-    const duffelResponse = await fetch(`${baseUrl}/api/flights/duffel/flight-search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params)
-    });
-
-    const duffelData = await duffelResponse.json();
-    
-    return NextResponse.json({
-      success: true,
-      offers: duffelData.offers || [],
-      providers: ['duffel']
-    });
-
-  } catch (error) {
-    console.error("Flight search error:", error);
-    return NextResponse.json({
-      success: false,
-      error: "Failed to search flights",
-      offers: []
-    }, { status: 500 });
+    const errorResponse = handleDuffelError(error);
+    return NextResponse.json(errorResponse, { status: errorResponse.status });
   }
 }
