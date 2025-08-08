@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createDuffelClient } from "@/lib/duffel";
-import crypto from 'crypto';
+import { createDuffelClient, verifyWebhookSignature, mapDuffelStatus } from "@/lib/duffel";
 
 /**
  * Maneja webhooks de Duffel para actualizar el estado de las órdenes y otras entidades
@@ -13,7 +12,7 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('duffel-signature');
     
     // Verificar firma del webhook para seguridad
-    if (!verifySignature(payload, signature)) {
+    if (!verifyWebhookSignature(payload, signature)) {
       console.error("Invalid webhook signature");
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
@@ -89,51 +88,6 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Verifica la firma digital del webhook para seguridad
- */
-function verifySignature(payload: string, signature?: string | null): boolean {
-  if (!signature || !process.env.DUFFEL_WEBHOOK_SECRET) {
-    console.warn("Missing signature or webhook secret");
-    return false;
-  }
-  
-  try {
-    const hmac = crypto.createHmac('sha256', process.env.DUFFEL_WEBHOOK_SECRET);
-    hmac.update(payload);
-    const calculatedSignature = hmac.digest('hex');
-    
-    // Comparación segura para evitar ataques de timing
-    return crypto.timingSafeEqual(
-      Buffer.from(calculatedSignature, 'hex'),
-      Buffer.from(signature, 'hex')
-    );
-  } catch (error) {
-    console.error("Signature verification error:", error);
-    return false;
-  }
-}
-
-/**
- * Mapea los estados de Duffel a estados internos de la aplicación
- */
-function mapDuffelStatus(duffelStatus: string): string {
-  const statusMap: Record<string, string> = {
-    'confirmed': 'confirmed',
-    'cancelled': 'cancelled',
-    'draft': 'pending',
-    'pending_payment': 'pending_payment',
-    'hold': 'hold',
-    'awaiting_passenger_information': 'awaiting_passenger_info',
-    'ready_for_ticketing': 'ready_for_ticketing',
-    'ticketed': 'ticketed',
-    'in_process': 'in_process',
-    'voided': 'voided'
-  };
-  
-  return statusMap[duffelStatus] || 'unknown';
-}
-
-/**
  * Maneja actualizaciones de órdenes
  */
 async function handleOrderUpdate(supabase: any, orderData: any) {
@@ -141,7 +95,7 @@ async function handleOrderUpdate(supabase: any, orderData: any) {
     // Verificar si ya existe esta orden en nuestra base de datos
     const { data: existingBooking } = await supabase
       .from("flight_bookings")
-      .select("id, duffel_order_id, status")
+      .select("id, duffel_order_id, status, metadata")
       .eq("duffel_order_id", orderData.id)
       .single();
     
@@ -154,7 +108,7 @@ async function handleOrderUpdate(supabase: any, orderData: any) {
           booking_reference: orderData.booking_reference,
           updated_at: new Date().toISOString(),
           metadata: {
-            ...existingBooking.metadata,
+            ...(existingBooking.metadata || {}),
             last_webhook_update: {
               timestamp: new Date().toISOString(),
               status: orderData.status,
@@ -242,24 +196,33 @@ async function handlePaymentUpdate(supabase: any, paymentData: any) {
   try {
     // Actualizar información de pago para la orden asociada
     if (paymentData.order_id) {
-      await supabase
+      const { data: booking } = await supabase
         .from("flight_bookings")
-        .update({
-          payment_status: paymentData.status,
-          updated_at: new Date().toISOString(),
-          metadata: {
-            payment: {
-              id: paymentData.id,
-              status: paymentData.status,
-              amount: paymentData.amount,
-              currency: paymentData.currency,
-              updated_at: new Date().toISOString()
-            }
-          }
-        })
-        .eq("duffel_order_id", paymentData.order_id);
+        .select("metadata")
+        .eq("duffel_order_id", paymentData.order_id)
+        .single();
       
-      console.log(`Updated payment status for order ${paymentData.order_id} to ${paymentData.status}`);
+      if (booking) {
+        await supabase
+          .from("flight_bookings")
+          .update({
+            payment_status: paymentData.status,
+            updated_at: new Date().toISOString(),
+            metadata: {
+              ...(booking.metadata || {}),
+              payment: {
+                id: paymentData.id,
+                status: paymentData.status,
+                amount: paymentData.amount,
+                currency: paymentData.currency,
+                updated_at: new Date().toISOString()
+              }
+            }
+          })
+          .eq("duffel_order_id", paymentData.order_id);
+        
+        console.log(`Updated payment status for order ${paymentData.order_id} to ${paymentData.status}`);
+      }
     }
   } catch (error) {
     console.error(`Error handling payment update for ${paymentData.id}:`, error);
@@ -372,38 +335,3 @@ async function handleServiceUpdate(supabase: any, serviceData: any) {
   } catch (error) {
     console.error(`Error handling service update for ${serviceData.id}:`, error);
     throw error;
-  }
-}
-
-/**
- * Maneja actualizaciones de solicitudes de cambio de orden
- */
-async function handleOrderChangeUpdate(supabase: any, changeData: any) {
-  try {
-    // Actualizar el estado de la solicitud de cambio en nuestra base de datos
-    const { data: existingChange } = await supabase
-      .from("order_changes")
-      .select("*")
-      .eq("duffel_change_request_id", changeData.id)
-      .single();
-    
-    if (existingChange) {
-      await supabase
-        .from("order_changes")
-        .update({
-          status: changeData.status,
-          updated_at: new Date().toISOString(),
-          confirmation_data: changeData
-        })
-        .eq("duffel_change_request_id", changeData.id);
-      
-      console.log(`Updated change request ${changeData.id} to status: ${changeData.status}`);
-    } else {
-      // La solicitud de cambio no está en nuestra base de datos
-      console.log(`Received update for unknown change request: ${changeData.id}`);
-    }
-  } catch (error) {
-    console.error(`Error handling order change update for ${changeData.id}:`, error);
-    throw error;
-  }
-}
