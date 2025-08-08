@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createDuffelClient, handleDuffelError } from "@/lib/duffel-config"
+import { createDuffelClient, handleDuffelError } from '@/lib/duffel';
 
 export async function GET(
   request: NextRequest,
