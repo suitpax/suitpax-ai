@@ -1,32 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
-export async function POST(req: NextRequest) {
-  const params = await req.json();
+import { createDuffelClient, handleDuffelError } from "@/lib/duffel-config";
 
+export async function POST(req: NextRequest) {
   try {
-    // Usar fetch interno para llamar al endpoint de Duffel
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    
-    const duffelResponse = await fetch(`${baseUrl}/api/flights/duffel/flight-search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params)
+    const duffel = createDuffelClient();
+    const params = await req.json();
+
+    // Validaciones
+    if (!params.origin || !params.destination || !params.departureDate) {
+      return NextResponse.json({
+        success: false,
+        error: "Missing required fields",
+        offers: []
+      }, { status: 400 });
+    }
+
+    // Construir slices para Duffel
+    const slices = [
+      {
+        origin: params.origin,
+        destination: params.destination,
+        departure_date: params.departureDate,
+      }
+    ];
+
+    // Si es round trip, agregar vuelo de regreso
+    if (params.tripType === 'round_trip' && params.returnDate) {
+      slices.push({
+        origin: params.destination,
+        destination: params.origin,
+        departure_date: params.returnDate,
+      });
+    }
+
+    // Crear pasajeros
+    const passengers = Array(params.passengers || 1).fill({ type: "adult" });
+
+    // Realizar búsqueda en Duffel
+    const offerRequest = await duffel.offerRequests.create({
+      slices,
+      passengers,
+      cabin_class: params.cabinClass || "economy",
+      max_connections: 2
     });
 
-    const duffelData = await duffelResponse.json();
-    
     return NextResponse.json({
       success: true,
-      offers: duffelData.offers || [],
+      offers: offerRequest.data.offers || [],
       providers: ['duffel'],
-      total_offers: duffelData.offers?.length || 0
+      total_offers: offerRequest.data.offers?.length || 0,
+      request_id: offerRequest.data.id
     });
 
   } catch (error) {
     console.error("Flight search error:", error);
+    const errorResponse = handleDuffelError(error);
     return NextResponse.json({
       success: false,
-      error: "Failed to search flights",
-      offers: []
-    }, { status: 500 });
+      error: errorResponse.error || "Failed to search flights",
+      offers: [],
+      status: errorResponse.status
+    }, { status: errorResponse.status || 500 });
   }
 }
