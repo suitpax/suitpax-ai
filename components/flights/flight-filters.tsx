@@ -561,5 +561,3 @@ export default function FlightFilters({
 </AnimatePresence>
 );
 }
-
-    

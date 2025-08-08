@@ -21,5 +21,3 @@ declare module "@anthropic-ai/sdk" {
 
   export default Anthropic
 }
-
-

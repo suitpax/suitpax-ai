@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Copy, Download, User, Bot } from "lucide-react"
+import { Copy, Download, User, Bot } from 'lucide-react'
 import { toast } from "sonner"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -116,86 +116,33 @@ const ChatMessage: React.FC<{ message: Message; isTyping?: boolean }> = ({ messa
             {isTyping ? (
               <TypingText text={message.content} />
             ) : (
-              <ReactMarkdown 
+              <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                  // Customizar componentes para mejor styling
-                  h1: ({ children }) => (
-                    <h1 className="text-lg font-bold text-gray-900 mb-3 mt-2">{children}</h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 className="text-base font-semibold text-gray-800 mb-2 mt-2">{children}</h2>
-                  ),
-                  h3: ({ children }) => (
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2 mt-2">{children}</h3>
-                  ),
-                  p: ({ children }) => (
-                    <p className="text-sm text-gray-700 mb-2 leading-relaxed">{children}</p>
-                  ),
-                  ul: ({ children }) => (
-                    <ul className="list-disc list-inside text-sm text-gray-700 mb-3 space-y-1 pl-2">
-                      {children}
-                    </ul>
-                  ),
-                  ol: ({ children }) => (
-                    <ol className="list-decimal list-inside text-sm text-gray-700 mb-3 space-y-1 pl-2">
-                      {children}
-                    </ol>
-                  ),
-                  li: ({ children }) => <li className="text-sm leading-relaxed">{children}</li>,
-                  strong: ({ children }) => (
-                    <strong className="font-semibold text-gray-900">{children}</strong>
-                  ),
-                  em: ({ children }) => <em className="italic text-gray-700">{children}</em>,
-                  code: ({ children }) => (
-                    <code className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs font-mono border">
-                      {children}
-                    </code>
-                  ),
-                  pre: ({ children }) => (
-                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-xs font-mono overflow-x-auto mb-3 border">
-                      {children}
-                    </pre>
-                  ),
-                  blockquote: ({ children }) => (
-                    <blockquote className="border-l-4 border-emerald-500 pl-4 my-3 text-gray-600 italic bg-emerald-50 py-2 rounded-r">
-                      {children}
-                    </blockquote>
-                  ),
-                  a: ({ href, children }) => (
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-emerald-600 hover:text-emerald-700 underline font-medium"
-                    >
-                      {children}
-                    </a>
-                  ),
-                  table: ({ children }) => (
-                    <div className="overflow-x-auto mb-3">
-                      <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+                  h1: ({node, ...props}) => <h1 className="text-xl font-bold my-4" {...props} />,
+                  h2: ({node, ...props}) => <h2 className="text-lg font-semibold my-3" {...props} />,
+                  h3: ({node, ...props}) => <h3 className="text-base font-semibold my-2" {...props} />,
+                  p: ({node, ...props}) => <p className="mb-4 leading-relaxed" {...props} />,
+                  ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-4 space-y-1" {...props} />,
+                  ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-4 space-y-1" {...props} />,
+                  li: ({node, ...props}) => <li className="mb-1" {...props} />,
+                  blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4" {...props} />,
+                  code: ({node, inline, className, children, ...props}) => {
+                    const match = /language-(\w+)/.exec(className || '')
+                    return !inline ? (
+                      <pre className="bg-gray-900 text-white p-4 rounded-lg my-4 overflow-x-auto">
+                        <code className={`language-${match ? match[1] : ''}`}>{children}</code>
+                      </pre>
+                    ) : (
+                      <code className="bg-gray-200 text-gray-800 rounded px-1.5 py-0.5 font-mono text-sm" {...props}>
                         {children}
-                      </table>
-                    </div>
-                  ),
-                  thead: ({ children }) => (
-                    <thead className="bg-gray-50">{children}</thead>
-                  ),
-                  tbody: ({ children }) => (
-                    <tbody className="bg-white divide-y divide-gray-200">{children}</tbody>
-                  ),
-                  tr: ({ children }) => (
-                    <tr className="hover:bg-gray-50">{children}</tr>
-                  ),
-                  th: ({ children }) => (
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                      {children}
-                    </th>
-                  ),
-                  td: ({ children }) => (
-                    <td className="px-4 py-2 text-sm text-gray-900 border-b">{children}</td>
-                  ),
+                      </code>
+                    )
+                  },
+                  table: ({node, ...props}) => <div className="overflow-x-auto"><table className="table-auto w-full my-4 border-collapse border border-gray-300" {...props} /></div>,
+                  thead: ({node, ...props}) => <thead className="bg-gray-100" {...props} />,
+                  th: ({node, ...props}) => <th className="border border-gray-300 px-4 py-2 text-left font-semibold" {...props} />,
+                  td: ({node, ...props}) => <td className="border border-gray-300 px-4 py-2" {...props} />,
                 }}
               >
                 {message.content}

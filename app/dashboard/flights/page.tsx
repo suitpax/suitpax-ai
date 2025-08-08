@@ -1,19 +1,29 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { Plane, Loader2, MapPin, CurrencyDollarIcon, HeartIcon, HeartIcon as HeartSolidIcon, FunnelIcon, Users } from "lucide-react"
-import FlightFilters from "@/components/flights/flight-filters"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useState, useEffect, useCallback, useMemo } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Plane, ArrowRight, Calendar, Users, Search, Loader2, SlidersHorizontal, X, Heart, Building, Clock, Tag } from 'lucide-react'
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { FlightFiltersDisplay } from "@/components/flights/flight-filters"
+import { FlightStops } from "@/components/flights/flight-stops"
+import { FlightConditionsDisplay } from "@/components/flights/flight-conditions"
+import { toast } from "sonner"
+import { createClient } from "@/lib/supabase/client"
+import type { User } from "@supabase/supabase-js"
 
-// Interfaces (adaptadas)
+// Interfaces
 interface DuffelOffer {
   id: string
   slices: Array<{
     segments: Array<{
+      aircraft: { name: string }
       airline: { name: string; iata_code: string; logo_symbol_url?: string }
+      flight_number: string
       origin: { city_name: string; iata_code: string; name: string }
       destination: { city_name: string; iata_code: string; name: string }
       departing_at: string
@@ -26,17 +36,20 @@ interface DuffelOffer {
   total_currency: string
   cabin_class: string
   owner: { name: string }
-  conditions: { change_before_departure?: any; refund_before_departure?: any }
+  conditions: any
+  private_fares: any[]
 }
+
 interface SearchParams {
   origin: string
   destination: string
   departureDate: string
-  returnDate?: string
+  returnDate: string
   passengers: number
   cabinClass: string
-  tripType: string
+  tripType: "one_way" | "round_trip"
 }
+
 interface FlightFiltersState {
   priceRange: [number, number]
   maxStops: number
@@ -50,256 +63,320 @@ interface FlightFiltersState {
   directOnly: boolean
 }
 
+// Skeleton Loader Component
+const FlightOfferSkeleton = () => (
+  <Card className="w-full animate-pulse">
+    <CardContent className="p-4">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-gray-200 rounded-full" />
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-24" />
+            <div className="h-3 bg-gray-200 rounded w-32" />
+          </div>
+        </div>
+        <div className="space-y-2 text-right">
+          <div className="h-6 bg-gray-200 rounded w-20" />
+          <div className="h-8 bg-gray-300 rounded-lg w-28" />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+)
+
+// Flight Offer Card Component
+const FlightOfferCard = ({ offer, isFavorite, onToggleFavorite }: { offer: DuffelOffer; isFavorite: boolean; onToggleFavorite: (id: string) => void }) => {
+  const { slices, total_amount, total_currency, cabin_class, conditions, private_fares } = offer
+  const mainSlice = slices[0]
+  const returnSlice = slices.length > 1 ? slices[1] : null
+  const airline = mainSlice.segments[0].airline
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Card className="overflow-hidden transition-all hover:shadow-xl border border-gray-200/80">
+        <div className="p-4 bg-white">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-3">
+              <img
+                src={airline.logo_symbol_url || `https://ui-avatars.com/api/?name=${airline.name}&background=random`}
+                alt={airline.name}
+                className="h-10 w-10 rounded-full border border-gray-200 object-contain"
+              />
+              <div>
+                <p className="font-semibold text-gray-900">{airline.name}</p>
+                <p className="text-xs text-gray-500">{offer.owner.name}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold tracking-tight text-gray-900">
+                {new Intl.NumberFormat('en-US', { style: 'currency', currency: total_currency }).format(parseFloat(total_amount))}
+              </p>
+              <p className="text-xs text-gray-500">Total price for all passengers</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 border-t border-gray-100 space-y-4">
+          {/* Outbound flight */}
+          <FlightSegmentDisplay slice={mainSlice} type="Outbound" />
+          {/* Return flight */}
+          {returnSlice && <FlightSegmentDisplay slice={returnSlice} type="Return" />}
+        </div>
+
+        <div className="px-4 py-3 bg-gray-50/80 border-t border-gray-100 flex justify-between items-center">
+          <FlightConditionsDisplay
+            conditions={conditions}
+            privateFares={private_fares}
+            cabinClass={cabin_class}
+            totalAmount={total_amount}
+            currency={total_currency}
+          />
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => onToggleFavorite(offer.id)}>
+              <Heart className={`h-5 w-5 ${isFavorite ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
+            </Button>
+            <Button className="bg-gray-900 text-white hover:bg-gray-800 rounded-xl">Select Flight</Button>
+          </div>
+        </div>
+      </Card>
+    </motion.div>
+  )
+}
+
+const FlightSegmentDisplay = ({ slice, type }: { slice: DuffelOffer['slices'][0], type: 'Outbound' | 'Return' }) => {
+  const firstSegment = slice.segments[0]
+  const lastSegment = slice.segments[slice.segments.length - 1]
+
+  const formatTime = (dateStr: string) => new Date(dateStr).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-2">
+        <Tag className="h-4 w-4 text-gray-500" />
+        <p className="text-sm font-medium text-gray-800">{type} flight</p>
+      </div>
+      <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center gap-3">
+          <div className="text-center">
+            <p className="font-semibold text-lg">{formatTime(firstSegment.departing_at)}</p>
+            <p className="text-gray-600">{firstSegment.origin.iata_code}</p>
+          </div>
+          <ArrowRight className="h-5 w-5 text-gray-300" />
+          <div className="text-center">
+            <p className="font-semibold text-lg">{formatTime(lastSegment.arriving_at)}</p>
+            <p className="text-gray-600">{lastSegment.destination.iata_code}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <FlightStops segments={slice.segments} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function FlightsPage() {
   const [searchParams, setSearchParams] = useState<SearchParams>({
-    origin: "",
-    destination: "",
+    origin: "JFK",
+    destination: "LHR",
     departureDate: new Date().toISOString().split('T')[0],
     returnDate: "",
     passengers: 1,
     cabinClass: "economy",
-    tripType: "one_way"
+    tripType: "one_way",
   })
   const [offers, setOffers] = useState<DuffelOffer[]>([])
   const [filteredOffers, setFilteredOffers] = useState<DuffelOffer[]>([])
   const [loading, setLoading] = useState(false)
-  const [showFiltersPanel, setShowFiltersPanel] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
   const [favoriteOffers, setFavoriteOffers] = useState<string[]>([])
   const [filters, setFilters] = useState<FlightFiltersState>({
-    priceRange: [0, 5000],
+    priceRange: [0, 10000],
     maxStops: 3,
     airlines: [],
     departureTime: [],
     arrivalTime: [],
-    duration: [0, 1440],
+    duration: [0, 2880],
     cabinClass: [],
     refundable: false,
     changeable: false,
-    directOnly: false
+    directOnly: false,
   })
 
-  // Buscar vuelos en Duffel API
-  const searchFlights = async () => {
+  const supabase = createClient()
+
+  useEffect(() => {
+    const getUserAndFavorites = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      if (user) {
+        const { data, error } = await supabase.from('favorite_offers').select('offer_id').eq('user_id', user.id)
+        if (error) console.error("Error fetching favorites:", error)
+        else setFavoriteOffers(data.map(fav => fav.offer_id))
+      }
+    }
+    getUserAndFavorites()
+  }, [supabase])
+
+  const handleSearch = async () => {
+    if (!searchParams.origin || !searchParams.destination) {
+      toast.error("Please enter origin and destination.")
+      return
+    }
     setLoading(true)
+    setHasSearched(true)
     setOffers([])
     try {
-      const res = await fetch("/api/flights", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/flights/duffel/flight-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(searchParams),
       })
-      const data = await res.json()
-      if (!data.success || !data.offers) throw new Error(data.error || "No offers found")
-      setOffers(data.offers)
+      const data = await response.json()
+      if (data.success) {
+        setOffers(data.offers || [])
+        toast.success(`Found ${data.offers?.length || 0} flights.`)
+      } else {
+        toast.error(data.error || "Failed to find flights.")
+      }
     } catch (error) {
+      toast.error("An error occurred while searching for flights.")
       console.error(error)
     } finally {
       setLoading(false)
     }
   }
 
-  // Aplicar filtros en frontend
-  useEffect(() => {
-    setFilteredOffers(applyFilters(offers))
-  }, [offers, filters])
-
-  function applyFilters(offers: DuffelOffer[]): DuffelOffer[] {
-    return offers.filter(offer => {
+  const applyFilters = useCallback((offersToFilter: DuffelOffer[]) => {
+    return offersToFilter.filter(offer => {
       const price = parseFloat(offer.total_amount)
-      const mainSegment = offer.slices[0]?.segments[0]
-      const airlineCode = mainSegment?.airline?.iata_code
       if (price < filters.priceRange[0] || price > filters.priceRange[1]) return false
-      if (filters.airlines.length > 0 && !filters.airlines.includes(airlineCode)) return false
-      if (filters.directOnly && (offer.slices[0].segments.length - 1 > 0)) return false
-      if (filters.cabinClass.length > 0 && !filters.cabinClass.includes(offer.cabin_class)) return false
-      // Otros filtros aquí...
+      if (filters.directOnly && offer.slices.some(s => s.segments.length > 1)) return false
+      if (filters.airlines.length > 0 && !filters.airlines.includes(offer.slices[0].segments[0].airline.iata_code)) return false
+      // Add more filter logic here
       return true
     })
+  }, [filters])
+
+  useEffect(() => {
+    setFilteredOffers(applyFilters(offers))
+  }, [offers, applyFilters])
+
+  const handleToggleFavorite = async (offerId: string) => {
+    if (!user) {
+      toast.error("Please log in to save favorites.")
+      return
+    }
+    const isFavorite = favoriteOffers.includes(offerId)
+    if (isFavorite) {
+      setFavoriteOffers(prev => prev.filter(id => id !== offerId))
+      const { error } = await supabase.from('favorite_offers').delete().match({ user_id: user.id, offer_id: offerId })
+      if (error) toast.error("Failed to remove favorite.")
+      else toast.success("Removed from favorites.")
+    } else {
+      setFavoriteOffers(prev => [...prev, offerId])
+      const { error } = await supabase.from('favorite_offers').insert({ user_id: user.id, offer_id: offerId })
+      if (error) toast.error("Failed to add favorite.")
+      else toast.success("Added to favorites.")
+    }
   }
 
-  function formatDuration(duration: string): string {
-    // PTxh ym → xh ym
-    const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/)
-    const h = parseInt(match?.[1] || "0", 10)
-    const m = parseInt(match?.[2] || "0", 10)
-    return h ? `${h}h ${m}m` : `${m}m`
-  }
-
-  const toggleFavorite = (id: string) => {
-    setFavoriteOffers(current =>
-      current.includes(id) ? current.filter(f => f !== id) : [...current, id]
-    )
-  }
-
-  // Componente Card oferta (con logo)
-  const renderOfferCard = (offer: DuffelOffer) => {
-    const mainSlice = offer.slices[0]
-    const firstSegment = mainSlice.segments[0]
-    const lastSegment = mainSlice.segments[mainSlice.segments.length - 1]
-    const airlineLogo =
-      firstSegment.airline.logo_symbol_url ||
-      `https://content.duffel.com/airlines/structures/logos/${firstSegment.airline.iata_code}.svg`
-    return (
-      <Card key={offer.id} className="mb-6 shadow rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
-        <CardHeader className="flex flex-row items-center gap-4 py-4">
-          <div className="flex items-center gap-2">
-            <img
-              src={airlineLogo}
-              alt={firstSegment.airline.name}
-              className="h-8 w-8 object-contain rounded-full border"
-              style={{ background: "#fff" }}
-              onError={e => { (e.target as HTMLImageElement).src = "/airline-placeholder.svg" }}
-            />
-            <span className="font-semibold">{firstSegment.airline.name}</span>
-            <Badge variant="outline" className="ml-2">{firstSegment.airline.iata_code}</Badge>
-          </div>
-          <div className="ml-auto flex gap-2">
-            <Button size="icon" variant="ghost" onClick={() => toggleFavorite(offer.id)}>
-              {favoriteOffers.includes(offer.id)
-                ? <HeartSolidIcon className="h-5 w-5 text-pink-500" />
-                : <HeartIcon className="h-5 w-5 text-gray-500" />}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="pb-4 px-6">
-          <div className="grid grid-cols-5 gap-2 items-center">
-            {/* Origen */}
-            <div className="flex flex-col items-center">
-              <MapPin className="h-4 w-4 mb-1 text-gray-400" />
-              <span className="font-semibold">{firstSegment.origin.iata_code}</span>
-              <span className="text-xs text-gray-500">{firstSegment.origin.city_name}</span>
-              <span className="text-xs text-gray-400">{firstSegment.origin.name}</span>
-              <span className="text-xs mt-1">{firstSegment.departing_at.slice(11, 16)}</span>
-            </div>
-            {/* Duración y clase */}
-            <div className="flex flex-col items-center col-span-1">
-              <Users className="h-5 w-5 text-black mb-1" />
-              <span className="text-xs font-semibold text-gray-700">{formatDuration(mainSlice.duration)}</span>
-              <Badge variant="outline" className="mt-1">{offer.cabin_class.charAt(0).toUpperCase() + offer.cabin_class.slice(1)}</Badge>
-            </div>
-            {/* Destino */}
-            <div className="flex flex-col items-center">
-              <MapPin className="h-4 w-4 mb-1 text-gray-400" />
-              <span className="font-semibold">{lastSegment.destination.iata_code}</span>
-              <span className="text-xs text-gray-500">{lastSegment.destination.city_name}</span>
-              <span className="text-xs text-gray-400">{lastSegment.destination.name}</span>
-              <span className="text-xs mt-1">{lastSegment.arriving_at.slice(11, 16)}</span>
-            </div>
-            {/* Paradas/reglas */}
-            <div className="flex flex-col items-center">
-              <Badge variant="outline" className="mt-1">{mainSlice.segments.length - 1} stops</Badge>
-              <Badge variant="default" className="mt-1">
-                {offer.conditions?.refund_before_departure?.allowed ? "Refundable" : "Non-refundable"}
-              </Badge>
-              <Badge variant="default" className="mt-1">
-                {offer.conditions?.change_before_departure?.allowed ? "Changeable" : "Non-changeable"}
-              </Badge>
-            </div>
-            {/* Precio y botón */}
-            <div className="flex flex-col items-center gap-1">
-              <CurrencyDollarIcon className="h-5 w-5 text-green-600 mb-1" />
-              <span className="font-bold text-xl text-black">${offer.total_amount}</span>
-              <span className="text-xs text-gray-500">{offer.total_currency}</span>
-              <Button size="sm" variant="default" className="mt-1">
-                Reservar
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  // Render principal
-  return (
-    <div className="max-w-5xl mx-auto py-8 px-4">
-      <Card className="mb-8 shadow-lg border bg-white">
-        <CardHeader>
-          <CardTitle className="text-2xl flex items-center gap-2">
-            <Plane className="h-5 w-5 text-black" /> Search flights
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {/* Formulario búsqueda profesional aquí */}
-          <div className="flex flex-row gap-4">
-            {/* Inputs: Origen, Destino, Fecha, Pasajeros, Clase, etc... */}
-            <div className="flex-1">
-              {/* Puedes crear los inputs y selects a tu gusto, por ejemplo: */}
-              <input
-                type="text"
-                placeholder="Origin"
-                value={searchParams.origin}
-                onChange={e =>
-                  setSearchParams(prev => ({ ...prev, origin: e.target.value.toUpperCase() }))
-                }
-                className="border p-2 rounded w-full mb-3"
-              />
-              <input
-                type="text"
-                placeholder="Destination"
-                value={searchParams.destination}
-                onChange={e =>
-                  setSearchParams(prev => ({ ...prev, destination: e.target.value.toUpperCase() }))
-                }
-                className="border p-2 rounded w-full mb-3"
-              />
-              <input
-                type="date"
-                placeholder="Departure"
-                value={searchParams.departureDate}
-                onChange={e =>
-                  setSearchParams(prev => ({ ...prev, departureDate: e.target.value }))
-                }
-                className="border p-2 rounded w-full mb-3"
-              />
-              {/* ...otros campos aquí... */}
+  const searchForm = (
+    <Card className="shadow-lg border-gray-200/80">
+      <CardContent className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="origin">From</Label>
+              <Input id="origin" placeholder="JFK" value={searchParams.origin} onChange={e => setSearchParams(p => ({ ...p, origin: e.target.value.toUpperCase() }))} />
             </div>
             <div>
-              <Button
-                size="default"
-                variant="default"
-                disabled={loading}
-                onClick={searchFlights}
-                className="min-w-[160px]"
-              >
-                {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <>Buscar</>}
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="ml-2"
-                onClick={() => setShowFiltersPanel((prev) => !prev)}
-                aria-label="Filters"
-              >
-                <FunnelIcon className="h-5 w-5 text-gray-700" />
-              </Button>
+              <Label htmlFor="destination">To</Label>
+              <Input id="destination" placeholder="LHR" value={searchParams.destination} onChange={e => setSearchParams(p => ({ ...p, destination: e.target.value.toUpperCase() }))} />
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      <FlightFilters
-        offers={offers}
-        filters={filters}
-        onFiltersChange={setFilters}
-        isOpen={showFiltersPanel}
-        onClose={() => setShowFiltersPanel(false)}
-      />
-
-      {/* Loader, error, mensajes */}
-      {loading && (
-        <div className="flex flex-col items-center justify-center min-h-[200px] text-gray-500 py-4">
-          <Loader2 className="h-8 w-8 animate-spin mb-4" />
-          Searching offers...
+          <div>
+            <Label htmlFor="departureDate">Departure</Label>
+            <Input id="departureDate" type="date" value={searchParams.departureDate} onChange={e => setSearchParams(p => ({ ...p, departureDate: e.target.value }))} />
+          </div>
+          <div>
+            <Label htmlFor="passengers">Passengers</Label>
+            <Select value={String(searchParams.passengers)} onValueChange={v => setSearchParams(p => ({ ...p, passengers: Number(v) }))}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>{Array.from({ length: 8 }, (_, i) => i + 1).map(n => <SelectItem key={n} value={String(n)}>{n} passenger{n > 1 ? 's' : ''}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
         </div>
-      )}
-      {!loading && filteredOffers.length === 0 && offers.length > 0 && (
-        <div className="text-center text-gray-500 py-6">
-          No offers match your filters.
+        <div className="mt-4 flex justify-end">
+          <Button onClick={handleSearch} disabled={loading} className="w-full md:w-auto bg-gray-900 text-white hover:bg-gray-800 rounded-xl">
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}
+            Search Flights
+          </Button>
         </div>
-      )}
-      <div className="mt-4 mb-16">
-        {filteredOffers.map(renderOfferCard)}
+      </CardContent>
+    </Card>
+  )
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold tracking-tighter text-gray-900">Flight Search</h1>
+          <p className="text-lg text-gray-500 mt-1">Find the best flights for your business needs.</p>
+        </header>
+
+        {searchForm}
+
+        <div className="mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-800">
+              {hasSearched ? `Results (${filteredOffers.length})` : "Start your search"}
+            </h2>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="rounded-xl">
+                  <SlidersHorizontal className="mr-2 h-4 w-4" /> Filters
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader><SheetTitle>Filter Flights</SheetTitle></SheetHeader>
+                <FlightFiltersDisplay offers={offers} filters={filters} onFiltersChange={setFilters} />
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          {loading && (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => <FlightOfferSkeleton key={i} />)}
+            </div>
+          )}
+
+          {!loading && hasSearched && filteredOffers.length === 0 && (
+            <div className="text-center py-16">
+              <Plane className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-lg font-medium text-gray-900">No flights found</h3>
+              <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filters.</p>
+            </div>
+          )}
+
+          {!loading && filteredOffers.length > 0 && (
+            <div className="space-y-4">
+              {filteredOffers.map(offer => (
+                <FlightOfferCard
+                  key={offer.id}
+                  offer={offer}
+                  isFavorite={favoriteOffers.includes(offer.id)}
+                  onToggleFavorite={handleToggleFavorite}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
