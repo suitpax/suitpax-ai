@@ -20,14 +20,14 @@ export async function GET(request: NextRequest) {
 
     let airports: any[] = []
 
-    // Si se proporcionan coordenadas, buscar por área geográfica
+    // Búsqueda por coordenadas si se proporcionan
     if (lat && lng) {
       try {
         const nearbyAirports = await duffel.airports.list({
           limit: 20,
           latitude: parseFloat(lat),
           longitude: parseFloat(lng),
-          radius: radius ? parseInt(radius) : 50 // Default 50km radius
+          radius: radius ? parseInt(radius) : 50
         })
         airports = nearbyAirports.data
       } catch (error) {
@@ -35,49 +35,56 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Búsqueda principal por nombre/código
-    const searchResults = await duffel.airports.list({
-      limit: 15,
-      name: query
-    })
+    // Búsqueda por nombre/código IATA
+    try {
+      // Primero intentar búsqueda por código IATA exacto
+      const iataSearch = await duffel.airports.list({
+        limit: 5,
+        iata_code: query.toUpperCase()
+      })
+      
+      if (iataSearch.data.length > 0) {
+        airports = [...airports, ...iataSearch.data]
+      } else {
+        // Si no hay resultados por IATA, buscar por nombre
+        const nameSearch = await duffel.airports.list({
+          limit: 15,
+          name: query
+        })
+        airports = [...airports, ...nameSearch.data]
+      }
+    } catch (error) {
+      console.error("Error searching airports:", error)
+    }
     
-    // Combinar resultados y eliminar duplicados
-    const allAirports = [...airports, ...searchResults.data]
-    const uniqueAirports = allAirports.filter((airport, index, self) => 
+    // Eliminar duplicados
+    const uniqueAirports = airports.filter((airport, index, self) => 
       index === self.findIndex(a => a.id === airport.id)
     )
 
-    // Mejorar scoring para búsquedas por código IATA
+    // Mejorar scoring
     const scoredAirports = uniqueAirports.map(airport => {
       let score = 0
       const queryLower = query.toLowerCase()
       
-      // Priorizar coincidencias exactas de código IATA
       if (airport.iata_code?.toLowerCase() === queryLower) {
         score += 100
       } else if (airport.iata_code?.toLowerCase().includes(queryLower)) {
         score += 50
       }
       
-      // Priorizar coincidencias de nombre de ciudad
       if (airport.city_name?.toLowerCase().includes(queryLower)) {
         score += 30
       }
       
-      // Priorizar coincidencias de nombre de aeropuerto
       if (airport.name?.toLowerCase().includes(queryLower)) {
         score += 20
-      }
-      
-      // Boost para aeropuertos más grandes (más conexiones)
-      if (airport.time_zone && airport.iata_code) {
-        score += 10
       }
 
       return { ...airport, search_score: score }
     })
 
-    // Ordenar por score y tomar los mejores
+    // Ordenar y limitar resultados
     const sortedAirports = scoredAirports
       .sort((a, b) => b.search_score - a.search_score)
       .slice(0, 10)
