@@ -10,14 +10,9 @@ import {
   MapPinIcon,
   PaperAirplaneIcon,
   StarIcon,
-  AdjustmentsHorizontalIcon
+  AdjustmentsHorizontalIcon,
+  CheckCircleIcon
 } from "@heroicons/react/24/outline"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface FlightFilters {
   priceRange: [number, number]
@@ -62,7 +57,131 @@ const CABIN_CLASSES = [
   { key: 'first', label: 'First Class' }
 ]
 
-export function FlightFilters({
+// Custom Checkbox Component
+const Checkbox = ({ checked, onCheckedChange, className = "" }) => (
+  <div 
+    className={`w-4 h-4 border-2 rounded cursor-pointer flex items-center justify-center transition-all duration-200 ${
+      checked 
+        ? 'bg-black border-black' 
+        : 'border-gray-300 hover:border-gray-400'
+    } ${className}`}
+    onClick={() => onCheckedChange(!checked)}
+  >
+    {checked && <CheckCircleIcon className="h-3 w-3 text-white" />}
+  </div>
+)
+
+// Custom Badge Component
+const Badge = ({ children, variant = "outline", className = "" }) => (
+  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+    variant === "outline" 
+      ? "border border-gray-200 bg-gray-50 text-gray-700" 
+      : "bg-blue-50 text-blue-700 border border-blue-200"
+  } ${className}`}>
+    {children}
+  </span>
+)
+
+// Custom Button Component
+const Button = ({ children, variant = "default", size = "default", onClick, className = "", disabled = false, ...props }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`inline-flex items-center justify-center rounded-2xl font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+      variant === "outline" 
+        ? "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-500" 
+        : variant === "ghost"
+        ? "text-gray-700 hover:bg-gray-100"
+        : "bg-black text-white hover:bg-gray-800 focus:ring-gray-500"
+    } ${
+      size === "sm" ? "px-3 py-1.5 text-sm" : "px-4 py-2"
+    } ${className}`}
+    {...props}
+  >
+    {children}
+  </button>
+)
+
+// Custom Label Component
+const Label = ({ children, className = "", ...props }) => (
+  <label className={`block text-sm font-medium text-gray-700 ${className}`} {...props}>
+    {children}
+  </label>
+)
+
+// Custom Slider Component
+const Slider = ({ value, onValueChange, min, max, step = 1, className = "" }) => {
+  const [localValue, setLocalValue] = useState(value)
+
+  useEffect(() => {
+    setLocalValue(value)
+  }, [value])
+
+  const handleChange = (index, newValue) => {
+    const updatedValue = [...localValue]
+    updatedValue[index] = parseInt(newValue)
+    setLocalValue(updatedValue)
+    onValueChange(updatedValue)
+  }
+
+  const percentage1 = ((localValue[0] - min) / (max - min)) * 100
+  const percentage2 = ((localValue[1] - min) / (max - min)) * 100
+
+  return (
+    <div className={`relative ${className}`}>
+      <div className="relative h-2 bg-gray-200 rounded-lg">
+        <div 
+          className="absolute h-2 bg-black rounded-lg"
+          style={{
+            left: `${percentage1}%`,
+            width: `${percentage2 - percentage1}%`
+          }}
+        />
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={localValue[0]}
+          onChange={(e) => handleChange(0, e.target.value)}
+          className="absolute w-full h-2 bg-transparent appearance-none cursor-pointer slider-thumb"
+        />
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={localValue[1]}
+          onChange={(e) => handleChange(1, e.target.value)}
+          className="absolute w-full h-2 bg-transparent appearance-none cursor-pointer slider-thumb"
+        />
+      </div>
+      <style jsx>{`
+        .slider-thumb::-webkit-slider-thumb {
+          appearance: none;
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #000;
+          cursor: pointer;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .slider-thumb::-moz-range-thumb {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #000;
+          cursor: pointer;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+      `}</style>
+    </div>
+  )
+}
+
+export default function FlightFilters({
   offers,
   filters,
   onFiltersChange,
@@ -219,34 +338,34 @@ export function FlightFilters({
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto"
           >
-            <Card className="h-full border-0 rounded-none">
-              <CardHeader className="pb-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+            <div className="h-full border-0 rounded-none flex flex-col">
+              {/* Header */}
+              <div className="pb-4 border-b border-gray-200 sticky top-0 bg-white z-10 p-6">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl font-medium flex items-center">
+                  <div className="flex items-center">
                     <FunnelIcon className="h-5 w-5 mr-2" />
-                    Filters
+                    <h2 className="text-xl font-medium">Filters</h2>
                     {activeFiltersCount > 0 && (
-                      <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700 border-blue-200">
+                      <Badge className="ml-2 bg-blue-50 text-blue-700 border-blue-200">
                         {activeFiltersCount}
                       </Badge>
                     )}
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  </div>
+                  <button
                     onClick={onClose}
-                    className="p-1 h-auto"
+                    className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     <XMarkIcon className="h-5 w-5" />
-                  </Button>
+                  </button>
                 </div>
-              </CardHeader>
+              </div>
 
-              <CardContent className="p-6 space-y-8">
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-8">
                 {/* Price Range */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-gray-900 flex items-center">
+                    <Label className="flex items-center">
                       <CurrencyDollarIcon className="h-4 w-4 mr-2" />
                       Price Range
                     </Label>
@@ -270,7 +389,7 @@ export function FlightFilters({
 
                 {/* Stops */}
                 <div className="space-y-4">
-                  <Label className="text-sm font-medium text-gray-900 flex items-center">
+                  <Label className="flex items-center">
                     <MapPinIcon className="h-4 w-4 mr-2" />
                     Stops
                   </Label>
@@ -278,7 +397,7 @@ export function FlightFilters({
                     <div className="flex items-center space-x-3">
                       <Checkbox
                         checked={tempFilters.directOnly}
-                        onCheckedChange={(checked) => updateFilter('directOnly', checked as boolean)}
+                        onCheckedChange={(checked) => updateFilter('directOnly', checked)}
                       />
                       <span className="text-sm text-gray-700">Direct flights only</span>
                     </div>
@@ -304,7 +423,7 @@ export function FlightFilters({
 
                 {/* Airlines */}
                 <div className="space-y-4">
-                  <Label className="text-sm font-medium text-gray-900 flex items-center">
+                  <Label className="flex items-center">
                     <PaperAirplaneIcon className="h-4 w-4 mr-2" />
                     Airlines
                   </Label>
@@ -318,7 +437,7 @@ export function FlightFilters({
                           />
                           <span className="text-sm text-gray-700">{airline.name}</span>
                         </div>
-                        <Badge variant="outline" className="text-xs bg-gray-50">
+                        <Badge className="text-xs bg-gray-50">
                           {airline.count}
                         </Badge>
                       </div>
@@ -328,7 +447,7 @@ export function FlightFilters({
 
                 {/* Departure Time */}
                 <div className="space-y-4">
-                  <Label className="text-sm font-medium text-gray-900 flex items-center">
+                  <Label className="flex items-center">
                     <ClockIcon className="h-4 w-4 mr-2" />
                     Departure Time
                   </Label>
@@ -351,7 +470,7 @@ export function FlightFilters({
                 {/* Duration */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-gray-900 flex items-center">
+                    <Label className="flex items-center">
                       <ClockIcon className="h-4 w-4 mr-2" />
                       Flight Duration
                     </Label>
@@ -375,7 +494,7 @@ export function FlightFilters({
 
                 {/* Cabin Class */}
                 <div className="space-y-4">
-                  <Label className="text-sm font-medium text-gray-900 flex items-center">
+                  <Label className="flex items-center">
                     <StarIcon className="h-4 w-4 mr-2" />
                     Cabin Class
                   </Label>
@@ -394,7 +513,7 @@ export function FlightFilters({
 
                 {/* Fare Options */}
                 <div className="space-y-4">
-                  <Label className="text-sm font-medium text-gray-900 flex items-center">
+                  <Label className="flex items-center">
                     <AdjustmentsHorizontalIcon className="h-4 w-4 mr-2" />
                     Fare Options
                   </Label>
@@ -402,20 +521,20 @@ export function FlightFilters({
                     <div className="flex items-center space-x-3">
                       <Checkbox
                         checked={tempFilters.refundable}
-                        onCheckedChange={(checked) => updateFilter('refundable', checked as boolean)}
+                        onCheckedChange={(checked) => updateFilter('refundable', checked)}
                       />
                       <span className="text-sm text-gray-700">Refundable fares only</span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <Checkbox
                         checked={tempFilters.changeable}
-                        onCheckedChange={(checked) => updateFilter('changeable', checked as boolean)}
+                        onCheckedChange={(checked) => updateFilter('changeable', checked)}
                       />
                       <span className="text-sm text-gray-700">Changeable fares only</span>
                     </div>
                   </div>
                 </div>
-              </CardContent>
+              </div>
 
               {/* Footer Actions */}
               <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 space-y-3">
@@ -423,25 +542,6 @@ export function FlightFilters({
                   <Button
                     variant="outline"
                     onClick={resetFilters}
-                    className="flex-1 rounded-2xl"
+                    className="flex-1"
                   >
                     Reset
-                  </Button>
-                  <Button
-                    onClick={applyFilters}
-                    className="flex-1 bg-gray-900 text-white hover:bg-gray-800 rounded-2xl"
-                  >
-                    Apply Filters
-                  </Button>
-                </div>
-                <p className="text-xs text-gray-500 text-center">
-                  {activeFiltersCount > 0 ? `${activeFiltersCount} filters applied` : 'No filters applied'}
-                </p>
-              </div>
-            </Card>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  )
-}
