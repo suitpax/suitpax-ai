@@ -42,6 +42,20 @@ interface FlightFiltersProps {
   className?: string
 }
 
+// Interfaz para FlightFiltersDisplay
+interface FlightFilter {
+  id: string
+  label: string
+  value: string
+  type: 'cabin' | 'airline' | 'stops' | 'price' | 'time'
+}
+
+interface FlightFiltersDisplayProps {
+  filters: FlightFilter[]
+  onRemoveFilter: (filterId: string) => void
+  onClearAll: () => void
+}
+
 const TIME_PERIODS = [
   { key: 'early-morning', label: 'Early Morning', time: '05:00 - 08:00' },
   { key: 'morning', label: 'Morning', time: '08:00 - 12:00' },
@@ -181,6 +195,43 @@ const Slider = ({ value, onValueChange, min, max, step = 1, className = "" }) =>
   )
 }
 
+// Componente FlightFiltersDisplay que necesita ser exportado
+export function FlightFiltersDisplay({ 
+  filters, 
+  onRemoveFilter, 
+  onClearAll 
+}: FlightFiltersDisplayProps) {
+  if (filters.length === 0) return null
+
+  return (
+    <div className="mb-4 p-4 bg-gray-50 rounded-lg border">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-sm font-medium text-gray-700">Active Filters</h3>
+        <button
+          onClick={onClearAll}
+          className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+        >
+          Clear all
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {filters.map((filter) => (
+          <Badge 
+            key={filter.id} 
+            className="flex items-center gap-1 bg-blue-50 text-blue-700 border-blue-200"
+          >
+            {filter.label}: {filter.value}
+            <XMarkIcon 
+              className="h-3 w-3 cursor-pointer hover:text-blue-900" 
+              onClick={() => onRemoveFilter(filter.id)}
+            />
+          </Badge>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function FlightFilters({
   offers,
   filters,
@@ -238,7 +289,7 @@ export default function FlightFilters({
   } : { min: 0, max: 1440 }
 
   function parseDuration(duration: string): number {
-    const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/)
+    const match = duration.match(/PT(?:(d+)H)?(?:(d+)M)?/)
     if (!match) return 0
     const hours = parseInt(match[1] || "0")
     const minutes = parseInt(match[2] || "0")
@@ -511,7 +562,7 @@ export default function FlightFilters({
                   </div>
                 </div>
 
-                {/* Fare Options */}
+                                {/* Fare Options */}
                 <div className="space-y-4">
                   <Label className="flex items-center">
                     <AdjustmentsHorizontalIcon className="h-4 w-4 mr-2" />
@@ -537,27 +588,28 @@ export default function FlightFilters({
               </div>
 
               {/* Footer Actions */}
-<div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 space-y-3">
-  <div className="flex space-x-3">
-    <Button
-      variant="outline"
-      onClick={resetFilters}
-      className="flex-1"
-    >
-      Reset
-    </Button>
-    <Button
-      onClick={applyFilters}
-      className="flex-1"
-    >
-      Apply
-    </Button>
-  </div>
-</div>
-</div> {/* Cierra el panel */}
-</motion.div> {/* Cierra el motion panel */}
-</>
-)}
-</AnimatePresence>
-);
+              <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 space-y-3">
+                <div className="flex space-x-3">
+                  <Button
+                    variant="outline"
+                    onClick={resetFilters}
+                    className="flex-1"
+                  >
+                    Reset
+                  </Button>
+                  <Button
+                    onClick={applyFilters}
+                    className="flex-1"
+                  >
+                    Apply Filters
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  )
 }
+              
