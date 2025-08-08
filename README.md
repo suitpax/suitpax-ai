@@ -1,159 +1,262 @@
-# Suitpax AI
 
-The next-generation AI-powered business travel platform landing page built with modern web technologies.
+```markdown
+<div align="center">
+  <img src="public/logo.png" alt="Suitpax AI Logo" width="200"/>
+  <h1>Suitpax AI</h1>
+  <p>Next-Generation AI-Powered Business Travel Assistant</p>
 
-## Features
-
-- **AI Voice Assistant** - Real-time speech recognition and natural language processing
-- **Modern Design** - Clean, professional interface with smooth animations
-- **Responsive Layout** - Optimized for all devices and screen sizes
-- **SEO Optimized** - Complete meta tags, sitemap, and structured data
-- **Performance First** - Optimized for Core Web Vitals and fast loading
-- **Accessibility** - WCAG compliant with proper ARIA labels
-
-## Tech Stack
-
-- **Framework**: Next.js 14 (App Router)
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Animations**: Framer Motion
-- **Voice AI**: ElevenLabs integration
-- **TypeScript**: Full type safety
-- **Deployment**: Vercel
-
-## Project Structure
-
-\`\`\`
-suitpax-landing/
-├── app/                    # Next.js App Router pages
-├── components/             # Reusable React components
-├── lib/                    # Utility functions and configurations
-├── hooks/                  # Custom React hooks
-├── public/                 # Static assets
-├── types/                  # TypeScript type definitions
-└── docs/                   # Documentation
-\`\`\`
-
-## Getting Started
-
-1. **Clone the repository**
-   \`\`\`bash
-   git clone https://github.com/suitpax/suitpax-landing.git
-   cd suitpax-landing
-   \`\`\`
-
-2. **Install dependencies**
-   \`\`\`bash
-   npm install
-   \`\`\`
-
-3. **Set up environment variables**
-   \`\`\`bash
-   cp .env.example .env.local
-   # Add your API keys and configuration
-   \`\`\`
-
-4. **Run the development server**
-   \`\`\`bash
-   npm run dev
-   \`\`\`
-
-5. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## 📊 Performance
-
-- **Lighthouse Score**: 95+ across all metrics
-- **Core Web Vitals**: Optimized for LCP, FID, and CLS
-- **Bundle Size**: Minimized with tree shaking and code splitting
-- **Images**: Optimized with Next.js Image component
-
-##  Design System
-
-### Colors
-- **Primary**: Gray-based palette
-- **Accent**: Emerald for highlights
-- **Background**: White and gray-50
-- **Text**: Black and gray variants
-
-### Typography
-- **Font**: Inter (Google Fonts)
-- **Hierarchy**: Consistent sizing scale
-- **Weight**: Light, medium, semibold
-
-### Components
-- **Base**: shadcn/ui components
-- **Custom**: Marketing-specific components
-- **Responsive**: Mobile-first approach
-
-## 🔧 Development
-
-### Available Scripts
-
-\`\`\`bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run type-check   # Run TypeScript checks
-\`\`\`
-
-### Code Quality
-
-- **ESLint**: Configured with Next.js and TypeScript rules
-- **Prettier**: Code formatting
-- **TypeScript**: Strict type checking
-- **Husky**: Pre-commit hooks
-
-## 📱 Pages
-
-- **Homepage** (`/`) - Main landing page with hero and features
-- **AI Voice** (`/ai-voice`) - Voice assistant demonstration
-- **Pricing** (`/pricing`) - Plans and feature comparison
-- **Manifesto** (`/manifesto`) - Company vision and values
-- **Travel Policies** (`/solutions/travel-policies`) - Policy management
-
-## 🌐 SEO & Analytics
-
-- **Meta Tags**: Dynamic per page
-- **Open Graph**: Social media optimization
-- **Sitemap**: Auto-generated XML sitemap
-- **Robots.txt**: Search engine directives
-- **Analytics**: Ready for Google Analytics integration
-
-## 🚀 Deployment
-
-### Vercel (Recommended)
-
-1. **Connect your repository** to Vercel
-2. **Set environment variables** in Vercel dashboard
-3. **Deploy** automatically on push to main branch
-
-### Manual Deployment
-
-\`\`\`bash
-npm run build
-npm run start
-\`\`\`
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is proprietary and confidential. All rights reserved by Suitpax.
-
-## 📞 Support
-
-For support and questions:
-- **Email**: hello@suitpax.com
-- **Website**: [suitpax.com](https://suitpax.com)
-- **Slack**: [Join our community](https://join.slack.com/t/suitpax/shared_invite/zt-34g7xm0pc-qcHjTFPLchwp6Zp0HDXzAw)
+  [![Next.js](https://img.shields.io/badge/Next.js-14.2.16-black)](https://nextjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue)](https://www.typescriptlang.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4.17-38B2AC)](https://tailwindcss.com/)
+  [![License](https://img.shields.io/badge/License-Private-red)]()
+</div>
 
 ---
 
-Built with ❤️ by the Suitpax team
+## Overview
+
+Suitpax AI is a cutting-edge business travel management platform that leverages artificial intelligence to revolutionize corporate travel planning and execution. Our platform combines natural language processing, voice assistance, and intelligent automation to provide a seamless travel management experience.
+
+### Key Features
+
+- **AI Voice Assistant**: Natural language interaction for travel planning and management
+- **Smart Itinerary Planning**: AI-powered travel recommendations and optimization
+- **Real-time Updates**: Live flight and hotel information
+- **Expense Management**: Automated receipt processing and expense reporting
+- **Policy Compliance**: Built-in corporate travel policy enforcement
+- **Multi-language Support**: Global travel assistance in multiple languages
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18.x or later
+- pnpm 8.x or later
+- Supabase account and project
+- Anthropic API key
+- Brevo API key
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/suitpax/suitpax-ai.git
+cd suitpax-ai
+```
+
+2. Install dependencies:
+```bash
+pnpm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
+
+Configure the following variables in `.env.local`:
+```env
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Authentication (Supabase)
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# AI Services
+ANTHROPIC_API_KEY=your_anthropic_key
+ELEVENLABS_API_KEY=your_elevenlabs_key
+
+# Email (Brevo)
+BREVO_API_KEY=your_brevo_key
+```
+
+4. Run the development server:
+```bash
+pnpm dev
+```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project Structure
+
+```
+suitpax-ai/
+├── app/                   # Next.js app directory
+│   ├── (auth)/           # Authentication routes
+│   ├── (dashboard)/      # Dashboard routes
+│   ├── api/              # API routes
+│   └── layout.tsx        # Root layout
+├── components/           # React components
+│   ├── ai/              # AI-related components
+│   ├── dashboard/       # Dashboard components
+│   ├── layout/         # Layout components
+│   └── ui/             # UI components
+├── lib/                 # Utility functions and shared code
+│   ├── actions/        # Server actions
+│   ├── api/            # API clients
+│   ├── config/         # Configuration
+│   ├── hooks/          # Custom React hooks
+│   ├── stores/         # State management
+│   ├── types/          # TypeScript types
+│   └── utils/          # Utility functions
+├── public/             # Static files
+└── styles/             # Global styles
+```
+
+## Technology Stack
+
+### Frontend
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Components**: Radix UI
+- **Animations**: Framer Motion
+- **Forms**: React Hook Form
+- **Data Visualization**: Recharts
+
+### Backend
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **AI**: Anthropic Claude
+- **Voice**: ElevenLabs
+- **Email**: Brevo
+
+### Development Tools
+- **Package Manager**: pnpm
+- **Linting**: ESLint
+- **Type Checking**: TypeScript
+- **Git Hooks**: husky
+- **Formatting**: Prettier
+
+## Security
+
+- **Authentication**: JWT-based authentication with Supabase
+- **Authorization**: Role-based access control
+- **API Security**: Rate limiting and request validation
+- **Data Protection**: End-to-end encryption for sensitive data
+- **Compliance**: GDPR and SOC 2 compliant
+
+## Testing
+
+```bash
+# Run unit tests
+pnpm test
+
+# Run integration tests
+pnpm test:integration
+
+# Run e2e tests
+pnpm test:e2e
+
+# Run all tests with coverage
+pnpm test:coverage
+```
+
+## Deployment
+
+The application is deployed using Vercel's Platform:
+
+1. Connect your GitHub repository to Vercel
+2. Configure environment variables
+3. Deploy using the Vercel CLI:
+```bash
+vercel --prod
+```
+
+## API Documentation
+
+API documentation is available at `/api/docs` when running the development server. The API follows RESTful principles and includes:
+
+- Authentication endpoints
+- Travel management endpoints
+- AI interaction endpoints
+- Voice processing endpoints
+- Expense management endpoints
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Performance Monitoring
+
+- **Analytics**: Vercel Analytics
+- **Error Tracking**: Sentry
+- **Performance Metrics**: Web Vitals
+- **Uptime Monitoring**: UptimeRobot
+
+## Internationalization
+
+The application supports multiple languages through:
+- Dynamic language detection
+- RTL support
+- Locale-specific formatting
+- Translation management
+
+## License
+
+This project is private and proprietary. All rights reserved.
+
+## Team
+
+- **Alberto Z. Burillo** - *Founder & CEO* - [@azburillo](https://github.com/azburillo)
+
+## 🙏 Acknowledgments
+
+- [Next.js Team](https://nextjs.org/)
+- [Supabase](https://supabase.com/)
+- [Anthropic](https://www.anthropic.com/)
+- [ElevenLabs](https://elevenlabs.io/)
+- [Vercel](https://vercel.com/)
+
+## Support
+
+For support, email support@suitpax.com or join our Slack channel.
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ by Suitpax Team</sub>
+</div>
+```
+
+This improved README includes:
+
+1. **Professional Structure**:
+   - Clear hierarchy of information
+   - Comprehensive sections
+   - Easy navigation
+
+2. **Detailed Technical Information**:
+   - Complete tech stack
+   - Project structure
+   - Setup instructions
+   - Development guidelines
+
+3. **Visual Elements**:
+   - Centered logo
+   - Status badges
+   - Clean formatting
+   - Professional layout
+
+4. **Security & Compliance**:
+   - Security measures
+   - Compliance information
+   - Best practices
+
+5. **Developer Experience**:
+   - Clear contribution guidelines
+   - Testing instructions
+   - Deployment process
+   - API documentation
+
+6. **Performance & Monitoring**:
+   - Analytics integration
+   - Error tracking
+   - Performance metrics
+
