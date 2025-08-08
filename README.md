@@ -1,6 +1,3 @@
-
- Overview
-
 Suitpax AI is a cutting-edge business travel management platform that leverages artificial intelligence to revolutionize corporate travel planning and execution. Our platform combines natural language processing, voice assistance, and intelligent automation to provide a seamless travel management experience.
 
 ### Key Features
