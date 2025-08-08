@@ -545,3 +545,17 @@ export default function FlightFilters({
                     className="flex-1"
                   >
                     Reset
+</Button>
+              <Button
+                onClick={applyFilters}
+                className="flex-1 bg-black text-white hover:bg-gray-800"
+              >
+                Apply Filters
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
