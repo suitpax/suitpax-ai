@@ -3,9 +3,9 @@ import { duffel } from '@/lib/duffel'
 import { z } from 'zod'
 
 const searchSchema = z.object({
-  origin: z.string().length(3),
-  destination: z.string().length(3),
-  departure_date: z.string().regex(/^d{4}-d{2}-d{2}$/),
+  origin: z.string().length(3, 'Origin must be 3-letter airport code'),
+  destination: z.string().length(3, 'Destination must be 3-letter airport code'),
+  departure_date: z.string().regex(/^d{4}-d{2}-d{2}$/, 'Invalid date format'),
   return_date: z.string().regex(/^d{4}-d{2}-d{2}$/).optional(),
   passengers: z.object({
     adults: z.number().min(1).max(9),
@@ -15,6 +15,7 @@ const searchSchema = z.object({
   cabin_class: z.enum(['economy', 'premium_economy', 'business', 'first']).optional(),
 })
 
+// Cache para aerolíneas
 const airlineCache = new Map<string, any>()
 
 async function getAirlineData(iataCode: string) {
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const searchParams = searchSchema.parse(body)
 
+    // Crear slices para la búsqueda
     const slices = [
       {
         origin: searchParams.origin,
@@ -58,6 +60,7 @@ export async function POST(request: NextRequest) {
       }
     ]
 
+    // Añadir vuelta si es ida y vuelta
     if (searchParams.return_date) {
       slices.push({
         origin: searchParams.destination,
@@ -66,24 +69,29 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Crear passengers array
     const passengers = []
     
+    // Añadir adultos
     for (let i = 0; i < searchParams.passengers.adults; i++) {
       passengers.push({ type: 'adult' as const })
     }
     
+    // Añadir niños si existen
     if (searchParams.passengers.children) {
       for (let i = 0; i < searchParams.passengers.children; i++) {
         passengers.push({ type: 'child' as const })
       }
     }
     
+    // Añadir bebés si existen
     if (searchParams.passengers.infants) {
       for (let i = 0; i < searchParams.passengers.infants; i++) {
         passengers.push({ type: 'infant_without_seat' as const })
       }
     }
 
+    // Realizar búsqueda con Duffel
     const offerRequest = await duffel.offerRequests.create({
       slices,
       passengers,
@@ -91,8 +99,10 @@ export async function POST(request: NextRequest) {
       return_offers: true,
     })
 
+    // Enriquecer ofertas con datos de aerolíneas
     const enrichedOffers = await Promise.all(
       offerRequest.data.offers.map(async (offer: any) => {
+        // Obtener aerolíneas únicas de todos los segmentos
         const airlineCodes = new Set<string>()
         
         offer.slices.forEach((slice: any) => {
@@ -106,6 +116,7 @@ export async function POST(request: NextRequest) {
           })
         })
 
+        // Obtener datos de aerolíneas
         const airlinePromises = Array.from(airlineCodes).map(code => 
           getAirlineData(code)
         )
@@ -119,6 +130,7 @@ export async function POST(request: NextRequest) {
           }
         })
 
+        // Enriquecer segmentos con logos
         const enrichedSlices = offer.slices.map((slice: any) => ({
           ...slice,
           segments: slice.segments.map((segment: any) => ({
@@ -137,6 +149,7 @@ export async function POST(request: NextRequest) {
         return {
           ...offer,
           slices: enrichedSlices,
+          // Aerolínea principal (primer segmento)
           primary_airline: airlineMap.get(
             offer.slices[0]?.segments[0]?.marketing_carrier?.iata_code
           ),
