@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createDuffelClient, handleDuffelError } from "@/lib/duffel-config";
-
+import { createDuffelClient, handleDuffelError } from '@/lib/duffel';
 export async function POST(req: NextRequest) {
   try {
     const duffel = createDuffelClient();
