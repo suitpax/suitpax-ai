@@ -135,20 +135,6 @@ CREATE INDEX IF NOT EXISTS idx_corporate_loyalty_authorizations_corporate ON cor
 CREATE INDEX IF NOT EXISTS idx_corporate_loyalty_authorizations_user ON corporate_loyalty_authorizations(user_id);
 CREATE INDEX IF NOT EXISTS idx_corporate_loyalty_authorizations_active ON corporate_loyalty_authorizations(active);
 
--- Tabla para autorizaciones pendientes por email
-CREATE TABLE IF NOT EXISTS corporate_loyalty_pending_authorizations (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  corporate_loyalty_id UUID REFERENCES corporate_loyalty_programs NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  role VARCHAR(20) DEFAULT 'user',
-  expires_at DATE,
-  allowed_routes JSONB,
-  max_bookings INTEGER,
-  created_by UUID REFERENCES auth.users NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(corporate_loyalty_id, email)
-);
-
 -- Tabla para cancelaciones de órdenes
 CREATE TABLE IF NOT EXISTS order_cancellations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -283,7 +269,6 @@ ALTER TABLE user_loyalty_programs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_corporate_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE corporate_loyalty_programs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE corporate_loyalty_authorizations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE corporate_loyalty_pending_authorizations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_cancellations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_changes ENABLE ROW LEVEL SECURITY;
 
@@ -312,13 +297,6 @@ CREATE POLICY corporate_loyalty_authorizations_user_policy ON corporate_loyalty_
   FOR SELECT USING (auth.uid() = user_id);
   
 CREATE POLICY corporate_loyalty_authorizations_admin_policy ON corporate_loyalty_authorizations
-  FOR ALL USING (auth.uid() IN (
-    SELECT admin_id FROM corporate_loyalty_programs 
-    WHERE id = corporate_loyalty_id
-  ));
-
--- Políticas para corporate_loyalty_pending_authorizations
-CREATE POLICY corporate_loyalty_pending_authorizations_admin_policy ON corporate_loyalty_pending_authorizations
   FOR ALL USING (auth.uid() IN (
     SELECT admin_id FROM corporate_loyalty_programs 
     WHERE id = corporate_loyalty_id
