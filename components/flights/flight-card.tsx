@@ -101,9 +101,9 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
           <div className="flex items-center gap-3">
             <AirlineLogo airline={offer.primary_airline} />
             <div>
-              <p className="font-medium">{offer.primary_airline?.name}</p>
+              <p className="font-medium">{offer.primary_airline?.name || 'Unknown Airline'}</p>
               <p className="text-sm text-muted-foreground">
-                {offer.primary_airline?.iata_code}
+                {offer.primary_airline?.iata_code || 'N/A'}
               </p>
             </div>
           </div>
