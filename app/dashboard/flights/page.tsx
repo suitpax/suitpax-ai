@@ -15,6 +15,7 @@ import { FlightConditionsDisplay } from "@/components/flights/flight-conditions"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
+import Link from 'next/link';
 
 // Interfaces
 interface DuffelOffer {
@@ -139,7 +140,11 @@ const FlightOfferCard = ({ offer, isFavorite, onToggleFavorite }: { offer: Duffe
             <Button variant="ghost" size="icon" onClick={() => onToggleFavorite(offer.id)}>
               <Heart className={`h-5 w-5 ${isFavorite ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
             </Button>
-            <Button className="bg-gray-900 text-white hover:bg-gray-800 rounded-xl">Select Flight</Button>
+            <Link href={`/dashboard/flights/book/${offer.id}`} passHref>
+              <Button asChild className="bg-gray-900 text-white hover:bg-gray-800 rounded-xl">
+                <a>Select Flight</a>
+              </Button>
+            </Link>
           </div>
         </div>
       </Card>

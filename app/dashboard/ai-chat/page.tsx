@@ -1,9 +1,9 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Loader2, ArrowUp, Paperclip, X, Sparkles, Download } from 'lucide-react'
+import { Loader2, ArrowUp, Sparkles, Wand2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
@@ -17,20 +17,35 @@ import {
   ChatContainerRoot,
   ChatContainerContent,
   ChatContainerScrollAnchor,
-  ChatMessage,
-  ChatLoadingIndicator,
 } from "@/components/prompt-kit/chat-container"
+import { ChatLoadingIndicator, ChatMessage } from "@/components/prompt-kit/chat-message"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
-import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@/components/prompt-kit/reasoning"
 import { toast } from "sonner"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 interface Message {
   id: string
   content: string
   role: "user" | "assistant"
   timestamp: Date
-  reasoning?: string
 }
+
+const PromptStarters = ({ onSelect }: { onSelect: (prompt: string) => void }) => (
+  <div className="space-y-2">
+    <p className="font-medium text-sm text-gray-800">Prompt Starters</p>
+    <button onClick={() => onSelect("Find flights from New York (JFK) to London (LHR) for next Monday, returning in 2 weeks for 1 adult.")} className="text-left text-sm text-gray-600 hover:text-gray-900 w-full p-2 rounded-md hover:bg-gray-100">
+      ✈️ Find flights from New York to London...
+    </button>
+    <button onClick={() => onSelect("Book a 5-star hotel in Paris near the Eiffel Tower for 3 nights starting next Friday.")} className="text-left text-sm text-gray-600 hover:text-gray-900 w-full p-2 rounded-md hover:bg-gray-100">
+      🏨 Book a 5-star hotel in Paris...
+    </button>
+    <button onClick={() => onSelect("Create a travel policy for our engineering team. Max flight budget is $1500 for international trips.")} className="text-left text-sm text-gray-600 hover:text-gray-900 w-full p-2 rounded-md hover:bg-gray-100">
+      📄 Create a travel policy for the engineering team...
+    </button>
+  </div>
+)
 
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -82,7 +97,6 @@ export default function AIChatPage() {
         content: data.response,
         role: "assistant",
         timestamp: new Date(),
-        reasoning: data.reasoning,
       }
 
       setMessages((prev) => [...prev, assistantMessage])
@@ -96,41 +110,16 @@ export default function AIChatPage() {
 
   return (
     <div className="flex flex-col h-full bg-gray-50 overflow-hidden">
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-              <Image src="/logo/suitpax-symbol-2.png" alt="Suitpax AI" width={40} height={40} />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900">Suitpax AI</h1>
-              <p className="text-sm text-gray-500">Your intelligent travel assistant</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <label htmlFor="reasoning-toggle" className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-              <Sparkles className="h-4 w-4" />
-              <span>AI Reasoning</span>
-            </label>
-            <input
-              id="reasoning-toggle"
-              type="checkbox"
-              checked={showReasoning}
-              onChange={() => setShowReasoning(!showReasoning)}
-              className="toggle-switch"
-            />
-          </div>
-        </div>
-      </header>
-
       <div className="flex-1 min-h-0">
         <ChatContainerRoot className="h-full">
           <ChatContainerContent className="p-4 space-y-4">
             {messages.length === 0 && !loading && (
               <div className="text-center py-16">
-                <Sparkles className="mx-auto h-12 w-12 text-gray-300" />
-                <h3 className="mt-4 text-lg font-medium text-gray-900">Welcome to Suitpax AI</h3>
-                <p className="mt-1 text-sm text-gray-500">How can I help you with your business travel today?</p>
+                <div className="inline-block p-4 bg-white rounded-full shadow-sm border">
+                   <Image src="/logo/suitpax-symbol-2.png" alt="Suitpax AI" width={56} height={56} />
+                </div>
+                <h3 className="mt-6 text-xl font-medium text-gray-900">Welcome to Suitpax AI</h3>
+                <p className="mt-2 text-sm text-gray-500">How can I help you with your business travel today?</p>
               </div>
             )}
             {messages.map((message) => (
@@ -140,19 +129,6 @@ export default function AIChatPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                {message.role === "assistant" && message.reasoning && (
-                  <div className="mb-2 ml-12">
-                    <Reasoning>
-                      <ReasoningTrigger className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
-                        <Sparkles className="h-3 w-3" />
-                        <span>View reasoning</span>
-                      </ReasoningTrigger>
-                      <ReasoningContent>
-                        <ReasoningResponse text={message.reasoning} />
-                      </ReasoningContent>
-                    </Reasoning>
-                  </div>
-                )}
                 <ChatMessage message={message} />
               </motion.div>
             ))}
@@ -166,8 +142,23 @@ export default function AIChatPage() {
       <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 p-4 flex-shrink-0">
         <div className="max-w-4xl mx-auto">
           <PromptInput value={input} onValueChange={setInput} onSubmit={handleSend} isLoading={loading}>
+            <PromptInputActions>
+               <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Sparkles className="h-5 w-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" align="start">
+                  <PromptStarters onSelect={(prompt) => {
+                    setInput(prompt)
+                    // find a way to close popover
+                  }} />
+                </PopoverContent>
+              </Popover>
+            </PromptInputActions>
             <PromptInputTextarea
-              placeholder="Ask about flights, hotels, or create a travel policy..."
+              placeholder="Ask to find flights, book hotels, or create a travel policy..."
               disabled={loading}
             />
             <PromptInputActions>
@@ -176,38 +167,15 @@ export default function AIChatPage() {
               </Button>
             </PromptInputActions>
           </PromptInput>
+          <div className="flex items-center justify-center mt-3 gap-3">
+             <Switch id="reasoning-mode" checked={showReasoning} onCheckedChange={setShowReasoning} />
+             <Label htmlFor="reasoning-mode" className="text-xs text-gray-600 font-medium flex items-center gap-1.5">
+                <Wand2 className="h-3 w-3" />
+                Enable Advanced Reasoning
+             </Label>
+          </div>
         </div>
       </footer>
-      <style jsx>{`
-        .toggle-switch {
-          position: relative;
-          width: 40px;
-          height: 22px;
-          -webkit-appearance: none;
-          appearance: none;
-          background: #e5e7eb;
-          border-radius: 9999px;
-          transition: background-color 0.2s;
-          cursor: pointer;
-        }
-        .toggle-switch::before {
-          content: '';
-          position: absolute;
-          width: 16px;
-          height: 16px;
-          border-radius: 50%;
-          background: white;
-          top: 3px;
-          left: 3px;
-          transition: transform 0.2s;
-        }
-        .toggle-switch:checked {
-          background-color: #10b981;
-        }
-        .toggle-switch:checked::before {
-          transform: translateX(18px);
-        }
-      `}</style>
     </div>
   )
 }
