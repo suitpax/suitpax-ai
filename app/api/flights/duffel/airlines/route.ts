@@ -1,17 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getAirlinesHandler } from './controller';
+import { NextRequest, NextResponse } from 'next/server'
+import { duffel } from '@/lib/duffel'
 
-// Maneja GET /api/flights/duffel/airlines
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const limit = searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined;
-  const after = searchParams.get('after') || undefined;
-  const before = searchParams.get('before') || undefined;
-
+export async function GET(request: NextRequest) {
   try {
-    const airlines = await getAirlinesHandler({ limit, after, before });
-    return NextResponse.json(airlines);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    const { searchParams } = new URL(request.url)
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50
+
+    const airlines = await duffel.airlines.list({ limit })
+    
+    const transformedData = airlines.data.map((airline: any) => ({
+      id: airline.id,
+      iata_code: airline.iata_code,
+      icao_code: airline.icao_code,
+      name: airline.name,
+      logo_lockup_url: airline.logo_lockup_url,
+      logo_symbol_url: airline.logo_symbol_url,
+    }))
+
+    return NextResponse.json({
+      success: true,
+      data: transformedData,
+      meta: airlines.meta
+    })
+
+  } catch (error) {
+    console.error('Airlines fetch error:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch airlines' },
+      { status: 500 }
+    )
   }
 }
