@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createDuffelClient, handleDuffelError } from "@/lib/duffel-config"
+import { createDuffelClient, handleDuffelError } from '@/lib/duffel';
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET(
