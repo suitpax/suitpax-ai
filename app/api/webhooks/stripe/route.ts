@@ -33,6 +33,27 @@ export async function POST(request: NextRequest) {
         console.log('Refund created:', refund.id)
         break
       }
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session
+        if (session.mode === 'subscription' && session.metadata?.source === 'suitpax_plans') {
+          console.log('Plan subscription started for user_id:', session.metadata.user_id)
+        }
+        break
+      }
+      case 'invoice.payment_succeeded': {
+        const invoice = event.data.object as Stripe.Invoice
+        if (invoice.billing_reason === 'subscription_cycle') {
+          console.log('Subscription invoice paid:', invoice.id)
+        }
+        break
+      }
+      case 'customer.subscription.deleted':
+      case 'customer.subscription.updated':
+      case 'customer.subscription.created': {
+        const subscription = event.data.object as Stripe.Subscription
+        console.log('Subscription event:', event.type, subscription.id)
+        break
+      }
       default:
         console.log(`Unhandled event type: ${event.type}`)
     }
