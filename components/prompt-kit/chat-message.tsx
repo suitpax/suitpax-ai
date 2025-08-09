@@ -6,6 +6,7 @@ import Image from "next/image"
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from "@/lib/utils"
+import { useState } from "react"
 
 interface Message {
   id: string
@@ -15,12 +16,13 @@ interface Message {
 
 export function ChatMessage({ message }: { message: Message }) {
   const isUser = message.role === "user"
+  const [avatarSrc, setAvatarSrc] = useState("/agents/agent-12.png")
 
   return (
-    <div className={cn("flex items-start gap-3", isUser ? "justify-end" : "justify-start")}>
+    <div className={cn("flex items-start gap-3", isUser ? "justify-end" : "justify-start")}> 
       {!isUser && (
         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white border shadow-sm flex items-center justify-center">
-          <Image src="/logo/suitpax-symbol-2.png" alt="Suitpax AI" width={20} height={20} />
+          <Image src={avatarSrc} alt="Suitpax AI" width={20} height={20} onError={() => setAvatarSrc("/agents/agent-11.png")} />
         </div>
       )}
       <div
@@ -55,6 +57,7 @@ export function ChatMessage({ message }: { message: Message }) {
 }
 
 export function ChatLoadingIndicator() {
+  const [avatarSrc, setAvatarSrc] = useState("/agents/agent-12.png")
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -63,7 +66,7 @@ export function ChatLoadingIndicator() {
       className="flex items-start gap-3"
     >
       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white border shadow-sm flex items-center justify-center">
-        <Image src="/logo/suitpax-symbol-2.png" alt="Suitpax AI" width={20} height={20} />
+        <Image src={avatarSrc} alt="Suitpax AI" width={20} height={20} onError={() => setAvatarSrc("/agents/agent-11.png")} />
       </div>
       <div className="max-w-2xl rounded-2xl p-4 bg-white text-gray-800 border border-gray-100 rounded-bl-lg">
         <div className="flex items-center gap-2">

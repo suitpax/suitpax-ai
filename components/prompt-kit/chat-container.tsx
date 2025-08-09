@@ -260,19 +260,19 @@ export const ChatContainerContent: React.FC<{ messages: Message[]; isLoading: bo
             </p>
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
               <div className="bg-gray-50 p-4 rounded-lg text-left">
-                <div className="font-medium text-gray-900 mb-1">✈️ Flight Search</div>
+                <div className="font-medium text-gray-900 mb-1">Flight Search</div>
                 <div className="text-sm text-gray-600">"Find flights from NYC to London next week"</div>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg text-left">
-                <div className="font-medium text-gray-900 mb-1">💰 Expense Help</div>
+                <div className="font-medium text-gray-900 mb-1">Expense Help</div>
                 <div className="text-sm text-gray-600">"Help me track my travel expenses"</div>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg text-left">
-                <div className="font-medium text-gray-900 mb-1">🏨 Hotel Booking</div>
+                <div className="font-medium text-gray-900 mb-1">Hotel Booking</div>
                 <div className="text-sm text-gray-600">"Recommend business hotels in Paris"</div>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg text-left">
-                <div className="font-medium text-gray-900 mb-1">📋 Travel Policy</div>
+                <div className="font-medium text-gray-900 mb-1">Travel Policy</div>
                 <div className="text-sm text-gray-600">"What's our company travel policy?"</div>
               </div>
             </div>
