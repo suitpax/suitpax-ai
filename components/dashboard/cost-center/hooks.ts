@@ -5,32 +5,33 @@ import { createClient } from "@/lib/supabase/client"
 import type { Database } from "@/lib/supabase/types"
 import type { CostCenter, CostCenterComputed, ExpenseLike, UpsertCostCenterInput } from "./types"
 
-// En este MVP usamos una tabla virtual de cost centers en memoria y calculamos gasto por expenses.project_code
-// En una siguiente iteración, puede migrarse a tablas reales `cost_centers` y `cost_center_budgets`.
+// MVP: keep local cost centers, compute spend by expenses.project_code from Supabase
 
 export function useCostCenters() {
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [centers, setCenters] = useState<CostCenter[]>([])
   const [expenses, setExpenses] = useState<ExpenseLike[]>([])
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
       try {
-        // 1) Cargar expenses del usuario actual
         const { data: session } = await supabase.auth.getSession()
-        const userId = session.session?.user?.id
-        if (userId) {
+        const uid = session.session?.user?.id || null
+        setUserId(uid)
+
+        if (uid) {
           const { data } = await supabase
             .from("expenses")
             .select("id, amount, currency, status, expense_date, project_code, title, category")
-            .eq("user_id", userId)
+            .eq("user_id", uid)
           setExpenses((data || []) as ExpenseLike[])
         }
 
-        // 2) Persistir centers de localStorage como MVP (hasta tener tabla real)
-        const raw = typeof window !== "undefined" ? window.localStorage.getItem("cost_centers") : null
+        const key = uid ? `cost_centers:${uid}` : "cost_centers"
+        const raw = typeof window !== "undefined" ? window.localStorage.getItem(key) : null
         const parsed: CostCenter[] = raw ? JSON.parse(raw) : []
         setCenters(parsed)
       } finally {
@@ -58,6 +59,13 @@ export function useCostCenters() {
 
   const totalBudget = useMemo(() => computed.reduce((s, c) => s + c.budget, 0), [computed])
   const totalSpent = useMemo(() => computed.reduce((s, c) => s + c.spent, 0), [computed])
+
+  const persist = (updated: CostCenter[]) => {
+    if (typeof window !== "undefined") {
+      const key = userId ? `cost_centers:${userId}` : "cost_centers"
+      window.localStorage.setItem(key, JSON.stringify(updated))
+    }
+  }
 
   const upsertCenters = (rows: UpsertCostCenterInput[]) => {
     const codeToExisting: Record<string, CostCenter> = {}
@@ -89,26 +97,20 @@ export function useCostCenters() {
     }
 
     setCenters(updated)
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("cost_centers", JSON.stringify(updated))
-    }
+    persist(updated)
   }
 
   const removeCenter = (centerId: string) => {
     const updated = centers.filter((c) => c.id !== centerId)
     setCenters(updated)
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("cost_centers", JSON.stringify(updated))
-    }
+    persist(updated)
   }
 
   const saveCenter = (input: UpsertCostCenterInput) => {
     upsertCenters([input])
   }
 
-  // Generar datos de gráfico mensual por nombre de centro
   const monthlyByDept = useMemo(() => {
-    // Tomar últimos 6 meses y agrupar por month + project_code
     const now = new Date()
     const months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)

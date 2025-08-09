@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { createClient } from "@/lib/supabase/client"
 
 interface Email {
   id: string
@@ -108,11 +109,27 @@ const folders = [
 export default function MailPage() {
   const [emails, setEmails] = useState<Email[]>(mockEmails)
   const [filteredEmails, setFilteredEmails] = useState<Email[]>(mockEmails)
+  const [userId, setUserId] = useState<string | null>(null)
   const [selectedFolder, setSelectedFolder] = useState("inbox")
   const [selectedEmails, setSelectedEmails] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null)
+
+  // Load per-user emails from localStorage once
+  useEffect(() => {
+    const supabase = createClient()
+    const init = async () => {
+      const { data: session } = await supabase.auth.getSession()
+      const uid = session.session?.user?.id || null
+      setUserId(uid)
+      const key = uid ? `emails:${uid}` : `emails`
+      const raw = typeof window !== "undefined" ? window.localStorage.getItem(key) : null
+      const parsed: Email[] = raw ? JSON.parse(raw) : mockEmails
+      setEmails(parsed)
+    }
+    init()
+  }, [])
 
   useEffect(() => {
     let filtered = emails.filter((email) => email.folder === selectedFolder)
@@ -149,32 +166,46 @@ export default function MailPage() {
     }
   }
 
+  const persist = (items: Email[]) => {
+    const key = userId ? `emails:${userId}` : `emails`
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(key, JSON.stringify(items))
+    }
+  }
+
   const handleStarEmail = (emailId: string) => {
-    setEmails(emails.map((email) => (email.id === emailId ? { ...email, starred: !email.starred } : email)))
+    const updated = emails.map((email) => (email.id === emailId ? { ...email, starred: !email.starred } : email))
+    setEmails(updated)
+    persist(updated)
   }
 
   const handleMarkAsRead = (emailId: string) => {
-    setEmails(emails.map((email) => (email.id === emailId ? { ...email, read: true } : email)))
+    const updated = emails.map((email) => (email.id === emailId ? { ...email, read: true } : email))
+    setEmails(updated)
+    persist(updated)
   }
 
   const handleBulkAction = (action: string) => {
+    let updated = emails
     switch (action) {
       case "read":
-        setEmails(emails.map((email) => (selectedEmails.includes(email.id) ? { ...email, read: true } : email)))
+        updated = emails.map((email) => (selectedEmails.includes(email.id) ? { ...email, read: true } : email))
         break
       case "unread":
-        setEmails(emails.map((email) => (selectedEmails.includes(email.id) ? { ...email, read: false } : email)))
+        updated = emails.map((email) => (selectedEmails.includes(email.id) ? { ...email, read: false } : email))
         break
       case "star":
-        setEmails(emails.map((email) => (selectedEmails.includes(email.id) ? { ...email, starred: true } : email)))
+        updated = emails.map((email) => (selectedEmails.includes(email.id) ? { ...email, starred: true } : email))
         break
       case "archive":
-        setEmails(emails.map((email) => (selectedEmails.includes(email.id) ? { ...email, folder: "archive" } : email)))
+        updated = emails.map((email) => (selectedEmails.includes(email.id) ? { ...email, folder: "archive" } : email))
         break
       case "delete":
-        setEmails(emails.map((email) => (selectedEmails.includes(email.id) ? { ...email, folder: "trash" } : email)))
+        updated = emails.map((email) => (selectedEmails.includes(email.id) ? { ...email, folder: "trash" } : email))
         break
     }
+    setEmails(updated)
+    persist(updated)
     setSelectedEmails([])
   }
 
