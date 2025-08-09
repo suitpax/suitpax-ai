@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { FlightCard } from '@/components/flights/flight-card'
-import { Search, Loader2, AlertCircle } from 'lucide-react'
+import FlightFilters, { FlightFiltersDisplay } from '@/components/flights/flight-filters'
+import { Search, Loader2, AlertCircle, Filter } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import AirportSearch from '@/components/flights/airport-search'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -39,8 +40,22 @@ export default function FlightsPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [offers, setOffers] = useState<FlightOffer[]>([])
+  const [filteredOffers, setFilteredOffers] = useState<FlightOffer[]>([])
   const [error, setError] = useState<string | null>(null)
   const [searchPerformed, setSearchPerformed] = useState(false)
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+  const [activeFilters, setActiveFilters] = useState({
+    priceRange: [0, 10000],
+    maxStops: 3,
+    airlines: [] as string[],
+    departureTime: [] as string[],
+    arrivalTime: [] as string[],
+    duration: [0, 1440],
+    cabinClass: [] as string[],
+    refundable: false,
+    changeable: false,
+    directOnly: false,
+  })
   
   const [searchForm, setSearchForm] = useState<SearchFormData>({
     origin: '',
@@ -154,22 +169,25 @@ export default function FlightsPage() {
       const data: FlightSearchResponse = await response.json()
       console.log('Search response:', data)
       
-      if (data.success && data.data) {
-        setOffers(data.data.offers || [])
-        
-        if (data.cached) {
-          toast.info('Results loaded from cache for faster response')
-        }
-        
-        if (data.data.offers?.length === 0) {
-          setError('No flights found for your search criteria. Try different dates or airports.')
-        } else {
-          toast.success(`Found ${data.data.offers.length} flight options`)
-        }
-      } else {
-        setError(data.error || 'Failed to search flights')
-        setOffers([])
-      }
+             if (data.success && data.data) {
+         const newOffers = data.data.offers || []
+         setOffers(newOffers)
+         setFilteredOffers(newOffers)
+         
+         if (data.cached) {
+           toast.info('Results loaded from cache for faster response')
+         }
+         
+         if (newOffers.length === 0) {
+           setError('No flights found for your search criteria. Try different dates or airports.')
+         } else {
+           toast.success(`Found ${newOffers.length} flight options`)
+         }
+       } else {
+         setError(data.error || 'Failed to search flights')
+         setOffers([])
+         setFilteredOffers([])
+       }
     } catch (error) {
       console.error('Search error:', error)
       const errorMessage = error instanceof Error ? error.message : 'An error occurred while searching'
@@ -181,9 +199,43 @@ export default function FlightsPage() {
     }
   }
 
-  const handleSelectFlight = (offerId: string) => {
-    router.push(`/dashboard/flights/book/${offerId}`)
-  }
+     const handleSelectFlight = (offerId: string) => {
+     router.push(`/dashboard/flights/book/${offerId}`)
+   }
+
+   const applyClientFilters = (filters: typeof activeFilters) => {
+     const filtered = offers.filter((offer) => {
+       const price = parseFloat(offer.total_amount)
+       if (price < filters.priceRange[0] || price > filters.priceRange[1]) return false
+
+       // stops
+       if (filters.directOnly) {
+         if (!offer.slices.every(s => s.segments.length === 1)) return false
+       } else if (filters.maxStops < 3) {
+         if (!offer.slices.every(s => (s.segments.length - 1) <= filters.maxStops)) return false
+       }
+
+       // airlines
+       if (filters.airlines.length > 0) {
+         const hasAirline = offer.slices.every(slice => slice.segments.some(seg => filters.airlines.includes(seg.marketing_carrier?.iata_code)))
+         if (!hasAirline) return false
+       }
+
+       // duration
+       const parseDuration = (duration: string) => {
+         const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/)
+         const hours = parseInt(match?.[1] || '0')
+         const minutes = parseInt(match?.[2] || '0')
+         return hours * 60 + minutes
+       }
+       const totalMinutes = offer.slices.reduce((acc, s) => acc + parseDuration(s.duration), 0)
+       if (totalMinutes < filters.duration[0] || totalMinutes > filters.duration[1]) return false
+
+       return true
+     })
+     setFilteredOffers(filtered)
+     setActiveFilters(filters)
+   }
 
   const handleAirportChange = (field: 'origin' | 'destination', code: string) => {
     setSearchForm(prev => ({ ...prev, [field]: code }))
@@ -416,23 +468,59 @@ export default function FlightsPage() {
               </div>
             ) : offers.length > 0 ? (
               <>
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-medium tracking-tighter">
-                    Flight Results ({offers.length})
-                  </h2>
-                  <div className="text-sm text-gray-500">
-                    {searchForm.return_date ? 'Round trip' : 'One way'} • {searchForm.passengers.adults + searchForm.passengers.children + searchForm.passengers.infants} passenger{(searchForm.passengers.adults + searchForm.passengers.children + searchForm.passengers.infants) !== 1 ? 's' : ''}
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  {offers.map((offer) => (
-                    <FlightCard 
-                      key={offer.id}
-                      offer={offer}
-                      onSelect={handleSelectFlight}
-                    />
-                  ))}
-                </div>
+                                 <div className="flex justify-between items-center mb-4">
+                   <div>
+                     <h2 className="text-xl font-medium tracking-tighter">
+                       Flight Results ({filteredOffers.length})
+                     </h2>
+                     <div className="text-sm text-gray-500">
+                       {searchForm.return_date ? 'Round trip' : 'One way'} • {searchForm.passengers.adults + searchForm.passengers.children + searchForm.passengers.infants} passenger{(searchForm.passengers.adults + searchForm.passengers.children + searchForm.passengers.infants) !== 1 ? 's' : ''}
+                     </div>
+                   </div>
+                   <Button variant="outline" onClick={() => setIsFiltersOpen(true)} className="flex items-center gap-2">
+                     <Filter className="h-4 w-4" /> Filters
+                   </Button>
+                 </div>
+
+                 {/* Active filters display */}
+                 <FlightFiltersDisplay
+                   filters={[]}
+                   onRemoveFilter={() => {}}
+                   onClearAll={() => {
+                     setActiveFilters({
+                       priceRange: [0, 10000],
+                       maxStops: 3,
+                       airlines: [],
+                       departureTime: [],
+                       arrivalTime: [],
+                       duration: [0, 1440],
+                       cabinClass: [],
+                       refundable: false,
+                       changeable: false,
+                       directOnly: false,
+                     })
+                     setFilteredOffers(offers)
+                   }}
+                 />
+
+                 <div className="space-y-4">
+                   {filteredOffers.map((offer) => (
+                     <FlightCard 
+                       key={offer.id}
+                       offer={offer}
+                       onSelect={handleSelectFlight}
+                     />
+                   ))}
+                 </div>
+
+                 {/* Filters drawer */}
+                 <FlightFilters
+                   offers={offers}
+                   filters={activeFilters as any}
+                   isOpen={isFiltersOpen}
+                   onClose={() => setIsFiltersOpen(false)}
+                   onFiltersChange={(f: any) => applyClientFilters(f)}
+                 />
               </>
             ) : !isLoading && searchPerformed ? (
               <div className="text-center py-12">
