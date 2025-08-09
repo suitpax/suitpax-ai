@@ -7,7 +7,7 @@ import { motion } from "framer-motion"
 import { Mail, ArrowLeft, Loader2, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createBrowserClient } from "@supabase/ssr"
 import toast from "react-hot-toast"
 
 export default function ForgotPasswordPage() {
@@ -15,7 +15,10 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
 
-  const supabase = createClientComponentClient()
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()

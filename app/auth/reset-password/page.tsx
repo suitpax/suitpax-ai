@@ -7,7 +7,7 @@ import { motion } from "framer-motion"
 import { Eye, EyeOff, Lock, ArrowRight, Loader2, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createBrowserClient } from "@supabase/ssr"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
 
@@ -19,7 +19,10 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [passwordReset, setPasswordReset] = useState(false)
 
-  const supabase = createClientComponentClient()
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
   const router = useRouter()
   const searchParams = useSearchParams()
 

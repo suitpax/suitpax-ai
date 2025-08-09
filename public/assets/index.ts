@@ -5,7 +5,6 @@ export const logoAssets = {
   // Main logos
   cloudLogo: "/logo/suitpax-cloud-logo.webp",
   blackLogo: "/logo/suitpax-bl-logo.webp",
-  greenLogo: "/logo/suitpax-green-logo.webp",
   symbol: "/logo/suitpax-symbol.webp",
   symbol2: "/logo/suitpax-symbol-2.png",
   diamondLogo: "/images/suitpax-diamond-logo.png",

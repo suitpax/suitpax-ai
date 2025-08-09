@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createServerClient } from "@supabase/ssr"
+import { cookieStore } from "@/lib/supabase/cookies"
 import Anthropic from "@anthropic-ai/sdk"
 
 const anthropic = new Anthropic({
@@ -10,8 +10,13 @@ const anthropic = new Anthropic({
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: cookieStore
+      }
+    )
 
     const {
       data: { user },
@@ -55,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       response: aiResponse,
-      tokens_used: response.usage?.input_tokens + response.usage?.output_tokens || 0,
+      tokens_used: (response.usage?.input_tokens || 0) + (response.usage?.output_tokens || 0),
     })
   } catch (error) {
     console.error("Voice AI error:", error)

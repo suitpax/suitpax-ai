@@ -1,12 +1,17 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createServerClient } from "@supabase/ssr"
 import type { Database } from "@/lib/supabase/types"
+import { cookieStore } from "@/lib/supabase/cookies"
 
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: cookieStore
+      }
+    )
 
     const {
       data: { user },
@@ -67,7 +72,16 @@ export async function GET(request: NextRequest) {
       .limit(5)
 
     // Combine recent activities
-    const activities = []
+    interface Activity {
+      id: string;
+      type: string;
+      title: string;
+      description: string;
+      created_at: string;
+      amount?: number;
+    }
+    
+    const activities: Activity[] = []
 
     recentExpenses?.forEach((expense) => {
       activities.push({
