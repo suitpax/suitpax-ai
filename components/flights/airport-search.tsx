@@ -81,6 +81,14 @@ export default function AirportSearch({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Mantener sincronizado el valor externo con el input visible
+  useEffect(() => {
+    // Si llega un IATA (3 letras) y el usuario no está escribiendo algo distinto, muéstralo
+    if (value && value !== query && value.length <= 8) {
+      setQuery(value)
+    }
+  }, [value])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = e.target.value
     setQuery(newQuery)

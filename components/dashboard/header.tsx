@@ -87,11 +87,11 @@ const getPageTitle = (pathname: string) => {
 }
 
 const quickActions = [
-  { name: "Book Flight", href: "/dashboard/flights", icon: "✈️", shortcut: "⌘F" },
-  { name: "Add Expense", href: "/dashboard/expenses", icon: "💳", shortcut: "⌘E" },
-  { name: "AI Chat", href: "/dashboard/ai-chat", icon: "🤖", shortcut: "⌘A" },
-  { name: "Calendar", href: "/dashboard/calendar", icon: "📅", shortcut: "⌘C" },
-  { name: "Analytics", href: "/dashboard/analytics", icon: "📊", shortcut: "⌘R" },
+  { name: "Book Flight", href: "/dashboard/flights", icon: "Flight", shortcut: "⌘F" },
+  { name: "Add Expense", href: "/dashboard/expenses", icon: "Expense", shortcut: "⌘E" },
+  { name: "AI Chat", href: "/dashboard/ai-chat", icon: "AI", shortcut: "⌘A" },
+  { name: "Calendar", href: "/dashboard/calendar", icon: "Calendar", shortcut: "⌘C" },
+  { name: "Analytics", href: "/dashboard/analytics", icon: "Analytics", shortcut: "⌘R" },
 ]
 
 export default function Header({ 
@@ -381,7 +381,7 @@ export default function Header({
                     <DropdownMenuItem className="text-purple-600 focus:text-purple-700 focus:bg-purple-50">
                       <Crown className="h-4 w-4 mr-2" />
                       Upgrade to Pro
-                      <CommandShortcut>⚡</CommandShortcut>
+                      <CommandShortcut>⇧</CommandShortcut>
                     </DropdownMenuItem>
                   </>
                 )}

@@ -445,7 +445,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-medium tracking-tighter mb-2">
-                  <em className="font-serif italic">Meet Zia, Your AI Travel Assistant</em>
+                  <em className="font-serif italic">Meet Suitpax AI, Your AI Travel Assistant</em>
                 </h3>
                 <p className="font-light text-gray-300">
                   Get personalized help with booking flights, finding hotels, and managing your travel expenses.
