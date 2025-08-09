@@ -22,7 +22,8 @@ import {
   User,
   Building,
   Mail,
-  VideoIcon as Meeting
+  VideoIcon as Meeting,
+  PieChart,
 } from "lucide-react"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
@@ -38,6 +39,7 @@ const navigation = [
   { name: "Hotels", href: "/dashboard/hotels", icon: Hotel },
   { name: "Expenses", href: "/dashboard/expenses", icon: CreditCard },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+  { name: "Cost Centers", href: "/dashboard/cost-center", icon: PieChart },
   { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
   { name: "Mail", href: "/dashboard/mail", icon: Mail },
   { name: "Meetings", href: "/dashboard/meetings", icon: Meeting },
@@ -138,7 +140,13 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
       <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 flex-shrink-0">
         {(!isCollapsed || isMobile) && (
           <Link href="/dashboard" className="flex items-center" onClick={isMobile ? onCloseMobile : undefined}>
-            <span className="text-base font-semibold tracking-tight text-gray-900">Dashboard</span>
+            <Image 
+              src="/logo/suitpax-bl-logo.webp" 
+              alt="Suitpax" 
+              width={88} 
+              height={20} 
+              className="h-5 w-auto" 
+            />
           </Link>
         )}
         
@@ -147,9 +155,9 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
             <Image 
               src="/logo/suitpax-symbol-2.png" 
               alt="Suitpax" 
-              width={24} 
-              height={24} 
-              className="h-6 w-6" 
+              width={20} 
+              height={20} 
+              className="h-5 w-5" 
             />
           </Link>
         )}

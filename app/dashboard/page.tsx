@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts"
 
 // Interfaces
 interface DashboardStats {
@@ -319,6 +320,42 @@ export default function DashboardPage() {
               <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
                 <TrendingUp className="h-5 w-5 text-gray-700" />
               </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Spending Trend (Black/Grey) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+          className="mb-8"
+        >
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-medium tracking-tighter">Monthly Spending</h2>
+              <span className="text-xs text-gray-500">Simulated</span>
+            </div>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={[
+                    { month: "Jan", amount: 0 },
+                    { month: "Feb", amount: 0 },
+                    { month: "Mar", amount: 0 },
+                    { month: "Apr", amount: 0 },
+                    { month: "May", amount: 0 },
+                    { month: "Jun", amount: 0 },
+                  ]}
+                  margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
+                  <Tooltip cursor={{ stroke: '#111827', strokeWidth: 1 }} formatter={(v: any) => `$${Number(v).toLocaleString()}`} />
+                  <Line type="monotone" dataKey="amount" stroke="#111827" strokeWidth={2} dot={{ r: 3, fill: '#111827' }} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </motion.div>

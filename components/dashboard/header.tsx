@@ -72,6 +72,7 @@ const getPageTitle = (pathname: string) => {
     '/dashboard/flights': { title: 'Flights', description: 'Search and book business flights' },
     '/dashboard/expenses': { title: 'Expenses', description: 'Track and manage travel expenses' },
     '/dashboard/analytics': { title: 'Analytics', description: 'Travel insights and reports' },
+    '/dashboard/cost-center': { title: 'Cost Centers', description: 'Budgets and spending by department' },
     '/dashboard/calendar': { title: 'Calendar', description: 'Schedule and manage trips' },
     '/dashboard/locations': { title: 'Locations', description: 'Saved places and destinations' },
     '/dashboard/team': { title: 'Team', description: 'Manage team members' },
