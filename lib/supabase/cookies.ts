@@ -3,23 +3,25 @@ import { type ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies"
 
 export const cookieStore = {
   get(name: string) {
-    const requestCookies = cookies()
-    return requestCookies.get(name)?.value
+    return cookies().then(requestCookies => requestCookies.get(name)?.value)
   },
   getAll(name?: string) {
-    const requestCookies = cookies()
-    if (name) {
-      const cookie = requestCookies.get(name)
-      return cookie ? [cookie] : []
-    }
-    return requestCookies.getAll()
+    return cookies().then(requestCookies => {
+      if (name) {
+        const cookie = requestCookies.get(name)
+        return cookie ? [cookie] : []
+      }
+      return requestCookies.getAll()
+    })
   },
   set(name: string, value: string, options: Partial<ResponseCookie>) {
-    const requestCookies = cookies()
-    requestCookies.set(name, value, options)
+    return cookies().then(requestCookies => {
+      requestCookies.set(name, value, options)
+    })
   },
-  remove(name: string, options: { path?: string; domain?: string }) {
-    const requestCookies = cookies()
-    requestCookies.delete(name, options)
+  remove(name: string, options?: { path?: string; domain?: string }) {
+    return cookies().then(requestCookies => {
+      requestCookies.delete(name)
+    })
   }
 }
