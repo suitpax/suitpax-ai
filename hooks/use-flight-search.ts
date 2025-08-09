@@ -15,33 +15,9 @@ interface SearchParams {
   corporateDiscounts?: boolean
 }
 
-interface CachedResult {
-  key: string
-  data: any
-  timestamp: number
-  expiresAt: number
-}
-
 interface UseFlightSearchReturn {
   search: (params: SearchParams) => Promise<any>
-  isLoading: boolean
-  error: string | null
-  offers: any[]
-  requestId: string | null
-  searchMetadata: any
-  clearCache: () => void
-  getCacheStats: () => { size: number; hits: number; misses: number }
-}
-
-interface CachedResult {
-  key: string
-  data: any
-  timestamp: number
-  expiresAt: number
-}
-
-interface UseFlightSearchReturn {
-  search: (params: SearchParams) => Promise<any>
+  searchDebounced: (params: SearchParams, delayMs?: number) => Promise<any>
   isLoading: boolean
   error: string | null
   offers: any[]
@@ -169,14 +145,12 @@ export function useFlightSearch(): UseFlightSearchReturn {
       const cachedResult = cache.getSearchResult(params)
       
       if (cachedResult) {
-        setOffers(cachedResult.offers || [])
-        setRequestId(cachedResult.request_id)
-        setSearchMetadata({
-          ...cachedResult.search_metadata,
-          cached: true
-        })
+        const dataNode = cachedResult.data || cachedResult
+        setOffers(dataNode.offers || [])
+        setRequestId(dataNode.id || null)
+        setSearchMetadata({ cached: true })
         setIsLoading(false)
-        return cachedResult
+        return dataNode
       }
 
       // Crear nuevo AbortController para esta request
@@ -187,22 +161,20 @@ export function useFlightSearch(): UseFlightSearchReturn {
       const searchData = {
         origin: params.origin.toUpperCase(),
         destination: params.destination.toUpperCase(),
-        departureDate: params.departureDate,
-        returnDate: params.returnDate,
-        passengers: params.passengers,
-        cabinClass: params.cabinClass,
-        loyaltyProgrammes: params.loyaltyProgrammes || [],
-        corporateDiscounts: params.corporateDiscounts || false,
-        // Configuraciones optimizadas
-        maxConnections: 2,
-        preferDirectFlights: true,
-        includeNearbyAirports: false,
-        sortBy: 'price',
+        departure_date: params.departureDate,
+        return_date: params.returnDate,
+        passengers: { adults: params.passengers },
+        cabin_class: params.cabinClass as any,
+        loyalty_programmes: params.loyaltyProgrammes || [],
+        filters: {
+          max_connections: 2,
+          direct_only: true,
+        },
+        sort_by: 'price' as const,
         currency: 'USD',
-        timeout: 30000
       }
 
-      const response = await fetch("/api/duffel/flight-search", {
+      const response = await fetch("/api/flights/duffel/flight-search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -226,11 +198,12 @@ export function useFlightSearch(): UseFlightSearchReturn {
       cache.setSearchResult(params, data, 'flight')
 
       // Actualizar estado
-      setOffers(data.offers || [])
-      setRequestId(data.request_id)
-      setSearchMetadata(data.search_metadata)
+      const dataNode = data.data || data
+      setOffers(dataNode.offers || [])
+      setRequestId(dataNode.id || null)
+      setSearchMetadata({})
 
-      return data
+      return dataNode
 
     } catch (error: any) {
       if (error.name === 'AbortError') {
@@ -259,6 +232,18 @@ export function useFlightSearch(): UseFlightSearchReturn {
     }
   }, [cache])
 
+  // Debounced version to avoid hammering the API when inputs change quickly
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
+  const searchDebounced = useCallback((params: SearchParams, delayMs = 300) => {
+    return new Promise<any>((resolve) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(async () => {
+        const result = await search(params)
+        resolve(result)
+      }, delayMs)
+    })
+  }, [search])
+
   const clearCache = useCallback(() => {
     clearSmartCache()
   }, [clearSmartCache])
@@ -269,6 +254,7 @@ export function useFlightSearch(): UseFlightSearchReturn {
 
   return {
     search,
+    searchDebounced,
     isLoading,
     error,
     offers,
