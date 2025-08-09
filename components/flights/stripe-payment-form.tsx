@@ -99,7 +99,7 @@ function PaymentForm({ amount, currency, onSuccess, onError }: PaymentFormProps)
         <Button
           type="submit"
           disabled={!stripe || loading}
-          className="w-full bg-gray-900 text-white hover:bg-gray-800 rounded-xl py-6 text-lg font-medium tracking-tight"
+          className="w-full bg-black text-white hover:bg-gray-800 rounded-xl py-6 text-lg font-medium tracking-tight"
         >
           {loading ? (
             <Loader2 className="mr-2 h-5 w-5 animate-spin" />

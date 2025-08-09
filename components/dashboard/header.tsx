@@ -77,7 +77,7 @@ const getPageTitle = (pathname: string) => {
     '/dashboard/team': { title: 'Team', description: 'Manage team members' },
     '/dashboard/mail': { title: 'Mail', description: 'Travel communications' },
     '/dashboard/meetings': { title: 'Meetings', description: 'Schedule and join meetings' },
-    '/dashboard/ai-chat': { title: 'Suitpax AI', description: 'AI-powered travel assistant' },
+          '/dashboard/ai-chat': { title: 'AI Assistant', description: 'AI-powered travel assistant' },
     '/dashboard/voice-ai': { title: 'Voice AI', description: 'Voice-powered assistance' },
     '/dashboard/settings': { title: 'Settings', description: 'Account and preferences' },
     '/dashboard/profile': { title: 'Profile', description: 'Personal information' },
@@ -201,15 +201,9 @@ export default function Header({
                 <Menu className="h-5 w-5" />
               </Button>
 
-              {/* Logo in rounded square */}
-              <div className="bg-gray-900 rounded-xl p-2 flex items-center justify-center">
-                <Image
-                  src="/logo/suitpax-bl-logo.webp"
-                  alt="Suitpax"
-                  width={80}
-                  height={20}
-                  className="h-4 w-auto brightness-0 invert"
-                />
+              {/* Brand */}
+              <div className="rounded-xl p-2 flex items-center justify-center">
+                <span className="text-sm font-medium tracking-tight text-gray-900">Dashboard</span>
               </div>
             </div>
 

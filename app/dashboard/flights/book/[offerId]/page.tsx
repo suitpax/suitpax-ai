@@ -286,7 +286,7 @@ export default function BookFlightPage() {
               <Button
                 onClick={handleContinueToPayment}
                 disabled={booking}
-                className="w-full bg-gray-900 text-white hover:bg-gray-800 rounded-xl py-6 text-lg font-medium tracking-tight"
+                className="w-full bg-black text-white hover:bg-gray-800 rounded-xl py-6 text-lg font-medium tracking-tight"
               >
                 {booking ? (
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />

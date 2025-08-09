@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
 
-    // Get expenses stats
+    // Get expenses stats and rows for aggregation
     const { data: expenses } = await supabase
       .from("expenses")
       .select("amount, status, created_at")
@@ -36,16 +36,24 @@ export async function GET(request: NextRequest) {
     const totalExpenses = expenses?.length || 0
     const pendingExpenses = expenses?.filter((e) => e.status === "pending").length || 0
 
-    // Calculate this month expenses
-    const currentMonth = new Date().getMonth()
-    const currentYear = new Date().getFullYear()
-    const thisMonthExpenses =
-      expenses
-        ?.filter((e) => {
-          const expenseDate = new Date(e.created_at)
-          return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear
-        })
-        .reduce((sum, e) => sum + (e.amount || 0), 0) || 0
+    // Calculate this month expenses and monthly series (last 6 months)
+    const now = new Date()
+    const monthKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+
+    const months: { key: string; label: string; amount: number }[] = []
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      const key = monthKey(d)
+      const label = d.toLocaleString('en-US', { month: 'short' })
+      const amount = (expenses || []).filter(e => {
+        const ed = new Date(e.created_at)
+        return monthKey(ed) === key
+      }).reduce((sum, e) => sum + (e.amount || 0), 0)
+      months.push({ key, label, amount })
+    }
+
+    const currentMonthKey = monthKey(now)
+    const thisMonthExpenses = months.find(m => m.key === currentMonthKey)?.amount || 0
 
     // Get recent activities
     const { data: recentExpenses } = await supabase
@@ -70,6 +78,25 @@ export async function GET(request: NextRequest) {
       .gte("departure_date", new Date().toISOString())
       .order("departure_date", { ascending: true })
       .limit(5)
+
+    // Top destinations aggregation (by count and by total amount)
+    const { data: userFlights } = await supabase
+      .from("flight_bookings")
+      .select("destination, total_amount")
+      .eq("user_id", user.id)
+
+    const destinationMap: Record<string, { trips: number; amount: number }> = {}
+    ;(userFlights || []).forEach((f) => {
+      const dest = f.destination || 'N/A'
+      if (!destinationMap[dest]) destinationMap[dest] = { trips: 0, amount: 0 }
+      destinationMap[dest].trips += 1
+      destinationMap[dest].amount += parseFloat(String(f.total_amount || 0))
+    })
+
+    const topDestinations = Object.entries(destinationMap)
+      .map(([city, v]) => ({ city, trips: v.trips, amount: v.amount }))
+      .sort((a, b) => b.trips - a.trips)
+      .slice(0, 8)
 
     // Combine recent activities
     interface Activity {
@@ -116,6 +143,8 @@ export async function GET(request: NextRequest) {
       },
       recent_activities: activities.slice(0, 5),
       upcoming_trips: upcomingTrips || [],
+      monthly_spending: months.map(m => ({ month: m.label, amount: m.amount })),
+      top_destinations: topDestinations,
     })
   } catch (error) {
     console.error("Dashboard stats error:", error)

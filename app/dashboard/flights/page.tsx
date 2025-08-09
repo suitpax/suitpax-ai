@@ -432,7 +432,7 @@ export default function FlightsPage() {
             <Button 
               onClick={handleSearch}
               disabled={!isFormValid || isLoading}
-              className="w-full"
+              className="w-full bg-black text-white hover:bg-gray-800"
               size="lg"
             >
               {isLoading ? (
