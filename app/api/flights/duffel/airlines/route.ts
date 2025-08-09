@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { duffel } from '@/lib/duffel'
+import { createDuffelClient } from '@/lib/duffel'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50
 
+    const duffel = createDuffelClient();
     const airlines = await duffel.airlines.list({ limit })
     
     const transformedData = airlines.data.map((airline: any) => ({

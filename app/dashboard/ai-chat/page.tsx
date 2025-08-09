@@ -111,29 +111,8 @@ export default function AIChatPage() {
   return (
     <div className="flex flex-col h-full bg-gray-50 overflow-hidden">
       <div className="flex-1 min-h-0">
-        <ChatContainerRoot className="h-full">
-          <ChatContainerContent className="p-4 space-y-4">
-            {messages.length === 0 && !loading && (
-              <div className="text-center py-16">
-                <div className="inline-block p-4 bg-white rounded-full shadow-sm border">
-                   <Image src="/logo/suitpax-symbol-2.png" alt="Suitpax AI" width={56} height={56} />
-                </div>
-                <h3 className="mt-6 text-xl font-medium text-gray-900">Welcome to Suitpax AI</h3>
-                <p className="mt-2 text-sm text-gray-500">How can I help you with your business travel today?</p>
-              </div>
-            )}
-            {messages.map((message) => (
-              <motion.div
-                key={message.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ChatMessage message={message} />
-              </motion.div>
-            ))}
-            {loading && <ChatLoadingIndicator />}
-          </ChatContainerContent>
+        <ChatContainerRoot>
+          <ChatContainerContent messages={messages} isLoading={loading} />
           <ChatContainerScrollAnchor />
           <ScrollButton />
         </ChatContainerRoot>

@@ -457,12 +457,7 @@ export interface BaggageService {
   segment_id?: string;
 }
 
-// ✅ SOLUCIÓN: Exportar instancia por defecto para compatibilidad
-/**
- * Instancia por defecto del cliente Duffel para compatibilidad con rutas existentes
- * Usar createDuffelClient() para casos más avanzados
- */
-export const duffel = createDuffelClient();
-
-// Export por defecto también para compatibilidad
-export default duffel;
+// ✅ SOLUCIÓN: Eliminar instancia por defecto para evitar creación en build time
+// Antes había una exportación de instancia por defecto que causaba errores si faltaba DUFFEL_API_KEY
+// export const duffel = createDuffelClient();
+// export default duffel;
