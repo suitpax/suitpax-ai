@@ -11,6 +11,7 @@ import {
   PiGlobeSimpleBold,
   PiWaveformBold,
   PiUserSwitchBold,
+  PiHeadsetBold,
 } from "react-icons/pi"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,7 +21,7 @@ import { useVoiceAIConsolidated } from "@/hooks/use-voice-ai-consolidated"
 import { ConversationInterface } from "@/components/voice-ai/conversation-interface"
 import { AgentCard } from "@/components/shared/agent-card"
 
-// Usar la misma definición de voiceAgents que tenías antes...
+// Agentes demo
 const voiceAgents = [
   {
     id: "emma",
@@ -35,7 +36,47 @@ const voiceAgents = [
     voice: "Professional, warm, efficient",
     status: "available" as const,
   },
-  // ... resto de agentes
+  {
+    id: "liam",
+    name: "Liam",
+    role: "Corporate Expense Analyst",
+    image: "/agents/agent-2.png",
+    rating: 4.8,
+    callsToday: 32,
+    languages: ["English", "German"],
+    specialty: "Expense optimization & policy",
+    accent: "British",
+    voice: "Confident, analytical",
+    status: "available" as const,
+  },
+  {
+    id: "sofia",
+    name: "Sofia",
+    role: "Meetings Coordinator",
+    image: "/agents/agent-5.png",
+    rating: 4.7,
+    callsToday: 26,
+    languages: ["Spanish", "English", "Portuguese"],
+    specialty: "Scheduling & logistics",
+    accent: "Iberian",
+    voice: "Warm, pragmatic",
+    status: "busy" as const,
+  },
+]
+
+interface CallLogItem {
+  id: string
+  agentId: string
+  agentName: string
+  startedAt: string
+  durationSec: number
+}
+
+const TEMPLATES = [
+  "Find me a direct business class flight to Tokyo next Tuesday",
+  "Book a 5-star hotel near La Défense in Paris for 2 nights",
+  "Create an expense report for last week and check policy compliance",
+  "Schedule a meeting with the London team next Thursday at 10am",
 ]
 
 export default function VoiceAIPage() {
@@ -44,10 +85,11 @@ export default function VoiceAIPage() {
   const [callDuration, setCallDuration] = useState(0)
   const [userTokens, setUserTokens] = useState({ used: 0, limit: 5000 })
   const [user, setUser] = useState<any>(null)
+  const [callLogs, setCallLogs] = useState<CallLogItem[]>([])
+  const [callStartTs, setCallStartTs] = useState<number | null>(null)
 
   const supabase = createClient()
 
-  // Usar el hook consolidado
   const {
     messages,
     status,
@@ -64,20 +106,17 @@ export default function VoiceAIPage() {
     audioPlayerRef,
   } = useVoiceAIConsolidated({
     agentId: selectedAgent.id,
-    onMessage: (message) => {
-      // Handle new messages if needed
-    },
+    onMessage: () => {},
     onError: (error) => {
       console.error("Voice AI Error:", error)
     },
-    onStatusChange: (newStatus) => {
-      // Handle status changes if needed
-    },
+    onStatusChange: () => {},
   })
 
-  // Resto de la lógica permanece igual...
   useEffect(() => {
     fetchUserData()
+    const raw = typeof window !== "undefined" ? window.localStorage.getItem("voice_ai_call_logs") : null
+    setCallLogs(raw ? JSON.parse(raw) : [])
   }, [])
 
   useEffect(() => {
@@ -100,14 +139,10 @@ export default function VoiceAIPage() {
         data: { session },
       } = await supabase.auth.getSession()
       if (session) {
-        const { data: userData } = await supabase.from("users").select("*").eq("id", session.user.id).single()
-
+        const { data: userData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single()
         if (userData) {
           setUser(userData)
-          setUserTokens({
-            used: userData.ai_tokens_used || 0,
-            limit: userData.ai_tokens_limit || 5000,
-          })
+          setUserTokens({ used: userData.ai_tokens_used || 0, limit: userData.ai_tokens_limit || 5000 })
         }
       }
     } catch (error) {
@@ -117,6 +152,7 @@ export default function VoiceAIPage() {
 
   async function startCall() {
     setIsCallActive(true)
+    setCallStartTs(Date.now())
     clearConversation()
     await startConversation()
   }
@@ -124,6 +160,21 @@ export default function VoiceAIPage() {
   function endCall() {
     setIsCallActive(false)
     clearConversation()
+    if (callStartTs) {
+      const item: CallLogItem = {
+        id: crypto.randomUUID(),
+        agentId: selectedAgent.id,
+        agentName: selectedAgent.name,
+        startedAt: new Date(callStartTs).toISOString(),
+        durationSec: Math.max(0, Math.floor((Date.now() - callStartTs) / 1000)),
+      }
+      const updated = [item, ...callLogs].slice(0, 20)
+      setCallLogs(updated)
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("voice_ai_call_logs", JSON.stringify(updated))
+      }
+      setCallStartTs(null)
+    }
   }
 
   function formatCallDuration(seconds: number) {
@@ -132,10 +183,11 @@ export default function VoiceAIPage() {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }
 
-  // El JSX ahora usa los componentes consolidados
+  const usagePct = userTokens.limit ? Math.min(100, Math.round((userTokens.used / userTokens.limit) * 100)) : 0
+
   return (
     <div className="space-y-6">
-      {/* Header - igual que antes */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-medium tracking-tighter text-black">Voice AI Agents</h1>
@@ -143,56 +195,104 @@ export default function VoiceAIPage() {
         </div>
         <div className="flex items-center space-x-3">
           <Badge variant="outline" className="bg-gray-50">
-            Tokens: {userTokens.used.toLocaleString()}/{userTokens.limit.toLocaleString()}
+            Tokens: {userTokens.used.toLocaleString()}/{userTokens.limit.toLocaleString()} ({usagePct}%)
           </Badge>
           <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-            <PiChatCircleFill className="h-3 w-3 mr-1" />
-            Voice Ready
+            <PiChatCircleFill className="h-3 w-3 mr-1" /> Voice Ready
           </Badge>
         </div>
       </div>
 
-      {/* Agent Selection - usando AgentCard */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-xl font-medium tracking-tighter">Choose Your AI Agent</CardTitle>
-              <CardDescription>Select a specialized agent for your business travel needs</CardDescription>
+      {/* Top grid: Agents + Voice Interface + Usage/History */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <Card className="xl:col-span-2">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-medium tracking-tighter">Choose Your AI Agent</CardTitle>
+                <CardDescription>Select a specialized agent for your business travel needs</CardDescription>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <PiUserSwitchBold className="w-4 h-4" />
+                <span>{voiceAgents.filter((a) => a.status === "available").length} available</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <PiUserSwitchBold className="w-4 h-4" />
-              <span>{voiceAgents.filter((a) => a.status === "available").length} available</span>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {voiceAgents.map((agent) => (
+                <AgentCard
+                  key={agent.id}
+                  agent={agent}
+                  onSelect={setSelectedAgent}
+                  isSelected={selectedAgent.id === agent.id}
+                  showDetails={true}
+                />
+              ))}
             </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {voiceAgents.map((agent) => (
-              <AgentCard
-                key={agent.id}
-                agent={agent}
-                onSelect={setSelectedAgent}
-                isSelected={selectedAgent.id === agent.id}
-                showDetails={true}
-              />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Voice Interface - usando ConversationInterface */}
+        {/* Usage + History */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg tracking-tight flex items-center gap-2">
+              <PiHeadsetBold className="w-4 h-4" /> Usage & History
+            </CardTitle>
+            <CardDescription>Your recent activity and token usage</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                <span>Token usage</span>
+                <span>
+                  {userTokens.used.toLocaleString()} / {userTokens.limit.toLocaleString()}
+                </span>
+              </div>
+              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-gray-900" style={{ width: `${usagePct}%` }} />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-xs font-medium text-gray-700">Recent calls</h4>
+                {callLogs.length > 0 && (
+                  <button
+                    className="text-[10px] text-gray-500 hover:text-gray-700"
+                    onClick={() => {
+                      setCallLogs([])
+                      if (typeof window !== "undefined") window.localStorage.removeItem("voice_ai_call_logs")
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {callLogs.length === 0 ? (
+                  <p className="text-xs text-gray-500">No recent calls</p>
+                ) : (
+                  callLogs.map((c) => (
+                    <div key={c.id} className="flex items-center justify-between text-xs bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5">
+                      <span className="font-medium text-gray-900">{c.agentName}</span>
+                      <span className="text-gray-500">{new Date(c.startedAt).toLocaleString()}</span>
+                      <span className="text-gray-700">{formatCallDuration(c.durationSec)}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Voice Interface */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Image
-                src={selectedAgent.image || "/placeholder.svg"}
-                alt={selectedAgent.name}
-                width={40}
-                height={40}
-                className="rounded-xl object-cover"
-              />
+              <Image src={selectedAgent.image || "/placeholder.svg"} alt={selectedAgent.name} width={40} height={40} className="rounded-xl object-cover" />
               <div>
                 <CardTitle className="text-lg font-medium tracking-tighter">{selectedAgent.name}</CardTitle>
                 <CardDescription>{selectedAgent.role}</CardDescription>
@@ -215,12 +315,7 @@ export default function VoiceAIPage() {
         <CardContent className="space-y-6">
           <AnimatePresence mode="wait">
             {isCallActive ? (
-              <motion.div
-                key="active-call"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
+              <motion.div key="active-call" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
                 <ConversationInterface
                   messages={messages}
                   status={status}
@@ -236,21 +331,9 @@ export default function VoiceAIPage() {
                 />
               </motion.div>
             ) : (
-              <motion.div
-                key="call-setup"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center py-8"
-              >
+              <motion.div key="call-setup" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center py-8">
                 <div className="mb-6">
-                  <Image
-                    src={selectedAgent.image || "/placeholder.svg"}
-                    alt={selectedAgent.name}
-                    width={80}
-                    height={80}
-                    className="rounded-xl object-cover mx-auto mb-4"
-                  />
+                  <Image src={selectedAgent.image || "/placeholder.svg"} alt={selectedAgent.name} width={80} height={80} className="rounded-xl object-cover mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">{selectedAgent.name}</h3>
                   <p className="text-sm text-gray-600 mb-2">{selectedAgent.role}</p>
                   <div className="flex items-center justify-center gap-4 text-xs text-gray-500 mb-4">
@@ -262,19 +345,12 @@ export default function VoiceAIPage() {
                     <span>{selectedAgent.callsToday} calls today</span>
                   </div>
                   <p className="text-xs text-gray-500 max-w-md mx-auto mb-6">
-                    {selectedAgent.voice} voice with {selectedAgent.accent} accent. Specializes in{" "}
-                    {selectedAgent.specialty.toLowerCase()}.
+                    {selectedAgent.voice} voice with {selectedAgent.accent} accent. Specializes in {selectedAgent.specialty.toLowerCase()}.
                   </p>
                 </div>
 
-                <Button
-                  onClick={startCall}
-                  size="lg"
-                  className="bg-black text-white hover:bg-gray-800"
-                  disabled={!browserSupportsSpeechRecognition}
-                >
-                  <PiPhoneFill className="w-5 h-5 mr-2" />
-                  Start Voice Conversation
+                <Button onClick={startCall} size="lg" className="bg-black text-white hover:bg-gray-800" disabled={!browserSupportsSpeechRecognition}>
+                  <PiPhoneFill className="w-5 h-5 mr-2" /> Start Voice Conversation
                 </Button>
 
                 {!browserSupportsSpeechRecognition && (
@@ -286,7 +362,7 @@ export default function VoiceAIPage() {
         </CardContent>
       </Card>
 
-      {/* Features - igual que antes */}
+      {/* Features + Templates */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardContent className="p-6 text-center">
@@ -318,6 +394,29 @@ export default function VoiceAIPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg tracking-tight">Quick templates</CardTitle>
+          <CardDescription>Use a starting phrase once the call begins</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {TEMPLATES.map((t) => (
+              <button
+                key={t}
+                className="text-xs px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50"
+                onClick={() => {
+                  if (!isCallActive) return
+                  // Placeholder: templates for guidance while on a call
+                }}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Hidden audio element */}
       <audio ref={audioPlayerRef} className="hidden" />
