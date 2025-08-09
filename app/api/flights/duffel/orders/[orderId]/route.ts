@@ -31,7 +31,34 @@ export async function GET(
         return NextResponse.json({ success: false, error: "Unauthorized access to order" }, { status: 403 })
     }
 
-    return NextResponse.json({ success: true, order: orderResponse.data })
+    // Enrich with airline logos
+    const order = orderResponse.data as any
+    const codes = new Set<string>()
+    for (const slice of order.slices || []) {
+      for (const segment of slice.segments || []) {
+        if (segment?.marketing_carrier?.iata_code) codes.add(segment.marketing_carrier.iata_code)
+      }
+    }
+    const { getAirlineData } = await import('@/lib/duffel')
+    const map: Record<string, any> = {}
+    await Promise.all(Array.from(codes).map(async (c) => {
+      try {
+        const a = await getAirlineData(duffel as any, c)
+        if (a) map[c] = a
+      } catch {}
+    }))
+    const enriched = {
+      ...order,
+      slices: order.slices.map((s: any) => ({
+        ...s,
+        segments: s.segments.map((seg: any) => {
+          const info = map[seg?.marketing_carrier?.iata_code]
+          return { ...seg, airline: info ? { name: info.name, logo_symbol_url: info.logo_symbol_url, logo_lockup_url: info.logo_lockup_url } : { name: seg.marketing_carrier?.name } }
+        })
+      }))
+    }
+
+    return NextResponse.json({ success: true, order: enriched })
   } catch (error) {
     const errorResponse = handleDuffelError(error)
     return NextResponse.json(errorResponse, { status: errorResponse.status })

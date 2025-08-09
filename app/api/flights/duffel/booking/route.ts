@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createDuffelClient, getPaymentMethod } from '@/lib/duffel'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import Stripe from 'stripe'
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
 const bookingSchema = z.object({
   selected_offers: z.array(z.string()).min(1),
@@ -25,6 +28,20 @@ const bookingSchema = z.object({
   metadata: z.record(z.any()).optional(),
 })
 
+const paymentFlowSchema = z.object({
+  offerId: z.string(),
+  passengers: z.array(z.object({
+    given_name: z.string().min(1),
+    family_name: z.string().min(1),
+    title: z.string().optional(),
+    born_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    phone_number: z.string().optional(),
+    email: z.string().email(),
+    type: z.enum(['adult','child','infant_without_seat'])
+  })).min(1),
+  paymentIntentId: z.string()
+})
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = createClient()
@@ -35,19 +52,52 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const bookingData = bookingSchema.parse(body)
+    let orderData: any
 
     const duffel = createDuffelClient();
+    // Support two flows: legacy (selected_offers provided) and Stripe-first (paymentIntentId provided)
+    if (body?.paymentIntentId && body?.offerId) {
+      const pf = paymentFlowSchema.parse({
+        offerId: body.offerId,
+        passengers: body.passengers,
+        paymentIntentId: body.paymentIntentId
+      })
 
-    // Create the order in Duffel
-    const order = await duffel.orders.create({
-      selected_offers: bookingData.selected_offers,
-      passengers: bookingData.passengers,
-      payments: bookingData.payments,
-      metadata: { ...(bookingData.metadata || {}), user_id: user.id },
-    })
+      // Verify payment
+      const pi = await stripe.paymentIntents.retrieve(pf.paymentIntentId)
+      if (pi.status !== 'succeeded') {
+        return NextResponse.json({ success: false, error: 'Payment not completed' }, { status: 400 })
+      }
 
-    const orderData = order.data
+      // Create Duffel order using balance payment (test env) with major units string
+      const amountMajor = (pi.amount_received / 100).toFixed(2)
+      const order = await duffel.orders.create({
+        selected_offers: [pf.offerId],
+        passengers: pf.passengers,
+        payments: [{ type: 'balance', amount: amountMajor, currency: (pi.currency || 'usd').toUpperCase() }],
+        metadata: { user_id: user.id, payment_intent_id: pi.id, source: 'suitpax' }
+      })
+      orderData = order.data
+
+      // Update PI metadata with order info
+      await stripe.paymentIntents.update(pi.id, {
+        metadata: {
+          ...pi.metadata,
+          order_id: orderData.id,
+          booking_reference: orderData.booking_reference,
+          booking_status: orderData.status || 'confirmed'
+        }
+      })
+    } else {
+      const bookingData = bookingSchema.parse(body)
+      const order = await duffel.orders.create({
+        selected_offers: bookingData.selected_offers,
+        passengers: bookingData.passengers,
+        payments: bookingData.payments,
+        metadata: { ...(bookingData.metadata || {}), user_id: user.id },
+      })
+      orderData = order.data
+    }
 
     // Persist booking record
     const firstSlice = orderData.slices?.[0]
@@ -81,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: {
+      order: {
         id: orderData.id,
         booking_reference: orderData.booking_reference,
         passengers: orderData.passengers,

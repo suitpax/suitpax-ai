@@ -43,10 +43,11 @@ interface FlightCardProps {
         }
         departing_at: string
         arriving_at: string
-        marketing_carrier: {
+        marketing_carrier?: {
           iata_code: string
           name: string
         }
+        airline?: { name: string; logo_symbol_url?: string }
         flight_number: string
         aircraft?: {
           name: string
@@ -176,13 +177,26 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
                     </div>
                   </div>
                 </div>
+                {/* Airline logo for first segment */}
+                {(() => {
+                  const seg = slice.segments[0]
+                  const name = seg.airline?.name || seg.marketing_carrier?.name
+                  const logo = seg.airline?.logo_symbol_url
+                  if (!name) return null
+                  const src = logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`
+                  return (
+                    <div className="ml-4 hidden md:block">
+                      <img src={src} alt={name} className="h-8 w-8 rounded-full" />
+                    </div>
+                  )
+                })()}
               </div>
 
               {/* Flight Details */}
               <div className="flex flex-wrap gap-2">
                 {slice.segments.map((segment, segmentIndex) => (
                   <Badge key={segment.id} variant="outline" className="text-xs">
-                    {segment.marketing_carrier.iata_code} {segment.flight_number}
+                    {(segment.marketing_carrier?.iata_code || '')} {segment.flight_number}
                     {segment.aircraft?.name && ` • ${segment.aircraft.name}`}
                   </Badge>
                 ))}
