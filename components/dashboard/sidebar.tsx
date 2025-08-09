@@ -35,8 +35,8 @@ import type { User as SupabaseUser } from "@supabase/supabase-js"
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Flights", href: "/dashboard/flights", icon: Plane },
-  { name: "Hotels", href: "/dashboard/hotels", icon: Hotel },
   { name: "Expenses", href: "/dashboard/expenses", icon: CreditCard },
+  { name: "Cost Centers", href: "/dashboard/cost-centers", icon: Building },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
   { name: "Mail", href: "/dashboard/mail", icon: Mail },
@@ -138,7 +138,13 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
       <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 flex-shrink-0">
         {(!isCollapsed || isMobile) && (
           <Link href="/dashboard" className="flex items-center" onClick={isMobile ? onCloseMobile : undefined}>
-            <span className="text-base font-semibold tracking-tight text-gray-900">Dashboard</span>
+            <Image 
+              src="/logo/suitpax-bl-logo.webp" 
+              alt="Suitpax" 
+              width={80} 
+              height={22} 
+              className="h-6 w-auto" 
+            />
           </Link>
         )}
         
