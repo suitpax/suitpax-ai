@@ -23,7 +23,7 @@ Esta documentaciÃ³n describe la implementaciÃ³n de la integraciÃ³n con Duf
 
 La integraciÃ³n utiliza un cliente Duffel centralizado para estandarizar todas las peticiones:
 
-```typescript
+\`\`\`typescript
 // lib/duffel.ts
 import { Duffel } from "@duffel/api";
 
@@ -37,14 +37,14 @@ export const createDuffelClient = (options?: {
   
   // Usar cliente en cachÃ© si existe...
 }
-```
+\`\`\`
 
 ### Variables de Entorno Requeridas
 
-```
+\`\`\`
 DUFFEL_API_KEY=duffel_test_...       # Clave API de Duffel
 DUFFEL_WEBHOOK_SECRET=whsec_...       # Secreto para verificar webhooks
-```
+\`\`\`
 
 ## Endpoints Implementados
 
@@ -80,7 +80,7 @@ La implementaciÃ³n de bÃºsqueda de vuelos incluye todas las mejores prÃ¡ct
 
 ### Ejemplo de Uso
 
-```typescript
+\`\`\`typescript
 // Ejemplo de peticiÃ³n de bÃºsqueda optimizada
 const searchRequest = {
   origin: "MAD",
@@ -96,7 +96,7 @@ const searchRequest = {
 };
 
 // POST /api/flights/duffel/optimized-search
-```
+\`\`\`
 
 ## Tarifas Privadas
 
@@ -110,7 +110,7 @@ La integraciÃ³n soporta bÃºsqueda con tarifas privadas (corporativas y progr
 
 ### Ejemplo de Uso
 
-```typescript
+\`\`\`typescript
 // Ejemplo de bÃºsqueda con tarifas privadas
 const privateSearchRequest = {
   origin: "MAD",
@@ -124,7 +124,7 @@ const privateSearchRequest = {
 };
 
 // POST /api/flights/duffel/private-fares
-```
+\`\`\`
 
 ## VisualizaciÃ³n de Condiciones
 
@@ -139,13 +139,13 @@ ImplementaciÃ³n optimizada para visualizar condiciones de ofertas y Ã³rdenes
 
 ### Ejemplo de Uso
 
-```typescript
+\`\`\`typescript
 // Obtener condiciones de una oferta
 // GET /api/flights/duffel/conditions?offer_id=off_123
 
 // Obtener condiciones de una orden
 // GET /api/flights/duffel/conditions?order_id=ord_123
-```
+\`\`\`
 
 ## VisualizaciÃ³n de Escalas
 
@@ -160,13 +160,13 @@ ImplementaciÃ³n completa para visualizar informaciÃ³n detallada de escalas:
 
 ### Ejemplo de Uso
 
-```typescript
+\`\`\`typescript
 // Obtener detalles de escalas de una oferta
 // GET /api/flights/duffel/stops?offer_id=off_123
 
 // Obtener detalles de escalas de un slice especÃ­fico
 // GET /api/flights/duffel/stops?offer_id=off_123&slice_id=sli_123
-```
+\`\`\`
 
 ## Programas de Fidelidad
 
@@ -181,7 +181,7 @@ La integraciÃ³n incluye soporte completo para programas de fidelidad personale
 
 ### Ejemplo de Uso
 
-```typescript
+\`\`\`typescript
 // Crear un programa de fidelidad personal
 const loyaltyProgram = {
   type: "loyalty_program",
@@ -193,7 +193,7 @@ const loyaltyProgram = {
 };
 
 // POST /api/flights/duffel/loyalty
-```
+\`\`\`
 
 ## Webhooks
 

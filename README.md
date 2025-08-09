@@ -22,23 +22,23 @@ Suitpax AI is a cutting-edge business travel management platform that leverages 
 ### Installation
 
 1. Clone the repository:
-```bash
+\`\`\`bash
 git clone https://github.com/suitpax/suitpax-ai.git
 cd suitpax-ai
-```
+\`\`\`
 
 2. Install dependencies:
-```bash
+\`\`\`bash
 pnpm install
-```
+\`\`\`
 
 3. Set up environment variables:
-```bash
+\`\`\`bash
 cp .env.example .env.local
-```
+\`\`\`
 
 Configure the following variables in `.env.local`:
-```env
+\`\`\`env
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
@@ -53,18 +53,18 @@ ELEVENLABS_API_KEY=your_elevenlabs_key
 
 # Email (Brevo)
 BREVO_API_KEY=your_brevo_key
-```
+\`\`\`
 
 4. Run the development server:
-```bash
+\`\`\`bash
 pnpm dev
-```
+\`\`\`
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Project Structure
 
-```
+\`\`\`
 suitpax-ai/
 ├── app/                   # Next.js app directory
 │   ├── (auth)/           # Authentication routes
@@ -86,7 +86,7 @@ suitpax-ai/
 │   └── utils/          # Utility functions
 ├── public/             # Static files
 └── styles/             # Global styles
-```
+\`\`\`
 
 ## Technology Stack
 
@@ -123,7 +123,7 @@ suitpax-ai/
 
 ## Testing
 
-```bash
+\`\`\`bash
 # Run unit tests
 pnpm test
 
@@ -135,7 +135,7 @@ pnpm test:e2e
 
 # Run all tests with coverage
 pnpm test:coverage
-```
+\`\`\`
 
 ## Deployment
 
@@ -144,9 +144,9 @@ The application is deployed using Vercel's Platform:
 1. Connect your GitHub repository to Vercel
 2. Configure environment variables
 3. Deploy using the Vercel CLI:
-```bash
+\`\`\`bash
 vercel --prod
-```
+\`\`\`
 
 ## API Documentation
 
@@ -206,6 +206,4 @@ For support, email support@suitpax.com or join our Slack channel.
 <div align="center">
   <sub>Built with ❤️ by Suitpax Team</sub>
 </div>
-```
-
-
+\`\`\`

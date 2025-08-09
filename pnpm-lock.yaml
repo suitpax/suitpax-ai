@@ -13,7 +13,7 @@ importers:
         version: 1.2.12(zod@3.25.64)
       '@anthropic-ai/sdk':
         specifier: latest
-        version: 0.58.0
+        version: 0.59.0
       '@duffel/api':
         specifier: latest
         version: 4.15.0
@@ -34,7 +34,7 @@ importers:
         version: 5.2.1(react-hook-form@7.62.0(react@19.1.0))
       '@intercom/messenger-js-sdk':
         specifier: latest
-        version: 0.0.14
+        version: 0.0.15
       '@next/third-parties':
         specifier: ^15.1.0
         version: 15.1.0(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
@@ -158,8 +158,11 @@ importers:
       cmdk:
         specifier: latest
         version: 1.1.1(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      crypto:
+        specifier: latest
+        version: 1.0.1
       date-fns:
-        specifier: ^4.1.0
+        specifier: latest
         version: 4.1.0
       elevenlabs:
         specifier: latest
@@ -243,7 +246,7 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
       uuid:
-        specifier: ^11.1.0
+        specifier: latest
         version: 11.1.0
       vaul:
         specifier: latest
@@ -330,8 +333,8 @@ packages:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
 
-  '@anthropic-ai/sdk@0.58.0':
-    resolution: {integrity: sha512-wF8w+LB0AlKVLYUQho0nbK0uDv0K5Cgb92dbh8213t4roilnQ9Tm6zndheIaUxQdoEAeb0uoOT+GkkoIkqD8+A==}
+  '@anthropic-ai/sdk@0.59.0':
+    resolution: {integrity: sha512-m9w9tC+N+GUNprwEOhU3VKKSYwXA1fIevRCe7kOFonV4xu5vxqmqyoLy+dkdVvc5W1F4WUTVE/7I4criaF9gnw==}
     hasBin: true
 
   '@babel/code-frame@7.27.1':
@@ -719,8 +722,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@intercom/messenger-js-sdk@0.0.14':
-    resolution: {integrity: sha512-2dH4BDAh9EI90K7hUkAdZ76W79LM45Sd1OBX7t6Vzy8twpNiQ5X+7sH9G5hlJlkSGnf+vFWlFcy9TOYAyEs1hA==}
+  '@intercom/messenger-js-sdk@0.0.15':
+    resolution: {integrity: sha512-n1vY5pOrTvtdUReO6TzZ+2D1oNi2ECzhvZIPUUiUaUKcVPaNzwbWLQDzVmvJtxpwYfwqul9Ft1Ez2ze4CGcqyQ==}
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -2263,6 +2266,10 @@ packages:
 
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
+
+  crypto@1.0.1:
+    resolution: {integrity: sha512-VxBKmeNcqQdiUQUW2Tzq0t377b54N2bMtXO/qiLa+6eRRmmC4qT3D4OnTGoT/U6O9aklQ/jTwbOtRMTTY8G0Ig==}
+    deprecated: This package is no longer supported. It's now a built-in Node module. If you've depended on crypto, you should switch to the one that's built-in.
 
   css-rules@1.1.0:
     resolution: {integrity: sha512-7L6krLIRwAEVCaVKyCEL6PQjQXUmf8DM9bWYKutlZd0DqOe0SiKIGQOkFb59AjDBb+3If7SDp3X8UlzDAgYSow==}
@@ -4811,7 +4818,7 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
-  '@anthropic-ai/sdk@0.58.0': {}
+  '@anthropic-ai/sdk@0.59.0': {}
 
   '@babel/code-frame@7.27.1':
     dependencies:
@@ -5193,7 +5200,7 @@ snapshots:
   '@img/sharp-win32-x64@0.34.1':
     optional: true
 
-  '@intercom/messenger-js-sdk@0.0.14': {}
+  '@intercom/messenger-js-sdk@0.0.15': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -6887,6 +6894,8 @@ snapshots:
       which: 2.0.2
 
   crypto-js@4.2.0: {}
+
+  crypto@1.0.1: {}
 
   css-rules@1.1.0:
     dependencies:
