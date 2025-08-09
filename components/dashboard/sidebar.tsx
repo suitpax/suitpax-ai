@@ -138,13 +138,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
       <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 flex-shrink-0">
         {(!isCollapsed || isMobile) && (
           <Link href="/dashboard" className="flex items-center" onClick={isMobile ? onCloseMobile : undefined}>
-            <Image 
-              src="/logo/suitpax-bl-logo.webp" 
-              alt="Suitpax" 
-              width={100} 
-              height={28} 
-              className="h-7 w-auto" 
-            />
+            <span className="text-base font-semibold tracking-tight text-gray-900">Dashboard</span>
           </Link>
         )}
         

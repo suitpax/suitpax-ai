@@ -1,66 +1,46 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createDuffelClient, handleDuffelError } from '@/lib/duffel';
-import { createClient } from "@/lib/supabase/server"
+import { createDuffelClient } from "@/lib/duffel"
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { orderId: string } }
-) {
+export async function GET(_req: NextRequest, { params }: { params: { orderId: string } }) {
   try {
     const duffel = createDuffelClient()
-    const supabase = createClient()
-    const { orderId } = params
+    const res = await duffel.orders.get(params.orderId)
+    const raw = res.data
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ success: false, error: "Authentication required" }, { status: 401 })
+    const order = {
+      id: raw.id,
+      booking_reference: raw.booking_reference,
+      status: raw.status,
+      total_amount: raw.total_amount,
+      total_currency: raw.total_currency,
+      passengers: raw.passengers?.map((p: any) => ({
+        given_name: p.given_name,
+        family_name: p.family_name,
+        type: p.type
+      })) || [],
+      slices: (raw.slices || []).map((slice: any) => ({
+        id: slice.id,
+        origin: slice.origin,
+        destination: slice.destination,
+        duration: slice.duration,
+        segments: (slice.segments || []).map((segment: any) => ({
+          id: segment.id,
+          origin: segment.origin,
+          destination: segment.destination,
+          departing_at: segment.departing_at,
+          arriving_at: segment.arriving_at,
+          marketing_carrier: segment.marketing_carrier,
+          operating_carrier: segment.operating_carrier,
+          flight_number: segment.flight_number,
+          aircraft: segment.aircraft,
+        }))
+      })),
+      available_actions: raw.available_actions || []
     }
 
-    if (!orderId) {
-      return NextResponse.json({ success: false, error: "Order ID is required" }, { status: 400 })
-    }
-
-    const orderResponse = await duffel.orders.get(orderId)
-
-    if (!orderResponse.data) {
-      return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 })
-    }
-    
-    // Security check: ensure the user requesting the order is the one who booked it
-    if (orderResponse.data.metadata?.user_id !== user.id) {
-        return NextResponse.json({ success: false, error: "Unauthorized access to order" }, { status: 403 })
-    }
-
-    // Enrich with airline logos
-    const order = orderResponse.data as any
-    const codes = new Set<string>()
-    for (const slice of order.slices || []) {
-      for (const segment of slice.segments || []) {
-        if (segment?.marketing_carrier?.iata_code) codes.add(segment.marketing_carrier.iata_code)
-      }
-    }
-    const { getAirlineData } = await import('@/lib/duffel')
-    const map: Record<string, any> = {}
-    await Promise.all(Array.from(codes).map(async (c) => {
-      try {
-        const a = await getAirlineData(duffel as any, c)
-        if (a) map[c] = a
-      } catch {}
-    }))
-    const enriched = {
-      ...order,
-      slices: order.slices.map((s: any) => ({
-        ...s,
-        segments: s.segments.map((seg: any) => {
-          const info = map[seg?.marketing_carrier?.iata_code]
-          return { ...seg, airline: info ? { name: info.name, logo_symbol_url: info.logo_symbol_url, logo_lockup_url: info.logo_lockup_url } : { name: seg.marketing_carrier?.name } }
-        })
-      }))
-    }
-
-    return NextResponse.json({ success: true, order: enriched })
-  } catch (error) {
-    const errorResponse = handleDuffelError(error)
-    return NextResponse.json(errorResponse, { status: errorResponse.status })
+    return NextResponse.json({ success: true, order })
+  } catch (error: any) {
+    console.error("Order fetch error:", error)
+    return NextResponse.json({ success: false, error: "Failed to fetch order" }, { status: 500 })
   }
 }
