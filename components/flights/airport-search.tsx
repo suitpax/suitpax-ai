@@ -45,11 +45,17 @@ export default function AirportSearch({
 
       setIsLoading(true)
       try {
-        const response = await fetch(`/api/flights/duffel/airports?q=${encodeURIComponent(query)}&limit=10`)
+        const response = await fetch(`/api/flights/duffel/places?q=${encodeURIComponent(query)}&limit=10`)
         const data = await response.json()
         
         if (data.success) {
-          setAirports(data.airports || [])
+          setAirports((data.places || []).map((p: any) => ({
+            id: p.id,
+            iata_code: p.iata_code,
+            name: p.name,
+            city_name: p.city_name || (p.type === 'city' ? p.name : ''),
+            country_name: p.country_name || ''
+          })))
         } else {
           setAirports([])
         }

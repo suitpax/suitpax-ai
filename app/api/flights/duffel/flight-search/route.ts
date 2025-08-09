@@ -94,8 +94,8 @@ export async function POST(request: NextRequest) {
     // Validate airport codes in parallel
     console.log('Validating airport codes...');
     const [originCheck, destinationCheck] = await Promise.all([
-      validateAirportCode(duffel, searchParams.origin),
-      validateAirportCode(duffel, searchParams.destination)
+      validatePlaceCode(duffel, searchParams.origin),
+      validatePlaceCode(duffel, searchParams.destination)
     ]);
 
     if (!originCheck.valid) {
@@ -387,22 +387,25 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function validateAirportCode(duffel: any, iataCode: string) {
+async function validatePlaceCode(duffel: any, iataCode: string) {
+  const code = iataCode.toUpperCase()
   try {
-    const response = await duffel.airports.list({
-      iata_code: iataCode.toUpperCase(),
-      limit: 1
-    });
-
-    const isValid = response.data && response.data.length > 0;
-    console.log(`Airport validation for ${iataCode}: ${isValid ? 'valid' : 'invalid'}`);
-
-    return {
-      valid: isValid,
-      airport: response.data?.[0] || null
-    };
+    // Try airport first
+    const airportRes = await duffel.airports.list({ iata_code: code, limit: 1 })
+    if (airportRes.data && airportRes.data.length > 0) {
+      console.log(`Place validation for ${code}: valid airport`)
+      return { valid: true, type: 'airport', place: airportRes.data[0] }
+    }
+    // Then try city
+    const cityRes = await duffel.cities.list({ iata_code: code, limit: 1 })
+    if (cityRes.data && cityRes.data.length > 0) {
+      console.log(`Place validation for ${code}: valid city`)
+      return { valid: true, type: 'city', place: cityRes.data[0] }
+    }
+    console.log(`Place validation for ${code}: invalid`)
+    return { valid: false, type: null, place: null }
   } catch (error) {
-    console.error(`Error validating airport ${iataCode}:`, error);
-    return { valid: false, airport: null };
+    console.error(`Error validating place ${code}:`, error)
+    return { valid: false, type: null, place: null }
   }
 }
