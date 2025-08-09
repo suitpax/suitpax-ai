@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { createClient } from "@/lib/supabase/client"
 
 interface Meeting {
   id: string
@@ -38,43 +39,7 @@ interface Meeting {
   meetingUrl?: string
 }
 
-const mockMeetings: Meeting[] = [
-  {
-    id: "1",
-    title: "Q4 Travel Budget Review",
-    type: "video",
-    status: "upcoming",
-    date: "2024-02-15",
-    time: "14:00",
-    duration: 60,
-    attendees: ["John Smith", "Sarah Wilson", "Mike Johnson"],
-    description: "Review Q4 travel expenses and plan for Q1 2024",
-    meetingUrl: "https://meet.suitpax.com/q4-budget-review",
-  },
-  {
-    id: "2",
-    title: "Client Meeting - Acme Corp",
-    type: "in-person",
-    status: "upcoming",
-    date: "2024-02-16",
-    time: "10:30",
-    duration: 90,
-    attendees: ["Alice Brown", "David Lee"],
-    location: "Acme Corp Office, 123 Business St, NYC",
-    description: "Discuss travel management solutions for Acme Corp",
-  },
-  {
-    id: "3",
-    title: "Team Standup",
-    type: "video",
-    status: "completed",
-    date: "2024-02-14",
-    time: "09:00",
-    duration: 30,
-    attendees: ["Team Members"],
-    description: "Daily team standup meeting",
-  },
-]
+const mockMeetings: Meeting[] = []
 
 const TEMPLATES = [
   {
@@ -101,6 +66,7 @@ export default function MeetingsPage() {
   const [meetings, setMeetings] = useState<Meeting[]>(mockMeetings)
   const [filteredMeetings, setFilteredMeetings] = useState<Meeting[]>(mockMeetings)
   const [searchQuery, setSearchQuery] = useState("")
+  const [userId, setUserId] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [showNewMeetingModal, setShowNewMeetingModal] = useState(false)
@@ -115,6 +81,21 @@ export default function MeetingsPage() {
     description: "",
     meetingUrl: "",
   })
+
+  // Load/save per-user meetings in localStorage
+  useEffect(() => {
+    const supabase = createClient()
+    const init = async () => {
+      const { data: session } = await supabase.auth.getSession()
+      const uid = session.session?.user?.id || null
+      setUserId(uid)
+      const key = uid ? `meetings:${uid}` : `meetings`
+      const raw = typeof window !== "undefined" ? window.localStorage.getItem(key) : null
+      const parsed: Meeting[] = raw ? JSON.parse(raw) : mockMeetings
+      setMeetings(parsed)
+    }
+    init()
+  }, [])
 
   useEffect(() => {
     let filtered = meetings
@@ -139,6 +120,13 @@ export default function MeetingsPage() {
     setFilteredMeetings(filtered)
   }, [meetings, searchQuery, statusFilter, typeFilter])
 
+  const persist = (items: Meeting[]) => {
+    const key = userId ? `meetings:${userId}` : `meetings`
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(key, JSON.stringify(items))
+    }
+  }
+
   const handleCreateMeeting = () => {
     const meeting: Meeting = {
       id: Date.now().toString(),
@@ -157,7 +145,9 @@ export default function MeetingsPage() {
       meetingUrl: newMeeting.type === "video" ? `https://meet.suitpax.com/${Date.now()}` : undefined,
     }
 
-    setMeetings([meeting, ...meetings])
+    const updated = [meeting, ...meetings]
+    setMeetings(updated)
+    persist(updated)
     setShowNewMeetingModal(false)
     setNewMeeting({
       title: "",
@@ -201,6 +191,7 @@ export default function MeetingsPage() {
   const upcomingMeetings = meetings.filter((m) => m.status === "upcoming").length
   const completedMeetings = meetings.filter((m) => m.status === "completed").length
   const totalDuration = meetings.reduce((acc, m) => acc + m.duration, 0)
+  const isEmpty = meetings.length === 0
 
   // Construir agenda compacta de los próximos 7 días
   const compactAgenda = (() => {

@@ -234,10 +234,10 @@ export default function DashboardPage() {
                 <Zap className="h-6 w-6 text-gray-700" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-medium tracking-tighter mb-2">Get Started in 3 Simple Steps</h3>
-                <p className="text-sm font-light text-gray-600 mb-6">
-                  Complete your setup to unlock AI-powered business travel management
-                </p>
+                <h3 className="text-lg font-medium tracking-tighter mb-2">Empieza en 3 pasos</h3>
+<p className="text-sm font-light text-gray-600 mb-6">
+  Completa tu configuración para desbloquear la gestión de viajes de negocio con IA
+</p>
                 <div className="grid md:grid-cols-3 gap-4">
                   {onboardingSteps.map((step, index) => (
                     <Link
