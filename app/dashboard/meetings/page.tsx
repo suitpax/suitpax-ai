@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface Meeting {
   id: string
@@ -72,6 +73,27 @@ const mockMeetings: Meeting[] = [
     duration: 30,
     attendees: ["Team Members"],
     description: "Daily team standup meeting",
+  },
+]
+
+const TEMPLATES = [
+  {
+    title: "Quarterly Travel Strategy",
+    description: "Review performance, budgets and policy updates for next quarter",
+    duration: 60,
+    type: "video" as const,
+  },
+  {
+    title: "Client Onboarding - Travel Program",
+    description: "Kick-off with client to configure policies, roles and integrations",
+    duration: 45,
+    type: "video" as const,
+  },
+  {
+    title: "Expense Policy Deep Dive",
+    description: "Walk through expense categories and compliance workflow",
+    duration: 30,
+    type: "video" as const,
   },
 ]
 
@@ -180,6 +202,25 @@ export default function MeetingsPage() {
   const completedMeetings = meetings.filter((m) => m.status === "completed").length
   const totalDuration = meetings.reduce((acc, m) => acc + m.duration, 0)
 
+  // Construir agenda compacta de los próximos 7 días
+  const compactAgenda = (() => {
+    const today = new Date()
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today)
+      d.setDate(today.getDate() + i)
+      const key = d.toISOString().slice(0, 10)
+      return { key, label: d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) }
+    })
+
+    const map: Record<string, Meeting[]> = {}
+    for (const day of days) map[day.key] = []
+    for (const m of meetings) {
+      const key = m.date
+      if (key in map) map[key].push(m)
+    }
+    return { days, map }
+  })()
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -206,21 +247,13 @@ export default function MeetingsPage() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="title">Meeting Title</Label>
-                  <Input
-                    id="title"
-                    value={newMeeting.title}
-                    onChange={(e) => setNewMeeting({ ...newMeeting, title: e.target.value })}
-                    placeholder="Enter meeting title"
-                  />
+                  <Input id="title" value={newMeeting.title} onChange={(e) => setNewMeeting({ ...newMeeting, title: e.target.value })} placeholder="Enter meeting title" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="type">Meeting Type</Label>
-                    <Select
-                      value={newMeeting.type}
-                      onValueChange={(value: Meeting["type"]) => setNewMeeting({ ...newMeeting, type: value })}
-                    >
+                    <Select value={newMeeting.type} onValueChange={(value: Meeting["type"]) => setNewMeeting({ ...newMeeting, type: value })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -234,82 +267,42 @@ export default function MeetingsPage() {
 
                   <div>
                     <Label htmlFor="duration">Duration (minutes)</Label>
-                    <Input
-                      id="duration"
-                      type="number"
-                      value={newMeeting.duration}
-                      onChange={(e) =>
-                        setNewMeeting({ ...newMeeting, duration: Number.parseInt(e.target.value) || 60 })
-                      }
-                    />
+                    <Input id="duration" type="number" value={newMeeting.duration} onChange={(e) => setNewMeeting({ ...newMeeting, duration: Number.parseInt(e.target.value) || 60 })} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="date">Date</Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={newMeeting.date}
-                      onChange={(e) => setNewMeeting({ ...newMeeting, date: e.target.value })}
-                    />
+                    <Input id="date" type="date" value={newMeeting.date} onChange={(e) => setNewMeeting({ ...newMeeting, date: e.target.value })} />
                   </div>
 
                   <div>
                     <Label htmlFor="time">Time</Label>
-                    <Input
-                      id="time"
-                      type="time"
-                      value={newMeeting.time}
-                      onChange={(e) => setNewMeeting({ ...newMeeting, time: e.target.value })}
-                    />
+                    <Input id="time" type="time" value={newMeeting.time} onChange={(e) => setNewMeeting({ ...newMeeting, time: e.target.value })} />
                   </div>
                 </div>
 
                 <div>
                   <Label htmlFor="attendees">Attendees (comma separated)</Label>
-                  <Input
-                    id="attendees"
-                    value={newMeeting.attendees}
-                    onChange={(e) => setNewMeeting({ ...newMeeting, attendees: e.target.value })}
-                    placeholder="john@example.com, sarah@example.com"
-                  />
+                  <Input id="attendees" value={newMeeting.attendees} onChange={(e) => setNewMeeting({ ...newMeeting, attendees: e.target.value })} placeholder="john@example.com, sarah@example.com" />
                 </div>
 
                 {newMeeting.type === "in-person" && (
                   <div>
                     <Label htmlFor="location">Location</Label>
-                    <Input
-                      id="location"
-                      value={newMeeting.location}
-                      onChange={(e) => setNewMeeting({ ...newMeeting, location: e.target.value })}
-                      placeholder="Enter meeting location"
-                    />
+                    <Input id="location" value={newMeeting.location} onChange={(e) => setNewMeeting({ ...newMeeting, location: e.target.value })} placeholder="Enter meeting location" />
                   </div>
                 )}
 
                 <div>
                   <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={newMeeting.description}
-                    onChange={(e) => setNewMeeting({ ...newMeeting, description: e.target.value })}
-                    placeholder="Meeting agenda or description"
-                    rows={3}
-                  />
+                  <Textarea id="description" value={newMeeting.description} onChange={(e) => setNewMeeting({ ...newMeeting, description: e.target.value })} placeholder="Meeting agenda or description" rows={3} />
                 </div>
 
                 <div className="flex justify-end space-x-2 pt-4">
-                  <Button variant="outline" onClick={() => setShowNewMeetingModal(false)}>
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleCreateMeeting}
-                    disabled={!newMeeting.title || !newMeeting.date || !newMeeting.time}
-                  >
-                    Schedule Meeting
-                  </Button>
+                  <Button variant="outline" onClick={() => setShowNewMeetingModal(false)}>Cancel</Button>
+                  <Button onClick={handleCreateMeeting} disabled={!newMeeting.title || !newMeeting.date || !newMeeting.time}>Schedule Meeting</Button>
                 </div>
               </div>
             </DialogContent>
@@ -318,12 +311,7 @@ export default function MeetingsPage() {
       </motion.div>
 
       {/* Stats */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
@@ -352,9 +340,7 @@ export default function MeetingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Hours</p>
-              <p className="text-3xl font-medium tracking-tighter text-gray-900 mt-1">
-                {Math.round(totalDuration / 60)}
-              </p>
+              <p className="text-3xl font-medium tracking-tighter text-gray-900 mt-1">{Math.round(totalDuration / 60)}</p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
               <ClockIcon className="h-6 w-6 text-purple-600" />
@@ -363,24 +349,68 @@ export default function MeetingsPage() {
         </div>
       </motion.div>
 
+      {/* Templates + Compact agenda */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-lg tracking-tight">Meeting templates</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {TEMPLATES.map((t) => (
+                <button
+                  key={t.title}
+                  className="text-xs px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50"
+                  onClick={() => {
+                    setShowNewMeetingModal(true)
+                    setNewMeeting((prev) => ({ ...prev, title: t.title, description: t.description, duration: t.duration, type: t.type }))
+                  }}
+                >
+                  {t.title}
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg tracking-tight">Next 7 days</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {compactAgenda.days.map((d) => (
+                <div key={d.key} className="bg-gray-50 border border-gray-100 rounded-lg p-3">
+                  <div className="text-xs font-medium text-gray-700 mb-2">{d.label}</div>
+                  <div className="space-y-2">
+                    {compactAgenda.map[d.key].length === 0 ? (
+                      <div className="text-[11px] text-gray-500">No meetings</div>
+                    ) : (
+                      compactAgenda.map[d.key].map((m) => (
+                        <div key={m.id} className="flex items-center justify-between text-[11px]">
+                          <div className="flex items-center gap-2">
+                            <span className="text-gray-900 font-medium">{m.time}</span>
+                            <span className="text-gray-600">{m.title}</span>
+                          </div>
+                          <span className="text-gray-500">{m.duration}m</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Filters */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           <div className="flex items-center space-x-4">
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search meetings..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-64"
-              />
+              <Input type="text" placeholder="Search meetings..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 w-64" />
             </div>
           </div>
 
@@ -413,23 +443,12 @@ export default function MeetingsPage() {
       </motion.div>
 
       {/* Meetings List */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="space-y-4"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="space-y-4">
         {filteredMeetings.length > 0 ? (
           filteredMeetings.map((meeting, index) => {
             const TypeIcon = getTypeIcon(meeting.type)
             return (
-              <motion.div
-                key={meeting.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
-              >
+              <motion.div key={meeting.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: index * 0.1 }} className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4">
                     <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
@@ -439,9 +458,7 @@ export default function MeetingsPage() {
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
                         <h3 className="text-lg font-medium tracking-tight text-gray-900">{meeting.title}</h3>
-                        <Badge className={getStatusColor(meeting.status)}>
-                          {meeting.status.charAt(0).toUpperCase() + meeting.status.slice(1)}
-                        </Badge>
+                        <Badge className={getStatusColor(meeting.status)}>{meeting.status.charAt(0).toUpperCase() + meeting.status.slice(1)}</Badge>
                       </div>
 
                       <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
@@ -473,9 +490,7 @@ export default function MeetingsPage() {
                       <div className="flex items-center space-x-2">
                         {meeting.attendees.slice(0, 3).map((attendee, i) => (
                           <div key={i} className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
-                            <span className="text-xs font-medium text-gray-600">
-                              {attendee.charAt(0).toUpperCase()}
-                            </span>
+                            <span className="text-xs font-medium text-gray-600">{attendee.charAt(0).toUpperCase()}</span>
                           </div>
                         ))}
                         {meeting.attendees.length > 3 && (
@@ -503,17 +518,10 @@ export default function MeetingsPage() {
             )
           })
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="bg-white/50 backdrop-blur-sm p-12 rounded-2xl border border-gray-200 shadow-sm text-center"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="bg-white/50 backdrop-blur-sm p-12 rounded-2xl border border-gray-200 shadow-sm text-center">
             <VideoCameraIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2 tracking-tight">
-              {searchQuery || statusFilter !== "all" || typeFilter !== "all"
-                ? "No meetings found"
-                : "No meetings scheduled"}
+              {searchQuery || statusFilter !== "all" || typeFilter !== "all" ? "No meetings found" : "No meetings scheduled"}
             </h3>
             <p className="text-gray-600 font-light mb-6">
               {searchQuery || statusFilter !== "all" || typeFilter !== "all"
