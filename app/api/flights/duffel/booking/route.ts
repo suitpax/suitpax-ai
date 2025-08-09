@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { duffel } from '@/lib/duffel'
+import { createDuffelClient } from '@/lib/duffel'
 import { z } from 'zod'
 
 const bookingSchema = z.object({
@@ -24,6 +24,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const bookingData = bookingSchema.parse(body)
+
+    const duffel = createDuffelClient();
 
     const order = await duffel.orders.create({
       selected_offers: bookingData.selected_offers,
