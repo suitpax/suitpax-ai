@@ -206,4 +206,3 @@ For support, email support@suitpax.com or join our Slack channel.
 <div align="center">
   <sub>Built with ❤️ by Suitpax Team</sub>
 </div>
-\`\`\`
