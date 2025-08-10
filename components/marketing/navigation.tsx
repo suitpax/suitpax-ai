@@ -4,31 +4,41 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
+import { PiDotsNineBold, PiDotsSixBold, PiArrowUpRightBold } from "react-icons/pi"
+import {
+  SiX,
+  SiGithub,
+  // SiProducthunt, // No incluido
+  SiLinkedin,
+  SiCrunchbase,
+  SiGmail,
+  SiSlack,
+} from "react-icons/si"
+import { FaDiscord } from "react-icons/fa"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
-import { FaTwitter, FaLinkedin, FaGithub, FaDiscord } from "react-icons/fa"
+import { cn } from "@/lib/utils"
 
 const navigationItems = [
-  { name: "Pricing", href: "/pricing" },
   { name: "Manifesto", href: "/manifesto" },
+  { name: "Pricing", href: "/pricing" },
   { name: "Talk to founder", href: "/contact" },
-]
-
-const socialLinks = [
-  { name: "Twitter", href: "https://twitter.com/suitpax", icon: FaTwitter },
-  { name: "LinkedIn", href: "https://linkedin.com/company/suitpax", icon: FaLinkedin },
-  { name: "GitHub", href: "https://github.com/suitpax", icon: FaGithub },
-  { name: "Discord", href: "https://discord.gg/suitpax", icon: FaDiscord },
 ]
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isScrolled, setIsScrolled] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
   const supabase = createClient()
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10)
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   useEffect(() => {
     const getUser = async () => {
@@ -38,16 +48,12 @@ export default function Navigation() {
       setUser(user)
       setLoading(false)
     }
-
     getUser()
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null)
       setLoading(false)
     })
-
     return () => subscription.unsubscribe()
   }, [supabase.auth])
 
@@ -58,53 +64,54 @@ export default function Navigation() {
 
   return (
     <>
-      {/* Floating Header */}
       <motion.nav
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="fixed top-4 left-4 right-4 z-50 bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-lg"
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-2 pb-2",
+          "transition-all duration-300"
+        )}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
-            {/* Logo */}
-            <Link href="/" className="flex items-center">
-              <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={100} height={24} className="h-6 w-auto" />
-            </Link>
+        <div
+          className={cn(
+            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-white/85 border border-black/5 px-4 py-1",
+            isScrolled ? "shadow-lg border-black/10" : ""
+          )}
+        >
+          {/* Logo */}
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo/suitpax-bl-logo.webp"
+              alt="Suitpax"
+              width={120}
+              height={25}
+              priority
+              className="h-6 w-auto"
+            />
+          </Link>
 
-            {/* Desktop Navigation */}
-            {!isMobile && (
-              <div className="hidden md:flex items-center space-x-6">
-                {navigationItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className="text-xs font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            {/* Social Links & Auth */}
-            <div className="flex items-center space-x-3">
-              {/* Social Links - Desktop Only */}
-              {!isMobile && (
-                <div className="hidden md:flex items-center space-x-2">
-                  {socialLinks.map((social) => (
-                    <Link
-                      key={social.name}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-black transition-colors"
-                    >
-                      <social.icon className="h-3 w-3" />
-                    </Link>
-                  ))}
-                </div>
-              )}
-
+          {/* Desktop Navigation */}
+          {!isMobile && (
+            <div className="hidden md:flex items-center space-x-5">
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="px-3 py-1.5 text-sm hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors text-black"
+                >
+                  {item.name}
+                </Link>
+              ))}
+              {/* Join Discord */}
+              <Link
+                href="https://discord.gg/suitpax"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-2 py-0.5 text-xs bg-transparent border border-black rounded-md font-medium tracking-tighter transition-colors flex items-center gap-1 text-black"
+              >
+                <FaDiscord className="h-4 w-4" />
+                Join Discord
+              </Link>
               {/* Auth Buttons */}
               {loading ? (
                 <div className="w-16 h-6 bg-gray-200 animate-pulse rounded-lg"></div>
@@ -124,40 +131,33 @@ export default function Navigation() {
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center space-x-2">
-                  {/* Login solo en desktop */}
-                  {!isMobile && (
-                    <Link
-                      href="/auth/login"
-                      className="text-xs font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
-                    >
-                      Log In
-                    </Link>
-                  )}
-                  <Link
-                    href="/auth/signup"
-                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-black hover:bg-gray-800 rounded-lg transition-colors tracking-tight"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-
-              {/* Mobile menu button */}
-              {isMobile && (
-                <button
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="p-1.5 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors"
+                <Link
+                  href="/auth/signup"
+                  className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-black hover:bg-gray-800 rounded-lg transition-colors tracking-tight"
                 >
-                  {isOpen ? <XMarkIcon className="h-4 w-4" /> : <Bars3Icon className="h-4 w-4" />}
-                </button>
+                  Sign Up
+                </Link>
               )}
             </div>
-          </div>
+          )}
+
+          {/* Mobile Button */}
+          {isMobile && (
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-1.5 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+            >
+              <span className="sr-only">{isOpen ? "Close menu" : "Open menu"}</span>
+              <div className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
+                {isOpen ? <PiDotsSixBold size={20} /> : <PiDotsNineBold size={20} />}
+              </div>
+            </button>
+          )}
         </div>
       </motion.nav>
 
-      {/* Mobile Navigation Menu */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && isMobile && (
           <motion.div
@@ -178,25 +178,53 @@ export default function Navigation() {
                 </Link>
               ))}
 
-              {/* Social Links - Mobile */}
-              <div className="pt-4 border-t border-gray-200">
-                <p className="text-xs font-medium text-gray-900 mb-3">Follow us</p>
-                <div className="flex items-center space-x-4">
-                  {socialLinks.map((social) => (
-                    <Link
-                      key={social.name}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-black transition-colors"
-                    >
-                      <social.icon className="h-4 w-4" />
-                    </Link>
-                  ))}
+              {/* Join Discord - Mobile */}
+              <div className="pt-2 border-t border-gray-200/30">
+                <Link
+                  href="https://discord.gg/suitpax"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
+                >
+                  <FaDiscord className="h-4 w-4 mr-1.5" />
+                  Join our Discord community
+                </Link>
+              </div>
+              
+              {/* Social Icons - Mobile */}
+              <div className="mt-4 px-0">
+                <div className="flex justify-start space-x-4 py-2">
+                  <Link href="https://twitter.com/suitpax" className="text-gray-500 hover:text-black">
+                    <SiX className="h-4 w-4" />
+                    <span className="sr-only">X</span>
+                  </Link>
+                  <Link href="https://linkedin.com/company/suitpax" className="text-gray-500 hover:text-black">
+                    <SiLinkedin className="h-4 w-4" />
+                    <span className="sr-only">LinkedIn</span>
+                  </Link>
+                  <Link href="https://github.com/suitpax" className="text-gray-500 hover:text-black">
+                    <SiGithub className="h-4 w-4" />
+                    <span className="sr-only">GitHub</span>
+                  </Link>
+                  <Link href="https://instagram.com/suitpax" className="text-gray-500 hover:text-black">
+                    {/* Puedes reemplazar este SVG por SiSlack si lo prefieres */}
+                    <SiSlack className="h-4 w-4" />
+                    <span className="sr-only">Instagram</span>
+                  </Link>
+                  <Link
+                    href="https://www.crunchbase.com/organization/suitpax"
+                    className="text-gray-500 hover:text-black"
+                  >
+                    <SiCrunchbase className="h-4 w-4" />
+                    <span className="sr-only">Crunchbase</span>
+                  </Link>
+                  <Link href="mailto:hello@suitpax.com" className="text-gray-500 hover:text-black">
+                    <SiGmail className="h-4 w-4" />
+                    <span className="sr-only">Email</span>
+                  </Link>
                 </div>
               </div>
 
-              {/* Auth buttons en móvil si no hay usuario */}
+              {/* Auth (Mobile) */}
               {!loading && !user && (
                 <div className="pt-4 border-t border-gray-200 space-y-3">
                   <Link
@@ -220,9 +248,11 @@ export default function Navigation() {
         )}
       </AnimatePresence>
 
-      {/* Mobile backdrop */}
       {isOpen && isMobile && (
-        <div className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm md:hidden" onClick={() => setIsOpen(false)} />
+        <div
+          className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm md:hidden"
+          onClick={() => setIsOpen(false)}
+        />
       )}
     </>
   )
