@@ -4,15 +4,13 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { PiDotsNineBold, PiDotsSixBold, PiArrowUpRightBold } from "react-icons/pi"
+import { PiDotsNineBold, PiDotsSixBold } from "react-icons/pi"
 import {
   SiX,
   SiGithub,
-  // SiProducthunt, // No incluido
   SiLinkedin,
   SiCrunchbase,
   SiGmail,
-  SiSlack,
 } from "react-icons/si"
 import { FaDiscord } from "react-icons/fa"
 import { useMediaQuery } from "@/hooks/use-media-query"
@@ -102,7 +100,7 @@ export default function Navigation() {
                   {item.name}
                 </Link>
               ))}
-              {/* Join Discord */}
+              {/* Discord (coming soon) */}
               <Link
                 href="https://discord.gg/suitpax"
                 target="_blank"
@@ -110,7 +108,7 @@ export default function Navigation() {
                 className="px-2 py-0.5 text-xs bg-transparent border border-black rounded-md font-medium tracking-tighter transition-colors flex items-center gap-1 text-black"
               >
                 <FaDiscord className="h-4 w-4" />
-                Join Discord
+                Discord (coming soon)
               </Link>
               {/* Auth Buttons */}
               {loading ? (
@@ -178,7 +176,7 @@ export default function Navigation() {
                 </Link>
               ))}
 
-              {/* Join Discord - Mobile */}
+              {/* Discord (coming soon) - Mobile */}
               <div className="pt-2 border-t border-gray-200/30">
                 <Link
                   href="https://discord.gg/suitpax"
@@ -186,10 +184,10 @@ export default function Navigation() {
                   className="flex items-center w-full py-1 text-lg font-medium tracking-tighter text-black hover:bg-black/5 rounded-md transition-colors"
                 >
                   <FaDiscord className="h-4 w-4 mr-1.5" />
-                  Join our Discord community
+                  Discord (coming soon)
                 </Link>
               </div>
-              
+
               {/* Social Icons - Mobile */}
               <div className="mt-4 px-0">
                 <div className="flex justify-start space-x-4 py-2">
@@ -206,9 +204,7 @@ export default function Navigation() {
                     <span className="sr-only">GitHub</span>
                   </Link>
                   <Link href="https://instagram.com/suitpax" className="text-gray-500 hover:text-black">
-                    {/* Puedes reemplazar este SVG por SiSlack si lo prefieres */}
-                    <SiSlack className="h-4 w-4" />
-                    <span className="sr-only">Instagram</span>
+                    {/* Puedes reemplazar este SVG por un icon personalizado si prefieres */}
                   </Link>
                   <Link
                     href="https://www.crunchbase.com/organization/suitpax"
