@@ -5,13 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { PiDotsNineBold, PiDotsSixBold } from "react-icons/pi"
-import {
-  SiX,
-  SiGithub,
-  SiLinkedin,
-  SiCrunchbase,
-  SiGmail,
-} from "react-icons/si"
+import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
 import { FaDiscord } from "react-icons/fa"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { createClient } from "@/lib/supabase/client"
@@ -40,14 +34,11 @@ export default function Navigation() {
 
   useEffect(() => {
     const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
       setLoading(false)
     }
     getUser()
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null)
       setLoading(false)
@@ -76,7 +67,6 @@ export default function Navigation() {
             isScrolled ? "shadow-lg border-black/10" : ""
           )}
         >
-          {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
               src="/logo/suitpax-bl-logo.webp"
@@ -88,7 +78,6 @@ export default function Navigation() {
             />
           </Link>
 
-          {/* Desktop Navigation */}
           {!isMobile && (
             <div className="hidden md:flex items-center space-x-5">
               {navigationItems.map((item) => (
@@ -100,7 +89,6 @@ export default function Navigation() {
                   {item.name}
                 </Link>
               ))}
-              {/* Discord (coming soon) */}
               <Link
                 href="https://discord.gg/suitpax"
                 target="_blank"
@@ -110,7 +98,6 @@ export default function Navigation() {
                 <FaDiscord className="h-4 w-4" />
                 Discord (coming soon)
               </Link>
-              {/* Auth Buttons */}
               {loading ? (
                 <div className="w-16 h-6 bg-gray-200 animate-pulse rounded-lg"></div>
               ) : user ? (
@@ -139,14 +126,11 @@ export default function Navigation() {
             </div>
           )}
 
-          {/* Mobile Button */}
           {isMobile && (
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-1.5 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
-              aria-label={isOpen ? "Close menu" : "Open menu"}
             >
-              <span className="sr-only">{isOpen ? "Close menu" : "Open menu"}</span>
               <div className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
                 {isOpen ? <PiDotsSixBold size={20} /> : <PiDotsNineBold size={20} />}
               </div>
@@ -155,7 +139,6 @@ export default function Navigation() {
         </div>
       </motion.nav>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && isMobile && (
           <motion.div
@@ -176,7 +159,6 @@ export default function Navigation() {
                 </Link>
               ))}
 
-              {/* Discord (coming soon) - Mobile */}
               <div className="pt-2 border-t border-gray-200/30">
                 <Link
                   href="https://discord.gg/suitpax"
@@ -188,7 +170,6 @@ export default function Navigation() {
                 </Link>
               </div>
 
-              {/* Social Icons - Mobile */}
               <div className="mt-4 px-0">
                 <div className="flex justify-start space-x-4 py-2">
                   <Link href="https://twitter.com/suitpax" className="text-gray-500 hover:text-black">
@@ -202,9 +183,6 @@ export default function Navigation() {
                   <Link href="https://github.com/suitpax" className="text-gray-500 hover:text-black">
                     <SiGithub className="h-4 w-4" />
                     <span className="sr-only">GitHub</span>
-                  </Link>
-                  <Link href="https://instagram.com/suitpax" className="text-gray-500 hover:text-black">
-                    {/* Puedes reemplazar este SVG por un icon personalizado si prefieres */}
                   </Link>
                   <Link
                     href="https://www.crunchbase.com/organization/suitpax"
@@ -220,7 +198,6 @@ export default function Navigation() {
                 </div>
               </div>
 
-              {/* Auth (Mobile) */}
               {!loading && !user && (
                 <div className="pt-4 border-t border-gray-200 space-y-3">
                   <Link
