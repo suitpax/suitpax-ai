@@ -159,7 +159,7 @@ export function ComparePlans() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-black leading-tight mb-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-black leading-tight mb-4">
               Compare all features
             </h2>
             <p className="text-base text-gray-500 mb-8">Detailed comparison of all features across our plans</p>

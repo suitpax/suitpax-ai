@@ -218,9 +218,7 @@ export default function MeetingsPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">
-              <em className="font-serif italic">Meetings</em>
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Meetings</h1>
             <p className="text-gray-600 font-light">Manage your business meetings and video calls</p>
           </div>
 

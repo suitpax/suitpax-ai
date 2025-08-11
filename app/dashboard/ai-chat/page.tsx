@@ -56,6 +56,16 @@ export default function AIChatPage() {
   const supabase = createClient()
 
   useEffect(() => {
+    try {
+      const saved = typeof window !== "undefined" ? localStorage.getItem("ai-chat:prompt") : null
+      if (saved) {
+        setInput(saved)
+        localStorage.removeItem("ai-chat:prompt")
+      }
+    } catch {}
+  }, [])
+
+  useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
@@ -112,7 +122,7 @@ export default function AIChatPage() {
     <div className="flex flex-col h-full bg-gray-50 overflow-hidden">
       <div className="flex-1 min-h-0">
         <ChatContainerRoot>
-          <ChatContainerContent messages={messages} isLoading={loading} />
+          <ChatContainerContent messages={messages} isLoading={loading} showExport />
           <ChatContainerScrollAnchor />
           <ScrollButton />
         </ChatContainerRoot>

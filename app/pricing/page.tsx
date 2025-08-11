@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import Plans from "@/components/marketing/plans"
 import ComparePlans from "@/components/marketing/compare-plans"
-import AirlinesSlider from "@/components/marketing/airlines-slider" 
 import Script from "next/script"
 
 export const metadata: Metadata = {
@@ -65,14 +64,14 @@ export default function PricingPage() {
       
       <main className="flex min-h-screen flex-col">
         {/* Hero Section con introducción a pricing */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-sky-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
           
           <div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl">
                 Simple, transparent{" "}
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
                   pricing
                 </span>
               </h1>
@@ -81,15 +80,7 @@ export default function PricingPage() {
                 no surprises—just powerful AI-driven travel management that scales with you.
               </p>
               
-              {/* Trust Badge con Airlines */}
-              <div className="mt-12">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-6">
-                  Trusted by travelers booking with 200+ airlines worldwide
-                </p>
-                <div className="mx-auto max-w-4xl">
-                  <AirlinesSlider />
-                </div>
-              </div>
+
             </div>
           </div>
         </section>
@@ -110,19 +101,17 @@ export default function PricingPage() {
           <ComparePlans />
         </section>
 
-        {/* Enterprise CTA with Airlines as Social Proof */}
-        <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600">
-          <div className="absolute inset-0 bg-black/20" />
+        {/* Enterprise CTA */}
+        <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-sky-500">
+          <div className="absolute inset-0 bg-black/10" />
           <div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
                 Need a custom solution?
               </h2>
-              <p className="mt-6 text-xl leading-8 text-blue-100">
-                Our enterprise plans include dedicated support, custom integrations, 
-                and access to exclusive airline partnerships.
+              <p className="mt-6 text-xl leading-8 text-white/90">
+                Our enterprise plans include dedicated support and custom integrations.
               </p>
-              
               <div className="mt-10 flex items-center justify-center gap-x-6">
                 <a
                   href="/contact"
@@ -132,20 +121,10 @@ export default function PricingPage() {
                 </a>
                 <a
                   href="/demo"
-                  className="text-sm font-semibold leading-6 text-white hover:text-blue-100 transition-colors"
+                  className="text-sm font-semibold leading-6 text-white hover:text-white/90 transition-colors"
                 >
                   Book a demo <span aria-hidden="true">→</span>
                 </a>
-              </div>
-
-              {/* Airlines como prueba social para Enterprise */}
-              <div className="mt-16">
-                <p className="text-sm font-medium text-blue-100 mb-6">
-                  Enterprise clients get priority access to premium airline partnerships
-                </p>
-                <div className="mx-auto max-w-4xl opacity-80 hover:opacity-100 transition-opacity">
-                  <AirlinesSlider />
-                </div>
               </div>
             </div>
           </div>

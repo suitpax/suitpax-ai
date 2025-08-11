@@ -204,11 +204,7 @@ export default function DashboardPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl md:text-4xl font-medium tracking-tighter leading-none">
-                <em className="font-serif italic">Welcome to</em>
-                <br />
-                <span className="text-gray-900">Suitpax</span>
-              </h1>
+              <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none">Dashboard</h1>
               <p className="text-lg font-light text-gray-600 mt-2">
                 Let's get your business travel management set up
               </p>

@@ -108,9 +108,7 @@ export default function ProfilePage() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-        <h1 className="text-2xl font-medium tracking-tighter text-gray-900">
-          <em className="font-serif italic">Profile Settings</em>
-        </h1>
+        <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Profile</h1>
         <p className="mt-1 text-sm text-gray-600">Manage your account information and preferences.</p>
       </motion.div>
 

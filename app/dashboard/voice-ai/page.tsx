@@ -190,7 +190,7 @@ export default function VoiceAIPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-medium tracking-tighter text-black">Voice AI Agents</h1>
+          <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none">Voice AI Agents</h1>
           <p className="text-gray-600 mt-1">Have natural voice conversations with specialized AI travel agents</p>
         </div>
         <div className="flex items-center space-x-3">

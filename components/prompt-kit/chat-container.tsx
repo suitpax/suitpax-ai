@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, createContext, useContext } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Copy, Download, User, Bot } from 'lucide-react'
+import { Copy, Download, User, Bot, FileDown } from 'lucide-react'
 import { toast } from "sonner"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -239,13 +239,26 @@ export const ChatContainerRoot: React.FC<{ children: React.ReactNode }> = ({ chi
 }
 
 // Componente del contenido del chat
-export const ChatContainerContent: React.FC<{ messages: Message[]; isLoading: boolean }> = ({ messages, isLoading }) => {
+export const ChatContainerContent: React.FC<{ messages: Message[]; isLoading: boolean; showExport?: boolean }> = ({ messages, isLoading, showExport = false }) => {
   const { scrollAreaRef, scrollToBottom } = useChatContainer()
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     scrollToBottom()
   }, [messages, isLoading, scrollToBottom])
+
+  const handleExport = async () => {
+    const html = scrollAreaRef.current?.innerHTML || ""
+    const res = await fetch("/api/pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ html: `<html><body><div>${html}</div></body></html>`, filename: "chat.pdf" }) })
+    if (!res.ok) return
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "suitpax-chat.pdf"
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
@@ -291,6 +304,13 @@ export const ChatContainerContent: React.FC<{ messages: Message[]; isLoading: bo
             <Card className="p-4 bg-white/50 backdrop-blur-sm border-gray-200">
               <ChatLoadingIndicator />
             </Card>
+          </div>
+        )}
+        {showExport && (
+          <div className="p-2 border-t bg-white/80 backdrop-blur-sm">
+            <Button size="sm" className="rounded-xl" onClick={handleExport}>
+              <FileDown className="h-4 w-4 mr-2" /> Export PDF
+            </Button>
           </div>
         )}
       </div>
