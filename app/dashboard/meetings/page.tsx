@@ -82,10 +82,36 @@ export default function MeetingsPage() {
     meetingUrl: "",
   })
   const [googleToken, setGoogleToken] = useState<string | null>(null)
+  const supabase = createClient()
+
+  const loadFromSupabase = async (uid: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('meetings')
+        .select('*')
+        .eq('user_id', uid)
+        .order('starts_at', { ascending: false })
+      if (!error && Array.isArray(data)) {
+        const mapped: Meeting[] = data.map((m: any) => ({
+          id: m.id,
+          title: m.title,
+          type: m.type,
+          status: m.status,
+          date: new Date(m.starts_at).toISOString().slice(0,10),
+          time: new Date(m.starts_at).toTimeString().slice(0,5),
+          duration: m.duration_minutes || Math.max(15, Math.round((new Date(m.ends_at).getTime() - new Date(m.starts_at).getTime())/60000)),
+          attendees: m.attendees || [],
+          location: m.location || undefined,
+          description: m.description || undefined,
+          meetingUrl: m.meeting_url || undefined,
+        }))
+        setMeetings(mapped)
+      }
+    } catch {}
+  }
 
   // Load/save per-user meetings in localStorage when no Google token
   useEffect(() => {
-    const supabase = createClient()
     const init = async () => {
       const { data: session } = await supabase.auth.getSession()
       const uid = session.session?.user?.id || null
@@ -93,10 +119,14 @@ export default function MeetingsPage() {
       // TODO: en el futuro, obtener token OAuth Google y guardarlo en sesión/BD
       setGoogleToken(null)
       if (!googleToken) {
-        const key = uid ? `meetings:${uid}` : `meetings`
-        const raw = typeof window !== "undefined" ? window.localStorage.getItem(key) : null
-        const parsed: Meeting[] = raw ? JSON.parse(raw) : mockMeetings
-        setMeetings(parsed)
+        if (uid) {
+          await loadFromSupabase(uid)
+        } else {
+          const key = uid ? `meetings:${uid}` : `meetings`
+          const raw = typeof window !== "undefined" ? window.localStorage.getItem(key) : null
+          const parsed: Meeting[] = raw ? JSON.parse(raw) : mockMeetings
+          setMeetings(parsed)
+        }
       }
     }
     init()
@@ -156,20 +186,33 @@ export default function MeetingsPage() {
     setFilteredMeetings(filtered)
   }, [meetings, searchQuery, statusFilter, typeFilter])
 
-  const persist = (items: Meeting[]) => {
+  const persist = async (items: Meeting[]) => {
     if (googleToken) return
-    const key = userId ? `meetings:${userId}` : `meetings`
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(key, JSON.stringify(items))
+    if (userId) {
+      // Sync to Supabase in background
+      try {
+        // naive sync: delete all and reinsert would be heavy; instead ignore
+      } catch {}
+    } else {
+      const key = userId ? `meetings:${userId}` : `meetings`
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(key, JSON.stringify(items))
+      }
     }
   }
 
-  const updateMeetingStatus = (id: string, status: Meeting["status"]) => {
+  const updateMeetingStatus = async (id: string, status: Meeting["status"]) => {
     setMeetings((prev) => {
       const updated = prev.map((m) => (m.id === id ? { ...m, status } : m))
-      persist(updated)
       return updated
     })
+    try {
+      if (userId) {
+        await supabase.from('meetings').update({ status }).eq('id', id).eq('user_id', userId)
+      } else {
+        persist(meetings)
+      }
+    } catch {}
   }
 
   const handleCreateMeeting = async () => {
@@ -222,25 +265,47 @@ export default function MeetingsPage() {
         }
       }
     } else {
-      const meeting: Meeting = {
-        id: Date.now().toString(),
-        title: newMeeting.title,
-        type: newMeeting.type,
-        status: "upcoming",
-        date: newMeeting.date,
-        time: newMeeting.time,
-        duration: newMeeting.duration,
-        attendees: newMeeting.attendees
-          .split(",")
-          .map((a) => a.trim())
-          .filter(Boolean),
-        location: newMeeting.location || undefined,
-        description: newMeeting.description || undefined,
-        meetingUrl: newMeeting.type === "video" ? `https://meet.suitpax.com/${Date.now()}` : undefined,
+      const attendees = newMeeting.attendees
+        .split(",")
+        .map((a) => a.trim())
+        .filter(Boolean)
+      if (userId) {
+        const startISO = `${newMeeting.date}T${newMeeting.time}:00`
+        const endDate = new Date(startISO)
+        endDate.setMinutes(endDate.getMinutes() + (newMeeting.duration || 30))
+        const { data, error } = await supabase.from('meetings').insert({
+          user_id: userId,
+          title: newMeeting.title,
+          type: newMeeting.type,
+          status: 'upcoming',
+          starts_at: new Date(startISO).toISOString(),
+          ends_at: endDate.toISOString(),
+          attendees,
+          location: newMeeting.location || null,
+          description: newMeeting.description || null,
+          meeting_url: newMeeting.type === 'video' ? `https://meet.suitpax.com/${Date.now()}` : null,
+        }).select().single()
+        if (!error && data) {
+          await loadFromSupabase(userId)
+        }
+      } else {
+        const meeting: Meeting = {
+          id: Date.now().toString(),
+          title: newMeeting.title,
+          type: newMeeting.type,
+          status: "upcoming",
+          date: newMeeting.date,
+          time: newMeeting.time,
+          duration: newMeeting.duration,
+          attendees,
+          location: newMeeting.location || undefined,
+          description: newMeeting.description || undefined,
+          meetingUrl: newMeeting.type === "video" ? `https://meet.suitpax.com/${Date.now()}` : undefined,
+        }
+        const updated = [meeting, ...meetings]
+        setMeetings(updated)
+        persist(updated)
       }
-      const updated = [meeting, ...meetings]
-      setMeetings(updated)
-      persist(updated)
     }
 
     setShowNewMeetingModal(false)

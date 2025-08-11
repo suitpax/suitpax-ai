@@ -246,6 +246,12 @@ function AIChatView() {
     })
     if (!response.ok) throw new Error("Failed to get response")
     const data = await response.json()
+    // Persist sources for attribution
+    try {
+      if (Array.isArray(data.sources) && data.sources.length > 0) {
+        await fetch('/api/web-sources', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sources: data.sources }) })
+      }
+    } catch {}
     const assistantMessage: Message = {
       id: (Date.now() + 1).toString(),
       content: data.response,

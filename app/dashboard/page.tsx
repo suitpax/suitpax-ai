@@ -22,6 +22,7 @@ import {
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts"
+import DashboardOverviewV2 from "@/components/dashboard/v2/overview"
 
 // Interfaces
 interface DashboardStats {
@@ -195,6 +196,10 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* New Overview (v2) */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-8">
+          <DashboardOverviewV2 />
+        </motion.div>
         {/* Welcome Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
