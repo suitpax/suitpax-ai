@@ -8,7 +8,7 @@ interface ResponseStreamProps {
   textStream: string | (() => AsyncGenerator<string> | Promise<AsyncGenerator<string>>)
   mode?: ResponseStreamMode
   speed?: number
-  as?: keyof JSX.IntrinsicElements
+  as?: any
   className?: string
   onComplete?: () => void
 }
