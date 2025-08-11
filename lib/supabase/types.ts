@@ -331,6 +331,35 @@ export interface Database {
           updated_at?: string
         }
       }
+      chat_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          archived: boolean
+          last_message_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title?: string
+          archived?: boolean
+          last_message_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          archived?: boolean
+          last_message_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
