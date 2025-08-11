@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Loader2, ArrowUp, Paperclip, X, Square, ArrowLeft, File as FileIcon, Image as ImageIcon, FileText, FileCode, FileSpreadsheet, Music, Video, Archive, Mic, Volume2 } from "lucide-react"
+import { Loader2, ArrowUp, Paperclip, X, Square, ArrowLeft, File as FileIcon, Image as ImageIcon, FileText, FileCode, FileSpreadsheet, Music, Video, Archive, Mic, Volume2, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
@@ -24,6 +24,8 @@ import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
 import SourceList from "@/components/prompt-kit/source-list"
 import { useChatStream } from "@/hooks/use-chat-stream"
 import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
+import ChatSidebar from "@/components/prompt-kit/chat-sidebar"
+import ToolSelector from "@/components/prompt-kit/tool-selector"
 
 interface Message {
   id: string
@@ -48,6 +50,9 @@ function AIChatView() {
   const [user, setUser] = useState<any>(null)
   const [files, setFiles] = useState<File[]>([])
   const [showReasoning, setShowReasoning] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [webSearch, setWebSearch] = useState(false)
+  const [deepSearch, setDeepSearch] = useState(false)
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
   const { speak, state: voiceState, startListening, stopListening } = useVoiceAI()
@@ -126,6 +131,8 @@ function AIChatView() {
         history: messages,
         context: "travel_booking",
         includeReasoning: showReasoning,
+        webSearch,
+        deepSearch,
       }),
     })
     if (!response.ok) throw new Error("Failed to get response")
@@ -188,7 +195,12 @@ function AIChatView() {
       setTypingMessageId(null)
       try { await speak(streamed) } catch {}
     } catch (err) {
-      await sendNonStreaming(userMessage)
+      try {
+        await sendNonStreaming(userMessage)
+      } catch (e2: any) {
+        const errorText = typeof e2?.message === "string" ? e2.message : "There was an issue generating the response. Please try again."
+        setMessages((prev) => [...prev, { id: (Date.now() + 2).toString(), role: "assistant", content: errorText, timestamp: new Date() }])
+      }
     } finally {
       setLoading(false)
     }
@@ -202,28 +214,29 @@ function AIChatView() {
 
   return (
     <VantaHaloBackground className="fixed inset-0">
+      <ChatSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} user={user} />
       <div className="absolute inset-0 flex flex-col bg-white/70">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="bg-white/60 backdrop-blur-sm border-b border-gray-200 flex-shrink-0" style={{ height: 'auto', minHeight: '4rem' }}>
           <div className="p-3 sm:p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 sm:space-x-4">
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSidebarOpen(true)} aria-label="Open chat sidebar">
+                  <Menu className="h-4 w-4" />
+                </Button>
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
                   <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={40} height={40} className="w-full h-full object-contain p-1" />
                 </div>
                 <div className="min-w-0 flex-1">
-                                     <h1 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tighter truncate"><em className="font-serif italic">Suitpax AI</em></h1>
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tighter truncate"><em className="font-serif italic">Suitpax AI</em></h1>
                   <p className="text-xs md:text-sm text-gray-600 font-light hidden sm:block">Try the superpowers ✨</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-4 sm:space-x-5 flex-shrink-0">
-                <Link href="/dashboard" className="text-xs text-gray-600 hover:text-black inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-2 py-1 hover:bg-gray-50" aria-label="Volver al dashboard">
-                  <ArrowLeft className="h-3.5 w-3.5" />
-                  <span className="sr-only">Volver al dashboard</span>
-                </Link>
+              <div className="flex items-center space-x-3 sm:space-x-4 flex-shrink-0">
+                <ToolSelector webSearchEnabled={webSearch} deepSearchEnabled={deepSearch} onToggleWeb={setWebSearch} onToggleDeep={setDeepSearch} />
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-gray-600 hidden sm:inline">Reasoning…</span>
                   <Switch checked={showReasoning} onCheckedChange={setShowReasoning} />
+                  <span className="text-[11px] text-gray-600">Reasoning</span>
                 </div>
                 <div className="inline-flex items-center gap-2">
                   <span className={`inline-flex items-center rounded-xl px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-medium ${voiceState.isSpeaking ? 'bg-green-500/10 text-green-700' : 'bg-gray-900/5 text-gray-900'}`}>
@@ -234,6 +247,10 @@ function AIChatView() {
                     {voiceState.isListening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                   </Button>
                 </div>
+                <Link href="/dashboard" className="text-xs text-gray-600 hover:text-black inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-2 py-1 hover:bg-gray-50" aria-label="Volver al dashboard">
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  <span className="sr-only">Volver al dashboard</span>
+                </Link>
               </div>
             </div>
           </div>
@@ -267,15 +284,26 @@ function AIChatView() {
                 <motion.div key={message.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.05 }} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div className={`${message.role === "user" ? "max-w-[85%] sm:max-w-sm md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-xl px-4 sm:px-6 py-2 sm:py-2.5 bg-black text-white" : "max-w-[90%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"}`}>
                     {message.role === "assistant" && (
-                      <div className="flex items-center space-x-2 mb-2">
-                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-                          <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={24} height={24} className="w-full h-full object-contain p-0.5" />
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
+                            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={24} height={24} className="w-full h-full object-contain p-0.5" />
+                          </div>
+                          <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
                         </div>
-                        <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
+                        {/* Badges compactos para tools/sources */}
+                        <div className="flex items-center gap-1">
+                          {message.sources && message.sources.length > 0 && (
+                            <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-700">Sources</span>
+                          )}
+                          {showReasoning && message.reasoning && (
+                            <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-700">Reasoning</span>
+                          )}
+                        </div>
                       </div>
                     )}
 
-                    {message.role === "assistant" && message.reasoning && (
+                    {message.role === "assistant" && showReasoning && message.reasoning && (
                       <div className="mb-3">
                         <Reasoning>
                           <ReasoningTrigger className="text-xs text-gray-400 hover:text-gray-600"><span>View AI logic</span></ReasoningTrigger>
@@ -298,107 +326,93 @@ function AIChatView() {
                             const match = message.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
                             if (!match) return null
                             try {
-                              const parsed = JSON.parse(match[1])
-                              return <div className="mt-2"><ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => {
-                                // Navigate to booking page
-                                window.location.href = `/dashboard/flights/book/${id}`
-                              }} /></div>
-                            } catch {
-                              return null
-                            }
+                              const data = JSON.parse(match[1])
+                              return <div className="mt-3"><ChatFlightOffers offers={data.offers || []} /></div>
+                            } catch {}
+                            return null
                           })()}
                         </>
                       )}
                     </div>
-                    {message.sources && message.sources.length > 0 && <SourceList items={message.sources} />}
-                    <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
-                      {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </p>
+
+                    {message.role === "assistant" && message.sources && message.sources.length > 0 && (
+                      <SourceList items={message.sources} />
+                    )}
                   </div>
                 </motion.div>
               ))}
 
               {loading && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-                  <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 max-w-[90%] sm:max-w-xs">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white"></div>
-                      <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
-                      <span className="text-sm text-gray-600 font-light">{showReasoning ? "Analyzing and thinking..." : "Thinking..."}</span>
+                <div className="flex justify-start">
+                  <div className="max-w-[90%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-sm overflow-hidden border border-gray-200 bg-white flex-shrink-0">
+                        <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={16} height={16} className="w-full h-full object-contain p-0.5" />
+                      </div>
+                      <span className="text-sm text-gray-800">Thinking…</span>
+                      <span className="inline-flex gap-1 ml-1">
+                        <span className="h-1.5 w-1.5 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.3s]"></span>
+                        <span className="h-1.5 w-1.5 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.15s]"></span>
+                        <span className="h-1.5 w-1.5 bg-gray-400 rounded-full animate-pulse"></span>
+                      </span>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )}
-            </ChatContainerContent>
 
-            <ChatContainerScrollAnchor />
-            <ScrollButton className="bottom-24 md:bottom-28 right-4 sm:right-6" />
+              <ChatContainerScrollAnchor />
+            </ChatContainerContent>
+            <ScrollButton />
           </ChatContainerRoot>
         </div>
 
         {/* Input */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="bg-white/60 backdrop-blur-sm border-t border-gray-200 flex-shrink-0" style={{ minHeight: '4rem' }}>
-          <div className="p-3 sm:p-4 lg:p-6">
-            <div className="max-w-4xl mx-auto">
-              <PromptInput value={input} onValueChange={setInput} isLoading={loading || isStreaming} onSubmit={handleSend} className="w-full bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-                {files.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pb-2">
-                    {files.map((file, index) => {
-                      const { Icon, sizeText } = getFileMeta(file)
-                      return (
-                        <div key={index} className="bg-gray-100 flex items-center gap-2 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm" onClick={e => e.stopPropagation()}>
-                          <Icon className="size-3.5 sm:size-4 text-gray-700" />
-                          <span className="max-w-[120px] truncate text-gray-800">{file.name}</span>
-                          <span className="text-[10px] text-gray-600">{sizeText}</span>
-                          <button onClick={() => handleRemoveFile(index)} className="hover:bg-gray-200 rounded-full p-1 transition-colors"><X className="size-3 sm:size-4 text-gray-600" /></button>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
+        <div className="flex-shrink-0 p-3 sm:p-4 lg:p-6 bg-white/60 backdrop-blur-md border-t border-gray-200">
+          <div className="max-w-3xl mx-auto">
+            {files.length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-2">
+                {files.map((file, i) => {
+                  const { Icon, sizeText } = getFileMeta(file)
+                  return (
+                    <div key={`${file.name}-${i}`} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700">
+                      <Icon className="h-4 w-4 text-gray-700" />
+                      <span className="truncate max-w-[140px]" title={file.name}>{file.name}</span>
+                      <span className="text-[10px] text-gray-500">{sizeText}</span>
+                      <button className="rounded-full bg-gray-100 hover:bg-gray-200 w-5 h-5 inline-flex items-center justify-center" onClick={() => handleRemoveFile(i)} aria-label="Remove file">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
 
-                <PromptInputTextarea placeholder="Ask me about flights, hotels, travel planning, or code/design…" className="text-gray-900 placeholder-gray-500 font-light text-sm sm:text-base" disabled={loading || isStreaming} />
-
-                <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
-                  <PromptInputAction tooltip="Attach files">
-                    <label htmlFor="file-upload" className="hover:bg-gray-100 flex h-7 w-7 sm:h-8 sm:w-8 cursor-pointer items-center justify-center rounded-2xl transition-colors">
-                      <input ref={uploadInputRef} type="file" multiple onChange={handleFileChange} className="hidden" id="file-upload" />
-                      <Paperclip className="size-3.5 sm:size-4 text-gray-700" />
-                    </label>
-                  </PromptInputAction>
-
-                  <PromptInputAction tooltip="Scan document">
-                    <DocumentScanner onScanned={(r) => { if (r?.raw_text) setInput((prev) => prev ? `${prev}\n\n${r.raw_text}` : r.raw_text || "") }} />
-                  </PromptInputAction>
-
-                  <PromptInputAction tooltip="Speak to type">
-                    <VoiceButton onTranscript={(t) => setInput((prev) => prev ? `${prev} ${t}` : t)} />
-                  </PromptInputAction>
-
-                  <div className="ml-auto" />
-
-                  <PromptInputAction tooltip={loading || isStreaming ? "Stop generation" : "Send message"}>
-                    <Button variant="default" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg:black hover:bg-gray-800 text-white" onClick={loading || isStreaming ? cancel : handleSend} disabled={!input.trim() && !(loading || isStreaming)}>
-                      {loading || isStreaming ? <Square className="size-3 sm:size-4 fill-current" /> : <ArrowUp className="size-3 sm:size-4" />}
-                    </Button>
-                  </PromptInputAction>
-                </PromptInputActions>
-              </PromptInput>
-                                 <p className="mt-2 text-[10px] text-gray-600 flex items-center justify-center gap-2"><span className="text-[11px]">Technology by</span><Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={14} height={14} className="inline-block" /></p>
-            </div>
+            <PromptInput value={input} onValueChange={setInput} isLoading={loading || isStreaming} onSubmit={handleSend}>
+              <PromptInputTextarea placeholder="Ask Suitpax AI…" />
+              <PromptInputActions>
+                <div className="flex items-center gap-2">
+                  <input ref={uploadInputRef} id="file-upload" type="file" className="hidden" multiple onChange={handleFileChange} />
+                  <label htmlFor="file-upload" className="inline-flex items-center gap-1.5 text-xs text-gray-700 hover:text-gray-900 cursor-pointer">
+                    <Paperclip className="h-4 w-4" /> Attach
+                  </label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button type="button" variant="ghost" size="icon" className="h-9 w-9" onClick={handleSend} disabled={loading || isStreaming || !input.trim()}>
+                    <ArrowUp className="h-4 w-4" />
+                  </Button>
+                </div>
+              </PromptInputActions>
+            </PromptInput>
           </div>
-        </motion.div>
+        </div>
       </div>
     </VantaHaloBackground>
   )
 }
 
-export default function AIChatPage() {
+export default function Page() {
   return (
-    <VoiceAIProvider initialLanguage="es-ES">
+    <VoiceAIProvider>
       <AIChatView />
     </VoiceAIProvider>
   )

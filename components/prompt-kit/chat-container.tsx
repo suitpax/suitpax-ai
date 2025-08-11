@@ -71,8 +71,7 @@ export function ChatContainerRoot({
         ref={containerRef}
         className={cn(
           "relative overflow-y-auto",
-          "[scrollbar-gutter:stable]",
-          "scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400",
+          "no-scrollbar",
           "pb-safe",
           className
         )}

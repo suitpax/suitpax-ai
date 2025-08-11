@@ -1,46 +1,47 @@
 import { NextRequest } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
+import { buildSystemPrompt } from "@/lib/prompts/system"
+
+export const runtime = "edge"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
 export async function POST(req: NextRequest) {
-  const { message, history = [], system, model = "claude-3-5-sonnet-20240620" } = await req.json()
-  if (!message) {
-    return new Response("Message required", { status: 400 })
-  }
+  const { message, history = [] } = await req.json()
+  if (!message) return new Response("Message is required", { status: 400 })
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      try {
-        const msg = await anthropic.messages.create({
-          model,
-          system: system || `You are Suitpax AI. Use clean Markdown. Start with a short summary, then use level-2 headers and flat lists. No emojis.`, 
-          max_tokens: 4096,
-          messages: [...history, { role: "user", content: message }],
-          stream: true,
-        } as any)
+  const systemPrompt = buildSystemPrompt({ domain: ["general", "travel", "coding", "business"] })
 
-        // @ts-expect-error: stream events typing
-        for await (const ev of msg) {
-          if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") {
-            const text = ev.delta.text as string
-            controller.enqueue(new TextEncoder().encode(text))
-          }
-        }
-      } catch (e) {
-        controller.error(e)
-      } finally {
-        controller.close()
-      }
-    },
+  const stream = await anthropic.messages.stream({
+    model: "claude-3-5-sonnet-20240620",
+    max_tokens: 4096,
+    system: systemPrompt,
+    messages: [...history.map((m: any) => ({ role: m.role, content: m.content })), { role: "user", content: message }],
   })
 
-  return new Response(stream, {
+  const encoder = new TextEncoder()
+
+  const readable = new ReadableStream({
+    async start(controller) {
+      try {
+        stream.on("text", (delta: string) => {
+          controller.enqueue(encoder.encode(delta))
+        })
+        stream.on("end", () => controller.close())
+        stream.on("error", (err: any) => {
+          controller.error(err)
+        })
+        await stream.done()
+      } catch (e) {
+        controller.error(e)
+      }
+    }
+  })
+
+  return new Response(readable, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
-      "Transfer-Encoding": "chunked",
-    },
+      "Cache-Control": "no-cache, no-transform",
+    }
   })
 }

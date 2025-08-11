@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from "@/lib/utils"
 import { useState } from "react"
+import CodeBlock from "@/components/prompt-kit/code-block"
 
 interface Message {
   id: string
@@ -16,7 +17,7 @@ interface Message {
 
 export function ChatMessage({ message }: { message: Message }) {
   const isUser = message.role === "user"
-  const [avatarSrc, setAvatarSrc] = useState("/agents/agent-12.png")
+  const [avatarSrc, setAvatarSrc] = useState("/logo/suitpax-bl-logo.webp")
 
   return (
     <div className={cn("flex items-start gap-3", isUser ? "justify-end" : "justify-start")}> 
@@ -73,7 +74,7 @@ export function ChatMessage({ message }: { message: Message }) {
 }
 
 export function ChatLoadingIndicator() {
-  const [avatarSrc, setAvatarSrc] = useState("/agents/agent-12.png")
+  const [avatarSrc, setAvatarSrc] = useState("/logo/suitpax-bl-logo.webp")
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -84,7 +85,7 @@ export function ChatLoadingIndicator() {
       <div className="flex-shrink-0 w-8 h-8 rounded-md bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
         <Image src={avatarSrc} alt="Suitpax AI" width={20} height={20} className="object-contain" />
       </div>
-      <div className="max-w-2xl p-4 bg-white/70 text-gray-800 border border-gray-200">
+      <div className="max-w-2xl p-4 bg-white/70 text-gray-800 border border-gray-200 rounded-2xl">
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.3s]"></div>
           <div className="h-2 w-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.15s]"></div>
