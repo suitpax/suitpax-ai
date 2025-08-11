@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
       try {
         const msg = await anthropic.messages.create({
           model,
-          system: system || "You are Suitpax AI. Answer in Markdown.",
+          system: system || `You are Suitpax AI. Use clean Markdown. Start with a short summary, then use level-2 headers and flat lists. No emojis.`, 
           max_tokens: 4096,
           messages: [...history, { role: "user", content: message }],
           stream: true,

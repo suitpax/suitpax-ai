@@ -1,4 +1,3 @@
-import Tesseract from 'tesseract.js'
 import axios from 'axios'
 
 export type ParsedExpense = {
@@ -11,7 +10,6 @@ export type ParsedExpense = {
 }
 
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  // Cargar pdfjs dinámicamente y deshabilitar worker en Node
   const pdfjs: any = await import('pdfjs-dist/build/pdf')
   const loadingTask = pdfjs.getDocument({ data: buffer, disableWorker: true })
   const pdf = await loadingTask.promise
@@ -23,11 +21,6 @@ export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
     fullText += strings.join(' ') + '\n'
   }
   return fullText
-}
-
-export async function extractTextFromImage(buffer: Buffer): Promise<string> {
-  const { data } = await Tesseract.recognize(buffer, 'eng', { logger: () => {} })
-  return data.text || ''
 }
 
 async function extractTextWithUnpdf(buffer: Buffer): Promise<string | null> {
@@ -51,6 +44,26 @@ async function extractTextWithUnpdf(buffer: Buffer): Promise<string | null> {
   }
 }
 
+async function extractTextFromImageWithOcrSpace(buffer: Buffer): Promise<string> {
+  const apiKey = process.env.OCR_SPACE_API_KEY
+  const endpoint = process.env.OCR_SPACE_ENDPOINT || 'https://api.ocr.space/parse/image'
+  const form = new FormData()
+  form.append('language', 'eng')
+  form.append('scale', 'true')
+  form.append('OCREngine', '2')
+  form.append('isTable', 'true')
+  form.append('file', new Blob([buffer]), 'image.png')
+  const resp = await fetch(endpoint, {
+    method: 'POST',
+    headers: apiKey ? { 'apikey': apiKey } : undefined,
+    body: form as any
+  })
+  if (!resp.ok) throw new Error('OCR.space request failed')
+  const data: any = await resp.json()
+  const parsed = data?.ParsedResults?.[0]?.ParsedText || ''
+  return parsed
+}
+
 export async function extractTextAuto(file: { buffer: Buffer, filename?: string, mimetype?: string }): Promise<string> {
   const { buffer, filename = '', mimetype = '' } = file
   const lower = (mimetype || '').toLowerCase()
@@ -60,7 +73,11 @@ export async function extractTextAuto(file: { buffer: Buffer, filename?: string,
     if (viaUnpdf && viaUnpdf.trim()) return viaUnpdf
     return extractTextFromPDF(buffer)
   }
-  return extractTextFromImage(buffer)
+  try {
+    return await extractTextFromImageWithOcrSpace(buffer)
+  } catch {
+    return ''
+  }
 }
 
 export function extractExpenseEntities(text: string): ParsedExpense {

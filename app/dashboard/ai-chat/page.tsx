@@ -23,6 +23,7 @@ import DocumentScanner from "@/components/prompt-kit/document-scanner"
 import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
 import SourceList from "@/components/prompt-kit/source-list"
 import { useChatStream } from "@/hooks/use-chat-stream"
+import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
 
 interface Message {
   id: string
@@ -157,13 +158,18 @@ function AIChatView() {
     setFiles([])
     setLoading(true)
 
+    const isFlightIntent = /\b([A-Z]{3})\b.*\b(to|→|-)\b.*\b([A-Z]{3})\b/i.test(userMessage.content) || /\bflight|vuelo|vuelos\b/i.test(userMessage.content)
+
     try {
+      if (isFlightIntent) {
+        await sendNonStreaming(userMessage)
+        return
+      }
       // Prefer streaming for better UX
       let streamed = ""
       await start({ message: userMessage.content, history: messages }, async (token) => {
         streamed += token
         setTypingMessageId("streaming")
-        // Optimistic rendering
         setMessages((prev) => {
           const others = prev.filter((m) => m.id !== "streaming-temp")
           return [
@@ -172,7 +178,6 @@ function AIChatView() {
           ]
         })
       })
-      // finalize
       setMessages((prev) => {
         const withoutTemp = prev.filter((m) => m.id !== "streaming-temp")
         return [
@@ -183,7 +188,6 @@ function AIChatView() {
       setTypingMessageId(null)
       try { await speak(streamed) } catch {}
     } catch (err) {
-      // fallback to non-streaming
       await sendNonStreaming(userMessage)
     } finally {
       setLoading(false)
@@ -205,11 +209,11 @@ function AIChatView() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-                  <Image src="/agents/agent-2.png" alt="Suitpax AI" width={40} height={40} className="w-full h-full object-cover" />
+                  <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={40} height={40} className="w-full h-full object-contain p-1" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tighter truncate"><em className="font-serif italic">Suitpax AI</em></h1>
-                  <p className="text-xs md:text-sm text-gray-600 font-light hidden sm:block">Try the superpowers</p>
+                                     <h1 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tighter truncate"><em className="font-serif italic">Suitpax AI</em></h1>
+                  <p className="text-xs md:text-sm text-gray-600 font-light hidden sm:block">Try the superpowers ✨</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4 sm:space-x-5 flex-shrink-0">
@@ -237,7 +241,20 @@ function AIChatView() {
           <ChatContainerRoot className="h-full">
             <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 relative min-h-[50vh] md:min-h-[60vh]">
               {messages.length === 0 && !loading && (
-                <div className="space-y-3">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-center py-6 sm:py-8">
+                    <div className="text-center">
+                      <motion.h2
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter bg-clip-text text-transparent bg-[linear-gradient(90deg,#111,#7a7a7a,#111)] bg-[length:200%_100%] animate-pulse"
+                      >
+                        Ask anything. Travel. Business. Code.
+                      </motion.h2>
+                      <p className="mt-2 text-xs sm:text-sm text-gray-600">Powered by Suitpax AI</p>
+                    </div>
+                  </div>
                   <PromptSuggestions suggestions={defaultSuggestions} onSelect={handleSuggestion} />
                   <div className="text-[11px] text-gray-600">Markdown and code blocks supported. Use triple backticks with language for syntax highlighting and copying.</div>
                 </div>
@@ -249,7 +266,7 @@ function AIChatView() {
                     {message.role === "assistant" && (
                       <div className="flex items-center space-x-2 mb-2">
                         <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-                          <Image src="/agents/agent-2.png" alt="Suitpax AI" width={24} height={24} className="w-full h-full object-cover" />
+                          <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={24} height={24} className="w-full h-full object-contain p-0.5" />
                         </div>
                         <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
                       </div>
@@ -272,7 +289,22 @@ function AIChatView() {
                       {message.role === "assistant" && typingMessageId === message.id ? (
                         <p className="text-sm font-light leading-relaxed text-gray-900">Typing…</p>
                       ) : (
-                        <Markdown content={message.content} />
+                        <>
+                          <Markdown content={message.content} />
+                          {(() => {
+                            const match = message.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
+                            if (!match) return null
+                            try {
+                              const parsed = JSON.parse(match[1])
+                              return <div className="mt-2"><ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => {
+                                // Navigate to booking page
+                                window.location.href = `/dashboard/flights/book/${id}`
+                              }} /></div>
+                            } catch {
+                              return null
+                            }
+                          })()}
+                        </>
                       )}
                     </div>
                     {message.sources && message.sources.length > 0 && <SourceList items={message.sources} />}
@@ -352,7 +384,7 @@ function AIChatView() {
                   </PromptInputAction>
                 </PromptInputActions>
               </PromptInput>
-              <p className="mt-2 text-[10px] text-gray-600">Streaming Markdown enabled. Code blocks have copy and language labels.</p>
+                                 <p className="mt-2 text-[10px] text-gray-600 flex items-center justify-center gap-2"><span className="text-[11px]">Technology by</span><Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={14} height={14} className="inline-block" /></p>
             </div>
           </div>
         </motion.div>
