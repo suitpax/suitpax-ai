@@ -112,7 +112,7 @@ export interface FlightSearchParams {
     arrival_time_window?: [string, string]
     direct_only?: boolean
   }
-  loyalty_programmes?: string[]
+  loyalty_programmes?: Array<{ airline_iata_code: string; account_number: string }>
   sort_by?: 'price' | 'duration' | 'relevance'
 }
 

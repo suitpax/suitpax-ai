@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { Duffel } from "@duffel/api"
 import { createClient } from "@/lib/supabase/server"
+import { createDuffelClient } from "@/lib/duffel"
 
-const duffel = new Duffel({
-  token: process.env.DUFFEL_API_KEY!,
-  environment: 'test'
-})
 
 interface CancellationRequest {
   orderId: string
@@ -43,6 +39,7 @@ export async function GET(request: NextRequest) {
     try {
       if (cancellationId) {
         // Obtener detalles de una cancelación específica
+        const duffel = createDuffelClient()
         const cancellation = await duffel.orderCancellations.get(cancellationId)
 
         return NextResponse.json({
@@ -78,6 +75,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Obtener la orden actual de Duffel
+        const duffel = createDuffelClient()
         const order = await duffel.orders.get(orderId)
 
         if (!order.data) {
@@ -224,6 +222,7 @@ export async function POST(request: NextRequest) {
 
     try {
       // Crear la cancelación en Duffel
+      const duffel = createDuffelClient()
       const cancellation = await duffel.orderCancellations.create({
         order_id: orderId
       })

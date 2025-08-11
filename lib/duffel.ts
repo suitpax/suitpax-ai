@@ -17,7 +17,8 @@ export const createDuffelClient = (options?: {
 }) => {
   const isProduction = process.env.NODE_ENV === 'production';
   const token = options?.token || process.env.DUFFEL_API_KEY || "";
-  const environment = options?.environment || (isProduction ? 'production' : 'test');
+  const envOverride = (process.env.DUFFEL_ENVIRONMENT as 'test' | 'production' | undefined);
+  const environment = options?.environment || envOverride || (isProduction ? 'production' : 'test');
   
   // Usar cliente en caché si existe
   const cacheKey = `${token}-${environment}`;
