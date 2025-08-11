@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useRef } from "react"
 import Image from "next/image"
 
@@ -93,15 +92,17 @@ const AirlinesSlider = () => {
       name: "Emirates",
       logo: "https://cdn.brandfetch.io/emirates.com/w/512/h/95/theme/light/logo?c=1idU-l8vdm7C5__3dci",
     },
-  
+    {
+      name: "Vueling",
+      logo: "https://cdn.brandfetch.io/vueling.com/w/512/h/169/logo?c=1idU-l8vdm7C5__3dci",
+    },
   ]
 
-  // Duplicate the airlines array multiple times to create a seamless infinite loop
+  // Duplicar para loop infinito
   const duplicatedAirlines = [...airlines, ...airlines, ...airlines, ...airlines]
 
   return (
     <div className="w-full overflow-hidden bg-black/40 backdrop-blur-sm rounded-xl">
-      {/* Single row */}
       <div className="py-6 relative overflow-hidden" ref={sliderTopRef}>
         <div className="flex slider-content">
           {duplicatedAirlines.map((airline, index) => (
@@ -115,7 +116,7 @@ const AirlinesSlider = () => {
                 alt={airline.name}
                 width={100}
                 height={40}
-                className="h-6 w-auto object-contain invert brightness-0 filter"
+                className="h-6 w-auto object-contain"
               />
             </div>
           ))}
