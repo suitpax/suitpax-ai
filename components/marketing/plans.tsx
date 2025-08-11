@@ -507,7 +507,7 @@ export const Plans = () => {
                       ? "mailto:hello@suitpax.com"
                       : "https://app.suitpax.com/sign-up"
                   }
-                  className={`w-full py-1.5 px-3 rounded-xl text-center text-[9px] sm:text-[10px] font-medium transition-colors ${plan.popular ? "bg-black text-white hover:bg-gray-800" : "bg-white text-black border border-black hover:bg-gray-100"}`}
+                  className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors ${plan.popular ? "bg-black text-white hover:bg-gray-800" : "bg-white text-black border border-black hover:bg-gray-100"} block mx-auto max-w-[220px]`}
                 >
                   {plan.cta}
                 </Link>

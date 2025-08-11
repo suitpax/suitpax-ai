@@ -32,7 +32,6 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
-import MiniChat from "@/components/ui/mini-chat"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -225,14 +224,21 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
           })}
         </div>
 
-        {/* AI Section with mini badge/chat */}
+        {/* AI Section - remove mini chat and show responsive agents row */}
         {(!isCollapsed || isMobile) && (
           <div className="pt-4">
-            <div className="px-3 mb-2 flex items-center justify-between">
-              <h3 className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider">
+            <div className="px-3 mb-2">
+              <h3 className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-2">
                 Suitpax AI
               </h3>
-              <MiniChat />
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+                {[1,2,3,4,5,6].map((i) => (
+                  <div key={i} className="flex items-center gap-2 border border-gray-200 rounded-xl px-2 py-1 bg-white min-w-max">
+                    <div className="w-5 h-5 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 bg-gray-100" />
+                    <span className="text-[10px] text-gray-700 font-medium hidden sm:inline">Agent {i}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="space-y-1">
               {aiNavigation.map((item) => {

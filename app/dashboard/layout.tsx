@@ -10,6 +10,7 @@ import { Toaster } from "react-hot-toast"
 import { motion } from "framer-motion"
 import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
+import AISearchInput from "@/components/ui/ai-search-input"
 
 export default function DashboardLayout({
   children,
@@ -176,8 +177,10 @@ export default function DashboardLayout({
               <span className="sr-only">Open sidebar</span>
               <Menu className="h-6 w-6" aria-hidden="true" />
             </button>
-            <div className="text-lg font-semibold text-gray-900">Suitpax</div>
-            <div className="w-10"></div> {/* Spacer for centering */}
+            <div className="flex-1 max-w-xs mx-4">
+              <AISearchInput size="sm" />
+            </div>
+            <div className="w-4"></div>
           </div>
         </div>
 

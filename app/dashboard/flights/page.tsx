@@ -252,11 +252,7 @@ export default function FlightsPage() {
     <div className="min-h-full bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <div>
-          <h1 className="text-3xl md:text-4xl font-medium tracking-tighter leading-none">
-            <em className="font-serif italic">Book</em>
-            <br />
-            <span className="text-gray-900">Flights</span>
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Flights</h1>
           <p className="text-sm md:text-base font-light text-gray-600 mt-2">
             Real-time pricing and availability powered by Duffel
           </p>

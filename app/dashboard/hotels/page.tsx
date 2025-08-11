@@ -54,7 +54,7 @@ export default function HotelsPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 lg:p-6">
           <div className="mb-4">
-            <h2 className="text-lg font-medium tracking-tight text-gray-900">Find your stay</h2>
+            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Stays</h1>
             <p className="text-sm text-gray-600">Search hotels and corporate rates</p>
           </div>
           <StaysSearchForm onSearch={onSearch} loading={loading} />

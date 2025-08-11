@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { 
   Menu, 
-  Search, 
   Bell, 
   User,
   ChevronDown,
@@ -20,6 +19,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import AISearchInput from "@/components/ui/ai-search-input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -184,19 +184,12 @@ export default function Header({
             </div>
           </div>
 
-          {/* Center Section - Command Bar */}
+          {/* Center Section - AI Search */}
           <div className="hidden lg:flex flex-1 max-w-lg mx-8">
-            <Button
-              variant="outline"
-              className="w-full justify-start text-sm text-gray-500 border-gray-200 hover:bg-gray-50"
-              onClick={() => setCommandOpen(true)}
-            >
-              <Search className="h-4 w-4 mr-2" />
-              Search or ask AI...
-              <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-gray-100 px-1.5 font-mono text-[10px] font-medium text-gray-600 opacity-100 ml-auto">
-                <span className="text-xs">⌘</span>K
-              </kbd>
-            </Button>
+            {/* Replaced command button with rounded AI input */}
+            <div className="w-full">
+              <AISearchInput size="md" />
+            </div>
           </div>
 
           {/* Right Section */}
@@ -333,14 +326,7 @@ export default function Header({
         {/* Mobile Search */}
         {isMobile && (
           <div className="mt-3 sm:hidden">
-            <Button
-              variant="outline"
-              className="w-full justify-start text-sm text-gray-500 border-gray-200"
-              onClick={() => setCommandOpen(true)}
-            >
-              <Search className="h-4 w-4 mr-2" />
-              Search or ask AI...
-            </Button>
+            <AISearchInput size="sm" />
           </div>
         )}
       </header>

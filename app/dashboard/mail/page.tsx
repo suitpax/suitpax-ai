@@ -322,8 +322,8 @@ export default function MailPage() {
           className="bg-white/50 backdrop-blur-sm border-b border-gray-200 p-4"
         >
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-medium tracking-tighter">
-              <em className="font-serif italic">{folders.find((f) => f.id === selectedFolder)?.name || "Mail"}</em>
+            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none">
+              {folders.find((f) => f.id === selectedFolder)?.name || "Mail"}
             </h1>
             <Button className="bg-black text-white hover:bg-gray-800">
               <EnvelopeIcon className="h-4 w-4 mr-2" />
