@@ -82,7 +82,7 @@ async function flightSearchTool(origin: string, destination: string, departure_d
 }
 
 export async function POST(request: NextRequest) {
-  const { message, history = [] } = await request.json();
+  const { message, history = [], includeReasoning = false } = await request.json();
 
   if (!message) {
     return NextResponse.json({ error: "Message is required" }, { status: 400 });
@@ -107,15 +107,35 @@ export async function POST(request: NextRequest) {
     const stopReason = initialResponse.stop_reason;
     const toolUseContent = initialResponse.content.find(c => c.type === 'tool_use');
 
+    // Helper to optionally compute a concise reasoning summary in ES
+    async function getReasoningSummary(context: { userMessage: string; finalText: string; toolData?: any }) {
+      if (!includeReasoning) return null;
+      const summary = await anthropic.messages.create({
+        model: "claude-3-sonnet-20240229",
+        max_tokens: 400,
+        system: "Eres un asistente que genera un breve resumen del razonamiento (3-5 viñetas) en español, sin revelar cadenas de pensamiento detalladas ni pasos internos. Sé claro, de alto nivel y útil.",
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: `Solicitud del usuario: ${context.userMessage}` },
+              { type: "text", text: `Respuesta final proposée: ${context.finalText}` },
+              ...(context.toolData ? [{ type: "text", text: `Datos de herramientas (resumen): ${typeof context.toolData === 'string' ? context.toolData : JSON.stringify(context.toolData).slice(0, 4000)}` }] : []),
+              { type: "text", text: "Redacta un resumen del razonamiento de alto nivel (máx 80-120 palabras o 3-5 bullets)." }
+            ]
+          }
+        ]
+      });
+      const reasoningText = summary.content.find(c => c.type === 'text')?.text?.trim() || null;
+      return reasoningText;
+    }
+
     if (stopReason === 'tool_use' && toolUseContent && toolUseContent.type === 'tool_use') {
-      const { name, input } = toolUseContent;
+      const { name, input } = toolUseContent as any;
       if (name === 'search_flights') {
         const { origin, destination, departure_date, return_date, passengers } = input as any;
-        
-        // Call the actual flight search tool
         const flightData = await flightSearchTool(origin, destination, departure_date, return_date, passengers);
 
-        // Second call to Anthropic with the tool results to generate a user-friendly response
         const finalResponse = await anthropic.messages.create({
           model: "claude-3-sonnet-20240229", // Sonnet is fine for summarizing
           max_tokens: 4096,
@@ -126,25 +146,28 @@ export async function POST(request: NextRequest) {
             {
               role: "assistant",
               content: [
-                { type: "tool_use", id: toolUseContent.id, name: toolUseContent.name, input: toolUseContent.input }
+                { type: "tool_use", id: (toolUseContent as any).id, name: (toolUseContent as any).name, input: (toolUseContent as any).input }
               ]
             },
             {
               role: "user",
               content: [
-                { type: "tool_result", tool_use_id: toolUseContent.id, content: JSON.stringify(flightData) }
+                { type: "tool_result", tool_use_id: (toolUseContent as any).id, content: JSON.stringify(flightData) }
               ]
             }
           ],
         });
-        
-        return NextResponse.json({ response: finalResponse.content[0].text });
+
+        const finalText = finalResponse.content.find(c => c.type === 'text')?.text || "";
+        const reasoning = await getReasoningSummary({ userMessage: message, finalText, toolData: flightData });
+        return NextResponse.json({ response: finalText, reasoning: reasoning || undefined });
       }
     }
 
     // If no tool is used, return the standard text response
     const textResponse = initialResponse.content.find(c => c.type === 'text')?.text || "I'm sorry, I couldn't process that request.";
-    return NextResponse.json({ response: textResponse });
+    const reasoning = await getReasoningSummary({ userMessage: message, finalText: textResponse });
+    return NextResponse.json({ response: textResponse, reasoning: reasoning || undefined });
 
   } catch (error) {
     console.error("AI Chat API Error:", error);

@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Loader2, ArrowUp, Sparkles, Wand2 } from 'lucide-react'
+import { Loader2, ArrowUp, Sparkles, Wand2, ArrowLeft } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
@@ -24,6 +24,7 @@ import { toast } from "sonner"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import Link from "next/link"
 
 interface Message {
   id: string
@@ -107,6 +108,8 @@ export default function AIChatPage() {
         content: data.response,
         role: "assistant",
         timestamp: new Date(),
+        // @ts-expect-error allow optional field in local type
+        reasoning: data.reasoning,
       }
 
       setMessages((prev) => [...prev, assistantMessage])
@@ -120,6 +123,18 @@ export default function AIChatPage() {
 
   return (
     <div className="flex flex-col h-full bg-gray-50 overflow-hidden">
+      {/* Header sutil con enlace de regreso */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 bg-white/60 backdrop-blur-sm">
+        <Link href="/dashboard" className="inline-flex items-center text-xs text-gray-600 hover:text-gray-900">
+          <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+          Volver al dashboard
+        </Link>
+        <div className="ml-auto flex items-center gap-2">
+          <Label htmlFor="reasoning-mode" className="text-[11px] text-gray-600 font-medium">Razonamiento</Label>
+          <Switch id="reasoning-mode" checked={showReasoning} onCheckedChange={setShowReasoning} />
+        </div>
+      </div>
+
       <div className="flex-1 min-h-0">
         <ChatContainerRoot>
           <ChatContainerContent messages={messages} isLoading={loading} showExport />
@@ -156,13 +171,7 @@ export default function AIChatPage() {
               </Button>
             </PromptInputActions>
           </PromptInput>
-          <div className="flex items-center justify-center mt-3 gap-3">
-             <Switch id="reasoning-mode" checked={showReasoning} onCheckedChange={setShowReasoning} />
-             <Label htmlFor="reasoning-mode" className="text-xs text-gray-600 font-medium flex items-center gap-1.5">
-                <Wand2 className="h-3 w-3" />
-                Enable Advanced Reasoning
-             </Label>
-          </div>
+          {/* Mover el switch al header superior; se elimina el bloque inferior */}
         </div>
       </footer>
     </div>
