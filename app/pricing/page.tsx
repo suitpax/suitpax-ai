@@ -2,6 +2,9 @@ import type { Metadata } from "next"
 import Plans from "@/components/marketing/plans"
 import ComparePlans from "@/components/marketing/compare-plans"
 import Script from "next/script"
+import dynamic from "next/dynamic"
+
+const AirlinesSlider = dynamic(() => import("@/components/marketing/airlines-slider"), { ssr: false })
 
 export const metadata: Metadata = {
   title: "Pricing & Plans | Suitpax - AI-powered Business Travel Management",
@@ -66,9 +69,13 @@ export default function PricingPage() {
           <h1 id="pricing-plans-heading" className="sr-only">
             Suitpax Pricing Plans
           </h1>
+          <div className="my-8">
+            <div className="[&_img]:invert [&_img]:grayscale [&_img]:brightness-0 [&_img]:contrast-[1.7]">
+              <AirlinesSlider />
+            </div>
+          </div>
           <Plans />
         </section>
-
         <section aria-labelledby="compare-plans-heading">
           <h2 id="compare-plans-heading" className="sr-only">
             Compare Suitpax Plans
