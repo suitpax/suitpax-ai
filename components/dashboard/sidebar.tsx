@@ -156,7 +156,6 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
       <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 flex-shrink-0">
         {(!isCollapsed || isMobile) && (
           <Link href="/dashboard" className="flex items-center gap-2" onClick={isMobile ? onCloseMobile : undefined}>
-            <span className="w-3.5 h-3.5 rounded-full bg-gray-900" />
             <Image 
               src="/logo/suitpax-bl-logo.webp" 
               alt="Suitpax" 
@@ -341,9 +340,9 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
         {(!isCollapsed || isMobile) && (
           <div className="border-t border-gray-100 pt-3">
             <div className="flex items-center space-x-3 px-3 py-2 mb-2">
-              <Avatar className="h-10 w-10 ring-2 ring-purple-400/40">
-                <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} />
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
+              <Avatar className="h-10 w-10 ring-2 ring-purple-400/40 rounded-xl">
+                <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} className="rounded-xl" />
+                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium rounded-xl">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
@@ -379,13 +378,13 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
         {(isCollapsed && !isMobile) && (
           <div className="border-t border-gray-100 pt-3 space-y-2">
             <div className="flex justify-center">
-              <Avatar className="h-10 w-10 ring-2 ring-purple-400/40">
-                <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} />
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
-            </div>
+              <Avatar className="h-10 w-10 ring-2 ring-purple-400/40 rounded-xl">
+                 <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} className="rounded-xl" />
+                 <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium rounded-xl">
+                   {getInitials()}
+                 </AvatarFallback>
+               </Avatar>
+             </div>
             <Button
               onClick={handleSignOut}
               variant="ghost"

@@ -81,21 +81,57 @@ export default function MeetingsPage() {
     description: "",
     meetingUrl: "",
   })
+  const [googleToken, setGoogleToken] = useState<string | null>(null)
 
-  // Load/save per-user meetings in localStorage
+  // Load/save per-user meetings in localStorage when no Google token
   useEffect(() => {
     const supabase = createClient()
     const init = async () => {
       const { data: session } = await supabase.auth.getSession()
       const uid = session.session?.user?.id || null
       setUserId(uid)
-      const key = uid ? `meetings:${uid}` : `meetings`
-      const raw = typeof window !== "undefined" ? window.localStorage.getItem(key) : null
-      const parsed: Meeting[] = raw ? JSON.parse(raw) : mockMeetings
-      setMeetings(parsed)
+      // TODO: en el futuro, obtener token OAuth Google y guardarlo en sesión/BD
+      setGoogleToken(null)
+      if (!googleToken) {
+        const key = uid ? `meetings:${uid}` : `meetings`
+        const raw = typeof window !== "undefined" ? window.localStorage.getItem(key) : null
+        const parsed: Meeting[] = raw ? JSON.parse(raw) : mockMeetings
+        setMeetings(parsed)
+      }
     }
     init()
-  }, [])
+  }, [googleToken])
+
+  // Cargar desde Google Calendar si hay token
+  useEffect(() => {
+    const loadGoogle = async () => {
+      if (!googleToken) return
+      const res = await fetch("/api/meetings/google/list", { headers: { Authorization: `Bearer ${googleToken}` } })
+      if (!res.ok) return
+      const { events } = await res.json()
+      const mapped: Meeting[] = (events || []).map((e: any) => {
+        const start = new Date(e.start)
+        const end = new Date(e.end)
+        const duration = Math.max(0, Math.round((end.getTime() - start.getTime()) / 60000))
+        const type: Meeting["type"] = e.hangoutLink ? "video" : e.location ? "in-person" : "phone"
+        return {
+          id: e.id || String(start.getTime()),
+          title: e.title || "Untitled",
+          type,
+          status: "upcoming",
+          date: start.toISOString().slice(0, 10),
+          time: start.toTimeString().slice(0, 5),
+          duration: duration || 30,
+          attendees: e.attendees || [],
+          location: e.location || undefined,
+          description: e.description || undefined,
+          meetingUrl: e.hangoutLink || undefined,
+        }
+      })
+      setMeetings(mapped)
+    }
+    loadGoogle()
+  }, [googleToken])
 
   useEffect(() => {
     let filtered = meetings
@@ -121,6 +157,7 @@ export default function MeetingsPage() {
   }, [meetings, searchQuery, statusFilter, typeFilter])
 
   const persist = (items: Meeting[]) => {
+    if (googleToken) return
     const key = userId ? `meetings:${userId}` : `meetings`
     if (typeof window !== "undefined") {
       window.localStorage.setItem(key, JSON.stringify(items))
@@ -135,27 +172,77 @@ export default function MeetingsPage() {
     })
   }
 
-  const handleCreateMeeting = () => {
-    const meeting: Meeting = {
-      id: Date.now().toString(),
-      title: newMeeting.title,
-      type: newMeeting.type,
-      status: "upcoming",
-      date: newMeeting.date,
-      time: newMeeting.time,
-      duration: newMeeting.duration,
-      attendees: newMeeting.attendees
+  const handleCreateMeeting = async () => {
+    if (googleToken) {
+      const startISO = `${newMeeting.date}T${newMeeting.time}:00`
+      const endDate = new Date(startISO)
+      endDate.setMinutes(endDate.getMinutes() + (newMeeting.duration || 30))
+      const endISO = endDate.toISOString()
+      const attendees = newMeeting.attendees
         .split(",")
         .map((a) => a.trim())
-        .filter(Boolean),
-      location: newMeeting.location || undefined,
-      description: newMeeting.description || undefined,
-      meetingUrl: newMeeting.type === "video" ? `https://meet.suitpax.com/${Date.now()}` : undefined,
+        .filter(Boolean)
+      const res = await fetch("/api/meetings/google/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${googleToken}` },
+        body: JSON.stringify({
+          title: newMeeting.title,
+          description: newMeeting.description,
+          start: startISO,
+          end: endISO,
+          attendees,
+          location: newMeeting.location || undefined,
+        }),
+      })
+      if (res.ok) {
+        // reload
+        const list = await fetch("/api/meetings/google/list", { headers: { Authorization: `Bearer ${googleToken}` } })
+        if (list.ok) {
+          const { events } = await list.json()
+          const mapped: Meeting[] = (events || []).map((e: any) => {
+            const start = new Date(e.start)
+            const end = new Date(e.end)
+            const duration = Math.max(0, Math.round((end.getTime() - start.getTime()) / 60000))
+            const type: Meeting["type"] = e.hangoutLink ? "video" : e.location ? "in-person" : "phone"
+            return {
+              id: e.id || String(start.getTime()),
+              title: e.title || "Untitled",
+              type,
+              status: "upcoming",
+              date: start.toISOString().slice(0, 10),
+              time: start.toTimeString().slice(0, 5),
+              duration: duration || 30,
+              attendees: e.attendees || [],
+              location: e.location || undefined,
+              description: e.description || undefined,
+              meetingUrl: e.hangoutLink || undefined,
+            }
+          })
+          setMeetings(mapped)
+        }
+      }
+    } else {
+      const meeting: Meeting = {
+        id: Date.now().toString(),
+        title: newMeeting.title,
+        type: newMeeting.type,
+        status: "upcoming",
+        date: newMeeting.date,
+        time: newMeeting.time,
+        duration: newMeeting.duration,
+        attendees: newMeeting.attendees
+          .split(",")
+          .map((a) => a.trim())
+          .filter(Boolean),
+        location: newMeeting.location || undefined,
+        description: newMeeting.description || undefined,
+        meetingUrl: newMeeting.type === "video" ? `https://meet.suitpax.com/${Date.now()}` : undefined,
+      }
+      const updated = [meeting, ...meetings]
+      setMeetings(updated)
+      persist(updated)
     }
 
-    const updated = [meeting, ...meetings]
-    setMeetings(updated)
-    persist(updated)
     setShowNewMeetingModal(false)
     setNewMeeting({
       title: "",
@@ -201,7 +288,6 @@ export default function MeetingsPage() {
   const totalDuration = meetings.reduce((acc, m) => acc + m.duration, 0)
   const isEmpty = meetings.length === 0
 
-  // Construir agenda compacta de los próximos 7 días
   const compactAgenda = (() => {
     const today = new Date()
     const days = Array.from({ length: 7 }, (_, i) => {
@@ -230,80 +316,85 @@ export default function MeetingsPage() {
             <p className="text-gray-600 font-light">Manage your business meetings and video calls</p>
           </div>
 
-          <Dialog open={showNewMeetingModal} onOpenChange={setShowNewMeetingModal}>
-            <DialogTrigger asChild>
-              <Button className="bg-black text-white hover:bg-gray-800">
-                <PlusIcon className="h-4 w-4 mr-2" />
-                Schedule Meeting
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Schedule New Meeting</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="title">Meeting Title</Label>
-                  <Input id="title" value={newMeeting.title} onChange={(e) => setNewMeeting({ ...newMeeting, title: e.target.value })} placeholder="Enter meeting title" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-2">
+            {!googleToken && (
+              <Button className="bg-black text-white hover:bg-gray-800">Connect Google Calendar</Button>
+            )}
+            <Dialog open={showNewMeetingModal} onOpenChange={setShowNewMeetingModal}>
+              <DialogTrigger asChild>
+                <Button className="bg-black text-white hover:bg-gray-800">
+                  <PlusIcon className="h-4 w-4 mr-2" />
+                  Schedule Meeting
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Schedule New Meeting</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
                   <div>
-                    <Label htmlFor="type">Meeting Type</Label>
-                    <Select value={newMeeting.type} onValueChange={(value: Meeting["type"]) => setNewMeeting({ ...newMeeting, type: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="video">Video Call</SelectItem>
-                        <SelectItem value="phone">Phone Call</SelectItem>
-                        <SelectItem value="in-person">In Person</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="title">Meeting Title</Label>
+                    <Input id="title" value={newMeeting.title} onChange={(e) => setNewMeeting({ ...newMeeting, title: e.target.value })} placeholder="Enter meeting title" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="type">Meeting Type</Label>
+                      <Select value={newMeeting.type} onValueChange={(value: Meeting["type"]) => setNewMeeting({ ...newMeeting, type: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="video">Video Call</SelectItem>
+                          <SelectItem value="phone">Phone Call</SelectItem>
+                          <SelectItem value="in-person">In Person</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="duration">Duration (minutes)</Label>
+                      <Input id="duration" type="number" value={newMeeting.duration} onChange={(e) => setNewMeeting({ ...newMeeting, duration: Number.parseInt(e.target.value) || 60 })} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="date">Date</Label>
+                      <Input id="date" type="date" value={newMeeting.date} onChange={(e) => setNewMeeting({ ...newMeeting, date: e.target.value })} />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="time">Time</Label>
+                      <Input id="time" type="time" value={newMeeting.time} onChange={(e) => setNewMeeting({ ...newMeeting, time: e.target.value })} />
+                    </div>
                   </div>
 
                   <div>
-                    <Label htmlFor="duration">Duration (minutes)</Label>
-                    <Input id="duration" type="number" value={newMeeting.duration} onChange={(e) => setNewMeeting({ ...newMeeting, duration: Number.parseInt(e.target.value) || 60 })} />
+                    <Label htmlFor="attendees">Attendees (comma separated)</Label>
+                    <Input id="attendees" value={newMeeting.attendees} onChange={(e) => setNewMeeting({ ...newMeeting, attendees: e.target.value })} placeholder="john@example.com, sarah@example.com" />
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                  {newMeeting.type === "in-person" && (
+                    <div>
+                      <Label htmlFor="location">Location</Label>
+                      <Input id="location" value={newMeeting.location} onChange={(e) => setNewMeeting({ ...newMeeting, location: e.target.value })} placeholder="Enter meeting location" />
+                    </div>
+                  )}
+
                   <div>
-                    <Label htmlFor="date">Date</Label>
-                    <Input id="date" type="date" value={newMeeting.date} onChange={(e) => setNewMeeting({ ...newMeeting, date: e.target.value })} />
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea id="description" value={newMeeting.description} onChange={(e) => setNewMeeting({ ...newMeeting, description: e.target.value })} placeholder="Meeting agenda or description" rows={3} />
                   </div>
 
-                  <div>
-                    <Label htmlFor="time">Time</Label>
-                    <Input id="time" type="time" value={newMeeting.time} onChange={(e) => setNewMeeting({ ...newMeeting, time: e.target.value })} />
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button variant="outline" onClick={() => setShowNewMeetingModal(false)}>Cancel</Button>
+                    <Button onClick={handleCreateMeeting} disabled={!newMeeting.title || !newMeeting.date || !newMeeting.time}>Schedule Meeting</Button>
                   </div>
                 </div>
-
-                <div>
-                  <Label htmlFor="attendees">Attendees (comma separated)</Label>
-                  <Input id="attendees" value={newMeeting.attendees} onChange={(e) => setNewMeeting({ ...newMeeting, attendees: e.target.value })} placeholder="john@example.com, sarah@example.com" />
-                </div>
-
-                {newMeeting.type === "in-person" && (
-                  <div>
-                    <Label htmlFor="location">Location</Label>
-                    <Input id="location" value={newMeeting.location} onChange={(e) => setNewMeeting({ ...newMeeting, location: e.target.value })} placeholder="Enter meeting location" />
-                  </div>
-                )}
-
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea id="description" value={newMeeting.description} onChange={(e) => setNewMeeting({ ...newMeeting, description: e.target.value })} placeholder="Meeting agenda or description" rows={3} />
-                </div>
-
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button variant="outline" onClick={() => setShowNewMeetingModal(false)}>Cancel</Button>
-                  <Button onClick={handleCreateMeeting} disabled={!newMeeting.title || !newMeeting.date || !newMeeting.time}>Schedule Meeting</Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </motion.div>
 
@@ -333,7 +424,7 @@ export default function MeetingsPage() {
           </div>
         </div>
 
-        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="bg:white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Hours</p>

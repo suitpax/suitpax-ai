@@ -522,20 +522,30 @@ export default function DashboardPage() {
           transition={{ duration: 0.6, delay: 0.75 }}
           className="mt-10"
         >
-          <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-2xl p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-medium tracking-tighter mb-2">
-                  <em className="font-serif italic">Meet Suitpax AI, Your AI Travel Assistant</em>
+          <div className="rounded-2xl border border-gray-200 bg-white p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex-1">
+                <h3 className="text-xl font-medium tracking-tighter mb-2 text-gray-900">
+                  <em className="font-serif italic">Meet Suitpax AI</em>
                 </h3>
-                <p className="font-light text-gray-300">
-                  Get personalized help with booking flights, finding hotels, and managing your travel expenses.
-                </p>
+                <p className="text-sm font-light text-gray-600">Your monochrome, modern travel copilot. Ask for flights, hotels, expenses, policies and more.</p>
+                {/* Mini typing example */}
+                <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-3">
+                  <div className="text-[11px] uppercase tracking-wider text-gray-500 mb-2">Live demo</div>
+                  <div className="rounded-lg border border-gray-200 bg-white p-3">
+                    <div className="text-xs text-gray-500 mb-1">You</div>
+                    <div className="text-sm text-gray-900">Find direct flights MAD → SFO next month</div>
+                  </div>
+                  <div className="mt-2 rounded-lg border border-gray-200 bg-white p-3">
+                    <div className="text-xs text-gray-500 mb-1">Suitpax AI</div>
+                    <div className="text-sm text-gray-900">
+                      <span className="inline-block w-2 h-3 bg-gray-900 animate-pulse align-baseline mr-1" />
+                      Searching best options… non-stop, sorted by price.
+                    </div>
+                  </div>
+                </div>
               </div>
-              <Link
-                href="/dashboard/ai-chat"
-                className="bg-white text-gray-900 px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition-colors duration-200 flex items-center gap-2"
-              >
+              <Link href="/dashboard/ai-chat" className="md:self-start inline-flex items-center gap-2 rounded-xl border border-gray-900 bg-gray-900 px-6 py-3 text-white hover:bg-gray-800 transition-colors">
                 <em className="font-serif italic">Start Chatting</em>
                 <ArrowRight className="h-4 w-4" />
               </Link>

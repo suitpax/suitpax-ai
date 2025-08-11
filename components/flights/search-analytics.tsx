@@ -7,8 +7,8 @@ import {
   ClockIcon,
   CurrencyDollarIcon,
   PaperAirplaneIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   CalendarIcon,
   MapPinIcon
 } from "@heroicons/react/24/outline"
@@ -97,9 +97,9 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
   const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
       case 'up':
-        return <TrendingUpIcon className="h-3 w-3 text-red-500" />
+        return <ArrowTrendingUpIcon className="h-3 w-3 text-red-500" />
       case 'down':
-        return <TrendingDownIcon className="h-3 w-3 text-green-500" />
+        return <ArrowTrendingDownIcon className="h-3 w-3 text-green-500" />
       default:
         return <div className="h-3 w-3 bg-gray-400 rounded-full" />
     }

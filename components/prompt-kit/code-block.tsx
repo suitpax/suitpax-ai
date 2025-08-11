@@ -2,54 +2,43 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { Check, Copy } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ClipboardCopy, Check } from "lucide-react"
 
 interface CodeBlockProps {
   code: string
   language?: string
   className?: string
+  showHeader?: boolean
 }
 
-export function CodeBlock({ code, language, className }: CodeBlockProps) {
+export default function CodeBlock({ code, language, className, showHeader = true }: CodeBlockProps) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(code)
       setCopied(true)
-      setTimeout(() => setCopied(false), 1200)
-    } catch (err) {
-      // ignore
-    }
+      setTimeout(() => setCopied(false), 1500)
+    } catch {}
   }
 
-  const lang = (language || "").replace(/^language-/, "").toUpperCase()
+  const langLabel = (language || "").replace("language-", "").toUpperCase()
 
   return (
-    <div className={cn("group relative mt-3 mb-4 overflow-hidden rounded-xl border border-gray-200 bg-white", className)}>
-      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100 bg-gray-50">
-        <span className="text-[10px] font-medium tracking-wide text-gray-600">{lang || "CODE"}</span>
-        <button
-          onClick={handleCopy}
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-medium text-gray-700 hover:bg-gray-100"
-          aria-label="Copy code"
-        >
-          {copied ? (
-            <>
-              <Check className="h-3.5 w-3.5" /> Copied
-            </>
-          ) : (
-            <>
-              <Copy className="h-3.5 w-3.5" /> Copy
-            </>
-          )}
-        </button>
-      </div>
-      <pre className="overflow-auto p-3 text-xs leading-relaxed text-gray-900">
-        <code>{code}</code>
+    <div className={cn("rounded-xl border border-gray-200 bg-gray-50 overflow-hidden", className)}>
+      {showHeader && (
+        <div className="flex items-center justify-between px-3 py-2 bg-white border-b border-gray-200">
+          <span className="text-[11px] font-medium text-gray-600">{langLabel || "CODE"}</span>
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-gray-700 hover:bg-gray-100" onClick={handleCopy}>
+            {copied ? <Check className="h-4 w-4" /> : <ClipboardCopy className="h-4 w-4" />}
+            <span className="sr-only">Copy</span>
+          </Button>
+        </div>
+      )}
+      <pre className="m-0 overflow-auto p-3 text-[12px] leading-relaxed text-gray-900">
+        <code className={cn(language)}>{code}</code>
       </pre>
     </div>
   )
 }
-
-export default CodeBlock
