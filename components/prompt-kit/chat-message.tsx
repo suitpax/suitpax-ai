@@ -21,8 +21,8 @@ export function ChatMessage({ message }: { message: Message }) {
   return (
     <div className={cn("flex items-start gap-3", isUser ? "justify-end" : "justify-start")}> 
       {!isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white border shadow-sm flex items-center justify-center">
-          <Image src={avatarSrc} alt="Suitpax AI" width={20} height={20} onError={() => setAvatarSrc("/agents/agent-11.png")} />
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white border shadow-sm flex items-center justify-center overflow-hidden">
+          <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={20} height={20} className="object-contain" />
         </div>
       )}
       <div
@@ -30,7 +30,7 @@ export function ChatMessage({ message }: { message: Message }) {
           "max-w-2xl rounded-2xl p-4",
           isUser
             ? "bg-gray-900 text-white rounded-br-lg"
-            : "bg-white text-gray-800 border border-gray-100 rounded-bl-lg"
+                         : "bg-white/70 backdrop-blur-sm text-gray-900 border border-gray-200 rounded-2xl"
         )}
       >
         <ReactMarkdown
@@ -81,8 +81,8 @@ export function ChatLoadingIndicator() {
       transition={{ duration: 0.3 }}
       className="flex items-start gap-3"
     >
-      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white border shadow-sm flex items-center justify-center">
-        <Image src={avatarSrc} alt="Suitpax AI" width={20} height={20} onError={() => setAvatarSrc("/agents/agent-11.png")} />
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white border shadow-sm flex items-center justify-center overflow-hidden">
+        <Image src={avatarSrc} alt="Suitpax AI" width={20} height={20} className="object-contain" />
       </div>
       <div className="max-w-2xl rounded-2xl p-4 bg-white text-gray-800 border border-gray-100 rounded-bl-lg">
         <div className="flex items-center gap-2">
