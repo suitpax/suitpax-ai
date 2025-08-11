@@ -69,7 +69,13 @@ export function ChatContainerRoot({
     <ChatContainerContext.Provider value={contextValue}>
       <div
         ref={containerRef}
-        className={cn("relative overflow-y-auto", className)}
+        className={cn(
+          "relative overflow-y-auto",
+          "[scrollbar-gutter:stable]",
+          "scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400",
+          "pb-safe",
+          className
+        )}
         {...props}
       >
         {children}

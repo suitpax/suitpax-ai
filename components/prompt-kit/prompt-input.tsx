@@ -5,16 +5,41 @@ import { cn } from "@/lib/utils"
 
 export const PromptInput = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLDivElement> & {
+    value?: string
+    onValueChange?: (val: string) => void
+    isLoading?: boolean
+    onSubmit?: () => void
+  }
+>(({ className, children, value, onValueChange, isLoading, onSubmit, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
       "flex w-full flex-col gap-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm",
+      "transition-shadow focus-within:shadow-md focus-within:ring-1 focus-within:ring-gray-300",
       className
     )}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault()
+        onSubmit?.()
+      }
+    }}
     {...props}
-  />
+  >
+    {React.Children.map(children, (child) => {
+      if (!React.isValidElement(child)) return child
+      // Inject controlled props into PromptInputTextarea if present
+      if ((child as any).type?.displayName === "PromptInputTextarea") {
+        return React.cloneElement(child as any, {
+          value,
+          onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => onValueChange?.(e.target.value),
+          disabled: (child as any).props?.disabled ?? isLoading,
+        })
+      }
+      return child
+    })}
+  </div>
 ))
 PromptInput.displayName = "PromptInput"
 
@@ -27,6 +52,7 @@ export const PromptInputTextarea = React.forwardRef<
     rows={1}
     className={cn(
       "w-full resize-none bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+      "leading-relaxed",
       className
     )}
     {...props}
