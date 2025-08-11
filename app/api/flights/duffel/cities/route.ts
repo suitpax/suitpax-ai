@@ -3,29 +3,33 @@ import { createDuffelClient } from "@/lib/duffel"
 
 export async function GET(req: NextRequest) {
   try {
-    const duffel = createDuffelClient()
+    createDuffelClient() // ensure token configured; SDK does not expose cities in this version
     const url = new URL(req.url)
     const limit = url.searchParams.get("limit") ? Number(url.searchParams.get("limit")) : 50
-    const after = url.searchParams.get("after") || undefined
-    const before = url.searchParams.get("before") || undefined
-    const iata_code = url.searchParams.get("iata_code") || undefined
-    const name = url.searchParams.get("name") || undefined
-    const country = url.searchParams.get("country") || undefined
+    const name = (url.searchParams.get("name") || url.searchParams.get("q") || "").trim()
 
-    const params: any = { limit }
-    if (after) params.after = after
-    if (before) params.before = before
-    if (iata_code) params.iata_code = iata_code
-    if (name) params.name = name
-    if (country) params.country = country
+    if (!name || name.length < 2) {
+      return NextResponse.json({ success: false, error: "name must be at least 2 characters" }, { status: 400 })
+    }
 
-    const response = await duffel.cities.list(params)
+    if (!process.env.DUFFEL_API_KEY) {
+      return NextResponse.json({ success: false, error: "Duffel API key not configured" }, { status: 500 })
+    }
 
-    return NextResponse.json({
-      success: true,
-      data: response.data,
-      meta: response.meta
+    const resp = await fetch(`https://api.duffel.com/air/places/suggestions?query=${encodeURIComponent(name)}&limit=${Math.max(limit, 20)}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.DUFFEL_API_KEY}`,
+        "Duffel-Version": "v2",
+      },
+      cache: 'no-store'
     })
+    if (!resp.ok) {
+      return NextResponse.json({ success: false, error: "Failed to fetch cities" }, { status: 502 })
+    }
+    const json: any = await resp.json()
+    const data = (json?.data || []).filter((p: any) => p.type === 'city')
+
+    return NextResponse.json({ success: true, data, meta: { limit } })
   } catch (error: any) {
     console.error("Cities fetch error:", error)
     return NextResponse.json({ error: "Failed to fetch cities" }, { status: 500 })

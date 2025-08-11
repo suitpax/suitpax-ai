@@ -27,6 +27,7 @@ export async function GET(_req: NextRequest, { params }: { params: { offerId: st
       })
     )
 
+    const ownerCode = raw.owner?.iata_code || ''
     const offer = {
       id: raw.id,
       total_amount: raw.total_amount,
@@ -34,8 +35,8 @@ export async function GET(_req: NextRequest, { params }: { params: { offerId: st
       expires_at: raw.expires_at,
       owner: {
         ...raw.owner,
-        logo_lockup_url: carrierCodeToAirline[raw.owner?.iata_code]?.logo_lockup_url,
-        logo_symbol_url: carrierCodeToAirline[raw.owner?.iata_code]?.logo_symbol_url,
+        logo_lockup_url: ownerCode ? carrierCodeToAirline[ownerCode]?.logo_lockup_url : undefined,
+        logo_symbol_url: ownerCode ? carrierCodeToAirline[ownerCode]?.logo_symbol_url : undefined,
       },
       slices: (raw.slices || []).map((slice: any) => ({
         id: slice.id,
@@ -43,7 +44,7 @@ export async function GET(_req: NextRequest, { params }: { params: { offerId: st
         destination: slice.destination,
         duration: slice.duration,
         segments: (slice.segments || []).map((segment: any) => {
-          const airlineInfo = carrierCodeToAirline[segment?.marketing_carrier?.iata_code]
+          const airlineInfo = carrierCodeToAirline[segment?.marketing_carrier?.iata_code || '']
           return {
             id: segment.id,
             origin: segment.origin,
@@ -52,7 +53,6 @@ export async function GET(_req: NextRequest, { params }: { params: { offerId: st
             arriving_at: segment.arriving_at,
             marketing_carrier: segment.marketing_carrier,
             operating_carrier: segment.operating_carrier,
-            flight_number: segment.flight_number,
             aircraft: segment.aircraft,
             airline: airlineInfo ? { name: airlineInfo.name, logo_symbol_url: airlineInfo.logo_symbol_url, logo_lockup_url: airlineInfo.logo_lockup_url } : { name: segment.marketing_carrier?.name }
           }

@@ -82,54 +82,15 @@ export async function GET(req: NextRequest) {
         if (item.name && item.name.toLowerCase().includes(q)) score += 45;
         if (item.city_name && item.city_name.toLowerCase().includes(q)) score += 25;
         if (isLikelyIata && item.type === "airport") score += 20;
+        if (types && types.length > 0 && !types.includes(item.type)) score -= 1000;
         return { ...item, score };
       }).sort((a, b) => b.score - a.score);
 
       return NextResponse.json({ success: true, places: scored.slice(0, limit) });
     }
 
-    // Fallback: fetch airports and cities in parallel matching the query
-    const [airportsRes, citiesRes] = await Promise.all([
-      duffel.airports.list({ limit: Math.max(limit, 20), name: query }),
-      duffel.cities.list({ limit: Math.max(limit, 20), name: query })
-    ]);
-
-    const airportItems = (airportsRes.data || []).map((a: any) => ({
-      id: a.id,
-      type: "airport",
-      iata_code: a.iata_code,
-      name: a.name,
-      city_name: a.city?.name,
-      country_name: a.country?.name,
-      latitude: a.latitude,
-      longitude: a.longitude
-    }));
-
-    const cityItems = (citiesRes.data || []).map((c: any) => ({
-      id: c.id,
-      type: "city",
-      iata_code: c.iata_code,
-      name: c.name,
-      city_name: undefined,
-      country_name: c.country?.name
-    }));
-
-    const merged = [...airportItems, ...cityItems].filter((item, idx, self) => idx === self.findIndex(i => i.id === item.id));
-
-    const q = query.toLowerCase();
-    const isLikelyIata = q.length === 3 && /^[a-z]{3}$/i.test(q);
-    const scored = merged.map(item => {
-      let score = 0;
-      if (item.iata_code && item.iata_code.toLowerCase() === q) score += 120;
-      if (item.name && item.name.toLowerCase() === q) score += 90;
-      if (item.name && item.name.toLowerCase().includes(q)) score += 45;
-      if (item.city_name && item.city_name.toLowerCase().includes(q)) score += 25;
-      if (isLikelyIata && item.type === "airport") score += 20;
-      if (types && types.length > 0 && !types.includes(item.type)) score -= 1000; // demote non-requested types
-      return { ...item, score };
-    }).sort((a, b) => b.score - a.score);
-
-    return NextResponse.json({ success: true, places: scored.slice(0, limit) });
+    // If no suggestions, return empty
+    return NextResponse.json({ success: true, places: [] })
   } catch (error: any) {
     console.error("Places suggestions error:", error)
     return NextResponse.json({ error: "Failed to fetch place suggestions" }, { status: 500 })

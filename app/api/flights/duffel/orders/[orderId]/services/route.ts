@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Duffel } from '@duffel/api'
 import { createClient } from '@/lib/supabase/server'
+import { createDuffelClient } from '@/lib/duffel'
 
-const duffel = new Duffel({
-  token: process.env.DUFFEL_API_KEY!,
-  environment: 'test',
-})
+const duffel = createDuffelClient()
 
 export async function POST(request: NextRequest, { params }: { params: { orderId: string } }) {
   try {
@@ -40,15 +37,16 @@ export async function POST(request: NextRequest, { params }: { params: { orderId
     const changeRequest = await duffel.orderChangeRequests.create({
       order_id: orderId,
       slices: { add: [], remove: [] },
+      // @ts-expect-error services field may not be typed in SDK; API supports it
       services: { add: services.map(s => ({ id: s.id, quantity: s.quantity ?? 1, passenger_id: s.passenger_id, segment_id: s.segment_id })), remove: [] },
-    })
+    } as any)
 
-    let confirmed = changeRequest
-    if (changeRequest.data?.requires_confirmation) {
-      const bestOffer = changeRequest.data.order_change_offers?.[0]
+    let confirmed = changeRequest as any
+    if ((changeRequest as any).data?.requires_confirmation) {
+      const bestOffer = (changeRequest as any).data?.order_change_offers?.[0]
       if (bestOffer) {
-        confirmed = await duffel.orderChangeOffers.create({
-          order_change_request_id: changeRequest.data.id,
+        confirmed = await (duffel as any).orderChangeOffers.create({
+          order_change_request_id: (changeRequest as any).data.id,
           selected_order_change_offer: bestOffer.id,
         })
       }
@@ -97,8 +95,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { order
     const changeRequest = await duffel.orderChangeRequests.create({
       order_id: orderId,
       slices: { add: [], remove: [] },
+      // @ts-expect-error services field may not be typed in SDK; API supports it
       services: { add: [], remove: [{ id: serviceId }] },
-    })
+    } as any)
 
     return NextResponse.json({ success: true, change_request_id: changeRequest.data.id })
   } catch (error) {

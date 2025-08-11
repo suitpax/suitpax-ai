@@ -10,7 +10,7 @@ export type ParsedExpense = {
 }
 
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  const pdfjs: any = await import('pdfjs-dist/build/pdf')
+  const pdfjs: any = await import('pdfjs-dist')
   const loadingTask = pdfjs.getDocument({ data: buffer, disableWorker: true })
   const pdf = await loadingTask.promise
   let fullText = ''
@@ -52,7 +52,10 @@ async function extractTextFromImageWithOcrSpace(buffer: Buffer): Promise<string>
   form.append('scale', 'true')
   form.append('OCREngine', '2')
   form.append('isTable', 'true')
-  form.append('file', new Blob([buffer]), 'image.png')
+  const ab = new ArrayBuffer(buffer.byteLength)
+  const view = new Uint8Array(ab)
+  view.set(buffer)
+  form.append('file', new Blob([ab]), 'image.png')
   const resp = await fetch(endpoint, {
     method: 'POST',
     headers: apiKey ? { 'apikey': apiKey } : undefined,

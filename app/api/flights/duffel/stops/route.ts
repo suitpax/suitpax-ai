@@ -57,6 +57,8 @@ export async function GET(request: NextRequest) {
         // Obtener info del aeropuerto de destino
         const destinationInfo = await getAirportData(duffel, segment.destination.iata_code);
         
+        const durationIso = segment.duration || "";
+        
         return {
           id: segment.id,
           origin: {
@@ -73,10 +75,9 @@ export async function GET(request: NextRequest) {
           },
           departing_at: segment.departing_at,
           arriving_at: segment.arriving_at,
-          duration: segment.duration,
+          duration: durationIso,
           marketing_carrier: segment.marketing_carrier,
           operating_carrier: segment.operating_carrier,
-          flight_number: segment.flight_number,
           aircraft: segment.aircraft,
           // Si no es el último segmento, este es una escala para el itinerario
           is_stop: index < slice.segments.length - 1,
@@ -101,7 +102,7 @@ export async function GET(request: NextRequest) {
             arriving_at: segment.arriving_at,
             departing_at: processedSegments[index + 1].departing_at,
             duration_minutes: segment.connection_duration,
-            connection_type: classifyConnection(segment.connection_duration),
+            connection_type: classifyConnection(segment.connection_duration ?? 0),
             change_planes: segment.aircraft?.iata_code !== processedSegments[index + 1].aircraft?.iata_code,
             change_terminals: false // Esta info no está disponible en Duffel, se podría enriquecer con una API externa
           };
@@ -117,7 +118,7 @@ export async function GET(request: NextRequest) {
       const flightDurationMinutes = processedSegments.reduce((sum, segment) => {
         // Extraer minutos de la duración ISO 8601 (PT2H30M -> 150 minutos)
         const durationPattern = /PT(?:(\d+)H)?(?:(\d+)M)?/;
-        const matches = segment.duration.match(durationPattern);
+        const matches = (segment.duration || "").match(durationPattern);
         
         if (!matches) return sum;
         
@@ -127,7 +128,7 @@ export async function GET(request: NextRequest) {
         return sum + (hours * 60 + minutes);
       }, 0);
       
-      const connectionDurationMinutes = stops.reduce((sum, stop) => sum + stop.duration_minutes, 0);
+      const connectionDurationMinutes = stops.reduce((sum, stop) => sum + (stop.duration_minutes ?? 0), 0);
       
       return {
         id: slice.id,
@@ -146,10 +147,10 @@ export async function GET(request: NextRequest) {
           details: stops,
           airports: stops.map(stop => stop.airport.iata_code),
           longest_connection: stops.length > 0 
-            ? Math.max(...stops.map(stop => stop.duration_minutes))
+            ? Math.max(...stops.map(stop => stop.duration_minutes ?? 0))
             : 0,
           shortest_connection: stops.length > 0 
-            ? Math.min(...stops.map(stop => stop.duration_minutes))
+            ? Math.min(...stops.map(stop => stop.duration_minutes ?? 0))
             : 0,
           has_overnight_connection: stops.some(stop => isOvernightConnection(stop.arriving_at, stop.departing_at))
         },
@@ -177,12 +178,13 @@ export async function GET(request: NextRequest) {
 /**
  * Calcula la duración de la conexión en minutos
  */
-function calculateConnectionDuration(arrivingAt: string, departingAt: string): number {
+function calculateConnectionDuration(arrivingAt: string, departingAt: string): number | null {
   const arrivalTime = new Date(arrivingAt);
   const departureTime = new Date(departingAt);
   
   // Diferencia en milisegundos
   const diffMs = departureTime.getTime() - arrivalTime.getTime();
+  if (Number.isNaN(diffMs)) return null;
   
   // Convertir a minutos
   return Math.floor(diffMs / (1000 * 60));

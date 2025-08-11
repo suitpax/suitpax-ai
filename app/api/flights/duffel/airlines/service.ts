@@ -15,9 +15,13 @@ export async function fetchAirlines(
   before?: string
 ): Promise<AirlineListResponse> {
   const duffel = createDuffelClient();
-  const res = await duffel.airlines.list({ limit, after, before });
+  const res = await duffel.airlines.list({ limit, after, before } as any);
   return {
     data: res.data,
-    meta: res.meta,
+    meta: {
+      limit: res.meta?.limit ?? limit,
+      after: (res.meta?.after ?? undefined) as string | undefined,
+      before: (res.meta?.before ?? undefined) as string | undefined,
+    },
   };
 }

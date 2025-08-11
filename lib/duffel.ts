@@ -33,9 +33,8 @@ export const createDuffelClient = (options?: {
   console.log(`Creating Duffel client for ${environment} environment`);
 
   const client = new Duffel({
-    token,
-    environment: environment as 'test' | 'production'
-  });
+    token
+  } as any);
   
   // Guardar en caché
   duffelClientCache.set(cacheKey, client);
@@ -212,7 +211,8 @@ export function mapDuffelStatus(duffelStatus: string): string {
 /**
  * Obtiene información de aerolínea con caché inteligente
  */
-export async function getAirlineData(duffel: Duffel, iataCode: string) {
+export async function getAirlineData(duffel: Duffel, iataCode: string | null | undefined) {
+  if (!iataCode) return null;
   const now = Date.now();
   const cacheKey = `airline-${iataCode}`;
   
@@ -225,16 +225,17 @@ export async function getAirlineData(duffel: Duffel, iataCode: string) {
   }
   
   try {
-    const airlines = await duffel.airlines.list({ iata_code: iataCode });
+    const resp = await duffel.airlines.list({ limit: 50 } as any);
+    const match = (resp?.data || []).find((a: any) => a.iata_code === iataCode);
     
-    if (airlines.data.length > 0) {
+    if (match) {
       const airlineData = {
-        id: airlines.data[0].id,
-        name: airlines.data[0].name,
-        iata_code: airlines.data[0].iata_code,
-        logo_lockup_url: airlines.data[0].logo_lockup_url,
-        logo_symbol_url: airlines.data[0].logo_symbol_url,
-        conditions_of_carriage_url: airlines.data[0].conditions_of_carriage_url,
+        id: match.id,
+        name: match.name,
+        iata_code: match.iata_code,
+        logo_lockup_url: match.logo_lockup_url,
+        logo_symbol_url: match.logo_symbol_url,
+        conditions_of_carriage_url: match.conditions_of_carriage_url,
       };
       
       // Guardar en caché
@@ -256,7 +257,8 @@ export async function getAirlineData(duffel: Duffel, iataCode: string) {
 /**
  * Obtiene información de aeropuerto con caché inteligente
  */
-export async function getAirportData(duffel: Duffel, iataCode: string) {
+export async function getAirportData(duffel: Duffel, iataCode: string | null | undefined) {
+  if (!iataCode) return null;
   const now = Date.now();
   const cacheKey = `airport-${iataCode}`;
   
@@ -269,21 +271,17 @@ export async function getAirportData(duffel: Duffel, iataCode: string) {
   }
   
   try {
-    const airports = await duffel.airports.list({ 
-      iata_code: iataCode,
-      limit: 1
-    });
+    const resp = await duffel.airports.list({ limit: 50 } as any);
+    const match = (resp?.data || []).find((a: any) => a.iata_code === iataCode);
     
-    if (airports.data.length > 0) {
-      const airportData = airports.data[0];
-      
+    if (match) {
       // Guardar en caché
       airportCache.set(cacheKey, {
-        data: airportData,
+        data: match,
         expires: now + CACHE_TTL
       });
       
-      return airportData;
+      return match;
     }
     
     return null;

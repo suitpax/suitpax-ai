@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { Duffel } from "@duffel/api"
 import { createClient } from "@/lib/supabase/server"
+import { createDuffelClient } from "@/lib/duffel"
 
-const duffel = new Duffel({
-  token: process.env.DUFFEL_API_KEY!,
-  environment: 'test'
-})
+const duffel = createDuffelClient()
 
 interface BaggageSearchRequest {
   orderId: string
@@ -57,20 +54,19 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      // Obtener servicios disponibles de Duffel
-      const availableServices = await duffel.orderChangeRequests.create({
+      // Obtener acciones disponibles para la orden
+      const available = await duffel.orderChangeRequests.create({
         order_id: orderId,
-        slices: {
-          add: [],
-          remove: []
-        }
-      })
+        slices: { add: [], remove: [] }
+      } as any)
+
+      const actions = (available as any)?.data?.available_actions || []
 
       // Filtrar solo servicios de equipaje
-      const baggageServices = availableServices.data.available_actions?.filter(
+      const baggageServices = actions.filter(
         (action: any) => action.type === 'add_service' && 
         (action.service?.type === 'baggage' || action.service?.metadata?.type === 'baggage')
-      ) || []
+      )
 
       // Procesar y categorizar servicios de equipaje
       const processedServices = baggageServices.map((service: any) => {
@@ -97,12 +93,12 @@ export async function GET(request: NextRequest) {
 
       // Agrupar servicios por categoría
       const categorizedServices = {
-        checked_bags: processedServices.filter(s => s.category === 'checked'),
-        carry_on: processedServices.filter(s => s.category === 'carry_on'),
-        overweight: processedServices.filter(s => s.category === 'overweight'),
-        oversized: processedServices.filter(s => s.category === 'oversized'),
-        sports_equipment: processedServices.filter(s => s.category === 'sports'),
-        other: processedServices.filter(s => s.category === 'other')
+        checked_bags: processedServices.filter((s: any) => s.category === 'checked'),
+        carry_on: processedServices.filter((s: any) => s.category === 'carry_on'),
+        overweight: processedServices.filter((s: any) => s.category === 'overweight'),
+        oversized: processedServices.filter((s: any) => s.category === 'oversized'),
+        sports_equipment: processedServices.filter((s: any) => s.category === 'sports'),
+        other: processedServices.filter((s: any) => s.category === 'other')
       }
 
       return NextResponse.json({
@@ -212,21 +208,22 @@ export async function POST(request: NextRequest) {
           })),
           remove: []
         }
-      })
+      } as any)
 
       if (!changeRequest.data) {
         throw new Error("No change request data received")
       }
 
       // Confirmar el cambio si es automáticamente aprobado
-      let confirmedChange
-      if (changeRequest.data.requires_confirmation) {
-        confirmedChange = await duffel.orderChangeOffers.create({
-          order_change_request_id: changeRequest.data.id,
-          selected_order_change_offer: changeRequest.data.order_change_offers[0].id
-        })
-      } else {
-        confirmedChange = changeRequest
+      let confirmedChange = changeRequest as any
+      if ((changeRequest as any).data?.requires_confirmation) {
+        const bestOffer = (changeRequest as any).data?.order_change_offers?.[0]
+        if (bestOffer) {
+          confirmedChange = await (duffel as any).orderChangeOffers.create({
+            order_change_request_id: (changeRequest as any).data.id,
+            selected_order_change_offer: bestOffer.id
+          })
+        }
       }
 
       // Actualizar la base de datos
@@ -246,7 +243,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Calcular costos adicionales
-      const additionalCost = confirmedChange.data.total_amount || '0'
+      const additionalCost = (confirmedChange.data?.total_amount || '0') as string
       const newTotalAmount = (
         parseFloat(booking.total_amount) + parseFloat(additionalCost)
       ).toString()
@@ -254,8 +251,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         change_request: {
-          id: confirmedChange.data.id,
-          status: confirmedChange.data.status || 'confirmed',
+          id: confirmedChange.data?.id || changeRequest.data.id,
+          status: confirmedChange.data?.status || 'confirmed',
           additional_cost: {
             amount: additionalCost,
             currency: booking.total_currency
@@ -265,7 +262,7 @@ export async function POST(request: NextRequest) {
             currency: booking.total_currency
           },
           services_added: services.length,
-          confirmation_required: changeRequest.data.requires_confirmation || false
+          confirmation_required: (changeRequest as any).data?.requires_confirmation || false
         },
         services: services.map(service => ({
           id: service.id,
@@ -383,7 +380,7 @@ export async function DELETE(request: NextRequest) {
           add: [],
           remove: [{ id: serviceId }]
         }
-      })
+      } as any)
 
       return NextResponse.json({
         success: true,
