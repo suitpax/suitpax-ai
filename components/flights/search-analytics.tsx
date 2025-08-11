@@ -186,7 +186,7 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
                 <PaperAirplaneIcon className="h-5 w-5 mr-2" />
                 Popular Routes
               </div>
-              <Badge variant="outline" className="bg-gray-50">
+              <Badge variant="outline" className="bg-gray-50 rounded-xl">
                 Last 7 days
               </Badge>
             </CardTitle>
@@ -244,7 +244,7 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
                 <CurrencyDollarIcon className="h-5 w-5 mr-2" />
                 Price Opportunities
               </div>
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 rounded-xl">
                 Save up to $92
               </Badge>
             </CardTitle>
@@ -339,7 +339,7 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
               >
                 <Badge 
                   variant="outline" 
-                  className="bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 cursor-pointer"
+                  className="bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 cursor-pointer rounded-xl"
                 >
                   {filter}
                 </Badge>

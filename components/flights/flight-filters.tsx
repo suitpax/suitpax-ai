@@ -87,7 +87,7 @@ const Checkbox = ({ checked, onCheckedChange, className = "" }) => (
 
 // Custom Badge Component
 const Badge = ({ children, variant = "outline", className = "" }) => (
-  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
     variant === "outline" 
       ? "border border-gray-200 bg-gray-50 text-gray-700" 
       : "bg-blue-50 text-blue-700 border border-blue-200"

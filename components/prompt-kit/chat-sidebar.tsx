@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Pencil, Trash2 } from "lucide-react"
 import { useVoiceAI } from "@/contexts/voice-ai-context"
 import { Switch } from "@/components/ui/switch"
+import TokenIndicator from "@/components/prompt-kit/token-indicator"
 
 export type ChatSidebarProps = {
   open: boolean
@@ -114,15 +115,20 @@ export default function ChatSidebar({ open, onClose, user, onSelectSession }: Ch
     <div className={cn("fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200 shadow-sm transition-transform duration-300 ease-in-out", open ? "translate-x-0" : "-translate-x-full")}
       role="dialog" aria-modal="true" aria-label="Chat history sidebar">
       <div className="h-full flex flex-col">
-        <div className="p-3 border-b border-gray-200 flex items-center gap-2">
-          <div className="w-7 h-7 rounded-md bg-white border border-gray-200 overflow-hidden flex items-center justify-center">
-            <Image src={user?.image || "/logo/suitpax-symbol.webp"} alt="User" width={20} height={20} className="object-contain" />
+        <div className="p-3 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-md bg-white border border-gray-200 overflow-hidden flex items-center justify-center">
+              <Image src={user?.image || "/logo/suitpax-symbol.webp"} alt="User" width={20} height={20} className="object-contain" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-medium truncate">{user?.name || user?.email || "Guest"}</div>
+              {user?.email && <div className="text-[10px] text-gray-600 truncate">{user.email}</div>}
+            </div>
+            <button onClick={onClose} className="ml-auto text-xs text-gray-600 hover:text-black">Close</button>
           </div>
-          <div className="min-w-0">
-            <div className="text-xs font-medium truncate">{user?.name || user?.email || "Guest"}</div>
-            {user?.email && <div className="text-[10px] text-gray-600 truncate">{user.email}</div>}
+          <div className="mt-2">
+            <TokenIndicator />
           </div>
-          <button onClick={onClose} className="ml-auto text-xs text-gray-600 hover:text-black">Close</button>
         </div>
         {/* Agents */}
         <div className="p-3">
