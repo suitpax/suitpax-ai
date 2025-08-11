@@ -28,6 +28,18 @@ export async function POST(request: NextRequest) {
   try {
     let text = ""
 
+    // PDF intent heuristic
+    const pdfIntent = /\b(generate|create|export)\b.*\bpdf\b/i.test(message)
+    if (pdfIntent) {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/pdf/create`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: message })
+      })
+      const data = await res.json()
+      if (data?.success && data?.url) {
+        return NextResponse.json({ response: `He generado tu PDF. Puedes descargarlo aquí: ${data.url}` })
+      }
+    }
+
     // Flight intent heuristic
     const isFlightIntent = /\b([A-Z]{3})\b.*\b(to|→|-)\b.*\b([A-Z]{3})\b/i.test(message) || /\bflight|vuelo|vuelos\b/i.test(message)
     let offersPayload: any = null
