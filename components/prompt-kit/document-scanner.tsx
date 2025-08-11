@@ -53,7 +53,7 @@ export default function DocumentScanner({ onScanned, className }: { onScanned?: 
       )}
       aria-label="Scan document"
     >
-      <input ref={inputRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={handleChange} />
+      <input ref={inputRef} type="file" accept="image/*,application/pdf" capture="environment" className="hidden" onChange={handleChange} />
       {isUploading ? (
         <Loader2 className="size-3.5 sm:size-4 animate-spin" />
       ) : done ? (

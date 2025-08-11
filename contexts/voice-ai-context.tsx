@@ -16,6 +16,7 @@ export interface VoiceAISettings {
   stability: number
   similarityBoost: number
   autoDetectLanguage: boolean
+  autoSpeak?: boolean
 }
 
 export interface VoiceAIState {
@@ -70,6 +71,7 @@ const initialSettings: VoiceAISettings = {
   stability: 0.5,
   similarityBoost: 0.5,
   autoDetectLanguage: true,
+  autoSpeak: true,
 }
 
 // Reducer
@@ -122,6 +124,38 @@ export function VoiceAIProvider({
     voiceId: initialVoiceId || initialSettings.voiceId,
     language: initialLanguage || initialSettings.language,
   })
+
+  // Restore settings from localStorage
+  React.useEffect(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('voiceAISettings') : null
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<VoiceAISettings>
+        setSettings((prev) => ({ ...prev, ...parsed }))
+      }
+    } catch {}
+  }, [])
+
+  // Persist settings
+  React.useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('voiceAISettings', JSON.stringify(settings))
+      }
+    } catch {}
+  }, [settings])
+
+  // Auto-adjust language from browser when enabled
+  React.useEffect(() => {
+    if (settings.autoDetectLanguage && typeof navigator !== 'undefined') {
+      const lang = navigator.language || 'en-US'
+      // Map common browser language to supported speech codes
+      const mapped = lang.startsWith('es') ? 'es-ES' : lang.startsWith('fr') ? 'fr-FR' : lang.startsWith('de') ? 'de-DE' : 'en-US'
+      if (mapped !== settings.language) {
+        setSettings((prev) => ({ ...prev, language: mapped as VoiceAISettings['language'] }))
+      }
+    }
+  }, [settings.autoDetectLanguage])
 
   // Speech Recognition
   const recognition = React.useRef<any>(null)

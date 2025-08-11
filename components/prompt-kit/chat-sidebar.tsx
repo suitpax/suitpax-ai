@@ -5,6 +5,8 @@ import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
 import { Pencil, Trash2 } from "lucide-react"
+import { useVoiceAI } from "@/contexts/voice-ai-context"
+import { Switch } from "@/components/ui/switch"
 
 export type ChatSidebarProps = {
   open: boolean
@@ -16,10 +18,38 @@ export type ChatSidebarProps = {
 type ChatSession = { id: string; title: string; updated_at: string }
 
 export default function ChatSidebar({ open, onClose, user, onSelectSession }: ChatSidebarProps) {
+  const { setVoice, updateSettings, settings } = useVoiceAI()
   const [sessions, setSessions] = useState<ChatSession[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [voices, setVoices] = useState<{ id: string; name: string; preview?: string }[]>([])
+  const [isVoicesLoading, setIsVoicesLoading] = useState(false)
+  const [selectedAgent, setSelectedAgent] = useState<string>(() => typeof window !== 'undefined' ? (localStorage.getItem('suitpax.selectedAgent') || 'emma') : 'emma')
+
   const supabase = createClient()
+
+  const AGENTS: { id: string; name: string; desc: string; voiceId: string; emoji: string }[] = [
+    { id: 'emma', name: 'Emma', desc: 'Business travel expert', voiceId: 'EXAVITQu4vr4xnSDxMaL', emoji: '💼' },
+    { id: 'marcus', name: 'Marcus', desc: 'Operations & bookings', voiceId: 'VR6AewLTigWG4xSOukaG', emoji: '🧭' },
+    { id: 'sophia', name: 'Sophia', desc: 'Luxury services & VIP', voiceId: '21m00Tcm4TlvDq8ikWAM', emoji: '✨' },
+  ]
+
+  useEffect(() => {
+    // Fetch voices
+    const loadVoices = async () => {
+      try {
+        setIsVoicesLoading(true)
+        const res = await fetch('/api/elevenlabs/voices')
+        if (res.ok) {
+          const data = await res.json()
+          setVoices(data.voices || [])
+        }
+      } finally {
+        setIsVoicesLoading(false)
+      }
+    }
+    loadVoices()
+  }, [])
 
   const fetchSessions = async () => {
     if (!user?.id) {
@@ -67,6 +97,19 @@ export default function ChatSidebar({ open, onClose, user, onSelectSession }: Ch
     }
   }
 
+  const selectAgent = (agentId: string, voiceId: string) => {
+    setSelectedAgent(agentId)
+    try {
+      localStorage.setItem('suitpax.selectedAgent', agentId)
+    } catch {}
+    setVoice(voiceId)
+  }
+
+  const selectVoice = (voiceId: string) => {
+    setVoice(voiceId)
+    try { localStorage.setItem('suitpax.selectedVoiceId', voiceId) } catch {}
+  }
+
   return (
     <div className={cn("fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200 shadow-sm transition-transform duration-300 ease-in-out", open ? "translate-x-0" : "-translate-x-full")}
       role="dialog" aria-modal="true" aria-label="Chat history sidebar">
@@ -80,6 +123,53 @@ export default function ChatSidebar({ open, onClose, user, onSelectSession }: Ch
             {user?.email && <div className="text-[10px] text-gray-600 truncate">{user.email}</div>}
           </div>
           <button onClick={onClose} className="ml-auto text-xs text-gray-600 hover:text-black">Close</button>
+        </div>
+        {/* Agents */}
+        <div className="p-3">
+          <div className="text-[11px] text-gray-600 mb-1">AI Agents</div>
+          <div className="space-y-2">
+            {AGENTS.map(a => (
+              <button key={a.id} onClick={() => selectAgent(a.id, a.voiceId)} className={cn("w-full text-left rounded-lg border p-2", selectedAgent === a.id ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:bg-gray-50')}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">{a.emoji}</span>
+                    <div>
+                      <div className="text-xs font-medium">{a.name}</div>
+                      <div className="text-[10px] text-gray-600">{a.desc}</div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-gray-600">Voice</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* Voices */}
+        <div className="px-3">
+          <div className="text-[11px] text-gray-600 mb-1">Voices</div>
+          <div className="max-h-32 overflow-y-auto space-y-1 border border-gray-100 rounded-md p-1">
+            {isVoicesLoading ? (
+              <div className="text-[11px] text-gray-500 p-2">Loading voices…</div>
+            ) : voices.length === 0 ? (
+              <div className="text-[11px] text-gray-500 p-2">No voices available</div>
+            ) : (
+              voices.slice(0, 12).map(v => (
+                <div key={v.id} className="flex items-center justify-between rounded px-2 py-1 hover:bg-gray-50">
+                  <button onClick={() => selectVoice(v.id)} className="text-left text-[11px] font-medium truncate">{v.name}</button>
+                  {v.preview && (
+                    <button onClick={() => { const a = new Audio(v.preview!); a.play().catch(()=>{}) }} className="text-[10px] text-gray-600 hover:text-black">Preview</button>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+        {/* Settings */}
+        <div className="p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-gray-700">Auto hablar (TTS)</span>
+            <Switch checked={settings?.autoSpeak !== false} onCheckedChange={(v) => updateSettings({ autoSpeak: v })} />
+          </div>
         </div>
         <div className="p-3 text-[11px] text-gray-600">Chat history</div>
         <div className="flex-1 overflow-y-auto no-scrollbar">
