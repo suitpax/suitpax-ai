@@ -56,7 +56,6 @@ export function ChatMessage({ message }: { message: Message }) {
               }
               const lang = match ? match[0] : undefined
               const content = String(children).replace(/\n$/, "")
-              const CodeBlock = require("@/components/prompt-kit/code-block").default
               return <CodeBlock code={content} language={lang} />
             },
           }}
