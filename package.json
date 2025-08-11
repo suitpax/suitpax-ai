@@ -80,6 +80,7 @@
     "embla-carousel-react": "8.6.0",
     "file-saver": "^2.0.5",
     "framer-motion": "12.23.12",
+    "googleapis": "^139",
     "html-pdf-node": "^1.0.8",
     "input-otp": "1.4.2",
     "latex.js": "^0.12.6",
