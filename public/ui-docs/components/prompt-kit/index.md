@@ -14,7 +14,7 @@ Prompt Kit es una colección de componentes de UI orientados a experiencias de c
 
 ## Integración rápida
 
-```tsx
+\`\`\`tsx
 import {
   ChatContainerRoot,
   ChatContainerContent,
@@ -25,11 +25,11 @@ import {
   <ChatContainerContent messages={messages} isLoading={loading} />
   <ChatContainerScrollAnchor />
 </ChatContainerRoot>
-```
+\`\`\`
 
 Entrada con acciones:
 
-```tsx
+\`\`\`tsx
 import { PromptInput, PromptInputTextarea, PromptInputActions } from "@/components/prompt-kit/prompt-input";
 
 <PromptInput value={input} onValueChange={setInput} onSubmit={handleSend}>
@@ -37,18 +37,18 @@ import { PromptInput, PromptInputTextarea, PromptInputActions } from "@/componen
   <PromptInputTextarea placeholder="Escribe tu solicitud…" />
   <PromptInputActions>{/* Botón enviar */}</PromptInputActions>
 </PromptInput>
-```
+\`\`\`
 
 ## Razonamiento (resumen)
 
 - Usa ReasoningResponse para mostrar un resumen del razonamiento devuelto por el backend.
 - Recomendación: mantenerlo opcional (switch) y presentar un resumen de alto nivel, no cadenas de pensamiento detalladas.
 
-```tsx
+\`\`\`tsx
 import { ReasoningResponse } from "@/components/prompt-kit/reasoning";
 
 {message.reasoning && <ReasoningResponse reasoning={message.reasoning} />}
-```
+\`\`\`
 
 ## Theming y estilo
 

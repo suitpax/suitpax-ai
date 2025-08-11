@@ -1,4 +1,3 @@
-
 export function formatDuration(duration: string): string {
   // Duration viene en formato ISO 8601: PT2H30M
   const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/)
