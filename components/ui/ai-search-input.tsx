@@ -36,9 +36,9 @@ export default function AISearchInput({ placeholder = "Ask Suitpax AI...", class
   return (
     <form onSubmit={handleSubmit} className={cn("w-full max-w-md", className)}>
       <div className={cn(
-        "relative rounded-2xl p-[2px]",
-        "bg-[conic-gradient(at_10%_10%,#e5e7eb,white_25%,#c7d2fe_50%,#bae6fd_75%,#e5e7eb)]",
-        "shadow-[0_0_0_1px_rgba(0,0,0,0.03)]"
+        "relative rounded-2xl p-[3px]",
+        "bg-[conic-gradient(at_0%_0%,#ff80b5,#ffb347,#ffd166,#06d6a0,#118ab2,#8e7dff,#ff80b5)]",
+        "shadow-[0_0_0_1px_rgba(0,0,0,0.06)]"
       )}>
         <div className={cn("flex items-center rounded-2xl bg-white", sizeClasses[size])}>
           <Search className="h-4 w-4 text-gray-400 mr-2" />
