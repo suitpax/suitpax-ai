@@ -1,5 +1,5 @@
-import Tesseract from 'tesseract.js'
 import axios from 'axios'
+import { TextractClient, DetectDocumentTextCommand } from '@aws-sdk/client-textract'
 
 export type ParsedExpense = {
   amount?: number
@@ -11,7 +11,6 @@ export type ParsedExpense = {
 }
 
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  // Cargar pdfjs dinámicamente y deshabilitar worker en Node
   const pdfjs: any = await import('pdfjs-dist/build/pdf')
   const loadingTask = pdfjs.getDocument({ data: buffer, disableWorker: true })
   const pdf = await loadingTask.promise
@@ -23,11 +22,6 @@ export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
     fullText += strings.join(' ') + '\n'
   }
   return fullText
-}
-
-export async function extractTextFromImage(buffer: Buffer): Promise<string> {
-  const { data } = await Tesseract.recognize(buffer, 'eng', { logger: () => {} })
-  return data.text || ''
 }
 
 async function extractTextWithUnpdf(buffer: Buffer): Promise<string | null> {
@@ -51,6 +45,15 @@ async function extractTextWithUnpdf(buffer: Buffer): Promise<string | null> {
   }
 }
 
+async function extractTextFromImageWithTextract(buffer: Buffer): Promise<string> {
+  const region = process.env.AWS_REGION || 'eu-west-1'
+  const client = new TextractClient({ region })
+  const cmd = new DetectDocumentTextCommand({ Document: { Bytes: buffer } })
+  const res = await client.send(cmd)
+  const lines = (res?.Blocks || []).filter(b => b.BlockType === 'LINE').map(b => b.Text || '')
+  return lines.join('\n')
+}
+
 export async function extractTextAuto(file: { buffer: Buffer, filename?: string, mimetype?: string }): Promise<string> {
   const { buffer, filename = '', mimetype = '' } = file
   const lower = (mimetype || '').toLowerCase()
@@ -60,7 +63,12 @@ export async function extractTextAuto(file: { buffer: Buffer, filename?: string,
     if (viaUnpdf && viaUnpdf.trim()) return viaUnpdf
     return extractTextFromPDF(buffer)
   }
-  return extractTextFromImage(buffer)
+  // Images -> Textract
+  try {
+    return await extractTextFromImageWithTextract(buffer)
+  } catch {
+    return ''
+  }
 }
 
 export function extractExpenseEntities(text: string): ParsedExpense {

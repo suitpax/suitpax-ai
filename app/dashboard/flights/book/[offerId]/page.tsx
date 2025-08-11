@@ -10,6 +10,9 @@ import FlightItinerary from "@/components/flights/flight-itinerary"
 import BookingSummary from "@/components/flights/booking-summary"
 import { StripePaymentForm } from "@/components/flights/stripe-payment-form"
 import { toast } from "sonner"
+import dynamic from "next/dynamic"
+
+const DuffelAncillaries = dynamic(() => import("@duffel/components").then(m => (m as any).Ancillaries), { ssr: false, loading: () => null })
 
 interface DuffelOffer {
   id: string
@@ -229,7 +232,30 @@ export default function BookFlightPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <FlightItinerary slices={offer.slices} />
-            
+
+            {/* Ancillaries (bags, seats, etc.) */}
+            <Card className="rounded-2xl border border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 font-medium tracking-tighter">
+                  Extras & Ancillaries
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {process.env.NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN ? (
+                  <DuffelAncillaries
+                    offerId={offer.id}
+                    duffelToken={process.env.NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN as string}
+                    onAdd={(items: any) => {
+                      // TODO: persist ancillary selections server-side if needed
+                      console.log("Ancillaries added", items)
+                    }}
+                  />
+                ) : (
+                  <div className="text-sm text-gray-600">Ancillaries unavailable. Configure NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN.</div>
+                )}
+              </CardContent>
+            </Card>
+
             {currentStep === 'details' && (
               <Card className="rounded-2xl border border-gray-200 shadow-sm">
                 <CardHeader>

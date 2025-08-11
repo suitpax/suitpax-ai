@@ -45,7 +45,7 @@ export default function AirportSearch({
 
       setIsLoading(true)
       try {
-        const response = await fetch(`/api/flights/duffel/places?q=${encodeURIComponent(query)}&limit=10`)
+        const response = await fetch(`/api/flights/duffel/places?q=${encodeURIComponent(query)}&limit=10&types=airport,city`)
         const data = await response.json()
         
         if (data.success) {
