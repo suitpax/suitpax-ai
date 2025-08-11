@@ -106,6 +106,10 @@ export default function SettingsPage() {
           company_name: companyName,
           avatar_url: avatarUrl,
         }))
+        // Notify other parts of the app
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('profile:updated', { detail: { full_name: fullName, avatar_url: avatarUrl } }))
+        }
       }
     } catch (error) {
       console.error("Error:", error)
@@ -132,6 +136,10 @@ export default function SettingsPage() {
 
       const { data } = supabase.storage.from("avatars").getPublicUrl(filePath)
       setAvatarUrl(data.publicUrl)
+      // Optimistically notify UI to reflect avatar change immediately
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('profile:updated', { detail: { avatar_url: data.publicUrl } }))
+      }
     } catch (error) {
       console.error("Error:", error)
     }

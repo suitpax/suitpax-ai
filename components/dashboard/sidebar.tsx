@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
+import MiniChat from "@/components/ui/mini-chat"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -48,7 +49,7 @@ const navigation = [
 ]
 
 const aiNavigation = [
-  { name: "AI Chat", href: "/dashboard/ai-chat", icon: MessageSquare, badge: "AI" },
+  { name: "Suitpax AI", href: "/dashboard/ai-chat", icon: MessageSquare, badge: "AI" },
   { name: "Voice AI", href: "/dashboard/voice-ai", icon: Mic, badge: "NEW" },
 ]
 
@@ -63,6 +64,7 @@ interface SidebarProps {
   isCollapsed: boolean
   isMobile: boolean
   onCloseMobile: () => void
+  onToggleCollapse?: () => void
 }
 
 interface UserProfile {
@@ -72,7 +74,7 @@ interface UserProfile {
   job_title?: string
 }
 
-export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: SidebarProps) {
+export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, onToggleCollapse }: SidebarProps) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const pathname = usePathname()
@@ -103,6 +105,20 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
       }
     }
     getUser()
+
+    // Listen to profile updates to refresh avatar/name
+    const handler = (e: Event) => {
+      const detail: any = (e as CustomEvent).detail || {}
+      setUserProfile((prev) => ({ ...prev, ...detail }))
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('profile:updated', handler)
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('profile:updated', handler)
+      }
+    }
   }, [supabase, onUserUpdate])
 
   const handleSignOut = async () => {
@@ -132,7 +148,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
   return (
     <div
       className={cn(
-        "flex flex-col bg-white border-r border-gray-200 h-full shadow-xl lg:shadow-none",
+        "flex flex-col bg-gray-100 border-r border-gray-200 h-full shadow-xl lg:shadow-none", // stronger gray bg
         isMobile ? "w-64" : isCollapsed ? "w-16" : "w-64"
       )}
     >
@@ -149,25 +165,13 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
             />
           </Link>
         )}
-        
-        {isCollapsed && !isMobile && (
-          <Link href="/dashboard" className="flex items-center justify-center w-full">
-            <Image 
-              src="/logo/suitpax-symbol-2.png" 
-              alt="Suitpax" 
-              width={20} 
-              height={20} 
-              className="h-5 w-5" 
-            />
-          </Link>
-        )}
-        
+        {/* Removed collapsed symbol logo intentionally */}
         {isMobile ? (
           <Button
             variant="ghost"
             size="icon"
             onClick={onCloseMobile}
-            className="h-8 w-8 rounded-lg hover:bg-gray-100"
+            className="h-8 w-8 rounded-lg hover:bg-gray-200"
           >
             <X className="h-4 w-4" />
             <span className="sr-only">Close sidebar</span>
@@ -176,7 +180,8 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-lg hover:bg-gray-100"
+            className="h-8 w-8 rounded-lg hover:bg-gray-200"
+            onClick={onToggleCollapse}
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             <span className="sr-only">{isCollapsed ? "Expand sidebar" : "Collapse sidebar"}</span>
@@ -196,10 +201,10 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
                 href={item.href}
                 onClick={isMobile ? onCloseMobile : undefined}
                 className={cn(
-                  "group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 relative",
+                  "group flex items-center px-3 py-2.5 text-xs font-medium rounded-lg transition-all duration-200 relative", // smaller text
                   isActive 
                     ? "bg-gray-900 text-white shadow-sm" 
-                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                    : "text-gray-800 hover:bg-gray-200 hover:text-gray-900",
                   (isCollapsed && !isMobile) && "justify-center px-2"
                 )}
                 title={(isCollapsed && !isMobile) ? item.name : ""}
@@ -212,8 +217,6 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
                   aria-hidden="true" 
                 />
                 {(!isCollapsed || isMobile) && <span>{item.name}</span>}
-                
-                {/* Active indicator */}
                 {isActive && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full" />
                 )}
@@ -222,13 +225,14 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
           })}
         </div>
 
-        {/* AI Section */}
+        {/* AI Section with mini badge/chat */}
         {(!isCollapsed || isMobile) && (
           <div className="pt-4">
-            <div className="px-3 mb-2">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                AI Assistance
+            <div className="px-3 mb-2 flex items-center justify-between">
+              <h3 className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider">
+                Suitpax AI
               </h3>
+              <MiniChat />
             </div>
             <div className="space-y-1">
               {aiNavigation.map((item) => {
@@ -239,10 +243,10 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
                     href={item.href}
                     onClick={isMobile ? onCloseMobile : undefined}
                     className={cn(
-                      "group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                      "group flex items-center justify-between px-3 py-2.5 text-xs font-medium rounded-lg transition-all duration-200",
                       isActive 
                         ? "bg-gray-900 text-white shadow-sm" 
-                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                        : "text-gray-800 hover:bg-gray-200 hover:text-gray-900"
                     )}
                   >
                     <div className="flex items-center">
@@ -253,10 +257,10 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
                       <Badge 
                         variant="secondary" 
                         className={cn(
-                          "text-xs px-1.5 py-0.5 h-5",
+                          "text-[10px] px-1.5 py-0.5 h-5",
                           isActive 
                             ? "bg-white/20 text-white border-white/20" 
-                            : "bg-gray-200 text-gray-600"
+                            : "bg-gray-300 text-gray-700"
                         )}
                       >
                         {item.badge}
@@ -279,10 +283,10 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "group flex items-center justify-center px-2 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 relative",
+                    "group flex items-center justify-center px-2 py-2.5 text-xs font-medium rounded-lg transition-all duration-200 relative",
                     isActive 
                       ? "bg-gray-900 text-white shadow-sm" 
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      : "text-gray-800 hover:bg-gray-200 hover:text-gray-900"
                   )}
                   title={item.name}
                 >
@@ -310,10 +314,10 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
                   href={item.href}
                   onClick={isMobile ? onCloseMobile : undefined}
                   className={cn(
-                    "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
+                    "group flex items-center px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200",
                     isActive 
-                      ? "bg-gray-100 text-gray-900" 
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      ? "bg-gray-200 text-gray-900" 
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   )}
                 >
                   <item.icon className="flex-shrink-0 h-4 w-4 mr-3" aria-hidden="true" />
@@ -329,10 +333,10 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "group flex items-center justify-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200",
+                    "group flex items-center justify-center px-2 py-2 text-xs font-medium rounded-lg transition-all duration-200",
                     isActive 
-                      ? "bg-gray-100 text-gray-900" 
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      ? "bg-gray-200 text-gray-900" 
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   )}
                   title={item.name}
                 >
@@ -354,10 +358,10 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-gray-900 truncate">
+                <p className="text-[11px] font-medium text-gray-900 truncate">
                   {getDisplayName()}
                 </p>
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-[10px] text-gray-600 truncate">
                   {userProfile?.company || getUserEmail()}
                 </p>
               </div>
@@ -366,7 +370,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile }: 
             <Button
               onClick={handleSignOut}
               variant="ghost"
-              className="w-full justify-start px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg"
+              className="w-full justify-start px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
             >
               <LogOut className="h-4 w-4 mr-3" />
               Sign Out

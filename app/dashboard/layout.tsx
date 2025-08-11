@@ -23,6 +23,7 @@ export default function DashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [sidebarHovered, setSidebarHovered] = useState(false)
 
   const supabase = createClient()
   const router = useRouter()
@@ -123,6 +124,8 @@ export default function DashboardLayout({
     return null
   }
 
+  const isActuallyCollapsed = !isMobile && sidebarCollapsed && !sidebarHovered
+
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Mobile backdrop */}
@@ -144,16 +147,19 @@ export default function DashboardLayout({
                 mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`
             : `relative transition-all duration-300 ${
-                sidebarCollapsed ? 'w-16' : 'w-64'
+                isActuallyCollapsed ? 'w-16' : 'w-64'
               }`
           }
         `}
+        onMouseEnter={() => { if (!isMobile && sidebarCollapsed) setSidebarHovered(true) }}
+        onMouseLeave={() => { if (!isMobile) setSidebarHovered(false) }}
       >
         <Sidebar 
           onUserUpdate={handleUserUpdate}
-          isCollapsed={sidebarCollapsed && !isMobile}
+          isCollapsed={isActuallyCollapsed && !isMobile}
           isMobile={isMobile}
           onCloseMobile={closeMobileMenu}
+          onToggleCollapse={toggleSidebar}
         />
       </div>
 
@@ -183,7 +189,7 @@ export default function DashboardLayout({
             subscriptionStatus={subscriptionStatus}
             onToggleSidebar={toggleSidebar}
             isMobile={isMobile}
-            sidebarCollapsed={sidebarCollapsed}
+            sidebarCollapsed={!!isActuallyCollapsed}
           />
         </div>
 
