@@ -15,8 +15,8 @@ export const PromptInput = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "flex w-full flex-col gap-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm",
-      "transition-shadow focus-within:shadow-md focus-within:ring-1 focus-within:ring-gray-300",
+      "flex w-full flex-col gap-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-white/80 dark:bg-gray-800/80 p-3 sm:p-4 shadow-sm",
+      "transition-all supports-[backdrop-filter]:backdrop-blur focus-within:shadow-md focus-within:ring-1 focus-within:ring-gray-300",
       className
     )}
     onKeyDown={(e) => {
@@ -49,16 +49,16 @@ export const PromptInputTextarea = React.forwardRef<
 >(({ className, onInput, ...props }, ref) => (
   <textarea
     ref={ref}
-    rows={1}
+    rows={2}
     onInput={(e) => {
       const el = e.currentTarget
       el.style.height = "auto"
-      el.style.height = `${Math.min(240, el.scrollHeight)}px`
+      el.style.height = `${Math.min(320, el.scrollHeight)}px`
       onInput?.(e)
     }}
     className={cn(
-      "w-full resize-none bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-      "leading-relaxed max-h-60 overflow-y-auto no-scrollbar",
+      "w-full resize-none bg-transparent text-sm sm:text-[15px] text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+      "leading-relaxed max-h-80 overflow-y-auto no-scrollbar",
       className
     )}
     {...props}

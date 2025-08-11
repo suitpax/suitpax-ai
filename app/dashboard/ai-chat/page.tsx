@@ -25,7 +25,6 @@ import SourceList from "@/components/prompt-kit/source-list"
 import { useChatStream } from "@/hooks/use-chat-stream"
 import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
 import ChatSidebar from "@/components/prompt-kit/chat-sidebar"
-import ToolSelector from "@/components/prompt-kit/tool-selector"
 
 interface Message {
   id: string
@@ -37,9 +36,12 @@ interface Message {
 }
 
 const defaultSuggestions = [
-  { id: "s1", title: "Plan a 2-day NYC business trip", prompt: "Plan a 2-day business trip itinerary in NYC with meetings near Midtown and a budget of $400 per night for hotel." },
-  { id: "s2", title: "Find flights MAD→SFO", prompt: "Find the 3 best flights from MAD to SFO on 2025-09-10, 1 adult, business class, direct preferred." },
-  { id: "s3", title: "Summarize attached PDF", prompt: "Summarize the attached PDF in 5 bullets and list key action items." },
+  { id: "s1", title: "Planifica 2 días en NYC (negocios)", prompt: "Planifica un itinerario de 2 días en NYC para reuniones cerca de Midtown con hotel máx. $400/noche y tiempo de traslados optimizado." },
+  { id: "s2", title: "Vuelos MAD→SFO (directos)", prompt: "Busca los 3 mejores vuelos de MAD a SFO el 2025-09-10, 1 adulto, business, directos preferidos, con políticas de empresa." },
+  { id: "s3", title: "Resumen de PDF adjunto", prompt: "Resume el PDF adjunto en 5 bullets y lista acciones clave con fechas." },
+  { id: "s4", title: "Genera PDF informe viaje", prompt: "Genera un PDF con el plan de viaje, horarios, presupuestos y contactos de proveedores." },
+  { id: "s5", title: "Política viajes Q3", prompt: "Crea una política de viajes corporativa concisa para Q3 con límites por ruta y cargos extra permitidos." },
+  { id: "s6", title: "Gastos a Excel", prompt: "Convierte estos gastos en una tabla con categorías, subtotal por categoría y total. Luego genera un PDF resumen." },
 ]
 
 function AIChatView() {
@@ -159,6 +161,42 @@ function AIChatView() {
     } catch {}
   }
 
+  const isPdfIntent = (text: string) => /\b(pdf|genera(r|)\s+un\s+pdf|genera(r|)\s+pdf|crear?\s+pdf|export(ar|a)\s+pdf|save\s+as\s+pdf)\b/i.test(text)
+
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }
+
+  const maybeGeneratePdf = async (userText: string, aiText: string, reasoning?: string) => {
+    if (!isPdfIntent(userText)) return
+    try {
+      const res = await fetch('/api/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: aiText, reasoning }),
+      })
+      if (!res.ok) throw new Error('PDF generation failed')
+      const blob = await res.blob()
+      downloadBlob(blob, `suitpax-ai-${Date.now()}.pdf`)
+      setMessages((prev) => [
+        ...prev,
+        { id: (Date.now() + 3).toString(), role: 'assistant', content: 'He generado y descargado el PDF automáticamente ✅', timestamp: new Date() },
+      ])
+    } catch (e: any) {
+      setMessages((prev) => [
+        ...prev,
+        { id: (Date.now() + 4).toString(), role: 'assistant', content: 'No he podido generar el PDF. Inténtalo de nuevo.', timestamp: new Date() },
+      ])
+    }
+  }
+
   const sendNonStreaming = async (userMessage: Message, sessionId: string | null) => {
     const response = await fetch("/api/ai-chat", {
       method: "POST",
@@ -186,6 +224,8 @@ function AIChatView() {
     setTypingMessageId(assistantMessage.id)
     try { await speak(data.response) } catch {}
     await logChat(sessionId, userMessage.content, data.response)
+    // Auto PDF if requested
+    await maybeGeneratePdf(userMessage.content, data.response, data.reasoning)
   }
 
   const handleSend = async () => {
@@ -234,6 +274,8 @@ function AIChatView() {
       setTypingMessageId(null)
       try { await speak(streamed) } catch {}
       await logChat(sessionId, userMessage.content, streamed)
+      // Auto PDF if requested
+      await maybeGeneratePdf(userMessage.content, streamed)
     } catch (err) {
       try {
         const sessionId = await ensureSession(userMessage.content)
@@ -296,8 +338,8 @@ function AIChatView() {
                   <p className="text-xs md:text-sm text-gray-600 font-light hidden sm:block">Try the superpowers ✨</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3 sm:space-x-4 flex-shrink-0">
-                <ToolSelector webSearchEnabled={webSearch} deepSearchEnabled={deepSearch} onToggleWeb={setWebSearch} onToggleDeep={setDeepSearch} />
+              <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+                {/* Removed header ToolSelector; toggles moved into input */}
                 <div className="flex items-center gap-2">
                   <Switch checked={showReasoning} onCheckedChange={setShowReasoning} />
                   <span className="text-[11px] text-gray-600">Reasoning</span>
@@ -354,16 +396,15 @@ function AIChatView() {
 
               {messages.map((message, index) => (
                 <motion.div key={message.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.05 }} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`${message.role === "user" ? "max-w-[85%] sm:max-w-sm md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-xl px-4 sm:px-6 py-2 sm:py-2.5 bg-black text-white" : "max-w-[90%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"}`}>
+                  <div className={`${message.role === "user" ? "max-w-[85%] sm:max-w-sm md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-xl px-4 sm:px-6 py-2 sm:py-2.5 bg-black text-white" : "max-w-[95%] sm:max-w-sm md:max-w-xl lg:max-w-2xl xl:max-w-3xl rounded-2xl px-3 sm:px-5 py-3 sm:py-4 bg-white/60 backdrop-blur-sm border border-gray-200 text-gray-900"}`}>
                     {message.role === "assistant" && (
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
-                          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-                            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={24} height={24} className="w-full h-full object-contain p-0.5" />
+                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
+                            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={32} height={32} className="w-full h-full object-contain p-0.5" />
                           </div>
                           <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
                         </div>
-                        {/* Badges compactos para tools/sources */}
                         <div className="flex items-center gap-1">
                           {message.sources && message.sources.length > 0 && (
                             <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-700">Sources</span>
@@ -443,6 +484,25 @@ function AIChatView() {
                   }
                 }} />
                 <PromptInputActions>
+                  <PromptInputAction className="gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setWebSearch(!webSearch)}
+                      aria-pressed={webSearch}
+                      className={`rounded-md border px-2 py-1 text-[10px] ${webSearch ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'}`}
+                    >
+                      Web
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeepSearch(!deepSearch)}
+                      aria-pressed={deepSearch}
+                      className={`rounded-md border px-2 py-1 text-[10px] ${deepSearch ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'}`}
+                    >
+                      Deep
+                    </button>
+                    <VoiceButton onTranscript={(t) => setInput((prev) => (prev ? prev + ' ' + t : t))} />
+                  </PromptInputAction>
                   <PromptInputAction asChild>
                     <label htmlFor="file-upload" className="cursor-pointer" aria-label="Attach files">
                       <input id="file-upload" ref={uploadInputRef} type="file" onChange={handleFileChange} className="hidden" multiple />
