@@ -1,47 +1,66 @@
 import { NextRequest } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { buildSystemPrompt } from "@/lib/prompts/system"
-
-export const runtime = "edge"
+import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
+export const dynamic = "force-dynamic"
+
 export async function POST(req: NextRequest) {
-  const { message, history = [] } = await req.json()
-  if (!message) return new Response("Message is required", { status: 400 })
+  try {
+    const { message, history = [] } = await req.json()
+    if (!message) return new Response("Message required", { status: 400 })
 
-  const systemPrompt = buildSystemPrompt({ domain: ["general", "travel", "coding", "business"] })
+    const supabase = createServerSupabase()
+    const { data: { user } } = await supabase.auth.getUser()
 
-  const stream = await anthropic.messages.stream({
-    model: "claude-3-5-sonnet-20240620",
-    max_tokens: 4096,
-    system: systemPrompt,
-    messages: [...history.map((m: any) => ({ role: m.role, content: m.content })), { role: "user", content: message }],
-  })
+    const system = buildSystemPrompt({ domain: ["general", "travel", "coding", "business"] })
 
-  const encoder = new TextEncoder()
+    // We use non-streaming API to get usage, then stream the text to client for UX
+    const res = await anthropic.messages.create({
+      model: "claude-3-5-sonnet-20240620",
+      max_tokens: 4096,
+      system,
+      messages: [...history.map((m: any) => ({ role: m.role, content: m.content })), { role: "user", content: message }],
+    })
 
-  const readable = new ReadableStream({
-    async start(controller) {
-      try {
-        stream.on("text", (delta: string) => {
-          controller.enqueue(encoder.encode(delta))
+    const text = (res.content.find((c: any) => c.type === "text") as any)?.text || ""
+
+    // Log usage
+    try {
+      const inputTokens = (res as any)?.usage?.input_tokens || 0
+      const outputTokens = (res as any)?.usage?.output_tokens || Math.ceil(text.length / 4)
+      if (user?.id) {
+        await supabase.from('ai_usage').insert({
+          user_id: user.id,
+          model: "claude-3-5-sonnet-20240620",
+          input_tokens: inputTokens,
+          output_tokens: outputTokens,
+          context_type: /flight|vuelo/i.test(message) ? 'flight_search' : 'general',
         })
-        stream.on("end", () => controller.close())
-        stream.on("error", (err: any) => {
-          controller.error(err)
-        })
-        await stream.done()
-      } catch (e) {
-        controller.error(e)
       }
-    }
-  })
+    } catch {}
 
-  return new Response(readable, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-cache, no-transform",
-    }
-  })
+    const encoder = new TextEncoder()
+    const stream = new ReadableStream({
+      start(controller) {
+        const chunkSize = 64
+        for (let i = 0; i < text.length; i += chunkSize) {
+          const slice = text.slice(i, i + chunkSize)
+          controller.enqueue(encoder.encode(slice))
+        }
+        controller.close()
+      }
+    })
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+      },
+    })
+  } catch (e: any) {
+    return new Response("Error", { status: 500 })
+  }
 }

@@ -263,6 +263,123 @@ export interface Database {
           created_at?: string
         }
       }
+      meetings: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          type: "video" | "phone" | "in-person"
+          status: "upcoming" | "completed" | "cancelled"
+          starts_at: string
+          ends_at: string
+          duration_minutes: number
+          attendees: string[] | null
+          location: string | null
+          description: string | null
+          meeting_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          type: "video" | "phone" | "in-person"
+          status?: "upcoming" | "completed" | "cancelled"
+          starts_at: string
+          ends_at: string
+          attendees?: string[] | null
+          location?: string | null
+          description?: string | null
+          meeting_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          type?: "video" | "phone" | "in-person"
+          status?: "upcoming" | "completed" | "cancelled"
+          starts_at?: string
+          ends_at?: string
+          attendees?: string[] | null
+          location?: string | null
+          description?: string | null
+          meeting_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      ai_usage: {
+        Row: {
+          id: number
+          user_id: string
+          session_id: string | null
+          model: string
+          input_tokens: number | null
+          output_tokens: number | null
+          total_tokens: number | null
+          cost_usd: number | null
+          context_type: "general" | "flight_search" | "expense_help" | "travel_planning"
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          user_id: string
+          session_id?: string | null
+          model: string
+          input_tokens?: number | null
+          output_tokens?: number | null
+          cost_usd?: number | null
+          context_type?: "general" | "flight_search" | "expense_help" | "travel_planning"
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          user_id?: string
+          session_id?: string | null
+          model?: string
+          input_tokens?: number | null
+          output_tokens?: number | null
+          total_tokens?: number | null
+          cost_usd?: number | null
+          context_type?: "general" | "flight_search" | "expense_help" | "travel_planning"
+          created_at?: string
+        }
+      }
+      web_sources: {
+        Row: {
+          id: number
+          user_id: string | null
+          href: string
+          title: string | null
+          description: string | null
+          favicon_url: string | null
+          content_snippet: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          user_id?: string | null
+          href: string
+          title?: string | null
+          description?: string | null
+          favicon_url?: string | null
+          content_snippet?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          user_id?: string | null
+          href?: string
+          title?: string | null
+          description?: string | null
+          favicon_url?: string | null
+          content_snippet?: string | null
+          created_at?: string
+        }
+      }
       user_preferences: {
         Row: {
           id: string

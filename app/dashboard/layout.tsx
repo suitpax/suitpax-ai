@@ -4,8 +4,10 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { Sidebar } from "@/components/dashboard/sidebar"
+import { Sidebar as LegacySidebar } from "@/components/dashboard/sidebar"
 import Header from "@/components/dashboard/header"
+import SidebarV2 from "@/components/dashboard/sidebar.v2"
+import HeaderV2 from "@/components/dashboard/header.v2"
 import { Toaster } from "react-hot-toast"
 import { motion } from "framer-motion"
 import { Menu } from "lucide-react"
@@ -155,13 +157,22 @@ export default function DashboardLayout({
         onMouseEnter={() => { if (!isMobile && sidebarCollapsed) setSidebarHovered(true) }}
         onMouseLeave={() => { if (!isMobile) setSidebarHovered(false) }}
       >
-        <Sidebar 
+        {false ? (
+          <LegacySidebar 
           onUserUpdate={handleUserUpdate}
           isCollapsed={isActuallyCollapsed && !isMobile}
           isMobile={isMobile}
           onCloseMobile={closeMobileMenu}
           onToggleCollapse={toggleSidebar}
         />
+        ) : (
+          <SidebarV2 
+            isCollapsed={isActuallyCollapsed && !isMobile}
+            isMobile={isMobile}
+            onCloseMobile={closeMobileMenu}
+            onToggleCollapse={toggleSidebar}
+          />
+        )}
       </div>
 
       {/* Main content */}
@@ -184,16 +195,9 @@ export default function DashboardLayout({
           </div>
         </div>
 
-        {/* Desktop Header */}
+        {/* Desktop Header - v2 minimal */}
         <div className="hidden lg:block">
-          <Header 
-            user={user} 
-            userPlan={userPlan} 
-            subscriptionStatus={subscriptionStatus}
-            onToggleSidebar={toggleSidebar}
-            isMobile={isMobile}
-            sidebarCollapsed={!!isActuallyCollapsed}
-          />
+          <HeaderV2 onToggleSidebar={toggleSidebar} />
         </div>
 
         {/* Main content area */}

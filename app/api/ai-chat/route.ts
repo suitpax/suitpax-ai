@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { buildSystemPrompt, buildReasoningInstruction } from "@/lib/prompts/system";
+import { createClient as createServerSupabase } from "@/lib/supabase/server";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
@@ -15,6 +16,8 @@ export async function POST(request: NextRequest) {
   try {
     let text = "";
     let sources: Array<{ title: string; url?: string; snippet?: string }> = [];
+    const supabase = createServerSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
 
     // PDF intent heuristic
     const pdfIntent = /\b(generate|create|export)\b.*\bpdf\b/i.test(message);
@@ -59,6 +62,7 @@ export async function POST(request: NextRequest) {
       } catch {}
     }
 
+    const started = Date.now();
     const initial = await anthropic.messages.create({
       model: "claude-3-5-sonnet-20240620",
       max_tokens: 4096,
@@ -82,6 +86,29 @@ export async function POST(request: NextRequest) {
       });
       reasoning = r.content.find((c: any) => c.type === "text")?.text?.trim();
     }
+
+    // Persist web sources for attribution
+    if (sources.length > 0) {
+      try {
+        const rows = sources.map((s) => ({ href: s.url || '', title: s.title, description: s.snippet || null, user_id: user?.id || null }))
+        await supabase.from('web_sources').insert(rows.filter(r => r.href))
+      } catch {}
+    }
+
+    // Log AI usage
+    try {
+      const inputTokens = (initial.usage as any)?.input_tokens || 0
+      const outputTokens = (initial.usage as any)?.output_tokens || Math.ceil(text.length / 4)
+      if (user?.id) {
+        await supabase.from('ai_usage').insert({
+          user_id: user.id,
+          model: "claude-3-5-sonnet-20240620",
+          input_tokens: inputTokens,
+          output_tokens: outputTokens,
+          context_type: isFlightIntent ? 'flight_search' : 'general',
+        })
+      }
+    } catch {}
 
     return NextResponse.json({ response: text, reasoning, sources });
   } catch (e: any) {
