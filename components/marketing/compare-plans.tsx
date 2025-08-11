@@ -129,11 +129,11 @@ const featureCategories = [
 // Helper function to render feature value
 const renderFeatureValue = (value: boolean | string) => {
   if (value === true) {
-    return <Check className="h-5 w-5 text-white" />
+    return <Check className="h-5 w-5 text-emerald-700" />
   } else if (value === false) {
-    return <X className="h-5 w-5 text-gray-500" />
+    return <X className="h-5 w-5 text-gray-400" />
   } else {
-    return <span className="text-sm font-medium text-white">{value}</span>
+    return <span className="text-sm font-medium text-gray-700">{value}</span>
   }
 }
 
@@ -151,7 +151,7 @@ export function ComparePlans() {
 
   return (
     <TooltipProvider>
-      <section className="py-16 md:py-24 bg-black">
+      <section className="py-16 md:py-24 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div
             className="text-center mb-12 md:mb-16"
@@ -159,16 +159,16 @@ export function ComparePlans() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-white leading-tight mb-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-black leading-tight mb-4">
               Compare all features
             </h2>
-            <p className="text-base text-gray-400 mb-8">Detailed comparison of all features across our plans</p>
+            <p className="text-base text-gray-500 mb-8">Detailed comparison of all features across our plans</p>
             <div className="flex justify-center">
-              <div className="flex items-center bg-gray-900 p-1 rounded-full border border-gray-800">
+              <div className="flex items-center bg-gray-100 p-1 rounded-full border border-gray-200">
                 <button
                   onClick={() => setIsAnnual(false)}
                   className={`px-6 py-2 text-sm font-medium rounded-full transition-all ${
-                    !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-white"
+                    !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600 hover:text-black"
                   }`}
                 >
                   Monthly
@@ -176,11 +176,11 @@ export function ComparePlans() {
                 <button
                   onClick={() => setIsAnnual(true)}
                   className={`px-6 py-2 text-sm font-medium rounded-full transition-all ${
-                    isAnnual ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-white"
+                    isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600 hover:text-black"
                   }`}
                 >
                   Annual
-                  <span className="ml-2 inline-flex items-center rounded-full bg-white px-2 py-0.5 text-xs font-medium text-black">
+                  <span className="ml-2 inline-flex items-center rounded-full bg-black px-2 py-0.5 text-xs font-medium text-white">
                     Save 20%
                   </span>
                 </button>
@@ -189,7 +189,7 @@ export function ComparePlans() {
           </motion.div>
 
           <motion.div
-            className="overflow-x-auto rounded-2xl border border-gray-800 shadow-2xl bg-gray-900"
+            className="overflow-x-auto rounded-2xl border border-gray-200 shadow bg-white"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -197,41 +197,40 @@ export function ComparePlans() {
             <div className="min-w-[900px]">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-800 bg-gray-900">
+                  <tr className="border-b border-gray-200 bg-white">
                     <th className="py-6 px-6 text-left w-1/5"></th>
                     <th className="py-6 px-6 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-lg font-medium text-white mb-1">Free</span>
-                        <span className="text-sm text-gray-400 mb-2">€0</span>
-                        <span className="inline-flex items-center rounded-full bg-gray-800 border border-gray-700 px-4 py-1 text-xs font-medium text-gray-300">
+                        <span className="text-lg font-medium text-black mb-1">Free</span>
+                        <span className="text-sm text-gray-500 mb-2">€0</span>
+                        <span className="inline-flex items-center rounded-full bg-transparent border border-black px-4 py-1 text-xs font-medium text-black">
                           Free
                         </span>
                       </div>
                     </th>
-                    <th className="py-6 px-6 text-center w-1/5 bg-gray-800/50 relative">
-                      <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-lg"></div>
+                    <th className="py-6 px-6 text-center w-1/5 bg-gray-50 relative">
                       <div className="relative flex flex-col items-center">
-                        <span className="text-lg font-medium text-white mb-1">Basic</span>
-                        <span className="text-sm text-gray-400 mb-2">{isAnnual ? "€39/month" : "€49/month"}</span>
-                        <span className="inline-flex items-center rounded-full bg-white px-4 py-1 text-xs font-medium text-black">
+                        <span className="text-lg font-medium text-black mb-1">Basic</span>
+                        <span className="text-sm text-gray-500 mb-2">{isAnnual ? "€39/month" : "€49/month"}</span>
+                        <span className="inline-flex items-center rounded-full bg-white border border-black px-4 py-1 text-xs font-medium text-black">
                           Most Popular
                         </span>
                       </div>
                     </th>
                     <th className="py-6 px-6 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-lg font-medium text-white mb-1">Pro</span>
-                        <span className="text-sm text-gray-400 mb-2">{isAnnual ? "€71/month" : "€89/month"}</span>
-                        <span className="inline-flex items-center rounded-full bg-gray-800 border border-gray-700 px-4 py-1 text-xs font-medium text-gray-300">
+                        <span className="text-lg font-medium text-black mb-1">Pro</span>
+                        <span className="text-sm text-gray-500 mb-2">{isAnnual ? "€71/month" : "€89/month"}</span>
+                        <span className="inline-flex items-center rounded-full bg-transparent border border-black px-4 py-1 text-xs font-medium text-black">
                           Advanced
                         </span>
                       </div>
                     </th>
                     <th className="py-6 px-6 text-center w-1/5">
                       <div className="flex flex-col items-center">
-                        <span className="text-lg font-medium text-white mb-1">Enterprise</span>
-                        <span className="text-sm text-gray-400 mb-2">Custom pricing</span>
-                        <span className="inline-flex items-center rounded-full bg-gray-800 border border-gray-700 px-4 py-1 text-xs font-medium text-gray-300">
+                        <span className="text-lg font-medium text-black mb-1">Enterprise</span>
+                        <span className="text-sm text-gray-500 mb-2">Custom pricing</span>
+                        <span className="inline-flex items-center rounded-full bg-transparent border border-black px-4 py-1 text-xs font-medium text-black">
                           Enterprise
                         </span>
                       </div>
@@ -242,8 +241,8 @@ export function ComparePlans() {
                   {featureCategories.map((category, categoryIndex) => (
                     <React.Fragment key={category.name}>
                       <tr
-                        className={`border-b border-gray-800 cursor-pointer hover:bg-gray-800/50 transition-colors ${
-                          expandedCategory === category.name ? "bg-gray-800/50" : ""
+                        className={`border-b border-gray-200 cursor-pointer hover:bg-gray-100/80 transition-colors ${
+                          expandedCategory === category.name ? "bg-gray-100" : ""
                         }`}
                         onClick={() => toggleCategory(category.name)}
                       >
@@ -270,19 +269,19 @@ export function ComparePlans() {
                         category.features.map((feature, index) => (
                           <motion.tr
                             key={`${category.name}-${index}`}
-                            className={`border-b border-gray-800 ${index % 2 === 1 ? "bg-gray-800/20" : ""}`}
+                            className={`border-b border-gray-200 ${index % 2 === 1 ? "bg-gray-50" : ""}`}
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: index * 0.05 }}
                           >
                             <td className="py-4 px-6">
                               <div className="flex items-center">
-                                <span className="text-sm font-medium text-white">{feature.name}</span>
+                                <span className="text-sm font-medium text-black">{feature.name}</span>
                                 <Tooltip>
                                   <TooltipTrigger>
-                                    <HelpCircle className="h-4 w-4 text-gray-500 ml-2 cursor-help hover:text-gray-400 transition-colors" />
+                                    <HelpCircle className="h-4 w-4 text-gray-500 ml-2 cursor-help hover:text-gray-700 transition-colors" />
                                   </TooltipTrigger>
-                                  <TooltipContent className="bg-gray-800 text-white border-gray-700 max-w-xs">
+                                  <TooltipContent className="bg-white text-black border border-gray-200 max-w-xs">
                                     {feature.description}
                                   </TooltipContent>
                                 </Tooltip>
@@ -309,9 +308,9 @@ export function ComparePlans() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <p className="text-base text-gray-400 mb-4">Need help choosing the right plan for your business?</p>
+            <p className="text-base text-gray-500 mb-4">Need help choosing the right plan for your business?</p>
             {isAnnual && (
-              <p className="text-sm text-white font-medium mb-6 bg-gray-800 inline-block px-4 py-2 rounded-full">
+              <p className="text-sm text-gray-800 font-medium mb-6 bg-gray-100 inline-block px-4 py-2 rounded-full">
                 Annual plans include a 20% discount compared to monthly billing
               </p>
             )}
