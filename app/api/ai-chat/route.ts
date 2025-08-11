@@ -82,7 +82,7 @@ async function flightSearchTool(origin: string, destination: string, departure_d
 }
 
 export async function POST(request: NextRequest) {
-  const { message, history = [], includeReasoning = false } = await request.json();
+  const { message, history = [], includeReasoning = false } = await request.json(); // includeReasoning controls a short rationale summary
 
   if (!message) {
     return NextResponse.json({ error: "Message is required" }, { status: 400 });
