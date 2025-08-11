@@ -23,6 +23,7 @@ import DocumentScanner from "@/components/prompt-kit/document-scanner"
 import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
 import SourceList from "@/components/prompt-kit/source-list"
 import { useChatStream } from "@/hooks/use-chat-stream"
+import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
 
 interface Message {
   id: string
@@ -157,13 +158,18 @@ function AIChatView() {
     setFiles([])
     setLoading(true)
 
+    const isFlightIntent = /\b([A-Z]{3})\b.*\b(to|→|-)\b.*\b([A-Z]{3})\b/i.test(userMessage.content) || /\bflight|vuelo|vuelos\b/i.test(userMessage.content)
+
     try {
+      if (isFlightIntent) {
+        await sendNonStreaming(userMessage)
+        return
+      }
       // Prefer streaming for better UX
       let streamed = ""
       await start({ message: userMessage.content, history: messages }, async (token) => {
         streamed += token
         setTypingMessageId("streaming")
-        // Optimistic rendering
         setMessages((prev) => {
           const others = prev.filter((m) => m.id !== "streaming-temp")
           return [
@@ -172,7 +178,6 @@ function AIChatView() {
           ]
         })
       })
-      // finalize
       setMessages((prev) => {
         const withoutTemp = prev.filter((m) => m.id !== "streaming-temp")
         return [
@@ -183,7 +188,6 @@ function AIChatView() {
       setTypingMessageId(null)
       try { await speak(streamed) } catch {}
     } catch (err) {
-      // fallback to non-streaming
       await sendNonStreaming(userMessage)
     } finally {
       setLoading(false)
@@ -285,7 +289,22 @@ function AIChatView() {
                       {message.role === "assistant" && typingMessageId === message.id ? (
                         <p className="text-sm font-light leading-relaxed text-gray-900">Typing…</p>
                       ) : (
-                        <Markdown content={message.content} />
+                        <>
+                          <Markdown content={message.content} />
+                          {(() => {
+                            const match = message.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
+                            if (!match) return null
+                            try {
+                              const parsed = JSON.parse(match[1])
+                              return <div className="mt-2"><ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => {
+                                // Navigate to booking page
+                                window.location.href = `/dashboard/flights/book/${id}`
+                              }} /></div>
+                            } catch {
+                              return null
+                            }
+                          })()}
+                        </>
                       )}
                     </div>
                     {message.sources && message.sources.length > 0 && <SourceList items={message.sources} />}

@@ -234,11 +234,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
         {/* AI Section (sin fila de agentes ni badges) */}
         {(!isCollapsed || isMobile) && (
           <div className="pt-4">
-            <div className="px-3 mb-2">
-              <h3 className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-2">
-                Suitpax AI
-              </h3>
-            </div>
+
             <div className="space-y-1">
               {aiNavigation.map((item) => {
                 const isActive = pathname === item.href
