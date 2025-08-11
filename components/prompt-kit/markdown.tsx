@@ -40,7 +40,7 @@ export default function Markdown({ content, className }: MarkdownProps) {
           td: ({ node, ...props }) => <td className="border border-gray-200 px-4 py-2" {...props} />,
           img: ({ node, ...props }) => <img className="rounded-lg my-2 max-w-full h-auto" {...props} />,
           p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
-          code({ node, inline, className, children, ...props }) {
+          code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || "")
             if (inline) {
               return (

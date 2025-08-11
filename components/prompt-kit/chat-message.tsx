@@ -50,7 +50,7 @@ export function ChatMessage({ message }: { message: Message }) {
             td: ({node, ...props}) => <td className="border border-gray-200 px-4 py-2" {...props} />,
             img: ({node, ...props}) => <img className="rounded-lg my-2 max-w-full h-auto" {...props} />,
             p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
-            code({node, inline, className, children, ...props}) {
+            code({node, inline, className, children, ...props}: any) {
               const match = /language-(\w+)/.exec(className || "")
               if (inline) {
                 return <code className="rounded bg-gray-100 px-1.5 py-0.5 text-[12px] text-gray-900" {...props}>{children}</code>

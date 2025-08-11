@@ -4,13 +4,12 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Loader2, ArrowUp, Paperclip, X, Square, ArrowLeft, File as FileIcon, Image as ImageIcon, FileText, FileCode, FileSpreadsheet, Music, Video, Archive, Mic, Volume2, Menu } from "lucide-react"
+import { Loader2, ArrowUp, Paperclip, X, Square, ArrowLeft, File as FileIcon, Image as ImageIcon, FileText, FileCode, FileSpreadsheet, Music, Video, Archive, Mic, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
 import Link from "next/link"
 import Markdown from "@/components/prompt-kit/markdown"
-import CodeBlock from "@/components/prompt-kit/code-block"
 import { PromptInput, PromptInputAction, PromptInputActions, PromptInputTextarea } from "@/components/prompt-kit/prompt-input"
 import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from "@/components/prompt-kit/chat-container"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
@@ -23,7 +22,6 @@ import DocumentScanner from "@/components/prompt-kit/document-scanner"
 import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
 import SourceList from "@/components/prompt-kit/source-list"
 import { useChatStream } from "@/hooks/use-chat-stream"
-import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
 import ChatSidebar from "@/components/prompt-kit/chat-sidebar"
 
 interface Message {
@@ -410,15 +408,7 @@ function AIChatView() {
         <div className="flex-1 min-h-0 relative">
           <ChatContainerRoot className="h-full">
             <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 relative min-h-[50vh] md:min-h-[60vh]">
-              {isUserLoading && (
-                <div className="flex items-center justify-center py-8">
-                  <div className="inline-flex items-center gap-2 text-gray-600 text-sm">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Loading Suitpax AI…</span>
-                  </div>
-                </div>
-              )}
-              {messages.length === 0 && !loading && !isUserLoading && (
+              {messages.length === 0 && !loading && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-center py-6 sm:py-8">
                     <div className="text-center">
@@ -472,9 +462,9 @@ function AIChatView() {
                         {message.reasoning && showReasoning && (
                           <Reasoning>
                             <ReasoningTrigger>Show reasoning</ReasoningTrigger>
-                            <ReasoningContent>
-                              <ReasoningResponse>{message.reasoning}</ReasoningResponse>
-                            </ReasoningContent>
+                                                         <ReasoningContent>
+                               <ReasoningResponse text={message.reasoning} />
+                             </ReasoningContent>
                           </Reasoning>
                         )}
                         {message.sources && message.sources.length > 0 && (
@@ -527,41 +517,41 @@ function AIChatView() {
                     handleSend()
                   }
                 }} />
-                <PromptInputActions>
-                  <PromptInputAction className="gap-2">
-                    <DocumentScanner onScanned={(r) => {
-                      if (r?.raw_text) setInput((prev) => (prev ? `${prev}\n\n${r.raw_text}` : r.raw_text!))
-                    }} />
-                    <button
-                      type="button"
-                      onClick={() => setWebSearch(!webSearch)}
-                      aria-pressed={webSearch}
-                      className={`rounded-md border px-2 py-1 text-[10px] ${webSearch ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'}`}
-                    >
-                      Web
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDeepSearch(!deepSearch)}
-                      aria-pressed={deepSearch}
-                      className={`rounded-md border px-2 py-1 text-[10px] ${deepSearch ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'}`}
-                    >
-                      Deep
-                    </button>
-                    <VoiceButton onTranscript={(t) => setInput((prev) => (prev ? prev + ' ' + t : t))} />
-                  </PromptInputAction>
-                  <PromptInputAction asChild>
-                    <label htmlFor="file-upload" className="cursor-pointer" aria-label="Attach files">
-                      <input id="file-upload" ref={uploadInputRef} type="file" onChange={handleFileChange} className="hidden" multiple />
-                      <Paperclip className="h-4 w-4" />
-                    </label>
-                  </PromptInputAction>
-                  <PromptInputAction asChild>
-                    <button onClick={handleSend} aria-label="Send message" disabled={loading || isStreaming}>
-                      {loading || isStreaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
-                    </button>
-                  </PromptInputAction>
-                </PromptInputActions>
+                                  <PromptInputActions>
+                    <PromptInputAction className="gap-2">
+                      <DocumentScanner onScanned={(r) => {
+                        if (r?.raw_text) setInput((prev) => (prev ? `${prev}\n\n${r.raw_text}` : r.raw_text!))
+                      }} />
+                      <button
+                        type="button"
+                        onClick={() => setWebSearch(!webSearch)}
+                        aria-pressed={webSearch}
+                        className={`rounded-md border px-2 py-1 text-[10px] ${webSearch ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'}`}
+                      >
+                        Web
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeepSearch(!deepSearch)}
+                        aria-pressed={deepSearch}
+                        className={`rounded-md border px-2 py-1 text-[10px] ${deepSearch ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'}`}
+                      >
+                        Deep
+                      </button>
+                      <VoiceButton onTranscript={(t) => setInput((prev) => (prev ? prev + ' ' + t : t))} />
+                    </PromptInputAction>
+                    <PromptInputAction>
+                      <label htmlFor="file-upload" className="cursor-pointer" aria-label="Attach files">
+                        <input id="file-upload" ref={uploadInputRef} type="file" onChange={handleFileChange} className="hidden" multiple />
+                        <Paperclip className="h-4 w-4" />
+                      </label>
+                    </PromptInputAction>
+                    <PromptInputAction>
+                      <button onClick={handleSend} aria-label="Send message" disabled={loading || isStreaming}>
+                        {loading || isStreaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
+                      </button>
+                    </PromptInputAction>
+                  </PromptInputActions>
               </PromptInput>
             </div>
           </div>

@@ -7,7 +7,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 type ChatContainerContextType = {
   isScrolledToBottom: boolean
   scrollToBottom: () => void
-  containerRef: React.RefObject<HTMLDivElement>
+  containerRef: React.RefObject<HTMLDivElement | null>
 }
 
 const ChatContainerContext = createContext<ChatContainerContextType | null>(null)
