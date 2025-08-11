@@ -131,9 +131,7 @@ export default function AirportSearch({
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           placeholder={placeholder}
-          className={`pl-10 ${error ? 'border-red-500' : ''} ${
-            selectedAirport ? 'border-green-500' : ''
-          }`}
+          className={`pl-10 rounded-full border-gray-300/60 bg-white/70 backdrop-blur-sm shadow-sm ${error ? 'border-red-500' : ''}`}
         />
         {selectedAirport && (
           <CheckIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-500" />

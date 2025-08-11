@@ -126,9 +126,9 @@ const ChatMessage: React.FC<{ message: Message; isTyping?: boolean }> = ({ messa
         <Card
           className={`p-4 ${
             message.role === "user"
-              ? "bg-emerald-950 text-white ml-auto"
+                            ? "bg-black text-white ml-auto"
               : "bg-white/50 backdrop-blur-sm border-gray-200"
-          }`}
+           }`}
         >
           <div className="prose prose-sm max-w-none dark:prose-invert">
             {isTyping ? (

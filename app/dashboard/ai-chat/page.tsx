@@ -128,9 +128,9 @@ export default function AIChatPage() {
         </ChatContainerRoot>
       </div>
 
-      <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 p-4 flex-shrink-0">
+      <footer className="bg-white/60 backdrop-blur-sm border-t border-gray-200 p-4 flex-shrink-0">
         <div className="max-w-4xl mx-auto">
-          <PromptInput value={input} onValueChange={setInput} onSubmit={handleSend} isLoading={loading}>
+          <PromptInput value={input} onValueChange={setInput} onSubmit={handleSend} isLoading={loading} className="rounded-full border-gray-300/60 bg-white/70 backdrop-blur-sm shadow-sm hover:shadow-md">
             <PromptInputActions>
                <Popover>
                 <PopoverTrigger asChild>
@@ -151,7 +151,7 @@ export default function AIChatPage() {
               disabled={loading}
             />
             <PromptInputActions>
-              <Button type="submit" size="icon" disabled={loading || !input.trim()} onClick={handleSend}>
+              <Button type="submit" size="icon" disabled={loading || !input.trim()} onClick={handleSend} className="rounded-full bg-black hover:bg-gray-800 text-white">
                 <ArrowUp className="h-4 w-4" />
               </Button>
             </PromptInputActions>
