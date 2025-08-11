@@ -46,13 +46,19 @@ PromptInput.displayName = "PromptInput"
 export const PromptInputTextarea = React.forwardRef<
   HTMLTextAreaElement,
   React.TextareaHTMLAttributes<HTMLTextAreaElement>
->(({ className, ...props }, ref) => (
+>(({ className, onInput, ...props }, ref) => (
   <textarea
     ref={ref}
     rows={1}
+    onInput={(e) => {
+      const el = e.currentTarget
+      el.style.height = "auto"
+      el.style.height = `${Math.min(240, el.scrollHeight)}px`
+      onInput?.(e)
+    }}
     className={cn(
       "w-full resize-none bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-      "leading-relaxed",
+      "leading-relaxed max-h-60 overflow-y-auto no-scrollbar",
       className
     )}
     {...props}

@@ -6,6 +6,14 @@
   .text-balance {
     text-wrap: balance;
   }
+  /* Ocultar scrollbars en navegadores modernos */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 }
 
 @layer base {
