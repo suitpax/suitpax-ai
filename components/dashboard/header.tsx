@@ -10,18 +10,11 @@ import {
   ChevronDown,
   Settings,
   LogOut,
-  Zap,
   Crown,
-  Command,
   Plus,
-  Calendar,
   MessageSquare,
   Calculator,
-  CreditCard,
   BarChart3,
-  Globe,
-  Sun,
-  Moon,
   HelpCircle,
   Sparkles
 } from "lucide-react"
@@ -50,10 +43,7 @@ import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
 import Link from "next/link"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 
@@ -70,6 +60,7 @@ const getPageTitle = (pathname: string) => {
   const routes: Record<string, { title: string; description?: string }> = {
     '/dashboard': { title: 'Dashboard', description: 'Overview and quick actions' },
     '/dashboard/flights': { title: 'Flights', description: 'Search and book business flights' },
+    '/dashboard/hotels': { title: 'Stays', description: 'Search and manage hotel stays' },
     '/dashboard/expenses': { title: 'Expenses', description: 'Track and manage travel expenses' },
     '/dashboard/analytics': { title: 'Analytics', description: 'Travel insights and reports' },
     '/dashboard/cost-center': { title: 'Cost Centers', description: 'Budgets and spending by department' },
@@ -78,7 +69,7 @@ const getPageTitle = (pathname: string) => {
     '/dashboard/team': { title: 'Team', description: 'Manage team members' },
     '/dashboard/mail': { title: 'Mail', description: 'Travel communications' },
     '/dashboard/meetings': { title: 'Meetings', description: 'Schedule and join meetings' },
-          '/dashboard/ai-chat': { title: 'AI Assistant', description: 'AI-powered travel assistant' },
+    '/dashboard/ai-chat': { title: 'Suitpax AI', description: 'AI-powered travel assistant' },
     '/dashboard/voice-ai': { title: 'Voice AI', description: 'Voice-powered assistance' },
     '/dashboard/settings': { title: 'Settings', description: 'Account and preferences' },
     '/dashboard/profile': { title: 'Profile', description: 'Personal information' },
@@ -88,11 +79,11 @@ const getPageTitle = (pathname: string) => {
 }
 
 const quickActions = [
-  { name: "Book Flight", href: "/dashboard/flights", icon: "Flight", shortcut: "⌘F" },
-  { name: "Add Expense", href: "/dashboard/expenses", icon: "Expense", shortcut: "⌘E" },
-  { name: "AI Chat", href: "/dashboard/ai-chat", icon: "AI", shortcut: "⌘A" },
-  { name: "Calendar", href: "/dashboard/calendar", icon: "Calendar", shortcut: "⌘C" },
-  { name: "Analytics", href: "/dashboard/analytics", icon: "Analytics", shortcut: "⌘R" },
+  { name: "Book Flight", href: "/dashboard/flights", shortcut: "⌘F" },
+  { name: "Add Expense", href: "/dashboard/expenses", shortcut: "⌘E" },
+  { name: "Suitpax AI", href: "/dashboard/ai-chat", shortcut: "⌘A" },
+  { name: "Calendar", href: "/dashboard/calendar", shortcut: "⌘C" },
+  { name: "Analytics", href: "/dashboard/analytics", shortcut: "⌘R" },
 ]
 
 export default function Header({ 
@@ -111,7 +102,6 @@ export default function Header({
     { id: 3, title: "Team meeting reminder", time: "3 hours ago", type: "meeting" },
   ])
   const [commandOpen, setCommandOpen] = useState(false)
-  const [theme, setTheme] = useState("light")
   const supabase = createClient()
 
   const pageInfo = getPageTitle(pathname)
@@ -131,19 +121,6 @@ export default function Header({
 
     getUserProfile()
   }, [user.id, supabase])
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setCommandOpen((open) => !open)
-      }
-    }
-
-    document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
-  }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -174,23 +151,13 @@ export default function Header({
     }
   }
 
-  const getTravelStats = () => {
-    // Mock data - replace with real data
-    return {
-      thisMonth: { flights: 3, savings: 420 },
-      pending: { expenses: 2, approvals: 1 }
-    }
-  }
-
-  const stats = getTravelStats()
-
   return (
     <>
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 lg:px-6 py-3 sticky top-0 z-40">
         <div className="flex items-center justify-between">
           {/* Left Section */}
           <div className="flex items-center space-x-4">
-            {/* Sidebar Toggle + Logo */}
+            {/* Sidebar Toggle + Brand */}
             <div className="flex items-center space-x-3">
               <Button
                 variant="ghost"
@@ -201,8 +168,6 @@ export default function Header({
               >
                 <Menu className="h-5 w-5" />
               </Button>
-
-              {/* Brand */}
               <div className="rounded-xl p-2 flex items-center justify-center">
                 <span className="text-sm font-medium tracking-tight text-gray-900">Dashboard</span>
               </div>
@@ -236,19 +201,6 @@ export default function Header({
 
           {/* Right Section */}
           <div className="flex items-center space-x-2">
-            {/* Quick Stats */}
-            <div className="hidden xl:flex items-center space-x-4 mr-4 text-xs">
-              <div className="flex items-center space-x-1 text-gray-600">
-                <span className="font-medium">{stats.thisMonth.flights}</span>
-                <span>flights this month</span>
-              </div>
-              <div className="w-px h-4 bg-gray-300" />
-              <div className="flex items-center space-x-1 text-green-600">
-                <span className="font-medium">${stats.thisMonth.savings}</span>
-                <span>saved</span>
-              </div>
-            </div>
-
             {/* Plan Badge */}
             {getPlanBadge()}
 
@@ -271,36 +223,15 @@ export default function Header({
                   className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   <Bell className="h-5 w-5 text-gray-600" />
-                  {notifications.length > 0 && (
-                    <Badge 
-                      variant="destructive" 
-                      className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-                    >
-                      {notifications.length}
-                    </Badge>
-                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-80">
                 <DropdownMenuLabel className="flex items-center justify-between">
                   Notifications
-                  <Button variant="ghost" size="sm" className="text-xs h-auto p-1">
-                    Mark all read
-                  </Button>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {notifications.map((notification) => (
-                  <DropdownMenuItem key={notification.id} className="flex items-start space-x-3 p-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                      <p className="text-xs text-gray-500">{notification.time}</p>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-center text-sm text-gray-500">
-                  View all notifications
+                  No new notifications
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -312,10 +243,17 @@ export default function Header({
                   variant="ghost"
                   className="flex items-center space-x-2 p-2 rounded-xl hover:bg-gray-100 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {user.email?.charAt(0).toUpperCase() || 'U'}
-                    </span>
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200">
+                    {userProfile?.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={userProfile.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-500">
+                        <span className="text-white text-sm font-medium">
+                          {user.email?.charAt(0).toUpperCase() || 'U'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   {!isMobile && (
                     <div className="hidden lg:flex items-center space-x-2">
@@ -418,7 +356,6 @@ export default function Header({
                 {quickActions.map((action) => (
                   <CommandItem key={action.name} asChild>
                     <Link href={action.href} onClick={() => setCommandOpen(false)}>
-                      <span className="mr-2">{action.icon}</span>
                       {action.name}
                       <CommandShortcut>{action.shortcut}</CommandShortcut>
                     </Link>
