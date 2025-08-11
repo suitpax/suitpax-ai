@@ -25,7 +25,6 @@ import SourceList from "@/components/prompt-kit/source-list"
 import { useChatStream } from "@/hooks/use-chat-stream"
 import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
 import ChatSidebar from "@/components/prompt-kit/chat-sidebar"
-import { ResponseStream } from "@/components/prompt-kit/response-stream"
 
 interface Message {
   id: string
