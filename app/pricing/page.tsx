@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import Plans from "@/components/marketing/plans"
 import ComparePlans from "@/components/marketing/compare-plans"
+import AirlinesSlider from "@/components/marketing/airlines-slider" 
 import Script from "next/script"
-import AirlinesSlider from "@/components/marketing/AirlinesSlider"
 
 export const metadata: Metadata = {
   title: "Pricing & Plans | Suitpax - AI-powered Business Travel Management",
@@ -62,27 +62,93 @@ export default function PricingPage() {
           }),
         }}
       />
+      
       <main className="flex min-h-screen flex-col">
-        <section aria-labelledby="pricing-plans-heading">
-          <h1 id="pricing-plans-heading" className="sr-only">
-            Suitpax Pricing Plans
-          </h1>
-
-          {/* Slider con filtro para logos negros */}
-          <div className="my-8">
-            <div className="[&_img]:invert [&_img]:grayscale [&_img]:brightness-0 [&_img]:contrast-[1.7]">
-              <AirlinesSlider />
+        {/* Hero Section con introducción a pricing */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+          
+          <div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl">
+                Simple, transparent{" "}
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  pricing
+                </span>
+              </h1>
+              <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
+                Choose the perfect plan for your business travel needs. No hidden fees, 
+                no surprises—just powerful AI-driven travel management that scales with you.
+              </p>
+              
+              {/* Trust Badge con Airlines */}
+              <div className="mt-12">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-6">
+                  Trusted by travelers booking with 200+ airlines worldwide
+                </p>
+                <div className="mx-auto max-w-4xl">
+                  <AirlinesSlider />
+                </div>
+              </div>
             </div>
           </div>
+        </section>
 
+        {/* Pricing Plans Section */}
+        <section aria-labelledby="pricing-plans-heading" className="relative bg-white dark:bg-gray-900">
+          <h2 id="pricing-plans-heading" className="sr-only">
+            Suitpax Pricing Plans
+          </h2>
           <Plans />
         </section>
 
-        <section aria-labelledby="compare-plans-heading">
+        {/* Compare Plans Section */}
+        <section aria-labelledby="compare-plans-heading" className="bg-gray-50 dark:bg-gray-800">
           <h2 id="compare-plans-heading" className="sr-only">
             Compare Suitpax Plans
           </h2>
           <ComparePlans />
+        </section>
+
+        {/* Enterprise CTA with Airlines as Social Proof */}
+        <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600">
+          <div className="absolute inset-0 bg-black/20" />
+          <div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                Need a custom solution?
+              </h2>
+              <p className="mt-6 text-xl leading-8 text-blue-100">
+                Our enterprise plans include dedicated support, custom integrations, 
+                and access to exclusive airline partnerships.
+              </p>
+              
+              <div className="mt-10 flex items-center justify-center gap-x-6">
+                <a
+                  href="/contact"
+                  className="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-blue-600 shadow-sm hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-colors"
+                >
+                  Contact Sales
+                </a>
+                <a
+                  href="/demo"
+                  className="text-sm font-semibold leading-6 text-white hover:text-blue-100 transition-colors"
+                >
+                  Book a demo <span aria-hidden="true">→</span>
+                </a>
+              </div>
+
+              {/* Airlines como prueba social para Enterprise */}
+              <div className="mt-16">
+                <p className="text-sm font-medium text-blue-100 mb-6">
+                  Enterprise clients get priority access to premium airline partnerships
+                </p>
+                <div className="mx-auto max-w-4xl opacity-80 hover:opacity-100 transition-opacity">
+                  <AirlinesSlider />
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </>
