@@ -507,6 +507,18 @@ export const Plans = () => {
                       ? "mailto:hello@suitpax.com"
                       : "https://app.suitpax.com/sign-up"
                   }
-                  className={`w-full py-1.5 px-3 rounded-xl text-center text-[9px] sm:text-[10px] font-medium transition-colors ${
-                    plan.popular
+                  className={`w-full py-1.5 px-3 rounded-xl text-center text-[9px] sm:text-[10px] font-medium transition-colors ${plan.popular ? "bg-black text-white hover:bg-gray-800" : "bg-white text-black border border-black hover:bg-gray-100"}`}
+                >
+                  {plan.cta}
+                </Link>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default Plans
           
