@@ -467,34 +467,6 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-        {/* AI Assistant CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-8"
-        >
-          <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-2xl p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-medium tracking-tighter mb-2">
-                  <em className="font-serif italic">Meet Suitpax AI, Your AI Travel Assistant</em>
-                </h3>
-                <p className="font-light text-gray-300">
-                  Get personalized help with booking flights, finding hotels, and managing your travel expenses.
-                </p>
-              </div>
-              <Link
-                href="/dashboard/ai-chat"
-                className="bg-white text-gray-900 px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition-colors duration-200 flex items-center gap-2"
-              >
-                <em className="font-serif italic">Start Chatting</em>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </motion.div>
-
         {/* Additional Intelligent Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -540,6 +512,38 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </motion.div>
+
+        {/* Footer CTA: Meet Suitpax AI at the very bottom */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.75 }}
+          className="mt-10"
+        >
+          <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-2xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-medium tracking-tighter mb-2">
+                  <em className="font-serif italic">Meet Suitpax AI, Your AI Travel Assistant</em>
+                </h3>
+                <p className="font-light text-gray-300">
+                  Get personalized help with booking flights, finding hotels, and managing your travel expenses.
+                </p>
+              </div>
+              <Link
+                href="/dashboard/ai-chat"
+                className="bg-white text-gray-900 px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition-colors duration-200 flex items-center gap-2"
+              >
+                <em className="font-serif italic">Start Chatting</em>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center justify-center text-xs text-gray-500">
+            <span className="mr-2">Technology by</span>
+            <img src="/logo/suitpax-bl-logo.webp" alt="Suitpax" className="h-4 w-auto" />
           </div>
         </motion.div>
       </div>

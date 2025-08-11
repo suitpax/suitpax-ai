@@ -32,6 +32,9 @@ import {
 } from "@/components/prompt-kit/reasoning"
 import { Switch } from "@/components/ui/switch"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import { VoiceAIProvider, useVoiceAI } from "@/contexts/voice-ai-context"
+import VoiceButton from "@/components/prompt-kit/voice-button"
+import DocumentScanner from "@/components/prompt-kit/document-scanner"
 
 interface Message {
   id: string
@@ -45,7 +48,7 @@ interface Message {
 const ShimmerWelcome: React.FC = () => (
   <div className="pointer-events-none select-none absolute inset-0 flex items-center justify-center">
     <div className="relative">
-      <span className="text-xs sm:text-sm font-medium bg-gradient-to-r from-gray-400 via-black to-gray-400 bg-[length:200%_100%] bg-clip-text text-transparent animate-[shimmer_2.5s_linear_infinite]">
+      <span className="text-base sm:text-lg md:text-2xl font-medium bg-gradient-to-r from-gray-400 via-black to-gray-400 bg-[length:200%_100%] bg-clip-text text-transparent animate-[shimmer_2.5s_linear_infinite]">
         Be bold. Ask anything. I will reason, then answer concisely.
       </span>
       <style jsx>{`
@@ -85,7 +88,7 @@ const TypingText: React.FC<{ text: string; speed?: number; onComplete?: () => vo
   return <span>{displayedText}</span>
 }
 
-export default function AIChatPage() {
+function AIChatView() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
@@ -95,6 +98,7 @@ export default function AIChatPage() {
   const [showReasoning, setShowReasoning] = useState(true)
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
+  const { speak } = useVoiceAI()
 
   useEffect(() => {
     const getUser = async () => {
@@ -179,6 +183,8 @@ export default function AIChatPage() {
 
       setMessages((prev) => [...prev, assistantMessage])
       setTypingMessageId(assistantMessage.id)
+      // Auto TTS for assistant
+      try { await speak(data.response) } catch {}
     } catch (error) {
       console.error("Error sending message:", error)
       const errorMessage: Message = {
@@ -244,7 +250,7 @@ export default function AIChatPage() {
         {/* Chat Container */}
         <div className="flex-1 min-h-0 relative">
           <ChatContainerRoot className="h-full">
-            <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 relative">
+            <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 relative min-h-[50vh] md:min-h-[60vh]">
               {messages.length === 0 && !loading && <ShimmerWelcome />}
 
               {messages.map((message, index) => (
@@ -351,7 +357,7 @@ export default function AIChatPage() {
             </ChatContainerContent>
 
             <ChatContainerScrollAnchor />
-            <ScrollButton className="bottom-20 sm:bottom-24 right-4 sm:right-6" />
+            <ScrollButton className="bottom-24 md:bottom-28 right-4 sm:right-6" />
           </ChatContainerRoot>
         </div>
 
@@ -404,6 +410,18 @@ export default function AIChatPage() {
                     </label>
                   </PromptInputAction>
 
+                  <PromptInputAction tooltip="Scan document">
+                    <DocumentScanner onScanned={(r) => {
+                      if (r?.raw_text) setInput((prev) => prev ? `${prev}\n\n${r.raw_text}` : r.raw_text || "")
+                    }} />
+                  </PromptInputAction>
+
+                  <PromptInputAction tooltip="Speak to type">
+                    <VoiceButton onTranscript={(t) => setInput((prev) => prev ? `${prev} ${t}` : t)} />
+                  </PromptInputAction>
+
+                  <div className="ml-auto" />
+
                   <PromptInputAction tooltip={loading ? "Stop generation" : "Send message"}>
                     <Button
                       variant="default"
@@ -427,5 +445,13 @@ export default function AIChatPage() {
         </motion.div>
       </div>
     </VantaHaloBackground>
+  )
+}
+
+export default function AIChatPage() {
+  return (
+    <VoiceAIProvider initialLanguage="es-ES">
+      <AIChatView />
+    </VoiceAIProvider>
   )
 }
