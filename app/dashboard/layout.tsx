@@ -214,23 +214,26 @@ export default function DashboardLayout({
         toastOptions={{
           duration: 4000,
           style: {
-            background: "#fff",
+            background: "#ffffff",
             color: "#374151",
             border: "1px solid #e5e7eb",
-            borderRadius: "12px",
+            borderRadius: "16px",
+            boxShadow: "0 10px 20px rgba(0,0,0,0.06)",
             fontSize: "14px",
-            fontWeight: "500",
+            fontWeight: 500,
           },
           success: {
-            iconTheme: {
-              primary: "#374151",
-              secondary: "#fff",
+            style: {
+              background: "#ecfdf5",
+              color: "#065f46",
+              border: "1px solid #a7f3d0",
             },
           },
           error: {
-            iconTheme: {
-              primary: "#374151",
-              secondary: "#fff",
+            style: {
+              background: "#fef2f2",
+              color: "#7f1d1d",
+              border: "1px solid #fecaca",
             },
           },
         }}

@@ -155,7 +155,8 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
       {/* Header */}
       <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 flex-shrink-0">
         {(!isCollapsed || isMobile) && (
-          <Link href="/dashboard" className="flex items-center" onClick={isMobile ? onCloseMobile : undefined}>
+          <Link href="/dashboard" className="flex items-center gap-2" onClick={isMobile ? onCloseMobile : undefined}>
+            <span className="w-3.5 h-3.5 rounded-full bg-gray-900" />
             <Image 
               src="/logo/suitpax-bl-logo.webp" 
               alt="Suitpax" 
@@ -231,21 +232,13 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
           })}
         </div>
 
-        {/* AI Section - remove mini chat and show responsive agents row */}
+        {/* AI Section (sin fila de agentes ni badges) */}
         {(!isCollapsed || isMobile) && (
           <div className="pt-4">
             <div className="px-3 mb-2">
               <h3 className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-2">
                 Suitpax AI
               </h3>
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-                {[1,2,3,4,5,6].map((i) => (
-                  <div key={i} className="flex items-center gap-2 border border-gray-200 rounded-xl px-2 py-1 bg-white min-w-max">
-                    <div className="w-5 h-5 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 bg-gray-100" />
-                    <span className="text-[10px] text-gray-700 font-medium hidden sm:inline">Agent {i}</span>
-                  </div>
-                ))}
-              </div>
             </div>
             <div className="space-y-1">
               {aiNavigation.map((item) => {
@@ -266,19 +259,6 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
                       <item.icon className="flex-shrink-0 h-5 w-5 mr-3" aria-hidden="true" />
                       <span>{item.name}</span>
                     </div>
-                    {item.badge && (
-                      <Badge 
-                        variant="secondary" 
-                        className={cn(
-                          "text-[10px] px-1.5 py-0.5 h-5",
-                          isActive 
-                            ? "bg-white/20 text-white border-white/20" 
-                            : "bg-gray-300 text-gray-700"
-                        )}
-                      >
-                        {item.badge}
-                      </Badge>
-                    )}
                   </Link>
                 )
               })}
@@ -286,7 +266,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
           </div>
         )}
 
-        {/* Collapsed AI icons */}
+        {/* Collapsed AI icons (sin indicadores/badges) */}
         {(isCollapsed && !isMobile) && (
           <div className="pt-4 space-y-1">
             {aiNavigation.map((item) => {
@@ -304,9 +284,6 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
                   title={item.name}
                 >
                   <item.icon className="h-5 w-5" aria-hidden="true" />
-                  {item.badge && (
-                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full" />
-                  )}
                 </Link>
               )
             })}

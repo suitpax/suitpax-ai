@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { FlightCard } from '@/components/flights/flight-card'
 import FlightFilters, { FlightFiltersDisplay } from '@/components/flights/flight-filters'
-import { Search, Loader2, AlertCircle, Filter } from 'lucide-react'
+import { Search, Loader2, AlertCircle, Filter, Calendar as CalendarIcon, Users as UsersIcon, Briefcase } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import AirportSearch from '@/components/flights/airport-search'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -266,7 +266,7 @@ export default function FlightsPage() {
           </p>
         </div>
 
-        <Card className="rounded-2xl border border-gray-200 shadow-sm">
+        <Card className="rounded-3xl border border-gray-200 bg-white/60 backdrop-blur-sm shadow-sm hover:shadow-md">
           <CardHeader>
             <CardTitle className="tracking-tighter">Search Flights</CardTitle>
           </CardHeader>
@@ -302,8 +302,9 @@ export default function FlightsPage() {
 
             {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="relative">
                 <Label htmlFor="departure">Departure Date</Label>
+                <CalendarIcon className="absolute left-3 bottom-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="departure"
                   type="date"
@@ -315,15 +316,16 @@ export default function FlightsPage() {
                     }
                   }}
                   min={new Date().toISOString().split('T')[0]}
-                  className={formErrors.departure_date ? 'border-red-500' : ''}
+                  className={`pl-10 rounded-full border-gray-300/60 bg-white/70 backdrop-blur-sm ${formErrors.departure_date ? 'border-red-500' : ''}`}
                 />
                 {formErrors.departure_date && (
                   <p className="mt-1 text-xs text-red-500">{formErrors.departure_date}</p>
                 )}
               </div>
               
-              <div>
+              <div className="relative">
                 <Label htmlFor="return">Return Date (optional)</Label>
+                <CalendarIcon className="absolute left-3 bottom-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="return"
                   type="date"
@@ -335,7 +337,7 @@ export default function FlightsPage() {
                     }
                   }}
                   min={searchForm.departure_date || new Date().toISOString().split('T')[0]}
-                  className={formErrors.return_date ? 'border-red-500' : ''}
+                  className={`pl-10 rounded-full border-gray-300/60 bg-white/70 backdrop-blur-sm ${formErrors.return_date ? 'border-red-500' : ''}`}
                 />
                 {formErrors.return_date && (
                   <p className="mt-1 text-xs text-red-500">{formErrors.return_date}</p>
@@ -345,7 +347,7 @@ export default function FlightsPage() {
 
             {/* Passengers and Class */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
+              <div className="relative">
                 <Label htmlFor="adults">Adults (18+)</Label>
                 <Select 
                   value={searchForm.passengers.adults.toString()}
@@ -354,7 +356,7 @@ export default function FlightsPage() {
                     passengers: { ...prev.passengers, adults: parseInt(value) }
                   }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="pl-9 rounded-full border-gray-300/60 bg-white/70 backdrop-blur-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -365,9 +367,10 @@ export default function FlightsPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                <UsersIcon className="absolute left-3 bottom-3 h-4 w-4 text-gray-400" />
               </div>
 
-              <div>
+              <div className="relative">
                 <Label htmlFor="children">Children (2-17)</Label>
                 <Select 
                   value={searchForm.passengers.children.toString()}
@@ -376,7 +379,7 @@ export default function FlightsPage() {
                     passengers: { ...prev.passengers, children: parseInt(value) }
                   }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="pl-9 rounded-full border-gray-300/60 bg-white/70 backdrop-blur-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -387,9 +390,10 @@ export default function FlightsPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                <UsersIcon className="absolute left-3 bottom-3 h-4 w-4 text-gray-400" />
               </div>
 
-              <div>
+              <div className="relative">
                 <Label htmlFor="infants">Infants (Under 2)</Label>
                 <Select 
                   value={searchForm.passengers.infants.toString()}
@@ -398,7 +402,7 @@ export default function FlightsPage() {
                     passengers: { ...prev.passengers, infants: parseInt(value) }
                   }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="pl-9 rounded-full border-gray-300/60 bg-white/70 backdrop-blur-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -409,9 +413,10 @@ export default function FlightsPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                <UsersIcon className="absolute left-3 bottom-3 h-4 w-4 text-gray-400" />
               </div>
 
-              <div>
+              <div className="relative">
                 <Label htmlFor="cabin">Cabin Class</Label>
                 <Select 
                   value={searchForm.cabin_class}
@@ -420,7 +425,7 @@ export default function FlightsPage() {
                     cabin_class: value
                   }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="pl-9 rounded-full border-gray-300/60 bg-white/70 backdrop-blur-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -430,6 +435,7 @@ export default function FlightsPage() {
                     <SelectItem value="first">First Class</SelectItem>
                   </SelectContent>
                 </Select>
+                <Briefcase className="absolute left-3 bottom-3 h-4 w-4 text-gray-400" />
               </div>
             </div>
 
@@ -449,7 +455,7 @@ export default function FlightsPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border border-gray-200 shadow-sm">
+        <Card className="rounded-3xl border border-gray-200 bg-white/60 backdrop-blur-sm shadow-sm hover:shadow-md">
           <CardHeader>
             <CardTitle className="tracking-tighter">Loyalty & Corporate Programs</CardTitle>
           </CardHeader>
@@ -490,7 +496,7 @@ export default function FlightsPage() {
                        {searchForm.return_date ? 'Round trip' : 'One way'} • {searchForm.passengers.adults + searchForm.passengers.children + searchForm.passengers.infants} passenger{(searchForm.passengers.adults + searchForm.passengers.children + searchForm.passengers.infants) !== 1 ? 's' : ''}
                      </div>
                    </div>
-                   <Button variant="outline" onClick={() => setIsFiltersOpen(true)} className="flex items-center gap-2">
+                   <Button variant="outline" onClick={() => setIsFiltersOpen(true)} className="flex items-center gap-2 bg-gray-100 text-gray-900 border-gray-200 hover:bg-gray-200">
                      <Filter className="h-4 w-4" /> Filters
                    </Button>
                  </div>

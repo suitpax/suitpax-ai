@@ -494,6 +494,54 @@ export default function DashboardPage() {
             </div>
           </div>
         </motion.div>
+
+        {/* Additional Intelligent Cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6"
+        >
+          <div className="lg:col-span-2 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-medium tracking-tighter">Proposal Progress</h3>
+              <span className="text-xs text-gray-500">April 2024</span>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <p className="text-xs text-gray-500">Proposals sent</p>
+                <p className="text-2xl font-medium tracking-tighter mt-1">64</p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <p className="text-xs text-gray-500">Interviews</p>
+                <p className="text-2xl font-medium tracking-tighter mt-1">12</p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <p className="text-xs text-gray-500">Hires</p>
+                <p className="text-2xl font-medium tracking-tighter mt-1">10</p>
+              </div>
+            </div>
+            <div className="mt-6 h-20 flex items-end gap-1">
+              {Array.from({ length: 36 }).map((_, i) => (
+                <div key={i} className={"w-2 rounded-t-sm " + (i % 5 === 0 ? "h-16 bg-gray-900" : "h-10 bg-gray-300")} />
+              ))}
+            </div>
+          </div>
+          <div className="bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md">
+            <h3 className="text-xl font-medium tracking-tighter mb-4">Recent Projects</h3>
+            <div className="space-y-3">
+              {["Web Development Project","Copyright Project","Web Design Project"].map((title, idx) => (
+                <div key={idx} className="group flex items-start justify-between p-3 rounded-xl border border-gray-200 bg-white hover:shadow-sm transition-all">
+                  <div>
+                    <p className="text-sm font-medium tracking-tight text-gray-900">{title}</p>
+                    <p className="text-xs text-gray-600">$10/hour • Remote</p>
+                  </div>
+                  <span className="text-[10px] rounded-full px-2 py-0.5 bg-gray-200 text-gray-800">Paid</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   )
