@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import {
   CreditCardIcon,
@@ -19,58 +19,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-const mockExpenses = [
-  {
-    id: 1,
-    description: "Flight to London - British Airways",
-    category: "Transportation",
-    amount: 1245.0,
-    date: "2024-03-15",
-    status: "approved",
-    receipt: true,
-    merchant: "British Airways",
-    paymentMethod: "Corporate Card",
-  },
-  {
-    id: 2,
-    description: "Hilton London Hotel - 3 nights",
-    category: "Accommodation",
-    amount: 450.0,
-    date: "2024-03-16",
-    status: "pending",
-    receipt: true,
-    merchant: "Hilton Hotels",
-    paymentMethod: "Corporate Card",
-  },
-  {
-    id: 3,
-    description: "Business Dinner - The Ivy",
-    category: "Meals",
-    amount: 125.5,
-    date: "2024-03-17",
-    status: "approved",
-    receipt: false,
-    merchant: "The Ivy Restaurant",
-    paymentMethod: "Personal Card",
-  },
-  {
-    id: 4,
-    description: "Taxi to Heathrow Airport",
-    category: "Transportation",
-    amount: 45.0,
-    date: "2024-03-18",
-    status: "pending",
-    receipt: true,
-    merchant: "Uber",
-    paymentMethod: "Corporate Card",
-  },
-]
+const mockExpenses: any[] = []
 
 export default function ExpensesPage() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedStatus, setSelectedStatus] = useState("all")
+  const [loading, setLoading] = useState(false)
+  const [expenses, setExpenses] = useState<any[]>([])
   const [formData, setFormData] = useState({
     description: "",
     category: "Transportation",
@@ -81,38 +38,75 @@ export default function ExpensesPage() {
     receipt: null as File | null,
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Expense submitted:", formData)
-    setShowAddForm(false)
-    setFormData({
-      description: "",
-      category: "Transportation",
-      amount: "",
-      date: "",
-      merchant: "",
-      paymentMethod: "Corporate Card",
-      receipt: null,
-    })
+  const loadExpenses = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch('/api/expenses')
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setExpenses(data.data || [])
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const filteredExpenses = mockExpenses.filter((expense) => {
+  useEffect(() => {
+    loadExpenses()
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      setLoading(true)
+      const fd = new FormData()
+      fd.append('title', formData.description)
+      fd.append('category', formData.category)
+      fd.append('amount', formData.amount)
+      fd.append('currency', 'USD')
+      fd.append('expense_date', formData.date)
+      fd.append('vendor', formData.merchant)
+      if (formData.receipt) fd.append('receipt', formData.receipt)
+
+      const res = await fetch('/api/expenses', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok || !data.success) throw new Error(data.error || 'Failed to create expense')
+
+      await loadExpenses()
+      setShowAddForm(false)
+      setFormData({
+        description: "",
+        category: "Transportation",
+        amount: "",
+        date: "",
+        merchant: "",
+        paymentMethod: "Corporate Card",
+        receipt: null,
+      })
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filteredExpenses = expenses.filter((expense) => {
     const matchesSearch =
-      expense.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      expense.merchant.toLowerCase().includes(searchQuery.toLowerCase())
+      (expense.title || expense.description || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (expense.merchant || expense.vendor || '').toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === "all" || expense.category === selectedCategory
     const matchesStatus = selectedStatus === "all" || expense.status === selectedStatus
 
     return matchesSearch && matchesCategory && matchesStatus
   })
 
-  const totalExpenses = mockExpenses.reduce((sum, expense) => sum + expense.amount, 0)
-  const approvedExpenses = mockExpenses
+  const totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0)
+  const approvedExpenses = expenses
     .filter((expense) => expense.status === "approved")
-    .reduce((sum, expense) => sum + expense.amount, 0)
-  const pendingExpenses = mockExpenses
+    .reduce((sum, expense) => sum + Number(expense.amount || 0), 0)
+  const pendingExpenses = expenses
     .filter((expense) => expense.status === "pending")
-    .reduce((sum, expense) => sum + expense.amount, 0)
+    .reduce((sum, expense) => sum + Number(expense.amount || 0), 0)
 
   const EmptyState = () => (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12">
@@ -126,7 +120,7 @@ export default function ExpensesPage() {
           : "Get started by adding your first business expense."}
       </p>
       {!searchQuery && selectedCategory === "all" && selectedStatus === "all" && (
-        <Button onClick={() => setShowAddForm(true)} className="bg-black text-white hover:bg-gray-800">
+        <Button onClick={() => setShowAddForm(true)} className="bg-black text-white hover:bg-gray-800" disabled={loading}>
           <PlusIcon className="h-4 w-4 mr-2" />
           Add Expense
         </Button>
@@ -361,7 +355,27 @@ export default function ExpensesPage() {
                       id="receipt"
                       type="file"
                       accept="image/*,.pdf"
-                      onChange={(e) => setFormData({ ...formData, receipt: e.target.files?.[0] || null })}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0] || null
+                        setFormData({ ...formData, receipt: file })
+                        if (file) {
+                          // Intentar OCR para pre-llenar
+                          const fd = new FormData()
+                          fd.append('parseOnly', 'true')
+                          fd.append('receipt', file)
+                          const res = await fetch('/api/expenses', { method: 'POST', body: fd })
+                          const data = await res.json()
+                          if (res.ok && data.success && data.parsed) {
+                            setFormData(prev => ({
+                              ...prev,
+                              amount: data.parsed.amount ? String(data.parsed.amount) : prev.amount,
+                              date: data.parsed.expense_date || prev.date,
+                              merchant: data.parsed.vendor || prev.merchant,
+                              description: prev.description || data.parsed.vendor || 'Expense'
+                            }))
+                          }
+                        }
+                      }}
                       className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-200 file:text-gray-700 hover:file:bg-gray-300"
                     />
                   </div>
@@ -377,7 +391,9 @@ export default function ExpensesPage() {
       )}
 
       {/* Expenses List */}
-      {filteredExpenses.length === 0 ? (
+      {loading ? (
+        <div className="text-sm text-gray-600">Loading...</div>
+      ) : filteredExpenses.length === 0 ? (
         <EmptyState />
       ) : (
         <motion.div
@@ -413,8 +429,8 @@ export default function ExpensesPage() {
                           <CreditCardIcon className="h-6 w-6 text-gray-600" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-medium text-gray-900">{expense.description}</h3>
-                          <p className="text-sm text-gray-600 mt-1">{expense.merchant}</p>
+                                                     <h3 className="font-medium text-gray-900">{expense.title || expense.description}</h3>
+                          <p className="text-sm text-gray-600 mt-1">{expense.merchant || expense.vendor}</p>
                           <div className="flex items-center space-x-4 mt-2">
                             <Badge className="bg-gray-200 text-gray-700 border-gray-200 text-xs">
                               {expense.category}
@@ -433,7 +449,7 @@ export default function ExpensesPage() {
 
                       <div className="flex items-center space-x-4">
                         <div className="text-right">
-                          <div className="text-lg font-medium">${expense.amount.toLocaleString()}</div>
+                                                     <div className="text-lg font-medium">${Number(expense.amount).toLocaleString()}</div>
                           <Badge
                             className={`text-xs ${
                               expense.status === "approved"
@@ -446,7 +462,7 @@ export default function ExpensesPage() {
                             {expense.status.charAt(0).toUpperCase() + expense.status.slice(1)}
                           </Badge>
                         </div>
-                        <Button size="sm" variant="outline">
+                                                 <Button size="sm" variant="outline" disabled={loading}>
                           <EllipsisVerticalIcon className="h-4 w-4" />
                         </Button>
                       </div>
