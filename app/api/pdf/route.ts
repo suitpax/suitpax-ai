@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
           h1,h2,h3,h4 { color: #111827; }
           .container { max-width: 800px; margin: 32px auto; padding: 0 24px; }
         </style>
-      </head><body><div class="container">${raw}</div></body></html>`
+      </head><body><div class=\"container\">${raw}</div></body></html>`
     }
 
     if (!contentHtml) {
@@ -43,7 +43,12 @@ export async function POST(req: NextRequest) {
     const pdfBuffer = await page.pdf({ format: format as any, printBackground: true, margin: { top: "20mm", bottom: "20mm" } })
     await browser.close()
 
-    return new Response(pdfBuffer, {
+    const ab = new ArrayBuffer(pdfBuffer.byteLength)
+    const view = new Uint8Array(ab)
+    view.set(pdfBuffer)
+    const blob = new Blob([ab], { type: "application/pdf" })
+
+    return new Response(blob, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

@@ -47,9 +47,9 @@ export async function GET(request: NextRequest) {
 
       if (offerId) {
         // Obtener mapa de asientos para una oferta específica
-        const seatMapResponse = await duffel.seatMaps.create({
+        const seatMapResponse = await (duffel as any).seatMaps.create({
           offer_id: offerId,
-          passengers: [{ type: 'adult' }] // Default passenger for seat map
+          passengers: [{ type: 'adult' }]
         })
         seatMaps = seatMapResponse.data.seat_maps || []
       } else if (orderId) {
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
           for (const slice of order.data.slices) {
             for (const segment of slice.segments) {
               try {
-                const seatMapResponse = await duffel.seatMaps.create({
+                const seatMapResponse = await (duffel as any).seatMaps.create({
                   offer_id: segment.id, // En realidad necesitaríamos recrear la oferta
                   passengers: order.data.passengers.map(p => ({ type: p.type }))
                 })
@@ -204,6 +204,7 @@ export async function POST(request: NextRequest) {
           add: [],
           remove: []
         },
+        // services field may not be typed in SDK; cast payload to any
         services: {
           add: selections.map(selection => ({
             id: selection.seat_id,
@@ -213,24 +214,22 @@ export async function POST(request: NextRequest) {
           })),
           remove: []
         }
-      })
+      } as any)
 
       if (!changeRequest.data) {
         throw new Error("No change request data received")
       }
 
       // Confirmar el cambio si es necesario
-      let confirmedChange
-      if (changeRequest.data.requires_confirmation) {
-        const bestOffer = changeRequest.data.order_change_offers?.[0]
+      let confirmedChange: any = changeRequest
+      if ((changeRequest as any).data?.requires_confirmation) {
+        const bestOffer = (changeRequest as any).data?.order_change_offers?.[0]
         if (bestOffer) {
-          confirmedChange = await duffel.orderChangeOffers.create({
-            order_change_request_id: changeRequest.data.id,
+          confirmedChange = await (duffel as any).orderChangeOffers.create({
+            order_change_request_id: (changeRequest as any).data.id,
             selected_order_change_offer: bestOffer.id
           })
         }
-      } else {
-        confirmedChange = changeRequest
       }
 
       // Actualizar la base de datos
@@ -269,7 +268,7 @@ export async function POST(request: NextRequest) {
             currency: booking.total_currency
           },
           seats_selected: selections.length,
-          confirmation_required: changeRequest.data.requires_confirmation || false
+          confirmation_required: (changeRequest as any).data?.requires_confirmation || false
         },
         selections: selections.map(selection => ({
           passenger_id: selection.passenger_id,
@@ -359,11 +358,12 @@ export async function DELETE(request: NextRequest) {
           add: [],
           remove: []
         },
+        // services field may not be typed in SDK; cast payload to any
         services: {
           add: [],
           remove: [{ id: seatServiceId }]
         }
-      })
+      } as any)
 
       return NextResponse.json({
         success: true,
