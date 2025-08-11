@@ -14,6 +14,9 @@ import AirportSearch from '@/components/flights/airport-search'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'sonner'
 import type { FlightSearchParams, FlightOffer, FlightSearchResponse } from '@/types/flights'
+import { SearchAnalytics } from '@/components/flights/search-analytics'
+import { LoyaltyProgramsManager } from '@/components/flights/loyalty-programs'
+import { PerformanceDashboard } from '@/components/flights/perfomance-dashboard'
 
 interface SearchFormData {
   origin: string
@@ -136,6 +139,11 @@ export default function FlightsPage() {
 
     setFormErrors(errors)
     return Object.keys(errors).length === 0
+  }
+
+  const handleRouteSelectFromAnalytics = (origin: string, destination: string) => {
+    setSearchForm(prev => ({ ...prev, origin, destination }))
+    toast.info(`Route selected: ${origin} → ${destination}`)
   }
 
   const handleSearch = async () => {
@@ -441,6 +449,15 @@ export default function FlightsPage() {
           </CardContent>
         </Card>
 
+        <Card className="rounded-2xl border border-gray-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="tracking-tighter">Loyalty & Corporate Programs</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <LoyaltyProgramsManager />
+          </CardContent>
+        </Card>
+
         {/* Error Display */}
         {error && (
           <Alert className="border-red-200 bg-red-50">
@@ -517,8 +534,12 @@ export default function FlightsPage() {
                    onClose={() => setIsFiltersOpen(false)}
                    onFiltersChange={(f: any) => applyClientFilters(f)}
                  />
-              </>
-            ) : !isLoading && searchPerformed ? (
+
+                  <div className="mt-8">
+                    <SearchAnalytics onRouteSelect={handleRouteSelectFromAnalytics} />
+                  </div>
+               </>
+             ) : !isLoading && searchPerformed ? (
               <div className="text-center py-12">
                 <div className="text-gray-500">
                   <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -530,6 +551,8 @@ export default function FlightsPage() {
           </div>
         )}
       </div>
+
+      <PerformanceDashboard />
     </div>
   )
 }

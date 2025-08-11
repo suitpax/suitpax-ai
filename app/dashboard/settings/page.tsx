@@ -309,21 +309,92 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {activeSection !== "profile" && (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  {(() => {
-                    const section = settingsSections.find((s) => s.id === activeSection)
-                    const IconComponent = section?.icon
-                    return IconComponent ? <IconComponent className="h-8 w-8 text-gray-400" /> : null
-                  })()}
+            {activeSection === "notifications" && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-medium tracking-tighter">Notification Preferences</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <Label>Email Notifications</Label>
+                    <div className="space-y-2 text-sm text-gray-700">
+                      <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> Booking updates</label>
+                      <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> Expense approvals</label>
+                      <label className="flex items-center gap-2"><input type="checkbox" /> Weekly analytics report</label>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <Label>Push Notifications</Label>
+                    <div className="space-y-2 text-sm text-gray-700">
+                      <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> Flight status alerts</label>
+                      <label className="flex items-center gap-2"><input type="checkbox" /> Meeting reminders</label>
+                      <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> Budget threshold alerts</label>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-lg font-medium tracking-tight text-gray-900 mb-2">
-                  {settingsSections.find((s) => s.id === activeSection)?.name} Settings
-                </h3>
-                <p className="text-gray-600 font-light">
-                  This section is coming soon. We're working on advanced settings for your account.
-                </p>
+                <Button className="px-6 py-3 bg-black text-white font-medium rounded-xl hover:bg-gray-800">Save Preferences</Button>
+              </div>
+            )}
+
+            {activeSection === "billing" && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-medium tracking-tighter">Billing</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Plan</Label>
+                      <p className="text-sm text-gray-600 mt-1">{profile?.plan?.toUpperCase() || 'FREE'}</p>
+                    </div>
+                    <Button className="w-fit">Update Plan</Button>
+                  </div>
+                  <div className="space-y-4">
+                    <Label>Payment Method</Label>
+                    <div className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700">Visa ending in 4242 • Exp 04/28</div>
+                    <Button variant="outline" className="w-fit">Change Card</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeSection === "security" && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-medium tracking-tighter">Security</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <Label>Password</Label>
+                    <Input type="password" placeholder="••••••••" />
+                    <Button className="w-fit">Update Password</Button>
+                  </div>
+                  <div className="space-y-3">
+                    <Label>Two-Factor Authentication</Label>
+                    <div className="rounded-xl border border-gray-200 p-4 flex items-center justify-between">
+                      <span className="text-sm text-gray-700">Authenticator App</span>
+                      <Button variant="outline" className="text-sm">Enable</Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeSection === "preferences" && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-medium tracking-tighter">Preferences</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Language</Label>
+                    <select className="px-3 py-2 rounded-xl border border-gray-200">
+                      <option>English</option>
+                      <option>Español</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Timezone</Label>
+                    <select className="px-3 py-2 rounded-xl border border-gray-200">
+                      <option>UTC</option>
+                      <option>America/New_York</option>
+                      <option>Europe/Madrid</option>
+                    </select>
+                  </div>
+                </div>
+                <Button className="w-fit">Save</Button>
               </div>
             )}
           </div>

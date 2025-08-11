@@ -127,6 +127,14 @@ export default function MeetingsPage() {
     }
   }
 
+  const updateMeetingStatus = (id: string, status: Meeting["status"]) => {
+    setMeetings((prev) => {
+      const updated = prev.map((m) => (m.id === id ? { ...m, status } : m))
+      persist(updated)
+      return updated
+    })
+  }
+
   const handleCreateMeeting = () => {
     const meeting: Meeting = {
       id: Date.now().toString(),
@@ -394,7 +402,7 @@ export default function MeetingsPage() {
       </motion.div>
 
       {/* Filters */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm sticky top-20 z-10">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           <div className="flex items-center space-x-4">
             <div className="relative">
@@ -497,6 +505,12 @@ export default function MeetingsPage() {
                         <PlayIcon className="h-4 w-4 mr-2" />
                         Join
                       </Button>
+                    )}
+                    {meeting.status === "upcoming" && (
+                      <Button size="sm" variant="outline" onClick={() => updateMeetingStatus(meeting.id, "completed")}>Mark done</Button>
+                    )}
+                    {meeting.status !== "cancelled" && (
+                      <Button size="sm" variant="outline" onClick={() => updateMeetingStatus(meeting.id, "cancelled")}>Cancel</Button>
                     )}
                     <Button variant="ghost" size="sm">
                       <EllipsisVerticalIcon className="h-4 w-4" />

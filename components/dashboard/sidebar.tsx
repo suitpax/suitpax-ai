@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
+import AISearchInput from "@/components/ui/ai-search-input"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -187,6 +188,12 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
           </Button>
         )}
       </div>
+
+      {(!isCollapsed || isMobile) && (
+        <div className="px-3 pt-3 border-b border-gray-200">
+          <AISearchInput size="sm" />
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
@@ -357,20 +364,27 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
         {(!isCollapsed || isMobile) && (
           <div className="border-t border-gray-100 pt-3">
             <div className="flex items-center space-x-3 px-3 py-2 mb-2">
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-10 w-10 ring-2 ring-purple-400/40">
                 <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} />
                 <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-medium text-gray-900 truncate">
+                <p className="text-[12px] font-medium text-gray-900 truncate">
                   {getDisplayName()}
                 </p>
-                <p className="text-[10px] text-gray-600 truncate">
-                  {userProfile?.company || getUserEmail()}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-[10px] text-gray-600 truncate">
+                    {userProfile?.company || getUserEmail()}
+                  </p>
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0.5">Member</Badge>
+                </div>
               </div>
+            </div>
+            <div className="px-3 pb-2 flex items-center gap-2">
+              <Link href="/dashboard/profile" className="text-[10px] px-2 py-1 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Profile</Link>
+              <Link href="/dashboard/settings" className="text-[10px] px-2 py-1 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Settings</Link>
             </div>
             
             <Button
@@ -388,7 +402,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
         {(isCollapsed && !isMobile) && (
           <div className="border-t border-gray-100 pt-3 space-y-2">
             <div className="flex justify-center">
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-10 w-10 ring-2 ring-purple-400/40">
                 <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} />
                 <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
                   {getInitials()}

@@ -108,6 +108,12 @@ export default function ExpensesPage() {
     .filter((expense) => expense.status === "pending")
     .reduce((sum, expense) => sum + Number(expense.amount || 0), 0)
 
+  const breakdownByCategory = expenses.reduce<Record<string, number>>((acc, e) => {
+    const key = e.category || 'Other'
+    acc[key] = (acc[key] || 0) + Number(e.amount || 0)
+    return acc
+  }, {})
+
   const EmptyState = () => (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12">
       <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -252,6 +258,20 @@ export default function ExpensesPage() {
           <option value="rejected">Rejected</option>
         </select>
       </motion.div>
+
+      {/* Category Breakdown */}
+      {expenses.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {Object.entries(breakdownByCategory).map(([cat, amt]) => (
+            <Card key={cat} className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
+              <CardContent className="p-4">
+                <div className="text-xs text-gray-600">{cat}</div>
+                <div className="text-lg font-medium tracking-tighter">${amt.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+          ))}
+        </motion.div>
+      )}
 
       {/* Add Expense Form */}
       {showAddForm && (
@@ -437,6 +457,9 @@ export default function ExpensesPage() {
                             </Badge>
                             <span className="text-sm text-gray-500">{expense.date}</span>
                             <span className="text-sm text-gray-500">{expense.paymentMethod}</span>
+                            {expense.currency && (
+                              <span className="text-sm text-gray-500">{expense.currency}</span>
+                            )}
                             {expense.receipt && (
                               <div className="flex items-center text-xs text-gray-500">
                                 <DocumentTextIcon className="h-3 w-3 mr-1" />
