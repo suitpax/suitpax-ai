@@ -1,51 +1,57 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 
 const AirlinesSlider = () => {
-  const sliderTopRef = useRef<HTMLDivElement>(null)
+  const sliderRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    const animateSlider = (sliderRef: React.RefObject<HTMLDivElement>, speed: number, reverse = false) => {
-      const slider = sliderRef.current
-      if (!slider) return
+    setIsClient(true)
+  }, [])
 
-      let animationId: number
-      let position = 0
+  useEffect(() => {
+    if (!isClient) return
 
-      const animate = () => {
-        position += reverse ? speed : -speed
+    const slider = sliderRef.current
+    const content = contentRef.current
+    
+    if (!slider || !content) return
 
-        // Reset position for seamless loop
-        const contentWidth = slider.scrollWidth
-        const viewportWidth = slider.clientWidth
+    let animationId: number
+    let position = 0
+    const speed = 0.5
 
-        if (Math.abs(position) >= contentWidth - viewportWidth) {
-          position = 0
-        }
-
-        if (slider.querySelector(".slider-content")) {
-          ;(slider.querySelector(".slider-content") as HTMLElement).style.transform = `translateX(${position}px)`
-        }
-
-        animationId = requestAnimationFrame(animate)
+    const animate = () => {
+      position -= speed
+      
+      // Calcular el ancho de un conjunto de aerolíneas (sin duplicados)
+      const singleSetWidth = (100 + 40) * airlines.length // 100px width + 40px margin (mx-5 = 20px each side)
+      
+      // Reset cuando hemos movido exactamente un conjunto completo
+      if (Math.abs(position) >= singleSetWidth) {
+        position = 0
       }
 
+      content.style.transform = `translateX(${position}px)`
       animationId = requestAnimationFrame(animate)
+    }
 
-      return () => {
+    // Pequeño delay para asegurar que el DOM esté listo
+    const timeoutId = setTimeout(() => {
+      animationId = requestAnimationFrame(animate)
+    }, 100)
+
+    return () => {
+      clearTimeout(timeoutId)
+      if (animationId) {
         cancelAnimationFrame(animationId)
       }
     }
-
-    const cleanupTop = animateSlider(sliderTopRef, 0.5)
-
-    return () => {
-      cleanupTop && cleanupTop()
-    }
-  }, [])
+  }, [isClient])
 
   const airlines = [
     {
@@ -53,7 +59,7 @@ const AirlinesSlider = () => {
       logo: "https://cdn.brandfetch.io/aa.com/w/512/h/78/theme/light/logo?c=1idU-l8vdm7C5__3dci",
     },
     {
-      name: "KLM Royal Dutch Airlines",
+      name: "KLM Royal Dutch Airlines", 
       logo: "https://cdn.brandfetch.io/klm.com/w/512/h/69/logo?c=1idU-l8vdm7C5__3dci",
     },
     {
@@ -61,7 +67,7 @@ const AirlinesSlider = () => {
       logo: "https://cdn.brandfetch.io/jal.com/w/512/h/49/theme/light/logo?c=1idU-l8vdm7C5__3dci",
     },
     {
-      name: "Qatar Airways",
+      name: "Qatar Airways", 
       logo: "https://cdn.brandfetch.io/qatarairways.com/w/512/h/144/theme/light/logo?c=1idU-l8vdm7C5__3dci",
     },
     {
@@ -98,13 +104,25 @@ const AirlinesSlider = () => {
     },
   ]
 
-  // Duplicar para loop infinito
-  const duplicatedAirlines = [...airlines, ...airlines, ...airlines, ...airlines]
+  // Duplicar para loop infinito - reducido a 3 copias para mejor rendimiento
+  const duplicatedAirlines = [...airlines, ...airlines, ...airlines]
+
+  if (!isClient) {
+    return (
+      <div className="w-full overflow-hidden bg-black/40 backdrop-blur-sm rounded-xl">
+        <div className="py-6 h-16" />
+      </div>
+    )
+  }
 
   return (
     <div className="w-full overflow-hidden bg-black/40 backdrop-blur-sm rounded-xl">
-      <div className="py-6 relative overflow-hidden" ref={sliderTopRef}>
-        <div className="flex slider-content">
+      <div className="py-6 relative overflow-hidden" ref={sliderRef}>
+        <div 
+          ref={contentRef}
+          className="flex"
+          style={{ willChange: 'transform' }}
+        >
           {duplicatedAirlines.map((airline, index) => (
             <div
               key={`airline-${airline.name}-${index}`}
@@ -117,6 +135,11 @@ const AirlinesSlider = () => {
                 width={100}
                 height={40}
                 className="h-6 w-auto object-contain"
+                priority={index < airlines.length} // Prioridad para el primer conjunto
+                onError={(e) => {
+                  // Fallback en caso de error de imagen
+                  (e.target as HTMLImageElement).src = "/placeholder.svg"
+                }}
               />
             </div>
           ))}
