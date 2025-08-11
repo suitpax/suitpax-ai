@@ -236,11 +236,8 @@ export function VoiceAIProvider({
           },
           body: JSON.stringify({
             text,
-            voice_id: settings.voiceId,
-            voice_settings: {
-              stability: settings.stability,
-              similarity_boost: settings.similarityBoost,
-            },
+            voiceId: settings.voiceId,
+            language: settings.language,
           }),
         })
 
