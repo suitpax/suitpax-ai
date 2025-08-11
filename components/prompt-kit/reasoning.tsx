@@ -82,21 +82,21 @@ export function ReasoningTrigger({
   return (
     <CollapsibleTrigger
       className={cn(
-        "flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors",
-        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm",
-        "py-1 px-2 -mx-2", // Add padding and negative margin for better click area
+        "flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 transition-colors",
+        "focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 rounded-md",
+        "py-1 px-2 -mx-2",
         className
       )}
       {...props}
     >
       {isOpen ? (
-        <ChevronDown className="h-4 w-4 transition-transform" />
+        <ChevronDown className="h-3.5 w-3.5 transition-transform" />
       ) : (
-        <ChevronRight className="h-4 w-4 transition-transform" />
+        <ChevronRight className="h-3.5 w-3.5 transition-transform" />
       )}
       {children || (
         <span className="font-medium">
-          {isOpen ? "Hide reasoning" : "Show reasoning"}
+          {isOpen ? "Ocultar razonamiento" : "Ver razonamiento"}
         </span>
       )}
     </CollapsibleTrigger>
@@ -117,8 +117,8 @@ export function ReasoningContent({
     <CollapsibleContent
       className={cn(
         "mt-2 space-y-2 overflow-hidden transition-all",
-        "border-l-2 border-muted pl-4 ml-2",
-        "text-sm text-muted-foreground",
+        "border-l-2 border-gray-200 pl-3 ml-1",
+        "text-xs text-gray-600",
         className
       )}
       {...props}
