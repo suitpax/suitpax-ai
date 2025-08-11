@@ -39,8 +39,36 @@ export async function GET(req: NextRequest) {
         }
       }
     } catch (e) {
-      // ignore and fallback
       suggestions = null;
+    }
+
+    // REST fallback if SDK does not expose place suggestions
+    if (!suggestions && process.env.DUFFEL_API_KEY) {
+      try {
+        const resp = await fetch(`https://api.duffel.com/air/places/suggestions?query=${encodeURIComponent(query)}&limit=${Math.max(limit, 20)}`, {
+          headers: {
+            Authorization: `Bearer ${process.env.DUFFEL_API_KEY}`,
+            "Duffel-Version": "v2",
+          },
+          cache: 'no-store'
+        })
+        if (resp.ok) {
+          const json: any = await resp.json()
+          const data = json?.data || []
+          if (Array.isArray(data) && data.length > 0) {
+            suggestions = data.map((p: any) => ({
+              id: p.id,
+              type: p.type,
+              iata_code: p.iata_code,
+              name: p.name,
+              city_name: p.city?.name || p.city_name || "",
+              country_name: p.city?.country_name || p.country_name || "",
+              latitude: p.latitude,
+              longitude: p.longitude,
+            }))
+          }
+        }
+      } catch {}
     }
 
     if (suggestions) {

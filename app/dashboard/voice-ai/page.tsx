@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { useVoiceAIConsolidated } from "@/hooks/use-voice-ai-consolidated"
 import { ConversationInterface } from "@/components/voice-ai/conversation-interface"
 import { AgentCard } from "@/components/shared/agent-card"
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 
 // Agentes demo
 const voiceAgents = [
@@ -186,240 +187,256 @@ export default function VoiceAIPage() {
   const usagePct = userTokens.limit ? Math.min(100, Math.round((userTokens.used / userTokens.limit) * 100)) : 0
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none">Voice AI Agents</h1>
-          <p className="text-gray-600 mt-1">Have natural voice conversations with specialized AI travel agents</p>
+    <VantaHaloBackground className="relative">
+      <div className="space-y-6 absolute inset-0 bg-white/70">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none">Voice AI Agents</h1>
+            <p className="text-gray-600 mt-1">Have natural voice conversations with specialized AI travel agents</p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Badge variant="outline" className="bg-gray-50">
+              Tokens: {userTokens.used.toLocaleString()}/{userTokens.limit.toLocaleString()} ({usagePct}%)
+            </Badge>
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+              <PiChatCircleFill className="h-3 w-3 mr-1" /> Voice Ready
+            </Badge>
+          </div>
         </div>
-        <div className="flex items-center space-x-3">
-          <Badge variant="outline" className="bg-gray-50">
-            Tokens: {userTokens.used.toLocaleString()}/{userTokens.limit.toLocaleString()} ({usagePct}%)
-          </Badge>
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-            <PiChatCircleFill className="h-3 w-3 mr-1" /> Voice Ready
-          </Badge>
-        </div>
-      </div>
 
-      {/* Top grid: Agents + Voice Interface + Usage/History */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <Card className="xl:col-span-2">
+        {/* Zero state shimmer */}
+        {!isCallActive && (
+          <div className="flex items-center justify-center py-6">
+            <div className="text-center">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter bg-clip-text text-transparent bg-[linear-gradient(90deg,#111,#7a7a7a,#111)] bg-[length:200%_100%] animate-pulse">Speak naturally. Plan. Book. Optimize.</h2>
+              <p className="mt-2 text-xs sm:text-sm text-gray-600 flex items-center justify-center gap-2">Powered by <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={16} height={16} /></p>
+            </div>
+          </div>
+        )}
+
+        {/* Top grid: Agents + Voice Interface + Usage/History */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <Card className="xl:col-span-2">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl font-medium tracking-tighter">Choose Your AI Agent</CardTitle>
+                  <CardDescription>Select a specialized agent for your business travel needs</CardDescription>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <PiUserSwitchBold className="w-4 h-4" />
+                  <span>{voiceAgents.filter((a) => a.status === "available").length} available</span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {voiceAgents.map((agent) => (
+                  <AgentCard
+                    key={agent.id}
+                    agent={agent}
+                    onSelect={setSelectedAgent}
+                    isSelected={selectedAgent.id === agent.id}
+                    showDetails={true}
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Usage + History */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg tracking-tight flex items-center gap-2">
+                <PiHeadsetBold className="w-4 h-4" /> Usage & History
+              </CardTitle>
+              <CardDescription>Your recent activity and token usage</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                  <span>Token usage</span>
+                  <span>
+                    {userTokens.used.toLocaleString()} / {userTokens.limit.toLocaleString()}
+                  </span>
+                </div>
+                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gray-900" style={{ width: `${usagePct}%` }} />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-xs font-medium text-gray-700">Recent calls</h4>
+                  {callLogs.length > 0 && (
+                    <button
+                      className="text-[10px] text-gray-500 hover:text-gray-700"
+                      onClick={() => {
+                        setCallLogs([])
+                        if (typeof window !== "undefined") window.localStorage.removeItem("voice_ai_call_logs")
+                      }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {callLogs.length === 0 ? (
+                    <p className="text-xs text-gray-500">No recent calls</p>
+                  ) : (
+                    callLogs.map((c) => (
+                      <div key={c.id} className="flex items-center justify-between text-xs bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5">
+                        <span className="font-medium text-gray-900">{c.agentName}</span>
+                        <span className="text-gray-500">{new Date(c.startedAt).toLocaleString()}</span>
+                        <span className="text-gray-700">{formatCallDuration(c.durationSec)}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Voice Interface */}
+        <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-xl font-medium tracking-tighter">Choose Your AI Agent</CardTitle>
-                <CardDescription>Select a specialized agent for your business travel needs</CardDescription>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex items-center justify-center">
+                  <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={24} height={24} className="object-contain" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg font-medium tracking-tighter">{selectedAgent.name}</CardTitle>
+                  <CardDescription>{selectedAgent.role}</CardDescription>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <PiUserSwitchBold className="w-4 h-4" />
-                <span>{voiceAgents.filter((a) => a.status === "available").length} available</span>
-              </div>
+              {isCallActive && (
+                <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <PiClockBold className="w-4 h-4" />
+                    <span>{formatCallDuration(callDuration)}</span>
+                  </div>
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse" />
+                    Live
+                  </Badge>
+                </div>
+              )}
             </div>
           </CardHeader>
+          <CardContent className="space-y-6">
+            <AnimatePresence mode="wait">
+              {isCallActive ? (
+                <motion.div key="active-call" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+                  <ConversationInterface
+                    messages={messages}
+                    status={status}
+                    transcript={transcript}
+                    agentName={selectedAgent.name}
+                    onStartListening={startListening}
+                    onStopListening={stopListening}
+                    onEndCall={endCall}
+                    onPlayMessage={playMessage}
+                    onPauseAudio={pauseAudio}
+                    error={error}
+                    isAudioPlaying={audioState.isPlaying}
+                  />
+                </motion.div>
+              ) : (
+                <motion.div key="call-setup" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center py-8">
+                  <div className="mb-6">
+                    <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 bg-white flex items-center justify-center mx-auto mb-4">
+                      <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={40} height={40} className="object-contain" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">{selectedAgent.name}</h3>
+                    <p className="text-sm text-gray-600 mb-2">{selectedAgent.role}</p>
+                    <div className="flex items-center justify-center gap-4 text-xs text-gray-500 mb-4">
+                      <div className="flex items-center gap-1">
+                        <PiStarFill className="w-3 h-3 text-yellow-500" />
+                        <span>{selectedAgent.rating} rating</span>
+                      </div>
+                      <span>•</span>
+                      <span>{selectedAgent.callsToday} calls today</span>
+                    </div>
+                    <p className="text-xs text-gray-500 max-w-md mx-auto mb-6">
+                      {selectedAgent.voice} voice with {selectedAgent.accent} accent. Specializes in {selectedAgent.specialty.toLowerCase()}.
+                    </p>
+                  </div>
+
+                  <Button onClick={startCall} size="lg" className="bg-black text-white hover:bg-gray-800" disabled={!browserSupportsSpeechRecognition}>
+                    <PiPhoneFill className="w-5 h-5 mr-2" /> Start Voice Conversation
+                  </Button>
+
+                  {!browserSupportsSpeechRecognition && (
+                    <p className="text-xs text-red-500 mt-2">Speech recognition not supported in this browser</p>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </CardContent>
+        </Card>
+
+        {/* Features + Templates */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <PiChatCircleFill className="w-6 h-6 text-gray-600" />
+              </div>
+              <h3 className="font-medium text-gray-900 mb-2">Natural Conversation</h3>
+              <p className="text-sm text-gray-600">AI agents understand context and maintain natural dialogue flow</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <PiGlobeSimpleBold className="w-6 h-6 text-gray-600" />
+              </div>
+              <h3 className="font-medium text-gray-900 mb-2">Multi-language Support</h3>
+              <p className="text-sm text-gray-600">Automatic language detection with support for 40+ languages</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <PiWaveformBold className="w-6 h-6 text-gray-600" />
+              </div>
+              <h3 className="font-medium text-gray-900 mb-2">Realistic Voices</h3>
+              <p className="text-sm text-gray-600">Powered by ElevenLabs for human-like speech synthesis</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg tracking-tight">Quick templates</CardTitle>
+            <CardDescription>Use a starting phrase once the call begins</CardDescription>
+          </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {voiceAgents.map((agent) => (
-                <AgentCard
-                  key={agent.id}
-                  agent={agent}
-                  onSelect={setSelectedAgent}
-                  isSelected={selectedAgent.id === agent.id}
-                  showDetails={true}
-                />
+            <div className="flex flex-wrap gap-2">
+              {TEMPLATES.map((t) => (
+                <button
+                  key={t}
+                  className="text-xs px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50"
+                  onClick={() => {
+                    if (!isCallActive) return
+                    // Placeholder: templates for guidance while on a call
+                  }}
+                >
+                  {t}
+                </button>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Usage + History */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg tracking-tight flex items-center gap-2">
-              <PiHeadsetBold className="w-4 h-4" /> Usage & History
-            </CardTitle>
-            <CardDescription>Your recent activity and token usage</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                <span>Token usage</span>
-                <span>
-                  {userTokens.used.toLocaleString()} / {userTokens.limit.toLocaleString()}
-                </span>
-              </div>
-              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-gray-900" style={{ width: `${usagePct}%` }} />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-xs font-medium text-gray-700">Recent calls</h4>
-                {callLogs.length > 0 && (
-                  <button
-                    className="text-[10px] text-gray-500 hover:text-gray-700"
-                    onClick={() => {
-                      setCallLogs([])
-                      if (typeof window !== "undefined") window.localStorage.removeItem("voice_ai_call_logs")
-                    }}
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {callLogs.length === 0 ? (
-                  <p className="text-xs text-gray-500">No recent calls</p>
-                ) : (
-                  callLogs.map((c) => (
-                    <div key={c.id} className="flex items-center justify-between text-xs bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5">
-                      <span className="font-medium text-gray-900">{c.agentName}</span>
-                      <span className="text-gray-500">{new Date(c.startedAt).toLocaleString()}</span>
-                      <span className="text-gray-700">{formatCallDuration(c.durationSec)}</span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Hidden audio element */}
+        <audio ref={audioPlayerRef} className="hidden" />
       </div>
-
-      {/* Voice Interface */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Image src={selectedAgent.image || "/placeholder.svg"} alt={selectedAgent.name} width={40} height={40} className="rounded-xl object-cover" />
-              <div>
-                <CardTitle className="text-lg font-medium tracking-tighter">{selectedAgent.name}</CardTitle>
-                <CardDescription>{selectedAgent.role}</CardDescription>
-              </div>
-            </div>
-            {isCallActive && (
-              <div className="flex items-center gap-4 text-sm text-gray-600">
-                <div className="flex items-center gap-1">
-                  <PiClockBold className="w-4 h-4" />
-                  <span>{formatCallDuration(callDuration)}</span>
-                </div>
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse" />
-                  Live
-                </Badge>
-              </div>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <AnimatePresence mode="wait">
-            {isCallActive ? (
-              <motion.div key="active-call" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-                <ConversationInterface
-                  messages={messages}
-                  status={status}
-                  transcript={transcript}
-                  agentName={selectedAgent.name}
-                  onStartListening={startListening}
-                  onStopListening={stopListening}
-                  onEndCall={endCall}
-                  onPlayMessage={playMessage}
-                  onPauseAudio={pauseAudio}
-                  error={error}
-                  isAudioPlaying={audioState.isPlaying}
-                />
-              </motion.div>
-            ) : (
-              <motion.div key="call-setup" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center py-8">
-                <div className="mb-6">
-                  <Image src={selectedAgent.image || "/placeholder.svg"} alt={selectedAgent.name} width={80} height={80} className="rounded-xl object-cover mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">{selectedAgent.name}</h3>
-                  <p className="text-sm text-gray-600 mb-2">{selectedAgent.role}</p>
-                  <div className="flex items-center justify-center gap-4 text-xs text-gray-500 mb-4">
-                    <div className="flex items-center gap-1">
-                      <PiStarFill className="w-3 h-3 text-yellow-500" />
-                      <span>{selectedAgent.rating} rating</span>
-                    </div>
-                    <span>•</span>
-                    <span>{selectedAgent.callsToday} calls today</span>
-                  </div>
-                  <p className="text-xs text-gray-500 max-w-md mx-auto mb-6">
-                    {selectedAgent.voice} voice with {selectedAgent.accent} accent. Specializes in {selectedAgent.specialty.toLowerCase()}.
-                  </p>
-                </div>
-
-                <Button onClick={startCall} size="lg" className="bg-black text-white hover:bg-gray-800" disabled={!browserSupportsSpeechRecognition}>
-                  <PiPhoneFill className="w-5 h-5 mr-2" /> Start Voice Conversation
-                </Button>
-
-                {!browserSupportsSpeechRecognition && (
-                  <p className="text-xs text-red-500 mt-2">Speech recognition not supported in this browser</p>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </CardContent>
-      </Card>
-
-      {/* Features + Templates */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <PiChatCircleFill className="w-6 h-6 text-gray-600" />
-            </div>
-            <h3 className="font-medium text-gray-900 mb-2">Natural Conversation</h3>
-            <p className="text-sm text-gray-600">AI agents understand context and maintain natural dialogue flow</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6 text-center">
-            <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <PiGlobeSimpleBold className="w-6 h-6 text-gray-600" />
-            </div>
-            <h3 className="font-medium text-gray-900 mb-2">Multi-language Support</h3>
-            <p className="text-sm text-gray-600">Automatic language detection with support for 40+ languages</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6 text-center">
-            <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <PiWaveformBold className="w-6 h-6 text-gray-600" />
-            </div>
-            <h3 className="font-medium text-gray-900 mb-2">Realistic Voices</h3>
-            <p className="text-sm text-gray-600">Powered by ElevenLabs for human-like speech synthesis</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg tracking-tight">Quick templates</CardTitle>
-          <CardDescription>Use a starting phrase once the call begins</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {TEMPLATES.map((t) => (
-              <button
-                key={t}
-                className="text-xs px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50"
-                onClick={() => {
-                  if (!isCallActive) return
-                  // Placeholder: templates for guidance while on a call
-                }}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Hidden audio element */}
-      <audio ref={audioPlayerRef} className="hidden" />
-    </div>
+    </VantaHaloBackground>
   )
 }
