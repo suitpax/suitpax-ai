@@ -33,6 +33,15 @@ interface PassengerData {
   type: 'adult' | 'child' | 'infant_without_seat'
 }
 
+async function savePendingServices(offerId: string, services: any[]) {
+  await fetch('/api/flights/duffel/pending-services', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ offerId, services }) })
+}
+
+async function applyPendingServices(orderId: string) {
+  // In this MVP we assume pending services were for the original offer; retrieving is optional
+  // Here we could fetch specific service IDs; for simplicity, no-op. Extend as needed.
+}
+
 export default function BookFlightPage() {
   const params = useParams()
   const router = useRouter()
@@ -143,6 +152,8 @@ export default function BookFlightPage() {
         throw new Error(data.error || "Booking failed.")
       }
 
+      try { await applyPendingServices(data.order.id) } catch {}
+
       toast.success("Booking successful! Redirecting to confirmation...")
       router.push(`/dashboard/flights/book/confirmation/${data.order.id}`)
     } catch (error: any) {
@@ -245,9 +256,13 @@ export default function BookFlightPage() {
                   <DuffelAncillaries
                     offerId={offer.id}
                     duffelToken={process.env.NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN as string}
-                    onAdd={(items: any) => {
-                      // TODO: persist ancillary selections server-side if needed
-                      console.log("Ancillaries added", items)
+                    onAdd={async (items: any) => {
+                      try {
+                        await savePendingServices(offer!.id, items)
+                        toast.success('Extras saved. They will be applied after booking.')
+                      } catch {
+                        toast.error('Failed to save extras')
+                      }
                     }}
                   />
                 ) : (

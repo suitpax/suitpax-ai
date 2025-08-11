@@ -12,14 +12,9 @@ export default function BillingPage() {
   const startSubscription = async () => {
     try {
       setLoading('checkout')
-      const res = await fetch('/api/billing/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-      })
-      const data = await res.json()
-      if (!data.success) throw new Error(data.error)
-      window.location.href = data.url
+      const link = process.env.NEXT_PUBLIC_STRIPE_LINK_PRO || ""
+      if (!link) throw new Error('Stripe Checkout Link not configured')
+      window.location.href = link
     } catch (e: any) {
       toast.error(e.message || 'Failed to start subscription')
     } finally {
@@ -62,7 +57,14 @@ export default function BillingPage() {
             <div className="flex gap-3">
               <Button onClick={startSubscription} disabled={loading !== null} className="bg-black text-white">
                 {loading === 'checkout' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CreditCard className="h-4 w-4 mr-2" />}
-                Choose plan / Subscribe
+                Upgrade to Pro
+              </Button>
+              <Button variant="outline" onClick={() => {
+                const link = process.env.NEXT_PUBLIC_STRIPE_LINK_ENTERPRISE || "";
+                if (!link) return toast.error('Enterprise link not configured');
+                window.location.href = link;
+              }} disabled={loading !== null}>
+                Enterprise
               </Button>
               <Button variant="outline" onClick={openPortal} disabled={loading !== null}>
                 {loading === 'portal' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Settings className="h-4 w-4 mr-2" />}
