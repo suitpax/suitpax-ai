@@ -240,7 +240,7 @@ const CommunityCarousel = ({ images }: { images: string[] }) => {
 }
 
 // Plans Component
-export const Plans = () => {
+const Plans = () => {
   const [randomTitle, setRandomTitle] = useState("")
   const [randomSubtitle, setRandomSubtitle] = useState("")
   const [isAnnual, setIsAnnual] = useState(true)
@@ -315,3 +315,5 @@ export const Plans = () => {
     </section>
   )
 }
+
+export default Plans
