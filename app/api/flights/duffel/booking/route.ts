@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createDuffelClient, getPaymentMethod } from '@/lib/duffel'
+import { createDuffelClient } from '@/lib/duffel'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import Stripe from 'stripe'
@@ -19,6 +19,7 @@ const bookingSchema = z.object({
     loyalty_programme_accounts: z.array(z.object({ airline_iata_code: z.string().length(2), account_number: z.string().min(3) })).optional(),
     seat_preference: z.string().optional(),
     meal_preference: z.string().optional(),
+    type: z.enum(['adult','child','infant_without_seat']).optional(),
   })).min(1),
   payments: z.array(z.object({
     type: z.string(),
@@ -71,12 +72,23 @@ export async function POST(request: NextRequest) {
 
       // Create Duffel order using balance payment (test env) with major units string
       const amountMajor = (pi.amount_received / 100).toFixed(2)
+      const passengers = pf.passengers.map((p, idx) => ({
+        id: `pas_${idx + 1}`,
+        type: p.type,
+        title: p.title as any,
+        given_name: p.given_name,
+        family_name: p.family_name,
+        gender: (p as any).gender || 'male',
+        born_on: p.born_on,
+        phone_number: p.phone_number || '',
+        email: p.email,
+      }))
       const order = await duffel.orders.create({
         selected_offers: [pf.offerId],
-        passengers: pf.passengers,
-        payments: [{ type: 'balance', amount: amountMajor, currency: (pi.currency || 'usd').toUpperCase() }],
+        passengers,
+        payments: [{ type: 'balance' as any, amount: amountMajor, currency: (pi.currency || 'usd').toUpperCase() }],
         metadata: { user_id: user.id, payment_intent_id: pi.id, source: 'suitpax' }
-      })
+      } as any)
       orderData = order.data
 
       // Update PI metadata with order info
@@ -90,12 +102,29 @@ export async function POST(request: NextRequest) {
       })
     } else {
       const bookingData = bookingSchema.parse(body)
+      const passengers = bookingData.passengers.map((p, idx) => ({
+        id: `pas_${idx + 1}`,
+        type: (p.type || 'adult') as any,
+        title: p.title as any,
+        given_name: p.given_name,
+        family_name: p.family_name,
+        gender: (p as any).gender || 'male',
+        born_on: p.born_on,
+        phone_number: p.phone_number,
+        email: p.email,
+        loyalty_programme_accounts: p.loyalty_programme_accounts as any,
+      }))
+      const payments = bookingData.payments.map((p) => ({
+        type: (p.type === 'arc_bsp_cash' ? 'arc_bsp_cash' : 'balance') as any,
+        amount: p.amount,
+        currency: p.currency,
+      }))
       const order = await duffel.orders.create({
         selected_offers: bookingData.selected_offers,
-        passengers: bookingData.passengers,
-        payments: bookingData.payments,
+        passengers,
+        payments,
         metadata: { ...(bookingData.metadata || {}), user_id: user.id },
-      })
+      } as any)
       orderData = order.data
     }
 
@@ -103,31 +132,32 @@ export async function POST(request: NextRequest) {
     const firstSlice = orderData.slices?.[0]
     const lastSlice = orderData.slices?.[orderData.slices.length - 1]
 
-    await supabase
-      .from('flight_bookings')
-      .insert({
-        user_id: user.id,
-        duffel_order_id: orderData.id,
-        booking_reference: orderData.booking_reference,
-        status: orderData.status || 'confirmed',
-        total_amount: orderData.total_amount,
-        total_currency: orderData.total_currency,
-        departure_date: firstSlice?.segments?.[0]?.departing_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
-        return_date: lastSlice?.segments?.[lastSlice.segments.length - 1]?.arriving_at?.slice(0, 10) || null,
-        origin: firstSlice?.origin?.iata_code || '',
-        destination: lastSlice?.destination?.iata_code || firstSlice?.destination?.iata_code || '',
-        passenger_count: orderData.passengers?.length || 1,
-        metadata: {
-          passengers: orderData.passengers,
-          slices: orderData.slices,
-          available_actions: orderData.available_actions,
-          created_at: new Date().toISOString(),
-        },
-        payment_status: 'paid',
-      })
-      .catch((e) => {
-        console.warn('Failed to insert flight_bookings:', e)
-      })
+    try {
+      await supabase
+        .from('flight_bookings')
+        .insert({
+          user_id: user.id,
+          duffel_order_id: orderData.id,
+          booking_reference: orderData.booking_reference,
+          status: orderData.status || 'confirmed',
+          total_amount: orderData.total_amount,
+          total_currency: orderData.total_currency,
+          departure_date: firstSlice?.segments?.[0]?.departing_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+          return_date: lastSlice?.segments?.[lastSlice.segments.length - 1]?.arriving_at?.slice(0, 10) || null,
+          origin: firstSlice?.origin?.iata_code || '',
+          destination: lastSlice?.destination?.iata_code || firstSlice?.destination?.iata_code || '',
+          passenger_count: orderData.passengers?.length || 1,
+          metadata: {
+            passengers: orderData.passengers,
+            slices: orderData.slices,
+            available_actions: (orderData as any).available_actions,
+            created_at: new Date().toISOString(),
+          },
+          payment_status: 'paid',
+        })
+    } catch (e) {
+      console.warn('Failed to insert flight_bookings:', e)
+    }
 
     return NextResponse.json({
       success: true,
@@ -137,7 +167,7 @@ export async function POST(request: NextRequest) {
         passengers: orderData.passengers,
         slices: orderData.slices,
         total_amount: orderData.total_amount,
-        available_actions: orderData.available_actions,
+        available_actions: (orderData as any).available_actions,
         status: orderData.status,
       }
     })
