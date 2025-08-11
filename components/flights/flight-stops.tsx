@@ -98,7 +98,7 @@ export function FlightStops({ segments, className = "", showDetails = false }: F
     // Vuelo directo
     return (
       <div className={`flex items-center space-x-2 ${className}`}>
-        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
+        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs rounded-full">
           <PaperAirplaneIcon className="h-3 w-3 mr-1" />
           Non-stop
         </Badge>
@@ -271,8 +271,8 @@ export function FlightStopsSummary({ segments, className = "" }: FlightStopsProp
   }
 
   return (
-    <Badge variant="outline" className={`bg-orange-50 text-orange-700 border-orange-200 text-xs ${className}`}>
-      {stops} {stops === 1 ? 'stop' : 'stops'}
-    </Badge>
+          <Badge variant="outline" className={`bg-orange-50 text-orange-700 border-orange-200 text-xs rounded-full ${className}`}>
+        {stops} {stops === 1 ? 'stop' : 'stops'}
+      </Badge>
   )
 }

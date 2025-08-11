@@ -434,3 +434,106 @@ DO $$ BEGIN
     FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
   END IF;
 END $$;
+
+-- =========================
+-- Meetings & Collaboration
+-- =========================
+CREATE TABLE IF NOT EXISTS public.meetings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('video','phone','in-person')),
+  status TEXT NOT NULL DEFAULT 'upcoming' CHECK (status IN ('upcoming','completed','cancelled')),
+  starts_at TIMESTAMPTZ NOT NULL,
+  ends_at TIMESTAMPTZ NOT NULL,
+  duration_minutes INTEGER GENERATED ALWAYS AS (GREATEST(0, (EXTRACT(EPOCH FROM (ends_at - starts_at)) / 60)::INT)) STORED,
+  attendees TEXT[] DEFAULT ARRAY[]::TEXT[],
+  location TEXT,
+  description TEXT,
+  meeting_url TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.meetings ENABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_meetings_user_id ON public.meetings(user_id);
+CREATE INDEX IF NOT EXISTS idx_meetings_starts_at ON public.meetings(starts_at);
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='meetings' AND policyname='Users can view own meetings') THEN
+    CREATE POLICY "Users can view own meetings" ON public.meetings FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='meetings' AND policyname='Users can insert own meetings') THEN
+    CREATE POLICY "Users can insert own meetings" ON public.meetings FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='meetings' AND policyname='Users can update own meetings') THEN
+    CREATE POLICY "Users can update own meetings" ON public.meetings FOR UPDATE USING (auth.uid() = user_id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='meetings' AND policyname='Users can delete own meetings') THEN
+    CREATE POLICY "Users can delete own meetings" ON public.meetings FOR DELETE USING (auth.uid() = user_id);
+  END IF;
+END $$;
+
+-- =========================
+-- AI Usage & Quotas
+-- =========================
+CREATE TABLE IF NOT EXISTS public.ai_usage (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  session_id UUID,
+  model TEXT NOT NULL,
+  input_tokens INTEGER DEFAULT 0,
+  output_tokens INTEGER DEFAULT 0,
+  total_tokens INTEGER GENERATED ALWAYS AS ((COALESCE(input_tokens,0) + COALESCE(output_tokens,0))) STORED,
+  cost_usd NUMERIC(12,6) DEFAULT 0,
+  context_type TEXT DEFAULT 'general' CHECK (context_type IN ('general','flight_search','expense_help','travel_planning')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.ai_usage ENABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_ai_usage_user_id ON public.ai_usage(user_id);
+CREATE INDEX IF NOT EXISTS idx_ai_usage_created_at ON public.ai_usage(created_at);
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='ai_usage' AND policyname='Users can view own ai_usage') THEN
+    CREATE POLICY "Users can view own ai_usage" ON public.ai_usage FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='ai_usage' AND policyname='Users can insert own ai_usage') THEN
+    CREATE POLICY "Users can insert own ai_usage" ON public.ai_usage FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
+
+-- =========================
+-- Web Sources (attributions)
+-- =========================
+CREATE TABLE IF NOT EXISTS public.web_sources (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  href TEXT NOT NULL,
+  title TEXT,
+  description TEXT,
+  favicon_url TEXT,
+  content_snippet TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.web_sources ENABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_web_sources_user_id ON public.web_sources(user_id);
+CREATE INDEX IF NOT EXISTS idx_web_sources_href ON public.web_sources(href);
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='web_sources' AND policyname='Users can view own web_sources') THEN
+    CREATE POLICY "Users can view own web_sources" ON public.web_sources FOR SELECT USING (user_id IS NULL OR auth.uid() = user_id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='web_sources' AND policyname='Users can insert own web_sources') THEN
+    CREATE POLICY "Users can insert own web_sources" ON public.web_sources FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
+
+-- Triggers for updated_at
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'handle_updated_at_meetings') THEN
+    CREATE TRIGGER handle_updated_at_meetings BEFORE UPDATE ON public.meetings
+    FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  END IF;
+END $$;

@@ -193,11 +193,13 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
               </div>
 
               {/* Flight Details */}
-              <div className="flex flex-wrap gap-2">
-                {slice.segments.map((segment, segmentIndex) => (
-                  <Badge key={segment.id} variant="outline" className="text-xs">
-                    {(segment.marketing_carrier?.iata_code || '')} {segment.flight_number}
-                    {segment.aircraft?.name && ` • ${segment.aircraft.name}`}
+                            <div className="flex flex-wrap gap-2">
+                {slice.segments.map((segment) => (
+                  <Badge key={segment.id} variant="outline" className="rounded-xl">
+                    <span className="text-[11px]">
+                      {(segment.marketing_carrier?.iata_code || "")} {segment.flight_number}
+                      {segment.aircraft?.name && ` • ${segment.aircraft.name}`}
+                    </span>
                   </Badge>
                 ))}
               </div>
