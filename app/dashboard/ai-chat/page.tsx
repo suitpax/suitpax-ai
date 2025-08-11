@@ -59,7 +59,7 @@ function AIChatView() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
-  const { speak, state: voiceState, startListening, stopListening } = useVoiceAI()
+  const { speak, state: voiceState, startListening, stopListening, settings: voiceSettings } = useVoiceAI()
   const { isStreaming, start, cancel } = useChatStream()
   const [isSessionLoading, setIsSessionLoading] = useState(false)
 
@@ -189,11 +189,45 @@ function AIChatView() {
         ...prev,
         { id: (Date.now() + 3).toString(), role: 'assistant', content: 'He generado y descargado el PDF automáticamente ✅', timestamp: new Date() },
       ])
-    } catch (e: any) {
-      setMessages((prev) => [
-        ...prev,
-        { id: (Date.now() + 4).toString(), role: 'assistant', content: 'No he podido generar el PDF. Inténtalo de nuevo.', timestamp: new Date() },
-      ])
+    } catch (e1: any) {
+      try {
+        // Fallback a /api/pdf con markdown
+        const res2 = await fetch('/api/pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ markdown: aiText, filename: `suitpax-ai-${Date.now()}.pdf` }),
+        })
+        if (!res2.ok) throw new Error('PDF generation fallback failed')
+        const blob2 = await res2.blob()
+        downloadBlob(blob2, `suitpax-ai-${Date.now()}.pdf`)
+        setMessages((prev) => [
+          ...prev,
+          { id: (Date.now() + 5).toString(), role: 'assistant', content: 'He generado y descargado el PDF (modo fallback) ✅', timestamp: new Date() },
+        ])
+      } catch (e2: any) {
+        try {
+          // Último fallback: guardar en Supabase y dar enlace
+          const res3 = await fetch('/api/pdf/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: aiText, reasoning, filename: `suitpax-ai` }),
+          })
+          const data3 = await res3.json()
+          if (data3?.success && data3.url) {
+            setMessages((prev) => [
+              ...prev,
+              { id: (Date.now() + 6).toString(), role: 'assistant', content: `He generado el PDF y lo he subido. Descárgalo aquí: ${data3.url}`, timestamp: new Date() },
+            ])
+            return
+          }
+          throw new Error('Upload failed')
+        } catch (e3: any) {
+          setMessages((prev) => [
+            ...prev,
+            { id: (Date.now() + 7).toString(), role: 'assistant', content: 'No he podido generar el PDF. Inténtalo de nuevo.', timestamp: new Date() },
+          ])
+        }
+      }
     }
   }
 
@@ -222,7 +256,9 @@ function AIChatView() {
     }
     setMessages((prev) => [...prev, assistantMessage])
     setTypingMessageId(assistantMessage.id)
-    try { await speak(data.response) } catch {}
+    if (voiceSettings?.autoSpeak !== false) {
+      try { await speak(data.response) } catch {}
+    }
     await logChat(sessionId, userMessage.content, data.response)
     // Auto PDF if requested
     await maybeGeneratePdf(userMessage.content, data.response, data.reasoning)
@@ -272,7 +308,9 @@ function AIChatView() {
         ]
       })
       setTypingMessageId(null)
-      try { await speak(streamed) } catch {}
+      if (voiceSettings?.autoSpeak !== false) {
+        try { await speak(streamed) } catch {}
+      }
       await logChat(sessionId, userMessage.content, streamed)
       // Auto PDF if requested
       await maybeGeneratePdf(userMessage.content, streamed)
@@ -485,6 +523,9 @@ function AIChatView() {
                 }} />
                 <PromptInputActions>
                   <PromptInputAction className="gap-2">
+                    <DocumentScanner onScanned={(r) => {
+                      if (r?.raw_text) setInput((prev) => (prev ? `${prev}\n\n${r.raw_text}` : r.raw_text!))
+                    }} />
                     <button
                       type="button"
                       onClick={() => setWebSearch(!webSearch)}

@@ -16,6 +16,7 @@ export interface VoiceAISettings {
   stability: number
   similarityBoost: number
   autoDetectLanguage: boolean
+  autoSpeak?: boolean
 }
 
 export interface VoiceAIState {
@@ -70,6 +71,7 @@ const initialSettings: VoiceAISettings = {
   stability: 0.5,
   similarityBoost: 0.5,
   autoDetectLanguage: true,
+  autoSpeak: true,
 }
 
 // Reducer
