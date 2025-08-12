@@ -24,6 +24,9 @@ import {
   Mail,
   CalendarIcon as Meeting,
   Receipt,
+  Crown,
+  Zap,
+  TrendingUp,
 } from "lucide-react"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
@@ -31,6 +34,8 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import AISearchInput from "@/components/ui/ai-search-input"
 
@@ -49,15 +54,14 @@ const navigation = [
 ]
 
 const aiNavigation = [
-  { name: "Suitpax AI", href: "/dashboard/ai-chat", icon: MessageSquare, badge: "AI" },
+  { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: MessageSquare, badge: "AI" },
   { name: "Voice AI", href: "/dashboard/voice-ai", icon: Mic, badge: "NEW" },
 ]
 
 const settingsNavigation = [
   { name: "Profile", href: "/dashboard/profile", icon: User },
   { name: "Company", href: "/dashboard/company", icon: Building },
-  { name: "Billing", href: "/dashboard/billing", icon: Receipt },
-  { name: "Google Drive", href: "/dashboard/google-drive", icon: Building },
+  { name: "Plans & Billing", href: "/dashboard/billing", icon: Crown },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
@@ -74,11 +78,19 @@ interface UserProfile {
   avatar_url?: string
   company?: string
   job_title?: string
+  plan?: string
+  subscription_status?: string
 }
 
 export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, onToggleCollapse }: SidebarProps) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [usageStats, setUsageStats] = useState({
+    flightSearches: 15,
+    maxFlightSearches: 50,
+    tokensUsed: 2500,
+    maxTokens: 10000,
+  })
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -96,7 +108,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
         try {
           const { data: profile } = await supabase
             .from("profiles")
-            .select("full_name, avatar_url, company, job_title")
+            .select("full_name, avatar_url, company, job_title, plan, subscription_status")
             .eq("id", user.id)
             .single()
 
@@ -153,6 +165,35 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
     if (!user) return ""
     return user.email || ""
   }
+
+  const getPlanBadge = () => {
+    const plan = userProfile?.plan || "free"
+    switch (plan.toLowerCase()) {
+      case "pro":
+        return (
+          <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 text-xs">
+            <Crown className="h-3 w-3 mr-1" />
+            Pro
+          </Badge>
+        )
+      case "enterprise":
+        return (
+          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 text-xs">
+            <Zap className="h-3 w-3 mr-1" />
+            Enterprise
+          </Badge>
+        )
+      default:
+        return (
+          <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200 text-xs">
+            Free
+          </Badge>
+        )
+    }
+  }
+
+  const flightSearchProgress = (usageStats.flightSearches / usageStats.maxFlightSearches) * 100
+  const tokenProgress = (usageStats.tokensUsed / usageStats.maxTokens) * 100
 
   return (
     <div
@@ -283,6 +324,38 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
 
       {/* Settings Section */}
       <div className="border-t border-gray-100/50 p-3 flex-shrink-0">
+        {/* Usage Stats - Only show when not collapsed */}
+        {(!isCollapsed || isMobile) && (
+          <div className="mb-4 p-3 bg-gray-50/50 rounded-xl">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-gray-700">Usage This Month</span>
+              {getPlanBadge()}
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-600">Flight Searches</span>
+                  <span className="text-xs font-medium text-gray-700">
+                    {usageStats.flightSearches}/{usageStats.maxFlightSearches}
+                  </span>
+                </div>
+                <Progress value={flightSearchProgress} className="h-1.5" />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-600">AI Tokens</span>
+                  <span className="text-xs font-medium text-gray-700">
+                    {usageStats.tokensUsed.toLocaleString()}/{usageStats.maxTokens.toLocaleString()}
+                  </span>
+                </div>
+                <Progress value={tokenProgress} className="h-1.5" />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Settings Navigation */}
         <nav className="space-y-1 mb-3">
           {!isCollapsed || isMobile
@@ -328,27 +401,101 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
         {/* User Profile & Sign Out */}
         {(!isCollapsed || isMobile) && (
           <div className="border-t border-gray-100/50 pt-3">
-            <div className="flex items-center space-x-3 px-3 py-2 mb-2">
-              <Avatar className="h-10 w-10 ring-2 ring-blue-400/40 rounded-xl">
-                <AvatarImage
-                  src={userProfile?.avatar_url || "/placeholder.svg"}
-                  alt={getDisplayName()}
-                  className="rounded-xl"
-                />
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-medium rounded-xl">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-xs text-gray-600 truncate">{userProfile?.company || getUserEmail()}</p>
-                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 rounded-lg">
-                    Member
-                  </Badge>
+            {/* User Details Dialog */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="flex items-center space-x-3 px-3 py-2 mb-2 cursor-pointer hover:bg-gray-50/80 rounded-xl transition-colors">
+                  <Avatar className="h-10 w-10 ring-2 ring-blue-400/40 rounded-xl">
+                    <AvatarImage
+                      src={userProfile?.avatar_url || "/placeholder.svg"}
+                      alt={getDisplayName()}
+                      className="rounded-xl"
+                    />
+                    <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-medium rounded-xl">
+                      {getInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-gray-600 truncate">{userProfile?.company || getUserEmail()}</p>
+                      <Badge variant="outline" className="text-xs px-1.5 py-0.5 rounded-lg">
+                        {userProfile?.plan || "Free"}
+                      </Badge>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </DialogTrigger>
+              <DialogContent className="bg-white/95 backdrop-blur-sm">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-3">
+                    <Avatar className="h-12 w-12 ring-2 ring-blue-400/40 rounded-xl">
+                      <AvatarImage
+                        src={userProfile?.avatar_url || "/placeholder.svg"}
+                        alt={getDisplayName()}
+                        className="rounded-xl"
+                      />
+                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-lg font-medium rounded-xl">
+                        {getInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900">{getDisplayName()}</h3>
+                      <p className="text-sm text-gray-600">{getUserEmail()}</p>
+                    </div>
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-blue-50 rounded-xl">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Plane className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-900">Flights Booked</span>
+                      </div>
+                      <p className="text-2xl font-bold text-blue-600">12</p>
+                      <p className="text-xs text-blue-700">This year</p>
+                    </div>
+
+                    <div className="p-4 bg-green-50 rounded-xl">
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">Savings</span>
+                      </div>
+                      <p className="text-2xl font-bold text-green-600">$2,450</p>
+                      <p className="text-xs text-green-700">Total saved</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <h4 className="font-medium text-gray-900 mb-3">Account Details</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Plan:</span>
+                        <span className="font-medium">{userProfile?.plan || "Free"}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Status:</span>
+                        <span className="font-medium">{userProfile?.subscription_status || "Active"}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Company:</span>
+                        <span className="font-medium">{userProfile?.company || "Personal"}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button asChild className="flex-1">
+                      <Link href="/dashboard/profile">Edit Profile</Link>
+                    </Button>
+                    <Button variant="outline" asChild className="flex-1 bg-transparent">
+                      <Link href="/dashboard/billing">Upgrade Plan</Link>
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
 
             <Button
               onClick={handleSignOut}
