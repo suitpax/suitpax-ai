@@ -77,8 +77,16 @@ Provide helpful, contextual responses for business travel needs. Be concise and 
     }
   }
 
+  async generateResponse(message: string, context?: string): Promise<IntelligenceResponse> {
+    return await this.enhancedChat(message, context)
+  }
+
   async addTravelPreference(preference: string, category: string) {
     return await this.memoryService.addTravelPreference(preference, category)
+  }
+
+  async getUserPreferences() {
+    return await this.memoryService.getTravelPreferences()
   }
 
   async getTravelPreferences() {

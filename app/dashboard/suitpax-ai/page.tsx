@@ -9,14 +9,14 @@ import {
   Send,
   Paperclip,
   X,
-  Mic,
-  MicOff,
   BrainCircuitIcon,
   MicroscopeIcon as MagnifyingGlassIcon,
   PlusIcon,
   SearchIcon,
   CheckIcon,
   XIcon,
+  ArrowRight,
+  Volume2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -24,9 +24,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { useVoiceAI } from "@/contexts/voice-ai-context"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import Link from "next/link"
 
 interface Message {
   id: string
@@ -52,11 +52,9 @@ export default function SuitpaxAIPage() {
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
-  const { speak, state: voiceState, startListening, stopListening } = useVoiceAI()
 
   const totalQueries = messages.length
   const tokensUsed = messages.reduce((acc, msg) => acc + msg.content.length * 0.75, 0)
-  const voiceMinutes = 0
   const sessionsToday = currentSessionId ? 1 : 0
 
   useEffect(() => {
@@ -74,59 +72,59 @@ export default function SuitpaxAIPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  const handleSend = async () => {
-    if (!input.trim() && files.length === 0) return
-    if (isLoading) return
+  const sendMessage = async (content: string) => {
+    if (!content.trim() || isLoading) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
+      content: content.trim(),
       role: "user",
-      content: input.trim(),
       timestamp: new Date(),
     }
 
     setMessages((prev) => [...prev, userMessage])
     setInput("")
-    setFiles([])
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/ai-chat", {
+      const response = await fetch("/api/suitpax-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: userMessage.content,
-          showReasoning,
-          sessionId: currentSessionId,
+          message: content,
+          userId: user?.id || "anonymous",
+          conversationHistory: messages.slice(-10), // Last 10 messages for context
         }),
       })
 
-      if (!response.ok) throw new Error("Failed to get response")
+      if (!response.ok) throw new Error("Failed to send message")
 
       const data = await response.json()
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
+        content: data.response,
         role: "assistant",
-        content: data.content,
         timestamp: new Date(),
-        reasoning: showReasoning ? data.reasoning : undefined,
-        sources: data.sources,
       }
 
       setMessages((prev) => [...prev, assistantMessage])
     } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 2).toString(),
-          role: "assistant",
-          content: "Sorry, there was an error processing your request. Please try again.",
-          timestamp: new Date(),
-        },
-      ])
+      console.error("Error sending message:", error)
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "Sorry, I encountered an error. Please try again.",
+        role: "assistant",
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleSend = () => {
+    sendMessage(input)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -223,7 +221,7 @@ export default function SuitpaxAIPage() {
             value={newTaskTitle}
             onChange={(e) => setNewTaskTitle(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && addTask()}
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent shadow-sm"
           />
           <Button
             onClick={addTask}
@@ -240,7 +238,7 @@ export default function SuitpaxAIPage() {
           {tasks.map((task) => (
             <div
               key={task.id}
-              className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200"
+              className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200"
             >
               <button
                 onClick={() => toggleTask(task.id)}
@@ -274,32 +272,29 @@ export default function SuitpaxAIPage() {
         transition={{ duration: 0.6 }}
         className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
       >
-        <div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-gray-900 leading-none mb-3">
-            Suitpax AI
-          </h1>
-          <p className="text-lg font-light text-gray-600 max-w-2xl">
-            Your intelligent business travel assistant powered by advanced AI
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="text-2xl font-medium tracking-tighter text-gray-900">{totalQueries}</div>
-            <div className="text-xs font-medium text-gray-500">QUERIES</div>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
+              Suitpax AI
+            </h1>
+            <p className="text-lg font-light text-gray-600">Your intelligent business travel assistant</p>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="text-2xl font-medium tracking-tighter text-gray-900">{Math.round(tokensUsed)}</div>
-            <div className="text-xs font-medium text-gray-500">TOKENS</div>
-          </div>
-          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="text-2xl font-medium tracking-tighter text-gray-900">{tasks.length}</div>
-            <div className="text-xs font-medium text-gray-500">TASKS</div>
-          </div>
-          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="text-2xl font-medium tracking-tighter text-gray-900">{sessionsToday}</div>
-            <div className="text-xs font-medium text-gray-500">SESSIONS</div>
-          </div>
+          <Link href="/dashboard/voice-ai">
+            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:shadow-md transition-all duration-200 cursor-pointer group">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-xl">
+                    <Volume2 className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">Voice AI</p>
+                    <p className="text-xs text-gray-600">Advanced voice features</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-blue-600 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </motion.div>
 
@@ -524,19 +519,6 @@ export default function SuitpaxAIPage() {
                       rows={1}
                     />
                     <div className="absolute right-3 bottom-3 flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className={`h-8 w-8 p-0 rounded-xl transition-colors ${
-                          voiceState.isListening
-                            ? "bg-red-100 text-red-600 hover:bg-red-200"
-                            : "hover:bg-gray-100 text-gray-600"
-                        }`}
-                        onClick={voiceState.isListening ? stopListening : startListening}
-                      >
-                        {voiceState.isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                      </Button>
-
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button

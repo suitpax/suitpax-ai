@@ -33,6 +33,10 @@ export default function VoiceAIPage() {
   const [isRecording, setIsRecording] = useState(false)
   const [conversations, setConversations] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [currentMessage, setCurrentMessage] = useState("")
+  const [aiResponse, setAiResponse] = useState("")
+  const [userPreferences, setUserPreferences] = useState([])
   const supabase = createClient()
 
   useEffect(() => {
@@ -58,6 +62,21 @@ export default function VoiceAIPage() {
 
     return () => clearInterval(timer)
   }, [supabase])
+
+  useEffect(() => {
+    const loadUserPreferences = async () => {
+      if (user) {
+        try {
+          const response = await fetch(`/api/suitpax-ai?userId=${user.id}`)
+          const data = await response.json()
+          setUserPreferences(data.preferences || [])
+        } catch (error) {
+          console.error("Error loading preferences:", error)
+        }
+      }
+    }
+    loadUserPreferences()
+  }, [user])
 
   const getDisplayName = () => {
     if (!user) return "User"
@@ -95,8 +114,47 @@ export default function VoiceAIPage() {
     return `${dayName}, ${monthName} ${date}`
   }
 
-  const handleStartRecording = () => {
+  const handleStartRecording = async () => {
+    if (!user) return
+
     setIsRecording(!isRecording)
+
+    if (!isRecording) {
+      // Start recording logic here
+      setCurrentMessage("Listening...")
+    } else {
+      // Stop recording and process with AI
+      setIsProcessing(true)
+      try {
+        const response = await fetch("/api/suitpax-ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: currentMessage || "Hello, I need help with business travel",
+            userId: user.id,
+          }),
+        })
+
+        const data = await response.json()
+        setAiResponse(data.response)
+
+        // Update conversations list
+        const newConversation = {
+          id: Date.now(),
+          message: currentMessage,
+          response: data.response,
+          timestamp: new Date().toISOString(),
+          memoriesUsed: data.memoriesUsed,
+          knowledgeUsed: data.knowledgeUsed,
+        }
+        setConversations((prev) => [newConversation, ...prev])
+      } catch (error) {
+        console.error("Error processing voice message:", error)
+      } finally {
+        setIsProcessing(false)
+        setCurrentMessage("")
+      }
+    }
   }
 
   return (
@@ -275,8 +333,15 @@ export default function VoiceAIPage() {
                   >
                     <div className="flex items-center justify-center gap-2 text-red-500">
                       <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                      <span className="text-sm font-medium">Listening...</span>
+                      <span className="text-sm font-medium">
+                        {isProcessing ? "Processing with AI..." : "Listening..."}
+                      </span>
                     </div>
+                    {userPreferences.length > 0 && (
+                      <div className="mt-2 text-xs text-gray-500 text-center">
+                        Using {userPreferences.length} saved preferences
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </div>
@@ -366,23 +431,45 @@ export default function VoiceAIPage() {
 
               <TabsContent value="all" className="mt-6">
                 <div className="space-y-4">
-                  {/* Empty State */}
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <MessageSquare className="h-8 w-8 text-gray-400" />
+                  {conversations.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <MessageSquare className="h-8 w-8 text-gray-400" />
+                      </div>
+                      <h4 className="text-lg font-medium tracking-tighter text-gray-900 mb-2">No conversations yet</h4>
+                      <p className="text-sm font-light text-gray-600 mb-6">
+                        Start your first voice conversation with AI memory to see it here
+                      </p>
+                      <Button
+                        onClick={handleStartRecording}
+                        className="rounded-2xl bg-gray-900 hover:bg-gray-800 text-white px-6"
+                      >
+                        <MicIcon className="h-4 w-4 mr-2" />
+                        Start AI Voice Chat
+                      </Button>
                     </div>
-                    <h4 className="text-lg font-medium tracking-tighter text-gray-900 mb-2">No conversations yet</h4>
-                    <p className="text-sm font-light text-gray-600 mb-6">
-                      Start your first voice conversation to see it here
-                    </p>
-                    <Button
-                      onClick={handleStartRecording}
-                      className="rounded-2xl bg-gray-900 hover:bg-gray-800 text-white px-6"
-                    >
-                      <MicIcon className="h-4 w-4 mr-2" />
-                      Start Voice Chat
-                    </Button>
-                  </div>
+                  ) : (
+                    conversations.map((conv) => (
+                      <div key={conv.id} className="p-4 bg-white rounded-xl border border-gray-200">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                            <MessageSquare className="h-4 w-4 text-gray-600" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900 mb-1">You:</p>
+                            <p className="text-sm text-gray-600 mb-3">{conv.message}</p>
+                            <p className="text-sm font-medium text-gray-900 mb-1">AI Assistant:</p>
+                            <p className="text-sm text-gray-600 mb-2">{conv.response}</p>
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                              <span>{new Date(conv.timestamp).toLocaleString()}</span>
+                              <span>{conv.memoriesUsed} memories used</span>
+                              <span>{conv.knowledgeUsed} knowledge sources</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </TabsContent>
 
@@ -400,6 +487,23 @@ export default function VoiceAIPage() {
             </Tabs>
           </Card>
         </motion.div>
+
+        {/* AI Response Display */}
+        {aiResponse && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-emerald-50 rounded-2xl p-4 mt-4"
+          >
+            <div className="flex items-start gap-3">
+              <Brain className="h-5 w-5 text-emerald-600 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-emerald-900 mb-1">AI Response:</p>
+                <p className="text-sm text-emerald-800">{aiResponse}</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   )
