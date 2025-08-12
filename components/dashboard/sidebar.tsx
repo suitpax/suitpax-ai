@@ -31,12 +31,12 @@ import {
   PiShield,
   PiDotsSixVertical,
 } from "react-icons/pi"
+import { Sparkles } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
 import {
   Dialog,
   DialogContent,
@@ -360,15 +360,19 @@ export function Sidebar({
       </div>
 
       {(!isCollapsed || isMobile) && (
-        <div className="px-4 pt-4 pb-2 border-b border-gray-200">
+        <div className="px-4 pt-6 pb-8 border-b border-gray-200">
           <form onSubmit={handleAiSubmit} className="relative">
-            <Input
+            <input
+              type="text"
               value={aiQuery}
               onChange={(e) => setAiQuery(e.target.value)}
-              placeholder="Ask AI anything..."
-              className="pr-10 rounded-xl border-gray-200 text-sm h-10 bg-gray-50 focus:bg-white transition-colors"
+              placeholder="Search or ask AI anything..."
+              className="w-full px-4 py-2.5 pl-10 pr-12 text-sm bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all placeholder:text-gray-400"
               disabled={isAiLoading}
             />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Sparkles className="h-4 w-4 text-gray-400" />
+            </div>
             <Button
               type="submit"
               size="sm"
