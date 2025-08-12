@@ -157,6 +157,14 @@ export default function VoiceAIPage() {
     }
   }
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value)
+  }
+
+  const filteredConversations = conversations.filter((conv) =>
+    conv.message.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -180,7 +188,7 @@ export default function VoiceAIPage() {
               <Input
                 placeholder="Search conversations..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearch}
                 className="pl-10 w-64 rounded-2xl border-gray-200 bg-white/80 backdrop-blur-sm"
               />
             </div>
@@ -431,7 +439,7 @@ export default function VoiceAIPage() {
 
               <TabsContent value="all" className="mt-6">
                 <div className="space-y-4">
-                  {conversations.length === 0 ? (
+                  {filteredConversations.length === 0 ? (
                     <div className="text-center py-12">
                       <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <MessageSquare className="h-8 w-8 text-gray-400" />
@@ -449,7 +457,7 @@ export default function VoiceAIPage() {
                       </Button>
                     </div>
                   ) : (
-                    conversations.map((conv) => (
+                    filteredConversations.map((conv) => (
                       <div key={conv.id} className="p-4 bg-white rounded-xl border border-gray-200">
                         <div className="flex items-start gap-3">
                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">

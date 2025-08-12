@@ -147,7 +147,7 @@ export default function ExpensesPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
@@ -164,7 +164,7 @@ export default function ExpensesPage() {
           </div>
           <button
             onClick={() => setShowAddForm(true)}
-            className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-colors tracking-tight"
+            className="mt-4 sm:mt-0 inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-colors tracking-tight"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             Add Expense
@@ -177,7 +177,7 @@ export default function ExpensesPage() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
-          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl border border-white/20 shadow-lg">
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">Total Expenses</p>
@@ -187,13 +187,13 @@ export default function ExpensesPage() {
                   <span className="text-sm text-green-600 font-medium">+12% from last month</span>
                 </div>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                <CurrencyDollarIcon className="h-6 w-6 text-gray-500" />
+              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                <CurrencyDollarIcon className="h-6 w-6 text-gray-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl border border-white/20 shadow-lg">
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">Approved</p>
@@ -207,13 +207,13 @@ export default function ExpensesPage() {
                   </span>
                 </div>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                <CheckCircleIcon className="h-6 w-6 text-gray-500" />
+              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                <CheckCircleIcon className="h-6 w-6 text-gray-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl border border-white/20 shadow-lg">
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">Pending</p>
@@ -225,8 +225,8 @@ export default function ExpensesPage() {
                   </span>
                 </div>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                <ClockIcon className="h-6 w-6 text-gray-500" />
+              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                <ClockIcon className="h-6 w-6 text-gray-600" />
               </div>
             </div>
           </div>
@@ -244,7 +244,7 @@ export default function ExpensesPage() {
               placeholder="Search expenses..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 rounded-xl border-white/20 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              className="pl-10 rounded-xl border-gray-200 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent"
             />
           </div>
           <select

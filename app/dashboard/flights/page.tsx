@@ -26,7 +26,6 @@ import {
 import { AirportSearch } from "@/components/flights/airport-search"
 import { FlightCard } from "@/components/flights/flight-card"
 
-// Mock flight data for demonstration
 const mockFlights = [
   {
     id: "1",
@@ -121,48 +120,42 @@ export default function FlightsPage() {
   }
 
   const stats = [
-    { label: "Airlines", value: "500+", icon: Plane, color: "text-blue-600" },
-    { label: "Routes", value: "10K+", icon: Globe, color: "text-green-600" },
-    { label: "Avg Savings", value: "30%", icon: TrendingUp, color: "text-purple-600" },
-    { label: "Bookings", value: "50K+", icon: Users, color: "text-orange-600" },
+    { label: "Airlines", value: "500+", icon: Plane, color: "text-gray-600" },
+    { label: "Routes", value: "10K+", icon: Globe, color: "text-gray-600" },
+    { label: "Avg Savings", value: "30%", icon: TrendingUp, color: "text-gray-600" },
+    { label: "Bookings", value: "50K+", icon: Users, color: "text-gray-600" },
   ]
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div className="min-h-full bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-gray-900 via-gray-800 to-black p-8 md:p-12"
+          className="relative overflow-hidden rounded-2xl bg-white border border-gray-200 p-8 md:p-12"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-gray-600/10"></div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-                <Plane className="h-6 w-6 text-white" />
+              <div className="p-3 rounded-xl bg-gray-100">
+                <Plane className="h-6 w-6 text-gray-700" />
               </div>
               <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-yellow-400" />
-                <span className="text-sm font-medium text-white/80">AI-Powered Business Travel</span>
+                <Sparkles className="h-5 w-5 text-gray-600" />
+                <span className="text-sm font-medium text-gray-600">AI-Powered Business Travel</span>
               </div>
             </div>
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium tracking-tighter leading-none mb-4">
-              <span className="bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
-                Smart Business
-              </span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-4 text-gray-900">
+              Smart Business
               <br />
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
-                Flight Solutions
-              </span>
+              <span className="text-gray-600">Flight Solutions</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mb-8 leading-relaxed font-light">
+            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mb-8 leading-relaxed font-light">
               Revolutionize your corporate travel with AI-driven insights, real-time pricing, and seamless booking
               experiences.
-              <span className="text-blue-400 font-medium"> Powered by advanced algorithms</span> that understand your
+              <span className="text-gray-900 font-medium"> Powered by advanced algorithms</span> that understand your
               business needs.
             </p>
 
@@ -173,10 +166,10 @@ export default function FlightsPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.1 * index }}
-                  className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20"
+                  className="flex items-center gap-2 bg-gray-50 rounded-xl px-4 py-2 border border-gray-200"
                 >
                   <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                  <span className="text-sm text-white font-medium">
+                  <span className="text-sm text-gray-700 font-medium">
                     {stat.value} {stat.label}
                   </span>
                 </motion.div>
@@ -185,33 +178,32 @@ export default function FlightsPage() {
           </div>
         </motion.div>
 
-        {/* Features Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300">
+          <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-sm transition-all duration-300">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-xl bg-green-100">
-                <Zap className="h-5 w-5 text-green-600" />
+              <div className="p-2 rounded-lg bg-gray-100">
+                <Zap className="h-5 w-5 text-gray-700" />
               </div>
-              <span className="text-lg font-medium tracking-tight">Real-Time Pricing</span>
-              <Badge className="bg-green-500 text-white rounded-lg text-[10px] px-2 py-0.5">Live</Badge>
+              <span className="text-lg font-medium tracking-tight text-gray-900">Real-Time Pricing</span>
+              <Badge className="bg-gray-900 text-white rounded-lg text-[10px] px-2 py-0.5">Live</Badge>
             </div>
             <p className="text-sm text-gray-600 font-light">
               Updated every minute with the latest fares and availability from 500+ airlines worldwide
             </p>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300">
+          <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-sm transition-all duration-300">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-xl bg-blue-100">
-                <Shield className="h-5 w-5 text-blue-600" />
+              <div className="p-2 rounded-lg bg-gray-100">
+                <Shield className="h-5 w-5 text-gray-700" />
               </div>
-              <span className="text-lg font-medium tracking-tight">Premium Routes</span>
-              <Badge variant="outline" className="border-blue-200 text-blue-800 rounded-lg text-[10px] px-2 py-0.5">
+              <span className="text-lg font-medium tracking-tight text-gray-900">Premium Routes</span>
+              <Badge variant="outline" className="border-gray-200 text-gray-700 rounded-lg text-[10px] px-2 py-0.5">
                 Enterprise
               </Badge>
             </div>
@@ -220,12 +212,12 @@ export default function FlightsPage() {
             </p>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300">
+          <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-sm transition-all duration-300">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-xl bg-purple-100">
-                <Sparkles className="h-5 w-5 text-purple-600" />
+              <div className="p-2 rounded-lg bg-gray-100">
+                <Sparkles className="h-5 w-5 text-gray-700" />
               </div>
-              <span className="text-lg font-medium tracking-tight">AI Insights</span>
+              <span className="text-lg font-medium tracking-tight text-gray-900">AI Insights</span>
               <Badge className="bg-gray-200 text-gray-700 rounded-lg text-[10px] px-2 py-0.5">AI</Badge>
             </div>
             <p className="text-sm text-gray-600 font-light">
@@ -234,23 +226,24 @@ export default function FlightsPage() {
           </div>
         </motion.div>
 
-        {/* Search Form */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <Card className="rounded-3xl border border-gray-200 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <Card className="rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500">
+                  <div className="p-2 rounded-lg bg-gray-900">
                     <Search className="h-5 w-5 text-white" />
                   </div>
-                  <CardTitle className="text-2xl font-medium tracking-tighter">Search Business Flights</CardTitle>
+                  <CardTitle className="text-2xl font-medium tracking-tighter text-gray-900">
+                    Search Business Flights
+                  </CardTitle>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-green-100 text-green-800 animate-pulse rounded-lg text-xs px-3 py-1">
+                  <Badge className="bg-gray-900 text-white animate-pulse rounded-lg text-xs px-3 py-1">
                     Live Pricing
                   </Badge>
                   <Badge className="bg-gray-200 text-gray-700 rounded-lg text-xs px-3 py-1">AI Powered</Badge>
@@ -259,14 +252,14 @@ export default function FlightsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <Tabs value={searchType} onValueChange={setSearchType} className="w-full">
-                <TabsList className="grid w-full grid-cols-3 rounded-xl bg-gray-100">
-                  <TabsTrigger value="roundtrip" className="rounded-lg font-medium">
+                <TabsList className="grid w-full grid-cols-3 rounded-lg bg-gray-100">
+                  <TabsTrigger value="roundtrip" className="rounded-md font-medium">
                     Round Trip
                   </TabsTrigger>
-                  <TabsTrigger value="oneway" className="rounded-lg font-medium">
+                  <TabsTrigger value="oneway" className="rounded-md font-medium">
                     One Way
                   </TabsTrigger>
-                  <TabsTrigger value="multicity" className="rounded-lg font-medium">
+                  <TabsTrigger value="multicity" className="rounded-md font-medium">
                     Multi-City
                   </TabsTrigger>
                 </TabsList>
@@ -292,7 +285,7 @@ export default function FlightsPage() {
                       <div className="relative">
                         <Input
                           type="date"
-                          className="rounded-xl border-gray-200 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          className="rounded-lg border-gray-200 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                         />
                         <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       </div>
@@ -305,7 +298,7 @@ export default function FlightsPage() {
                         <div className="relative">
                           <Input
                             type="date"
-                            className="rounded-xl border-gray-200 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            className="rounded-lg border-gray-200 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                           />
                           <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         </div>
@@ -317,7 +310,7 @@ export default function FlightsPage() {
                     <div className="space-y-2">
                       <Label className="text-sm font-medium text-gray-700">Passengers</Label>
                       <Select value={passengers} onValueChange={setPassengers}>
-                        <SelectTrigger className="rounded-xl border-gray-200 focus:ring-2 focus:ring-gray-900">
+                        <SelectTrigger className="rounded-lg border-gray-200 focus:ring-2 focus:ring-gray-900">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -331,7 +324,7 @@ export default function FlightsPage() {
                     <div className="space-y-2">
                       <Label className="text-sm font-medium text-gray-700">Class</Label>
                       <Select value={travelClass} onValueChange={setTravelClass}>
-                        <SelectTrigger className="rounded-xl border-gray-200 focus:ring-2 focus:ring-gray-900">
+                        <SelectTrigger className="rounded-lg border-gray-200 focus:ring-2 focus:ring-gray-900">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -346,7 +339,7 @@ export default function FlightsPage() {
                       <Button
                         onClick={handleSearch}
                         disabled={isSearching}
-                        className="w-full rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium tracking-tight transition-colors h-11"
+                        className="w-full rounded-lg bg-gray-900 hover:bg-gray-800 text-white font-medium tracking-tight transition-colors h-11"
                       >
                         {isSearching ? (
                           <>
@@ -385,7 +378,7 @@ export default function FlightsPage() {
               </div>
               <div className="flex items-center gap-3">
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-40 rounded-xl border-gray-200">
+                  <SelectTrigger className="w-40 rounded-lg border-gray-200">
                     <ArrowUpDown className="h-4 w-4 mr-2" />
                     <SelectValue />
                   </SelectTrigger>
@@ -396,7 +389,7 @@ export default function FlightsPage() {
                     <SelectItem value="arrival">Arrival Time</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="outline" className="rounded-xl border-gray-200 bg-transparent">
+                <Button variant="outline" className="rounded-lg border-gray-200 bg-transparent">
                   <Filter className="h-4 w-4 mr-2" />
                   Filters
                 </Button>
@@ -419,14 +412,13 @@ export default function FlightsPage() {
 
             {/* Load More */}
             <div className="flex justify-center pt-6">
-              <Button variant="outline" className="rounded-xl border-gray-200 px-8 bg-transparent">
+              <Button variant="outline" className="rounded-lg border-gray-200 px-8 bg-transparent">
                 Load More Flights
               </Button>
             </div>
           </motion.div>
         )}
 
-        {/* Quick Stats */}
         {!showResults && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -434,19 +426,19 @@ export default function FlightsPage() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="grid grid-cols-2 md:grid-cols-4 gap-4"
           >
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
               <div className="text-2xl font-bold text-gray-900 mb-1">24/7</div>
               <div className="text-sm text-gray-600 font-light">Support</div>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
               <div className="text-2xl font-bold text-gray-900 mb-1">99.9%</div>
               <div className="text-sm text-gray-600 font-light">Uptime</div>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
               <div className="text-2xl font-bold text-gray-900 mb-1">2min</div>
               <div className="text-sm text-gray-600 font-light">Avg Search</div>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
               <div className="text-2xl font-bold text-gray-900 mb-1">4.9★</div>
               <div className="text-sm text-gray-600 font-light">Rating</div>
             </div>

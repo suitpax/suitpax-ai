@@ -95,7 +95,7 @@ export class PolicyService {
 
   private async storePolicyInMemory(policy: TravelPolicy): Promise<void> {
     try {
-      const response = await fetch("/api/suitpax-intelligence/memory", {
+      const response = await fetch("/api/intelligence/memory", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

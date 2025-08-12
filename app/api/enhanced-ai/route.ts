@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { SuitpaxIntelligenceService } from "@/lib/suitpax-intelligence"
+import { SuitpaxIntelligenceService } from "@/lib/intelligence"
 
 export async function POST(request: NextRequest) {
   try {

@@ -183,24 +183,12 @@ export function Sidebar({
       )}
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200/60 flex-shrink-0">
+      <div className="p-4 border-b border-gray-200/60 flex-shrink-0 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center shadow-sm">
               <span className="text-white text-sm font-bold">S</span>
             </div>
-            {(!isCollapsed || isMobile) && (
-              <div>
-                <h1 className="text-lg font-bold tracking-tighter text-gray-900">Suitpax</h1>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-gray-600">{getDisplayName()}</span>
-                  <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse"></div>
-                    <span className="text-[10px] text-gray-500">v2.1.0</span>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
           <Button
             variant="ghost"
