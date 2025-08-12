@@ -107,14 +107,14 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-700 font-medium tracking-tight">Loading your workspace...</p>
         </motion.div>
       </div>
@@ -128,7 +128,7 @@ export default function DashboardLayout({
   const isActuallyCollapsed = !isMobile && sidebarCollapsed && !sidebarHovered
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden">
       {/* Mobile backdrop */}
       {isMobile && mobileMenuOpen && (
         <motion.div
@@ -164,6 +164,8 @@ export default function DashboardLayout({
           isMobile={isMobile}
           onCloseMobile={closeMobileMenu}
           onToggleCollapse={toggleSidebar}
+          userPlan={userPlan}
+          subscriptionStatus={subscriptionStatus}
         />
       </div>
 
@@ -171,10 +173,10 @@ export default function DashboardLayout({
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         {/* Mobile Header with Menu Button */}
         <div className="lg:hidden">
-          <div className="flex items-center justify-between h-16 px-4 bg-white/70 backdrop-blur-sm border-b border-white/20">
+          <div className="flex items-center justify-between h-16 px-4 bg-white/80 backdrop-blur-sm border-b border-gray-200">
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500/20 transition-colors"
+              className="inline-flex items-center justify-center p-2 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-900/20 transition-colors"
               onClick={toggleSidebar}
             >
               <span className="sr-only">Open sidebar</span>

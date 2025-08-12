@@ -1,44 +1,39 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
+import { motion } from "framer-motion"
 import {
-  Mic,
-  MicOff,
-  Volume2,
-  VolumeX,
-  Settings,
-  Sparkles,
-  MessageSquare,
-  Clock,
-  BarChart3,
+  Search,
+  Plus,
+  Calendar,
+  TrendingUp,
   Users,
+  BarChart3,
+  Clock,
+  Settings,
+  Filter,
+  MicIcon,
+  Volume2,
+  Pause,
+  MessageSquare,
   Zap,
   Brain,
   Headphones,
-  RotateCcw,
 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-import { useVoiceAI } from "@/contexts/voice-ai-context"
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Progress } from "@/components/ui/progress"
 
 export default function VoiceAIPage() {
   const [user, setUser] = useState<any>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [isListening, setIsListening] = useState(false)
-  const [voiceEnabled, setVoiceEnabled] = useState(true)
-  const [volume, setVolume] = useState([75])
-  const [transcript, setTranscript] = useState("")
-  const [response, setResponse] = useState("")
-  const [isProcessing, setIsProcessing] = useState(false)
-
+  const [isRecording, setIsRecording] = useState(false)
+  const [conversations, setConversations] = useState([])
+  const [searchTerm, setSearchTerm] = useState("")
   const supabase = createClient()
-  const { startListening, stopListening, isSupported } = useVoiceAI()
 
   useEffect(() => {
     const getUser = async () => {
@@ -76,296 +71,334 @@ export default function VoiceAIPage() {
     return "Good evening"
   }
 
-  const handleVoiceToggle = async () => {
-    if (isListening) {
-      setIsListening(false)
-      stopListening()
-    } else {
-      setIsListening(true)
-      startListening()
-    }
+  const formatDate = () => {
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ]
+
+    const dayName = days[currentTime.getDay()]
+    const monthName = months[currentTime.getMonth()]
+    const date = currentTime.getDate()
+
+    return `${dayName}, ${monthName} ${date}`
   }
 
-  const voiceFeatures = [
-    {
-      icon: Brain,
-      title: "AI-Powered Understanding",
-      description: "Advanced natural language processing for complex business queries",
-      color: "bg-blue-50 border-blue-200",
-      iconColor: "text-blue-600",
-    },
-    {
-      icon: Zap,
-      title: "Instant Responses",
-      description: "Get immediate answers to travel planning and expense questions",
-      color: "bg-purple-50 border-purple-200",
-      iconColor: "text-purple-600",
-    },
-    {
-      icon: BarChart3,
-      title: "Data Insights",
-      description: "Voice-activated analytics and reporting for business travel",
-      color: "bg-green-50 border-green-200",
-      iconColor: "text-green-600",
-    },
-    {
-      icon: Users,
-      title: "Team Collaboration",
-      description: "Coordinate team travel and expenses through voice commands",
-      color: "bg-orange-50 border-orange-200",
-      iconColor: "text-orange-600",
-    },
-  ]
-
-  const quickCommands = [
-    "Book a flight to New York",
-    "Show my expense reports",
-    "What's my travel budget?",
-    "Schedule a team meeting",
-    "Find hotels in San Francisco",
-    "Generate monthly travel report",
-  ]
+  const handleStartRecording = () => {
+    setIsRecording(!isRecording)
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
-      <VantaHaloBackground />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+        >
+          <div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-gray-900 mb-2">
+              Voice AI Assistant
+            </h1>
+            <p className="text-lg font-light text-gray-600">
+              {getGreeting()}, {getDisplayName().split(" ")[0]}! Ready to help with your business needs.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search conversations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-64 rounded-2xl border-gray-200 bg-white/80 backdrop-blur-sm"
+              />
+            </div>
+            <Button variant="outline" size="icon" className="rounded-2xl bg-white/80 backdrop-blur-sm border-gray-200">
+              <Filter className="h-4 w-4" />
+            </Button>
+          </div>
+        </motion.div>
+
+        {/* Stats Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-4">
-            <Sparkles className="h-3 w-3 mr-1" />
-            AI-Powered Voice Assistant
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none text-gray-900 mb-4">
-            {getGreeting()}, {getDisplayName().split(" ")[0]}!
-          </h1>
-          <p className="text-xl font-light text-gray-600 max-w-2xl mx-auto">
-            Your intelligent voice assistant for business travel management and expense tracking
-          </p>
+          <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
+                CONVERSATIONS
+              </div>
+              <MessageSquare className="h-5 w-5 text-gray-400" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-2xl font-medium tracking-tighter text-gray-900">247</p>
+              <p className="text-xs font-light text-gray-600">Total voice chats</p>
+            </div>
+            <div className="flex items-center mt-3 text-xs">
+              <TrendingUp className="h-3 w-3 text-emerald-950 mr-1" />
+              <span className="text-emerald-950 font-medium">+12%</span>
+              <span className="text-gray-500 ml-1">vs last month</span>
+            </div>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
+                VOICE TIME
+              </div>
+              <Clock className="h-5 w-5 text-gray-400" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-2xl font-medium tracking-tighter text-gray-900">42.5h</p>
+              <p className="text-xs font-light text-gray-600">Total speaking time</p>
+            </div>
+            <div className="flex items-center mt-3 text-xs">
+              <span className="text-gray-500">This month</span>
+            </div>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
+                AI RESPONSES
+              </div>
+              <Brain className="h-5 w-5 text-gray-400" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-2xl font-medium tracking-tighter text-gray-900">1,847</p>
+              <p className="text-xs font-light text-gray-600">Generated responses</p>
+            </div>
+            <div className="flex items-center mt-3 text-xs">
+              <Zap className="h-3 w-3 text-emerald-950 mr-1" />
+              <span className="text-emerald-950 font-medium">98.2%</span>
+              <span className="text-gray-500 ml-1">accuracy rate</span>
+            </div>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
+                VOICE QUALITY
+              </div>
+              <Volume2 className="h-5 w-5 text-gray-400" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-2xl font-medium tracking-tighter text-gray-900">HD</p>
+              <p className="text-xs font-light text-gray-600">Audio quality</p>
+            </div>
+            <div className="flex items-center mt-3">
+              <Progress value={95} className="flex-1 h-1" />
+              <span className="text-xs text-gray-500 ml-2">95%</span>
+            </div>
+          </Card>
         </motion.div>
 
         {/* Main Voice Interface */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-12"
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
         >
-          <Card className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="text-center">
-              {/* Voice Visualizer */}
-              <div className="relative mb-8">
-                <div
-                  className={`w-32 h-32 mx-auto rounded-full flex items-center justify-center transition-all duration-300 ${
-                    isListening
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg shadow-blue-500/25 animate-pulse"
-                      : "bg-gray-200 hover:bg-gray-300"
-                  }`}
-                >
-                  <Button
-                    onClick={handleVoiceToggle}
-                    disabled={!isSupported}
-                    className={`w-24 h-24 rounded-full border-0 shadow-none ${
-                      isListening
-                        ? "bg-white text-blue-600 hover:bg-gray-50"
-                        : "bg-white text-gray-600 hover:bg-gray-50"
+          {/* Voice Control Panel */}
+          <div className="lg:col-span-2">
+            <Card className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm">
+              <div className="text-center space-y-6">
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-medium tracking-tighter text-gray-900">Ready to assist you</h2>
+                  <p className="text-lg font-light text-gray-600">
+                    Speak naturally and get intelligent responses powered by advanced AI
+                  </p>
+                </div>
+
+                {/* Voice Recording Button */}
+                <div className="flex justify-center">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleStartRecording}
+                    className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isRecording ? "bg-red-500 shadow-lg shadow-red-500/25" : "bg-gray-900 hover:bg-gray-800 shadow-lg"
                     }`}
                   >
-                    {isListening ? <MicOff className="h-8 w-8" /> : <Mic className="h-8 w-8" />}
+                    {isRecording ? (
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1 }}
+                      >
+                        <Pause className="h-8 w-8 text-white" />
+                      </motion.div>
+                    ) : (
+                      <MicIcon className="h-8 w-8 text-white" />
+                    )}
+                  </motion.button>
+                </div>
+
+                <div className="flex items-center justify-center gap-4">
+                  <Button
+                    variant="outline"
+                    className="rounded-2xl px-6 py-3 bg-white/80 backdrop-blur-sm border-gray-200"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Voice Settings
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="rounded-2xl px-6 py-3 bg-white/80 backdrop-blur-sm border-gray-200"
+                  >
+                    <Headphones className="h-4 w-4 mr-2" />
+                    Audio Test
                   </Button>
                 </div>
 
-                {isListening && (
-                  <div className="absolute inset-0 rounded-full border-4 border-blue-400 animate-ping opacity-20"></div>
+                {isRecording && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-gray-50 rounded-2xl p-4"
+                  >
+                    <div className="flex items-center justify-center gap-2 text-red-500">
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                      <span className="text-sm font-medium">Listening...</span>
+                    </div>
+                  </motion.div>
                 )}
               </div>
-
-              <h2 className="text-2xl font-medium tracking-tighter text-gray-900 mb-2">
-                {isListening ? "Listening..." : "Ready to help"}
-              </h2>
-              <p className="text-gray-600 font-light mb-6">
-                {isListening
-                  ? "Speak naturally about your travel needs"
-                  : "Click the microphone to start voice interaction"}
-              </p>
-
-              {/* Voice Controls */}
-              <div className="flex items-center justify-center gap-4 mb-8">
-                <div className="flex items-center gap-2">
-                  <Switch checked={voiceEnabled} onCheckedChange={setVoiceEnabled} disabled={isListening} />
-                  <span className="text-sm text-gray-600">Voice responses</span>
-                </div>
-
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="rounded-xl bg-white/80">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80 bg-white/95 backdrop-blur-sm">
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">Voice Volume</label>
-                        <div className="flex items-center gap-3">
-                          <VolumeX className="h-4 w-4 text-gray-400" />
-                          <Slider value={volume} onValueChange={setVolume} max={100} step={1} className="flex-1" />
-                          <Volume2 className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <span className="text-xs text-gray-500">{volume[0]}%</span>
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {/* Transcript and Response */}
-              {(transcript || response) && (
-                <div className="space-y-4 text-left">
-                  {transcript && (
-                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Mic className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-900">You said:</span>
-                      </div>
-                      <p className="text-gray-700">{transcript}</p>
-                    </div>
-                  )}
-
-                  {response && (
-                    <div className="bg-green-50 p-4 rounded-xl border border-green-200">
-                      <div className="flex items-center gap-2 mb-2">
-                        <MessageSquare className="h-4 w-4 text-green-600" />
-                        <span className="text-sm font-medium text-green-900">AI Response:</span>
-                      </div>
-                      <p className="text-gray-700">{response}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Quick Commands */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mb-12"
-        >
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-medium tracking-tighter text-gray-900 mb-2">Try these voice commands</h3>
-            <p className="text-gray-600 font-light">Click any command to try it out, or speak naturally</p>
+            </Card>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {quickCommands.map((command, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                className="p-4 h-auto text-left justify-start bg-white/80 hover:bg-white border-gray-200 rounded-xl"
-                onClick={() => setTranscript(command)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MessageSquare className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <span className="text-sm text-gray-700">"{command}"</span>
+          {/* Voice AI Features */}
+          <div className="space-y-6">
+            <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-medium tracking-tighter text-gray-900">AI Capabilities</h3>
+                <div className="inline-flex items-center rounded-xl bg-emerald-950 px-2.5 py-0.5 text-[10px] font-medium text-white">
+                  ACTIVE
                 </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Brain className="h-5 w-5 text-gray-600" />
+                    <span className="font-medium text-gray-900">Natural Language</span>
+                  </div>
+                  <p className="text-xs font-light text-gray-600">Understand context and nuance in conversations</p>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3 mb-2">
+                    <BarChart3 className="h-5 w-5 text-gray-600" />
+                    <span className="font-medium text-gray-900">Data Analysis</span>
+                  </div>
+                  <p className="text-xs font-light text-gray-600">Analyze business metrics and provide insights</p>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Zap className="h-5 w-5 text-gray-600" />
+                    <span className="font-medium text-gray-900">Real-time Response</span>
+                  </div>
+                  <p className="text-xs font-light text-gray-600">Instant processing and intelligent replies</p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+              <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-4">Quick Actions</h3>
+              <div className="space-y-3">
+                <Button className="w-full justify-start rounded-xl bg-gray-900 hover:bg-gray-800 text-white">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Start New Conversation
+                </Button>
+                <Button variant="outline" className="w-full justify-start rounded-xl bg-white/80 border-gray-200">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Schedule Voice Meeting
+                </Button>
+                <Button variant="outline" className="w-full justify-start rounded-xl bg-white/80 border-gray-200">
+                  <Users className="h-4 w-4 mr-2" />
+                  Team Voice Chat
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </motion.div>
+
+        {/* Conversation History */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-medium tracking-tighter text-gray-900">Recent Conversations</h3>
+              <Button variant="outline" size="sm" className="rounded-xl bg-white/80 border-gray-200">
+                <Plus className="h-4 w-4 mr-2" />
+                New Chat
               </Button>
-            ))}
-          </div>
-        </motion.div>
+            </div>
 
-        {/* Voice AI Features */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mb-12"
-        >
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-medium tracking-tighter text-gray-900 mb-2">Powerful Voice Capabilities</h3>
-            <p className="text-gray-600 font-light">Advanced AI features designed for business travel management</p>
-          </div>
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 rounded-xl bg-gray-100">
+                <TabsTrigger value="all" className="rounded-lg">
+                  All
+                </TabsTrigger>
+                <TabsTrigger value="business" className="rounded-lg">
+                  Business
+                </TabsTrigger>
+                <TabsTrigger value="personal" className="rounded-lg">
+                  Personal
+                </TabsTrigger>
+              </TabsList>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {voiceFeatures.map((feature, index) => (
-              <Card key={index} className={`p-6 rounded-2xl border shadow-sm ${feature.color}`}>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className={`h-6 w-6 ${feature.iconColor}`} />
-                  </div>
-                  <h4 className="font-medium tracking-tight text-gray-900 mb-2">{feature.title}</h4>
-                  <p className="text-sm font-light text-gray-600">{feature.description}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Usage Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-        >
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Voice Sessions Today</p>
-                  <p className="text-3xl font-medium tracking-tighter text-gray-900">12</p>
-                  <div className="flex items-center mt-2 text-sm">
-                    <Clock className="h-4 w-4 text-blue-500 mr-1" />
-                    <span className="text-blue-600 font-medium">2.5 hours total</span>
+              <TabsContent value="all" className="mt-6">
+                <div className="space-y-4">
+                  {/* Empty State */}
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <MessageSquare className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <h4 className="text-lg font-medium tracking-tighter text-gray-900 mb-2">No conversations yet</h4>
+                    <p className="text-sm font-light text-gray-600 mb-6">
+                      Start your first voice conversation to see it here
+                    </p>
+                    <Button
+                      onClick={handleStartRecording}
+                      className="rounded-2xl bg-gray-900 hover:bg-gray-800 text-white px-6"
+                    >
+                      <MicIcon className="h-4 w-4 mr-2" />
+                      Start Voice Chat
+                    </Button>
                   </div>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <Headphones className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-            </Card>
+              </TabsContent>
 
-            <Card className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Commands Processed</p>
-                  <p className="text-3xl font-medium tracking-tighter text-gray-900">47</p>
-                  <div className="flex items-center mt-2 text-sm">
-                    <Zap className="h-4 w-4 text-green-500 mr-1" />
-                    <span className="text-green-600 font-medium">98% accuracy</span>
-                  </div>
+              <TabsContent value="business" className="mt-6">
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-sm font-light">No business conversations yet</p>
                 </div>
-                <div className="p-3 bg-green-100 rounded-xl">
-                  <Brain className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-            </Card>
+              </TabsContent>
 
-            <Card className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Time Saved</p>
-                  <p className="text-3xl font-medium tracking-tighter text-gray-900">3.2h</p>
-                  <div className="flex items-center mt-2 text-sm">
-                    <RotateCcw className="h-4 w-4 text-purple-500 mr-1" />
-                    <span className="text-purple-600 font-medium">vs manual tasks</span>
-                  </div>
+              <TabsContent value="personal" className="mt-6">
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-sm font-light">No personal conversations yet</p>
                 </div>
-                <div className="p-3 bg-purple-100 rounded-xl">
-                  <Clock className="h-6 w-6 text-purple-600" />
-                </div>
-              </div>
-            </Card>
-          </div>
+              </TabsContent>
+            </Tabs>
+          </Card>
         </motion.div>
       </div>
     </div>
