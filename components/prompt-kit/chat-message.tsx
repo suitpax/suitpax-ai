@@ -32,9 +32,14 @@ export function ChatMessage({ message, isTyping = false, showReasoning = false }
   const [showSources, setShowSources] = useState(false)
 
   return (
-    <div className={cn("flex items-start gap-3", isUser ? "justify-end" : "justify-start")}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={cn("flex items-start gap-3 mb-6", isUser ? "justify-end" : "justify-start")}
+    >
       {!isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
+        <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br from-white to-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden shadow-sm">
           <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={20} height={20} className="object-contain" />
         </div>
       )}
@@ -42,10 +47,10 @@ export function ChatMessage({ message, isTyping = false, showReasoning = false }
       <div className="flex flex-col gap-2 max-w-3xl">
         <div
           className={cn(
-            "rounded-2xl p-4",
+            "rounded-2xl p-4 transition-all duration-200",
             isUser
-              ? "bg-gray-900 text-white rounded-br-lg"
-              : "bg-white/80 backdrop-blur-sm text-gray-900 border border-gray-200 shadow-sm",
+              ? "bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-br-lg shadow-lg"
+              : "bg-white/90 backdrop-blur-sm text-gray-900 border border-gray-200/50 shadow-sm hover:shadow-md",
           )}
         >
           {isTyping ? (
@@ -65,10 +70,9 @@ export function ChatMessage({ message, isTyping = false, showReasoning = false }
                 ol: ({ node, ...props }) => <ol className="list-decimal pl-5 space-y-1 mb-3" {...props} />,
                 li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
                 blockquote: ({ node, ...props }) => (
-                  <blockquote
-                    className="border-l-4 border-gray-300 pl-4 italic text-gray-700 my-4 bg-gray-50 py-2 rounded-r-lg"
-                    {...props}
-                  />
+                  <div className="border-l-4 border-blue-500 pl-4 my-4 bg-gradient-to-r from-blue-50 to-transparent py-3 rounded-r-lg">
+                    <blockquote className="italic text-gray-700 font-medium" {...props} />
+                  </div>
                 ),
                 a: ({ node, href, children, ...props }) => (
                   <a
@@ -87,20 +91,17 @@ export function ChatMessage({ message, isTyping = false, showReasoning = false }
                   </a>
                 ),
                 table: ({ node, ...props }) => (
-                  <div className="overflow-x-auto my-4">
-                    <table
-                      className="w-full border-collapse border border-gray-200 rounded-lg overflow-hidden"
-                      {...props}
-                    />
+                  <div className="overflow-x-auto my-4 rounded-xl border border-gray-200 shadow-sm">
+                    <table className="w-full border-collapse bg-white" {...props} />
                   </div>
                 ),
                 th: ({ node, ...props }) => (
                   <th
-                    className="border border-gray-200 px-4 py-3 text-left bg-gray-50 font-semibold text-gray-900"
+                    className="border-b border-gray-200 px-4 py-3 text-left bg-gradient-to-r from-gray-50 to-gray-100 font-semibold text-gray-900 text-sm"
                     {...props}
                   />
                 ),
-                td: ({ node, ...props }) => <td className="border border-gray-200 px-4 py-3" {...props} />,
+                td: ({ node, ...props }) => <td className="border-b border-gray-100 px-4 py-3 text-sm" {...props} />,
                 img: ({ node, src, alt, ...props }) => (
                   <div className="my-4">
                     <img
@@ -142,12 +143,16 @@ export function ChatMessage({ message, isTyping = false, showReasoning = false }
 
         {/* Reasoning Section */}
         {!isUser && showReasoning && message.reasoning && (
-          <div className="bg-blue-50/80 backdrop-blur-sm border border-blue-200 rounded-xl p-3">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 backdrop-blur-sm border border-blue-200/50 rounded-xl p-3 shadow-sm"
+          >
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowReasoningDetails(!showReasoningDetails)}
-              className="flex items-center gap-2 text-blue-700 hover:text-blue-800 hover:bg-blue-100 p-2 h-auto"
+              className="flex items-center gap-2 text-blue-700 hover:text-blue-800 hover:bg-blue-100/50 p-2 h-auto rounded-lg transition-all"
             >
               <Bot className="h-4 w-4" />
               <span className="text-sm font-medium">AI Reasoning</span>
@@ -159,14 +164,14 @@ export function ChatMessage({ message, isTyping = false, showReasoning = false }
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-3 pt-3 border-t border-blue-200"
+                className="mt-3 pt-3 border-t border-blue-200/50"
               >
                 <div className="text-sm text-blue-800 leading-relaxed">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.reasoning}</ReactMarkdown>
                 </div>
               </motion.div>
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Sources Section */}
@@ -187,7 +192,7 @@ export function ChatMessage({ message, isTyping = false, showReasoning = false }
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-3 pt-3 border-t border-gray-200 space-y-2"
+                className="mt-3 pt-3 border-t border-gray-200/50 space-y-2"
               >
                 {message.sources.map((source, index) => (
                   <div key={index} className="flex items-start gap-2">
@@ -217,17 +222,17 @@ export function ChatMessage({ message, isTyping = false, showReasoning = false }
         )}
 
         {/* Timestamp */}
-        <div className={cn("text-xs text-gray-500", isUser ? "text-right" : "text-left")}>
+        <div className={cn("text-xs text-gray-400 font-medium", isUser ? "text-right" : "text-left")}>
           {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </div>
       </div>
 
       {isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gray-200 flex items-center justify-center">
+        <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center shadow-sm">
           <User className="h-5 w-5 text-gray-600" />
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }
 

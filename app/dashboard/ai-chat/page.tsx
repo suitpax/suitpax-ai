@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { motion } from "framer-motion"
 import {
   Loader2,
   ArrowUp,
@@ -26,19 +25,13 @@ import {
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { PromptInput, PromptInputActions, PromptInputAction } from "@/components/prompt-kit/prompt-input"
-import {
-  ChatContainerRoot,
-  ChatContainerContent,
-  ChatContainerScrollAnchor,
-} from "@/components/prompt-kit/chat-container"
+import { ChatContainer } from "@/components/prompt-kit/chat-container"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 import { Switch } from "@/components/ui/switch"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import { useVoiceAI } from "@/contexts/voice-ai-context"
 import VoiceButton from "@/components/prompt-kit/voice-button"
 import { useChatStream } from "@/hooks/use-chat-stream"
-import ChatSidebar from "@/components/prompt-kit/chat-sidebar"
-import { ChatMessage } from "@/components/prompt-kit/chat-message"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 
@@ -93,7 +86,7 @@ const PROMPT_STARTERS = [
 function AIChatView() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const [isUserLoading, setIsUserLoading] = useState(true)
@@ -352,7 +345,7 @@ function AIChatView() {
   }
 
   const handleSend = async () => {
-    if (!input.trim() || loading || isStreaming) return
+    if (!input.trim() || isLoading || isStreaming) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -364,7 +357,7 @@ function AIChatView() {
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setFiles([])
-    setLoading(true)
+    setIsLoading(true)
 
     const isFlightIntent =
       /\b([A-Z]{3})\b.*\b(to|→|-|from)\b.*\b([A-Z]{3})\b/i.test(userMessage.content) ||
@@ -418,7 +411,7 @@ function AIChatView() {
         ])
       }
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
@@ -485,7 +478,6 @@ function AIChatView() {
                 </Button>
               </div>
             </div>
-            <ChatSidebar currentSessionId={currentSessionId} onSessionSelect={setCurrentSessionId} />
           </div>
         )}
       </div>
@@ -525,70 +517,9 @@ function AIChatView() {
 
         {/* Chat Content */}
         <div className="flex-1 flex flex-col min-h-0">
-          <ChatContainerRoot className="flex-1">
-            <ChatContainerContent className="px-6 py-8">
-              {messages.length === 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="max-w-4xl mx-auto text-center space-y-8"
-                >
-                  <div className="space-y-4">
-                    <div className="w-16 h-16 mx-auto bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
-                      <Sparkles className="h-8 w-8 text-white" />
-                    </div>
-                    <h1 className="text-3xl font-medium text-white/90 tracking-tight">Welcome to Suitpax AI</h1>
-                    <p className="text-lg text-white/60 max-w-2xl mx-auto">
-                      Your intelligent travel assistant powered by real-time flight data and advanced AI reasoning
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
-                    {PROMPT_STARTERS.map((category, idx) => (
-                      <div key={idx} className="space-y-4">
-                        <h3 className="text-lg font-medium text-white/80">{category.category}</h3>
-                        <div className="space-y-3">
-                          {category.prompts.map((prompt, promptIdx) => (
-                            <button
-                              key={promptIdx}
-                              onClick={() => setInput(prompt)}
-                              className="w-full text-left p-4 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/10 hover:border-white/20 transition-all text-sm text-white/70 hover:text-white/90 backdrop-blur-sm"
-                            >
-                              {prompt}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-
-              {messages.map((message) => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-8"
-                >
-                  <ChatMessage
-                    message={message}
-                    isTyping={typingMessageId === message.id}
-                    showReasoning={showReasoning}
-                  />
-                </motion.div>
-              ))}
-
-              {(loading || isStreaming || isSessionLoading) && (
-                <div className="flex items-center gap-3 text-white/60 text-sm p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <span>{isSessionLoading ? "Loading conversation…" : "Generating answer…"}</span>
-                </div>
-              )}
-
-              <ChatContainerScrollAnchor />
-            </ChatContainerContent>
-          </ChatContainerRoot>
+          <div className="flex-1 overflow-hidden">
+            <ChatContainer messages={messages} isLoading={isLoading} onRetry={handleSend} />
+          </div>
 
           <ScrollButton />
 
@@ -600,7 +531,7 @@ function AIChatView() {
                 onChange={setInput}
                 onSubmit={handleSend}
                 placeholder="Ask about flights, hotels, travel planning, or anything else..."
-                disabled={loading || isStreaming}
+                disabled={isLoading || isStreaming}
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-2xl backdrop-blur-sm"
               >
                 <PromptInputActions>
@@ -687,8 +618,8 @@ function AIChatView() {
                     </label>
                   </PromptInputAction>
                   <PromptInputAction>
-                    <button onClick={handleSend} aria-label="Send message" disabled={loading || isStreaming}>
-                      {loading || isStreaming ? (
+                    <button onClick={handleSend} aria-label="Send message" disabled={isLoading || isStreaming}>
+                      {isLoading || isStreaming ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
                         <ArrowUp className="h-5 w-5" />
