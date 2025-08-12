@@ -2,34 +2,11 @@ import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { buildSystemPrompt, buildReasoningInstruction } from "@/lib/prompts/system"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
+import { SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/enhanced-system"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
-const TRAVEL_AGENT_SYSTEM_PROMPT = `You are Suitpax AI, an advanced travel agent assistant with access to real-time flight data through the Duffel API. You specialize in business travel and can help users find, compare, and book flights.
-
-Key capabilities:
-- Search real flights using current market data
-- Provide detailed flight information with airline logos and route details
-- Format responses with rich markdown including flight cards
-- Generate destination images and travel recommendations
-- Handle complex travel queries with multiple destinations and dates
-
-When users ask about flights, always:
-1. Extract origin, destination, and travel dates from their query
-2. Use the flight search tool to get real data
-3. Present results in a visually appealing markdown format with:
-   - Flight cards showing airline logos, times, prices, and duration
-   - Destination images when relevant
-   - Clear booking links
-   - Travel tips and recommendations
-
-Response format for flight results:
-- Use markdown tables and cards for flight information
-- Include airline logos using the provided URLs
-- Add destination images using placeholder URLs with descriptive queries
-- Provide clear next steps for booking
-
-Always be helpful, professional, and focus on providing actionable travel solutions.`
+const TRAVEL_AGENT_SYSTEM_PROMPT = SUITPAX_AI_SYSTEM_PROMPT
 
 export async function POST(request: NextRequest) {
   const {
@@ -50,6 +27,45 @@ export async function POST(request: NextRequest) {
     const {
       data: { user },
     } = await supabase.auth.getUser()
+
+    if (!user?.id) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
+    }
+
+    // Estimate tokens needed (rough calculation: 1 token ≈ 4 characters)
+    const estimatedInputTokens = Math.ceil((message + JSON.stringify(conversationHistory)).length / 4)
+    const estimatedOutputTokens = 1000 // Conservative estimate for response
+
+    // Check if user can use AI tokens
+    const { data: canUseTokens, error: tokenCheckError } = await supabase.rpc("can_use_ai_tokens", {
+      user_uuid: user.id,
+      tokens_needed: estimatedInputTokens + estimatedOutputTokens,
+    })
+
+    if (tokenCheckError) {
+      console.error("Token check error:", tokenCheckError)
+      return NextResponse.json({ error: "Failed to check token limits" }, { status: 500 })
+    }
+
+    if (!canUseTokens) {
+      // Get user's current plan limits for error message
+      const { data: planLimits } = await supabase.rpc("get_user_plan_limits", { user_uuid: user.id })
+      const limits = planLimits?.[0]
+
+      return NextResponse.json(
+        {
+          error: "Token limit exceeded",
+          details: {
+            message: `You've reached your AI token limit for the ${limits?.plan_name || "current"} plan.`,
+            tokensUsed: limits?.ai_tokens_used || 0,
+            tokensLimit: limits?.ai_tokens_limit || 0,
+            planName: limits?.plan_name || "free",
+            upgradeRequired: true,
+          },
+        },
+        { status: 429 },
+      )
+    }
 
     const isFlightIntent =
       /\b([A-Z]{3})\b.*\b(to|→|-|from)\b.*\b([A-Z]{3})\b/i.test(message) ||
@@ -94,6 +110,20 @@ export async function POST(request: NextRequest) {
     })
 
     text = initial.content.find((c: any) => c.type === "text")?.text || ""
+
+    const actualInputTokens = (initial.usage as any)?.input_tokens || estimatedInputTokens
+    const actualOutputTokens = (initial.usage as any)?.output_tokens || Math.ceil(text.length / 4)
+    const totalTokensUsed = actualInputTokens + actualOutputTokens
+
+    const { data: tokenUpdateSuccess, error: tokenUpdateError } = await supabase.rpc("increment_ai_tokens", {
+      user_uuid: user.id,
+      tokens_used: totalTokensUsed,
+    })
+
+    if (tokenUpdateError || !tokenUpdateSuccess) {
+      console.error("Failed to update token usage:", tokenUpdateError)
+      // Continue with response but log the error
+    }
 
     if (flightData?.success && flightData.offers?.length > 0) {
       const offers = flightData.offers
@@ -155,31 +185,60 @@ export async function POST(request: NextRequest) {
         messages: [{ role: "user", content: reasoningPrompt }],
       })
       reasoning = r.content.find((c: any) => c.type === "text")?.text?.trim()
+
+      const reasoningTokens = (r.usage as any)?.input_tokens + (r.usage as any)?.output_tokens || 100
+      await supabase.rpc("increment_ai_tokens", {
+        user_uuid: user.id,
+        tokens_used: reasoningTokens,
+      })
     }
 
-    // Log AI usage
     try {
-      const inputTokens = (initial.usage as any)?.input_tokens || 0
-      const outputTokens = (initial.usage as any)?.output_tokens || Math.ceil(text.length / 4)
-      if (user?.id) {
-        await supabase.from("ai_usage").insert({
-          user_id: user.id,
-          model: "claude-3-5-sonnet-20241022",
-          input_tokens: inputTokens,
-          output_tokens: outputTokens,
-          context_type: isFlightIntent ? "flight_search" : "general",
-        })
-      }
+      await supabase.from("ai_usage").insert({
+        user_id: user.id,
+        model: "claude-3-5-sonnet-20241022",
+        input_tokens: actualInputTokens,
+        output_tokens: actualOutputTokens,
+        total_tokens: totalTokensUsed,
+        context_type: isFlightIntent ? "flight_search" : "general",
+        provider: "anthropic",
+        cost_usd: calculateTokenCost(totalTokensUsed, "claude-3-5-sonnet-20241022"),
+      })
+
+      // Also log to ai_chat_logs for backward compatibility
+      await supabase.from("ai_chat_logs").insert({
+        user_id: user.id,
+        message: message,
+        response: text,
+        tokens_used: totalTokensUsed,
+        model_used: "claude-3-5-sonnet-20241022",
+        context_type: isFlightIntent ? "flight_search" : "general",
+      })
     } catch (e) {
       console.error("Failed to log AI usage:", e)
     }
 
-    return NextResponse.json({ response: text, reasoning, sources })
+    return NextResponse.json({
+      response: text,
+      reasoning,
+      sources,
+      tokenUsage: {
+        used: totalTokensUsed,
+        inputTokens: actualInputTokens,
+        outputTokens: actualOutputTokens,
+      },
+    })
   } catch (e: any) {
     const errorId = Math.random().toString(36).slice(2)
     console.error("AI Chat API Error:", errorId, e?.stack || e)
     return NextResponse.json({ error: "We're experiencing technical difficulties.", errorId }, { status: 500 })
   }
+}
+
+function calculateTokenCost(totalTokens: number, model: string): number {
+  // Anthropic Claude 3.5 Sonnet pricing (approximate)
+  const costPer1kTokens = 0.003 // $3 per 1M tokens = $0.003 per 1k tokens
+  return (totalTokens / 1000) * costPer1kTokens
 }
 
 function getDestinationName(iataCode: string): string {

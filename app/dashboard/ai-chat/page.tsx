@@ -25,7 +25,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
-import { PromptInput, PromptInputAction, PromptInputActions } from "@/components/prompt-kit/prompt-input"
+import { PromptInput, PromptInputActions, PromptInputAction } from "@/components/prompt-kit/prompt-input"
 import {
   ChatContainerRoot,
   ChatContainerContent,
@@ -707,14 +707,9 @@ function AIChatView() {
 
 export default function AIChatPage() {
   return (
-    <div className="h-full flex flex-col">
-      {/* Vanta Background */}
-      <div className="absolute inset-0 -z-10">
-        <VantaHaloBackground />
-      </div>
-
-      {/* Chat Interface */}
-      <div className="flex-1 flex relative">
+    <div className="relative h-screen overflow-hidden">
+      <VantaHaloBackground />
+      <div className="relative z-10 flex h-full">
         <AIChatView />
       </div>
     </div>

@@ -373,29 +373,35 @@ export default function MeetingsPage() {
       const key = m.date
       if (key in map) map[key].push(m)
     }
-    return { days, map }
+
+    const thisWeekCount = Object.values(map).reduce((acc, meetings) => acc + meetings.length, 0)
+    return { days, map, thisWeekCount }
   })()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4 md:p-6">
+      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Meetings</h1>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-none mb-2">
+                Meetings
+              </h1>
               <p className="text-gray-600 font-light">
                 <em className="font-serif italic">Manage your business meetings and video calls</em>
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               {!googleToken && (
-                <Button className="bg-black text-white hover:bg-gray-800 rounded-xl">Connect Google Calendar</Button>
+                <Button className="bg-black text-white hover:bg-gray-800 rounded-xl px-4 py-2">
+                  Connect Google Calendar
+                </Button>
               )}
               <Dialog open={showNewMeetingModal} onOpenChange={setShowNewMeetingModal}>
                 <DialogTrigger asChild>
-                  <Button className="bg-black text-white hover:bg-gray-800 rounded-xl">
+                  <Button className="bg-black text-white hover:bg-gray-800 rounded-xl px-4 py-2">
                     <PlusIcon className="h-4 w-4 mr-2" />
                     Schedule Meeting
                   </Button>
@@ -519,24 +525,87 @@ export default function MeetingsPage() {
           </div>
         </motion.div>
 
+        {/* Stats Cards - New responsive section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
+        >
+          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
+            <CardContent className="p-4 md:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Meetings</p>
+                  <p className="text-2xl font-medium tracking-tight">{meetings.length}</p>
+                </div>
+                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                  <VideoCameraIcon className="h-5 w-5 text-gray-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
+            <CardContent className="p-4 md:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Upcoming</p>
+                  <p className="text-2xl font-medium tracking-tight">{upcomingMeetings}</p>
+                </div>
+                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                  <CalendarIcon className="h-5 w-5 text-gray-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
+            <CardContent className="p-4 md:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">This Week</p>
+                  <p className="text-2xl font-medium tracking-tight">{compactAgenda.thisWeekCount}</p>
+                </div>
+                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                  <ClockIcon className="h-5 w-5 text-gray-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
+            <CardContent className="p-4 md:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Completed</p>
+                  <p className="text-2xl font-medium tracking-tight">{completedMeetings}</p>
+                </div>
+                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                  <UserGroupIcon className="h-5 w-5 text-gray-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {/* Templates + Compact agenda */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6"
         >
-          {/* Glassmorphism style to cards */}
-          <Card className="lg:col-span-2 bg-white/70 backdrop-blur-sm border-white/20 shadow-lg rounded-2xl">
-            <CardHeader>
-              <CardTitle className="text-lg tracking-tight">Meeting templates</CardTitle>
+          <Card className="lg:col-span-2 bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-medium tracking-tight">Meeting Templates</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {TEMPLATES.map((t) => (
                   <button
                     key={t.title}
-                    className="text-xs px-2 py-1 rounded-lg border border-white/30 hover:bg-white/50 backdrop-blur-sm transition-colors"
+                    className="text-left p-4 rounded-xl border border-gray-200 hover:bg-white/50 backdrop-blur-sm transition-all hover:shadow-sm"
                     onClick={() => {
                       setShowNewMeetingModal(true)
                       setNewMeeting((prev) => ({
@@ -548,33 +617,37 @@ export default function MeetingsPage() {
                       }))
                     }}
                   >
-                    {t.title}
+                    <div className="font-medium text-sm mb-1">{t.title}</div>
+                    <div className="text-xs text-gray-600 mb-2">{t.description}</div>
+                    <div className="text-xs text-gray-500">
+                      {t.duration} minutes • {t.type}
+                    </div>
                   </button>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-lg rounded-2xl">
-            <CardHeader>
-              <CardTitle className="text-lg tracking-tight">Next 7 days</CardTitle>
+          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-medium tracking-tight">Next 7 Days</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {compactAgenda.days.map((d) => (
-                  <div key={d.key} className="bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg p-3">
+                  <div key={d.key} className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl p-3">
                     <div className="text-xs font-medium text-gray-700 mb-2">{d.label}</div>
                     <div className="space-y-2">
                       {compactAgenda.map[d.key].length === 0 ? (
-                        <div className="text-[11px] text-gray-500">No meetings</div>
+                        <div className="text-xs text-gray-500">No meetings</div>
                       ) : (
                         compactAgenda.map[d.key].map((m) => (
-                          <div key={m.id} className="flex items-center justify-between text-[11px]">
+                          <div key={m.id} className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
                               <span className="text-gray-900 font-medium">{m.time}</span>
-                              <span className="text-gray-600">{m.title}</span>
+                              <span className="text-gray-600 truncate">{m.title}</span>
                             </div>
-                            <span className="text-gray-500">{m.duration}m</span>
+                            <span className="text-gray-500 text-xs">{m.duration}m</span>
                           </div>
                         ))
                       )}
@@ -591,26 +664,26 @@ export default function MeetingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl border border-white/20 shadow-lg sticky top-20 z-10"
+          className="bg-white/70 backdrop-blur-sm p-4 md:p-6 rounded-2xl border border-white/20 shadow-sm sticky top-4 z-10"
         >
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="relative flex-1 sm:flex-initial sm:w-80">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   type="text"
                   placeholder="Search meetings..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-64"
+                  className="pl-10 rounded-xl border-gray-200"
                 />
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
+                <SelectTrigger className="w-full sm:w-40 rounded-xl">
+                  <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
@@ -621,13 +694,13 @@ export default function MeetingsPage() {
               </Select>
 
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
+                <SelectTrigger className="w-full sm:w-40 rounded-xl">
+                  <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="video">Video</SelectItem>
-                  <SelectItem value="phone">Phone</SelectItem>
+                  <SelectItem value="video">Video Call</SelectItem>
+                  <SelectItem value="phone">Phone Call</SelectItem>
                   <SelectItem value="in-person">In Person</SelectItem>
                 </SelectContent>
               </Select>
@@ -650,24 +723,24 @@ export default function MeetingsPage() {
                   key={meeting.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl border border-white/20 shadow-lg hover:shadow-xl transition-shadow"
+                  transition={{ duration: 0.6, delay: index * 0.05 }}
+                  className="bg-white/70 backdrop-blur-sm p-4 md:p-6 rounded-2xl border border-white/20 shadow-sm hover:shadow-md transition-all"
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
+                      <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
                         <TypeIcon className="h-6 w-6 text-gray-600" />
                       </div>
 
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-medium tracking-tight text-gray-900">{meeting.title}</h3>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 mb-2">
+                          <h3 className="text-lg font-medium tracking-tight text-gray-900 truncate">{meeting.title}</h3>
                           <Badge className={getStatusColor(meeting.status)}>
                             {meeting.status.charAt(0).toUpperCase() + meeting.status.slice(1)}
                           </Badge>
                         </div>
 
-                        <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
                           <div className="flex items-center space-x-1">
                             <CalendarIcon className="h-4 w-4" />
                             <span>{new Date(meeting.date).toLocaleDateString()}</span>
@@ -684,25 +757,27 @@ export default function MeetingsPage() {
                           </div>
                         </div>
 
-                        {meeting.description && <p className="text-sm text-gray-600 mb-3">{meeting.description}</p>}
+                        {meeting.description && (
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{meeting.description}</p>
+                        )}
 
                         {meeting.location && (
                           <div className="flex items-center space-x-1 text-sm text-gray-600 mb-3">
                             <MapPinIcon className="h-4 w-4" />
-                            <span>{meeting.location}</span>
+                            <span className="truncate">{meeting.location}</span>
                           </div>
                         )}
 
                         <div className="flex items-center space-x-2">
                           {meeting.attendees.slice(0, 3).map((attendee, i) => (
-                            <div key={i} className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
+                            <div key={i} className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                               <span className="text-xs font-medium text-gray-600">
                                 {attendee.charAt(0).toUpperCase()}
                               </span>
                             </div>
                           ))}
                           {meeting.attendees.length > 3 && (
-                            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
                               <span className="text-xs font-medium text-gray-600">+{meeting.attendees.length - 3}</span>
                             </div>
                           )}
@@ -710,9 +785,9 @@ export default function MeetingsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {meeting.status === "upcoming" && meeting.meetingUrl && (
-                        <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white rounded-xl">
+                        <Button size="sm" className="bg-black hover:bg-gray-800 text-white rounded-xl">
                           <PlayIcon className="h-4 w-4 mr-2" />
                           Join
                         </Button>
@@ -722,9 +797,9 @@ export default function MeetingsPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => updateMeetingStatus(meeting.id, "completed")}
-                          className="rounded-xl"
+                          className="rounded-xl border-gray-200"
                         >
-                          Mark done
+                          Mark Done
                         </Button>
                       )}
                       {meeting.status !== "cancelled" && (
@@ -732,7 +807,7 @@ export default function MeetingsPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => updateMeetingStatus(meeting.id, "cancelled")}
-                          className="rounded-xl"
+                          className="rounded-xl border-gray-200"
                         >
                           Cancel
                         </Button>
@@ -750,9 +825,9 @@ export default function MeetingsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="bg-white/70 backdrop-blur-sm p-12 rounded-2xl border border-white/20 shadow-lg text-center"
+              className="bg-white/70 backdrop-blur-sm p-8 md:p-12 rounded-2xl border border-white/20 shadow-sm text-center"
             >
-              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <VideoCameraIcon className="h-8 w-8 text-gray-500" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2 tracking-tight">

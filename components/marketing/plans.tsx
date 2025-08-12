@@ -1,11 +1,11 @@
 "use client"
 
+import { useRef } from "react"
+
 import { motion } from "framer-motion"
-import { useState, useEffect, useRef } from "react"
-import Link from "next/link"
+import { useState, useEffect } from "react"
 import Image from "next/image"
-import CounterBadge from "@/components/ui/counter-badge"
-import FAQ, { defaultFAQItems } from "../marketing/faq"
+import { useSubscription } from "@/lib/hooks/use-subscription"
 
 // Títulos alternativos
 const titleVariations = [
@@ -363,6 +363,7 @@ export const Plans = () => {
   const [randomTitle, setRandomTitle] = useState("")
   const [randomSubtitle, setRandomSubtitle] = useState("")
   const [isAnnual, setIsAnnual] = useState(false)
+  const { createCheckoutSession, loading: subscriptionLoading } = useSubscription()
 
   useEffect(() => {
     // Seleccionar un título aleatorio al montar el componente
@@ -373,6 +374,33 @@ export const Plans = () => {
     const subtitleIndex = Math.floor(Math.random() * subtitles.length)
     setRandomSubtitle(subtitles[subtitleIndex])
   }, [])
+
+  const handlePlanSelect = async (planId: string) => {
+    if (planId === "free") {
+      // Redirect to sign up for free plan
+      window.location.href = "https://app.suitpax.com/sign-up"
+      return
+    }
+
+    if (planId === "enterprise" || planId === "pro") {
+      // Send email for custom plans
+      window.location.href = "mailto:hello@suitpax.com"
+      return
+    }
+
+    if (planId === "basic") {
+      // Get the appropriate price ID based on billing cycle
+      const priceId = isAnnual ? "price_basic_yearly" : "price_basic_monthly"
+
+      try {
+        await createCheckoutSession(priceId)
+      } catch (error) {
+        console.error("Failed to create checkout session:", error)
+        // Fallback to sign up page
+        window.location.href = "https://app.suitpax.com/sign-up"
+      }
+    }
+  }
 
   return (
     <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-gray-50">
@@ -501,16 +529,17 @@ export const Plans = () => {
               {plan.id !== "beta" && plan.communityImages && <CommunityCarousel images={plan.communityImages} />}
 
               <div className="mt-3">
-                <Link
-                  href={
-                    plan.id === "enterprise" || plan.id === "pro"
-                      ? "mailto:hello@suitpax.com"
-                      : "https://app.suitpax.com/sign-up"
-                  }
-                  className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors ${plan.popular ? "bg-black text-white hover:bg-gray-800" : "bg-white text-black border border-black hover:bg-gray-100"} block mx-auto max-w-[220px]`}
+                <button
+                  onClick={() => handlePlanSelect(plan.id)}
+                  disabled={subscriptionLoading}
+                  className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                    plan.popular
+                      ? "bg-black text-white hover:bg-gray-800"
+                      : "bg-white text-black border border-black hover:bg-gray-100"
+                  } block mx-auto max-w-[220px]`}
                 >
-                  {plan.cta}
-                </Link>
+                  {subscriptionLoading ? "Loading..." : plan.cta}
+                </button>
               </div>
             </motion.div>
           ))}
