@@ -178,19 +178,39 @@ export function Sidebar({
   return (
     <div
       className={cn(
-        "flex flex-col bg-white/90 backdrop-blur-sm border-r border-gray-200 h-full shadow-lg",
+        "flex flex-col bg-gray-50/80 backdrop-blur-sm border-r border-gray-200/60 h-full shadow-sm",
         isMobile ? "w-64" : isCollapsed ? "w-16" : "w-64",
       )}
     >
       {/* Header */}
-      <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 flex-shrink-0">
+      <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200/60 flex-shrink-0">
         {(!isCollapsed || isMobile) && (
-          <Link href="/dashboard" className="flex items-center gap-2" onClick={isMobile ? onCloseMobile : undefined}>
-            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={88} height={20} className="h-5 w-auto" />
-          </Link>
+          <div className="flex flex-col">
+            <Link href="/dashboard" className="flex items-center gap-2" onClick={isMobile ? onCloseMobile : undefined}>
+              <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={100} height={24} className="h-6 w-auto" />
+            </Link>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-gray-900 rounded-full animate-pulse"></div>
+                  <div
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"
+                    style={{ animationDelay: "0.5s" }}
+                  ></div>
+                </div>
+                <span className="text-[10px] font-medium text-gray-600">Suitpax AI v2.1</span>
+              </div>
+              {user && <span className="text-[10px] text-gray-500">• {getDisplayName()}</span>}
+            </div>
+          </div>
         )}
         {isMobile ? (
-          <Button variant="ghost" size="icon" onClick={onCloseMobile} className="h-8 w-8 rounded-xl hover:bg-gray-100">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onCloseMobile}
+            className="h-8 w-8 rounded-xl hover:bg-gray-100/80"
+          >
             <X className="h-4 w-4" />
             <span className="sr-only">Close sidebar</span>
           </Button>
@@ -198,7 +218,7 @@ export function Sidebar({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-xl hover:bg-gray-100"
+            className="h-8 w-8 rounded-xl hover:bg-gray-100/80"
             onClick={onToggleCollapse}
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -208,7 +228,7 @@ export function Sidebar({
       </div>
 
       {(!isCollapsed || isMobile) && (
-        <div className="px-3 pt-3 border-b border-gray-200">
+        <div className="px-3 pt-3 border-b border-gray-200/60">
           <AISearchInput size="sm" />
         </div>
       )}
@@ -225,8 +245,10 @@ export function Sidebar({
                 href={item.href}
                 onClick={isMobile ? onCloseMobile : undefined}
                 className={cn(
-                  "group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 relative",
-                  isActive ? "bg-gray-900 text-white shadow-lg" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                  "group flex items-center px-3 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200 relative",
+                  isActive
+                    ? "bg-gray-900 text-white shadow-md"
+                    : "text-gray-700 hover:bg-white/60 hover:text-gray-900 hover:shadow-sm",
                   isCollapsed && !isMobile && "justify-center px-2",
                 )}
                 title={isCollapsed && !isMobile ? item.name : ""}
@@ -253,17 +275,17 @@ export function Sidebar({
                     href={item.href}
                     onClick={isMobile ? onCloseMobile : undefined}
                     className={cn(
-                      "group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
+                      "group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200",
                       isActive
-                        ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
-                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                        ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md"
+                        : "text-gray-700 hover:bg-white/60 hover:text-gray-900 hover:shadow-sm",
                     )}
                   >
                     <div className="flex items-center">
                       <item.icon className="flex-shrink-0 h-5 w-5 mr-3" aria-hidden="true" />
                       <span>{item.name}</span>
                     </div>
-                    <Badge className="bg-gray-200 text-gray-700 text-[10px] px-2 py-0.5">{item.badge}</Badge>
+                    <Badge className="bg-gray-200 text-gray-700 text-[10px] px-2 py-0.5 rounded-lg">{item.badge}</Badge>
                   </Link>
                 )
               })}
@@ -281,10 +303,10 @@ export function Sidebar({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "group flex items-center justify-center px-2 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 relative",
+                    "group flex items-center justify-center px-2 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200 relative",
                     isActive
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md"
+                      : "text-gray-700 hover:bg-white/60 hover:text-gray-900 hover:shadow-sm",
                   )}
                   title={item.name}
                 >
@@ -297,14 +319,17 @@ export function Sidebar({
       </nav>
 
       {/* Bottom Section */}
-      <div className="border-t border-gray-200 p-3 flex-shrink-0 space-y-4">
+      <div className="border-t border-gray-200/60 p-3 flex-shrink-0 space-y-4">
         {/* Usage Stats - Only show when not collapsed */}
         {(!isCollapsed || isMobile) && (
           <div className="space-y-3">
-            <div className="bg-gray-50 rounded-xl p-3 space-y-3">
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 space-y-3 shadow-sm border border-gray-200/40">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-gray-700">Usage This Month</span>
-                <Badge variant="outline" className="text-[10px] px-2 py-0.5">
+                <Badge
+                  variant="outline"
+                  className="text-[10px] px-2 py-0.5 rounded-lg bg-gray-100 text-gray-700 border-gray-200"
+                >
                   {userPlan.toUpperCase()}
                 </Badge>
               </div>
@@ -339,7 +364,7 @@ export function Sidebar({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-xs h-8 rounded-xl border-gray-200 bg-transparent"
+                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-200/60 bg-white/40 hover:bg-white/60 backdrop-blur-sm"
                 >
                   <Crown className="h-3 w-3 mr-2" />
                   Plans & Billing
@@ -353,10 +378,10 @@ export function Sidebar({
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
-                  <div className="bg-gray-50 rounded-xl p-4">
+                  <div className="bg-gray-50 rounded-2xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-gray-900">Current Plan</span>
-                      <Badge className="bg-gray-200 text-gray-700">{userPlan.toUpperCase()}</Badge>
+                      <Badge className="bg-gray-200 text-gray-700 rounded-lg">{userPlan.toUpperCase()}</Badge>
                     </div>
                     <p className="text-sm text-gray-600 font-light">
                       {userPlan === "premium"
@@ -365,8 +390,10 @@ export function Sidebar({
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-xl">Upgrade Plan</Button>
-                    <Button variant="outline" className="flex-1 rounded-xl bg-transparent">
+                    <Button className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-2xl">
+                      Upgrade Plan
+                    </Button>
+                    <Button variant="outline" className="flex-1 rounded-2xl bg-transparent">
                       View Billing
                     </Button>
                   </div>
@@ -378,7 +405,7 @@ export function Sidebar({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-xs h-8 rounded-xl border-gray-200 bg-transparent"
+                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-200/60 bg-white/40 hover:bg-white/60 backdrop-blur-sm"
                 >
                   <Settings className="h-3 w-3 mr-2" />
                   Settings
@@ -391,19 +418,19 @@ export function Sidebar({
                 </DialogHeader>
                 <div className="space-y-3">
                   <Link href="/dashboard/profile" onClick={isMobile ? onCloseMobile : undefined}>
-                    <Button variant="ghost" className="w-full justify-start rounded-xl">
+                    <Button variant="ghost" className="w-full justify-start rounded-2xl">
                       <User className="h-4 w-4 mr-3" />
                       Profile Settings
                     </Button>
                   </Link>
                   <Link href="/dashboard/settings" onClick={isMobile ? onCloseMobile : undefined}>
-                    <Button variant="ghost" className="w-full justify-start rounded-xl">
+                    <Button variant="ghost" className="w-full justify-start rounded-2xl">
                       <Settings className="h-4 w-4 mr-3" />
                       Account Settings
                     </Button>
                   </Link>
                   <Link href="/dashboard/company" onClick={isMobile ? onCloseMobile : undefined}>
-                    <Button variant="ghost" className="w-full justify-start rounded-xl">
+                    <Button variant="ghost" className="w-full justify-start rounded-2xl">
                       <Building className="h-4 w-4 mr-3" />
                       Company Settings
                     </Button>
@@ -416,15 +443,15 @@ export function Sidebar({
 
         {/* User Profile & Sign Out */}
         {(!isCollapsed || isMobile) && (
-          <div className="border-t border-gray-200 pt-3">
-            <div className="flex items-center space-x-3 px-3 py-2 mb-2">
-              <Avatar className="h-10 w-10 ring-2 ring-gray-200 rounded-xl">
+          <div className="border-t border-gray-200/60 pt-3">
+            <div className="flex items-center space-x-3 px-3 py-2 mb-2 bg-white/40 rounded-2xl backdrop-blur-sm">
+              <Avatar className="h-10 w-10 ring-2 ring-gray-200/60 rounded-2xl">
                 <AvatarImage
                   src={userProfile?.avatar_url || "/placeholder.svg"}
                   alt={getDisplayName()}
-                  className="rounded-xl"
+                  className="rounded-2xl"
                 />
-                <AvatarFallback className="bg-gray-900 text-white text-sm font-medium rounded-xl">
+                <AvatarFallback className="bg-gray-900 text-white text-sm font-medium rounded-2xl">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
@@ -434,7 +461,7 @@ export function Sidebar({
                   <p className="text-xs text-gray-600 truncate">{userProfile?.company || getUserEmail()}</p>
                   <Badge
                     variant="outline"
-                    className="text-[10px] px-1.5 py-0.5 rounded-lg bg-gray-200 text-gray-700 border-gray-200"
+                    className="text-[10px] px-1.5 py-0.5 rounded-lg bg-gray-200/60 text-gray-700 border-gray-200/60"
                   >
                     Member
                   </Badge>
@@ -445,7 +472,7 @@ export function Sidebar({
             <Button
               onClick={handleSignOut}
               variant="ghost"
-              className="w-full justify-start px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-xl"
+              className="w-full justify-start px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white/60 hover:text-gray-900 rounded-2xl"
             >
               <LogOut className="h-4 w-4 mr-3" />
               Sign Out
@@ -455,15 +482,15 @@ export function Sidebar({
 
         {/* Collapsed state user profile */}
         {isCollapsed && !isMobile && (
-          <div className="border-t border-gray-200 pt-3 space-y-2">
+          <div className="border-t border-gray-200/60 pt-3 space-y-2">
             <div className="flex justify-center">
-              <Avatar className="h-10 w-10 ring-2 ring-gray-200 rounded-xl">
+              <Avatar className="h-10 w-10 ring-2 ring-gray-200/60 rounded-2xl">
                 <AvatarImage
                   src={userProfile?.avatar_url || "/placeholder.svg"}
                   alt={getDisplayName()}
-                  className="rounded-xl"
+                  className="rounded-2xl"
                 />
-                <AvatarFallback className="bg-gray-900 text-white text-sm font-medium rounded-xl">
+                <AvatarFallback className="bg-gray-900 text-white text-sm font-medium rounded-2xl">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
@@ -472,7 +499,7 @@ export function Sidebar({
               onClick={handleSignOut}
               variant="ghost"
               size="icon"
-              className="w-full h-10 rounded-xl hover:bg-gray-100"
+              className="w-full h-10 rounded-2xl hover:bg-white/60"
               title="Sign Out"
             >
               <LogOut className="h-4 w-4" />
