@@ -6,30 +6,30 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
-  LayoutDashboard,
-  Plane,
-  Hotel,
-  CreditCard,
-  Users,
-  Settings,
-  BarChart3,
-  Calendar,
-  MapPin,
-  MessageSquare,
-  Mic,
-  ChevronLeft,
-  ChevronRight,
-  LogOut,
-  User,
-  Building,
-  Mail,
-  CalendarIcon as Meeting,
-  Receipt,
-  Crown,
-  Send,
-  CheckSquare,
-  Shield,
-} from "lucide-react"
+  PiSquaresFour,
+  PiAirplane,
+  PiBuildings,
+  PiCreditCard,
+  PiUsers,
+  PiGear,
+  PiChartBar,
+  PiCalendar,
+  PiMapPin,
+  PiChatCircle,
+  PiMicrophone,
+  PiCaretLeft,
+  PiCaretRight,
+  PiSignOut,
+  PiUser,
+  PiOfficeChair,
+  PiEnvelope,
+  PiVideoCamera,
+  PiReceipt,
+  PiCrown,
+  PiPaperPlaneTilt,
+  PiCheckSquare,
+  PiShield,
+} from "react-icons/pi"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -48,24 +48,24 @@ import {
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Flights", href: "/dashboard/flights", icon: Plane },
-  { name: "Hotels", href: "/dashboard/hotels", icon: Hotel },
-  { name: "Finance", href: "/dashboard/finance", icon: CreditCard },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-  { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
-  { name: "Mail", href: "/dashboard/mail", icon: Mail },
-  { name: "Meetings", href: "/dashboard/meetings", icon: Meeting },
-  { name: "Locations", href: "/dashboard/locations", icon: MapPin },
-  { name: "Team", href: "/dashboard/team", icon: Users },
-  { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
-  { name: "Tasks", href: "/dashboard/tasks", icon: CheckSquare },
-  { name: "Policies", href: "/dashboard/policies", icon: Shield },
+  { name: "Dashboard", href: "/dashboard", icon: PiSquaresFour },
+  { name: "Flights", href: "/dashboard/flights", icon: PiAirplane },
+  { name: "Hotels", href: "/dashboard/hotels", icon: PiBuildings },
+  { name: "Finance", href: "/dashboard/finance", icon: PiCreditCard },
+  { name: "Analytics", href: "/dashboard/analytics", icon: PiChartBar },
+  { name: "Calendar", href: "/dashboard/calendar", icon: PiCalendar },
+  { name: "Mail", href: "/dashboard/mail", icon: PiEnvelope },
+  { name: "Meetings", href: "/dashboard/meetings", icon: PiVideoCamera },
+  { name: "Locations", href: "/dashboard/locations", icon: PiMapPin },
+  { name: "Team", href: "/dashboard/team", icon: PiUsers },
+  { name: "Expenses", href: "/dashboard/expenses", icon: PiReceipt },
+  { name: "Tasks", href: "/dashboard/tasks", icon: PiCheckSquare },
+  { name: "Policies", href: "/dashboard/policies", icon: PiShield },
 ]
 
 const aiNavigation = [
-  { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: MessageSquare, badge: "AI" },
-  { name: "Voice AI", href: "/dashboard/voice-ai", icon: Mic, badge: "NEW" },
+  { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatCircle, badge: "AI" },
+  { name: "Voice AI", href: "/dashboard/voice-ai", icon: PiMicrophone, badge: "NEW" },
 ]
 
 interface SidebarProps {
@@ -250,7 +250,7 @@ export function Sidebar({
             onClick={() => setIsCollapsed?.(!isCollapsed)}
             className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl"
           >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            {isCollapsed ? <PiCaretRight className="h-4 w-4" /> : <PiCaretLeft className="h-4 w-4" />}
           </Button>
         </div>
       </div>
@@ -275,7 +275,7 @@ export function Sidebar({
               {isAiLoading ? (
                 <div className="animate-spin rounded-full h-3 w-3 border-2 border-gray-400 border-t-transparent" />
               ) : (
-                <Send className="h-3 w-3" />
+                <PiPaperPlaneTilt className="h-3 w-3" />
               )}
             </Button>
           </form>
@@ -412,7 +412,7 @@ export function Sidebar({
                   variant="outline"
                   className="w-full justify-start text-xs h-8 rounded-2xl border-gray-300 bg-white hover:bg-gray-50"
                 >
-                  <Crown className="h-3 w-3 mr-2" />
+                  <PiCrown className="h-3 w-3 mr-2" />
                   Plans & Billing
                 </Button>
               </DialogTrigger>
@@ -453,7 +453,7 @@ export function Sidebar({
                   variant="outline"
                   className="w-full justify-start text-xs h-8 rounded-2xl border-gray-300 bg-white hover:bg-gray-50"
                 >
-                  <Settings className="h-3 w-3 mr-2" />
+                  <PiGear className="h-3 w-3 mr-2" />
                   Settings
                 </Button>
               </DialogTrigger>
@@ -465,19 +465,19 @@ export function Sidebar({
                 <div className="space-y-3">
                   <Link href="/dashboard/profile" onClick={isMobile ? onCloseMobile : undefined}>
                     <Button variant="ghost" className="w-full justify-start rounded-2xl">
-                      <User className="h-4 w-4 mr-3" />
+                      <PiUser className="h-4 w-4 mr-3" />
                       Profile Settings
                     </Button>
                   </Link>
                   <Link href="/dashboard/settings" onClick={isMobile ? onCloseMobile : undefined}>
                     <Button variant="ghost" className="w-full justify-start rounded-2xl">
-                      <Settings className="h-4 w-4 mr-3" />
+                      <PiGear className="h-4 w-4 mr-3" />
                       Account Settings
                     </Button>
                   </Link>
                   <Link href="/dashboard/company" onClick={isMobile ? onCloseMobile : undefined}>
                     <Button variant="ghost" className="w-full justify-start rounded-2xl">
-                      <Building className="h-4 w-4 mr-3" />
+                      <PiOfficeChair className="h-4 w-4 mr-3" />
                       Company Settings
                     </Button>
                   </Link>
@@ -522,7 +522,7 @@ export function Sidebar({
               variant="ghost"
               className="w-full justify-start px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-2xl"
             >
-              <LogOut className="h-4 w-4 mr-3" />
+              <PiSignOut className="h-4 w-4 mr-3" />
               Sign Out
             </Button>
           </div>
@@ -550,7 +550,7 @@ export function Sidebar({
               className="w-full h-8 rounded-2xl hover:bg-gray-50"
               title="Sign Out"
             >
-              <LogOut className="h-4 w-4" />
+              <PiSignOut className="h-4 w-4" />
               <span className="sr-only">Sign Out</span>
             </Button>
           </div>

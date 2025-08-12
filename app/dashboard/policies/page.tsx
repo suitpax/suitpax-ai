@@ -32,7 +32,6 @@ import {
   Trash2,
   Target,
 } from "lucide-react"
-import { AdvancedOCRService } from "@/lib/ocr/advanced-ocr-service"
 
 interface Policy {
   id: string
@@ -126,7 +125,6 @@ const DocumentUploadZone = ({ onDocumentAnalyzed }: { onDocumentAnalyzed: (analy
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisResults, setAnalysisResults] = useState<DocumentAnalysis[]>([])
   const [processingProgress, setProcessingProgress] = useState(0)
-  const ocrService = AdvancedOCRService.getInstance()
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -137,10 +135,21 @@ const DocumentUploadZone = ({ onDocumentAnalyzed }: { onDocumentAnalyzed: (analy
         try {
           setProcessingProgress(((index + 0.5) / acceptedFiles.length) * 100)
 
-          // Use real OCR service
-          const ocrResult = await ocrService.processDocument(file)
+          const formData = new FormData()
+          formData.append("file", file)
 
-          // Convert OCR result to DocumentAnalysis format
+          const response = await fetch("/api/process-document", {
+            method: "POST",
+            body: formData,
+          })
+
+          if (!response.ok) {
+            throw new Error("Document processing failed")
+          }
+
+          const ocrResult = await response.json()
+
+          // Convert API result to DocumentAnalysis format
           const analysis: DocumentAnalysis = {
             id: Math.random().toString(36).substr(2, 9),
             fileName: file.name,
@@ -179,7 +188,7 @@ const DocumentUploadZone = ({ onDocumentAnalyzed }: { onDocumentAnalyzed: (analy
           setProcessingProgress(((index + 1) / acceptedFiles.length) * 100)
         } catch (error) {
           console.error("Document processing failed:", error)
-          // Fallback to mock data if OCR fails
+          // Fallback to mock data if processing fails
           const mockAnalysis: DocumentAnalysis = {
             id: Math.random().toString(36).substr(2, 9),
             fileName: file.name,
@@ -207,7 +216,7 @@ const DocumentUploadZone = ({ onDocumentAnalyzed }: { onDocumentAnalyzed: (analy
       setIsAnalyzing(false)
       setProcessingProgress(0)
     },
-    [onDocumentAnalyzed, ocrService],
+    [onDocumentAnalyzed],
   )
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
