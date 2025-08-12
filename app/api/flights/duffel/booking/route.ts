@@ -2,9 +2,8 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createDuffelClient } from "@/lib/duffel"
 import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
-import Stripe from "stripe"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+// Stripe will be initialized only when needed and properly configured
 
 const bookingSchema = z.object({
   selected_offers: z.array(z.string()).min(1),
@@ -27,6 +26,7 @@ const bookingSchema = z.object({
       }),
     )
     .min(1),
+  hold_order: z.boolean().optional(),
   payments: z
     .array(
       z.object({
@@ -35,7 +35,7 @@ const bookingSchema = z.object({
         currency: z.string().length(3),
       }),
     )
-    .min(1),
+    .optional(), // Made optional for hold orders
   metadata: z.record(z.any()).optional(),
 })
 
@@ -54,12 +54,96 @@ const paymentFlowSchema = z.object({
       }),
     )
     .min(1),
-  paymentIntentId: z.string(),
+  paymentIntentId: z.string().optional(), // Made optional for hold orders
+  hold_order: z.boolean().optional(),
 })
 
-async function handleDuffelError(error) {
-  // Implement enhanced error handling for Duffel-specific errors here
-  return { error: "Failed to create booking", status: 500 }
+async function handleDuffelError(error: any) {
+  console.error("Duffel API Error:", error)
+
+  if (error?.response?.data?.errors) {
+    const duffelErrors = error.response.data.errors
+    return {
+      error: "Booking failed",
+      details: duffelErrors,
+      status: error.response.status || 400,
+    }
+  }
+
+  if (error?.message?.includes("offer_expired")) {
+    return {
+      error: "Offer has expired. Please search for new flights.",
+      expired: true,
+      status: 410,
+    }
+  }
+
+  if (error?.message?.includes("price_changed")) {
+    return {
+      error: "Flight price has changed. Please review the updated price.",
+      price_changed: true,
+      status: 409,
+    }
+  }
+
+  return {
+    error: "Failed to create booking. Please try again.",
+    status: 500,
+  }
+}
+
+function validatePassengerData(passengers: any[]) {
+  const errors: string[] = []
+
+  passengers.forEach((passenger, index) => {
+    if (!passenger.given_name || passenger.given_name.length < 1) {
+      errors.push(`Passenger ${index + 1}: Given name is required`)
+    }
+    if (!passenger.family_name || passenger.family_name.length < 1) {
+      errors.push(`Passenger ${index + 1}: Family name is required`)
+    }
+    if (!passenger.email || !/\S+@\S+\.\S+/.test(passenger.email)) {
+      errors.push(`Passenger ${index + 1}: Valid email is required`)
+    }
+    if (!passenger.born_on || !/^\d{4}-\d{2}-\d{2}$/.test(passenger.born_on)) {
+      errors.push(`Passenger ${index + 1}: Valid birth date (YYYY-MM-DD) is required`)
+    }
+  })
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
+}
+
+async function validateOfferBeforeBooking(duffel: any, offerId: string) {
+  try {
+    const offer = await duffel.offers.get(offerId)
+    const offerData = offer.data
+
+    // Check if offer is expired
+    const now = new Date()
+    const expiresAt = new Date(offerData.expires_at)
+
+    if (now > expiresAt) {
+      return {
+        valid: false,
+        expired: true,
+        error: "Offer has expired",
+      }
+    }
+
+    return {
+      valid: true,
+      offer: offerData,
+    }
+  } catch (error) {
+    return {
+      valid: false,
+      error: "Could not validate offer",
+      expired: false,
+    }
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -78,15 +162,16 @@ export async function POST(request: NextRequest) {
 
     const duffel = createDuffelClient()
 
-    // Support two flows: legacy (selected_offers provided) and Stripe-first (paymentIntentId provided)
-    if (body?.paymentIntentId && body?.offerId) {
+    if (body?.offerId) {
+      // Modern flow with offer ID
       const pf = paymentFlowSchema.parse({
         offerId: body.offerId,
         passengers: body.passengers,
         paymentIntentId: body.paymentIntentId,
+        hold_order: body.hold_order || false,
       })
 
-      const validation = await (await import("@/lib/duffel")).validateOfferBeforeBooking(duffel, pf.offerId)
+      const validation = await validateOfferBeforeBooking(duffel, pf.offerId)
       if (!validation.valid) {
         return NextResponse.json(
           {
@@ -98,7 +183,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      const passengerValidation = (await import("@/lib/duffel")).validatePassengerData(pf.passengers as any)
+      const passengerValidation = validatePassengerData(pf.passengers)
       if (!passengerValidation.valid) {
         return NextResponse.json(
           {
@@ -108,12 +193,6 @@ export async function POST(request: NextRequest) {
           },
           { status: 400 },
         )
-      }
-
-      // Verify payment
-      const pi = await stripe.paymentIntents.retrieve(pf.paymentIntentId)
-      if (pi.status !== "succeeded") {
-        return NextResponse.json({ success: false, error: "Payment not completed" }, { status: 400 })
       }
 
       const offer = validation.offer
@@ -129,37 +208,72 @@ export async function POST(request: NextRequest) {
         email: p.email,
       }))
 
-      // Create Duffel order using balance payment (test env) with major units string
-      const amountMajor = (pi.amount_received / 100).toFixed(2)
-      const order = await duffel.orders.create({
-        selected_offers: [pf.offerId],
-        passengers,
-        payments: [
-          {
-            type: "balance" as any,
-            amount: amountMajor,
-            currency: (pi.currency || "usd").toUpperCase(),
+      if (pf.hold_order) {
+        // Create hold order without payment
+        const order = await duffel.orders.create({
+          selected_offers: [pf.offerId],
+          passengers,
+          type: "hold",
+          metadata: {
+            user_id: user.id,
+            source: "suitpax",
+            booking_timestamp: new Date().toISOString(),
+            hold_order: true,
           },
-        ],
-        metadata: {
-          user_id: user.id,
-          payment_intent_id: pi.id,
-          source: "suitpax",
-          booking_timestamp: new Date().toISOString(),
-        },
-      } as any)
-      orderData = order.data
+        } as any)
+        orderData = order.data
+      } else {
+        // Handle payment flow
+        if (!pf.paymentIntentId) {
+          return NextResponse.json({ success: false, error: "Payment required for immediate booking" }, { status: 400 })
+        }
 
-      // Update PI metadata with order info
-      await stripe.paymentIntents.update(pi.id, {
-        metadata: {
-          ...pi.metadata,
-          order_id: orderData.id,
-          booking_reference: orderData.booking_reference,
-          booking_status: orderData.status || "confirmed",
-        },
-      })
+        if (!process.env.STRIPE_SECRET_KEY) {
+          return NextResponse.json({ success: false, error: "Payment processing not configured" }, { status: 500 })
+        }
+
+        const Stripe = (await import("stripe")).default
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
+        // Verify payment
+        const pi = await stripe.paymentIntents.retrieve(pf.paymentIntentId)
+        if (pi.status !== "succeeded") {
+          return NextResponse.json({ success: false, error: "Payment not completed" }, { status: 400 })
+        }
+
+        // Create paid order
+        const amountMajor = (pi.amount_received / 100).toFixed(2)
+        const order = await duffel.orders.create({
+          selected_offers: [pf.offerId],
+          passengers,
+          payments: [
+            {
+              type: "balance" as any,
+              amount: amountMajor,
+              currency: (pi.currency || "usd").toUpperCase(),
+            },
+          ],
+          metadata: {
+            user_id: user.id,
+            payment_intent_id: pi.id,
+            source: "suitpax",
+            booking_timestamp: new Date().toISOString(),
+          },
+        } as any)
+        orderData = order.data
+
+        // Update PI metadata with order info
+        await stripe.paymentIntents.update(pi.id, {
+          metadata: {
+            ...pi.metadata,
+            order_id: orderData.id,
+            booking_reference: orderData.booking_reference,
+            booking_status: orderData.status || "confirmed",
+          },
+        })
+      }
     } else {
+      // Legacy flow
       const bookingData = bookingSchema.parse(body)
       const passengers = bookingData.passengers.map((p, idx) => ({
         id: `pas_${idx + 1}`,
@@ -173,26 +287,41 @@ export async function POST(request: NextRequest) {
         email: p.email,
         loyalty_programme_accounts: p.loyalty_programme_accounts as any,
       }))
-      const payments = bookingData.payments.map((p) => ({
-        type: (p.type === "arc_bsp_cash" ? "arc_bsp_cash" : "balance") as any,
-        amount: p.amount,
-        currency: p.currency,
-      }))
-      const order = await duffel.orders.create({
-        selected_offers: bookingData.selected_offers,
-        passengers,
-        payments,
-        metadata: { ...(bookingData.metadata || {}), user_id: user.id },
-      } as any)
-      orderData = order.data
+
+      if (bookingData.hold_order) {
+        const order = await duffel.orders.create({
+          selected_offers: bookingData.selected_offers,
+          passengers,
+          type: "hold",
+          metadata: { ...(bookingData.metadata || {}), user_id: user.id, hold_order: true },
+        } as any)
+        orderData = order.data
+      } else {
+        if (!bookingData.payments || bookingData.payments.length === 0) {
+          return NextResponse.json({ success: false, error: "Payment information required" }, { status: 400 })
+        }
+
+        const payments = bookingData.payments.map((p) => ({
+          type: (p.type === "arc_bsp_cash" ? "arc_bsp_cash" : "balance") as any,
+          amount: p.amount,
+          currency: p.currency,
+        }))
+
+        const order = await duffel.orders.create({
+          selected_offers: bookingData.selected_offers,
+          passengers,
+          payments,
+          metadata: { ...(bookingData.metadata || {}), user_id: user.id },
+        } as any)
+        orderData = order.data
+      }
     }
 
-    // Persist booking record
     const firstSlice = orderData.slices?.[0]
     const lastSlice = orderData.slices?.[orderData.slices.length - 1]
 
     try {
-      await supabase.from("flight_bookings").insert({
+      const { error: insertError } = await supabase.from("flight_bookings").insert({
         user_id: user.id,
         duffel_order_id: orderData.id,
         booking_reference: orderData.booking_reference,
@@ -209,11 +338,16 @@ export async function POST(request: NextRequest) {
           slices: orderData.slices,
           available_actions: (orderData as any).available_actions,
           created_at: new Date().toISOString(),
+          hold_order: body.hold_order || false,
         },
-        payment_status: "paid",
+        payment_status: body.hold_order ? "pending" : "paid",
       })
+
+      if (insertError) {
+        console.error("Failed to insert flight_bookings:", insertError)
+      }
     } catch (e) {
-      console.warn("Failed to insert flight_bookings:", e)
+      console.error("Database error:", e)
     }
 
     return NextResponse.json({
@@ -226,12 +360,15 @@ export async function POST(request: NextRequest) {
         total_amount: orderData.total_amount,
         available_actions: (orderData as any).available_actions,
         status: orderData.status,
+        hold_order: body.hold_order || false,
+        payment_required_by: (orderData as any).payment_required_by,
         confirmation: {
           booking_reference: orderData.booking_reference,
           confirmation_number: orderData.id,
           booking_date: new Date().toISOString(),
-          total_paid: orderData.total_amount,
+          total_paid: body.hold_order ? "0.00" : orderData.total_amount,
           currency: orderData.total_currency,
+          is_hold_order: body.hold_order || false,
         },
       },
     })
