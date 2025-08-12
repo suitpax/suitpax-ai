@@ -15,7 +15,7 @@ import {
   XCircleIcon,
   BanknotesIcon,
   BuildingOfficeIcon,
-  ScanLineIcon,
+  QrCodeIcon,
   CloudArrowUpIcon,
 } from "@heroicons/react/24/outline"
 import { Card, CardContent } from "@/components/ui/card"
@@ -131,7 +131,7 @@ export default function ExpensesPage() {
       {!searchQuery && selectedCategory === "all" && selectedStatus === "all" && (
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button onClick={() => setShowOCRUpload(true)} className="bg-gray-900 text-white hover:bg-black rounded-xl">
-            <ScanLineIcon className="h-4 w-4 mr-2" />
+            <QrCodeIcon className="h-4 w-4 mr-2" />
             Scan Receipt
           </Button>
           <Button onClick={() => setShowAddForm(true)} variant="outline" className="rounded-xl border-gray-200">
@@ -159,7 +159,7 @@ export default function ExpensesPage() {
               className="rounded-xl border-gray-200 hover:bg-gray-50 bg-transparent"
               onClick={() => setShowOCRUpload(true)}
             >
-              <ScanLineIcon className="h-4 w-4 mr-2" />
+              <QrCodeIcon className="h-4 w-4 mr-2" />
               Scan Receipt
             </Button>
             <Button
@@ -262,7 +262,7 @@ export default function ExpensesPage() {
                   htmlFor="ocr-upload"
                   className="inline-flex items-center px-4 py-2 bg-gray-900 text-white font-medium rounded-xl hover:bg-black transition-colors cursor-pointer"
                 >
-                  <ScanLineIcon className="h-4 w-4 mr-2" />
+                  <QrCodeIcon className="h-4 w-4 mr-2" />
                   Choose File
                 </label>
               </div>
