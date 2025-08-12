@@ -13,7 +13,7 @@ export interface EnhancedUserMemory {
   }
 }
 
-export class EnhancedSuitpaxMemoryService {
+export class MemoryService {
   private memoryClient: MemoryClient
   private userId: string
 

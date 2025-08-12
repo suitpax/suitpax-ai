@@ -1,6 +1,6 @@
 import { generateText } from "ai"
 import { anthropic } from "@ai-sdk/anthropic"
-import { SuitpaxMemoryService } from "../memory/memory-service"
+import { MemoryService } from "../memory/memory-service"
 import { SuitpaxKnowledgeService } from "../knowledge/knowledge-service"
 
 export interface IntelligenceConfig {
@@ -16,12 +16,12 @@ export interface IntelligenceResponse {
 }
 
 export class SuitpaxIntelligenceService {
-  private memoryService: SuitpaxMemoryService
+  private memoryService: MemoryService
   private knowledgeService: SuitpaxKnowledgeService
   private model: string
 
   constructor(config: IntelligenceConfig) {
-    this.memoryService = new SuitpaxMemoryService(config.userId)
+    this.memoryService = new MemoryService(config.userId)
     this.knowledgeService = new SuitpaxKnowledgeService()
     this.model = config.model || "claude-3-5-sonnet-20241022"
   }
@@ -34,7 +34,7 @@ export class SuitpaxIntelligenceService {
     try {
       // Get relevant memories and knowledge
       const [memories, knowledge] = await Promise.all([
-        this.memoryService.searchRelevantMemories(message, 3),
+        this.memoryService.searchMemoriesWithContext(message, undefined, 3),
         this.knowledgeService.searchKnowledge(message, 2),
       ])
 
@@ -63,7 +63,7 @@ Provide helpful, contextual responses for business travel needs. Be concise and 
       })
 
       // Store conversation in memory
-      await this.memoryService.addConversation(message, text)
+      await this.memoryService.addConversationWithContext(message, text)
 
       return {
         response: text,
@@ -86,11 +86,13 @@ Provide helpful, contextual responses for business travel needs. Be concise and 
   }
 
   async getUserPreferences() {
-    return await this.memoryService.getTravelPreferences()
+    const insights = await this.memoryService.getMemoryInsights()
+    return insights?.recentActivity || []
   }
 
   async getTravelPreferences() {
-    return await this.memoryService.getTravelPreferences()
+    const insights = await this.memoryService.getMemoryInsights()
+    return insights?.recentActivity || []
   }
 
   async addKnowledgeDocument(document: any) {

@@ -26,17 +26,51 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
+import { useVoiceAI } from "@/contexts/voice-ai-context"
+import { useSpeechToText } from "@/hooks/use-speech-recognition"
 
 export default function VoiceAIPage() {
-  const [user, setUser] = useState<any>(null)
-  const [currentTime, setCurrentTime] = useState(new Date())
-  const [isRecording, setIsRecording] = useState(false)
-  const [conversations, setConversations] = useState([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [user, setUser] = useState(null)
+  const {
+    state: voiceState,
+    settings: voiceSettings,
+    startListening: startVoiceListening,
+    stopListening: stopVoiceListening,
+    speak,
+    cancelSpeech,
+    setVoice,
+    setLanguage,
+    clearTranscript,
+  } = useVoiceAI()
+
+  const {
+    isListening: speechIsListening,
+    transcript: speechTranscript,
+    error: speechError,
+    startListening: startSpeechListening,
+    stopListening: stopSpeechListening,
+    resetTranscript,
+  } = useSpeechToText({
+    continuous: true,
+    interimResults: true,
+    language: voiceSettings.language,
+    onResult: (transcript, isFinal) => {
+      if (isFinal) {
+        setCurrentMessage(transcript)
+      }
+    },
+    onEnd: async (finalTranscript) => {
+      if (finalTranscript.trim()) {
+        await handleProcessMessage(finalTranscript)
+      }
+    },
+  })
+
   const [currentMessage, setCurrentMessage] = useState("")
   const [aiResponse, setAiResponse] = useState("")
-  const [userPreferences, setUserPreferences] = useState([])
+  const [conversations, setConversations] = useState<any[]>([])
+  const [userPreferences, setUserPreferences] = useState<string[]>([])
+  const [isProcessing, setIsProcessing] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
@@ -78,6 +112,8 @@ export default function VoiceAIPage() {
     loadUserPreferences()
   }, [user])
 
+  const [currentTime, setCurrentTime] = useState(new Date())
+
   const getDisplayName = () => {
     if (!user) return "User"
     return user.profile?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "User"
@@ -114,52 +150,85 @@ export default function VoiceAIPage() {
     return `${dayName}, ${monthName} ${date}`
   }
 
+  const handleProcessMessage = async (message: string) => {
+    if (!user || !message.trim()) return
+
+    setIsProcessing(true)
+    try {
+      const response = await fetch("/api/suitpax-ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message,
+          userId: user.id,
+        }),
+      })
+
+      const data = await response.json()
+      setAiResponse(data.response)
+
+      if (voiceSettings.autoSpeak && data.response) {
+        await speak(data.response)
+      }
+
+      const newConversation = {
+        id: Date.now(),
+        message,
+        response: data.response,
+        timestamp: new Date().toISOString(),
+        memoriesUsed: data.memoriesUsed || [],
+        knowledgeUsed: data.knowledgeUsed || [],
+      }
+      setConversations((prev) => [newConversation, ...prev])
+    } catch (error) {
+      console.error("Error processing voice message:", error)
+      setAiResponse("Sorry, I encountered an error processing your request.")
+    } finally {
+      setIsProcessing(false)
+      setCurrentMessage("")
+      resetTranscript()
+    }
+  }
+
   const handleStartRecording = async () => {
     if (!user) return
 
-    setIsRecording(!isRecording)
-
-    if (!isRecording) {
-      // Start recording logic here
-      setCurrentMessage("Listening...")
+    if (speechIsListening || voiceState.isListening) {
+      stopSpeechListening()
+      stopVoiceListening()
+      cancelSpeech()
     } else {
-      // Stop recording and process with AI
-      setIsProcessing(true)
+      clearTranscript()
+      resetTranscript()
+      setCurrentMessage("")
+      setAiResponse("")
+
       try {
-        const response = await fetch("/api/suitpax-ai", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: currentMessage || "Hello, I need help with business travel",
-            userId: user.id,
-          }),
-        })
-
-        const data = await response.json()
-        setAiResponse(data.response)
-
-        // Update conversations list
-        const newConversation = {
-          id: Date.now(),
-          message: currentMessage,
-          response: data.response,
-          timestamp: new Date().toISOString(),
-          memoriesUsed: data.memoriesUsed,
-          knowledgeUsed: data.knowledgeUsed,
-        }
-        setConversations((prev) => [newConversation, ...prev])
+        await startSpeechListening()
       } catch (error) {
-        console.error("Error processing voice message:", error)
-      } finally {
-        setIsProcessing(false)
-        setCurrentMessage("")
+        console.log("Fallback to voice AI context")
+        await startVoiceListening()
       }
     }
   }
 
+  const handleVoiceChange = (voiceId: string) => {
+    setVoice(voiceId)
+  }
+
+  const handleLanguageChange = (language: "en-US" | "es-ES" | "fr-FR" | "de-DE") => {
+    setLanguage(language)
+  }
+
+  const isRecording = speechIsListening || voiceState.isListening
+  const currentTranscript = speechTranscript || voiceState.transcript || currentMessage
+  const currentError = speechError || voiceState.error
+
   const handleSearch = (e) => {
     setSearchTerm(e.target.value)
   }
+
+  const [searchTerm, setSearchTerm] = useState("")
 
   const filteredConversations = conversations.filter((conv) =>
     conv.message.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -320,20 +389,22 @@ export default function VoiceAIPage() {
                   <Button
                     variant="outline"
                     className="rounded-2xl px-6 py-3 bg-white/80 backdrop-blur-sm border-gray-200"
+                    onClick={() => handleVoiceChange("EXAVITQu4vr4xnSDxMaL")}
                   >
                     <Settings className="h-4 w-4 mr-2" />
-                    Voice Settings
+                    Voice: Emma
                   </Button>
                   <Button
                     variant="outline"
                     className="rounded-2xl px-6 py-3 bg-white/80 backdrop-blur-sm border-gray-200"
+                    onClick={() => handleLanguageChange(voiceSettings.language === "en-US" ? "es-ES" : "en-US")}
                   >
                     <Headphones className="h-4 w-4 mr-2" />
-                    Audio Test
+                    Lang: {voiceSettings.language}
                   </Button>
                 </div>
 
-                {isRecording && (
+                {(isRecording || currentTranscript) && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -342,14 +413,29 @@ export default function VoiceAIPage() {
                     <div className="flex items-center justify-center gap-2 text-red-500">
                       <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                       <span className="text-sm font-medium">
-                        {isProcessing ? "Processing with AI..." : "Listening..."}
+                        {isProcessing ? "Processing with AI..." : isRecording ? "Listening..." : "Processing..."}
                       </span>
                     </div>
+                    {currentTranscript && (
+                      <div className="mt-2 text-sm text-gray-700 text-center">"{currentTranscript}"</div>
+                    )}
                     {userPreferences.length > 0 && (
                       <div className="mt-2 text-xs text-gray-500 text-center">
                         Using {userPreferences.length} saved preferences
                       </div>
                     )}
+                  </motion.div>
+                )}
+
+                {currentError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-red-50 rounded-2xl p-4"
+                  >
+                    <div className="flex items-center justify-center gap-2 text-red-600">
+                      <span className="text-sm font-medium">{currentError}</span>
+                    </div>
                   </motion.div>
                 )}
               </div>
@@ -470,8 +556,8 @@ export default function VoiceAIPage() {
                             <p className="text-sm text-gray-600 mb-2">{conv.response}</p>
                             <div className="flex items-center gap-4 text-xs text-gray-500">
                               <span>{new Date(conv.timestamp).toLocaleString()}</span>
-                              <span>{conv.memoriesUsed} memories used</span>
-                              <span>{conv.knowledgeUsed} knowledge sources</span>
+                              <span>{conv.memoriesUsed.length} memories used</span>
+                              <span>{conv.knowledgeUsed.length} knowledge sources</span>
                             </div>
                           </div>
                         </div>
