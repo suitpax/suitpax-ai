@@ -2,31 +2,32 @@
 
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import {
   Sparkles,
   Send,
   Paperclip,
   X,
-  BrainCircuitIcon,
-  MicroscopeIcon as MagnifyingGlassIcon,
-  PlusIcon,
-  SearchIcon,
-  CheckIcon,
-  XIcon,
-  ArrowRight,
-  Volume2,
+  MoreHorizontal,
+  Plane,
+  Building2,
+  MapPin,
+  Calendar,
+  CreditCard,
+  Users,
+  ChevronRight,
+  Star,
+  Globe,
+  Clock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import Link from "next/link"
+import { OnboardingModal } from "@/components/dashboard/onboarding-modal"
 
 interface Message {
   id: string
@@ -37,6 +38,24 @@ interface Message {
   sources?: Array<{ title: string; url: string }>
 }
 
+const aiCapabilities = [
+  { icon: Plane, title: "Flight Search", desc: "Find and book flights worldwide", color: "bg-blue-500" },
+  { icon: Building2, title: "Hotel Booking", desc: "Discover perfect accommodations", color: "bg-emerald-500" },
+  { icon: MapPin, title: "Travel Planning", desc: "Create detailed itineraries", color: "bg-purple-500" },
+  { icon: Calendar, title: "Schedule Management", desc: "Organize meetings and events", color: "bg-orange-500" },
+  { icon: CreditCard, title: "Expense Tracking", desc: "Monitor business expenses", color: "bg-red-500" },
+  { icon: Users, title: "Team Coordination", desc: "Manage team travel needs", color: "bg-indigo-500" },
+]
+
+const quickActions = [
+  { icon: Plane, text: "Find flights from Madrid to San Francisco", category: "Travel" },
+  { icon: Building2, text: "Book a hotel in downtown Tokyo for 3 nights", category: "Accommodation" },
+  { icon: Calendar, text: "Plan a 5-day business trip to London", category: "Planning" },
+  { icon: CreditCard, text: "Create an expense report for last month", category: "Finance" },
+  { icon: Users, text: "Schedule team meeting in New York office", category: "Team" },
+  { icon: Globe, text: "What are the visa requirements for Brazil?", category: "Information" },
+]
+
 export default function SuitpaxAIPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
@@ -46,39 +65,37 @@ export default function SuitpaxAIPage() {
   const [files, setFiles] = useState<File[]>([])
   const [showReasoning, setShowReasoning] = useState(true)
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [tasks, setTasks] = useState<Array<{ id: string; title: string; completed: boolean; createdAt: Date }>>([])
-  const [newTaskTitle, setNewTaskTitle] = useState("")
-  const uploadInputRef = useRef<HTMLInputElement>(null)
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const supabase = createClient()
-
-  const totalQueries = messages.length
-  const tokensUsed = messages.reduce((acc, msg) => acc + msg.content.length * 0.75, 0)
-  const sessionsToday = currentSessionId ? 1 : 0
+  const uploadInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const getUser = async () => {
+      const supabase = createClient()
       const {
         data: { user },
       } = await supabase.auth.getUser()
       setUser(user)
       setIsUserLoading(false)
+
+      if (user && !localStorage.getItem(`suitpax-ai-onboarded-${user.id}`)) {
+        setShowOnboarding(true)
+      }
     }
     getUser()
-  }, [supabase])
+  }, [])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  const sendMessage = async (content: string) => {
-    if (!content.trim() || isLoading) return
+  const handleSend = async () => {
+    if ((!input.trim() && files.length === 0) || isLoading) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: content.trim(),
       role: "user",
+      content: input,
       timestamp: new Date(),
     }
 
@@ -91,40 +108,32 @@ export default function SuitpaxAIPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: content,
-          userId: user?.id || "anonymous",
-          conversationHistory: messages.slice(-10), // Last 10 messages for context
+          message: input,
+          userId: user?.id,
+          sessionId: currentSessionId,
+          conversationHistory: messages.slice(-10),
         }),
       })
 
-      if (!response.ok) throw new Error("Failed to send message")
-
+      if (!response.ok) throw new Error("Failed to get response")
       const data = await response.json()
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
         role: "assistant",
+        content: data.response,
         timestamp: new Date(),
+        reasoning: data.reasoning,
+        sources: data.sources,
       }
 
       setMessages((prev) => [...prev, assistantMessage])
+      if (data.sessionId) setCurrentSessionId(data.sessionId)
     } catch (error) {
-      console.error("Error sending message:", error)
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "Sorry, I encountered an error. Please try again.",
-        role: "assistant",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, errorMessage])
+      console.error("Error:", error)
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const handleSend = () => {
-    sendMessage(input)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -134,378 +143,378 @@ export default function SuitpaxAIPage() {
     }
   }
 
-  const promptSuggestions = [
-    {
-      category: "Flight & Travel",
-      prompts: [
-        "Find business class flights from NYC to London next week",
-        "Search for the cheapest flights to Tokyo in March",
-        "Plan a 3-day business trip to Berlin with hotel recommendations",
-      ],
-    },
-    {
-      category: "Expense Management",
-      prompts: [
-        "Analyze my travel expenses from last month",
-        "Check if my hotel booking complies with company policy",
-        "Generate an expense report for my recent trip",
-      ],
-    },
-    {
-      category: "Document Processing",
-      prompts: [
-        "Extract data from my uploaded receipt",
-        "Summarize this contract document",
-        "Generate a travel itinerary from my email confirmations",
-      ],
-    },
-  ]
-
-  const filteredMessages = messages.filter((message) =>
-    message.content.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
-
-  const addTask = () => {
-    if (!newTaskTitle.trim()) return
-
-    const newTask = {
-      id: Date.now().toString(),
-      title: newTaskTitle.trim(),
-      completed: false,
-      createdAt: new Date(),
-    }
-
-    setTasks((prev) => [...prev, newTask])
-    setNewTaskTitle("")
-  }
-
-  const toggleTask = (taskId: string) => {
-    setTasks((prev) => prev.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task)))
-  }
-
-  const deleteTask = (taskId: string) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId))
-  }
-
   if (isUserLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-700 font-medium tracking-tight">Loading your AI assistant...</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700 font-medium tracking-tight">Initializing Suitpax AI...</p>
         </motion.div>
       </div>
     )
   }
 
   const EmptyState = () => (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
-      <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-        <BrainCircuitIcon className="h-10 w-10 text-gray-500" />
-      </div>
-      <h3 className="text-2xl font-medium tracking-tighter text-gray-900 mb-3">Welcome to Suitpax AI</h3>
-      <p className="text-gray-600 font-light mb-8 max-w-md mx-auto">
-        Your intelligent business travel assistant. Start a conversation or create tasks to get organized.
-      </p>
-
-      <div className="max-w-md mx-auto mb-8">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Create your first task..."
-            value={newTaskTitle}
-            onChange={(e) => setNewTaskTitle(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && addTask()}
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent shadow-sm"
-          />
-          <Button
-            onClick={addTask}
-            disabled={!newTaskTitle.trim()}
-            className="bg-gray-900 text-white hover:bg-gray-800 rounded-xl px-6 py-3 font-medium tracking-tight"
-          >
-            <PlusIcon className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
-
-      {tasks.length > 0 && (
-        <div className="max-w-md mx-auto space-y-2">
-          {tasks.map((task) => (
-            <div
-              key={task.id}
-              className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200"
-            >
-              <button
-                onClick={() => toggleTask(task.id)}
-                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                  task.completed ? "bg-gray-900 border-gray-900" : "border-gray-300"
-                }`}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <motion.div
+                className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {task.completed && <CheckIcon className="h-3 w-3 text-white" />}
-              </button>
-              <span className={`flex-1 text-left ${task.completed ? "line-through text-gray-500" : "text-gray-900"}`}>
-                {task.title}
-              </span>
-              <button
-                onClick={() => deleteTask(task.id)}
-                className="text-gray-400 hover:text-red-500 transition-colors"
-              >
-                <XIcon className="h-4 w-4" />
-              </button>
+                <Sparkles className="h-6 w-6 text-white" />
+              </motion.div>
+              <div>
+                <h1 className="text-2xl font-medium tracking-tighter text-gray-900">Suitpax AI</h1>
+                <p className="text-sm text-gray-500">Your intelligent business travel assistant</p>
+              </div>
             </div>
-          ))}
+
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-emerald-200">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></div>
+                Online
+              </Badge>
+              <Button variant="ghost" size="sm" className="rounded-xl">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
-      )}
-    </motion.div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="text-center mb-16">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <h2 className="text-5xl md:text-7xl font-light text-gray-800 mb-6 leading-tight tracking-tighter">
+              Ask anything.
+              <br />
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Travel. Business. Code.
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 mb-12 font-light">
+              Powered by advanced AI with memory and business travel expertise
+            </p>
+          </motion.div>
+
+          {/* AI Capabilities Grid */}
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            {aiCapabilities.map((capability, index) => (
+              <motion.div
+                key={capability.title}
+                className="bg-white/60 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                whileHover={{ scale: 1.02, y: -2 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <div
+                  className={`w-12 h-12 ${capability.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                >
+                  <capability.icon className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-medium text-gray-900 mb-2">{capability.title}</h3>
+                <p className="text-sm text-gray-600">{capability.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Quick Actions */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <h3 className="text-2xl font-medium text-gray-900 mb-8 tracking-tight">Try these examples</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+              {quickActions.map((action, index) => (
+                <motion.button
+                  key={action.text}
+                  onClick={() => setInput(action.text)}
+                  className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 text-left hover:shadow-lg hover:border-gray-300 transition-all duration-300 group"
+                  whileHover={{ scale: 1.02 }}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + index * 0.1 }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                      <action.icon className="h-5 w-5 text-gray-600" />
+                    </div>
+                    <div className="flex-1">
+                      <Badge variant="outline" className="mb-3 text-xs">
+                        {action.category}
+                      </Badge>
+                      <p className="text-gray-900 font-medium leading-relaxed">{action.text}</p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Features Note */}
+          <motion.div
+            className="mt-16 p-6 bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <Star className="h-5 w-5 text-yellow-500" />
+              <h4 className="font-medium text-gray-900">Advanced Features</h4>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Supports markdown, code blocks, file attachments, and remembers your preferences across conversations. Use
+              triple backticks with language for syntax highlighting.
+            </p>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Input Area */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-6">
+        <div className="max-w-4xl mx-auto">
+          <AnimatePresence>
+            {files.length > 0 && (
+              <motion.div
+                className="mb-4 flex flex-wrap gap-2"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                {files.map((file, idx) => (
+                  <div key={idx} className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
+                    <span className="text-sm text-gray-700">{file.name}</span>
+                    <button
+                      onClick={() => setFiles(files.filter((_, i) => i !== idx))}
+                      className="text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="flex items-end gap-4">
+            <div className="flex-1 relative">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ask me about flights, hotels, travel planning, or anything else..."
+                disabled={isLoading}
+                className="bg-white border-gray-300 rounded-2xl resize-none min-h-[60px] pr-20 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                rows={1}
+              />
+              <div className="absolute right-3 bottom-3 flex items-center gap-2">
+                <input
+                  ref={uploadInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setFiles([...files, ...Array.from(e.target.files)])
+                    }
+                  }}
+                />
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 w-8 p-0 hover:bg-gray-100 rounded-full"
+                  onClick={() => uploadInputRef.current?.click()}
+                >
+                  <Paperclip className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <Button
+              onClick={handleSend}
+              disabled={isLoading || (!input.trim() && files.length === 0)}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <Send className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 
   return (
-    <div className="space-y-8 p-4 lg:p-0">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
-              Suitpax AI
-            </h1>
-            <p className="text-lg font-light text-gray-600">Your intelligent business travel assistant</p>
-          </div>
-          <Link href="/dashboard/voice-ai">
-            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:shadow-md transition-all duration-200 cursor-pointer group">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-xl">
-                    <Volume2 className="h-5 w-5 text-blue-600" />
+    <>
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={() => {
+          setShowOnboarding(false)
+          if (user) {
+            localStorage.setItem(`suitpax-ai-onboarded-${user.id}`, "true")
+          }
+        }}
+      />
+
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+        {messages.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="flex flex-col h-screen">
+            {/* Header */}
+            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-gray-200">
+              <div className="max-w-6xl mx-auto px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center">
+                      <Sparkles className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h1 className="text-xl font-medium text-gray-900">Suitpax AI</h1>
+                      <p className="text-xs text-gray-500">Conversation started</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-gray-900 text-sm">Voice AI</p>
-                    <p className="text-xs text-gray-600">Advanced voice features</p>
+
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={showReasoning}
+                        onCheckedChange={setShowReasoning}
+                        className="data-[state=checked]:bg-blue-600"
+                      />
+                      <span className="text-sm text-gray-600">Show reasoning</span>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setMessages([])
+                        setCurrentSessionId(null)
+                      }}
+                      variant="ghost"
+                      size="sm"
+                      className="rounded-xl"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-blue-600 group-hover:translate-x-1 transition-transform" />
                 </div>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-      </motion.div>
+              </div>
+            </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
-      >
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <input
-              type="text"
-              placeholder="Search conversations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-64 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white/80 backdrop-blur-sm"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={showReasoning}
-              onCheckedChange={setShowReasoning}
-              className="data-[state=checked]:bg-gray-900"
-            />
-            <span className="text-sm font-medium text-gray-700">Show reasoning</span>
-          </div>
-        </div>
-
-        <Button
-          onClick={() => {
-            setMessages([])
-            setCurrentSessionId(null)
-            setTasks([])
-          }}
-          className="bg-gray-900 text-white hover:bg-gray-800 rounded-xl px-6 py-3 font-medium tracking-tight"
-        >
-          <PlusIcon className="h-5 w-5 mr-2" />
-          New Session
-        </Button>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="flex flex-col sm:flex-row gap-4"
-      >
-        <div className="relative flex-1">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search conversations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 rounded-xl border-gray-200 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-          />
-        </div>
-        <Button
-          onClick={() => {
-            setMessages([])
-            setCurrentSessionId(null)
-            setTasks([])
-          }}
-          className="bg-gray-900 text-white hover:bg-gray-800 rounded-xl px-6 py-3 font-medium tracking-tight"
-        >
-          <PlusIcon className="h-5 w-5 mr-2" />
-          New Session
-        </Button>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
-        <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg">
-          <CardContent className="p-0">
-            <div className="h-[600px] flex flex-col">
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                {messages.length === 0 ? (
-                  <EmptyState />
-                ) : (
-                  <>
-                    {(searchQuery ? filteredMessages : messages).map((message, index) => (
-                      <motion.div
-                        key={message.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: index * 0.1 }}
-                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+                {messages.map((message, index) => (
+                  <motion.div
+                    key={message.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div className={`max-w-3xl ${message.role === "user" ? "ml-12" : "mr-12"}`}>
+                      <div
+                        className={`rounded-2xl p-6 shadow-sm ${
+                          message.role === "user"
+                            ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                            : "bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-900"
+                        }`}
                       >
-                        <div
-                          className={`max-w-3xl rounded-2xl p-6 ${
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          className={`prose max-w-none ${
                             message.role === "user"
-                              ? "bg-gray-900 text-white"
-                              : "bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-900 shadow-sm"
+                              ? "prose-invert prose-headings:text-white prose-p:text-white prose-strong:text-white"
+                              : "prose-gray"
                           }`}
                         >
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            className={`prose max-w-none ${message.role === "user" ? "prose-invert" : ""}`}
-                            components={{
-                              code: ({ node, inline, className, children, ...props }) => {
-                                if (inline) {
-                                  return (
-                                    <code
-                                      className={`px-2 py-1 rounded text-sm ${
-                                        message.role === "user" ? "bg-white/20" : "bg-gray-200"
-                                      }`}
-                                      {...props}
-                                    >
-                                      {children}
-                                    </code>
-                                  )
-                                }
-                                return (
-                                  <pre
-                                    className={`p-4 rounded-xl overflow-x-auto ${
-                                      message.role === "user" ? "bg-black/30" : "bg-gray-100"
-                                    }`}
-                                  >
-                                    <code className="text-sm" {...props}>
-                                      {children}
-                                    </code>
-                                  </pre>
-                                )
-                              },
-                            }}
-                          >
-                            {message.content}
-                          </ReactMarkdown>
+                          {message.content}
+                        </ReactMarkdown>
 
-                          {message.reasoning && showReasoning && (
-                            <details
-                              className={`mt-4 p-4 rounded-xl border ${
-                                message.role === "user" ? "bg-white/10 border-white/20" : "bg-gray-50 border-gray-200"
-                              }`}
-                            >
-                              <summary className="cursor-pointer text-sm font-medium mb-2 flex items-center gap-2">
-                                <Sparkles className="h-4 w-4" />
-                                AI Reasoning Process
-                              </summary>
-                              <div className="text-sm whitespace-pre-wrap opacity-80">{message.reasoning}</div>
-                            </details>
-                          )}
-
-                          {message.sources && message.sources.length > 0 && (
-                            <div className="mt-4 space-y-2">
-                              <p className="text-xs font-medium opacity-70">Sources:</p>
-                              {message.sources.map((source, idx) => (
-                                <a
-                                  key={idx}
-                                  href={source.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={`block text-xs underline ${
-                                    message.role === "user"
-                                      ? "text-blue-300 hover:text-blue-200"
-                                      : "text-blue-600 hover:text-blue-800"
-                                  }`}
-                                >
-                                  {source.title}
-                                </a>
-                              ))}
+                        {message.reasoning && showReasoning && (
+                          <details className="mt-6 p-4 rounded-xl bg-gray-50/80 backdrop-blur-sm border border-gray-200">
+                            <summary className="cursor-pointer text-sm font-medium mb-3 flex items-center gap-2 text-gray-700">
+                              <Sparkles className="h-4 w-4" />
+                              AI Reasoning Process
+                            </summary>
+                            <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
+                              {message.reasoning}
                             </div>
-                          )}
+                          </details>
+                        )}
 
-                          <div className={`text-xs mt-3 opacity-60`}>{message.timestamp.toLocaleTimeString()}</div>
+                        <div
+                          className={`flex items-center gap-2 mt-4 text-xs ${
+                            message.role === "user" ? "text-white/70" : "text-gray-500"
+                          }`}
+                        >
+                          <Clock className="h-3 w-3" />
+                          {message.timestamp.toLocaleTimeString()}
                         </div>
-                      </motion.div>
-                    ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
 
-                    {isLoading && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex justify-start"
-                      >
+                <AnimatePresence>
+                  {isLoading && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="flex justify-start"
+                    >
+                      <div className="mr-12 max-w-3xl">
                         <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm">
                           <div className="flex items-center space-x-3">
-                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-200 border-t-gray-900"></div>
-                            <span className="text-sm text-gray-700 font-medium">AI is thinking...</span>
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-200 border-t-blue-600"></div>
+                            <span className="text-sm text-gray-700">Suitpax AI is thinking...</span>
                           </div>
                         </div>
-                      </motion.div>
-                    )}
-                    <div ref={messagesEndRef} />
-                  </>
-                )}
-              </div>
-
-              <div className="p-6 border-t border-gray-200 bg-gray-50/50">
-                {files.length > 0 && (
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    {files.map((file, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-gray-200 shadow-sm"
-                      >
-                        <span className="text-sm text-gray-700 font-medium">{file.name}</span>
-                        <button
-                          onClick={() => setFiles(files.filter((_, i) => i !== idx))}
-                          className="text-gray-500 hover:text-gray-700 transition-colors"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <div ref={messagesEndRef} />
+              </div>
+            </div>
+
+            {/* Input Area */}
+            <div className="bg-white/95 backdrop-blur-md border-t border-gray-200 p-6">
+              <div className="max-w-4xl mx-auto">
+                <AnimatePresence>
+                  {files.length > 0 && (
+                    <motion.div
+                      className="mb-4 flex flex-wrap gap-2"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                    >
+                      {files.map((file, idx) => (
+                        <div key={idx} className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
+                          <span className="text-sm text-gray-700">{file.name}</span>
+                          <button
+                            onClick={() => setFiles(files.filter((_, i) => i !== idx))}
+                            className="text-gray-500 hover:text-gray-700 transition-colors"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <div className="flex items-end gap-4">
                   <div className="flex-1 relative">
@@ -513,44 +522,12 @@ export default function SuitpaxAIPage() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Ask about flights, hotels, expenses, or anything else..."
+                      placeholder="Continue the conversation..."
                       disabled={isLoading}
-                      className="bg-white border-gray-200 text-gray-900 placeholder:text-gray-500 rounded-2xl resize-none min-h-[60px] pr-32 focus:ring-2 focus:ring-gray-900 focus:border-transparent shadow-sm"
+                      className="bg-white border-gray-300 rounded-2xl resize-none min-h-[60px] pr-20 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
                       rows={1}
                     />
                     <div className="absolute right-3 bottom-3 flex items-center gap-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-600 rounded-xl"
-                          >
-                            <Sparkles className="h-4 w-4" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-96 p-6 bg-white/95 border-gray-200 backdrop-blur-sm rounded-2xl shadow-lg">
-                          <div className="space-y-6">
-                            {promptSuggestions.map((category) => (
-                              <div key={category.category} className="space-y-3">
-                                <h4 className="text-sm font-medium text-gray-900">{category.category}</h4>
-                                <div className="space-y-2">
-                                  {category.prompts.map((prompt) => (
-                                    <button
-                                      key={prompt}
-                                      onClick={() => setInput(prompt)}
-                                      className="w-full text-left p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-sm text-gray-700 border border-gray-200"
-                                    >
-                                      {prompt}
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-
                       <input
                         ref={uploadInputRef}
                         type="file"
@@ -565,7 +542,7 @@ export default function SuitpaxAIPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-600 rounded-xl"
+                        className="h-8 w-8 p-0 hover:bg-gray-100 rounded-full"
                         onClick={() => uploadInputRef.current?.click()}
                       >
                         <Paperclip className="h-4 w-4" />
@@ -575,16 +552,16 @@ export default function SuitpaxAIPage() {
                   <Button
                     onClick={handleSend}
                     disabled={isLoading || (!input.trim() && files.length === 0)}
-                    className="bg-gray-900 hover:bg-gray-800 text-white rounded-2xl px-8 py-4 font-medium tracking-tight transition-colors shadow-lg"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     <Send className="h-5 w-5" />
                   </Button>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
+          </div>
+        )}
+      </div>
+    </>
   )
 }

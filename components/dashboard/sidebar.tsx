@@ -178,8 +178,8 @@ export function Sidebar({
   return (
     <div
       className={cn(
-        "flex flex-col bg-gray-50/80 backdrop-blur-sm border-r border-gray-200/60 h-full shadow-sm",
-        isMobile ? "w-64" : isCollapsed ? "w-16" : "w-64",
+        "flex flex-col h-full bg-gray-100/60 backdrop-blur-sm border-r border-gray-200/60 transition-all duration-300",
+        isCollapsed ? "w-16" : "w-64",
       )}
     >
       {/* Header */}
@@ -458,7 +458,9 @@ export function Sidebar({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
                 <div className="flex items-center gap-2">
-                  <p className="text-xs text-gray-600 truncate">{userProfile?.company || getUserEmail()}</p>
+                  <p className="text-xs text-gray-600 truncate">
+                    {userProfile?.company ? userProfile.company : getUserEmail()}
+                  </p>
                   <Badge
                     variant="outline"
                     className="text-[10px] px-1.5 py-0.5 rounded-lg bg-gray-200/60 text-gray-700 border-gray-200/60"
