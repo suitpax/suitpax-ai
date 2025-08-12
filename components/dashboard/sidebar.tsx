@@ -28,6 +28,7 @@ import {
   Crown,
   Send,
   CheckSquare,
+  Shield,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
@@ -59,6 +60,7 @@ const navigation = [
   { name: "Team", href: "/dashboard/team", icon: Users },
   { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
   { name: "Tasks", href: "/dashboard/tasks", icon: CheckSquare },
+  { name: "Policies", href: "/dashboard/policies", icon: Shield },
 ]
 
 const aiNavigation = [
