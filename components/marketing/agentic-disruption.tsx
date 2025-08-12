@@ -44,7 +44,7 @@ const disruptiveAgents = [
   "/agents/agent-8.png",
   "/agents/agent-10.png",
   "/agents/agent-11.png",
-  "/agents/agent-12.png",
+  "/agents/agent-42.png",
   "/agents/agent-13.png",
   "/agents/agent-15.png",
   "/agents/agent-16.png",
@@ -192,41 +192,7 @@ export default function AgenticDisruption() {
             AI Travel Agents
           </span>
           <div className="flex justify-center gap-2 mb-4 flex-wrap max-w-2xl">
-            {[
-              "/agents/agent-nova.jpeg",
-              "/agents/agent-aria.jpeg",
-              "/agents/agent-sage.jpeg",
-              "/agents/agent-ruby.png",
-              "/agents/agent-tyler.png",
-              "/agents/agent-maya.jpeg",
-              "/agents/agent-zoe.jpeg",
-              "/agents/agent-kai-new.png",
-              "/agents/agent-luna-new.png",
-              "/agents/agent-2.png",
-              "/agents/agent-41.png",
-              "/agents/agent-9.png",
-              "/agents/agent-54.png",
-              "/agents/agent-1.png",
-              "/agents/agent-5.png",
-              "/agents/agent-6.png",
-              "/agents/agent-7.png",
-              "/agents/agent-8.png",
-              "/agents/agent-10.png",
-              "/agents/agent-11.png",
-              "/agents/agent-12.png",
-              "/agents/agent-13.png",
-              "/agents/agent-15.png",
-              "/agents/agent-16.png",
-              "/agents/agent-17.png",
-              "/agents/agent-18.png",
-              "/agents/agent-19.png",
-              "/agents/agent-20.png",
-              "/agents/agent-21.png",
-              "/agents/agent-22.png",
-              "/agents/agent-23.png",
-              "/agents/agent-24.png",
-              "/agents/agent-25.png",
-            ].map((image, index) => (
+            {disruptiveAgents.map((image, index) => (
               <motion.div
                 key={index}
                 className="w-8 h-8 rounded-md overflow-hidden border border-gray-300 bg-white"

@@ -37,7 +37,7 @@ const agents = [
   {
     id: 1,
     name: "Luna",
-    avatar: "/agents/agent-12.png",
+    avatar: "/agents/agent-42.png",
     role: "AI Agent",
     description: "Coordinates travel for corporate and sports teams with personalized itineraries.",
   },

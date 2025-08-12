@@ -343,8 +343,14 @@ export const BusinessIntelligence = () => {
         <div className="flex flex-col items-center justify-center text-center mb-12">
           <div className="flex items-center gap-2 mb-4">
             <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-              <Image src="/logo/suitpax-cloud-logo.webp" alt="Suitpax" width={16} height={16} className="mr-1.5" />
-              Technology by Suitpax
+              <Image
+                src="/logo/suitpax-cloud-logo.webp"
+                alt="Suitpax Cloud"
+                width={16}
+                height={16}
+                className="mr-1.5"
+              />
+              Technology by Suitpax Cloud
             </span>
             <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
               <span className="w-1.5 h-1.5 rounded-full bg-gray-700 animate-pulse mr-1"></span>

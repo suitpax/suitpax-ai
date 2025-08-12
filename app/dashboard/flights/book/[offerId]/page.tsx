@@ -9,12 +9,6 @@ import PassengerForm from "@/components/flights/passenger-form"
 import FlightItinerary from "@/components/flights/flight-itinerary"
 import BookingSummary from "@/components/flights/booking-summary"
 import { toast } from "sonner"
-import dynamic from "next/dynamic"
-
-const DuffelAncillaries = dynamic(() => import("@duffel/components").then((m) => (m as any).Ancillaries), {
-  ssr: false,
-  loading: () => null,
-})
 
 interface DuffelOffer {
   id: string
@@ -33,19 +27,6 @@ interface PassengerData {
   email: string
   phone_number: string
   type: "adult" | "child" | "infant_without_seat"
-}
-
-async function savePendingServices(offerId: string, services: any[]) {
-  await fetch("/api/flights/duffel/pending-services", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ offerId, services }),
-  })
-}
-
-async function applyPendingServices(orderId: string) {
-  // In this MVP we assume pending services were for the original offer; retrieving is optional
-  // Here we could fetch specific service IDs; for simplicity, no-op. Extend as needed.
 }
 
 export default function BookFlightPage() {
@@ -239,35 +220,6 @@ export default function BookFlightPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <FlightItinerary slices={offer.slices} />
-
-            {/* Ancillaries (bags, seats, etc.) */}
-            <Card className="rounded-2xl border border-gray-200 shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 font-medium tracking-tighter">
-                  Extras & Ancillaries
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {process.env.NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN ? (
-                  <DuffelAncillaries
-                    offerId={offer.id}
-                    duffelToken={process.env.NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN as string}
-                    onAdd={async (items: any) => {
-                      try {
-                        await savePendingServices(offer!.id, items)
-                        toast.success("Extras saved. They will be applied after booking.")
-                      } catch {
-                        toast.error("Failed to save extras")
-                      }
-                    }}
-                  />
-                ) : (
-                  <div className="text-sm text-gray-600">
-                    Ancillaries unavailable. Configure NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN.
-                  </div>
-                )}
-              </CardContent>
-            </Card>
 
             {currentStep === "details" && (
               <Card className="rounded-2xl border border-gray-200 shadow-sm">
