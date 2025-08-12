@@ -27,6 +27,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import Image from "next/image"
 
 interface Message {
   id: string
@@ -139,9 +140,9 @@ export default function SuitpaxAIPage() {
 
   if (isUserLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-gray-600 mx-auto mb-4"></div>
           <p className="text-gray-700 font-medium tracking-tight">Initializing Suitpax AI...</p>
         </motion.div>
       </div>
@@ -149,28 +150,34 @@ export default function SuitpaxAIPage() {
   }
 
   const EmptyState = () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <motion.div
-                className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg"
+                className="w-12 h-12 rounded-md overflow-hidden shadow-sm"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Sparkles className="h-6 w-6 text-white" />
+                <Image
+                  src="/suitpax-bl-logo.webp"
+                  alt="Suitpax"
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-cover"
+                />
               </motion.div>
               <div>
-                <h1 className="text-2xl font-medium tracking-tighter text-gray-900">Suitpax AI</h1>
-                <p className="text-sm text-gray-500">Your intelligent business travel assistant</p>
+                <h1 className="text-xl sm:text-2xl font-medium tracking-tighter text-gray-900">Suitpax AI</h1>
+                <p className="text-xs sm:text-sm text-gray-500">Your intelligent business travel assistant</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-emerald-200">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></div>
+              <Badge variant="secondary" className="bg-gray-200 text-gray-700 border-gray-200">
+                <div className="w-2 h-2 bg-gray-600 rounded-full mr-2 animate-pulse"></div>
                 Online
               </Badge>
               <Button variant="ghost" size="sm" className="rounded-xl">
@@ -182,24 +189,24 @@ export default function SuitpaxAIPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="text-center mb-16">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8 lg:py-12">
+        <div className="text-center mb-12 lg:mb-16">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h2 className="text-5xl md:text-7xl font-light text-gray-800 mb-6 leading-tight tracking-tighter">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-gray-800 mb-4 lg:mb-6 leading-tight tracking-tighter">
               Ask anything.
               <br />
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-gray-600 to-gray-900 bg-clip-text text-transparent">
                 Travel. Business. Code.
               </span>
             </h2>
-            <p className="text-xl text-gray-600 mb-12 font-light">
+            <p className="text-sm sm:text-lg lg:text-xl text-gray-600 mb-8 lg:mb-12 font-light">
               Powered by advanced AI with memory and business travel expertise
             </p>
           </motion.div>
 
           {/* AI Capabilities Grid */}
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-16"
+            className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-12 lg:mb-16"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -207,19 +214,19 @@ export default function SuitpaxAIPage() {
             {aiCapabilities.map((capability, index) => (
               <motion.div
                 key={capability.title}
-                className="bg-white/60 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                className="bg-white/60 backdrop-blur-sm border border-gray-200 rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
                 whileHover={{ scale: 1.02, y: -2 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
                 <div
-                  className={`w-12 h-12 ${capability.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                  className={`w-10 h-10 sm:w-12 sm:h-12 ${capability.color} rounded-xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}
                 >
-                  <capability.icon className="h-6 w-6 text-white" />
+                  <capability.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
-                <h3 className="font-medium text-gray-900 mb-2">{capability.title}</h3>
-                <p className="text-sm text-gray-600">{capability.desc}</p>
+                <h3 className="text-sm sm:text-base font-medium text-gray-900 mb-1 sm:mb-2">{capability.title}</h3>
+                <p className="text-xs sm:text-sm text-gray-600">{capability.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -230,29 +237,31 @@ export default function SuitpaxAIPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <h3 className="text-2xl font-medium text-gray-900 mb-8 tracking-tight">Try these examples</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            <h3 className="text-xl sm:text-2xl font-medium text-gray-900 mb-6 sm:mb-8 tracking-tight">
+              Try these examples
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 max-w-4xl mx-auto">
               {quickActions.map((action, index) => (
                 <motion.button
                   key={action.text}
                   onClick={() => setInput(action.text)}
-                  className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 text-left hover:shadow-lg hover:border-gray-300 transition-all duration-300 group"
+                  className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-4 sm:p-6 text-left hover:shadow-lg hover:border-gray-300 transition-all duration-300 group"
                   whileHover={{ scale: 1.02 }}
                   initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                      <action.icon className="h-5 w-5 text-gray-600" />
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                      <action.icon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
                     </div>
                     <div className="flex-1">
-                      <Badge variant="outline" className="mb-3 text-xs">
+                      <Badge variant="outline" className="mb-2 sm:mb-3 text-[10px] sm:text-xs">
                         {action.category}
                       </Badge>
-                      <p className="text-gray-900 font-medium leading-relaxed">{action.text}</p>
+                      <p className="text-sm sm:text-base text-gray-900 font-medium leading-relaxed">{action.text}</p>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                    <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                   </div>
                 </motion.button>
               ))}
@@ -261,16 +270,16 @@ export default function SuitpaxAIPage() {
 
           {/* Features Note */}
           <motion.div
-            className="mt-16 p-6 bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 max-w-2xl mx-auto"
+            className="mt-12 lg:mt-16 p-4 sm:p-6 bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 max-w-2xl mx-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
           >
             <div className="flex items-center gap-3 mb-3">
-              <Star className="h-5 w-5 text-yellow-500" />
-              <h4 className="font-medium text-gray-900">Advanced Features</h4>
+              <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />
+              <h4 className="text-sm sm:text-base font-medium text-gray-900">Advanced Features</h4>
             </div>
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
               Supports markdown, code blocks, file attachments, and remembers your preferences across conversations. Use
               triple backticks with language for syntax highlighting.
             </p>
@@ -279,7 +288,7 @@ export default function SuitpaxAIPage() {
       </div>
 
       {/* Input Area */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-6">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-4 sm:p-6">
         <div className="max-w-4xl mx-auto">
           <AnimatePresence>
             {files.length > 0 && (
@@ -304,7 +313,7 @@ export default function SuitpaxAIPage() {
             )}
           </AnimatePresence>
 
-          <div className="flex items-end gap-4">
+          <div className="flex items-end gap-3 sm:gap-4">
             <div className="flex-1 relative">
               <Textarea
                 value={input}
@@ -312,10 +321,10 @@ export default function SuitpaxAIPage() {
                 onKeyPress={handleKeyPress}
                 placeholder="Ask me about flights, hotels, travel planning, or anything else..."
                 disabled={isLoading}
-                className="bg-white border-gray-300 rounded-2xl resize-none min-h-[60px] pr-20 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                className="bg-white border-gray-300 rounded-2xl resize-none min-h-[50px] sm:min-h-[60px] pr-16 sm:pr-20 focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm text-sm sm:text-base"
                 rows={1}
               />
-              <div className="absolute right-3 bottom-3 flex items-center gap-2">
+              <div className="absolute right-2 sm:right-3 bottom-2 sm:bottom-3 flex items-center gap-2">
                 <input
                   ref={uploadInputRef}
                   type="file"
@@ -330,19 +339,19 @@ export default function SuitpaxAIPage() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-8 w-8 p-0 hover:bg-gray-100 rounded-full"
+                  className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-gray-100 rounded-full"
                   onClick={() => uploadInputRef.current?.click()}
                 >
-                  <Paperclip className="h-4 w-4" />
+                  <Paperclip className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </div>
             <Button
               onClick={handleSend}
               disabled={isLoading || (!input.trim() && files.length === 0)}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-gray-900 hover:bg-black text-white rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              <Send className="h-5 w-5" />
+              <Send className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </div>
         </div>
@@ -352,21 +361,27 @@ export default function SuitpaxAIPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
         {messages.length === 0 ? (
           <EmptyState />
         ) : (
           <div className="flex flex-col h-screen">
             {/* Header */}
             <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-gray-200">
-              <div className="max-w-6xl mx-auto px-6 py-4">
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center">
-                      <Sparkles className="h-5 w-5 text-white" />
+                    <div className="w-10 h-10 rounded-md overflow-hidden shadow-sm">
+                      <Image
+                        src="/suitpax-bl-logo.webp"
+                        alt="Suitpax"
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div>
-                      <h1 className="text-xl font-medium text-gray-900">Suitpax AI</h1>
+                      <h1 className="text-lg sm:text-xl font-medium text-gray-900">Suitpax AI</h1>
                       <p className="text-xs text-gray-500">Conversation started</p>
                     </div>
                   </div>
@@ -376,9 +391,9 @@ export default function SuitpaxAIPage() {
                       <Switch
                         checked={showReasoning}
                         onCheckedChange={setShowReasoning}
-                        className="data-[state=checked]:bg-blue-600"
+                        className="data-[state=checked]:bg-gray-600"
                       />
-                      <span className="text-sm text-gray-600">Show reasoning</span>
+                      <span className="text-sm text-gray-600 hidden sm:inline">Show reasoning</span>
                     </div>
                     <Button
                       onClick={() => {
@@ -398,7 +413,7 @@ export default function SuitpaxAIPage() {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto">
-              <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
                 {messages.map((message, index) => (
                   <motion.div
                     key={message.id}
@@ -407,17 +422,17 @@ export default function SuitpaxAIPage() {
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                     className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                   >
-                    <div className={`max-w-3xl ${message.role === "user" ? "ml-12" : "mr-12"}`}>
+                    <div className={`max-w-3xl ${message.role === "user" ? "ml-8 sm:ml-12" : "mr-8 sm:mr-12"}`}>
                       <div
-                        className={`rounded-2xl p-6 shadow-sm ${
+                        className={`rounded-2xl p-4 sm:p-6 shadow-sm ${
                           message.role === "user"
-                            ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                            ? "bg-gray-900 text-white"
                             : "bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-900"
                         }`}
                       >
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
-                          className={`prose max-w-none ${
+                          className={`prose max-w-none text-sm sm:text-base ${
                             message.role === "user"
                               ? "prose-invert prose-headings:text-white prose-p:text-white prose-strong:text-white"
                               : "prose-gray"
@@ -427,19 +442,19 @@ export default function SuitpaxAIPage() {
                         </ReactMarkdown>
 
                         {message.reasoning && showReasoning && (
-                          <details className="mt-6 p-4 rounded-xl bg-gray-50/80 backdrop-blur-sm border border-gray-200">
-                            <summary className="cursor-pointer text-sm font-medium mb-3 flex items-center gap-2 text-gray-700">
-                              <Sparkles className="h-4 w-4" />
+                          <details className="mt-4 sm:mt-6 p-3 sm:p-4 rounded-xl bg-gray-50/80 backdrop-blur-sm border border-gray-200">
+                            <summary className="cursor-pointer text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center gap-2 text-gray-700">
+                              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
                               AI Reasoning Process
                             </summary>
-                            <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
+                            <div className="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
                               {message.reasoning}
                             </div>
                           </details>
                         )}
 
                         <div
-                          className={`flex items-center gap-2 mt-4 text-xs ${
+                          className={`flex items-center gap-2 mt-3 sm:mt-4 text-xs ${
                             message.role === "user" ? "text-white/70" : "text-gray-500"
                           }`}
                         >
@@ -459,11 +474,11 @@ export default function SuitpaxAIPage() {
                       exit={{ opacity: 0, y: -20 }}
                       className="flex justify-start"
                     >
-                      <div className="mr-12 max-w-3xl">
-                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm">
+                      <div className="mr-8 sm:mr-12 max-w-3xl">
+                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
                           <div className="flex items-center space-x-3">
-                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-200 border-t-blue-600"></div>
-                            <span className="text-sm text-gray-700">Suitpax AI is thinking...</span>
+                            <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-gray-200 border-t-gray-600"></div>
+                            <span className="text-xs sm:text-sm text-gray-700">Suitpax AI is thinking...</span>
                           </div>
                         </div>
                       </div>
@@ -475,7 +490,7 @@ export default function SuitpaxAIPage() {
             </div>
 
             {/* Input Area */}
-            <div className="bg-white/95 backdrop-blur-md border-t border-gray-200 p-6">
+            <div className="bg-white/95 backdrop-blur-md border-t border-gray-200 p-4 sm:p-6">
               <div className="max-w-4xl mx-auto">
                 <AnimatePresence>
                   {files.length > 0 && (
@@ -500,7 +515,7 @@ export default function SuitpaxAIPage() {
                   )}
                 </AnimatePresence>
 
-                <div className="flex items-end gap-4">
+                <div className="flex items-end gap-3 sm:gap-4">
                   <div className="flex-1 relative">
                     <Textarea
                       value={input}
@@ -508,10 +523,10 @@ export default function SuitpaxAIPage() {
                       onKeyPress={handleKeyPress}
                       placeholder="Continue the conversation..."
                       disabled={isLoading}
-                      className="bg-white border-gray-300 rounded-2xl resize-none min-h-[60px] pr-20 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                      className="bg-white border-gray-300 rounded-2xl resize-none min-h-[50px] sm:min-h-[60px] pr-16 sm:pr-20 focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm text-sm sm:text-base"
                       rows={1}
                     />
-                    <div className="absolute right-3 bottom-3 flex items-center gap-2">
+                    <div className="absolute right-2 sm:right-3 bottom-2 sm:bottom-3 flex items-center gap-2">
                       <input
                         ref={uploadInputRef}
                         type="file"
@@ -526,19 +541,19 @@ export default function SuitpaxAIPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 w-8 p-0 hover:bg-gray-100 rounded-full"
+                        className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-gray-100 rounded-full"
                         onClick={() => uploadInputRef.current?.click()}
                       >
-                        <Paperclip className="h-4 w-4" />
+                        <Paperclip className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   </div>
                   <Button
                     onClick={handleSend}
                     disabled={isLoading || (!input.trim() && files.length === 0)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="bg-gray-900 hover:bg-black text-white rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                   >
-                    <Send className="h-5 w-5" />
+                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                   </Button>
                 </div>
               </div>

@@ -29,6 +29,7 @@ import {
   PiPaperPlaneTilt,
   PiCheckSquare,
   PiShield,
+  PiDotsSixVertical,
 } from "react-icons/pi"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
@@ -46,22 +47,23 @@ import {
 } from "@/components/ui/dialog"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import { TokenUsageChart } from "@/components/charts/token-usage-chart"
-import { FlightUsageChart } from "@/components/charts/flight-usage-chart"
+import Image from "next/image"
+import { AISidebarManager } from "@/lib/ai-sidebar-manager"
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: PiSquaresFour },
-  { name: "Flights", href: "/dashboard/flights", icon: PiAirplane },
-  { name: "Hotels", href: "/dashboard/hotels", icon: PiBuildings },
-  { name: "Finance", href: "/dashboard/finance", icon: PiCreditCard },
-  { name: "Analytics", href: "/dashboard/analytics", icon: PiChartBar },
-  { name: "Calendar", href: "/dashboard/calendar", icon: PiCalendar },
-  { name: "Mail", href: "/dashboard/mail", icon: PiEnvelope },
-  { name: "Meetings", href: "/dashboard/meetings", icon: PiVideoCamera },
-  { name: "Locations", href: "/dashboard/locations", icon: PiMapPin },
-  { name: "Team", href: "/dashboard/team", icon: PiUsers },
-  { name: "Expenses", href: "/dashboard/expenses", icon: PiReceipt },
-  { name: "Tasks", href: "/dashboard/tasks", icon: PiCheckSquare },
-  { name: "Policies", href: "/dashboard/policies", icon: PiShield },
+const defaultNavigation = [
+  { id: "dashboard", name: "Dashboard", href: "/dashboard", icon: PiSquaresFour },
+  { id: "flights", name: "Flights", href: "/dashboard/flights", icon: PiAirplane },
+  { id: "hotels", name: "Hotels", href: "/dashboard/hotels", icon: PiBuildings },
+  { id: "finance", name: "Finance", href: "/dashboard/finance", icon: PiCreditCard },
+  { id: "analytics", name: "Analytics", href: "/dashboard/analytics", icon: PiChartBar },
+  { id: "calendar", name: "Calendar", href: "/dashboard/calendar", icon: PiCalendar },
+  { id: "mail", name: "Mail", href: "/dashboard/mail", icon: PiEnvelope },
+  { id: "meetings", name: "Meetings", href: "/dashboard/meetings", icon: PiVideoCamera },
+  { id: "locations", name: "Locations", href: "/dashboard/locations", icon: PiMapPin },
+  { id: "team", name: "Team", href: "/dashboard/team", icon: PiUsers },
+  { id: "expenses", name: "Expenses", href: "/dashboard/expenses", icon: PiReceipt },
+  { id: "tasks", name: "Tasks", href: "/dashboard/tasks", icon: PiCheckSquare },
+  { id: "policies", name: "Policies", href: "/dashboard/policies", icon: PiShield },
 ]
 
 const aiNavigation = [
@@ -99,17 +101,115 @@ export function Sidebar({
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [aiQuery, setAiQuery] = useState("")
   const [isAiLoading, setIsAiLoading] = useState(false)
+  const [navigation, setNavigation] = useState(defaultNavigation)
+  const [draggedItem, setDraggedItem] = useState<string | null>(null)
   const [usageStats, setUsageStats] = useState({
-    flightSearches: 12,
-    maxFlightSearches: userPlan === "premium" ? 1000 : 50,
     tokensUsed: 2450,
     maxTokens: userPlan === "premium" ? 100000 : 10000,
   })
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const [aiSidebarManager, setAiSidebarManager] = useState<AISidebarManager | null>(null)
 
   const setIsCollapsed = onToggleCollapse
+
+  useEffect(() => {
+    const savedOrder = localStorage.getItem("sidebar-navigation-order")
+    if (savedOrder) {
+      try {
+        const orderIds = JSON.parse(savedOrder)
+        const reorderedNav = orderIds
+          .map((id: string) => defaultNavigation.find((item) => item.id === id))
+          .filter(Boolean)
+
+        // Add any new items that weren't in the saved order
+        const existingIds = new Set(orderIds)
+        const newItems = defaultNavigation.filter((item) => !existingIds.has(item.id))
+
+        setNavigation([...reorderedNav, ...newItems])
+      } catch (error) {
+        console.error("Error loading navigation order:", error)
+      }
+    }
+  }, [])
+
+  // Initialize AI sidebar manager when user is available
+  useEffect(() => {
+    if (user?.id) {
+      const manager = new AISidebarManager(user.id)
+      setAiSidebarManager(manager)
+
+      // Load stored navigation order or optimize based on usage
+      const loadNavigationOrder = async () => {
+        const storedOrder = await manager.getStoredNavigationOrder()
+        if (storedOrder) {
+          const reorderedNav = storedOrder
+            .map((id: string) => defaultNavigation.find((item) => item.id === id))
+            .filter(Boolean)
+
+          // Add any new items that weren't in the stored order
+          const existingIds = new Set(storedOrder)
+          const newItems = defaultNavigation.filter((item) => !existingIds.has(item.id))
+
+          setNavigation([...reorderedNav, ...newItems])
+        } else {
+          // First time user - optimize based on common patterns
+          const optimizedNav = await manager.optimizeNavigationForUser(defaultNavigation)
+          setNavigation(optimizedNav)
+        }
+      }
+
+      loadNavigationOrder()
+    }
+  }, [user])
+
+  // Enhanced save function that also updates AI preferences
+  const saveNavigationOrder = async (newNavigation: typeof navigation) => {
+    const orderIds = newNavigation.map((item) => item.id)
+    localStorage.setItem("sidebar-navigation-order", JSON.stringify(orderIds))
+
+    // Also save to AI system for cross-device sync
+    if (aiSidebarManager) {
+      await aiSidebarManager.reorderNavigation(orderIds, "User manual reorder via drag & drop")
+    }
+  }
+
+  const handleDragStart = (e: React.DragEvent, itemId: string) => {
+    setDraggedItem(itemId)
+    e.dataTransfer.effectAllowed = "move"
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "move"
+  }
+
+  const handleDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault()
+
+    if (!draggedItem || draggedItem === targetId) {
+      setDraggedItem(null)
+      return
+    }
+
+    const draggedIndex = navigation.findIndex((item) => item.id === draggedItem)
+    const targetIndex = navigation.findIndex((item) => item.id === targetId)
+
+    if (draggedIndex === -1 || targetIndex === -1) return
+
+    const newNavigation = [...navigation]
+    const [draggedItemData] = newNavigation.splice(draggedIndex, 1)
+    newNavigation.splice(targetIndex, 0, draggedItemData)
+
+    setNavigation(newNavigation)
+    saveNavigationOrder(newNavigation)
+    setDraggedItem(null)
+  }
+
+  const handleDragEnd = () => {
+    setDraggedItem(null)
+  }
 
   useEffect(() => {
     const getUser = async () => {
@@ -223,8 +323,14 @@ export function Sidebar({
       <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-white text-lg font-bold">bl</span>
+            <div className="w-12 h-12 rounded-md overflow-hidden shadow-sm">
+              <Image
+                src="/suitpax-bl-logo.webp"
+                alt="Suitpax"
+                width={48}
+                height={48}
+                className="w-full h-full object-cover"
+              />
             </div>
             {(!isCollapsed || isMobile) && (
               <div className="flex flex-col">
@@ -254,13 +360,13 @@ export function Sidebar({
       </div>
 
       {(!isCollapsed || isMobile) && (
-        <div className="px-3 pt-3 border-b border-gray-200">
+        <div className="px-4 pt-4 pb-2 border-b border-gray-200">
           <form onSubmit={handleAiSubmit} className="relative">
             <Input
               value={aiQuery}
               onChange={(e) => setAiQuery(e.target.value)}
               placeholder="Ask AI anything..."
-              className="pr-10 rounded-xl border-gray-200 text-sm h-9 bg-gray-50 focus:bg-white transition-colors"
+              className="pr-10 rounded-xl border-gray-200 text-sm h-10 bg-gray-50 focus:bg-white transition-colors"
               disabled={isAiLoading}
             />
             <Button
@@ -268,7 +374,7 @@ export function Sidebar({
               size="sm"
               variant="ghost"
               disabled={!aiQuery.trim() || isAiLoading}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100 rounded-lg"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100 rounded-lg"
             >
               {isAiLoading ? (
                 <div className="animate-spin rounded-full h-3 w-3 border-2 border-gray-400 border-t-transparent" />
@@ -281,36 +387,55 @@ export function Sidebar({
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {/* Main Navigation */}
+      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        {/* Main Navigation with Drag & Drop */}
         <div className="space-y-1">
           {navigation.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
+            const isDragging = draggedItem === item.id
+
             return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={isMobile ? onCloseMobile : undefined}
-                className={cn(
-                  "group flex items-center px-3 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200 relative",
-                  isActive ? "bg-gray-900 text-white shadow-md" : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
-                  isCollapsed && !isMobile && "justify-center px-2",
-                )}
-                title={isCollapsed && !isMobile ? item.name : ""}
+              <div
+                key={item.id}
+                draggable={!isCollapsed && !isMobile}
+                onDragStart={(e) => handleDragStart(e, item.id)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, item.id)}
+                onDragEnd={handleDragEnd}
+                className={cn("group relative", isDragging && "opacity-50")}
               >
-                <item.icon
-                  className={cn("flex-shrink-0 h-5 w-5", isCollapsed && !isMobile ? "mx-auto" : "mr-3")}
-                  aria-hidden="true"
-                />
-                {(!isCollapsed || isMobile) && <span>{item.name}</span>}
-              </Link>
+                <Link
+                  href={item.href}
+                  onClick={isMobile ? onCloseMobile : undefined}
+                  className={cn(
+                    "flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 relative",
+                    isActive
+                      ? "bg-gray-900 text-white shadow-sm"
+                      : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
+                    isCollapsed && !isMobile && "justify-center px-2",
+                  )}
+                  title={isCollapsed && !isMobile ? item.name : ""}
+                >
+                  {!isCollapsed && !isMobile && (
+                    <PiDotsSixVertical className="h-4 w-4 mr-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing" />
+                  )}
+                  <item.icon
+                    className={cn(
+                      "flex-shrink-0 h-5 w-5",
+                      isCollapsed && !isMobile ? "mx-auto" : !isCollapsed && !isMobile ? "" : "mr-3",
+                    )}
+                    aria-hidden="true"
+                  />
+                  {(!isCollapsed || isMobile) && <span className="ml-1">{item.name}</span>}
+                </Link>
+              </div>
             )
           })}
         </div>
 
         {/* AI Section */}
         {(!isCollapsed || isMobile) && (
-          <div className="pt-4">
+          <div className="pt-6">
             <div className="space-y-1">
               {aiNavigation.map((item) => {
                 const isActive = pathname === item.href
@@ -320,7 +445,7 @@ export function Sidebar({
                     href={item.href}
                     onClick={isMobile ? onCloseMobile : undefined}
                     className={cn(
-                      "group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200",
+                      "group flex items-center justify-between px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200",
                       isActive
                         ? "bg-gray-200 text-gray-900 shadow-sm"
                         : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
@@ -340,7 +465,7 @@ export function Sidebar({
 
         {/* Collapsed AI icons */}
         {isCollapsed && !isMobile && (
-          <div className="pt-4 space-y-1">
+          <div className="pt-6 space-y-1">
             {aiNavigation.map((item) => {
               const isActive = pathname === item.href
               return (
@@ -348,7 +473,7 @@ export function Sidebar({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "group flex items-center justify-center px-2 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200 relative",
+                    "group flex items-center justify-center px-2 py-3 text-sm font-medium rounded-xl transition-all duration-200 relative",
                     isActive
                       ? "bg-gray-200 text-gray-900 shadow-sm"
                       : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
@@ -364,15 +489,10 @@ export function Sidebar({
       </nav>
 
       {/* Bottom Section */}
-      <div className="border-t border-gray-200 p-3 flex-shrink-0 space-y-4">
+      <div className="border-t border-gray-200 p-4 flex-shrink-0 space-y-4">
         {(!isCollapsed || isMobile) && (
           <div className="space-y-3">
             <TokenUsageChart used={usageStats.tokensUsed} total={usageStats.maxTokens} plan={userPlan} />
-            <FlightUsageChart
-              searches={usageStats.flightSearches}
-              maxSearches={usageStats.maxFlightSearches}
-              bookings={3}
-            />
           </div>
         )}
 
@@ -383,7 +503,7 @@ export function Sidebar({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-300 bg-white hover:bg-gray-50"
+                  className="w-full justify-start text-xs h-9 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
                 >
                   <PiCrown className="h-3 w-3 mr-2" />
                   Plans & Billing
@@ -397,7 +517,7 @@ export function Sidebar({
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
-                  <div className="bg-gray-50 rounded-2xl p-4">
+                  <div className="bg-gray-50 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-gray-900">Current Plan</span>
                       <Badge className="bg-gray-200 text-gray-700 rounded-lg">{userPlan.toUpperCase()}</Badge>
@@ -409,10 +529,8 @@ export function Sidebar({
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-2xl">
-                      Upgrade Plan
-                    </Button>
-                    <Button variant="outline" className="flex-1 rounded-2xl bg-transparent">
+                    <Button className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-xl">Upgrade Plan</Button>
+                    <Button variant="outline" className="flex-1 rounded-xl bg-transparent">
                       View Billing
                     </Button>
                   </div>
@@ -424,7 +542,7 @@ export function Sidebar({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-300 bg-white hover:bg-gray-50"
+                  className="w-full justify-start text-xs h-9 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
                 >
                   <PiGear className="h-3 w-3 mr-2" />
                   Settings
@@ -437,19 +555,19 @@ export function Sidebar({
                 </DialogHeader>
                 <div className="space-y-3">
                   <Link href="/dashboard/profile" onClick={isMobile ? onCloseMobile : undefined}>
-                    <Button variant="ghost" className="w-full justify-start rounded-2xl">
+                    <Button variant="ghost" className="w-full justify-start rounded-xl">
                       <PiUser className="h-4 w-4 mr-3" />
                       Profile Settings
                     </Button>
                   </Link>
                   <Link href="/dashboard/settings" onClick={isMobile ? onCloseMobile : undefined}>
-                    <Button variant="ghost" className="w-full justify-start rounded-2xl">
+                    <Button variant="ghost" className="w-full justify-start rounded-xl">
                       <PiGear className="h-4 w-4 mr-3" />
                       Account Settings
                     </Button>
                   </Link>
                   <Link href="/dashboard/company" onClick={isMobile ? onCloseMobile : undefined}>
-                    <Button variant="ghost" className="w-full justify-start rounded-2xl">
+                    <Button variant="ghost" className="w-full justify-start rounded-xl">
                       <PiOfficeChair className="h-4 w-4 mr-3" />
                       Company Settings
                     </Button>
@@ -462,15 +580,15 @@ export function Sidebar({
 
         {/* User Profile & Sign Out */}
         {(!isCollapsed || isMobile) && (
-          <div className="border-t border-gray-200 pt-3">
-            <div className="flex items-center space-x-3 px-3 py-2 mb-2 bg-gray-50 rounded-2xl border border-gray-200">
-              <Avatar className="h-8 w-8 ring-2 ring-gray-200 rounded-lg">
+          <div className="border-t border-gray-200 pt-4">
+            <div className="flex items-center space-x-3 px-3 py-3 mb-3 bg-gray-50 rounded-xl border border-gray-200">
+              <Avatar className="h-9 w-9 ring-2 ring-gray-200 rounded-md">
                 <AvatarImage
                   src={userProfile?.avatar_url || "/placeholder.svg"}
                   alt={getDisplayName()}
-                  className="rounded-lg"
+                  className="rounded-md"
                 />
-                <AvatarFallback className="bg-gray-900 text-white text-xs font-medium rounded-lg">
+                <AvatarFallback className="bg-gray-900 text-white text-xs font-medium rounded-md">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
@@ -493,7 +611,7 @@ export function Sidebar({
             <Button
               onClick={handleSignOut}
               variant="ghost"
-              className="w-full justify-start px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-2xl"
+              className="w-full justify-start px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl"
             >
               <PiSignOut className="h-4 w-4 mr-3" />
               Sign Out
@@ -503,15 +621,15 @@ export function Sidebar({
 
         {/* Collapsed state user profile */}
         {isCollapsed && !isMobile && (
-          <div className="border-t border-gray-200 pt-3 space-y-2">
+          <div className="border-t border-gray-200 pt-4 space-y-2">
             <div className="flex justify-center">
-              <Avatar className="h-8 w-8 ring-2 ring-gray-200 rounded-lg">
+              <Avatar className="h-9 w-9 ring-2 ring-gray-200 rounded-md">
                 <AvatarImage
                   src={userProfile?.avatar_url || "/placeholder.svg"}
                   alt={getDisplayName()}
-                  className="rounded-lg"
+                  className="rounded-md"
                 />
-                <AvatarFallback className="bg-gray-900 text-white text-xs font-medium rounded-lg">
+                <AvatarFallback className="bg-gray-900 text-white text-xs font-medium rounded-md">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
@@ -520,7 +638,7 @@ export function Sidebar({
               onClick={handleSignOut}
               variant="ghost"
               size="icon"
-              className="w-full h-8 rounded-2xl hover:bg-gray-50"
+              className="w-full h-9 rounded-xl hover:bg-gray-50"
               title="Sign Out"
             >
               <PiSignOut className="h-4 w-4" />
