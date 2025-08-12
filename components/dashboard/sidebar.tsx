@@ -26,12 +26,10 @@ import {
   PiVideoCamera,
   PiReceipt,
   PiCrown,
-  PiPaperPlaneTilt,
   PiCheckSquare,
   PiShield,
   PiDotsSixVertical,
 } from "react-icons/pi"
-import { Sparkles } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -46,9 +44,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
-import { TokenUsageChart } from "@/components/charts/token-usage-chart"
 import Image from "next/image"
 import { AISidebarManager } from "@/lib/ai-sidebar-manager"
+import AiSearchInput from "@/components/ui/ai-search-input"
 
 const defaultNavigation = [
   { id: "dashboard", name: "Dashboard", href: "/dashboard", icon: PiSquaresFour },
@@ -99,8 +97,6 @@ export function Sidebar({
 }: SidebarProps) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
-  const [aiQuery, setAiQuery] = useState("")
-  const [isAiLoading, setIsAiLoading] = useState(false)
   const [navigation, setNavigation] = useState(defaultNavigation)
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
   const [usageStats, setUsageStats] = useState({
@@ -262,36 +258,6 @@ export function Sidebar({
     }
   }
 
-  const handleAiSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!aiQuery.trim() || isAiLoading) return
-
-    setIsAiLoading(true)
-    try {
-      const response = await fetch("/api/suitpax-ai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: aiQuery,
-          userId: user?.id,
-        }),
-      })
-
-      const data = await response.json()
-      if (data.success) {
-        // Navigate to Suitpax AI page with the response
-        router.push(`/dashboard/suitpax-ai?query=${encodeURIComponent(aiQuery)}`)
-        setAiQuery("")
-      }
-    } catch (error) {
-      console.error("Error sending AI query:", error)
-    } finally {
-      setIsAiLoading(false)
-    }
-  }
-
   const getDisplayName = () => {
     if (!user) return "User"
     return userProfile?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "User"
@@ -312,6 +278,10 @@ export function Sidebar({
     return user.email || ""
   }
 
+  const getPlanDisplayName = () => {
+    return userPlan.charAt(0).toUpperCase() + userPlan.slice(1).toLowerCase()
+  }
+
   return (
     <div
       className={cn(
@@ -319,32 +289,25 @@ export function Sidebar({
         isCollapsed ? "w-16" : "w-64",
       )}
     >
-      {/* Header */}
       <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-md overflow-hidden shadow-sm">
+            <div className="w-10 h-10 rounded-md overflow-hidden shadow-sm">
               <Image
                 src="/suitpax-bl-logo.webp"
                 alt="Suitpax"
-                width={48}
-                height={48}
+                width={40}
+                height={40}
                 className="w-full h-full object-cover"
               />
             </div>
             {(!isCollapsed || isMobile) && (
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-600">{getDisplayName().split(" ")[0]}</span>
-                  <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse"></div>
-                    <div
-                      className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-pulse"
-                      style={{ animationDelay: "0.5s" }}
-                    ></div>
-                  </div>
+                  <span className="text-sm font-medium text-gray-900">{getDisplayName().split(" ")[0]}</span>
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                 </div>
-                <div className="text-xs text-gray-500">Suitpax AI v2.1.0</div>
+                <div className="text-xs text-gray-500 font-light">Business Travel AI</div>
               </div>
             )}
           </div>
@@ -360,40 +323,14 @@ export function Sidebar({
       </div>
 
       {(!isCollapsed || isMobile) && (
-        <div className="px-4 pt-6 pb-8 border-b border-gray-200">
-          <form onSubmit={handleAiSubmit} className="relative">
-            <input
-              type="text"
-              value={aiQuery}
-              onChange={(e) => setAiQuery(e.target.value)}
-              placeholder="Search or ask AI anything..."
-              className="w-full px-4 py-2.5 pl-10 pr-12 text-sm bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all placeholder:text-gray-400"
-              disabled={isAiLoading}
-            />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Sparkles className="h-4 w-4 text-gray-400" />
-            </div>
-            <Button
-              type="submit"
-              size="sm"
-              variant="ghost"
-              disabled={!aiQuery.trim() || isAiLoading}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100 rounded-lg"
-            >
-              {isAiLoading ? (
-                <div className="animate-spin rounded-full h-3 w-3 border-2 border-gray-400 border-t-transparent" />
-              ) : (
-                <PiPaperPlaneTilt className="h-3 w-3" />
-              )}
-            </Button>
-          </form>
+        <div className="px-4 pt-4 pb-6 border-b border-gray-200">
+          <AiSearchInput />
         </div>
       )}
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
         {/* Main Navigation with Drag & Drop */}
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {navigation.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
             const isDragging = draggedItem === item.id
@@ -412,7 +349,7 @@ export function Sidebar({
                   href={item.href}
                   onClick={isMobile ? onCloseMobile : undefined}
                   className={cn(
-                    "flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 relative",
+                    "flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 relative",
                     isActive
                       ? "bg-gray-900 text-white shadow-sm"
                       : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
@@ -439,8 +376,8 @@ export function Sidebar({
 
         {/* AI Section */}
         {(!isCollapsed || isMobile) && (
-          <div className="pt-6">
-            <div className="space-y-1">
+          <div className="pt-4">
+            <div className="space-y-0.5">
               {aiNavigation.map((item) => {
                 const isActive = pathname === item.href
                 return (
@@ -449,7 +386,7 @@ export function Sidebar({
                     href={item.href}
                     onClick={isMobile ? onCloseMobile : undefined}
                     className={cn(
-                      "group flex items-center justify-between px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200",
+                      "group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
                       isActive
                         ? "bg-gray-200 text-gray-900 shadow-sm"
                         : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
@@ -469,7 +406,7 @@ export function Sidebar({
 
         {/* Collapsed AI icons */}
         {isCollapsed && !isMobile && (
-          <div className="pt-6 space-y-1">
+          <div className="pt-4 space-y-0.5">
             {aiNavigation.map((item) => {
               const isActive = pathname === item.href
               return (
@@ -477,7 +414,7 @@ export function Sidebar({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "group flex items-center justify-center px-2 py-3 text-sm font-medium rounded-xl transition-all duration-200 relative",
+                    "group flex items-center justify-center px-2 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 relative",
                     isActive
                       ? "bg-gray-200 text-gray-900 shadow-sm"
                       : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
@@ -493,10 +430,25 @@ export function Sidebar({
       </nav>
 
       {/* Bottom Section */}
-      <div className="border-t border-gray-200 p-4 flex-shrink-0 space-y-4">
+      <div className="border-t border-gray-200 p-4 flex-shrink-0 space-y-3">
         {(!isCollapsed || isMobile) && (
-          <div className="space-y-3">
-            <TokenUsageChart used={usageStats.tokensUsed} total={usageStats.maxTokens} plan={userPlan} />
+          <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-gray-700">Token Usage</span>
+              <Badge className="bg-gray-200 text-gray-700 text-[10px] px-1.5 py-0.5 rounded-lg">
+                {getPlanDisplayName()}
+              </Badge>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+              <div
+                className="bg-gray-900 h-1.5 rounded-full transition-all duration-300"
+                style={{ width: `${(usageStats.tokensUsed / usageStats.maxTokens) * 100}%` }}
+              ></div>
+            </div>
+            <div className="flex justify-between text-[10px] text-gray-600">
+              <span>{usageStats.tokensUsed.toLocaleString()}</span>
+              <span>{usageStats.maxTokens.toLocaleString()}</span>
+            </div>
           </div>
         )}
 
@@ -507,7 +459,7 @@ export function Sidebar({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-xs h-9 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
+                  className="w-full justify-start text-xs h-8 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
                 >
                   <PiCrown className="h-3 w-3 mr-2" />
                   Plans & Billing
@@ -524,7 +476,7 @@ export function Sidebar({
                   <div className="bg-gray-50 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-gray-900">Current Plan</span>
-                      <Badge className="bg-gray-200 text-gray-700 rounded-lg">{userPlan.toUpperCase()}</Badge>
+                      <Badge className="bg-gray-200 text-gray-700 rounded-lg">{getPlanDisplayName()}</Badge>
                     </div>
                     <p className="text-sm text-gray-600 font-light">
                       {userPlan === "premium"
@@ -546,7 +498,7 @@ export function Sidebar({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-xs h-9 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
+                  className="w-full justify-start text-xs h-8 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
                 >
                   <PiGear className="h-3 w-3 mr-2" />
                   Settings
@@ -584,9 +536,9 @@ export function Sidebar({
 
         {/* User Profile & Sign Out */}
         {(!isCollapsed || isMobile) && (
-          <div className="border-t border-gray-200 pt-4">
-            <div className="flex items-center space-x-3 px-3 py-3 mb-3 bg-gray-50 rounded-xl border border-gray-200">
-              <Avatar className="h-9 w-9 ring-2 ring-gray-200 rounded-md">
+          <div className="border-t border-gray-200 pt-3">
+            <div className="flex items-center space-x-3 px-3 py-2.5 mb-2 bg-gray-50 rounded-xl border border-gray-200">
+              <Avatar className="h-8 w-8 ring-2 ring-gray-200 rounded-md">
                 <AvatarImage
                   src={userProfile?.avatar_url || "/placeholder.svg"}
                   alt={getDisplayName()}
@@ -615,7 +567,7 @@ export function Sidebar({
             <Button
               onClick={handleSignOut}
               variant="ghost"
-              className="w-full justify-start px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl"
+              className="w-full justify-start px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl"
             >
               <PiSignOut className="h-4 w-4 mr-3" />
               Sign Out
@@ -625,9 +577,9 @@ export function Sidebar({
 
         {/* Collapsed state user profile */}
         {isCollapsed && !isMobile && (
-          <div className="border-t border-gray-200 pt-4 space-y-2">
+          <div className="border-t border-gray-200 pt-3 space-y-2">
             <div className="flex justify-center">
-              <Avatar className="h-9 w-9 ring-2 ring-gray-200 rounded-md">
+              <Avatar className="h-8 w-8 ring-2 ring-gray-200 rounded-md">
                 <AvatarImage
                   src={userProfile?.avatar_url || "/placeholder.svg"}
                   alt={getDisplayName()}
@@ -642,7 +594,7 @@ export function Sidebar({
               onClick={handleSignOut}
               variant="ghost"
               size="icon"
-              className="w-full h-9 rounded-xl hover:bg-gray-50"
+              className="w-full h-8 rounded-xl hover:bg-gray-50"
               title="Sign Out"
             >
               <PiSignOut className="h-4 w-4" />
