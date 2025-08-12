@@ -16,44 +16,70 @@ export const createDuffelClient = (options?: {
   environment?: "test" | "production"
 }) => {
   const isProduction = process.env.NODE_ENV === "production"
-  const token = options?.token || process.env.DUFFEL_API_KEY || process.env.DUFFEL_ACCESS_TOKEN
+  const token = options?.token || process.env.DUFFEL_API_KEY
   const envOverride = process.env.DUFFEL_ENVIRONMENT as "test" | "production" | undefined
   const environment = options?.environment || envOverride || (isProduction ? "production" : "test")
+
+  console.log("Duffel Client Debug:", {
+    hasToken: !!token,
+    tokenLength: token?.length || 0,
+    environment,
+    nodeEnv: process.env.NODE_ENV,
+    hasApiKey: !!process.env.DUFFEL_API_KEY,
+  })
 
   // Usar cliente en caché si existe
   const cacheKey = `${token}-${environment}`
   if (duffelClientCache.has(cacheKey)) {
+    console.log("Using cached Duffel client")
     return duffelClientCache.get(cacheKey)!
   }
 
   if (!token) {
-    console.warn(`Duffel API key not configured for ${environment} environment`)
-    if (process.env.NODE_ENV === "development" && !process.env.CI) {
-      throw new Error(`Duffel API key not configured for ${environment} environment`)
-    }
-    // Return a minimal mock client for build time
+    console.error(`❌ Duffel API key not configured for ${environment} environment`)
     return {
-      offerRequests: { create: () => Promise.reject(new Error("Duffel not configured")) },
-      offers: { get: () => Promise.reject(new Error("Duffel not configured")) },
-      orders: { create: () => Promise.reject(new Error("Duffel not configured")) },
-      airlines: { list: () => Promise.reject(new Error("Duffel not configured")) },
-      airports: { list: () => Promise.reject(new Error("Duffel not configured")) },
-      cities: { list: () => Promise.reject(new Error("Duffel not configured")) },
+      offerRequests: {
+        create: () => Promise.reject(new Error(`Duffel API key not configured for ${environment}`)),
+      },
+      offers: {
+        get: () => Promise.reject(new Error(`Duffel API key not configured for ${environment}`)),
+      },
+      orders: {
+        create: () => Promise.reject(new Error(`Duffel API key not configured for ${environment}`)),
+      },
+      airlines: {
+        list: () => Promise.reject(new Error(`Duffel API key not configured for ${environment}`)),
+      },
+      airports: {
+        list: () => Promise.reject(new Error(`Duffel API key not configured for ${environment}`)),
+      },
+      cities: {
+        list: () => Promise.reject(new Error(`Duffel API key not configured for ${environment}`)),
+      },
+      places: {
+        suggestions: () => Promise.reject(new Error(`Duffel API key not configured for ${environment}`)),
+      },
     } as any
   }
 
-  console.log(`Creating Duffel client for ${environment} environment`)
+  console.log(`✅ Creating Duffel client for ${environment} environment`)
 
-  const client = new Duffel({
-    token,
-    apiVersion: "v2",
-    userAgent: `Suitpax/1.0.0 (${environment})`,
-  } as any)
+  try {
+    const client = new Duffel({
+      token,
+      apiVersion: "v2",
+      userAgent: `Suitpax/1.0.0 (${environment})`,
+    } as any)
 
-  // Guardar en caché
-  duffelClientCache.set(cacheKey, client)
+    // Guardar en caché
+    duffelClientCache.set(cacheKey, client)
+    console.log("✅ Duffel client created and cached successfully")
 
-  return client
+    return client
+  } catch (error) {
+    console.error("❌ Error creating Duffel client:", error)
+    throw error
+  }
 }
 
 // ... [Todo tu código existente se mantiene igual] ...
