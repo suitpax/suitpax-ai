@@ -23,6 +23,7 @@ import {
   Building,
   Mail,
   CalendarIcon as Meeting,
+  Receipt,
 } from "lucide-react"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
@@ -44,6 +45,7 @@ const navigation = [
   { name: "Meetings", href: "/dashboard/meetings", icon: Meeting },
   { name: "Locations", href: "/dashboard/locations", icon: MapPin },
   { name: "Team", href: "/dashboard/team", icon: Users },
+  { name: "Tasks", href: "/dashboard/tasks", icon: Receipt },
 ]
 
 const aiNavigation = [
@@ -54,6 +56,8 @@ const aiNavigation = [
 const settingsNavigation = [
   { name: "Profile", href: "/dashboard/profile", icon: User },
   { name: "Company", href: "/dashboard/company", icon: Building },
+  { name: "Billing", href: "/dashboard/billing", icon: Receipt },
+  { name: "Google Drive", href: "/dashboard/google-drive", icon: Building },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 

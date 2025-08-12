@@ -1,9 +1,21 @@
 "use client"
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Search, Badge, Plane, Sparkles, TrendingUp, Globe } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { Search, Plane, Sparkles, TrendingUp, Globe, Calendar, ArrowRight } from "lucide-react"
+import { AirportSearch } from "@/components/flights/airport-search"
 import { PerformanceDashboard } from "@/components/flights/perfomance-dashboard"
 
 export default function FlightsPage() {
+  const [searchType, setSearchType] = useState("roundtrip")
+  const [passengers, setPassengers] = useState("1")
+  const [travelClass, setTravelClass] = useState("economy")
+
   return (
     <div className="min-h-full bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -54,12 +66,11 @@ export default function FlightsPage() {
           </div>
         </div>
 
-        {/* ... existing code for stats cards ... */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-green-100">
-                <Badge className="bg-green-500 text-white">Live</Badge>
+                <Badge className="bg-green-500 text-white rounded-lg">Live</Badge>
               </div>
               <span className="text-lg font-semibold tracking-tight">Real-Time Pricing</span>
             </div>
@@ -69,7 +80,7 @@ export default function FlightsPage() {
           <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-blue-100">
-                <Badge variant="outline" className="border-blue-200 text-blue-800">
+                <Badge variant="outline" className="border-blue-200 text-blue-800 rounded-lg">
                   Enterprise
                 </Badge>
               </div>
@@ -89,7 +100,6 @@ export default function FlightsPage() {
           </div>
         </div>
 
-        {/* ... existing code continues with corrected Select components ... */}
         <Card className="rounded-3xl border border-gray-200 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
@@ -97,17 +107,96 @@ export default function FlightsPage() {
                 <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500">
                   <Search className="h-5 w-5 text-white" />
                 </div>
-                <CardTitle className="text-2xl tracking-tighter">Search Flights</CardTitle>
+                <CardTitle className="text-2xl tracking-tighter">Search Business Flights</CardTitle>
               </div>
-              <Badge variant="secondary" className="bg-green-100 text-green-800 animate-pulse">
+              <Badge variant="secondary" className="bg-green-100 text-green-800 animate-pulse rounded-lg">
                 Live Pricing
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">{/* ... existing form content continues ... */}</CardContent>
-        </Card>
+          <CardContent className="space-y-6">
+            <Tabs value={searchType} onValueChange={setSearchType} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 rounded-xl">
+                <TabsTrigger value="roundtrip" className="rounded-lg">
+                  Round Trip
+                </TabsTrigger>
+                <TabsTrigger value="oneway" className="rounded-lg">
+                  One Way
+                </TabsTrigger>
+                <TabsTrigger value="multicity" className="rounded-lg">
+                  Multi-City
+                </TabsTrigger>
+              </TabsList>
 
-        {/* ... rest of existing code ... */}
+              <TabsContent value={searchType} className="space-y-6 mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="from">From</Label>
+                    <AirportSearch placeholder="Departure city" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="to">To</Label>
+                    <AirportSearch placeholder="Destination city" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="departure">Departure</Label>
+                    <div className="relative">
+                      <Input type="date" className="rounded-xl" />
+                      <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  {searchType === "roundtrip" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="return">Return</Label>
+                      <div className="relative">
+                        <Input type="date" className="rounded-xl" />
+                        <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Passengers</Label>
+                    <Select value={passengers} onValueChange={setPassengers}>
+                      <SelectTrigger className="rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 Passenger</SelectItem>
+                        <SelectItem value="2">2 Passengers</SelectItem>
+                        <SelectItem value="3">3 Passengers</SelectItem>
+                        <SelectItem value="4">4+ Passengers</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Class</Label>
+                    <Select value={travelClass} onValueChange={setTravelClass}>
+                      <SelectTrigger className="rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="economy">Economy</SelectItem>
+                        <SelectItem value="premium">Premium Economy</SelectItem>
+                        <SelectItem value="business">Business</SelectItem>
+                        <SelectItem value="first">First Class</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-end">
+                    <Button className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                      <Search className="h-4 w-4 mr-2" />
+                      Search Flights
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
 
       <PerformanceDashboard />

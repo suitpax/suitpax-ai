@@ -1,442 +1,368 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
-import {
-  PiPhoneFill,
-  PiStarFill,
-  PiClockBold,
-  PiChatCircleFill,
-  PiGlobeSimpleBold,
-  PiWaveformBold,
-  PiUserSwitchBold,
-  PiHeadsetBold,
-} from "react-icons/pi"
 import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Search,
+  Mic,
+  Plus,
+  Calendar,
+  TrendingUp,
+  Users,
+  BarChart3,
+  Clock,
+  Settings,
+  Filter,
+  ChevronDown,
+} from "lucide-react"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { useVoiceAIConsolidated } from "@/hooks/use-voice-ai-consolidated"
-import { ConversationInterface } from "@/components/voice-ai/conversation-interface"
-import { AgentCard } from "@/components/shared/agent-card"
-import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-
-// Agentes demo
-const voiceAgents = [
-  {
-    id: "emma",
-    name: "Emma",
-    role: "Executive Travel Assistant",
-    image: "/agents/agent-emma.jpeg",
-    rating: 4.9,
-    callsToday: 47,
-    languages: ["English", "Spanish", "French"],
-    specialty: "Flight booking & luxury travel",
-    accent: "American",
-    voice: "Professional, warm, efficient",
-    status: "available" as const,
-  },
-  {
-    id: "liam",
-    name: "Liam",
-    role: "Corporate Expense Analyst",
-    image: "/agents/agent-2.png",
-    rating: 4.8,
-    callsToday: 32,
-    languages: ["English", "German"],
-    specialty: "Expense optimization & policy",
-    accent: "British",
-    voice: "Confident, analytical",
-    status: "available" as const,
-  },
-  {
-    id: "sofia",
-    name: "Sofia",
-    role: "Meetings Coordinator",
-    image: "/agents/agent-5.png",
-    rating: 4.7,
-    callsToday: 26,
-    languages: ["Spanish", "English", "Portuguese"],
-    specialty: "Scheduling & logistics",
-    accent: "Iberian",
-    voice: "Warm, pragmatic",
-    status: "busy" as const,
-  },
-]
-
-interface CallLogItem {
-  id: string
-  agentId: string
-  agentName: string
-  startedAt: string
-  durationSec: number
-}
-
-const TEMPLATES = [
-  "Find me a direct business class flight to Tokyo next Tuesday",
-  "Book a 5-star hotel near La Défense in Paris for 2 nights",
-  "Create an expense report for last week and check policy compliance",
-  "Schedule a meeting with the London team next Thursday at 10am",
-]
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function VoiceAIPage() {
-  const [selectedAgent, setSelectedAgent] = useState(voiceAgents[0])
-  const [isCallActive, setIsCallActive] = useState(false)
-  const [callDuration, setCallDuration] = useState(0)
-  const [userTokens, setUserTokens] = useState({ used: 0, limit: 5000 })
   const [user, setUser] = useState<any>(null)
-  const [callLogs, setCallLogs] = useState<CallLogItem[]>([])
-  const [callStartTs, setCallStartTs] = useState<number | null>(null)
-
+  const [currentTime, setCurrentTime] = useState(new Date())
   const supabase = createClient()
 
-  const {
-    messages,
-    status,
-    transcript,
-    audioState,
-    error,
-    browserSupportsSpeechRecognition,
-    startListening,
-    stopListening,
-    startConversation,
-    clearConversation,
-    playMessage,
-    pauseAudio,
-    audioPlayerRef,
-  } = useVoiceAIConsolidated({
-    agentId: selectedAgent.id,
-    onMessage: () => {},
-    onError: (error) => {
-      console.error("Voice AI Error:", error)
-    },
-    onStatusChange: () => {},
-  })
-
   useEffect(() => {
-    fetchUserData()
-    const raw = typeof window !== "undefined" ? window.localStorage.getItem("voice_ai_call_logs") : null
-    setCallLogs(raw ? JSON.parse(raw) : [])
-  }, [])
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout
-    if (isCallActive) {
-      interval = setInterval(() => {
-        setCallDuration((prev) => prev + 1)
-      }, 1000)
-    } else {
-      setCallDuration(0)
-    }
-    return () => {
-      if (interval) clearInterval(interval)
-    }
-  }, [isCallActive])
-
-  async function fetchUserData() {
-    try {
+    const getUser = async () => {
       const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      if (session) {
-        const { data: userData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single()
-        if (userData) {
-          setUser(userData)
-          setUserTokens({ used: userData.ai_tokens_used || 0, limit: userData.ai_tokens_limit || 5000 })
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user) {
+        setUser(user)
+        // Get user profile for display name
+        const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", user.id).single()
+        if (profile) {
+          setUser({ ...user, profile })
         }
       }
-    } catch (error) {
-      console.error("Error fetching user data:", error)
     }
+    getUser()
+
+    // Update time every minute
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 60000)
+
+    return () => clearInterval(timer)
+  }, [supabase])
+
+  const getDisplayName = () => {
+    if (!user) return "User"
+    return user.profile?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "User"
   }
 
-  async function startCall() {
-    setIsCallActive(true)
-    setCallStartTs(Date.now())
-    clearConversation()
-    await startConversation()
+  const getGreeting = () => {
+    const hour = currentTime.getHours()
+    if (hour < 12) return "Good morning"
+    if (hour < 18) return "Good afternoon"
+    return "Good evening"
   }
 
-  function endCall() {
-    setIsCallActive(false)
-    clearConversation()
-    if (callStartTs) {
-      const item: CallLogItem = {
-        id: crypto.randomUUID(),
-        agentId: selectedAgent.id,
-        agentName: selectedAgent.name,
-        startedAt: new Date(callStartTs).toISOString(),
-        durationSec: Math.max(0, Math.floor((Date.now() - callStartTs) / 1000)),
-      }
-      const updated = [item, ...callLogs].slice(0, 20)
-      setCallLogs(updated)
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("voice_ai_call_logs", JSON.stringify(updated))
-      }
-      setCallStartTs(null)
-    }
-  }
+  const formatDate = () => {
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ]
 
-  function formatCallDuration(seconds: number) {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-  }
+    const dayName = days[currentTime.getDay()]
+    const monthName = months[currentTime.getMonth()]
+    const date = currentTime.getDate()
 
-  const usagePct = userTokens.limit ? Math.min(100, Math.round((userTokens.used / userTokens.limit) * 100)) : 0
+    return `${dayName}, ${monthName} ${date}`
+  }
 
   return (
-    <VantaHaloBackground className="relative">
-      <div className="space-y-6 absolute inset-0 bg-white/70">
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none">Voice AI Agents</h1>
-            <p className="text-gray-600 mt-1">Have natural voice conversations with specialized AI travel agents</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Badge variant="outline" className="bg-gray-50">
-              Tokens: {userTokens.used.toLocaleString()}/{userTokens.limit.toLocaleString()} ({usagePct}%)
-            </Badge>
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-              <PiChatCircleFill className="h-3 w-3 mr-1" /> Voice Ready
-            </Badge>
-          </div>
-        </div>
-
-        {/* Zero state shimmer */}
-        {!isCallActive && (
-          <div className="flex items-center justify-center py-6">
-            <div className="text-center">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter bg-clip-text text-transparent bg-[linear-gradient(90deg,#111,#7a7a7a,#111)] bg-[length:200%_100%] animate-pulse">Speak naturally. Plan. Book. Optimize.</h2>
-              <p className="mt-2 text-xs sm:text-sm text-gray-600 flex items-center justify-center gap-2">Powered by <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={16} height={16} /></p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-black rounded-2xl flex items-center justify-center">
+              <span className="text-white font-bold text-lg">NB</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">Financial Dashboard</h1>
+              <p className="text-sm text-gray-600">Voice AI Assistant</p>
             </div>
           </div>
-        )}
 
-        {/* Top grid: Agents + Voice Interface + Usage/History */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <Card className="xl:col-span-2">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-xl font-medium tracking-tighter">Choose Your AI Agent</CardTitle>
-                  <CardDescription>Select a specialized agent for your business travel needs</CardDescription>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <PiUserSwitchBold className="w-4 h-4" />
-                  <span>{voiceAgents.filter((a) => a.status === "available").length} available</span>
-                </div>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className="rounded-xl">
+              <Plus className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-3">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src="/placeholder.svg" alt="User" />
+                <AvatarFallback className="bg-orange-500 text-white text-sm">
+                  {getDisplayName()
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900">{getDisplayName()}</p>
+                <p className="text-xs text-gray-600">CEO Assistant</p>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {voiceAgents.map((agent) => (
-                  <AgentCard
-                    key={agent.id}
-                    agent={agent}
-                    onSelect={setSelectedAgent}
-                    isSelected={selectedAgent.id === agent.id}
-                    showDetails={true}
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input placeholder="Start searching here..." className="pl-10 w-64 rounded-xl border-gray-300 bg-white" />
+            </div>
+          </div>
+        </div>
 
-          {/* Usage + History */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg tracking-tight flex items-center gap-2">
-                <PiHeadsetBold className="w-4 h-4" /> Usage & History
-              </CardTitle>
-              <CardDescription>Your recent activity and token usage</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                  <span>Token usage</span>
-                  <span>
-                    {userTokens.used.toLocaleString()} / {userTokens.limit.toLocaleString()}
-                  </span>
-                </div>
-                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-gray-900" style={{ width: `${usagePct}%` }} />
-                </div>
+        {/* Date and Tasks */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-6">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-gray-900">{currentTime.getDate()}</div>
+              <div className="text-sm text-gray-600">{formatDate()}</div>
+            </div>
+            <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl px-6">Show my Tasks</Button>
+            <Button variant="outline" size="icon" className="rounded-xl bg-transparent">
+              <Calendar className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Main Voice AI Section */}
+        <div className="mb-8">
+          <Card className="bg-white rounded-3xl shadow-sm border-0 p-8">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Mic className="h-6 w-6 text-orange-500" />
+                <span className="text-lg font-medium text-gray-900">Voice AI Ready</span>
               </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-xs font-medium text-gray-700">Recent calls</h4>
-                  {callLogs.length > 0 && (
-                    <button
-                      className="text-[10px] text-gray-500 hover:text-gray-700"
-                      onClick={() => {
-                        setCallLogs([])
-                        if (typeof window !== "undefined") window.localStorage.removeItem("voice_ai_call_logs")
-                      }}
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {callLogs.length === 0 ? (
-                    <p className="text-xs text-gray-500">No recent calls</p>
-                  ) : (
-                    callLogs.map((c) => (
-                      <div key={c.id} className="flex items-center justify-between text-xs bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5">
-                        <span className="font-medium text-gray-900">{c.agentName}</span>
-                        <span className="text-gray-500">{new Date(c.startedAt).toLocaleString()}</span>
-                        <span className="text-gray-700">{formatCallDuration(c.durationSec)}</span>
-                      </div>
-                    ))
-                  )}
-                </div>
+              <h2 className="text-4xl font-bold text-gray-900 mb-2">
+                Hey, {getDisplayName().split(" ")[0]}! Need help?
+              </h2>
+              <p className="text-xl text-gray-500 mb-8">Just ask me anything!</p>
+
+              <div className="flex items-center justify-center gap-4">
+                <Button
+                  size="lg"
+                  className="bg-orange-500 hover:bg-orange-600 text-white rounded-2xl px-8 py-4 text-lg"
+                >
+                  <Mic className="h-5 w-5 mr-2" />
+                  Start Voice Chat
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="rounded-2xl px-8 py-4 text-lg border-gray-300 bg-transparent"
+                >
+                  <Settings className="h-5 w-5 mr-2" />
+                  Voice Settings
+                </Button>
               </div>
-            </CardContent>
+            </div>
           </Card>
         </div>
 
-        {/* Voice Interface */}
-        <Card>
-          <CardHeader>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex items-center justify-center">
-                  <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={24} height={24} className="object-contain" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg font-medium tracking-tighter">{selectedAgent.name}</CardTitle>
-                  <CardDescription>{selectedAgent.role}</CardDescription>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Total Income</p>
+                <p className="text-2xl font-bold text-gray-900">$23,194.80</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <TrendingUp className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+            <div className="flex items-center mt-4 text-sm">
+              <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+              <span className="text-green-600 font-medium">+12%</span>
+              <span className="text-gray-500 ml-1">vs last month</span>
+            </div>
+          </Card>
+
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Total Paid</p>
+                <p className="text-2xl font-bold text-gray-900">$8,145.20</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <BarChart3 className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+            <div className="flex items-center mt-4 text-sm">
+              <span className="text-gray-500">Weekly</span>
+              <ChevronDown className="h-4 w-4 text-gray-400 ml-1" />
+            </div>
+          </Card>
+
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">System Lock</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center">
+                    <div className="text-white text-sm font-bold">36%</div>
+                  </div>
+                  <div className="text-xs text-gray-500">Growth rate</div>
                 </div>
               </div>
-              {isCallActive && (
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <PiClockBold className="w-4 h-4" />
-                    <span>{formatCallDuration(callDuration)}</span>
+            </div>
+          </Card>
+
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">13 Days</p>
+                <p className="text-xs text-gray-500">109 hours, 23 minutes</p>
+                <div className="flex gap-1 mt-2">
+                  {Array.from({ length: 13 }).map((_, i) => (
+                    <div key={i} className={`w-2 h-6 rounded-sm ${i < 8 ? "bg-orange-500" : "bg-gray-200"}`} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Activity Manager */}
+          <div className="lg:col-span-2">
+            <Card className="bg-white rounded-2xl shadow-sm border-0 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Activity Manager</h3>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="rounded-lg bg-transparent">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filters
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">B</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Business plans</p>
+                      <p className="text-sm text-gray-600">$43.20 USD</p>
+                    </div>
                   </div>
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse" />
-                    Live
+                  <Badge className="bg-orange-100 text-orange-800 rounded-lg">Active</Badge>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">B</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Bank loans</p>
+                      <p className="text-sm text-gray-600">Cards limitation</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="rounded-lg">
+                    Pending
                   </Badge>
                 </div>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <AnimatePresence mode="wait">
-              {isCallActive ? (
-                <motion.div key="active-call" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-                  <ConversationInterface
-                    messages={messages}
-                    status={status}
-                    transcript={transcript}
-                    agentName={selectedAgent.name}
-                    onStartListening={startListening}
-                    onStopListening={stopListening}
-                    onEndCall={endCall}
-                    onPlayMessage={playMessage}
-                    onPauseAudio={pauseAudio}
-                    error={error}
-                    isAudioPlaying={audioState.isPlaying}
-                  />
-                </motion.div>
-              ) : (
-                <motion.div key="call-setup" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center py-8">
-                  <div className="mb-6">
-                    <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 bg-white flex items-center justify-center mx-auto mb-4">
-                      <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={40} height={40} className="object-contain" />
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">A</span>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">{selectedAgent.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{selectedAgent.role}</p>
-                    <div className="flex items-center justify-center gap-4 text-xs text-gray-500 mb-4">
-                      <div className="flex items-center gap-1">
-                        <PiStarFill className="w-3 h-3 text-yellow-500" />
-                        <span>{selectedAgent.rating} rating</span>
-                      </div>
-                      <span>•</span>
-                      <span>{selectedAgent.callsToday} calls today</span>
+                    <div>
+                      <p className="font-medium text-gray-900">Accounting</p>
+                      <p className="text-sm text-gray-600">View on chart mode</p>
                     </div>
-                    <p className="text-xs text-gray-500 max-w-md mx-auto mb-6">
-                      {selectedAgent.voice} voice with {selectedAgent.accent} accent. Specializes in {selectedAgent.specialty.toLowerCase()}.
-                    </p>
                   </div>
+                  <Badge variant="outline" className="rounded-lg">
+                    Review
+                  </Badge>
+                </div>
 
-                  <Button onClick={startCall} size="lg" className="bg-black text-white hover:bg-gray-800" disabled={!browserSupportsSpeechRecognition}>
-                    <PiPhoneFill className="w-5 h-5 mr-2" /> Start Voice Conversation
-                  </Button>
-
-                  {!browserSupportsSpeechRecognition && (
-                    <p className="text-xs text-red-500 mt-2">Speech recognition not supported in this browser</p>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </CardContent>
-        </Card>
-
-        {/* Features + Templates */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <PiChatCircleFill className="w-6 h-6 text-gray-600" />
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">H</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">HR management</p>
+                      <p className="text-sm text-gray-600">Employee records</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-green-100 text-green-800 rounded-lg">Complete</Badge>
+                </div>
               </div>
-              <h3 className="font-medium text-gray-900 mb-2">Natural Conversation</h3>
-              <p className="text-sm text-gray-600">AI agents understand context and maintain natural dialogue flow</p>
-            </CardContent>
-          </Card>
+            </Card>
+          </div>
 
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <PiGlobeSimpleBold className="w-6 h-6 text-gray-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Multi-language Support</h3>
-              <p className="text-sm text-gray-600">Automatic language detection with support for 40+ languages</p>
-            </CardContent>
-          </Card>
+          {/* Voice AI Features */}
+          <div>
+            <Card className="bg-white rounded-2xl shadow-sm border-0 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Voice AI Features</h3>
 
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <PiWaveformBold className="w-6 h-6 text-gray-600" />
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 rounded-xl">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Mic className="h-5 w-5 text-blue-600" />
+                    <span className="font-medium text-gray-900">Natural Speech</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Speak naturally and get intelligent responses</p>
+                </div>
+
+                <div className="p-4 bg-green-50 rounded-xl">
+                  <div className="flex items-center gap-3 mb-2">
+                    <BarChart3 className="h-5 w-5 text-green-600" />
+                    <span className="font-medium text-gray-900">Data Analysis</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Ask questions about your business data</p>
+                </div>
+
+                <div className="p-4 bg-purple-50 rounded-xl">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Users className="h-5 w-5 text-purple-600" />
+                    <span className="font-medium text-gray-900">Team Insights</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Get insights about team performance</p>
+                </div>
+
+                <div className="p-4 bg-orange-50 rounded-xl">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Clock className="h-5 w-5 text-orange-600" />
+                    <span className="font-medium text-gray-900">24/7 Available</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Always ready to help with your queries</p>
+                </div>
               </div>
-              <h3 className="font-medium text-gray-900 mb-2">Realistic Voices</h3>
-              <p className="text-sm text-gray-600">Powered by ElevenLabs for human-like speech synthesis</p>
-            </CardContent>
-          </Card>
+
+              <Button className="w-full mt-6 bg-black hover:bg-gray-800 text-white rounded-xl">
+                <Mic className="h-4 w-4 mr-2" />
+                Try Voice AI Now
+              </Button>
+            </Card>
+          </div>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg tracking-tight">Quick templates</CardTitle>
-            <CardDescription>Use a starting phrase once the call begins</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {TEMPLATES.map((t) => (
-                <button
-                  key={t}
-                  className="text-xs px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50"
-                  onClick={() => {
-                    if (!isCallActive) return
-                    // Placeholder: templates for guidance while on a call
-                  }}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Hidden audio element */}
-        <audio ref={audioPlayerRef} className="hidden" />
       </div>
-    </VantaHaloBackground>
+    </div>
   )
 }
