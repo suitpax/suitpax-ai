@@ -2,6 +2,7 @@ import { generateText } from "ai"
 import { anthropic } from "@ai-sdk/anthropic"
 import { MemoryService } from "../memory/memory-service"
 import { SuitpaxKnowledgeService } from "../knowledge/knowledge-service"
+import { PromptRouter, type PromptContext } from "../../prompts/prompt-router"
 
 export interface IntelligenceConfig {
   userId: string
@@ -32,11 +33,19 @@ export class SuitpaxIntelligenceService {
 
   async enhancedChat(message: string, context?: string): Promise<IntelligenceResponse> {
     try {
+      const promptContext: PromptContext = {
+        intent: PromptRouter.detectIntent(message),
+        conversationHistory: [],
+        urgency: "medium",
+      }
+
       // Get relevant memories and knowledge
       const [memories, knowledge] = await Promise.all([
         this.memoryService.searchMemoriesWithContext(message, undefined, 3),
         this.knowledgeService.searchKnowledge(message, 2),
       ])
+
+      const baseSystemPrompt = PromptRouter.getSystemPrompt(promptContext)
 
       // Build enhanced context
       const memoryContext =
@@ -45,7 +54,7 @@ export class SuitpaxIntelligenceService {
       const knowledgeContext =
         knowledge.length > 0 ? `Relevant information:\n${knowledge.map((k) => `- ${k.content}`).join("\n")}\n` : ""
 
-      const systemPrompt = `You are Suitpax AI, an intelligent business travel assistant.
+      const systemPrompt = `${baseSystemPrompt}
 
 ${context ? `Current context: ${context}\n` : ""}
 ${memoryContext}

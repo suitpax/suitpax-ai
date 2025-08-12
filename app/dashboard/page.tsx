@@ -5,18 +5,10 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
-import {
-  ArrowRight,
-  Bot,
-  Sparkles,
-  MessageSquare,
-  Brain,
-  UserIcon,
-  Settings,
-  BarChart3,
-  TrendingUp,
-} from "lucide-react"
+import { ArrowRight, Bot, Sparkles, MessageSquare, Brain, UserIcon, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { UserStatsChart } from "@/components/charts/user-stats-chart"
+import { SuitpaxRadarChart } from "@/components/charts/radar-chart"
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
@@ -137,26 +129,8 @@ export default function DashboardPage() {
         transition={{ duration: 0.6, delay: 0.08 }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
-            <h3 className="text-lg font-medium tracking-tighter mb-4">Travel Analytics</h3>
-            <div className="h-48 bg-gray-50 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">No travel data yet</p>
-                <p className="text-xs text-gray-400">Start booking to see analytics</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
-            <h3 className="text-lg font-medium tracking-tighter mb-4">Expense Trends</h3>
-            <div className="h-48 bg-gray-50 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">No expenses recorded</p>
-                <p className="text-xs text-gray-400">Add expenses to track trends</p>
-              </div>
-            </div>
-          </div>
+          <UserStatsChart />
+          <SuitpaxRadarChart />
         </div>
       </motion.div>
 

@@ -35,7 +35,6 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
 import {
   Dialog,
@@ -46,6 +45,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
+import { TokenUsageChart } from "@/components/charts/token-usage-chart"
+import { FlightUsageChart } from "@/components/charts/flight-usage-chart"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: PiSquaresFour },
@@ -211,9 +212,6 @@ export function Sidebar({
     return user.email || ""
   }
 
-  const flightSearchPercentage = (usageStats.flightSearches / usageStats.maxFlightSearches) * 100
-  const tokensPercentage = (usageStats.tokensUsed / usageStats.maxTokens) * 100
-
   return (
     <div
       className={cn(
@@ -369,37 +367,12 @@ export function Sidebar({
       <div className="border-t border-gray-200 p-3 flex-shrink-0 space-y-4">
         {(!isCollapsed || isMobile) && (
           <div className="space-y-3">
-            <div className="bg-gray-50 rounded-2xl p-3 space-y-3 border border-gray-200">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-gray-700">Usage This Month</span>
-                <Badge
-                  variant="outline"
-                  className="text-[10px] px-2 py-0.5 rounded-lg bg-white text-gray-700 border-gray-300"
-                >
-                  {userPlan.toUpperCase()}
-                </Badge>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-600">Flight Searches</span>
-                  <span className="font-medium text-gray-900">
-                    {usageStats.flightSearches}/{usageStats.maxFlightSearches}
-                  </span>
-                </div>
-                <Progress value={flightSearchPercentage} className="h-1.5" />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-600">AI Tokens</span>
-                  <span className="font-medium text-gray-900">
-                    {usageStats.tokensUsed.toLocaleString()}/{usageStats.maxTokens.toLocaleString()}
-                  </span>
-                </div>
-                <Progress value={tokensPercentage} className="h-1.5" />
-              </div>
-            </div>
+            <TokenUsageChart used={usageStats.tokensUsed} total={usageStats.maxTokens} plan={userPlan} />
+            <FlightUsageChart
+              searches={usageStats.flightSearches}
+              maxSearches={usageStats.maxFlightSearches}
+              bookings={3}
+            />
           </div>
         )}
 
