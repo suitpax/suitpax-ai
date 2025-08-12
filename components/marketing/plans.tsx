@@ -5,7 +5,6 @@ import { useRef } from "react"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { useSubscription } from "@/lib/hooks/use-subscription"
 
 // Títulos alternativos
 const titleVariations = [
@@ -363,7 +362,6 @@ export const Plans = () => {
   const [randomTitle, setRandomTitle] = useState("")
   const [randomSubtitle, setRandomSubtitle] = useState("")
   const [isAnnual, setIsAnnual] = useState(false)
-  const { createCheckoutSession, loading: subscriptionLoading } = useSubscription()
 
   useEffect(() => {
     // Seleccionar un título aleatorio al montar el componente
@@ -389,16 +387,8 @@ export const Plans = () => {
     }
 
     if (planId === "basic") {
-      // Get the appropriate price ID based on billing cycle
-      const priceId = isAnnual ? "price_basic_yearly" : "price_basic_monthly"
-
-      try {
-        await createCheckoutSession(priceId)
-      } catch (error) {
-        console.error("Failed to create checkout session:", error)
-        // Fallback to sign up page
-        window.location.href = "https://app.suitpax.com/sign-up"
-      }
+      // Redirect to sign up page for now
+      window.location.href = "https://app.suitpax.com/sign-up"
     }
   }
 
@@ -531,14 +521,13 @@ export const Plans = () => {
               <div className="mt-3">
                 <button
                   onClick={() => handlePlanSelect(plan.id)}
-                  disabled={subscriptionLoading}
-                  className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors ${
                     plan.popular
                       ? "bg-black text-white hover:bg-gray-800"
                       : "bg-white text-black border border-black hover:bg-gray-100"
                   } block mx-auto max-w-[220px]`}
                 >
-                  {subscriptionLoading ? "Loading..." : plan.cta}
+                  {plan.cta}
                 </button>
               </div>
             </motion.div>

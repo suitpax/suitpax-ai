@@ -1,13 +1,40 @@
 "use client"
 import { motion } from "framer-motion"
-import { useSubscription } from "@/lib/hooks/use-subscription"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 
+const mockStatus = {
+  planName: "free",
+  aiTokensLimit: 10000,
+  aiTokensUsed: 2500,
+  teamMembersLimit: 5,
+  travelSearchesLimit: 10,
+  travelSearchesUsed: 3,
+  features: {
+    hasAiExpenseManagement: false,
+    hasCustomPolicies: false,
+    hasPrioritySupport: false,
+    hasBankIntegration: false,
+    hasCrmIntegration: false,
+  },
+  usage: {
+    aiTokensPercentage: 25,
+    travelSearchesPercentage: 30,
+  },
+}
+
 export default function BillingPage() {
-  const { status, loading, error, createCheckoutSession, manageBilling } = useSubscription()
+  const status = mockStatus
+  const loading = false
+  const error = null
+
+  const handleUpgrade = (plan: string) => {
+    if (plan === "basic" || plan === "pro") {
+      window.location.href = "mailto:hello@suitpax.com?subject=Upgrade to " + plan + " plan"
+    }
+  }
 
   if (loading) {
     return (
@@ -165,20 +192,16 @@ export default function BillingPage() {
             <CardContent className="flex flex-col sm:flex-row gap-4">
               {status?.planName === "free" ? (
                 <>
-                  <Button onClick={() => createCheckoutSession("price_basic_monthly")} className="flex-1">
+                  <Button onClick={() => handleUpgrade("basic")} className="flex-1">
                     Upgrade to Basic
                   </Button>
-                  <Button
-                    onClick={() => createCheckoutSession("price_pro_monthly")}
-                    variant="outline"
-                    className="flex-1"
-                  >
+                  <Button onClick={() => handleUpgrade("pro")} variant="outline" className="flex-1">
                     Upgrade to Pro
                   </Button>
                 </>
               ) : (
-                <Button onClick={manageBilling} className="flex-1">
-                  Manage Billing
+                <Button onClick={() => (window.location.href = "mailto:hello@suitpax.com")} className="flex-1">
+                  Contact Support
                 </Button>
               )}
               <Button variant="outline" onClick={() => (window.location.href = "/pricing")} className="flex-1">

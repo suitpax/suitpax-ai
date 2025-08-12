@@ -223,57 +223,18 @@ export async function POST(request: NextRequest) {
         } as any)
         orderData = order.data
       } else {
-        // Handle payment flow
-        if (!pf.paymentIntentId) {
-          return NextResponse.json({ success: false, error: "Payment required for immediate booking" }, { status: 400 })
-        }
-
-        if (!process.env.STRIPE_SECRET_KEY) {
-          return NextResponse.json({ success: false, error: "Payment processing not configured" }, { status: 500 })
-        }
-
-        const Stripe = (await import("stripe")).default
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
-
-        // Verify payment
-        const pi = await stripe.paymentIntents.retrieve(pf.paymentIntentId)
-        if (pi.status !== "succeeded") {
-          return NextResponse.json({ success: false, error: "Payment not completed" }, { status: 400 })
-        }
-
-        // Create paid order
-        const amountMajor = (pi.amount_received / 100).toFixed(2)
-        const order = await duffel.orders.create({
-          selected_offers: [pf.offerId],
-          passengers,
-          payments: [
-            {
-              type: "balance" as any,
-              amount: amountMajor,
-              currency: (pi.currency || "usd").toUpperCase(),
-            },
-          ],
-          metadata: {
-            user_id: user.id,
-            payment_intent_id: pi.id,
-            source: "suitpax",
-            booking_timestamp: new Date().toISOString(),
+        // For now, redirect to contact for payment processing
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Payment processing temporarily unavailable. Please contact hello@suitpax.com for assistance.",
+            contact_required: true,
           },
-        } as any)
-        orderData = order.data
-
-        // Update PI metadata with order info
-        await stripe.paymentIntents.update(pi.id, {
-          metadata: {
-            ...pi.metadata,
-            order_id: orderData.id,
-            booking_reference: orderData.booking_reference,
-            booking_status: orderData.status || "confirmed",
-          },
-        })
+          { status: 503 },
+        )
       }
     } else {
-      // Legacy flow
+      // Legacy flow - simplified to hold orders only
       const bookingData = bookingSchema.parse(body)
       const passengers = bookingData.passengers.map((p, idx) => ({
         id: `pas_${idx + 1}`,
@@ -297,23 +258,14 @@ export async function POST(request: NextRequest) {
         } as any)
         orderData = order.data
       } else {
-        if (!bookingData.payments || bookingData.payments.length === 0) {
-          return NextResponse.json({ success: false, error: "Payment information required" }, { status: 400 })
-        }
-
-        const payments = bookingData.payments.map((p) => ({
-          type: (p.type === "arc_bsp_cash" ? "arc_bsp_cash" : "balance") as any,
-          amount: p.amount,
-          currency: p.currency,
-        }))
-
-        const order = await duffel.orders.create({
-          selected_offers: bookingData.selected_offers,
-          passengers,
-          payments,
-          metadata: { ...(bookingData.metadata || {}), user_id: user.id },
-        } as any)
-        orderData = order.data
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Payment processing temporarily unavailable. Please contact hello@suitpax.com for assistance.",
+            contact_required: true,
+          },
+          { status: 503 },
+        )
       }
     }
 
