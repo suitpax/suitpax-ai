@@ -27,7 +27,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { OnboardingModal } from "@/components/dashboard/onboarding-modal"
 
 interface Message {
   id: string
@@ -65,7 +64,6 @@ export default function SuitpaxAIPage() {
   const [files, setFiles] = useState<File[]>([])
   const [showReasoning, setShowReasoning] = useState(true)
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
-  const [showOnboarding, setShowOnboarding] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const uploadInputRef = useRef<HTMLInputElement>(null)
 
@@ -77,10 +75,6 @@ export default function SuitpaxAIPage() {
       } = await supabase.auth.getUser()
       setUser(user)
       setIsUserLoading(false)
-
-      if (user && !localStorage.getItem(`suitpax-ai-onboarded-${user.id}`)) {
-        setShowOnboarding(true)
-      }
     }
     getUser()
   }, [])
@@ -358,16 +352,6 @@ export default function SuitpaxAIPage() {
 
   return (
     <>
-      <OnboardingModal
-        isOpen={showOnboarding}
-        onClose={() => {
-          setShowOnboarding(false)
-          if (user) {
-            localStorage.setItem(`suitpax-ai-onboarded-${user.id}`, "true")
-          }
-        }}
-      />
-
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
         {messages.length === 0 ? (
           <EmptyState />

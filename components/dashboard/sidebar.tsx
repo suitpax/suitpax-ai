@@ -18,7 +18,6 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  X,
   User,
   Building,
   Mail,
@@ -26,7 +25,6 @@ import {
   Receipt,
   Crown,
 } from "lucide-react"
-import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -100,6 +98,8 @@ export function Sidebar({
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+
+  const setIsCollapsed = onToggleCollapse // Declare setIsCollapsed variable
 
   useEffect(() => {
     const getUser = async () => {
@@ -178,53 +178,39 @@ export function Sidebar({
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-gray-100/60 backdrop-blur-sm border-r border-gray-200/60 transition-all duration-300",
+        "flex flex-col h-full bg-white/80 backdrop-blur-sm border-r border-gray-200/80 transition-all duration-300",
         isCollapsed ? "w-16" : "w-64",
       )}
     >
       {/* Header */}
-      <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200/60 flex-shrink-0">
-        {(!isCollapsed || isMobile) && (
-          <div className="flex flex-col">
-            <Link href="/dashboard" className="flex items-center gap-2" onClick={isMobile ? onCloseMobile : undefined}>
-              <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={100} height={24} className="h-6 w-auto" />
-            </Link>
-            <div className="flex items-center gap-2 mt-1">
-              <div className="flex items-center gap-1.5">
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-gray-900 rounded-full animate-pulse"></div>
-                  <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"
-                    style={{ animationDelay: "0.5s" }}
-                  ></div>
-                </div>
-                <span className="text-[10px] font-medium text-gray-600">Suitpax AI v2.1</span>
-              </div>
-              {user && <span className="text-[10px] text-gray-500">• {getDisplayName()}</span>}
+      <div className="p-4 border-b border-gray-200/60 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center shadow-sm">
+              <span className="text-white text-sm font-bold">S</span>
             </div>
+            {(!isCollapsed || isMobile) && (
+              <div>
+                <h1 className="text-lg font-bold tracking-tighter text-gray-900">Suitpax</h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-gray-600">{getDisplayName()}</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse"></div>
+                    <span className="text-[10px] text-gray-500">v2.1.0</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-        {isMobile ? (
           <Button
             variant="ghost"
-            size="icon"
-            onClick={onCloseMobile}
-            className="h-8 w-8 rounded-xl hover:bg-gray-100/80"
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close sidebar</span>
-          </Button>
-        ) : (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-xl hover:bg-gray-100/80"
-            onClick={onToggleCollapse}
+            size="sm"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="h-8 w-8 p-0 hover:bg-gray-100/60 rounded-xl"
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            <span className="sr-only">{isCollapsed ? "Expand sidebar" : "Collapse sidebar"}</span>
           </Button>
-        )}
+        </div>
       </div>
 
       {(!isCollapsed || isMobile) && (
@@ -323,12 +309,12 @@ export function Sidebar({
         {/* Usage Stats - Only show when not collapsed */}
         {(!isCollapsed || isMobile) && (
           <div className="space-y-3">
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 space-y-3 shadow-sm border border-gray-200/40">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-3 space-y-3 shadow-sm border border-gray-200/60">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-gray-700">Usage This Month</span>
                 <Badge
                   variant="outline"
-                  className="text-[10px] px-2 py-0.5 rounded-lg bg-gray-100 text-gray-700 border-gray-200"
+                  className="text-[10px] px-2 py-0.5 rounded-lg bg-gray-50 text-gray-700 border-gray-300"
                 >
                   {userPlan.toUpperCase()}
                 </Badge>
@@ -364,7 +350,7 @@ export function Sidebar({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-200/60 bg-white/40 hover:bg-white/60 backdrop-blur-sm"
+                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-300 bg-white/60 hover:bg-white/80 backdrop-blur-sm"
                 >
                   <Crown className="h-3 w-3 mr-2" />
                   Plans & Billing
@@ -405,7 +391,7 @@ export function Sidebar({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-200/60 bg-white/40 hover:bg-white/60 backdrop-blur-sm"
+                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-300 bg-white/60 hover:bg-white/80 backdrop-blur-sm"
                 >
                   <Settings className="h-3 w-3 mr-2" />
                   Settings
@@ -444,7 +430,7 @@ export function Sidebar({
         {/* User Profile & Sign Out */}
         {(!isCollapsed || isMobile) && (
           <div className="border-t border-gray-200/60 pt-3">
-            <div className="flex items-center space-x-3 px-3 py-2 mb-2 bg-white/40 rounded-2xl backdrop-blur-sm">
+            <div className="flex items-center space-x-3 px-3 py-2 mb-2 bg-white/60 rounded-2xl backdrop-blur-sm border border-gray-200/40">
               <Avatar className="h-10 w-10 ring-2 ring-gray-200/60 rounded-2xl">
                 <AvatarImage
                   src={userProfile?.avatar_url || "/placeholder.svg"}
