@@ -9,7 +9,7 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(15)
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
@@ -27,15 +27,15 @@ export default function CalendarPage() {
             </p>
           </div>
           <div className="flex items-center gap-3 mt-4 sm:mt-0">
-            <div className="flex bg-gray-200 rounded-xl p-1">
+            <div className="flex bg-white/80 backdrop-blur-sm rounded-xl p-1 border border-white/20">
               {["month", "week", "day"].map((view) => (
                 <button
                   key={view}
                   onClick={() => setSelectedView(view)}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-all capitalize ${
                     selectedView === view
-                      ? "bg-white text-black shadow-sm"
-                      : "text-gray-600 hover:text-black hover:bg-gray-100"
+                      ? "bg-black text-white shadow-sm"
+                      : "text-gray-600 hover:text-black hover:bg-white/50"
                   }`}
                 >
                   {view}
@@ -54,10 +54,10 @@ export default function CalendarPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-gray-100 rounded-2xl border border-gray-200 overflow-hidden shadow-sm"
+          className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 overflow-hidden shadow-lg"
         >
           {/* Calendar Header */}
-          <div className="bg-white border-b border-gray-200 p-6">
+          <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-black">December 2024</h2>
               <div className="flex items-center gap-2">
@@ -79,16 +79,16 @@ export default function CalendarPage() {
           </div>
 
           {/* Days of Week */}
-          <div className="grid grid-cols-7 bg-gray-100 border-b border-gray-200">
+          <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
               <div key={day} className="p-4 text-center">
-                <span className="text-sm font-semibold text-gray-700">{day}</span>
+                <span className="text-sm font-semibold text-black">{day}</span>
               </div>
             ))}
           </div>
 
           {/* Calendar Days */}
-          <div className="grid grid-cols-7 bg-gray-100">
+          <div className="grid grid-cols-7 bg-gray-50">
             {Array.from({ length: 35 }, (_, i) => {
               const day = i - 5 + 1
               const isCurrentMonth = day > 0 && day <= 31
@@ -99,8 +99,8 @@ export default function CalendarPage() {
                 <div
                   key={i}
                   onClick={() => isCurrentMonth && setSelectedDate(day)}
-                  className={`min-h-[120px] p-3 border-r border-b border-gray-200 hover:bg-gray-50 transition-all cursor-pointer ${
-                    !isCurrentMonth ? "bg-gray-200/50" : "bg-gray-100"
+                  className={`min-h-[120px] p-3 border-r border-b border-gray-200 hover:bg-white transition-all cursor-pointer ${
+                    !isCurrentMonth ? "bg-gray-100" : "bg-gray-50"
                   } ${isSelected && isCurrentMonth ? "bg-white shadow-sm" : ""}`}
                 >
                   <div
@@ -153,7 +153,7 @@ export default function CalendarPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg hover:border-gray-300 transition-all duration-300 group cursor-pointer">
+          <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:shadow-lg hover:bg-white/90 transition-all duration-300 group cursor-pointer">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors">
                 <ClockIcon className="h-6 w-6" />
@@ -165,7 +165,7 @@ export default function CalendarPage() {
             <div className="text-xs text-gray-500">3 trips this month</div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg hover:border-gray-300 transition-all duration-300 group cursor-pointer">
+          <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:shadow-lg hover:bg-white/90 transition-all duration-300 group cursor-pointer">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors">
                 <MapPinIcon className="h-6 w-6" />
@@ -177,7 +177,7 @@ export default function CalendarPage() {
             <div className="text-xs text-gray-500">NYC, London, Tokyo</div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg hover:border-gray-300 transition-all duration-300 group cursor-pointer">
+          <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:shadow-lg hover:bg-white/90 transition-all duration-300 group cursor-pointer">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors">
                 <CalendarIcon className="h-6 w-6" />

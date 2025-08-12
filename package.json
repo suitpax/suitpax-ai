@@ -149,7 +149,7 @@
     "react": "^19",
     "react-day-picker": "9.8.1",
     "react-dom": "^19",
-    "react-dropzone": "^14.3.8",
+    "react-dropzone": "latest",
     "react-hook-form": "7.62.0",
     "react-hot-toast": "latest",
     "react-icons": "latest",

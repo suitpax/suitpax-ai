@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
@@ -24,6 +26,8 @@ import {
   CalendarIcon as Meeting,
   Receipt,
   Crown,
+  Send,
+  CheckSquare,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
@@ -31,6 +35,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Input } from "@/components/ui/input"
 import {
   Dialog,
   DialogContent,
@@ -40,7 +45,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
-import AISearchInput from "@/components/ui/ai-search-input"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -54,6 +58,7 @@ const navigation = [
   { name: "Locations", href: "/dashboard/locations", icon: MapPin },
   { name: "Team", href: "/dashboard/team", icon: Users },
   { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
+  { name: "Tasks", href: "/dashboard/tasks", icon: CheckSquare },
 ]
 
 const aiNavigation = [
@@ -89,6 +94,8 @@ export function Sidebar({
 }: SidebarProps) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [aiQuery, setAiQuery] = useState("")
+  const [isAiLoading, setIsAiLoading] = useState(false)
   const [usageStats, setUsageStats] = useState({
     flightSearches: 12,
     maxFlightSearches: userPlan === "premium" ? 1000 : 50,
@@ -99,7 +106,7 @@ export function Sidebar({
   const router = useRouter()
   const supabase = createClient()
 
-  const setIsCollapsed = onToggleCollapse // Declare setIsCollapsed variable
+  const setIsCollapsed = onToggleCollapse
 
   useEffect(() => {
     const getUser = async () => {
@@ -152,6 +159,36 @@ export function Sidebar({
     }
   }
 
+  const handleAiSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!aiQuery.trim() || isAiLoading) return
+
+    setIsAiLoading(true)
+    try {
+      const response = await fetch("/api/suitpax-ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: aiQuery,
+          userId: user?.id,
+        }),
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        // Navigate to Suitpax AI page with the response
+        router.push(`/dashboard/suitpax-ai?query=${encodeURIComponent(aiQuery)}`)
+        setAiQuery("")
+      }
+    } catch (error) {
+      console.error("Error sending AI query:", error)
+    } finally {
+      setIsAiLoading(false)
+    }
+  }
+
   const getDisplayName = () => {
     if (!user) return "User"
     return userProfile?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "User"
@@ -178,23 +215,38 @@ export function Sidebar({
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-white/80 backdrop-blur-sm border-r border-gray-200/80 transition-all duration-300",
+        "flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300",
         isCollapsed ? "w-16" : "w-64",
       )}
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200/60 flex-shrink-0 bg-white">
+      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center shadow-sm">
-              <span className="text-white text-sm font-bold">S</span>
+            <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center shadow-sm">
+              <span className="text-white text-lg font-bold">bl</span>
             </div>
+            {(!isCollapsed || isMobile) && (
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-600">{getDisplayName().split(" ")[0]}</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse"></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-pulse"
+                      style={{ animationDelay: "0.5s" }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500">Suitpax AI v2.1.0</div>
+              </div>
+            )}
           </div>
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="h-8 w-8 p-0 hover:bg-gray-100/60 rounded-xl"
+            onClick={() => setIsCollapsed?.(!isCollapsed)}
+            className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl"
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
@@ -202,8 +254,29 @@ export function Sidebar({
       </div>
 
       {(!isCollapsed || isMobile) && (
-        <div className="px-3 pt-3 border-b border-gray-200/60">
-          <AISearchInput size="sm" />
+        <div className="px-3 pt-3 border-b border-gray-200">
+          <form onSubmit={handleAiSubmit} className="relative">
+            <Input
+              value={aiQuery}
+              onChange={(e) => setAiQuery(e.target.value)}
+              placeholder="Ask AI anything..."
+              className="pr-10 rounded-xl border-gray-200 text-sm h-9 bg-gray-50 focus:bg-white transition-colors"
+              disabled={isAiLoading}
+            />
+            <Button
+              type="submit"
+              size="sm"
+              variant="ghost"
+              disabled={!aiQuery.trim() || isAiLoading}
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100 rounded-lg"
+            >
+              {isAiLoading ? (
+                <div className="animate-spin rounded-full h-3 w-3 border-2 border-gray-400 border-t-transparent" />
+              ) : (
+                <Send className="h-3 w-3" />
+              )}
+            </Button>
+          </form>
         </div>
       )}
 
@@ -220,9 +293,7 @@ export function Sidebar({
                 onClick={isMobile ? onCloseMobile : undefined}
                 className={cn(
                   "group flex items-center px-3 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200 relative",
-                  isActive
-                    ? "bg-gray-900 text-white shadow-md"
-                    : "text-gray-700 hover:bg-white/60 hover:text-gray-900 hover:shadow-sm",
+                  isActive ? "bg-gray-900 text-white shadow-md" : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
                   isCollapsed && !isMobile && "justify-center px-2",
                 )}
                 title={isCollapsed && !isMobile ? item.name : ""}
@@ -251,8 +322,8 @@ export function Sidebar({
                     className={cn(
                       "group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200",
                       isActive
-                        ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md"
-                        : "text-gray-700 hover:bg-white/60 hover:text-gray-900 hover:shadow-sm",
+                        ? "bg-gray-200 text-gray-900 shadow-sm"
+                        : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
                     )}
                   >
                     <div className="flex items-center">
@@ -279,8 +350,8 @@ export function Sidebar({
                   className={cn(
                     "group flex items-center justify-center px-2 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200 relative",
                     isActive
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md"
-                      : "text-gray-700 hover:bg-white/60 hover:text-gray-900 hover:shadow-sm",
+                      ? "bg-gray-200 text-gray-900 shadow-sm"
+                      : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
                   )}
                   title={item.name}
                 >
@@ -293,16 +364,15 @@ export function Sidebar({
       </nav>
 
       {/* Bottom Section */}
-      <div className="border-t border-gray-200/60 p-3 flex-shrink-0 space-y-4">
-        {/* Usage Stats - Only show when not collapsed */}
+      <div className="border-t border-gray-200 p-3 flex-shrink-0 space-y-4">
         {(!isCollapsed || isMobile) && (
           <div className="space-y-3">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-3 space-y-3 shadow-sm border border-gray-200/60">
+            <div className="bg-gray-50 rounded-2xl p-3 space-y-3 border border-gray-200">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-gray-700">Usage This Month</span>
                 <Badge
                   variant="outline"
-                  className="text-[10px] px-2 py-0.5 rounded-lg bg-gray-50 text-gray-700 border-gray-300"
+                  className="text-[10px] px-2 py-0.5 rounded-lg bg-white text-gray-700 border-gray-300"
                 >
                   {userPlan.toUpperCase()}
                 </Badge>
@@ -338,7 +408,7 @@ export function Sidebar({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-300 bg-white/60 hover:bg-white/80 backdrop-blur-sm"
+                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-300 bg-white hover:bg-gray-50"
                 >
                   <Crown className="h-3 w-3 mr-2" />
                   Plans & Billing
@@ -379,7 +449,7 @@ export function Sidebar({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-300 bg-white/60 hover:bg-white/80 backdrop-blur-sm"
+                  className="w-full justify-start text-xs h-8 rounded-2xl border-gray-300 bg-white hover:bg-gray-50"
                 >
                   <Settings className="h-3 w-3 mr-2" />
                   Settings
@@ -417,15 +487,15 @@ export function Sidebar({
 
         {/* User Profile & Sign Out */}
         {(!isCollapsed || isMobile) && (
-          <div className="border-t border-gray-200/60 pt-3">
-            <div className="flex items-center space-x-3 px-3 py-2 mb-2 bg-white/60 rounded-2xl backdrop-blur-sm border border-gray-200/40">
-              <Avatar className="h-10 w-10 ring-2 ring-gray-200/60 rounded-2xl">
+          <div className="border-t border-gray-200 pt-3">
+            <div className="flex items-center space-x-3 px-3 py-2 mb-2 bg-gray-50 rounded-2xl border border-gray-200">
+              <Avatar className="h-8 w-8 ring-2 ring-gray-200 rounded-lg">
                 <AvatarImage
                   src={userProfile?.avatar_url || "/placeholder.svg"}
                   alt={getDisplayName()}
-                  className="rounded-2xl"
+                  className="rounded-lg"
                 />
-                <AvatarFallback className="bg-gray-900 text-white text-sm font-medium rounded-2xl">
+                <AvatarFallback className="bg-gray-900 text-white text-xs font-medium rounded-lg">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
@@ -437,7 +507,7 @@ export function Sidebar({
                   </p>
                   <Badge
                     variant="outline"
-                    className="text-[10px] px-1.5 py-0.5 rounded-lg bg-gray-200/60 text-gray-700 border-gray-200/60"
+                    className="text-[10px] px-1.5 py-0.5 rounded-lg bg-gray-200 text-gray-700 border-gray-200"
                   >
                     Member
                   </Badge>
@@ -448,7 +518,7 @@ export function Sidebar({
             <Button
               onClick={handleSignOut}
               variant="ghost"
-              className="w-full justify-start px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white/60 hover:text-gray-900 rounded-2xl"
+              className="w-full justify-start px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-2xl"
             >
               <LogOut className="h-4 w-4 mr-3" />
               Sign Out
@@ -458,15 +528,15 @@ export function Sidebar({
 
         {/* Collapsed state user profile */}
         {isCollapsed && !isMobile && (
-          <div className="border-t border-gray-200/60 pt-3 space-y-2">
+          <div className="border-t border-gray-200 pt-3 space-y-2">
             <div className="flex justify-center">
-              <Avatar className="h-10 w-10 ring-2 ring-gray-200/60 rounded-2xl">
+              <Avatar className="h-8 w-8 ring-2 ring-gray-200 rounded-lg">
                 <AvatarImage
                   src={userProfile?.avatar_url || "/placeholder.svg"}
                   alt={getDisplayName()}
-                  className="rounded-2xl"
+                  className="rounded-lg"
                 />
-                <AvatarFallback className="bg-gray-900 text-white text-sm font-medium rounded-2xl">
+                <AvatarFallback className="bg-gray-900 text-white text-xs font-medium rounded-lg">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
@@ -475,7 +545,7 @@ export function Sidebar({
               onClick={handleSignOut}
               variant="ghost"
               size="icon"
-              className="w-full h-10 rounded-2xl hover:bg-white/60"
+              className="w-full h-8 rounded-2xl hover:bg-gray-50"
               title="Sign Out"
             >
               <LogOut className="h-4 w-4" />

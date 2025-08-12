@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useDropzone } from "react-dropzone"
 import {
   Shield,
   Plus,
@@ -24,6 +25,10 @@ import {
   Upload,
   Eye,
   BarChart3,
+  Scan,
+  Brain,
+  Zap,
+  Target,
 } from "lucide-react"
 
 interface Policy {
@@ -47,6 +52,18 @@ interface PolicyRule {
   condition: string
   value: string | number
   action: "allow" | "require_approval" | "block"
+}
+
+interface DocumentAnalysis {
+  id: string
+  fileName: string
+  extractedText: string
+  detectedPolicyType: "travel" | "expense" | "approval" | "compliance"
+  confidence: number
+  suggestedRules: PolicyRule[]
+  companySize?: "startup" | "sme" | "enterprise"
+  industry?: string
+  uploadedAt: string
 }
 
 const mockPolicies: Policy[] = [
@@ -102,6 +119,290 @@ const mockPolicies: Policy[] = [
   },
 ]
 
+const DocumentUploadZone = ({ onDocumentAnalyzed }: { onDocumentAnalyzed: (analysis: DocumentAnalysis) => void }) => {
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisResults, setAnalysisResults] = useState<DocumentAnalysis[]>([])
+
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      setIsAnalyzing(true)
+
+      for (const file of acceptedFiles) {
+        // Simulate OCR and AI analysis
+        const mockAnalysis: DocumentAnalysis = {
+          id: Math.random().toString(36).substr(2, 9),
+          fileName: file.name,
+          extractedText: "Sample extracted text from document...",
+          detectedPolicyType: "travel",
+          confidence: 0.92,
+          suggestedRules: [
+            {
+              id: "auto-1",
+              type: "budget_limit",
+              condition: "daily_accommodation",
+              value: 300,
+              action: "require_approval",
+            },
+            { id: "auto-2", type: "booking_class", condition: "flight_class", value: "economy", action: "allow" },
+          ],
+          companySize: "sme",
+          industry: "Technology",
+          uploadedAt: new Date().toISOString(),
+        }
+
+        setTimeout(() => {
+          setAnalysisResults((prev) => [...prev, mockAnalysis])
+          onDocumentAnalyzed(mockAnalysis)
+          setIsAnalyzing(false)
+        }, 2000)
+      }
+    },
+    [onDocumentAnalyzed],
+  )
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "application/pdf": [".pdf"],
+      "image/*": [".png", ".jpg", ".jpeg"],
+      "application/msword": [".doc"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+    },
+  })
+
+  return (
+    <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-sm">
+      <div className="p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-blue-100 rounded-xl">
+            <Scan className="h-5 w-5 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="font-medium tracking-tighter text-black">Smart Document Analysis</h3>
+            <p className="text-sm text-gray-600">Upload documents to auto-generate policies</p>
+          </div>
+        </div>
+
+        <div
+          {...getRootProps()}
+          className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+            isDragActive ? "border-blue-400 bg-blue-50" : "border-gray-300 hover:border-gray-400"
+          }`}
+        >
+          <input {...getInputProps()} />
+          <Upload className="h-8 w-8 text-gray-400 mx-auto mb-4" />
+          {isDragActive ? (
+            <p className="text-blue-600">Drop the files here...</p>
+          ) : (
+            <div>
+              <p className="text-gray-600 mb-2">Drag & drop documents here, or click to select</p>
+              <p className="text-xs text-gray-500">Supports PDF, DOC, DOCX, and images</p>
+            </div>
+          )}
+        </div>
+
+        {isAnalyzing && (
+          <div className="mt-4 p-4 bg-blue-50 rounded-xl">
+            <div className="flex items-center gap-3">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+              <span className="text-sm text-blue-700">Analyzing document with AI...</span>
+            </div>
+          </div>
+        )}
+
+        {analysisResults.length > 0 && (
+          <div className="mt-6 space-y-4">
+            <h4 className="font-medium text-black">Analysis Results</h4>
+            {analysisResults.map((result) => (
+              <div key={result.id} className="p-4 bg-gray-50 rounded-xl">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h5 className="font-medium text-sm">{result.fileName}</h5>
+                    <p className="text-xs text-gray-500">Confidence: {(result.confidence * 100).toFixed(0)}%</p>
+                  </div>
+                  <Badge className="bg-green-100 text-green-800 border-green-200">{result.detectedPolicyType}</Badge>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs text-gray-600">Suggested Rules:</p>
+                  {result.suggestedRules.map((rule) => (
+                    <div key={rule.id} className="text-xs bg-white p-2 rounded border">
+                      {rule.condition}: {rule.value} ({rule.action})
+                    </div>
+                  ))}
+                </div>
+                <Button size="sm" className="mt-3 bg-black hover:bg-gray-800 text-white">
+                  Create Policy from Analysis
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Card>
+  )
+}
+
+const AIPolicyGenerator = () => {
+  const [prompt, setPrompt] = useState("")
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedPolicy, setGeneratedPolicy] = useState<Policy | null>(null)
+
+  const generatePolicy = async () => {
+    setIsGenerating(true)
+
+    // Simulate AI policy generation
+    setTimeout(() => {
+      const mockPolicy: Policy = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: "AI Generated Travel Policy",
+        category: "travel",
+        status: "draft",
+        description: "Automatically generated policy based on your requirements",
+        rules: [
+          {
+            id: "ai-1",
+            type: "budget_limit",
+            condition: "daily_accommodation",
+            value: 250,
+            action: "require_approval",
+          },
+          { id: "ai-2", type: "booking_class", condition: "flight_class", value: "economy", action: "allow" },
+        ],
+        applicableRoles: ["Employee", "Manager"],
+        createdAt: new Date().toISOString().split("T")[0],
+        updatedAt: new Date().toISOString().split("T")[0],
+        createdBy: "AI Assistant",
+        violations: 0,
+        compliance: 100,
+      }
+
+      setGeneratedPolicy(mockPolicy)
+      setIsGenerating(false)
+    }, 3000)
+  }
+
+  return (
+    <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-sm">
+      <div className="p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-purple-100 rounded-xl">
+            <Brain className="h-5 w-5 text-purple-600" />
+          </div>
+          <div>
+            <h3 className="font-medium tracking-tighter text-black">AI Policy Generator</h3>
+            <p className="text-sm text-gray-600">Describe your needs and get a custom policy</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Textarea
+            placeholder="Describe your company's travel policy needs... (e.g., 'Create a policy for a 500-person tech company with moderate budget constraints')"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            rows={3}
+            className="resize-none"
+          />
+
+          <Button
+            onClick={generatePolicy}
+            disabled={!prompt.trim() || isGenerating}
+            className="w-full bg-black hover:bg-gray-800 text-white"
+          >
+            {isGenerating ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Generating Policy...
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4" />
+                Generate Policy with AI
+              </div>
+            )}
+          </Button>
+        </div>
+
+        {generatedPolicy && (
+          <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
+            <div className="flex items-center gap-2 mb-3">
+              <Target className="h-4 w-4 text-green-600" />
+              <span className="font-medium text-green-800">Policy Generated Successfully</span>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">{generatedPolicy.name}</h4>
+              <p className="text-xs text-gray-600">{generatedPolicy.description}</p>
+              <div className="flex gap-2 mt-3">
+                <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                  Add to Policies
+                </Button>
+                <Button size="sm" variant="outline">
+                  Edit Policy
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </Card>
+  )
+}
+
+function CreatePolicyForm({ onClose }: { onClose: () => void }) {
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "",
+    description: "",
+    applicableRoles: [] as string[],
+    rules: [] as PolicyRule[],
+  })
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Policy Name</label>
+          <Input
+            placeholder="Enter policy name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Category</label>
+          <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="travel">Travel</SelectItem>
+              <SelectItem value="expense">Expense</SelectItem>
+              <SelectItem value="approval">Approval</SelectItem>
+              <SelectItem value="compliance">Compliance</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-700">Description</label>
+        <Textarea
+          placeholder="Describe this policy..."
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          rows={3}
+        />
+      </div>
+
+      <div className="flex justify-end gap-3">
+        <Button variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button className="bg-black hover:bg-gray-800 text-white">Create Policy</Button>
+      </div>
+    </div>
+  )
+}
+
 export default function PoliciesPage() {
   const [policies, setPolicies] = useState<Policy[]>(mockPolicies)
   const [selectedPolicy, setSelectedPolicy] = useState<Policy | null>(null)
@@ -109,6 +410,11 @@ export default function PoliciesPage() {
   const [filterCategory, setFilterCategory] = useState<string>("all")
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [documentAnalyses, setDocumentAnalyses] = useState<DocumentAnalysis[]>([])
+
+  const handleDocumentAnalyzed = (analysis: DocumentAnalysis) => {
+    setDocumentAnalyses((prev) => [...prev, analysis])
+  }
 
   const filteredPolicies = policies.filter((policy) => {
     const matchesSearch =
@@ -153,25 +459,21 @@ export default function PoliciesPage() {
   const avgCompliance = Math.round(policies.reduce((sum, p) => sum + p.compliance, 0) / policies.length)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
         <div className="px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl md:text-5xl font-medium tracking-tighter text-black mb-2">Travel Policies</h1>
               <p className="text-lg text-gray-600 font-light">
-                Manage and enforce company travel policies with intelligent automation
+                AI-powered policy management with intelligent document analysis
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" className="gap-2 bg-transparent">
+              <Button variant="outline" className="gap-2 bg-white/80 backdrop-blur-sm">
                 <Download className="h-4 w-4" />
                 Export
-              </Button>
-              <Button variant="outline" className="gap-2 bg-transparent">
-                <Upload className="h-4 w-4" />
-                Import
               </Button>
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <DialogTrigger asChild>
@@ -192,8 +494,14 @@ export default function PoliciesPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="px-6 py-6">
+        {/* AI-powered tools section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <DocumentUploadZone onDocumentAnalyzed={handleDocumentAnalyzed} />
+          <AIPolicyGenerator />
+        </div>
+
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm">
@@ -371,62 +679,6 @@ export default function PoliciesPage() {
             </Button>
           </Card>
         )}
-      </div>
-    </div>
-  )
-}
-
-function CreatePolicyForm({ onClose }: { onClose: () => void }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    category: "",
-    description: "",
-    applicableRoles: [] as string[],
-    rules: [] as PolicyRule[],
-  })
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Policy Name</label>
-          <Input
-            placeholder="Enter policy name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Category</label>
-          <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="travel">Travel</SelectItem>
-              <SelectItem value="expense">Expense</SelectItem>
-              <SelectItem value="approval">Approval</SelectItem>
-              <SelectItem value="compliance">Compliance</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Description</label>
-        <Textarea
-          placeholder="Describe this policy..."
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          rows={3}
-        />
-      </div>
-
-      <div className="flex justify-end gap-3">
-        <Button variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button className="bg-black hover:bg-gray-800 text-white">Create Policy</Button>
       </div>
     </div>
   )
