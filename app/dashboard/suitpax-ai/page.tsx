@@ -82,7 +82,6 @@ function AIChatView() {
       if (!response.ok) throw new Error("Failed to get response")
 
       const data = await response.json()
-
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -163,7 +162,6 @@ function AIChatView() {
                 <p className="text-sm text-white/60">Your intelligent business travel assistant</p>
               </div>
             </div>
-
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <Switch
@@ -281,7 +279,6 @@ function AIChatView() {
               </div>
             </div>
           )}
-
           <div ref={messagesEndRef} />
         </div>
 
@@ -343,6 +340,7 @@ function AIChatView() {
                       </div>
                     </PopoverContent>
                   </Popover>
+
                   <input
                     ref={uploadInputRef}
                     type="file"
@@ -379,7 +377,7 @@ function AIChatView() {
   )
 }
 
-export default function AIChatPage() {
+export default function SuitpaxAIPage() {
   return (
     <div className="relative h-screen overflow-hidden">
       <VantaHaloBackground />
