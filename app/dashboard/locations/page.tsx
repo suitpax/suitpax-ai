@@ -2,99 +2,28 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { MapPin, Search, Globe, Building, Plane, Star, Navigation, Heart, Plus, TrendingUp, Clock } from "lucide-react"
+import {
+  MapPin,
+  Search,
+  Globe,
+  Building,
+  Plane,
+  Star,
+  Navigation,
+  Heart,
+  Plus,
+  TrendingUp,
+  Clock,
+  Users,
+  BarChart3,
+} from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
-const financialCities = [
-  {
-    id: 1,
-    name: "New York City",
-    country: "United States",
-    region: "North America",
-    description: "Global financial capital with Wall Street and major banks",
-    image: "/nyc-financial-district.png",
-    businessHotels: 847,
-    avgFlightCost: 450,
-    timeZone: "EST",
-    businessRating: 4.8,
-    tags: ["Finance", "Banking", "Trading"],
-    coordinates: { lat: 40.7128, lng: -74.006 },
-  },
-  {
-    id: 2,
-    name: "London",
-    country: "United Kingdom",
-    region: "Europe",
-    description: "Leading European financial hub with the City of London",
-    image: "/placeholder-q64is.png",
-    businessHotels: 623,
-    avgFlightCost: 680,
-    timeZone: "GMT",
-    businessRating: 4.7,
-    tags: ["Banking", "Insurance", "Fintech"],
-    coordinates: { lat: 51.5074, lng: -0.1278 },
-  },
-  {
-    id: 3,
-    name: "Singapore",
-    country: "Singapore",
-    region: "Asia Pacific",
-    description: "Asia's premier financial center and trading hub",
-    image: "/singapore-marina-bay-financial-district.png",
-    businessHotels: 412,
-    avgFlightCost: 890,
-    timeZone: "SGT",
-    businessRating: 4.9,
-    tags: ["Trading", "Wealth Management", "Fintech"],
-    coordinates: { lat: 1.3521, lng: 103.8198 },
-  },
-  {
-    id: 4,
-    name: "Hong Kong",
-    country: "Hong Kong SAR",
-    region: "Asia Pacific",
-    description: "Gateway to China and major Asian financial center",
-    image: "/placeholder-ncqec.png",
-    businessHotels: 389,
-    avgFlightCost: 820,
-    timeZone: "HKT",
-    businessRating: 4.6,
-    tags: ["Banking", "Trading", "Investment"],
-    coordinates: { lat: 22.3193, lng: 114.1694 },
-  },
-  {
-    id: 5,
-    name: "Tokyo",
-    country: "Japan",
-    region: "Asia Pacific",
-    description: "Japan's financial capital with major stock exchanges",
-    image: "/placeholder-5ssdo.png",
-    businessHotels: 567,
-    avgFlightCost: 750,
-    timeZone: "JST",
-    businessRating: 4.5,
-    tags: ["Banking", "Insurance", "Technology"],
-    coordinates: { lat: 35.6762, lng: 139.6503 },
-  },
-  {
-    id: 6,
-    name: "Frankfurt",
-    country: "Germany",
-    region: "Europe",
-    description: "European Central Bank headquarters and financial hub",
-    image: "/frankfurt-financial-skyline.png",
-    businessHotels: 298,
-    avgFlightCost: 520,
-    timeZone: "CET",
-    businessRating: 4.4,
-    tags: ["Central Banking", "Euro Trading", "Insurance"],
-    coordinates: { lat: 50.1109, lng: 8.6821 },
-  },
-]
+import { businessCities } from "@/data/cities"
+import Image from "next/image"
 
 const savedLocations = [
   {
@@ -124,7 +53,7 @@ export default function LocationsPage() {
   const [selectedRegion, setSelectedRegion] = useState("all")
   const [activeTab, setActiveTab] = useState("explore")
 
-  const filteredCities = financialCities.filter((city) => {
+  const filteredCities = businessCities.filter((city) => {
     const matchesSearch =
       city.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       city.country.toLowerCase().includes(searchQuery.toLowerCase())
@@ -133,9 +62,9 @@ export default function LocationsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
+        {/* Header - Updated to match dashboard style */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -143,29 +72,79 @@ export default function LocationsPage() {
           className="flex flex-col sm:flex-row sm:items-center sm:justify-between"
         >
           <div>
-            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2 text-gray-900">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-2 text-gray-900">
               Business Locations
             </h1>
             <p className="text-gray-600 font-light">
-              <em className="font-serif italic">
-                Discover and manage global financial centers and business destinations
-              </em>
+              Discover and manage global business destinations with AI-powered insights
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex gap-3">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
+            <Button className="bg-gray-900 hover:bg-gray-800 text-white rounded-2xl px-6">
               <Plus className="h-4 w-4 mr-2" />
               Add Location
             </Button>
           </div>
         </motion.div>
 
-        {/* Search and Filters */}
+        {/* Stats Overview - Added dashboard-style stats cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-lg"
+          className="grid grid-cols-1 md:grid-cols-4 gap-6"
+        >
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                <Globe className="h-5 w-5 text-gray-600" />
+              </div>
+              <span className="text-xs font-medium text-gray-500">GLOBAL</span>
+            </div>
+            <div className="text-2xl font-medium tracking-tighter text-gray-900 mb-1">{businessCities.length}</div>
+            <div className="text-xs text-gray-500">Cities Available</div>
+          </div>
+
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                <Building className="h-5 w-5 text-gray-600" />
+              </div>
+              <span className="text-xs font-medium text-gray-500">HOTELS</span>
+            </div>
+            <div className="text-2xl font-medium tracking-tighter text-gray-900 mb-1">2.4K+</div>
+            <div className="text-xs text-gray-500">Business Hotels</div>
+          </div>
+
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                <Users className="h-5 w-5 text-gray-600" />
+              </div>
+              <span className="text-xs font-medium text-gray-500">SAVED</span>
+            </div>
+            <div className="text-2xl font-medium tracking-tighter text-gray-900 mb-1">{savedLocations.length}</div>
+            <div className="text-xs text-gray-500">Your Locations</div>
+          </div>
+
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                <BarChart3 className="h-5 w-5 text-gray-600" />
+              </div>
+              <span className="text-xs font-medium text-gray-500">INSIGHTS</span>
+            </div>
+            <div className="text-2xl font-medium tracking-tighter text-gray-900 mb-1">AI</div>
+            <div className="text-xs text-gray-500">Powered Analytics</div>
+          </div>
+        </motion.div>
+
+        {/* Search and Filters - Updated styling to match dashboard */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm"
         >
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
@@ -174,35 +153,35 @@ export default function LocationsPage() {
                 placeholder="Search cities, countries, or business districts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 rounded-xl border-gray-300"
+                className="pl-10 rounded-2xl border-gray-200 bg-white/80"
               />
             </div>
             <div className="flex gap-2">
               <Button
                 variant={selectedRegion === "all" ? "default" : "outline"}
                 onClick={() => setSelectedRegion("all")}
-                className="rounded-xl"
+                className="rounded-2xl bg-gray-900 hover:bg-gray-800"
               >
                 All Regions
               </Button>
               <Button
                 variant={selectedRegion === "north america" ? "default" : "outline"}
                 onClick={() => setSelectedRegion("north america")}
-                className="rounded-xl"
+                className="rounded-2xl"
               >
                 Americas
               </Button>
               <Button
                 variant={selectedRegion === "europe" ? "default" : "outline"}
                 onClick={() => setSelectedRegion("europe")}
-                className="rounded-xl"
+                className="rounded-2xl"
               >
                 Europe
               </Button>
               <Button
                 variant={selectedRegion === "asia" ? "default" : "outline"}
                 onClick={() => setSelectedRegion("asia")}
-                className="rounded-xl"
+                className="rounded-2xl"
               >
                 Asia Pacific
               </Button>
@@ -210,26 +189,26 @@ export default function LocationsPage() {
           </div>
         </motion.div>
 
-        {/* Tabs */}
+        {/* Tabs - Updated tab styling */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 rounded-xl">
-            <TabsTrigger value="explore" className="rounded-lg">
+          <TabsList className="grid w-full grid-cols-3 rounded-2xl bg-gray-100">
+            <TabsTrigger value="explore" className="rounded-xl">
               Explore Cities
             </TabsTrigger>
-            <TabsTrigger value="saved" className="rounded-lg">
+            <TabsTrigger value="saved" className="rounded-xl">
               Saved Locations
             </TabsTrigger>
-            <TabsTrigger value="maps" className="rounded-lg">
-              Interactive Maps
+            <TabsTrigger value="maps" className="rounded-xl">
+              Global Map
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="explore" className="space-y-6 mt-6">
-            {/* Financial Cities Grid */}
+            {/* Cities Grid - Updated to use businessCities data and dashboard styling */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
               {filteredCities.map((city, index) => (
@@ -239,71 +218,78 @@ export default function LocationsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.1 * index }}
                 >
-                  <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden group">
+                  <Card className="bg-white/50 backdrop-blur-sm border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden group">
                     <div className="relative">
-                      <img
-                        src={city.image || "/placeholder.svg"}
-                        alt={city.name}
+                      <Image
+                        src={city.imageUrl || "/placeholder.svg"}
+                        alt={`${city.name}, ${city.country}`}
+                        width={400}
+                        height={200}
                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute top-4 right-4">
-                        <Button size="sm" variant="outline" className="bg-white/90 backdrop-blur-sm rounded-lg">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="bg-white/90 backdrop-blur-sm rounded-xl border-gray-200"
+                        >
                           <Heart className="h-4 w-4" />
                         </Button>
                       </div>
                       <div className="absolute bottom-4 left-4">
-                        <Badge className="bg-blue-600 text-white rounded-lg">
+                        <Badge className="bg-gray-900 text-white rounded-xl">
                           <Star className="h-3 w-3 mr-1" />
-                          {city.businessRating}
+                          {city.businessImportance === "high" ? "4.8" : "4.5"}
                         </Badge>
                       </div>
                     </div>
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <h3 className="text-lg font-semibold tracking-tight text-gray-900">{city.name}</h3>
-                          <p className="text-sm text-gray-600">{city.country}</p>
+                          <h3 className="text-lg font-medium tracking-tighter text-gray-900">{city.name}</h3>
+                          <p className="text-sm text-gray-500 font-light">{city.country}</p>
                         </div>
-                        <Badge variant="outline" className="text-xs rounded-lg">
+                        <Badge variant="outline" className="text-xs rounded-xl border-gray-200">
                           {city.region}
                         </Badge>
                       </div>
 
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">{city.description}</p>
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-2 font-light">{city.description}</p>
 
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div className="flex items-center gap-2">
-                          <Building className="h-4 w-4 text-gray-500" />
-                          <span className="text-xs text-gray-600">{city.businessHotels} hotels</span>
+                          <Building className="h-4 w-4 text-gray-400" />
+                          <span className="text-xs text-gray-500">250+ hotels</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Plane className="h-4 w-4 text-gray-500" />
-                          <span className="text-xs text-gray-600">${city.avgFlightCost} avg</span>
+                          <Plane className="h-4 w-4 text-gray-400" />
+                          <span className="text-xs text-gray-500">$650 avg</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-gray-500" />
-                          <span className="text-xs text-gray-600">{city.timeZone}</span>
+                          <Clock className="h-4 w-4 text-gray-400" />
+                          <span className="text-xs text-gray-500">{city.timezone}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4 text-gray-500" />
-                          <span className="text-xs text-gray-600">Business Hub</span>
+                          <TrendingUp className="h-4 w-4 text-gray-400" />
+                          <span className="text-xs text-gray-500">Business Hub</span>
                         </div>
                       </div>
 
                       <div className="flex flex-wrap gap-1 mb-4">
-                        {city.tags.map((tag, tagIndex) => (
-                          <Badge key={tagIndex} variant="secondary" className="text-xs rounded-lg">
-                            {tag}
-                          </Badge>
-                        ))}
+                        <Badge variant="secondary" className="text-xs rounded-xl bg-gray-100 text-gray-600">
+                          Finance
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs rounded-xl bg-gray-100 text-gray-600">
+                          Business
+                        </Badge>
                       </div>
 
                       <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                        <Button size="sm" className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-xl">
                           <Navigation className="h-4 w-4 mr-2" />
                           View Details
                         </Button>
-                        <Button size="sm" variant="outline" className="rounded-lg bg-transparent">
+                        <Button size="sm" variant="outline" className="rounded-xl border-gray-200 bg-transparent">
                           <MapPin className="h-4 w-4" />
                         </Button>
                       </div>
@@ -318,34 +304,34 @@ export default function LocationsPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
               className="space-y-4"
             >
               {savedLocations.length > 0 ? (
                 savedLocations.map((location) => (
                   <Card
                     key={location.id}
-                    className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl"
+                    className="bg-white/50 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl"
                   >
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold tracking-tight text-gray-900">{location.name}</h3>
-                            <Badge variant="outline" className="text-xs rounded-lg">
+                            <h3 className="text-lg font-medium tracking-tighter text-gray-900">{location.name}</h3>
+                            <Badge variant="outline" className="text-xs rounded-xl border-gray-200">
                               {location.type}
                             </Badge>
                           </div>
-                          <p className="text-sm text-gray-600 mb-1">{location.address}</p>
-                          <p className="text-sm text-gray-600 mb-3">{location.city}</p>
-                          <p className="text-xs text-gray-500 italic">{location.notes}</p>
+                          <p className="text-sm text-gray-500 font-light mb-1">{location.address}</p>
+                          <p className="text-sm text-gray-500 font-light mb-3">{location.city}</p>
+                          <p className="text-xs text-gray-400 italic">{location.notes}</p>
                         </div>
                         <div className="text-right">
                           <div className="flex items-center gap-1 mb-2">
                             <Star className="h-4 w-4 text-yellow-500" />
                             <span className="text-sm font-medium">{location.rating}</span>
                           </div>
-                          <p className="text-xs text-gray-500">Last visited: {location.lastVisited}</p>
+                          <p className="text-xs text-gray-400">Last visited: {location.lastVisited}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -355,8 +341,10 @@ export default function LocationsPage() {
                 <div className="text-center py-12">
                   <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No saved locations yet</h3>
-                  <p className="text-gray-600 mb-6">Save your favorite business destinations for quick access</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
+                  <p className="text-gray-500 font-light mb-6">
+                    Save your favorite business destinations for quick access
+                  </p>
+                  <Button className="bg-gray-900 hover:bg-gray-800 text-white rounded-2xl">
                     <Plus className="h-4 w-4 mr-2" />
                     Add First Location
                   </Button>
@@ -369,36 +357,46 @@ export default function LocationsPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-lg"
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm"
             >
               <div className="text-center py-12">
-                <Globe className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold tracking-tight text-gray-900 mb-2">Interactive Maps</h3>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                  Explore business locations with Google Maps and Atlas integration. Search for offices, hotels, and
-                  meeting venues worldwide.
+                <Globe className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-medium tracking-tighter text-gray-900 mb-2">Global Business Map</h3>
+                <p className="text-gray-500 font-light mb-6 max-w-md mx-auto">
+                  Interactive world map showing all business locations with real-time data and AI-powered
+                  recommendations.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
+                  <Button className="bg-gray-900 hover:bg-gray-800 text-white rounded-2xl">
                     <Search className="h-4 w-4 mr-2" />
-                    Search Google Maps
+                    Launch Map View
                   </Button>
-                  <Button variant="outline" className="rounded-xl border-gray-300 bg-transparent">
+                  <Button variant="outline" className="rounded-2xl border-gray-200 bg-transparent">
                     <Globe className="h-4 w-4 mr-2" />
-                    Open Atlas View
+                    Satellite View
                   </Button>
                 </div>
-                <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                  <p className="text-sm text-gray-600 mb-2">
-                    <strong>Coming Soon:</strong> Full Google Maps integration with:
-                  </p>
-                  <ul className="text-xs text-gray-500 space-y-1">
-                    <li>• Real-time business location search</li>
-                    <li>• Corporate hotel and venue recommendations</li>
-                    <li>• Travel time and route optimization</li>
-                    <li>• Integration with your saved locations</li>
-                  </ul>
+                <div className="mt-8 p-6 bg-gray-50 rounded-2xl border border-gray-200">
+                  <p className="text-sm text-gray-600 mb-3 font-medium">Map Integration Features:</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-gray-500">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                      <span>Real-time location data</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                      <span>Business venue recommendations</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                      <span>Travel time optimization</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                      <span>Synchronized with saved locations</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>

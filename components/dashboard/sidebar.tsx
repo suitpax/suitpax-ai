@@ -292,22 +292,36 @@ export function Sidebar({
       <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-md overflow-hidden shadow-sm">
-              <Image
-                src="/suitpax-bl-logo.webp"
-                alt="Suitpax"
-                width={40}
-                height={40}
-                className="w-full h-full object-cover"
-              />
+            <div className="relative">
+              <div className="w-10 h-10 rounded-md overflow-hidden shadow-sm">
+                <Image
+                  src="/suitpax-bl-logo.webp"
+                  alt="Suitpax"
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Status dots */}
+              <div className="absolute -top-1 -right-1 flex items-center gap-0.5">
+                <div className="w-1.5 h-1.5 bg-gray-900 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+              </div>
             </div>
             {(!isCollapsed || isMobile) && (
               <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-900">{getDisplayName().split(" ")[0]}</span>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-medium text-gray-900 tracking-tighter">
+                    {getDisplayName().split(" ")[0]}
+                  </span>
                   <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                 </div>
-                <div className="text-xs text-gray-500 font-light">Business Travel AI</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500 font-light">Suitpax AI</span>
+                  <Badge className="bg-gray-200 text-gray-700 text-[8px] px-1.5 py-0.5 rounded-md font-medium">
+                    v0.0.1
+                  </Badge>
+                </div>
               </div>
             )}
           </div>
@@ -323,12 +337,12 @@ export function Sidebar({
       </div>
 
       {(!isCollapsed || isMobile) && (
-        <div className="px-4 pt-4 pb-6 border-b border-gray-200">
+        <div className="px-4 pt-3 pb-4 border-b border-gray-200">
           <AiSearchInput />
         </div>
       )}
 
-      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-4 py-3 space-y-1 overflow-y-auto">
         {/* Main Navigation with Drag & Drop */}
         <div className="space-y-0.5">
           {navigation.map((item) => {
@@ -349,7 +363,7 @@ export function Sidebar({
                   href={item.href}
                   onClick={isMobile ? onCloseMobile : undefined}
                   className={cn(
-                    "flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 relative",
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 relative",
                     isActive
                       ? "bg-gray-900 text-white shadow-sm"
                       : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
@@ -376,7 +390,7 @@ export function Sidebar({
 
         {/* AI Section */}
         {(!isCollapsed || isMobile) && (
-          <div className="pt-4">
+          <div className="pt-3">
             <div className="space-y-0.5">
               {aiNavigation.map((item) => {
                 const isActive = pathname === item.href
@@ -386,7 +400,7 @@ export function Sidebar({
                     href={item.href}
                     onClick={isMobile ? onCloseMobile : undefined}
                     className={cn(
-                      "group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
+                      "group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200",
                       isActive
                         ? "bg-gray-200 text-gray-900 shadow-sm"
                         : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
@@ -406,7 +420,7 @@ export function Sidebar({
 
         {/* Collapsed AI icons */}
         {isCollapsed && !isMobile && (
-          <div className="pt-4 space-y-0.5">
+          <div className="pt-3 space-y-0.5">
             {aiNavigation.map((item) => {
               const isActive = pathname === item.href
               return (
@@ -414,7 +428,7 @@ export function Sidebar({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "group flex items-center justify-center px-2 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 relative",
+                    "group flex items-center justify-center px-2 py-2 text-sm font-medium rounded-xl transition-all duration-200 relative",
                     isActive
                       ? "bg-gray-200 text-gray-900 shadow-sm"
                       : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
