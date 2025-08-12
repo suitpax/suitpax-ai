@@ -504,6 +504,180 @@ export function validatePassengerData(passengers: any[]): { valid: boolean; erro
   }
 }
 
+/**
+ * Checks if an offer can be held and paid for later
+ */
+export function canOfferBeHeld(offer: any): boolean {
+  return offer.payment_requirements?.requires_instant_payment === false
+}
+
+/**
+ * Gets payment requirements information from an offer
+ */
+export function getPaymentRequirements(offer: any) {
+  const requirements = offer.payment_requirements || {}
+
+  return {
+    requires_instant_payment: requirements.requires_instant_payment ?? true,
+    price_guarantee_expires_at: requirements.price_guarantee_expires_at || null,
+    payment_required_by: requirements.payment_required_by || null,
+    has_price_guarantee: !!requirements.price_guarantee_expires_at,
+  }
+}
+
+/**
+ * Creates a hold order (without payment)
+ */
+export async function createHoldOrder(
+  duffel: Duffel,
+  offerId: string,
+  passengers: any[],
+  metadata?: Record<string, any>,
+) {
+  try {
+    // First validate the offer can be held
+    const offer = await duffel.offers.get(offerId)
+
+    if (!canOfferBeHeld(offer.data)) {
+      throw new Error("This offer requires instant payment and cannot be held")
+    }
+
+    // Create hold order without payments
+    const order = await duffel.orders.create({
+      type: "hold",
+      selected_offers: [offerId],
+      passengers: passengers.map((p, idx) => ({
+        id: `pas_${idx + 1}`,
+        type: "adult",
+        title: p.title,
+        given_name: p.given_name,
+        family_name: p.family_name,
+        gender: p.gender,
+        born_on: p.born_on,
+        phone_number: p.phone_number,
+        email: p.email,
+      })),
+      metadata: {
+        ...metadata,
+        order_type: "hold",
+        created_at: new Date().toISOString(),
+      },
+    } as any)
+
+    return {
+      success: true,
+      order: order.data,
+      payment_status: order.data.payment_status,
+    }
+  } catch (error) {
+    console.error("Error creating hold order:", error)
+    return {
+      success: false,
+      error: error.message || "Failed to create hold order",
+    }
+  }
+}
+
+/**
+ * Pays for a hold order
+ */
+export async function payHoldOrder(duffel: Duffel, orderId: string, paymentAmount: string, paymentCurrency: string) {
+  try {
+    // First get the latest order to check current price
+    const order = await duffel.orders.get(orderId)
+
+    if (!order.data.payment_status?.awaiting_payment) {
+      throw new Error("Order is not awaiting payment")
+    }
+
+    // Check if payment is still required
+    const paymentRequiredBy = new Date(order.data.payment_status.payment_required_by)
+    if (paymentRequiredBy <= new Date()) {
+      throw new Error("Payment deadline has passed")
+    }
+
+    // Verify the amount matches current price
+    if (order.data.total_amount !== paymentAmount) {
+      throw new Error("Price has changed. Please refresh and try again.")
+    }
+
+    // Create payment
+    const payment = await duffel.payments.create({
+      order_id: orderId,
+      payment: {
+        type: "balance",
+        amount: paymentAmount,
+        currency: paymentCurrency,
+      },
+    } as any)
+
+    return {
+      success: true,
+      payment: payment.data,
+      order: order.data,
+    }
+  } catch (error) {
+    console.error("Error paying hold order:", error)
+
+    // Handle specific Duffel errors
+    if (error.message?.includes("price_changed")) {
+      return {
+        success: false,
+        error: "Price has changed since booking",
+        error_code: "PRICE_CHANGED",
+      }
+    }
+
+    if (error.message?.includes("schedule_changed")) {
+      return {
+        success: false,
+        error: "Flight schedule has changed",
+        error_code: "SCHEDULE_CHANGED",
+      }
+    }
+
+    return {
+      success: false,
+      error: error.message || "Failed to process payment",
+    }
+  }
+}
+
+/**
+ * Gets the current status and pricing of a hold order
+ */
+export async function getHoldOrderStatus(duffel: Duffel, orderId: string) {
+  try {
+    const order = await duffel.orders.get(orderId)
+    const paymentStatus = order.data.payment_status || {}
+
+    const now = new Date()
+    const paymentRequiredBy = paymentStatus.payment_required_by ? new Date(paymentStatus.payment_required_by) : null
+    const priceGuaranteeExpiresAt = paymentStatus.price_guarantee_expires_at
+      ? new Date(paymentStatus.price_guarantee_expires_at)
+      : null
+
+    return {
+      success: true,
+      order: order.data,
+      status: {
+        awaiting_payment: paymentStatus.awaiting_payment ?? false,
+        payment_required_by: paymentRequiredBy,
+        price_guarantee_expires_at: priceGuaranteeExpiresAt,
+        payment_expired: paymentRequiredBy ? paymentRequiredBy <= now : false,
+        price_guarantee_expired: priceGuaranteeExpiresAt ? priceGuaranteeExpiresAt <= now : false,
+        time_remaining: paymentRequiredBy ? Math.max(0, paymentRequiredBy.getTime() - now.getTime()) : 0,
+      },
+    }
+  } catch (error) {
+    console.error("Error getting hold order status:", error)
+    return {
+      success: false,
+      error: error.message || "Failed to get order status",
+    }
+  }
+}
+
 // Interfaces mejoradas
 export interface FlightSearchParams {
   origin: string
