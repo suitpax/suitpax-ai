@@ -84,6 +84,26 @@ function AIChatView() {
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
   const { isStreaming, start, cancel } = useChatStream()
+  
+  const sendWithReasoning = async (userMessage: Message) => {
+    const res = await fetch('/api/suitpax-ai', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: userMessage.content, history: messages, userId: user?.id, includeReasoning: showReasoning })
+    })
+    if (res.ok) {
+      const data = await res.json()
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: data.response,
+        role: 'assistant',
+        timestamp: new Date(),
+        reasoning: data.reasoning,
+        sources: data.sources || []
+      }
+      setMessages(prev => [...prev, assistantMessage])
+      setTypingMessageId(assistantMessage.id)
+    }
+  }
 
   useEffect(() => {
     const getUser = async () => {
@@ -205,13 +225,19 @@ function AIChatView() {
       /\b([A-Z]{3})\b.*\b(to|→|-)\b.*\b([A-Z]{3})\b/i.test(userMessage.content) ||
       /\bflight|vuelo|vuelos\b/i.test(userMessage.content)
 
+    // Always connect userId for Mem0 association
+    if (!user) {
+      const { data } = await supabase.auth.getUser()
+      setUser(data.user)
+    }
+
     try {
-      if (isFlightIntent) {
-        await sendNonStreaming(userMessage)
+      if (isFlightIntent || showReasoning) {
+        await sendWithReasoning(userMessage)
         return
       }
       let streamed = ""
-      await start({ message: userMessage.content, history: messages }, async (token) => {
+      await start({ message: userMessage.content, history: messages, userId: user?.id }, async (token) => {
         streamed += token
         setTypingMessageId("streaming")
         setMessages((prev) => {
