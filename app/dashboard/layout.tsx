@@ -11,6 +11,8 @@ import { motion } from "framer-motion"
 import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 import AISearchInput from "@/components/ui/ai-search-input"
+import FooterBanner from "@/components/dashboard/footer-banner"
+import { SUITPAX_VERSION } from "@/lib/version"
 
 export default function DashboardLayout({
   children,
@@ -227,6 +229,7 @@ export default function DashboardLayout({
             {children}
           </motion.div>
         </main>
+        <FooterBanner version={SUITPAX_VERSION} userName={user?.email?.split("@")[0]} />
       </div>
 
       <Toaster

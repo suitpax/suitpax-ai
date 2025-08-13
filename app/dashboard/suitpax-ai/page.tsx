@@ -86,7 +86,7 @@ function AIChatView() {
   const { isStreaming, start, cancel } = useChatStream()
   
   const sendWithReasoning = async (userMessage: Message) => {
-    const res = await fetch('/api/suitpax-ai', {
+    const res = await fetch('/api/ai-chat', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: userMessage.content, history: messages, userId: user?.id, includeReasoning: showReasoning })
     })
@@ -182,7 +182,7 @@ function AIChatView() {
   }
 
   const sendNonStreaming = async (userMessage: Message) => {
-    const response = await fetch("/api/suitpax-ai", {
+    const response = await fetch("/api/ai-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

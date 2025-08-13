@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client"
+import { createClient as createServerSupabaseClient } from "@/lib/supabase/server"
 
 export interface TravelPolicy {
   id: string
@@ -37,10 +37,15 @@ export interface PolicyViolation {
 }
 
 export class PolicyService {
-  private supabase = createClient()
+  private supabasePromise = createServerSupabaseClient()
+
+  private async getSupabase() {
+    return await this.supabasePromise
+  }
 
   async createPolicy(policy: Omit<TravelPolicy, "id" | "created_at" | "updated_at">): Promise<TravelPolicy> {
-    const { data, error } = await this.supabase.from("travel_policies").insert([policy]).select().single()
+    const supabase = await this.getSupabase()
+    const { data, error } = await supabase.from("travel_policies").insert([policy]).select().single()
 
     if (error) throw error
 
@@ -51,7 +56,8 @@ export class PolicyService {
   }
 
   async getUserPolicies(userId: string): Promise<TravelPolicy[]> {
-    const { data, error } = await this.supabase
+    const supabase = await this.getSupabase()
+    const { data, error } = await supabase
       .from("travel_policies")
       .select(`
         *,
@@ -196,7 +202,8 @@ export class PolicyService {
   }> {
     const policies = await this.getUserPolicies(userId)
 
-    const { data: violations } = await this.supabase
+    const supabase = await this.getSupabase()
+    const { data: violations } = await supabase
       .from("policy_violations")
       .select("violation_type")
       .eq("user_id", userId)
