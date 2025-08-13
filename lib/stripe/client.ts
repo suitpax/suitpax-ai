@@ -1,13 +1,15 @@
 import Stripe from "stripe"
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is required")
-}
+let stripeInstance: Stripe | null = null
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-12-18.acacia",
-  typescript: true,
-})
+function getStripe(): Stripe {
+  if (!stripeInstance) {
+    const key = process.env.STRIPE_SECRET_KEY
+    if (!key) throw new Error("STRIPE_SECRET_KEY is required")
+    stripeInstance = new Stripe(key, { apiVersion: "2024-12-18.acacia", typescript: true })
+  }
+  return stripeInstance
+}
 
 export const STRIPE_CONFIG = {
   publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
@@ -70,7 +72,7 @@ export function getPlanConfig(planType: PlanType) {
 }
 
 export async function createCustomer(email: string, name?: string, metadata?: Record<string, string>) {
-  return await stripe.customers.create({
+  return await getStripe().customers.create({
     email,
     name,
     metadata,
@@ -90,7 +92,7 @@ export async function createCheckoutSession({
   cancelUrl: string
   metadata?: Record<string, string>
 }) {
-  return await stripe.checkout.sessions.create({
+  return await getStripe().checkout.sessions.create({
     customer: customerId,
     payment_method_types: ["card"],
     line_items: [
@@ -105,33 +107,31 @@ export async function createCheckoutSession({
     metadata,
     allow_promotion_codes: true,
     billing_address_collection: "required",
-    tax_id_collection: {
-      enabled: true,
-    },
+    tax_id_collection: { enabled: true },
   })
 }
 
 export async function createCustomerPortalSession(customerId: string, returnUrl: string) {
-  return await stripe.billingPortal.sessions.create({
+  return await getStripe().billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
   })
 }
 
 export async function getSubscription(subscriptionId: string) {
-  return await stripe.subscriptions.retrieve(subscriptionId, {
+  return await getStripe().subscriptions.retrieve(subscriptionId, {
     expand: ["default_payment_method", "customer"],
   })
 }
 
 export async function cancelSubscription(subscriptionId: string) {
-  return await stripe.subscriptions.cancel(subscriptionId)
+  return await getStripe().subscriptions.cancel(subscriptionId)
 }
 
 export async function updateSubscription(subscriptionId: string, priceId: string) {
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+  const subscription = await getStripe().subscriptions.retrieve(subscriptionId)
 
-  return await stripe.subscriptions.update(subscriptionId, {
+  return await getStripe().subscriptions.update(subscriptionId, {
     items: [
       {
         id: subscription.items.data[0].id,

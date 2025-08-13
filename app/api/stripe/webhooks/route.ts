@@ -1,8 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
-import { stripe, STRIPE_CONFIG } from "@/lib/stripe/client"
+import { STRIPE_CONFIG } from "@/lib/stripe/client"
 import { createClient } from "@/lib/supabase/server"
-import type Stripe from "stripe"
+import Stripe from "stripe"
+
+function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) throw new Error("STRIPE_SECRET_KEY is required")
+  return new Stripe(key, { apiVersion: "2024-12-18.acacia", typescript: true })
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -15,7 +21,7 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, STRIPE_CONFIG.webhookSecret)
+    event = getStripe().webhooks.constructEvent(body, signature, STRIPE_CONFIG.webhookSecret)
   } catch (error) {
     console.error("Webhook signature verification failed:", error)
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 })

@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     // Crear pasajeros
     const passengers = Array(params.passengers || 1).fill({ type: "adult" });
 
-    // Realizar búsqueda en Duffel
+    // Realizar búsqueda en Duffel (SDK v4)
     const offerRequest = await duffel.offerRequests.create({
       slices,
       passengers,

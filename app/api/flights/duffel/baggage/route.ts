@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createDuffelClient } from "@/lib/duffel"
 
-const duffel = createDuffelClient()
-
 interface BaggageSearchRequest {
   orderId: string
 }
@@ -54,6 +52,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
+      const duffel = createDuffelClient()
       // Obtener acciones disponibles para la orden
       const available = await duffel.orderChangeRequests.create({
         order_id: orderId,
@@ -192,6 +191,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
+      const duffel = createDuffelClient()
       // Crear change request para agregar servicios de equipaje
       const changeRequest = await duffel.orderChangeRequests.create({
         order_id: orderId,
@@ -369,6 +369,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     try {
+      const duffel = createDuffelClient()
       // Crear change request para remover servicio de equipaje
       const changeRequest = await duffel.orderChangeRequests.create({
         order_id: orderId,

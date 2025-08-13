@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getDuffelClient } from "@/lib/duffel/client"
+import { createDuffelClient } from "@/lib/duffel"
 import { createClient } from "@/lib/supabase/server"
 
 export async function POST(request: NextRequest) {
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Check-out date must be after check-in date" }, { status: 400 })
     }
 
-    const duffel = getDuffelClient()
+    const duffel = createDuffelClient()
     const supabase = createClient()
 
     // Get current user
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     // Search hotels using Duffel
-    const searchResult = await duffel.searchHotels({
+    const searchResult = await duffel.stays.search({
       location: {
         latitude: location.latitude,
         longitude: location.longitude,
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       check_out_date,
       guests,
       rooms,
-    })
+    } as any)
 
     // Store search in database if user is authenticated
     if (user) {
@@ -65,27 +65,17 @@ export async function POST(request: NextRequest) {
           guests,
           rooms,
         },
-        results_count: searchResult.data.length,
+        results_count: (searchResult as any).data?.length || 0,
       })
     }
 
     return NextResponse.json({
       success: true,
-      results: searchResult.data,
-      count: searchResult.data.length,
+      results: (searchResult as any).data || [],
+      count: (searchResult as any).data?.length || 0,
     })
   } catch (error) {
     console.error("Hotel search error:", error)
-
-    if (error.name === "DuffelError") {
-      return NextResponse.json(
-        {
-          error: "Hotel search failed",
-          details: error.message,
-        },
-        { status: error.status || 500 },
-      )
-    }
 
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }

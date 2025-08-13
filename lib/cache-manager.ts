@@ -122,14 +122,14 @@ export function useSmartCache() {
         const existing = cacheRef.current.getSearchResult(keyData)
         if (existing) return
         try {
-          const res = await fetch('/api/flights/duffel/flight-search', {
+          const res = await fetch('/api/flights/search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               origin: q.origin,
               destination: q.destination,
               departure_date: q.departureDate,
-              passengers: { adults: q.passengers },
+              passengers: [{ type: 'adult' }],
               cabin_class: q.cabinClass,
             }),
           })

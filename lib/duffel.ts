@@ -1,14 +1,24 @@
-import { getDuffelClient, type DuffelOffer, type DuffelOrder } from "@/lib/duffel/client"
+import { Duffel } from "@duffel/api"
+import type { DuffelOffer, DuffelOrder } from "@/lib/duffel/client"
 
-// Legacy compatibility exports
+// SDK client singleton
+let sdkClient: Duffel | null = null
+
 export function createDuffelClient() {
-  return getDuffelClient()
+  if (!sdkClient) {
+    const token = process.env.DUFFEL_API_KEY
+    if (!token) {
+      throw new Error("Duffel API key not configured. Please set DUFFEL_API_KEY environment variable.")
+    }
+    sdkClient = new Duffel({ token })
+  }
+  return sdkClient
 }
 
 export function handleDuffelError(error: any) {
   console.error("Duffel Error:", error)
 
-  if (error.name === "DuffelError") {
+  if (error?.name === "DuffelError") {
     return {
       success: false,
       error: error.message,
@@ -35,10 +45,18 @@ export async function getAirportData(query: string) {
   }
 }
 
-export function verifyWebhookSignature(payload: string, signature: string, secret: string): boolean {
-  // In production, implement proper webhook signature verification
-  // This is a placeholder implementation
-  return true
+export function verifyWebhookSignature(payload: string, signature?: string | null): boolean {
+  const secret = process.env.DUFFEL_WEBHOOK_SECRET
+  if (!secret || !signature) return false
+  try {
+    // Duffel signs as HMAC-SHA256 of payload using secret
+    const h = require("crypto").createHmac("sha256", secret)
+    h.update(payload, "utf8")
+    const expected = h.digest("hex")
+    return expected === signature
+  } catch {
+    return false
+  }
 }
 
 export function mapDuffelStatus(status: string): string {

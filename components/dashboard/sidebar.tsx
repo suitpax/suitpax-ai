@@ -63,7 +63,7 @@ const defaultNavigation = [
   { id: "flights", name: "Flights", href: "/dashboard/flights", icon: PiAirplane },
   { id: "hotels", name: "Hotels", href: "/dashboard/hotels", icon: PiBuildings },
   { id: "suitpax-bank", name: "Suitpax Bank", href: "/dashboard/suitpax-bank", icon: PiBank },
-  { id: "air-data", name: "Air Data", href: "/dashboard/air-data", icon: PiRadar },
+  { id: "air-data", name: "Air Data", href: "/dashboard/air-data", icon: PiMapTrifold },
   { id: "finance", name: "Finance", href: "/dashboard/finance", icon: PiCreditCard },
   { id: "analytics", name: "Analytics", href: "/dashboard/analytics", icon: PiChartBar },
   { id: "calendar", name: "Calendar", href: "/dashboard/calendar", icon: PiCalendar },

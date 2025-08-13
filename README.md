@@ -107,6 +107,9 @@ OCR_SPACE_API_KEY=your_ocr_space_key
 DUFFEL_API_KEY=your_duffel_key
 DUFFEL_WEBHOOK_SECRET=your_duffel_webhook_secret
 
+# Flights Data (optional)
+AIRLABS_API_KEY=your_airlabs_key
+
 # Email Services
 BREVO_API_KEY=your_brevo_key
 

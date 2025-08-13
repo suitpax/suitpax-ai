@@ -1,34 +1,20 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getDuffelClient } from "@/lib/duffel/client"
+import { createDuffelClient } from "@/lib/duffel"
 
-export async function GET(request: NextRequest, { params }: { params: { searchResultId: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: { searchResultId: string } }) {
   try {
     const { searchResultId } = params
 
     if (!searchResultId) {
-      return NextResponse.json({ error: "Search result ID is required" }, { status: 400 })
+      return NextResponse.json({ error: "searchResultId is required" }, { status: 400 })
     }
 
-    const duffel = getDuffelClient()
-    const rates = await duffel.getHotelRates(searchResultId)
+    const duffel = createDuffelClient()
+    const rates = await (duffel as any).stays.searchResults.getRates(searchResultId)
 
-    return NextResponse.json({
-      success: true,
-      rates: rates.data,
-    })
+    return NextResponse.json({ success: true, rates })
   } catch (error) {
     console.error("Get hotel rates error:", error)
-
-    if (error.name === "DuffelError") {
-      return NextResponse.json(
-        {
-          error: "Failed to get hotel rates",
-          details: error.message,
-        },
-        { status: error.status || 500 },
-      )
-    }
-
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to get rates" }, { status: 500 })
   }
 }

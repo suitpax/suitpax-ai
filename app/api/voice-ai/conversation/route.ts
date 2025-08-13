@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@supabase/ssr"
-import { cookieStore } from "@/lib/supabase/cookies"
+import { createClient } from "@/lib/supabase/server"
 import Anthropic from "@anthropic-ai/sdk"
 
 const anthropic = new Anthropic({
@@ -10,13 +9,7 @@ const anthropic = new Anthropic({
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: cookieStore
-      }
-    )
+    const supabase = createClient()
 
     const {
       data: { user },

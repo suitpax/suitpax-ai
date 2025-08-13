@@ -19,13 +19,13 @@ export async function GET(request: NextRequest, { params }: { params: { offerId:
   } catch (error) {
     console.error("Get offer error:", error)
 
-    if (error.name === "DuffelError") {
+    if ((error as any)?.name === "DuffelError") {
       return NextResponse.json(
         {
           error: "Failed to get offer",
-          details: error.message,
+          details: (error as any).message,
         },
-        { status: error.status || 500 },
+        { status: (error as any).status || 500 },
       )
     }
 

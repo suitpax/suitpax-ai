@@ -16,13 +16,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate passenger data
-    const validation = validatePassengerData(passengers)
-    if (!validation.valid) {
+    // Validate passenger data (array)
+    if (!Array.isArray(passengers) || passengers.length === 0) {
+      return NextResponse.json(
+        { error: "Passengers must be a non-empty array" },
+        { status: 400 },
+      )
+    }
+    const allValid = passengers.every((p: any) => validatePassengerData(p).isValid)
+    if (!allValid) {
+      const errors = passengers.map((p: any, i: number) => ({ index: i, ...validatePassengerData(p) })).filter((r) => !r.isValid)
       return NextResponse.json(
         {
           error: "Invalid passenger data",
-          details: validation.errors,
+          details: errors,
         },
         { status: 400 },
       )
@@ -89,13 +96,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Flight booking error:", error)
 
-    if (error.name === "DuffelError") {
+    if ((error as any).name === "DuffelError") {
       return NextResponse.json(
         {
           error: "Booking failed",
-          details: error.message,
+          details: (error as any).message,
         },
-        { status: error.status || 500 },
+        { status: (error as any).status || 500 },
       )
     }
 

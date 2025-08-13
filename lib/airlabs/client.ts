@@ -3,7 +3,7 @@
  * Provides access to real-time flight data, airport information, and aviation databases
  */
 
-const AIRLABS_API_KEY = "86989372-7e37-4743-b60a-48ba1df29434"
+const AIRLABS_API_KEY = process.env.AIRLABS_API_KEY || ""
 const AIRLABS_BASE_URL = "https://airlabs.co/api/v9"
 
 export interface AirLabsResponse<T> {
@@ -100,6 +100,9 @@ export class AirLabsClient {
   }
 
   private async makeRequest<T>(endpoint: string, params: Record<string, any> = {}): Promise<T> {
+    if (!this.apiKey) {
+      throw new Error("AIRLABS_API_KEY is not configured")
+    }
     const url = new URL(`${this.baseUrl}/${endpoint}`)
     url.searchParams.append("api_key", this.apiKey)
 

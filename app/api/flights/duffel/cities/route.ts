@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createDuffelClient } from "@/lib/duffel"
 
 export async function GET(req: NextRequest) {
   try {
-    createDuffelClient() // ensure token configured; SDK does not expose cities in this version
     const url = new URL(req.url)
     const limit = url.searchParams.get("limit") ? Number(url.searchParams.get("limit")) : 50
     const name = (url.searchParams.get("name") || url.searchParams.get("q") || "").trim()
