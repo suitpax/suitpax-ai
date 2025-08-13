@@ -5,14 +5,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { FlightSearchForm } from "@/components/flights/flight-search-form"
-import { PlaneIcon, ClockIcon, UsersIcon } from "lucide-react"
+import { PlaneIcon, ClockIcon, UsersIcon, Filter } from "lucide-react"
 import { formatPrice, formatDuration, getStopDescription } from "@/lib/duffel/utils"
 import type { DuffelOffer } from "@/lib/duffel/client"
+import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
+import { SearchAnalytics } from "@/components/flights/search-analytics"
 
 export default function FlightsPage() {
   const [searchResults, setSearchResults] = useState<DuffelOffer[]>([])
   const [selectedOffer, setSelectedOffer] = useState<DuffelOffer | null>(null)
   const [showResults, setShowResults] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
+  const [activeFilters, setActiveFilters] = useState({
+    priceRange: [0, 5000],
+    maxStops: 2,
+    airlines: [],
+    departureTime: [],
+    arrivalTime: [],
+    duration: [0, 1440],
+    cabinClass: [],
+    refundable: false,
+    changeable: false,
+    directOnly: false,
+  })
+  const [displayFilters, setDisplayFilters] = useState<any[]>([])
 
   const handleSearchResults = (results: DuffelOffer[]) => {
     setSearchResults(results)
@@ -29,13 +45,23 @@ export default function FlightsPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-2">
-            Business Flights
-          </h1>
-          <p className="text-lg font-light text-gray-600">
-            Search and book flights for your business travel with enterprise-grade tools
-          </p>
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">
+              Business Flights
+            </h1>
+            <p className="text-sm md:text-base font-light text-gray-600">
+              Search and book with Duffel. Filters and market insights included.
+            </p>
+          </div>
+          {showResults && (
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="bg-gray-200 text-gray-700">{searchResults.length} results</Badge>
+              <Button variant="outline" onClick={() => setShowFilters(true)} className="rounded-xl">
+                <Filter className="h-4 w-4 mr-2" /> Filters
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Search Form */}
@@ -45,20 +71,8 @@ export default function FlightsPage() {
 
         {/* Search Results */}
         {showResults && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-medium tracking-tighter">Flight Results ({searchResults.length})</h2>
-              <div className="flex gap-2">
-                <Badge variant="outline" className="bg-gray-200 text-gray-700">
-                  Best Price
-                </Badge>
-                <Badge variant="outline" className="bg-gray-200 text-gray-700">
-                  Fastest
-                </Badge>
-              </div>
-            </div>
-
-            <div className="grid gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-8 space-y-4">
               {searchResults.length === 0 ? (
                 <Card className="bg-white/50 backdrop-blur-sm border border-gray-200">
                   <CardContent className="p-12 text-center">
@@ -72,6 +86,9 @@ export default function FlightsPage() {
                   <FlightOfferCard key={offer.id} offer={offer} onSelect={() => handleSelectOffer(offer)} />
                 ))
               )}
+            </div>
+            <div className="lg:col-span-4">
+              <SearchAnalytics className="sticky top-4" />
             </div>
           </div>
         )}
@@ -122,6 +139,15 @@ export default function FlightsPage() {
             </Card>
           </div>
         )}
+
+        {/* Filters Drawer */}
+        <FlightFilters
+          offers={searchResults as any}
+          filters={activeFilters as any}
+          onFiltersChange={(f: any) => setActiveFilters(f)}
+          isOpen={showFilters}
+          onClose={() => setShowFilters(false)}
+        />
       </div>
     </div>
   )

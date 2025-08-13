@@ -421,6 +421,9 @@ export function Sidebar({
               priority
             />
           </Link>
+          <div className="hidden lg:flex items-center gap-2 mr-2">
+            <span className="text-[10px] text-gray-500">{user ? (user.email?.split("@")[0] || "User") : ""}</span>
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -430,6 +433,13 @@ export function Sidebar({
             {isCollapsed ? <PiCaretRight className="h-4 w-4" /> : <PiCaretLeft className="h-4 w-4" />}
           </Button>
         </div>
+        {!isCollapsed && (
+          <div className="mt-2 flex items-center gap-2">
+            <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-700">
+              Suitpax AI {process.env.NEXT_PUBLIC_APP_VERSION || "v0.1.0"}
+            </span>
+          </div>
+        )}
       </div>
 
       {(!isCollapsed || isMobile) && (
