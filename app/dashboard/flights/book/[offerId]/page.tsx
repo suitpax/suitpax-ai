@@ -24,7 +24,7 @@ export default function FlightBookingPage() {
       given_name: "",
       family_name: "",
       title: "mr",
-      gender: "m",
+      gender: "male",
       born_on: "",
       phone_number: "",
       email: "",
@@ -58,6 +58,8 @@ export default function FlightBookingPage() {
         body: JSON.stringify({
           offer_id: offerId,
           passengers,
+          payment_amount: offer.total_amount,
+          payment_currency: offer.total_currency,
         }),
       })
 

@@ -165,7 +165,7 @@ const DashboardPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm"
+              className="bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-gray-200 shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -245,13 +245,13 @@ const DashboardPage = () => {
 
             <div className="relative z-10 flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center border border-gray-600 shadow-inner">
-                  <Sparkles className="w-6 h-6 text-gray-300" />
+                                <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-600 shadow-inner bg-gray-800">
+                  <img src="/agents/ai-agent-white-hair.png" alt="Suitpax AI" className="w-full h-full object-cover" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-medium tracking-tight text-gray-100">Suitpax AI Assistant</h3>
+                  <h3 className="text-lg font-medium tracking-tight text-gray-100">Suitpax AI</h3>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
                     <span className="text-[10px] text-gray-400 font-medium">Ready</span>
