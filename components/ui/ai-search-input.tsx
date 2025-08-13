@@ -15,7 +15,7 @@ interface AISearchInputProps {
   onSubmit?: (query: string) => void
 }
 
-export default function AISearchInput({
+export function AiSearchInput({
   placeholder = "Search or ask AI anything...",
   className,
   size = "md",
@@ -97,3 +97,5 @@ export default function AISearchInput({
     </div>
   )
 }
+
+export default AiSearchInput
