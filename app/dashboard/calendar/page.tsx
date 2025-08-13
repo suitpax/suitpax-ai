@@ -9,8 +9,7 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(15)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -27,7 +26,7 @@ export default function CalendarPage() {
             </p>
           </div>
           <div className="flex items-center gap-3 mt-4 sm:mt-0">
-            <div className="flex bg-white/80 backdrop-blur-sm rounded-xl p-1 border border-white/20">
+            <div className="flex bg-white/60 backdrop-blur-sm rounded-xl p-1 border border-gray-200">
               {["month", "week", "day"].map((view) => (
                 <button
                   key={view}

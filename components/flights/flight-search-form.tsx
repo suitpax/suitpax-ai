@@ -37,7 +37,7 @@ export function FlightSearchForm({ onResults }: FlightSearchFormProps) {
       ...Array(infants).fill({ type: "infant_without_seat", age: 1 }),
     ]
 
-    await searchFlights({
+    const offers = await searchFlights({
       origin,
       destination,
       departure_date: departureDate,
@@ -46,9 +46,7 @@ export function FlightSearchForm({ onResults }: FlightSearchFormProps) {
       cabin_class: cabinClass,
     })
 
-    if (results && onResults) {
-      onResults(results)
-    }
+    if (onResults) onResults(offers || [])
   }
 
   return (
