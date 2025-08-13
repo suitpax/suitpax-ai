@@ -14,7 +14,7 @@ import {
   SiTrello,
   SiHubspot,
 } from "react-icons/si"
-import { Calendar, Mail, Clock, Users, Video, CheckCircle } from "lucide-react"
+import { CalendarIcon, Mail, Clock, Users, Video, CheckCircle } from "lucide-react"
 
 // Breakpoint personalizado para pantallas muy pequeñas
 const useExtraSmallScreen = () => {
@@ -207,26 +207,77 @@ export const AIMeetingsAttachment = () => {
           </div>
 
           {/* Calendar Showcase */}
-          <div className="mb-12 max-w-lg mx-auto">
-            <div className="rounded-xl border border-gray-500/20 p-2.5 bg-black/20 backdrop-blur-sm">
-              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-gray-200/10">
-                <Image
-                  src="https://tailark.com/_next/image?url=%2Forigin-cal-dark.png&w=3840&q=75"
-                  alt="Calendar Integration"
-                  width={1207}
-                  height={929}
-                  className="w-full h-full object-cover"
-                />
+          <div className="mb-12 max-w-2xl mx-auto">
+            <div className="rounded-2xl border border-gray-500/20 p-4 bg-black/20 backdrop-blur-sm">
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-gray-200/10">
+                <div className="w-full h-full bg-gradient-to-br from-gray-900 to-black p-6">
+                  {/* Calendar Header */}
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-white text-lg font-medium">October 2025</h3>
+                    <div className="flex gap-2">
+                      <button className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+                        <CalendarIcon className="w-4 h-4 text-white" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Calendar Grid */}
+                  <div className="grid grid-cols-7 gap-2 mb-4">
+                    {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
+                      <div key={day} className="text-center text-xs text-gray-400 font-medium p-2">
+                        {day}
+                      </div>
+                    ))}
+                    {Array.from({ length: 35 }, (_, i) => {
+                      const day = i - 6 + 1
+                      const isToday = day === 15
+                      const hasMeeting = [8, 12, 18, 22, 25].includes(day)
+
+                      return (
+                        <div
+                          key={i}
+                          className={`
+                            aspect-square flex items-center justify-center text-xs rounded-lg transition-all
+                            ${day > 0 && day <= 31 ? "text-white hover:bg-white/10" : "text-transparent"}
+                            ${isToday ? "bg-blue-500 text-white font-medium" : ""}
+                            ${hasMeeting ? "bg-emerald-500/20 border border-emerald-500/30" : ""}
+                          `}
+                        >
+                          {day > 0 && day <= 31 ? day : ""}
+                          {hasMeeting && <div className="absolute w-1 h-1 bg-emerald-400 rounded-full mt-3"></div>}
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Upcoming meetings */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <div className="flex-1">
+                        <div className="text-white text-sm font-medium">Team Standup</div>
+                        <div className="text-gray-400 text-xs">Today, 10:00 AM</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                      <div className="flex-1">
+                        <div className="text-white text-sm font-medium">Client Review</div>
+                        <div className="text-gray-400 text-xs">Tomorrow, 2:00 PM</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Overlay elements */}
-                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-gray-200/20">
+                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-gray-200/20">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-gray-300" />
                     <span className="text-[10px] text-gray-300">Smart scheduling</span>
                   </div>
                 </div>
 
-                <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-gray-200/20">
+                <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-gray-200/20">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-emerald-400" />
                     <span className="text-[10px] text-gray-300">AI-optimized time slots</span>
@@ -238,7 +289,7 @@ export const AIMeetingsAttachment = () => {
               <div className="grid grid-cols-2 gap-2 mt-2">
                 <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-gray-200/10">
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-300" />
+                    <CalendarIcon className="w-4 h-4 text-gray-300" />
                     <div>
                       <div className="text-[10px] text-gray-300 font-medium">Calendar Sync</div>
                       <div className="text-[8px] text-gray-400">Automatic availability detection</div>

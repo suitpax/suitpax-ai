@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createDuffelClient } from '@/lib/duffel'
 
-const duffel = createDuffelClient()
-
 export async function POST(request: NextRequest, { params }: { params: { orderId: string } }) {
   try {
     const supabase = createClient()
@@ -33,6 +31,7 @@ export async function POST(request: NextRequest, { params }: { params: { orderId
       return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 })
     }
 
+    const duffel = createDuffelClient()
     // Create change request
     const changeRequest = await duffel.orderChangeRequests.create({
       order_id: orderId,
@@ -92,6 +91,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { order
       return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 })
     }
 
+    const duffel = createDuffelClient()
     const changeRequest = await duffel.orderChangeRequests.create({
       order_id: orderId,
       slices: { add: [], remove: [] },

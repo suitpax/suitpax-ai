@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import type React from "react"
 
 import { useState } from "react"
@@ -17,7 +19,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
-  const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,6 +26,7 @@ export default function LoginPage() {
     setError("")
 
     try {
+      const supabase = createClient()
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -144,7 +146,7 @@ export default function LoginPage() {
                 <div className="text-sm">
                   <Link
                     href="/auth/forgot-password"
-                    className="font-medium text-gray-600 hover:text-black transition-colors"
+                    className="font-medium text-gray-600 hover:text_black transition-colors"
                   >
                     Forgot your password?
                   </Link>
@@ -155,7 +157,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg_black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
                 >
                   {loading ? "Signing in..." : "Sign in"}
                 </button>

@@ -1,175 +1,83 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Loader2, User, CreditCard, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react'
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import PassengerForm from "@/components/flights/passenger-form"
-import FlightItinerary from "@/components/flights/flight-itinerary"
-import BookingSummary from "@/components/flights/booking-summary"
-import { StripePaymentForm } from "@/components/flights/stripe-payment-form"
-import { toast } from "sonner"
-import dynamic from "next/dynamic"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { PlaneIcon, CreditCardIcon, UserIcon } from "lucide-react"
+import { formatPrice, formatDuration, getStopDescription } from "@/lib/duffel/utils"
+import type { DuffelOffer } from "@/lib/duffel/client"
 
-const DuffelAncillaries = dynamic(() => import("@duffel/components").then(m => (m as any).Ancillaries), { ssr: false, loading: () => null })
-
-interface DuffelOffer {
-  id: string
-  total_amount: string
-  total_currency: string
-  passengers: Array<{ type: string }>
-  slices: any[]
-}
-
-interface PassengerData {
-  id?: string
-  title: string
-  given_name: string
-  family_name: string
-  born_on: string
-  email: string
-  phone_number: string
-  type: 'adult' | 'child' | 'infant_without_seat'
-}
-
-async function savePendingServices(offerId: string, services: any[]) {
-  await fetch('/api/flights/duffel/pending-services', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ offerId, services }) })
-}
-
-async function applyPendingServices(orderId: string) {
-  // In this MVP we assume pending services were for the original offer; retrieving is optional
-  // Here we could fetch specific service IDs; for simplicity, no-op. Extend as needed.
-}
-
-export default function BookFlightPage() {
+export default function FlightBookingPage() {
   const params = useParams()
   const router = useRouter()
   const offerId = params.offerId as string
 
   const [offer, setOffer] = useState<DuffelOffer | null>(null)
-  const [passengers, setPassengers] = useState<PassengerData[]>([])
-  const [loading, setLoading] = useState(true)
-  const [booking, setBooking] = useState(false)
-  const [currentStep, setCurrentStep] = useState<'details' | 'payment' | 'confirmation'>('details')
-  const [paymentIntent, setPaymentIntent] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isBooking, setIsBooking] = useState(false)
+  const [passengers, setPassengers] = useState([
+    {
+      given_name: "",
+      family_name: "",
+      title: "mr",
+      gender: "m",
+      born_on: "",
+      phone_number: "",
+      email: "",
+    },
+  ])
 
   useEffect(() => {
-    if (!offerId) return
-
     const fetchOffer = async () => {
       try {
-        setLoading(true)
-        const res = await fetch(`/api/flights/duffel/offers/${offerId}`)
-        const data = await res.json()
-        if (!data.success) {
-          throw new Error(data.error || "Failed to fetch flight details.")
-        }
+        const response = await fetch(`/api/flights/offers/${offerId}`)
+        const data = await response.json()
         setOffer(data.offer)
-        setPassengers(data.offer.passengers.map((p: any) => ({
-          title: 'mr',
-          given_name: '',
-          family_name: '',
-          born_on: '',
-          email: '',
-          phone_number: '',
-          type: p.type,
-        })))
-      } catch (error: any) {
-        toast.error(error.message)
-        router.push("/dashboard/flights")
+      } catch (error) {
+        console.error("Error fetching offer:", error)
       } finally {
-        setLoading(false)
+        setIsLoading(false)
       }
     }
 
     fetchOffer()
-  }, [offerId, router])
+  }, [offerId])
 
-  const handlePassengerChange = (index: number, data: PassengerData) => {
-    const newPassengers = [...passengers]
-    newPassengers[index] = data
-    setPassengers(newPassengers)
-  }
+  const handleBooking = async () => {
+    if (!offer) return
 
-  const validatePassengers = () => {
-    for (const p of passengers) {
-      if (!p.given_name || !p.family_name || !p.born_on || !p.email) {
-        toast.error("Please fill all required fields for all passengers.")
-        return false
-      }
-    }
-    return true
-  }
-
-  const handleContinueToPayment = async () => {
-    if (!validatePassengers() || !offer) return
-
-    setBooking(true)
+    setIsBooking(true)
     try {
-      const res = await fetch("/api/flights/create-payment-intent", {
+      const response = await fetch("/api/flights/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          offerId, 
+        body: JSON.stringify({
+          offer_id: offerId,
           passengers,
-          amount: Math.round(parseFloat(offer.total_amount) * 100),
-          currency: offer.total_currency.toLowerCase()
         }),
       })
 
-      const data = await res.json()
-
-      if (!data.success) {
-        throw new Error(data.error || "Failed to create payment intent.")
+      const data = await response.json()
+      if (data.success) {
+        router.push(`/dashboard/flights/confirmation/${data.order.id}`)
       }
-
-      setPaymentIntent(data.clientSecret)
-      setCurrentStep('payment')
-    } catch (error: any) {
-      toast.error(error.message)
+    } catch (error) {
+      console.error("Booking error:", error)
     } finally {
-      setBooking(false)
+      setIsBooking(false)
     }
   }
 
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
-    setBooking(true)
-    try {
-      const res = await fetch("/api/flights/duffel/booking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          offerId, 
-          passengers,
-          paymentIntentId 
-        }),
-      })
-
-      const data = await res.json()
-
-      if (!data.success) {
-        throw new Error(data.error || "Booking failed.")
-      }
-
-      try { await applyPendingServices(data.order.id) } catch {}
-
-      toast.success("Booking successful! Redirecting to confirmation...")
-      router.push(`/dashboard/flights/book/confirmation/${data.order.id}`)
-    } catch (error: any) {
-      toast.error(error.message)
-      setCurrentStep('details')
-    } finally {
-      setBooking(false)
-    }
-  }
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-gray-500 mx-auto mb-4" />
-          <p className="text-gray-600 font-light">Loading flight details...</p>
+          <PlaneIcon className="h-12 w-12 text-gray-400 mx-auto mb-4 animate-pulse" />
+          <p className="text-gray-600">Loading flight details...</p>
         </div>
       </div>
     )
@@ -179,10 +87,9 @@ export default function BookFlightPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-gray-900 font-medium">Could not load flight offer</p>
-          <Button variant="outline" onClick={() => router.push("/dashboard/flights")} className="mt-4">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Search
+          <p className="text-gray-600">Flight not found</p>
+          <Button onClick={() => router.back()} className="mt-4">
+            Go Back
           </Button>
         </div>
       </div>
@@ -191,165 +98,215 @@ export default function BookFlightPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <Button variant="ghost" onClick={() => router.back()} className="mb-4 text-gray-600 hover:text-gray-900">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to results
-          </Button>
-          
-          <div>
-            <h1 className="text-3xl md:text-4xl font-medium tracking-tighter leading-none">
-              <em className="font-serif italic">Complete</em>
-              <br />
-              <span className="text-gray-900">Your Booking</span>
-            </h1>
-            <p className="text-sm md:text-base font-light text-gray-600 mt-2">
-              Secure checkout powered by Stripe
-            </p>
-          </div>
-        </div>
-
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-center space-x-8">
-            <div className={`flex items-center space-x-2 ${currentStep === 'details' ? 'text-gray-900' : currentStep === 'payment' || currentStep === 'confirmation' ? 'text-green-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'details' ? 'bg-gray-900 text-white' : currentStep === 'payment' || currentStep === 'confirmation' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
-                {currentStep === 'payment' || currentStep === 'confirmation' ? <CheckCircle className="h-4 w-4" /> : '1'}
-              </div>
-              <span className="text-sm font-medium">Passenger Details</span>
-            </div>
-            
-            <div className={`w-16 h-px ${currentStep === 'payment' || currentStep === 'confirmation' ? 'bg-green-600' : 'bg-gray-200'}`} />
-            
-            <div className={`flex items-center space-x-2 ${currentStep === 'payment' ? 'text-gray-900' : currentStep === 'confirmation' ? 'text-green-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'payment' ? 'bg-gray-900 text-white' : currentStep === 'confirmation' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
-                {currentStep === 'confirmation' ? <CheckCircle className="h-4 w-4" /> : '2'}
-              </div>
-              <span className="text-sm font-medium">Payment</span>
-            </div>
-            
-            <div className={`w-16 h-px ${currentStep === 'confirmation' ? 'bg-green-600' : 'bg-gray-200'}`} />
-            
-            <div className={`flex items-center space-x-2 ${currentStep === 'confirmation' ? 'text-green-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'confirmation' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
-                {currentStep === 'confirmation' ? <CheckCircle className="h-4 w-4" /> : '3'}
-              </div>
-              <span className="text-sm font-medium">Confirmation</span>
-            </div>
-          </div>
+          <h1 className="text-4xl font-medium tracking-tighter leading-none mb-2">Complete Your Booking</h1>
+          <p className="text-lg font-light text-gray-600">Review flight details and passenger information</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <FlightItinerary slices={offer.slices} />
-
-            {/* Ancillaries (bags, seats, etc.) */}
-            <Card className="rounded-2xl border border-gray-200 shadow-sm">
+          {/* Flight Summary */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="bg-white/50 backdrop-blur-sm border border-gray-200">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 font-medium tracking-tighter">
-                  Extras & Ancillaries
+                <CardTitle className="flex items-center gap-2">
+                  <PlaneIcon className="h-5 w-5" />
+                  Flight Summary
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {process.env.NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN ? (
-                  <DuffelAncillaries
-                    offerId={offer.id}
-                    duffelToken={process.env.NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN as string}
-                    onAdd={async (items: any) => {
-                      try {
-                        await savePendingServices(offer!.id, items)
-                        toast.success('Extras saved. They will be applied after booking.')
-                      } catch {
-                        toast.error('Failed to save extras')
-                      }
-                    }}
-                  />
-                ) : (
-                  <div className="text-sm text-gray-600">Ancillaries unavailable. Configure NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN.</div>
-                )}
+                {offer.slices.map((slice, index) => (
+                  <div key={index} className="mb-6 last:mb-0">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-medium">{index === 0 ? "Outbound" : "Return"} Flight</h3>
+                      <div className="text-sm text-gray-600">
+                        {formatDuration(slice.duration)} • {getStopDescription(slice.segments.length - 1)}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <div className="text-center">
+                        <div className="text-lg font-medium">
+                          {new Date(slice.segments[0].departing_at).toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                          })}
+                        </div>
+                        <div className="text-sm text-gray-600">{slice.origin.iata_code}</div>
+                      </div>
+
+                      <div className="flex-1 flex items-center">
+                        <div className="h-px bg-gray-300 flex-1"></div>
+                        <PlaneIcon className="h-4 w-4 text-gray-400 mx-2" />
+                        <div className="h-px bg-gray-300 flex-1"></div>
+                      </div>
+
+                      <div className="text-center">
+                        <div className="text-lg font-medium">
+                          {new Date(slice.segments[slice.segments.length - 1].arriving_at).toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                          })}
+                        </div>
+                        <div className="text-sm text-gray-600">{slice.destination.iata_code}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </CardContent>
             </Card>
 
-            {currentStep === 'details' && (
-              <Card className="rounded-2xl border border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-medium tracking-tighter">
-                    <User className="h-5 w-5" />
-                    Passenger Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {passengers.map((p, index) => (
-                    <PassengerForm
-                      key={index}
-                      passengerNumber={index + 1}
-                      passengerData={p}
-                      onChange={(data) => handlePassengerChange(index, data)}
-                    />
-                  ))}
-                </CardContent>
-              </Card>
-            )}
+            {/* Passenger Details */}
+            <Card className="bg-white/50 backdrop-blur-sm border border-gray-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserIcon className="h-5 w-5" />
+                  Passenger Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {passengers.map((passenger, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 rounded-lg"
+                  >
+                    <div className="md:col-span-2">
+                      <h4 className="font-medium mb-4">Passenger {index + 1}</h4>
+                    </div>
 
-            {currentStep === 'payment' && paymentIntent && (
-              <Card className="rounded-2xl border border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-medium tracking-tighter">
-                    <CreditCard className="h-5 w-5" />
-                    Payment Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <StripePaymentForm
-                    clientSecret={paymentIntent}
-                    amount={parseFloat(offer.total_amount)}
-                    currency={offer.total_currency}
-                    onSuccess={handlePaymentSuccess}
-                    onError={(error) => {
-                      toast.error(error)
-                      setCurrentStep('details')
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            )}
+                    <div className="space-y-2">
+                      <Label>Title</Label>
+                      <Select
+                        value={passenger.title}
+                        onValueChange={(value) => {
+                          const updated = [...passengers]
+                          updated[index].title = value
+                          setPassengers(updated)
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="mr">Mr</SelectItem>
+                          <SelectItem value="ms">Ms</SelectItem>
+                          <SelectItem value="mrs">Mrs</SelectItem>
+                          <SelectItem value="dr">Dr</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>First Name</Label>
+                      <Input
+                        value={passenger.given_name}
+                        onChange={(e) => {
+                          const updated = [...passengers]
+                          updated[index].given_name = e.target.value
+                          setPassengers(updated)
+                        }}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Last Name</Label>
+                      <Input
+                        value={passenger.family_name}
+                        onChange={(e) => {
+                          const updated = [...passengers]
+                          updated[index].family_name = e.target.value
+                          setPassengers(updated)
+                        }}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Date of Birth</Label>
+                      <Input
+                        type="date"
+                        value={passenger.born_on}
+                        onChange={(e) => {
+                          const updated = [...passengers]
+                          updated[index].born_on = e.target.value
+                          setPassengers(updated)
+                        }}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Email</Label>
+                      <Input
+                        type="email"
+                        value={passenger.email}
+                        onChange={(e) => {
+                          const updated = [...passengers]
+                          updated[index].email = e.target.value
+                          setPassengers(updated)
+                        }}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Phone Number</Label>
+                      <Input
+                        type="tel"
+                        value={passenger.phone_number}
+                        onChange={(e) => {
+                          const updated = [...passengers]
+                          updated[index].phone_number = e.target.value
+                          setPassengers(updated)
+                        }}
+                        required
+                      />
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           </div>
 
-          <div className="space-y-8">
-            <BookingSummary
-              totalAmount={offer.total_amount}
-              currency={offer.total_currency}
-              passengersCount={offer.passengers.length}
-            />
-            
-            {currentStep === 'details' && (
-              <Button
-                onClick={handleContinueToPayment}
-                disabled={booking}
-                className="w-full bg-black text-white hover:bg-gray-800 rounded-xl py-6 text-lg font-medium tracking-tight"
-              >
-                {booking ? (
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                ) : (
-                  <>Continue to Payment</>
-                )}
-              </Button>
-            )}
-            
-            {currentStep === 'payment' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-medium text-blue-900">Secure Payment</h4>
-                    <p className="text-xs text-blue-700 mt-1">
-                      Your payment is secured by Stripe. We never store your card details.
-                    </p>
+          {/* Booking Summary */}
+          <div className="space-y-6">
+            <Card className="bg-white/50 backdrop-blur-sm border border-gray-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCardIcon className="h-5 w-5" />
+                  Booking Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between">
+                  <span>Flight Price</span>
+                  <span className="font-medium">{formatPrice(offer.total_amount, offer.total_currency)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Taxes & Fees</span>
+                  <span className="font-medium">Included</span>
+                </div>
+                <div className="border-t pt-4">
+                  <div className="flex justify-between text-lg font-medium">
+                    <span>Total</span>
+                    <span>{formatPrice(offer.total_amount, offer.total_currency)}</span>
                   </div>
                 </div>
-              </div>
-            )}
+
+                <Button
+                  onClick={handleBooking}
+                  disabled={isBooking}
+                  className="w-full bg-black text-white hover:bg-gray-800"
+                >
+                  {isBooking ? "Processing..." : "Complete Booking"}
+                </Button>
+
+                <p className="text-xs text-gray-600 text-center">By booking, you agree to our terms and conditions</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

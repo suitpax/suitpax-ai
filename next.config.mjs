@@ -8,7 +8,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['images.unsplash.com', 'assets.duffel.com', 'duffel-platform-public-assets.s3.eu-west-1.amazonaws.com', 'ui-avatars.com', 'cdn.brandfetch.io'],
+    domains: ['images.unsplash.com', 'images.pexels.com', 'assets.duffel.com', 'duffel-platform-public-assets.s3.eu-west-1.amazonaws.com', 'ui-avatars.com', 'cdn.brandfetch.io'],
   },
 };
 

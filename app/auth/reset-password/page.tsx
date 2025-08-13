@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import type React from "react"
 
 import { useState, useEffect } from "react"
@@ -7,9 +9,9 @@ import { motion } from "framer-motion"
 import { Eye, EyeOff, Lock, ArrowRight, Loader2, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { createBrowserClient } from "@supabase/ssr"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
+import { createClient } from "@/lib/supabase/client"
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("")
@@ -19,10 +21,7 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [passwordReset, setPasswordReset] = useState(false)
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const supabase = createClient()
   const router = useRouter()
   const searchParams = useSearchParams()
 

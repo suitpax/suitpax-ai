@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createDuffelClient } from "@/lib/duffel";
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    createDuffelClient()
     if (!process.env.DUFFEL_API_KEY) {
       return NextResponse.json({ error: "Duffel API key not configured" }, { status: 500 })
     }

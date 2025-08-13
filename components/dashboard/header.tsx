@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
-import { 
-  Menu, 
-  Bell, 
+import {
+  Menu,
+  Bell,
   User,
   ChevronDown,
   Settings,
@@ -15,11 +15,10 @@ import {
   Calculator,
   BarChart3,
   HelpCircle,
-  Sparkles
+  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import AISearchInput from "@/components/ui/ai-search-input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,13 +38,11 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command"
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
+import AiSearchInput from "@/components/ui/ai-search-input"
 
 interface HeaderProps {
   user: SupabaseUser
@@ -58,24 +55,24 @@ interface HeaderProps {
 
 const getPageTitle = (pathname: string) => {
   const routes: Record<string, { title: string; description?: string }> = {
-    '/dashboard': { title: 'Dashboard', description: 'Overview and quick actions' },
-    '/dashboard/flights': { title: 'Flights', description: 'Search and book business flights' },
-    '/dashboard/hotels': { title: 'Stays', description: 'Search and manage hotel stays' },
-    '/dashboard/expenses': { title: 'Expenses', description: 'Track and manage travel expenses' },
-    '/dashboard/analytics': { title: 'Analytics', description: 'Travel insights and reports' },
-    '/dashboard/cost-center': { title: 'Cost Centers', description: 'Budgets and spending by department' },
-    '/dashboard/calendar': { title: 'Calendar', description: 'Schedule and manage trips' },
-    '/dashboard/locations': { title: 'Locations', description: 'Saved places and destinations' },
-    '/dashboard/team': { title: 'Team', description: 'Manage team members' },
-    '/dashboard/mail': { title: 'Mail', description: 'Travel communications' },
-    '/dashboard/meetings': { title: 'Meetings', description: 'Schedule and join meetings' },
-    '/dashboard/ai-chat': { title: 'Suitpax AI', description: 'AI-powered travel assistant' },
-    '/dashboard/voice-ai': { title: 'Voice AI', description: 'Voice-powered assistance' },
-    '/dashboard/settings': { title: 'Settings', description: 'Account and preferences' },
-    '/dashboard/profile': { title: 'Profile', description: 'Personal information' },
+    "/dashboard": { title: "Dashboard", description: "Overview and quick actions" },
+    "/dashboard/flights": { title: "Flights", description: "Search and book business flights" },
+    "/dashboard/hotels": { title: "Stays", description: "Search and manage hotel stays" },
+    "/dashboard/expenses": { title: "Expenses", description: "Track and manage travel expenses" },
+    "/dashboard/analytics": { title: "Analytics", description: "Travel insights and reports" },
+    "/dashboard/cost-center": { title: "Cost Centers", description: "Budgets and spending by department" },
+    "/dashboard/calendar": { title: "Calendar", description: "Schedule and manage trips" },
+    "/dashboard/locations": { title: "Locations", description: "Saved places and destinations" },
+    "/dashboard/team": { title: "Team", description: "Manage team members" },
+    "/dashboard/mail": { title: "Mail", description: "Travel communications" },
+    "/dashboard/meetings": { title: "Meetings", description: "Schedule and join meetings" },
+    "/dashboard/ai-chat": { title: "Suitpax AI", description: "AI-powered travel assistant" },
+    "/dashboard/voice-ai": { title: "Voice AI", description: "Voice-powered assistance" },
+    "/dashboard/settings": { title: "Settings", description: "Account and preferences" },
+    "/dashboard/profile": { title: "Profile", description: "Personal information" },
   }
-  
-  return routes[pathname] || { title: 'Dashboard', description: 'Overview and quick actions' }
+
+  return routes[pathname] || { title: "Dashboard", description: "Overview and quick actions" }
 }
 
 const quickActions = [
@@ -86,13 +83,13 @@ const quickActions = [
   { name: "Analytics", href: "/dashboard/analytics", shortcut: "⌘R" },
 ]
 
-export default function Header({ 
-  user, 
-  userPlan, 
-  subscriptionStatus, 
+export default function Header({
+  user,
+  userPlan,
+  subscriptionStatus,
   onToggleSidebar,
   isMobile,
-  sidebarCollapsed 
+  sidebarCollapsed,
 }: HeaderProps) {
   const pathname = usePathname()
   const [userProfile, setUserProfile] = useState<any>(null)
@@ -108,11 +105,7 @@ export default function Header({
 
   useEffect(() => {
     const getUserProfile = async () => {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single()
+      const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
       if (profile) {
         setUserProfile(profile)
@@ -128,14 +121,14 @@ export default function Header({
 
   const getPlanBadge = () => {
     switch (userPlan.toLowerCase()) {
-      case 'pro':
+      case "pro":
         return (
           <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 text-xs">
             <Crown className="h-3 w-3 mr-1" />
             Pro
           </Badge>
         )
-      case 'enterprise':
+      case "enterprise":
         return (
           <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 text-xs">
             <Sparkles className="h-3 w-3 mr-1" />
@@ -153,7 +146,7 @@ export default function Header({
 
   return (
     <>
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 lg:px-6 py-3 sticky top-0 z-40">
+      <header className="bg-white/70 backdrop-blur-sm border-b border-white/20 px-4 lg:px-6 py-4 sticky top-0 z-40">
         <div className="flex items-center justify-between">
           {/* Left Section */}
           <div className="flex items-center space-x-4">
@@ -163,48 +156,38 @@ export default function Header({
                 variant="ghost"
                 size="sm"
                 onClick={onToggleSidebar}
-                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-xl hover:bg-gray-100/80 transition-colors"
                 aria-label={isMobile ? "Open menu" : "Toggle sidebar"}
               >
                 <Menu className="h-5 w-5" />
               </Button>
-              <div className="rounded-xl p-2 flex items-center justify-center">
-                <span className="text-sm font-medium tracking-tight text-gray-900">Dashboard</span>
-              </div>
             </div>
 
             {/* Page Info */}
             <div className="hidden sm:block">
-              <h1 className="text-lg font-medium text-gray-900 tracking-tight">
-                {pageInfo.title}
-              </h1>
-              {pageInfo.description && (
-                <p className="text-xs text-gray-500 mt-0.5">{pageInfo.description}</p>
-              )}
+              <h1 className="text-xl font-medium text-gray-900 tracking-tight">{pageInfo.title}</h1>
+              {pageInfo.description && <p className="text-sm text-gray-500 mt-0.5">{pageInfo.description}</p>}
             </div>
           </div>
 
           {/* Center Section - AI Search */}
           <div className="hidden lg:flex flex-1 max-w-lg mx-8">
-            {/* Replaced command button with rounded AI input */}
-            <div className="w-full">
-              <AISearchInput size="md" />
-            </div>
+            <AiSearchInput className="w-full" />
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             {/* Plan Badge */}
-            {getPlanBadge()}
+            <div className="hidden md:block">{getPlanBadge()}</div>
 
             {/* Quick Actions */}
             <Button
               variant="outline"
               size="sm"
-              className="hidden md:flex items-center space-x-1 rounded-xl border-gray-200 hover:bg-gray-50"
+              className="hidden md:flex items-center space-x-2 rounded-xl border-gray-200/50 hover:bg-gray-50/80 bg-white/50 backdrop-blur-sm"
             >
               <Plus className="h-4 w-4" />
-              <span className="text-xs">Quick</span>
+              <span className="text-sm">New</span>
             </Button>
 
             {/* Notifications */}
@@ -213,19 +196,30 @@ export default function Header({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="relative p-2.5 rounded-xl hover:bg-gray-100/80 transition-colors"
                 >
                   <Bell className="h-5 w-5 text-gray-600" />
+                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuContent align="end" className="w-80 bg-white/95 backdrop-blur-sm border-gray-200/50">
                 <DropdownMenuLabel className="flex items-center justify-between">
                   Notifications
+                  <Badge variant="secondary" className="text-xs">
+                    3
+                  </Badge>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-center text-sm text-gray-500">
-                  No new notifications
-                </DropdownMenuItem>
+                <div className="p-2 space-y-2">
+                  <div className="p-3 rounded-xl bg-blue-50/50 border border-blue-100/50">
+                    <p className="text-sm font-medium text-gray-900">Flight confirmed to NYC</p>
+                    <p className="text-xs text-gray-500 mt-1">2 minutes ago</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-green-50/50 border border-green-100/50">
+                    <p className="text-sm font-medium text-gray-900">Expense report approved</p>
+                    <p className="text-xs text-gray-500 mt-1">1 hour ago</p>
+                  </div>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -234,16 +228,20 @@ export default function Header({
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center space-x-2 p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100/80 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200">
+                  <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500 ring-2 ring-blue-200/50">
                     {userProfile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={userProfile.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                      <img
+                        src={userProfile.avatar_url || "/placeholder.svg"}
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-500">
+                      <div className="w-full h-full flex items-center justify-center">
                         <span className="text-white text-sm font-medium">
-                          {user.email?.charAt(0).toUpperCase() || 'U'}
+                          {user.email?.charAt(0).toUpperCase() || "U"}
                         </span>
                       </div>
                     )}
@@ -252,22 +250,20 @@ export default function Header({
                     <div className="hidden lg:flex items-center space-x-2">
                       <div className="text-left">
                         <p className="text-sm font-medium text-gray-900">
-                          {userProfile?.full_name || user.email?.split('@')[0] || 'User'}
+                          {userProfile?.full_name || user.email?.split("@")[0] || "User"}
                         </p>
-                        <p className="text-xs text-gray-500 capitalize">
-                          {userPlan} Plan
-                        </p>
+                        <p className="text-xs text-gray-500 capitalize">{userPlan} Plan</p>
                       </div>
                       <ChevronDown className="h-4 w-4 text-gray-400" />
                     </div>
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              
-              <DropdownMenuContent align="end" className="w-64">
+
+              <DropdownMenuContent align="end" className="w-64 bg-white/95 backdrop-blur-sm border-gray-200/50">
                 <div className="px-3 py-2">
                   <p className="text-sm font-medium text-gray-900">
-                    {userProfile?.full_name || user.email?.split('@')[0] || 'User'}
+                    {userProfile?.full_name || user.email?.split("@")[0] || "User"}
                   </p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                   <div className="mt-2 flex items-center space-x-2">
@@ -277,9 +273,9 @@ export default function Header({
                     </Badge>
                   </div>
                 </div>
-                
+
                 <DropdownMenuSeparator />
-                
+
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard/profile" className="cursor-pointer">
@@ -287,7 +283,7 @@ export default function Header({
                       Profile
                     </Link>
                   </DropdownMenuItem>
-                  
+
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard/settings" className="cursor-pointer">
                       <Settings className="h-4 w-4 mr-2" />
@@ -301,7 +297,7 @@ export default function Header({
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
 
-                {userPlan === 'free' && (
+                {userPlan === "free" && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="text-purple-600 focus:text-purple-700 focus:bg-purple-50">
@@ -313,7 +309,7 @@ export default function Header({
                 )}
 
                 <DropdownMenuSeparator />
-                
+
                 <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-700 focus:bg-red-50">
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign out
@@ -325,8 +321,8 @@ export default function Header({
 
         {/* Mobile Search */}
         {isMobile && (
-          <div className="mt-3 sm:hidden">
-            <AISearchInput size="sm" />
+          <div className="mt-4 sm:hidden">
+            <AiSearchInput />
           </div>
         )}
       </header>

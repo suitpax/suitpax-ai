@@ -7,7 +7,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 type ChatContainerContextType = {
   isScrolledToBottom: boolean
   scrollToBottom: () => void
-  containerRef: React.RefObject<HTMLDivElement | null>
+  containerRef: React.RefObject<HTMLDivElement>
 }
 
 const ChatContainerContext = createContext<ChatContainerContextType | null>(null)
@@ -69,12 +69,7 @@ export function ChatContainerRoot({
     <ChatContainerContext.Provider value={contextValue}>
       <div
         ref={containerRef}
-        className={cn(
-          "relative overflow-y-auto",
-          "no-scrollbar",
-          "pb-safe",
-          className
-        )}
+        className={cn("relative overflow-y-auto", className)}
         {...props}
       >
         {children}

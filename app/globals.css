@@ -243,6 +243,23 @@ body {
   scrollbar-width: none; /* Firefox */
 }
 
+/* Additional utility for smooth horizontal scrolling */
+.scroll-smooth-x {
+  scroll-behavior: smooth;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Enhanced scrollbar hiding for bank selection components */
+.bank-scroll-container {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.bank-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 /* Animaciones para el componente Hyperspeed */
 @keyframes flow-speed {
   0% {
@@ -298,4 +315,37 @@ body {
     transform: translateX(calc(100vw + 100px)) translateY(20px) rotate(5deg);
     opacity: 0;
   }
+}
+
+/* Shimmer animation for Suitpax AI text effects */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Additional shimmer variant for slower effect */
+@keyframes shimmer-slow {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-shimmer-slow {
+  animation: shimmer-slow 4s ease-in-out infinite;
 }

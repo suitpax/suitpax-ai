@@ -1,54 +1,99 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Search } from "lucide-react"
+import { ArrowRight } from "lucide-react"
+import Image from "next/image"
 
 interface AISearchInputProps {
   placeholder?: string
   className?: string
   size?: "sm" | "md" | "lg"
+  onSubmit?: (query: string) => void
 }
 
-export default function AISearchInput({ placeholder = "Ask Suitpax AI...", className, size = "md" }: AISearchInputProps) {
+export default function AISearchInput({
+  placeholder = "Search or ask AI anything...",
+  className,
+  size = "md",
+  onSubmit,
+}: AISearchInputProps) {
   const [query, setQuery] = useState("")
+  const [showReasoning, setShowReasoning] = useState(false)
   const router = useRouter()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const value = query.trim()
     if (!value) return
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("ai-chat:prompt", value)
-      }
-    } catch {}
-    router.push("/dashboard/ai-chat")
+
+    setShowReasoning(true)
+    setTimeout(() => setShowReasoning(false), 2000)
+
+    if (onSubmit) {
+      onSubmit(value)
+    } else {
+      try {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("ai-chat:prompt", value)
+        }
+      } catch {}
+      router.push("/dashboard/suitpax-ai")
+    }
+
+    setQuery("")
   }
 
-  const sizeClasses = {
-    sm: "h-9 text-xs px-3",
-    md: "h-10 text-sm px-3.5",
-    lg: "h-11 text-sm px-4",
-  } as const
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value)
+    if (e.target.value.length > 0 && !showReasoning) {
+      setShowReasoning(true)
+      setTimeout(() => setShowReasoning(false), 1500)
+    }
+  }
 
   return (
-    <form onSubmit={handleSubmit} className={cn("w-full max-w-md", className)}>
-      <div className="relative w-full">
-        <div className={cn("flex items-center rounded-full border border-gray-300/60 bg-white/70 backdrop-blur-sm shadow-sm", sizeClasses[size])}>
-          <Search className="h-4 w-4 text-gray-500 mr-2" />
+    <div className={cn("w-full relative", className)}>
+      <form onSubmit={handleSubmit}>
+        <div className="relative">
           <input
+            type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleInputChange}
             placeholder={placeholder}
-            className="w-full bg-transparent outline-none placeholder:text-gray-500 text-gray-900"
+            className="w-full px-4 py-3 pl-11 pr-12 text-sm bg-white/90 backdrop-blur-sm border border-blue-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all placeholder:text-gray-400 shadow-sm hover:shadow-md"
           />
-          <button type="submit" className="ml-2 inline-flex items-center justify-center h-7 px-3 rounded-full bg-black text-white text-xs font-medium hover:bg-gray-800">
-            Ask
-          </button>
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <div className="w-4 h-4 rounded-md overflow-hidden">
+              <Image
+                src="/ai-agent-white-hair.png"
+                alt="AI Agent"
+                width={16}
+                height={16}
+                className="w-full h-full object-cover rounded-md"
+              />
+            </div>
+          </div>
+          <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+            <ArrowRight className="h-4 w-4 text-gray-400" />
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+
+      {showReasoning && (
+        <div className="absolute top-full left-0 right-0 mt-2 z-50">
+          <div className="bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-xl p-3 shadow-lg animate-in slide-in-from-top-2 duration-200">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-gray-600 rounded-full animate-pulse"></div>
+              <span className="text-xs font-medium text-gray-700">Reasoning...</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Analyzing your request and preparing the best response</p>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

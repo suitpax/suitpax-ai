@@ -4,10 +4,8 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { Sidebar as LegacySidebar } from "@/components/dashboard/sidebar"
+import { Sidebar } from "@/components/dashboard/sidebar"
 import Header from "@/components/dashboard/header"
-import SidebarV2 from "@/components/dashboard/sidebar.v2"
-import HeaderV2 from "@/components/dashboard/header.v2"
 import { Toaster } from "react-hot-toast"
 import { motion } from "framer-motion"
 import { Menu } from "lucide-react"
@@ -42,8 +40,8 @@ export default function DashboardLayout({
     }
 
     checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
   useEffect(() => {
@@ -109,15 +107,15 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium tracking-tight">Loading your workspace...</p>
+          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-blue-700 font-medium tracking-tight">Loading your workspace...</p>
         </motion.div>
       </div>
     )
@@ -130,14 +128,14 @@ export default function DashboardLayout({
   const isActuallyCollapsed = !isMobile && sidebarCollapsed && !sidebarHovered
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden">
       {/* Mobile backdrop */}
       {isMobile && mobileMenuOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
           onClick={closeMobileMenu}
         />
       )}
@@ -145,44 +143,40 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <div
         className={`
-          ${isMobile 
-            ? `fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${
-                mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-              }`
-            : `relative transition-all duration-300 ${
-                isActuallyCollapsed ? 'w-16' : 'w-64'
-              }`
+          ${
+            isMobile
+              ? `fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${
+                  mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+                }`
+              : `relative transition-all duration-300 ${isActuallyCollapsed ? "w-16" : "w-64"}`
           }
         `}
-        onMouseEnter={() => { if (!isMobile && sidebarCollapsed) setSidebarHovered(true) }}
-        onMouseLeave={() => { if (!isMobile) setSidebarHovered(false) }}
+        onMouseEnter={() => {
+          if (!isMobile && sidebarCollapsed) setSidebarHovered(true)
+        }}
+        onMouseLeave={() => {
+          if (!isMobile) setSidebarHovered(false)
+        }}
       >
-        {false ? (
-          <LegacySidebar 
+        <Sidebar
           onUserUpdate={handleUserUpdate}
           isCollapsed={isActuallyCollapsed && !isMobile}
           isMobile={isMobile}
           onCloseMobile={closeMobileMenu}
           onToggleCollapse={toggleSidebar}
+          userPlan={userPlan}
+          subscriptionStatus={subscriptionStatus}
         />
-        ) : (
-          <SidebarV2 
-            isCollapsed={isActuallyCollapsed && !isMobile}
-            isMobile={isMobile}
-            onCloseMobile={closeMobileMenu}
-            onToggleCollapse={toggleSidebar}
-          />
-        )}
       </div>
 
       {/* Main content */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         {/* Mobile Header with Menu Button */}
         <div className="lg:hidden">
-          <div className="flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200">
+          <div className="flex items-center justify-between h-16 px-4 bg-white/80 backdrop-blur-sm border-b border-gray-200">
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500"
+              className="inline-flex items-center justify-center p-2 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-900/20 transition-colors"
               onClick={toggleSidebar}
             >
               <span className="sr-only">Open sidebar</span>
@@ -195,13 +189,20 @@ export default function DashboardLayout({
           </div>
         </div>
 
-        {/* Desktop Header - v2 minimal */}
+        {/* Desktop Header */}
         <div className="hidden lg:block">
-          <HeaderV2 onToggleSidebar={toggleSidebar} />
+          <Header
+            user={user}
+            userPlan={userPlan}
+            subscriptionStatus={subscriptionStatus}
+            onToggleSidebar={toggleSidebar}
+            isMobile={isMobile}
+            sidebarCollapsed={sidebarCollapsed}
+          />
         </div>
 
         {/* Main content area */}
-        <main className="flex-1 overflow-y-auto bg-gray-50">
+        <main className="flex-1 overflow-y-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -218,26 +219,27 @@ export default function DashboardLayout({
         toastOptions={{
           duration: 4000,
           style: {
-            background: "#ffffff",
+            background: "rgba(255, 255, 255, 0.95)",
             color: "#374151",
-            border: "1px solid #e5e7eb",
+            border: "1px solid rgba(229, 231, 235, 0.5)",
             borderRadius: "16px",
-            boxShadow: "0 10px 20px rgba(0,0,0,0.06)",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
             fontSize: "14px",
             fontWeight: 500,
+            backdropFilter: "blur(12px)",
           },
           success: {
             style: {
-              background: "#ecfdf5",
+              background: "rgba(236, 253, 245, 0.95)",
               color: "#065f46",
-              border: "1px solid #a7f3d0",
+              border: "1px solid rgba(167, 243, 208, 0.5)",
             },
           },
           error: {
             style: {
-              background: "#fef2f2",
+              background: "rgba(254, 242, 242, 0.95)",
               color: "#7f1d1d",
-              border: "1px solid #fecaca",
+              border: "1px solid rgba(254, 202, 202, 0.5)",
             },
           },
         }}

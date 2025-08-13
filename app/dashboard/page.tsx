@@ -1,567 +1,307 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { DraggableDashboard } from "@/components/dashboard/draggable-dashboard"
+import { BankConnectionCard } from "@/components/dashboard/bank-connection-card"
+import { TopDestinationsCard } from "@/components/dashboard/top-destinations-card"
+import { RadarChart } from "@/components/charts/radar-chart"
+import { ExpenseTrendsChart } from "@/components/charts/expense-trends-chart"
+import { BusinessMetricsChart } from "@/components/charts/business-metrics-chart"
+import { TravelEfficiencyChart } from "@/components/charts/travel-efficiency-chart"
+import { MonthlySpendingChart } from "@/components/charts/monthly-spending-chart"
 import { motion } from "framer-motion"
-import {
-  Plane,
-  Hotel,
-  CreditCard,
-  BarChart3,
-  Clock,
-  DollarSign,
-  TrendingUp,
-  Calendar,
-  Zap,
-  CheckCircle,
-  ArrowRight,
-  Plus,
-  Users,
-  Building,
-  MapPin,
-} from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
+import { Calendar, TrendingUp, Building2, Clock, DollarSign, Plane, Sparkles, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts"
-import DashboardOverviewV2 from "@/components/dashboard/v2/overview"
+import { useUserData } from "@/hooks/use-user-data"
 
-// Interfaces
-interface DashboardStats {
-  totalTrips: number
-  totalSavings: number
-  upcomingTrips: number
-  activeBookings: number
-}
+const DashboardPage = () => {
+  const { user, profile, loading } = useUserData()
 
-interface RecentActivity {
-  id: string
-  type: "welcome" | "profile" | "setup"
-  title: string
-  description: string
-  timestamp: Date
-  status: "completed" | "pending"
-}
-
-interface User {
-  id: string
-  email?: string
-  created_at: string
-  user_metadata?: {
-    full_name?: string
+  const getDisplayName = () => {
+    if (profile?.full_name) return profile.full_name
+    if (profile?.first_name) return profile.first_name
+    if (user?.email) return user.email.split("@")[0]
+    return "User"
   }
-}
 
-export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [stats, setStats] = useState<DashboardStats>({
-    totalTrips: 0,
-    totalSavings: 0,
-    upcomingTrips: 0,
-    activeBookings: 0,
-  })
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
+  }
 
-  // Configuración inicial para nuevos usuarios
-  const initializeNewUser = useCallback(() => {
-    const welcomeActivity: RecentActivity = {
-      id: "welcome",
-      type: "welcome",
-      title: "Welcome to Suitpax!",
-      description: "Your business travel account has been created successfully",
-      timestamp: new Date(),
-      status: "completed",
-    }
-    
-    setRecentActivity([welcomeActivity])
-    setStats({
-      totalTrips: 0,
-      totalSavings: 0,
-      upcomingTrips: 0,
-      activeBookings: 0,
-    })
-  }, [])
-
-  useEffect(() => {
-    let isMounted = true
-    
-    const getUser = async () => {
-      try {
-        const supabase = createClient()
-        
-        const {
-          data: { user },
-          error,
-        } = await supabase.auth.getUser()
-
-        if (error) {
-          console.error("Error getting user:", error)
-          return
-        }
-
-        if (user && isMounted) {
-          setUser(user)
-          // Todos los usuarios empiezan con estado cero
-          initializeNewUser()
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.error("Error in getUser:", error)
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    getUser()
-    
-    return () => {
-      isMounted = false
-    }
-  }, [initializeNewUser])
-
-  // Acciones principales para empezar
-  const quickActions = [
-    {
-      icon: Plane,
-      title: "Book Your First Flight",
-      description: "Start by booking your first business trip",
-      href: "/dashboard/flights",
-      color: "bg-gray-100 text-gray-800",
-      priority: true,
-    },
-    {
-      icon: Hotel,
-      title: "Find Hotels",
-      description: "Discover and book accommodations",
-      href: "/dashboard/hotels",
-      color: "bg-gray-100 text-gray-800",
-      priority: true,
-    },
-    {
-      icon: Users,
-      title: "Invite Team",
-      description: "Add team members to your account",
-      href: "/dashboard/team",
-      color: "bg-gray-100 text-gray-800",
-      priority: false,
-    },
-    {
-      icon: Building,
-      title: "Company Setup",
-      description: "Configure your company travel policies",
-      href: "/dashboard/settings",
-      color: "bg-gray-100 text-gray-800",
-      priority: false,
-    },
-  ]
-
-  // Pasos de onboarding
-  const onboardingSteps = [
-    {
-      icon: CheckCircle,
-      title: "Complete Your Profile",
-      description: "Add your travel preferences and contact details",
-      href: "/dashboard/profile",
-      completed: false,
-    },
-    {
-      icon: MapPin,
-      title: "Set Travel Preferences",
-      description: "Configure your preferred airlines, hotels, and travel class",
-      href: "/dashboard/preferences",
-      completed: false,
-    },
-    {
-      icon: CreditCard,
-      title: "Add Payment Method",
-      description: "Secure payment setup for seamless bookings",
-      href: "/dashboard/billing",
-      completed: false,
-    },
-  ]
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-light">Loading your dashboard...</p>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* New Overview (v2) */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-8">
-          <DashboardOverviewV2 />
-        </motion.div>
-        {/* Welcome Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none">Dashboard</h1>
-              <p className="text-lg font-light text-gray-600 mt-2">
-                Let's get your business travel management set up
-              </p>
-            </div>
-            <div className="hidden md:block">
-              <div className="inline-flex items-center rounded-xl bg-gray-200 px-3 py-1 text-xs font-medium text-gray-800">
-                <em className="font-serif italic">New Account</em>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+  const displayName = getDisplayName()
 
-        {/* Getting Started Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-8"
-        >
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-2xl p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Zap className="h-6 w-6 text-gray-700" />
+  const dashboardCards = [
+    {
+      id: "user-profile",
+      title: "User Profile",
+      component: (
+        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-gray-600 font-medium text-lg shadow-sm">
+                  {getInitials(displayName)}
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-600 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+                  <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-medium tracking-tighter mb-2">Empieza en 3 pasos</h3>
-<p className="text-sm font-light text-gray-600 mb-6">
-  Completa tu configuración para desbloquear la gestión de viajes de negocio con IA
-</p>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {onboardingSteps.map((step, index) => (
-                    <Link
-                      key={index}
-                      href={step.href}
-                      className="group flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 transition-all"
-                    >
-                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <step.icon className="h-4 w-4 text-gray-700" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 group-hover:text-black transition-colors">
-                          {step.title}
-                        </p>
-                        <p className="text-xs font-light text-gray-600 mt-0.5">
-                          {step.description}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Stats Grid - Estado Cero */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-        >
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Trips</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">{stats.totalTrips}</p>
-                <p className="text-xs text-gray-700 font-medium mt-1">Book your first trip →</p>
-              </div>
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <Plane className="h-5 w-5 text-gray-700" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Savings</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">${stats.totalSavings.toLocaleString()}</p>
-                <p className="text-xs text-gray-700 font-medium mt-1">Start saving with AI →</p>
-              </div>
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-gray-700" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Upcoming Trips</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">{stats.upcomingTrips}</p>
-                <p className="text-xs text-gray-700 font-medium mt-1">Plan your trips →</p>
-              </div>
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-gray-700" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Active Bookings</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">{stats.activeBookings}</p>
-                <p className="text-xs text-gray-700 font-medium mt-1">Make first booking →</p>
-              </div>
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-gray-700" />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Spending Trend (Black/Grey) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.35 }}
-          className="mb-8"
-        >
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-medium tracking-tighter">Monthly Spending</h2>
-              <span className="text-xs text-gray-500">Simulated</span>
-            </div>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={[
-                    { month: "Jan", amount: 0 },
-                    { month: "Feb", amount: 0 },
-                    { month: "Mar", amount: 0 },
-                    { month: "Apr", amount: 0 },
-                    { month: "May", amount: 0 },
-                    { month: "Jun", amount: 0 },
-                  ]}
-                  margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
-                  <Tooltip cursor={{ stroke: '#111827', strokeWidth: 1 }} formatter={(v: any) => `$${Number(v).toLocaleString()}`} />
-                  <Line type="monotone" dataKey="amount" stroke="#111827" strokeWidth={2} dot={{ r: 3, fill: '#111827' }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </motion.div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="lg:col-span-2"
-          >
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-medium tracking-tighter mb-6">
-                <em className="font-serif italic">Quick Actions</em>
-              </h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                {quickActions.map((action, index) => (
-                  <Link
-                    key={index}
-                    href={action.href}
-                    className={`group p-4 rounded-xl border transition-all duration-200 hover:shadow-sm ${
-                      action.priority 
-                        ? 'border-gray-300 bg-gray-50 hover:border-gray-400' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${action.color}`}>
-                        <action.icon className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-medium tracking-tighter group-hover:text-black transition-colors">
-                            {action.title}
-                          </h3>
-                          {action.priority && (
-                            <div className="inline-flex items-center rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-medium text-gray-800">
-                              Start Here
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-sm font-light text-gray-600 mt-1">{action.description}</p>
-                      </div>
-                      <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Recent Activity - Estado Inicial */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-medium tracking-tighter mb-6">
-                <em className="font-serif italic">Activity</em>
-              </h2>
-              <div className="space-y-4">
-                {recentActivity.length > 0 ? (
-                  recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle className="h-4 w-4 text-gray-700" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm tracking-tighter">{activity.title}</p>
-                        <p className="text-xs font-light text-gray-600 mt-1">{activity.description}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {activity.timestamp.toLocaleDateString()} at{" "}
-                          {activity.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <Clock className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                    <p className="text-sm font-light text-gray-600">No activity yet</p>
-                    <p className="text-xs text-gray-500 mt-1">Your travel activity will appear here</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-lg font-medium tracking-tight text-gray-900">{displayName}</h3>
+                  <div className="inline-flex items-center rounded-md bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700">
+                    {profile?.subscription_plan || "Free"}
                   </div>
-                )}
-                
-                {/* Placeholder for future activities */}
-                <div className="border-t border-gray-100 pt-4 mt-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 opacity-40">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        <Plane className="h-4 w-4 text-gray-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-xs font-light text-gray-500">First flight booking</p>
-                        <p className="text-xs text-gray-400">Coming soon...</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 opacity-40">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        <Hotel className="h-4 w-4 text-gray-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-xs font-light text-gray-500">Hotel reservation</p>
-                        <p className="text-xs text-gray-400">Coming soon...</p>
-                      </div>
-                    </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-2">{profile?.job_title || "Business Travel Manager"}</p>
+                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                  <div className="flex items-center space-x-1.5">
+                    <Building2 className="h-2.5 w-2.5 text-gray-500" />
+                    <span className="text-gray-600">{profile?.company_name || "Your Company"}</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <Clock className="h-2.5 w-2.5 text-gray-500" />
+                    <span className="text-gray-600">Member since {new Date().getFullYear()}</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <Calendar className="h-2.5 w-2.5 text-gray-500" />
+                    <span className="text-gray-600">No trips yet</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <TrendingUp className="h-2.5 w-2.5 text-gray-500" />
+                    <span className="text-gray-600">Travel Score: 0/100</span>
                   </div>
                 </div>
               </div>
             </div>
-          </motion.div>
+            <div className="text-right">
+              <div className="text-[10px] text-gray-500 mb-1">This Month</div>
+              <div className="text-xl font-medium text-gray-900 mb-1">$0</div>
+              <div className="text-[10px] text-gray-600 mb-2">Travel Expenses</div>
+              <div className="flex items-center justify-end space-x-1">
+                <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
+                <span className="text-[10px] text-gray-600 font-medium">Active</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100 pt-3">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="text-center">
+                <div className="text-base font-medium text-gray-900 mb-1">0</div>
+                <div className="text-[10px] text-gray-500">Trips Completed</div>
+                <div className="w-full bg-gray-100 rounded-full h-1 mt-1.5">
+                  <div className="bg-gray-600 h-1 rounded-full" style={{ width: "0%" }}></div>
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-base font-medium text-gray-900 mb-1">$0</div>
+                <div className="text-[10px] text-gray-500">Total Saved</div>
+                <div className="w-full bg-gray-100 rounded-full h-1 mt-1.5">
+                  <div className="bg-gray-500 h-1 rounded-full" style={{ width: "0%" }}></div>
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-base font-medium text-gray-900 mb-1">0%</div>
+                <div className="text-[10px] text-gray-500">Policy Compliance</div>
+                <div className="w-full bg-gray-100 rounded-full h-1 mt-1.5">
+                  <div className="bg-gray-400 h-1 rounded-full" style={{ width: "0%" }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        {/* Additional Intelligent Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6"
-        >
-          <div className="lg:col-span-2 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-medium tracking-tighter">Proposal Progress</h3>
-              <span className="text-xs text-gray-500">April 2024</span>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <p className="text-xs text-gray-500">Proposals sent</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">64</p>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <p className="text-xs text-gray-500">Interviews</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">12</p>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <p className="text-xs text-gray-500">Hires</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">10</p>
-              </div>
-            </div>
-            <div className="mt-6 h-20 flex items-end gap-1">
-              {Array.from({ length: 36 }).map((_, i) => (
-                <div key={i} className={"w-2 rounded-t-sm " + (i % 5 === 0 ? "h-16 bg-gray-900" : "h-10 bg-gray-300")} />
-              ))}
-            </div>
-          </div>
-          <div className="bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md">
-            <h3 className="text-xl font-medium tracking-tighter mb-4">Recent Projects</h3>
-            <div className="space-y-3">
-              {["Web Development Project","Copyright Project","Web Design Project"].map((title, idx) => (
-                <div key={idx} className="group flex items-start justify-between p-3 rounded-xl border border-gray-200 bg-white hover:shadow-sm transition-all">
-                  <div>
-                    <p className="text-sm font-medium tracking-tight text-gray-900">{title}</p>
-                    <p className="text-xs text-gray-600">$10/hour • Remote</p>
-                  </div>
-                  <span className="text-[10px] rounded-full px-2 py-0.5 bg-gray-200 text-gray-800">Paid</span>
+      ),
+    },
+    {
+      id: "kpi-stats",
+      title: "KPI Statistics",
+      component: (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            {
+              title: "Total Trips",
+              value: "0",
+              change: "+0%",
+              icon: Plane,
+              color: "text-gray-600",
+            },
+            {
+              title: "Total Spent",
+              value: "$0",
+              change: "+0%",
+              icon: DollarSign,
+              color: "text-gray-600",
+            },
+            {
+              title: "Avg Trip Cost",
+              value: "$0",
+              change: "+0%",
+              icon: TrendingUp,
+              color: "text-gray-600",
+            },
+            {
+              title: "Active Bookings",
+              value: "0",
+              change: "+0%",
+              icon: Calendar,
+              color: "text-gray-600",
+            },
+          ].map((stat, index) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-medium text-gray-600 mb-1">{stat.title}</p>
+                  <p className="text-lg font-medium tracking-tight text-gray-900">{stat.value}</p>
+                  <p className="text-[10px] text-gray-500 mt-1">{stat.change} from last month</p>
                 </div>
-              ))}
+                <div className={`p-2 rounded-xl bg-gray-100 ${stat.color}`}>
+                  <stat.icon className="h-3.5 w-3.5" />
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "bank-connection",
+      title: "Bank Connection",
+      component: <BankConnectionCard />,
+    },
+    {
+      id: "top-destinations",
+      title: "Top Destinations",
+      component: <TopDestinationsCard />,
+    },
+    {
+      id: "performance-radar",
+      title: "Performance Radar",
+      component: (
+        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-base font-medium tracking-tight text-gray-900">Travel Performance</h3>
+            <div className="flex items-center space-x-2">
+              <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
+              <span className="text-[10px] text-gray-600">Current Period</span>
             </div>
           </div>
-        </motion.div>
+          <RadarChart />
+        </div>
+      ),
+    },
+    {
+      id: "expense-trends",
+      title: "Expense Trends",
+      component: <ExpenseTrendsChart />,
+    },
+    {
+      id: "business-metrics",
+      title: "Business Metrics",
+      component: <BusinessMetricsChart />,
+    },
+    {
+      id: "travel-efficiency",
+      title: "Travel Efficiency",
+      component: <TravelEfficiencyChart />,
+    },
+    {
+      id: "monthly-spending",
+      title: "Monthly Spending",
+      component: <MonthlySpendingChart />,
+    },
+    {
+      id: "suitpax-ai",
+      title: "Suitpax AI",
+      component: (
+        <Link href="/dashboard/suitpax-ai" className="block group">
+          <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 p-6 rounded-2xl border border-gray-800 shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:scale-[1.02]">
+            {/* Shining effect overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-out"></div>
 
-        {/* Footer CTA: Meet Suitpax AI at the very bottom */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.75 }}
-          className="mt-10"
-        >
-          <div className="rounded-2xl border border-gray-200 bg-white p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex-1">
-                <h3 className="text-xl font-medium tracking-tighter mb-2 text-gray-900">
-                  <em className="font-serif italic">Meet Suitpax AI</em>
-                </h3>
-                <p className="text-sm font-light text-gray-600">Your monochrome, modern travel copilot. Ask for flights, hotels, expenses, policies and more.</p>
-                {/* Mini typing example */}
-                <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-3">
-                  <div className="text-[11px] uppercase tracking-wider text-gray-500 mb-2">Live demo</div>
-                  <div className="rounded-lg border border-gray-200 bg-white p-3">
-                    <div className="text-xs text-gray-500 mb-1">You</div>
-                    <div className="text-sm text-gray-900">Find direct flights MAD → SFO next month</div>
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-gray-600 to-transparent rounded-full blur-2xl"></div>
+              <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-tr from-gray-700 to-transparent rounded-full blur-xl"></div>
+            </div>
+
+            <div className="relative z-10 flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center border border-gray-600 shadow-inner">
+                  <Sparkles className="w-6 h-6 text-gray-300" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-medium tracking-tight text-gray-100">Suitpax AI Assistant</h3>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                    <span className="text-[10px] text-gray-400 font-medium">Ready</span>
                   </div>
-                  <div className="mt-2 rounded-lg border border-gray-200 bg-white p-3">
-                    <div className="text-xs text-gray-500 mb-1">Suitpax AI</div>
-                    <div className="text-sm text-gray-900">
-                      <span className="inline-block w-2 h-3 bg-gray-900 animate-pulse align-baseline mr-1" />
-                      Searching best options… non-stop, sorted by price.
+                </div>
+
+                <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+                  Your intelligent travel companion powered by advanced AI. Ready to optimize your business trips and
+                  find the best deals.
+                </p>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="inline-flex items-center rounded-lg bg-gray-800 px-2.5 py-1 text-[10px] font-medium text-gray-300 border border-gray-700">
+                      AI Powered
+                    </div>
+                    <div className="inline-flex items-center rounded-lg bg-gray-800 px-2.5 py-1 text-[10px] font-medium text-gray-300 border border-gray-700">
+                      24/7 Available
                     </div>
                   </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-300 group-hover:translate-x-1 transition-all duration-200" />
                 </div>
               </div>
-              <Link href="/dashboard/ai-chat" className="md:self-start inline-flex items-center gap-2 rounded-xl border border-gray-900 bg-gray-900 px-6 py-3 text-white hover:bg-gray-800 transition-colors">
-                <em className="font-serif italic">Start Chatting</em>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-center text-xs text-gray-500">
-            <span className="mr-2">Technology by</span>
-            <img src="/logo/suitpax-bl-logo.webp" alt="Suitpax" className="h-4 w-auto" />
-          </div>
+        </Link>
+      ),
+    },
+  ]
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="mb-8">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <h1 className="text-4xl md:text-5xl font-medium leading-none text-gray-900 mb-2">Dashboard</h1>
+          <p className="text-lg font-light tracking-tighter text-gray-600">Welcome back, {displayName.split(" ")[0]}</p>
+          <p className="text-sm text-gray-500 font-light mt-1">
+            Your comprehensive business travel management overview and insights
+          </p>
         </motion.div>
       </div>
+
+      <DraggableDashboard
+        cards={dashboardCards}
+        onReorder={(newOrder) => {
+          console.log("Dashboard reordered:", newOrder)
+        }}
+      />
     </div>
   )
 }
+
+export default DashboardPage
