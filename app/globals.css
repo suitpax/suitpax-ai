@@ -243,6 +243,13 @@ body {
   scrollbar-width: none; /* Firefox */
 }
 
+/* Additional utility for smooth horizontal scrolling */
+.scroll-smooth-x {
+  scroll-behavior: smooth;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 /* Animaciones para el componente Hyperspeed */
 @keyframes flow-speed {
   0% {

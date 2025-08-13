@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback, useRef, useState } from "react"
 
 export function useChatStream() {
@@ -14,7 +16,7 @@ export function useChatStream() {
     abortRef.current = controller
 
     try {
-      const res = await fetch("/api/ai-chat/stream", {
+      const res = await fetch("/api/suitpax-ai/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

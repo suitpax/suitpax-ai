@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BankAccountItem } from "@/components/dashboard/bank-account-item"
 import { TransactionList } from "@/components/dashboard/transaction-list"
 import { BankConnectionModal } from "@/components/dashboard/bank-connection-modal"
+import { BankSelection } from "@/components/dashboard/bank-selection"
 import { ExpenseAnalytics } from "@/components/dashboard/expense-analytics"
 import { AutoCategorizationSettings } from "@/components/dashboard/auto-categorization-settings"
 import { BankNotifications } from "@/components/dashboard/bank-notifications"
@@ -45,6 +46,9 @@ export default function SuitpaxBankPage() {
   const [showConnectionModal, setShowConnectionModal] = useState(false)
   const [filter, setFilter] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
+  const [selectedCountry, setSelectedCountry] = useState("GB")
+  const [selectedBank, setSelectedBank] = useState("")
+  const [bankSearchTerm, setBankSearchTerm] = useState("")
 
   const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0)
   const monthlySpending = transactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0)
@@ -80,6 +84,22 @@ export default function SuitpaxBankPage() {
     }
   }
 
+  const handleInlineBankConnect = async () => {
+    if (!selectedBank) return
+
+    setIsConnecting(true)
+    try {
+      await handleConnectBank({
+        country: selectedCountry,
+        bank: selectedBank,
+      })
+      setSelectedBank("")
+      setBankSearchTerm("")
+    } finally {
+      setIsConnecting(false)
+    }
+  }
+
   const filteredTransactions = transactions.filter((transaction) => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesFilter = filter === "all" || transaction.category.toLowerCase() === filter.toLowerCase()
@@ -104,21 +124,50 @@ export default function SuitpaxBankPage() {
           : "Your transaction history will appear here after connecting a bank account."}
       </p>
       {type === "accounts" && (
-        <Button
-          onClick={() => setShowConnectionModal(true)}
-          className="bg-gray-900 text-white hover:bg-black rounded-xl"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Connect Bank Account
-        </Button>
+        <div className="space-y-6">
+          <div className="max-w-2xl mx-auto">
+            <BankSelection
+              selectedCountry={selectedCountry}
+              selectedBank={selectedBank}
+              onBankSelect={setSelectedBank}
+              searchTerm={bankSearchTerm}
+              onSearchChange={setBankSearchTerm}
+            />
+          </div>
+          <div className="flex gap-4 justify-center">
+            <Button
+              onClick={handleInlineBankConnect}
+              disabled={!selectedBank || isConnecting}
+              className="bg-gray-900 text-white hover:bg-black rounded-xl"
+            >
+              {isConnecting ? (
+                <>
+                  <Clock className="h-4 w-4 mr-2 animate-spin" />
+                  Connecting...
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Connect Selected Bank
+                </>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowConnectionModal(true)}
+              className="rounded-xl border-gray-200 hover:bg-gray-50 bg-transparent"
+            >
+              Advanced Setup
+            </Button>
+          </div>
+        </div>
       )}
     </motion.div>
   )
 
   return (
     <div className="space-y-6 p-4 lg:p-0">
-      {/* Header - Following expense page pattern */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 p-4 lg:p-0">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
             <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Suitpax Bank</h1>
@@ -148,7 +197,6 @@ export default function SuitpaxBankPage() {
         </div>
       </motion.div>
 
-      {/* KPIs - Following expense page pattern */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -182,7 +230,6 @@ export default function SuitpaxBankPage() {
         </div>
       </motion.div>
 
-      {/* Main Content Tabs - Improved responsive design */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -208,7 +255,6 @@ export default function SuitpaxBankPage() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            {/* Connected Accounts */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -232,13 +278,50 @@ export default function SuitpaxBankPage() {
                       {accounts.map((account) => (
                         <BankAccountItem key={account.id} account={account} />
                       ))}
+                      <div className="border-t border-gray-200 pt-6 mt-6">
+                        <h3 className="text-lg font-medium tracking-tighter text-black mb-4">Connect Another Bank</h3>
+                        <BankSelection
+                          selectedCountry={selectedCountry}
+                          selectedBank={selectedBank}
+                          onBankSelect={setSelectedBank}
+                          searchTerm={bankSearchTerm}
+                          onSearchChange={setBankSearchTerm}
+                        />
+                        <div className="flex gap-3 mt-4">
+                          <Button
+                            onClick={handleInlineBankConnect}
+                            disabled={!selectedBank || isConnecting}
+                            size="sm"
+                            className="bg-gray-900 text-white hover:bg-black rounded-xl"
+                          >
+                            {isConnecting ? (
+                              <>
+                                <Clock className="h-4 w-4 mr-2 animate-spin" />
+                                Connecting...
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="h-4 w-4 mr-2" />
+                                Connect Bank
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowConnectionModal(true)}
+                            className="rounded-xl border-gray-200 bg-transparent"
+                          >
+                            Advanced Setup
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </CardContent>
               </Card>
             </motion.div>
 
-            {/* Transactions */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -313,7 +396,6 @@ export default function SuitpaxBankPage() {
         </Tabs>
       </motion.div>
 
-      {/* Security Notice - Improved design */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -337,7 +419,6 @@ export default function SuitpaxBankPage() {
         </Card>
       </motion.div>
 
-      {/* Bank Connection Modal */}
       <BankConnectionModal
         isOpen={showConnectionModal}
         onClose={() => setShowConnectionModal(false)}

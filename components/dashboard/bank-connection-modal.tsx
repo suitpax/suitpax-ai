@@ -3,9 +3,9 @@
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
-import { Building2, Shield, CheckCircle, ArrowRight, Search, Sparkles } from "lucide-react"
+import { Building2, Shield, CheckCircle, ArrowRight, Sparkles } from "lucide-react"
+import { BankSelection } from "./bank-selection"
 
 interface BankConnectionModalProps {
   isOpen: boolean
@@ -185,40 +185,13 @@ export function BankConnectionModal({ isOpen, onClose, onConnect }: BankConnecti
                   <p className="text-gray-600 font-light">Choose your business banking provider</p>
                 </div>
 
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    placeholder="Search for your bank..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 rounded-xl border-gray-200 bg-white/80 backdrop-blur-sm h-12"
-                  />
-                </div>
-
-                <div className="overflow-x-auto pb-2">
-                  <div className="flex space-x-4 min-w-max">
-                    {filteredBanks.map((bank) => (
-                      <Card
-                        key={bank.id}
-                        className={`flex-shrink-0 w-48 p-4 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] ${
-                          selectedBank === bank.id
-                            ? "border-black bg-gray-50 shadow-md"
-                            : "border-gray-200 hover:border-gray-300 bg-white/80 backdrop-blur-sm"
-                        }`}
-                        onClick={() => setSelectedBank(bank.id)}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <img
-                            src={bank.logo || "/placeholder.svg"}
-                            alt={bank.name}
-                            className="w-8 h-8 rounded-lg object-contain"
-                          />
-                          <span className="font-medium text-black text-sm">{bank.name}</span>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
+                <BankSelection
+                  selectedCountry={selectedCountry}
+                  selectedBank={selectedBank}
+                  onBankSelect={setSelectedBank}
+                  searchTerm={searchTerm}
+                  onSearchChange={setSearchTerm}
+                />
 
                 <div className="flex space-x-4">
                   <Button

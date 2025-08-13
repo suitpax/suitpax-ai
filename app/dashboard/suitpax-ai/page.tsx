@@ -4,15 +4,39 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Loader2, ArrowUp, Paperclip, X, Square, ArrowLeft, File as FileIcon, Image as ImageIcon, FileText, FileCode, FileSpreadsheet, Music, Video, Archive, Mic, Volume2 } from "lucide-react"
+import {
+  Loader2,
+  ArrowUp,
+  Paperclip,
+  X,
+  Square,
+  ArrowLeft,
+  FileIcon,
+  ImageIcon,
+  FileText,
+  FileCode,
+  FileSpreadsheet,
+  Music,
+  Video,
+  Archive,
+  Mic,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
 import Link from "next/link"
 import Markdown from "@/components/prompt-kit/markdown"
-import CodeBlock from "@/components/prompt-kit/code-block"
-import { PromptInput, PromptInputAction, PromptInputActions, PromptInputTextarea } from "@/components/prompt-kit/prompt-input"
-import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from "@/components/prompt-kit/chat-container"
+import {
+  PromptInput,
+  PromptInputAction,
+  PromptInputActions,
+  PromptInputTextarea,
+} from "@/components/prompt-kit/prompt-input"
+import {
+  ChatContainerRoot,
+  ChatContainerContent,
+  ChatContainerScrollAnchor,
+} from "@/components/prompt-kit/chat-container"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@/components/prompt-kit/reasoning"
 import { Switch } from "@/components/ui/switch"
@@ -35,9 +59,22 @@ interface Message {
 }
 
 const defaultSuggestions = [
-  { id: "s1", title: "Plan a 2-day NYC business trip", prompt: "Plan a 2-day business trip itinerary in NYC with meetings near Midtown and a budget of $400 per night for hotel." },
-  { id: "s2", title: "Find flights MAD→SFO", prompt: "Find the 3 best flights from MAD to SFO on 2025-09-10, 1 adult, business class, direct preferred." },
-  { id: "s3", title: "Summarize attached PDF", prompt: "Summarize the attached PDF in 5 bullets and list key action items." },
+  {
+    id: "s1",
+    title: "Plan a 2-day NYC business trip",
+    prompt:
+      "Plan a 2-day business trip itinerary in NYC with meetings near Midtown and a budget of $400 per night for hotel.",
+  },
+  {
+    id: "s2",
+    title: "Find flights MAD→SFO",
+    prompt: "Find the 3 best flights from MAD to SFO on 2025-09-10, 1 adult, business class, direct preferred.",
+  },
+  {
+    id: "s3",
+    title: "Summarize attached PDF",
+    prompt: "Summarize the attached PDF in 5 bullets and list key action items.",
+  },
 ]
 
 function AIChatView() {
@@ -55,7 +92,9 @@ function AIChatView() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       setUser(user)
     }
     getUser()
@@ -74,7 +113,14 @@ function AIChatView() {
     else if (type.startsWith("audio/")) Icon = Music
     else if (type.startsWith("video/")) Icon = Video
     else if (type.includes("zip") || type.includes("compressed") || type.includes("rar")) Icon = Archive
-    else if (type.includes("javascript") || type.includes("typescript") || type.includes("python") || type.includes("java") || type.includes("rust")) Icon = FileCode
+    else if (
+      type.includes("javascript") ||
+      type.includes("typescript") ||
+      type.includes("python") ||
+      type.includes("java") ||
+      type.includes("rust")
+    )
+      Icon = FileCode
 
     return { Icon, sizeText }
   }
@@ -93,7 +139,7 @@ function AIChatView() {
         throw new Error(`File type not allowed: ${f.type}`)
       }
       if (f.size > MAX_SIZE_MB * 1024 * 1024) {
-        throw new Error(`File too large: ${f.name} (> ${MAX_SIZE_MB} MB)`) 
+        throw new Error(`File too large: ${f.name} (> ${MAX_SIZE_MB} MB)`)
       }
     }
   }
@@ -105,7 +151,10 @@ function AIChatView() {
         validateFiles(newFiles)
         setFiles((prev) => [...prev, ...newFiles])
       } catch (e: any) {
-        setMessages((prev) => [...prev, { id: Date.now().toString(), role: "assistant", content: e.message, timestamp: new Date() }])
+        setMessages((prev) => [
+          ...prev,
+          { id: Date.now().toString(), role: "assistant", content: e.message, timestamp: new Date() },
+        ])
       }
     }
   }
@@ -118,7 +167,7 @@ function AIChatView() {
   }
 
   const sendNonStreaming = async (userMessage: Message) => {
-    const response = await fetch("/api/ai-chat", {
+    const response = await fetch("/api/suitpax-ai", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -140,7 +189,9 @@ function AIChatView() {
     }
     setMessages((prev) => [...prev, assistantMessage])
     setTypingMessageId(assistantMessage.id)
-    try { await speak(data.response) } catch {}
+    try {
+      await speak(data.response)
+    } catch {}
   }
 
   const handleSend = async () => {
@@ -158,24 +209,22 @@ function AIChatView() {
     setFiles([])
     setLoading(true)
 
-    const isFlightIntent = /\b([A-Z]{3})\b.*\b(to|→|-)\b.*\b([A-Z]{3})\b/i.test(userMessage.content) || /\bflight|vuelo|vuelos\b/i.test(userMessage.content)
+    const isFlightIntent =
+      /\b([A-Z]{3})\b.*\b(to|→|-)\b.*\b([A-Z]{3})\b/i.test(userMessage.content) ||
+      /\bflight|vuelo|vuelos\b/i.test(userMessage.content)
 
     try {
       if (isFlightIntent) {
         await sendNonStreaming(userMessage)
         return
       }
-      // Prefer streaming for better UX
       let streamed = ""
       await start({ message: userMessage.content, history: messages }, async (token) => {
         streamed += token
         setTypingMessageId("streaming")
         setMessages((prev) => {
           const others = prev.filter((m) => m.id !== "streaming-temp")
-          return [
-            ...others,
-            { id: "streaming-temp", content: streamed, role: "assistant", timestamp: new Date() },
-          ]
+          return [...others, { id: "streaming-temp", content: streamed, role: "assistant", timestamp: new Date() }]
         })
       })
       setMessages((prev) => {
@@ -186,7 +235,9 @@ function AIChatView() {
         ]
       })
       setTypingMessageId(null)
-      try { await speak(streamed) } catch {}
+      try {
+        await speak(streamed)
+      } catch {}
     } catch (err) {
       await sendNonStreaming(userMessage)
     } finally {
@@ -204,20 +255,38 @@ function AIChatView() {
     <VantaHaloBackground className="fixed inset-0">
       <div className="absolute inset-0 flex flex-col bg-white/70">
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="bg-white/60 backdrop-blur-sm border-b border-gray-200 flex-shrink-0" style={{ height: 'auto', minHeight: '4rem' }}>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="bg-white/60 backdrop-blur-sm border-b border-gray-200 flex-shrink-0"
+          style={{ height: "auto", minHeight: "4rem" }}
+        >
           <div className="p-3 sm:p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-                  <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={40} height={40} className="w-full h-full object-contain p-1" />
+                  <Image
+                    src="/logo/suitpax-bl-logo.webp"
+                    alt="Suitpax AI"
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-contain p-1"
+                  />
                 </div>
                 <div className="min-w-0 flex-1">
-                                     <h1 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tighter truncate"><em className="font-serif italic">Suitpax AI</em></h1>
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tighter truncate">
+                    <em className="font-serif italic">Suitpax AI</em>
+                  </h1>
                   <p className="text-xs md:text-sm text-gray-600 font-light hidden sm:block">Try the superpowers</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4 sm:space-x-5 flex-shrink-0">
-                <Link href="/dashboard" className="text-xs text-gray-600 hover:text-black inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-2 py-1 hover:bg-gray-50" aria-label="Volver al dashboard">
+                <Link
+                  href="/dashboard"
+                  className="text-xs text-gray-600 hover:text-black inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-2 py-1 hover:bg-gray-50"
+                  aria-label="Volver al dashboard"
+                >
                   <ArrowLeft className="h-3.5 w-3.5" />
                   <span className="sr-only">Dashboard</span>
                 </Link>
@@ -226,11 +295,20 @@ function AIChatView() {
                   <Switch checked={showReasoning} onCheckedChange={setShowReasoning} />
                 </div>
                 <div className="inline-flex items-center gap-2">
-                  <span className={`inline-flex items-center rounded-xl px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-medium ${voiceState.isSpeaking ? 'bg-green-500/10 text-green-700' : 'bg-gray-900/5 text-gray-900'}`}>
-                    <span className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${voiceState.isSpeaking ? 'bg-green-600 animate-pulse' : 'bg-gray-900'} mr-1`}></span>
-                    {voiceState.isSpeaking ? 'Speaking' : 'Online'}
+                  <span
+                    className={`inline-flex items-center rounded-xl px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-medium ${voiceState.isSpeaking ? "bg-green-500/10 text-green-700" : "bg-gray-900/5 text-gray-900"}`}
+                  >
+                    <span
+                      className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${voiceState.isSpeaking ? "bg-green-600 animate-pulse" : "bg-gray-900"} mr-1`}
+                    ></span>
+                    {voiceState.isSpeaking ? "Speaking" : "Online"}
                   </span>
-                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={voiceState.isListening ? stopListening : startListening}>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-7 w-7"
+                    onClick={voiceState.isListening ? stopListening : startListening}
+                  >
                     {voiceState.isListening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                   </Button>
                 </div>
@@ -259,17 +337,34 @@ function AIChatView() {
                     </div>
                   </div>
                   <PromptSuggestions suggestions={defaultSuggestions} onSelect={handleSuggestion} />
-                  <div className="text-[11px] text-gray-600">Markdown and code blocks supported. Use triple backticks with language for syntax highlighting and copying.</div>
+                  <div className="text-[11px] text-gray-600">
+                    Markdown and code blocks supported. Use triple backticks with language for syntax highlighting and
+                    copying.
+                  </div>
                 </div>
               )}
 
               {messages.map((message, index) => (
-                <motion.div key={message.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.05 }} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`${message.role === "user" ? "max-w-[85%] sm:max-w-sm md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-xl px-4 sm:px-6 py-2 sm:py-2.5 bg-black text-white" : "max-w-[90%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"}`}>
+                <motion.div
+                  key={message.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`${message.role === "user" ? "max-w-[85%] sm:max-w-sm md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-xl px-4 sm:px-6 py-2 sm:py-2.5 bg-black text-white" : "max-w-[90%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"}`}
+                  >
                     {message.role === "assistant" && (
                       <div className="flex items-center space-x-2 mb-2">
                         <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-                          <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={24} height={24} className="w-full h-full object-contain p-0.5" />
+                          <Image
+                            src="/logo/suitpax-bl-logo.webp"
+                            alt="Suitpax AI"
+                            width={24}
+                            height={24}
+                            className="w-full h-full object-contain p-0.5"
+                          />
                         </div>
                         <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
                       </div>
@@ -278,7 +373,9 @@ function AIChatView() {
                     {message.role === "assistant" && message.reasoning && (
                       <div className="mb-3">
                         <Reasoning>
-                          <ReasoningTrigger className="text-xs text-gray-400 hover:text-gray-600"><span>View AI logic</span></ReasoningTrigger>
+                          <ReasoningTrigger className="text-xs text-gray-400 hover:text-gray-600">
+                            <span>View AI logic</span>
+                          </ReasoningTrigger>
                           <ReasoningContent>
                             <div className="text-xs text-gray-600 leading-relaxed whitespace-pre-line bg-gray-50 rounded-lg p-2 border border-gray-100">
                               <ReasoningResponse text={message.reasoning} className="text-xs text-gray-700" />
@@ -299,10 +396,17 @@ function AIChatView() {
                             if (!match) return null
                             try {
                               const parsed = JSON.parse(match[1])
-                              return <div className="mt-2"><ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => {
-                                // Navigate to booking page
-                                window.location.href = `/dashboard/flights/book/${id}`
-                              }} /></div>
+                              return (
+                                <div className="mt-2">
+                                  <ChatFlightOffers
+                                    offers={parsed.offers || []}
+                                    onSelect={(id) => {
+                                      // Navigate to booking page
+                                      window.location.href = `/dashboard/flights/book/${id}`
+                                    }}
+                                  />
+                                </div>
+                              )
                             } catch {
                               return null
                             }
@@ -319,7 +423,11 @@ function AIChatView() {
               ))}
 
               {loading && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex justify-start"
+                >
                   <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 max-w-[90%] sm:max-w-xs">
                     <div className="flex items-center space-x-2 mb-2">
                       <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white"></div>
@@ -327,7 +435,9 @@ function AIChatView() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
-                      <span className="text-sm text-gray-600 font-light">{showReasoning ? "Analyzing and thinking..." : "Thinking..."}</span>
+                      <span className="text-sm text-gray-600 font-light">
+                        {showReasoning ? "Analyzing and thinking..." : "Thinking..."}
+                      </span>
                     </div>
                   </div>
                 </motion.div>
@@ -340,38 +450,105 @@ function AIChatView() {
         </div>
 
         {/* Input */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="bg-white/60 backdrop-blur-sm border-t border-gray-200 flex-shrink-0" style={{ minHeight: '4rem' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-white/60 backdrop-blur-sm border-t border-gray-200 flex-shrink-0"
+          style={{ minHeight: "4rem" }}
+        >
           <div className="p-3 sm:p-4 lg:p-6">
             <div className="max-w-4xl mx-auto">
-              <PromptInput value={input} onValueChange={setInput} isLoading={loading || isStreaming} onSubmit={handleSend} className="w-full bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <PromptInput
+                value={input}
+                onValueChange={setInput}
+                isLoading={loading || isStreaming}
+                onSubmit={handleSend}
+                className="w-full bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200"
+              >
                 {files.length > 0 && (
                   <div className="flex flex-wrap gap-2 pb-2">
                     {files.map((file, index) => {
                       const { Icon, sizeText } = getFileMeta(file)
                       return (
-                        <div key={index} className="bg-gray-100 flex items-center gap-2 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm" onClick={e => e.stopPropagation()}>
+                        <div
+                          key={index}
+                          className="bg-gray-100 flex items-center gap-2 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <Icon className="size-3.5 sm:size-4 text-gray-700" />
                           <span className="max-w-[120px] truncate text-gray-800">{file.name}</span>
                           <span className="text-[10px] text-gray-600">{sizeText}</span>
-                          <button onClick={() => handleRemoveFile(index)} className="hover:bg-gray-200 rounded-full p-1 transition-colors"><X className="size-3 sm:size-4 text-gray-600" /></button>
+                          <button
+                            onClick={() => handleRemoveFile(index)}
+                            className="hover:bg-gray-200 rounded-full p-1 transition-colors"
+                          >
+                            <X className="size-3 sm:size-4 text-gray-600" />
+                          </button>
                         </div>
                       )
                     })}
                   </div>
                 )}
 
-                <PromptInputTextarea placeholder="Ask me about flights, hotels, travel planning, or code/design…" className="text-gray-900 placeholder-gray-500 font-light text-sm sm:text-base" disabled={loading || isStreaming} />
+                <PromptInputTextarea
+                  placeholder="Ask me about flights, hotels, travel planning, or code/design…"
+                  className="text-gray-900 placeholder-gray-500 font-light text-sm sm:text-base"
+                  disabled={loading || isStreaming}
+                />
 
                 <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
                   <PromptInputAction tooltip="Attach files">
-                    <label htmlFor="file-upload" className="hover:bg-gray-100 flex h-7 w-7 sm:h-8 sm:w-8 cursor-pointer items-center justify-center rounded-2xl transition-colors">
-                      <input ref={uploadInputRef} type="file" multiple onChange={handleFileChange} className="hidden" id="file-upload" />
+                    <label
+                      htmlFor="file-upload"
+                      className="hover:bg-gray-100 flex h-7 w-7 sm:h-8 sm:w-8 cursor-pointer items-center justify-center rounded-2xl transition-colors"
+                    >
+                      <input
+                        ref={uploadInputRef}
+                        type="file"
+                        multiple
+                        onChange={handleFileChange}
+                        className="hidden"
+                        id="file-upload"
+                      />
                       <Paperclip className="size-3.5 sm:size-4 text-gray-700" />
                     </label>
                   </PromptInputAction>
 
                   <PromptInputAction tooltip="Scan document">
-                    <DocumentScanner onScanned={(r) => { if (r?.raw_text) setInput((prev) => prev ? `${prev}\n\n${r.raw_text}` : r.raw_text || "") }} />
+                    <DocumentScanner
+                      onScanned={(r) => {
+                        if (r?.raw_text) setInput((prev) => (prev ? `${prev}\n\n${r.raw_text}` : r.raw_text || ""))
+                      }}
+                    />
                   </PromptInputAction>
 
-                  <PromptInputAction 
+                  <VoiceButton />
+
+                  <PromptInputAction tooltip="Send message">
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={!input.trim() || loading || isStreaming}
+                      className="bg-black text-white hover:bg-gray-800 rounded-2xl h-7 w-7 sm:h-8 sm:w-8 p-0 disabled:opacity-50"
+                    >
+                      <ArrowUp className="size-3.5 sm:size-4" />
+                    </Button>
+                  </PromptInputAction>
+                </PromptInputActions>
+              </PromptInput>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </VantaHaloBackground>
+  )
+}
+
+export default function SuitpaxAIPage() {
+  return (
+    <VoiceAIProvider>
+      <AIChatView />
+    </VoiceAIProvider>
+  )
+}
