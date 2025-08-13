@@ -6,7 +6,6 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { ArrowRight } from "lucide-react"
-import Image from "next/image"
 
 interface AISearchInputProps {
   placeholder?: string
@@ -67,15 +66,7 @@ export default function AISearchInput({
             className="w-full px-4 py-3 pl-11 pr-12 text-sm bg-white/90 backdrop-blur-sm border border-blue-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all placeholder:text-gray-400 shadow-sm hover:shadow-md"
           />
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <div className="w-4 h-4 rounded-md overflow-hidden">
-              <Image
-                src="/ai-agent-white-hair.png"
-                alt="AI Agent"
-                width={16}
-                height={16}
-                className="w-full h-full object-cover rounded-md"
-              />
-            </div>
+            <div className="w-2 h-2 bg-gray-600 rounded-full animate-pulse"></div>
           </div>
           <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
             <ArrowRight className="h-4 w-4 text-gray-400" />
