@@ -36,35 +36,32 @@ export function TopDestinationsCard({ className }: TopDestinationsCardProps) {
       className={className}
     >
       <div className="bg-white border border-gray-200 shadow-sm rounded-2xl overflow-hidden">
-        {/* Header with black bars */}
-        <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-black via-gray-800 to-black"></div>
-          <div className="p-6 pb-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                  <MapPin className="h-5 w-5 text-gray-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium tracking-tighter text-gray-900">Top Business Destinations</h3>
-                  <p className="text-xs text-gray-500 font-light">Your most visited locations with travel insights</p>
-                </div>
+        {/* Header - removed black bars from top */}
+        <div className="p-6 pb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                <MapPin className="h-5 w-5 text-gray-600" />
               </div>
-              <div className="flex items-center gap-1 bg-gray-100 rounded-lg px-2 py-1">
-                <TrendingUp className="h-3 w-3 text-gray-600" />
-                <span className="text-xs font-medium text-gray-600">Analytics</span>
+              <div>
+                <h3 className="text-lg font-medium tracking-tighter text-gray-900">Top Business Destinations</h3>
+                <p className="text-xs text-gray-500 font-light">Your most visited locations with travel insights</p>
               </div>
             </div>
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg px-2 py-1">
+              <TrendingUp className="h-3 w-3 text-gray-600" />
+              <span className="text-xs font-medium text-gray-600">Analytics</span>
+            </div>
+          </div>
 
-            <div className="flex items-center gap-6 text-xs text-gray-500">
-              <div className="flex items-center gap-1">
-                <Users className="h-3 w-3" />
-                <span>6 destinations tracked</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                <span>Last updated: Today</span>
-              </div>
+          <div className="flex items-center gap-6 text-xs text-gray-500">
+            <div className="flex items-center gap-1">
+              <Users className="h-3 w-3" />
+              <span>6 destinations tracked</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              <span>Last updated: Today</span>
             </div>
           </div>
         </div>
@@ -108,10 +105,10 @@ export function TopDestinationsCard({ className }: TopDestinationsCardProps) {
                   <h4 className="text-sm font-medium text-gray-900 truncate">{city.name}</h4>
                   <p className="text-xs text-gray-500 truncate">{city.country}</p>
 
-                  {/* Travel stats */}
+                  {/* Travel stats - changed emerald dot to gray */}
                   <div className="flex items-center justify-between text-[10px] text-gray-400">
                     <div className="flex items-center gap-1">
-                      <div className="w-1 h-1 bg-emerald-500 rounded-full"></div>
+                      <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
                       <span>{city.visits} trips</span>
                     </div>
                     <span>{city.avgStay}d avg</span>
@@ -154,7 +151,7 @@ export function TopDestinationsCard({ className }: TopDestinationsCardProps) {
             <div className="flex items-center justify-between text-xs text-gray-500">
               <span>AI-powered travel insights</span>
               <div className="flex items-center gap-1">
-                <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></div>
+                <div className="w-1 h-1 bg-gray-600 rounded-full animate-pulse"></div>
                 <span>Live data</span>
               </div>
             </div>

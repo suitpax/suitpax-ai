@@ -62,8 +62,8 @@ export default function LocationsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gray-50 p-4 lg:p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header - Updated to match dashboard style */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -72,7 +72,7 @@ export default function LocationsPage() {
           className="flex flex-col sm:flex-row sm:items-center sm:justify-between"
         >
           <div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-2 text-gray-900">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-none mb-2 text-gray-900">
               Business Locations
             </h1>
             <p className="text-gray-600 font-light">
@@ -92,49 +92,49 @@ export default function LocationsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-6"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
         >
-          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <Globe className="h-5 w-5 text-gray-600" />
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Globe className="h-4 w-4 text-gray-600" />
               </div>
-              <span className="text-xs font-medium text-gray-500">GLOBAL</span>
+              <span className="text-[10px] font-medium text-gray-500">GLOBAL</span>
             </div>
-            <div className="text-2xl font-medium tracking-tighter text-gray-900 mb-1">{businessCities.length}</div>
+            <div className="text-xl font-medium tracking-tighter text-gray-900 mb-1">{businessCities.length}</div>
             <div className="text-xs text-gray-500">Cities Available</div>
           </div>
 
-          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <Building className="h-5 w-5 text-gray-600" />
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Building className="h-4 w-4 text-gray-600" />
               </div>
-              <span className="text-xs font-medium text-gray-500">HOTELS</span>
+              <span className="text-[10px] font-medium text-gray-500">HOTELS</span>
             </div>
-            <div className="text-2xl font-medium tracking-tighter text-gray-900 mb-1">2.4K+</div>
+            <div className="text-xl font-medium tracking-tighter text-gray-900 mb-1">2.4K+</div>
             <div className="text-xs text-gray-500">Business Hotels</div>
           </div>
 
-          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <Users className="h-5 w-5 text-gray-600" />
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Users className="h-4 w-4 text-gray-600" />
               </div>
-              <span className="text-xs font-medium text-gray-500">SAVED</span>
+              <span className="text-[10px] font-medium text-gray-500">SAVED</span>
             </div>
-            <div className="text-2xl font-medium tracking-tighter text-gray-900 mb-1">{savedLocations.length}</div>
+            <div className="text-xl font-medium tracking-tighter text-gray-900 mb-1">{savedLocations.length}</div>
             <div className="text-xs text-gray-500">Your Locations</div>
           </div>
 
-          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <BarChart3 className="h-5 w-5 text-gray-600" />
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                <BarChart3 className="h-4 w-4 text-gray-600" />
               </div>
-              <span className="text-xs font-medium text-gray-500">INSIGHTS</span>
+              <span className="text-[10px] font-medium text-gray-500">INSIGHTS</span>
             </div>
-            <div className="text-2xl font-medium tracking-tighter text-gray-900 mb-1">AI</div>
+            <div className="text-xl font-medium tracking-tighter text-gray-900 mb-1">AI</div>
             <div className="text-xs text-gray-500">Powered Analytics</div>
           </div>
         </motion.div>
@@ -144,10 +144,10 @@ export default function LocationsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm"
+          className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl p-4 shadow-sm"
         >
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
+          <div className="space-y-3">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search cities, countries, or business districts..."
@@ -156,32 +156,36 @@ export default function LocationsPage() {
                 className="pl-10 rounded-2xl border-gray-200 bg-white/80"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               <Button
                 variant={selectedRegion === "all" ? "default" : "outline"}
                 onClick={() => setSelectedRegion("all")}
-                className="rounded-2xl bg-gray-900 hover:bg-gray-800"
+                size="sm"
+                className="rounded-xl bg-gray-900 hover:bg-gray-800 text-xs"
               >
                 All Regions
               </Button>
               <Button
                 variant={selectedRegion === "north america" ? "default" : "outline"}
                 onClick={() => setSelectedRegion("north america")}
-                className="rounded-2xl"
+                size="sm"
+                className="rounded-xl text-xs"
               >
                 Americas
               </Button>
               <Button
                 variant={selectedRegion === "europe" ? "default" : "outline"}
                 onClick={() => setSelectedRegion("europe")}
-                className="rounded-2xl"
+                size="sm"
+                className="rounded-xl text-xs"
               >
                 Europe
               </Button>
               <Button
                 variant={selectedRegion === "asia" ? "default" : "outline"}
                 onClick={() => setSelectedRegion("asia")}
-                className="rounded-2xl"
+                size="sm"
+                className="rounded-xl text-xs"
               >
                 Asia Pacific
               </Button>

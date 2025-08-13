@@ -5,7 +5,8 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Sparkles, ArrowRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
+import Image from "next/image"
 
 interface AISearchInputProps {
   placeholder?: string
@@ -66,7 +67,15 @@ export default function AISearchInput({
             className="w-full px-4 py-3 pl-11 pr-12 text-sm bg-white/90 backdrop-blur-sm border border-blue-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all placeholder:text-gray-400 shadow-sm hover:shadow-md"
           />
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <Sparkles className="h-4 w-4 text-blue-500" />
+            <div className="w-4 h-4 rounded-md overflow-hidden">
+              <Image
+                src="/ai-agent-white-hair.png"
+                alt="AI Agent"
+                width={16}
+                height={16}
+                className="w-full h-full object-cover rounded-md"
+              />
+            </div>
           </div>
           <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
             <ArrowRight className="h-4 w-4 text-gray-400" />
@@ -78,7 +87,7 @@ export default function AISearchInput({
         <div className="absolute top-full left-0 right-0 mt-2 z-50">
           <div className="bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-xl p-3 shadow-lg animate-in slide-in-from-top-2 duration-200">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-gray-600 rounded-full animate-pulse"></div>
               <span className="text-xs font-medium text-gray-700">Reasoning...</span>
             </div>
             <p className="text-xs text-gray-500 mt-1">Analyzing your request and preparing the best response</p>

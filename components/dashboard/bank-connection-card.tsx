@@ -2,11 +2,12 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { CreditCard, Shield, Plus, CheckCircle, Building2, Wallet, ExternalLink, Trash2 } from "lucide-react"
+import { CreditCard, Shield, Plus, CheckCircle, Wallet, ExternalLink, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import Image from "next/image"
 
 interface BankAccount {
   id: string
@@ -162,16 +163,29 @@ export function BankConnectionCard() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-white" />
+                <Image
+                  src="/suitpax-bl-logo.webp"
+                  alt="Suitpax"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 object-contain"
+                />
               </div>
               <div>
                 <h3 className="text-lg font-medium tracking-tighter">Bank Accounts</h3>
-                <p className="text-xs text-white/70">Powered by GoCardless</p>
+                <p className="text-xs text-white/70">Powered by Suitpax Connect</p>
               </div>
             </div>
-            <Badge variant="secondary" className="bg-white/10 text-white border-white/20 text-xs">
-              {connectedAccounts.length} Connected
-            </Badge>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
+                <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+              </div>
+              <Badge variant="secondary" className="bg-white/10 text-white border-white/20 text-xs">
+                {connectedAccounts.length} Connected
+              </Badge>
+            </div>
           </div>
         </div>
       </div>
@@ -179,14 +193,14 @@ export function BankConnectionCard() {
       {/* Content */}
       <div className="p-6">
         {/* Security Notice */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
           <div className="flex items-start gap-3">
-            <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <Shield className="h-5 w-5 text-gray-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="text-sm font-medium text-blue-900 mb-1">Bank-level Security</h4>
-              <p className="text-xs text-blue-700">
-                Your banking information is encrypted and protected with 256-bit SSL encryption. We use GoCardless's
-                secure API and never store your login credentials.
+              <h4 className="text-sm font-medium text-gray-900 mb-1">Bank-level Security</h4>
+              <p className="text-xs text-gray-600">
+                Your banking information is encrypted and protected with 256-bit SSL encryption. We use secure APIs and
+                never store your login credentials.
               </p>
             </div>
           </div>
@@ -212,7 +226,7 @@ export function BankConnectionCard() {
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium text-gray-900">{account.name}</p>
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
                         </div>
                         <p className="text-xs text-gray-500">
                           {account.type.charAt(0).toUpperCase() + account.type.slice(1)}
@@ -231,7 +245,7 @@ export function BankConnectionCard() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDisconnectAccount(account.id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-100"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -247,8 +261,8 @@ export function BankConnectionCard() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium text-gray-900">Add New Account</h4>
-            <Badge variant="outline" className="text-xs">
-              GoCardless Secure
+            <Badge variant="outline" className="text-xs bg-gray-200 text-gray-700 border-gray-200">
+              Suitpax Connect
             </Badge>
           </div>
 
@@ -307,8 +321,8 @@ export function BankConnectionCard() {
               </div>
               <h5 className="text-sm font-medium text-gray-900 mb-2">Connect Your Bank Account</h5>
               <p className="text-xs text-gray-600 mb-4 max-w-sm mx-auto">
-                Securely connect your business bank account via GoCardless to automatically track expenses and manage
-                your travel budget.
+                Securely connect your business bank account via Suitpax Connect to automatically track expenses and
+                manage your travel budget.
               </p>
 
               <Button
@@ -329,7 +343,7 @@ export function BankConnectionCard() {
                 ) : (
                   <>
                     <ExternalLink className="h-4 w-4 mr-2" />
-                    Connect with GoCardless
+                    Connect with Suitpax
                   </>
                 )}
               </Button>
@@ -343,22 +357,22 @@ export function BankConnectionCard() {
           {/* Benefits */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
             <div className="text-center p-3 bg-white rounded-xl border border-gray-200">
-              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <CheckCircle className="h-4 w-4 text-gray-600" />
               </div>
               <p className="text-xs font-medium text-gray-900 mb-1">Auto Sync</p>
               <p className="text-xs text-gray-500">Real-time transaction data</p>
             </div>
             <div className="text-center p-3 bg-white rounded-xl border border-gray-200">
-              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                <Shield className="h-4 w-4 text-blue-600" />
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <Shield className="h-4 w-4 text-gray-600" />
               </div>
               <p className="text-xs font-medium text-gray-900 mb-1">Secure</p>
-              <p className="text-xs text-gray-500">GoCardless encryption</p>
+              <p className="text-xs text-gray-500">Bank-level encryption</p>
             </div>
             <div className="text-center p-3 bg-white rounded-xl border border-gray-200">
-              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                <Wallet className="h-4 w-4 text-purple-600" />
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <Wallet className="h-4 w-4 text-gray-600" />
               </div>
               <p className="text-xs font-medium text-gray-900 mb-1">Multi-Bank</p>
               <p className="text-xs text-gray-500">30+ countries supported</p>
