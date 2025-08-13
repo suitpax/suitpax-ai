@@ -1,7 +1,8 @@
 "use client"
 
 import { DraggableDashboard } from "@/components/dashboard/draggable-dashboard"
-import { BankConnectionCard } from "@/components/dashboard/bank-connection-card"
+import { BankConnectionSection } from "@/components/dashboard/bank-connection-section"
+import { FlightsVisualization } from "@/components/dashboard/flights-visualization"
 import { TopDestinationsCard } from "@/components/dashboard/top-destinations-card"
 import { RadarChart } from "@/components/charts/radar-chart"
 import { ExpenseTrendsChart } from "@/components/charts/expense-trends-chart"
@@ -9,7 +10,7 @@ import { BusinessMetricsChart } from "@/components/charts/business-metrics-chart
 import { TravelEfficiencyChart } from "@/components/charts/travel-efficiency-chart"
 import { MonthlySpendingChart } from "@/components/charts/monthly-spending-chart"
 import { motion } from "framer-motion"
-import { Calendar, TrendingUp, Building2, Clock, DollarSign, Plane, Sparkles, ArrowRight } from "lucide-react"
+import { Calendar, TrendingUp, Building2, Clock, Sparkles, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useUserData } from "@/hooks/use-user-data"
 
@@ -126,66 +127,14 @@ const DashboardPage = () => {
       ),
     },
     {
-      id: "kpi-stats",
-      title: "KPI Statistics",
-      component: (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              title: "Total Trips",
-              value: "0",
-              change: "+0%",
-              icon: Plane,
-              color: "text-gray-600",
-            },
-            {
-              title: "Total Spent",
-              value: "$0",
-              change: "+0%",
-              icon: DollarSign,
-              color: "text-gray-600",
-            },
-            {
-              title: "Avg Trip Cost",
-              value: "$0",
-              change: "+0%",
-              icon: TrendingUp,
-              color: "text-gray-600",
-            },
-            {
-              title: "Active Bookings",
-              value: "0",
-              change: "+0%",
-              icon: Calendar,
-              color: "text-gray-600",
-            },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-medium text-gray-600 mb-1">{stat.title}</p>
-                  <p className="text-lg font-medium tracking-tight text-gray-900">{stat.value}</p>
-                  <p className="text-[10px] text-gray-500 mt-1">{stat.change} from last month</p>
-                </div>
-                <div className={`p-2 rounded-xl bg-gray-100 ${stat.color}`}>
-                  <stat.icon className="h-3.5 w-3.5" />
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      ),
+      id: "bank-connection",
+      title: "Banking & Finance",
+      component: <BankConnectionSection />,
     },
     {
-      id: "bank-connection",
-      title: "Bank Connection",
-      component: <BankConnectionCard />,
+      id: "flights-visualization",
+      title: "Global Flight Tracking",
+      component: <FlightsVisualization />,
     },
     {
       id: "top-destinations",

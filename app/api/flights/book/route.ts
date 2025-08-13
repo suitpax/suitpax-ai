@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getDuffelClient } from "@/lib/duffel/client"
 import { validatePassengerData } from "@/lib/duffel/utils"
 import { createClient } from "@/lib/supabase/server"
+import { cookies } from "next/headers"
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     const duffel = getDuffelClient()
-    const supabase = createClient()
+    const supabase = createClient(cookies())
 
     // Get current user
     const {
