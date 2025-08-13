@@ -244,9 +244,9 @@ const DashboardPage = () => {
             </div>
 
             <div className="relative z-10 flex items-start space-x-4">
-              <div className="flex-shrink-0">
+                              <div className="flex-shrink-0">
                                 <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-600 shadow-inner bg-gray-800">
-                  <img src="/agents/ai-agent-white-hair.png" alt="Suitpax AI" className="w-full h-full object-cover" />
+                  <img src="/logo/suitpax-cloud-logo.webp" alt="Suitpax" className="w-full h-full object-contain" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">

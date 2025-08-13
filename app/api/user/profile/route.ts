@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@supabase/ssr"
 import { cookieStore } from "@/lib/supabase/cookies"
 import { z } from "zod"
+import { createClient } from "@/lib/supabase/server"
 
 const profileUpdateSchema = z.object({
   full_name: z.string().min(1).optional(),
@@ -25,13 +25,7 @@ const profileUpdateSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: cookieStore
-      }
-    )
+    const supabase = await createClient()
 
     const {
       data: { user },
@@ -44,7 +38,7 @@ export async function GET(request: NextRequest) {
     // Get user profile from database
     const { data: profile, error } = await supabase.from("user_profiles").select("*").eq("user_id", user.id).single()
 
-    if (error && error.code !== "PGRST116") {
+    if (error && (error as any).code !== "PGRST116") {
       console.error("Profile fetch error:", error)
       return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500 })
     }
@@ -65,13 +59,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: cookieStore
-      }
-    )
+    const supabase = await createClient()
 
     const {
       data: { user },
