@@ -28,7 +28,7 @@ import {
   PiCrown,
   PiCheckSquare,
   PiShield,
-  PiDotsSixVertical,
+
   PiBank,
   PiPencil,
   PiCamera,
@@ -409,43 +409,18 @@ export function Sidebar({
         isCollapsed ? "w-16" : "w-64",
       )}
     >
-      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-gradient-to-br from-white via-gray-50 to-white">
+      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800 rounded-xl blur-sm opacity-20 group-hover:opacity-30 transition-opacity"></div>
-              <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 p-2 rounded-xl shadow-lg border border-gray-800">
-                <Image
-                  src="/suitpax-bl-logo.webp"
-                  alt="Suitpax"
-                  width={24}
-                  height={24}
-                  className="w-6 h-6 object-contain filter invert"
-                />
-              </div>
-              <div className="absolute -top-1 -right-1 flex items-center gap-0.5">
-                <div className="w-1 h-1 bg-gray-900 rounded-full animate-pulse"></div>
-                <div className="w-1 h-1 bg-gray-600 rounded-full animate-pulse delay-100"></div>
-                <div className="w-1 h-1 bg-gray-400 rounded-full animate-pulse delay-200"></div>
-              </div>
-            </div>
-            {(!isCollapsed || isMobile) && (
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg font-medium text-gray-900 tracking-tighter">Suitpax</span>
-                  <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 font-light tracking-tight">
-                    Welcome back, {getDisplayName().split(" ")[0]}
-                  </span>
-                  <Badge className="bg-gradient-to-r from-gray-900 to-gray-700 text-white text-[8px] px-1.5 py-0.5 rounded-md font-medium border-0">
-                    AI
-                  </Badge>
-                </div>
-              </div>
-            )}
-          </div>
+          <Link href="/dashboard" className="flex items-center">
+            <Image
+              src="/suitpax-bl-logo.webp"
+              alt="Suitpax"
+              width={120}
+              height={32}
+              className={cn("object-contain", isCollapsed && !isMobile ? "h-6 w-6 mx-auto" : "h-6 w-auto")}
+              priority
+            />
+          </Link>
           <Button
             variant="ghost"
             size="sm"
@@ -491,9 +466,7 @@ export function Sidebar({
                   )}
                   title={isCollapsed && !isMobile ? item.name : ""}
                 >
-                  {!isCollapsed && !isMobile && (
-                    <PiDotsSixVertical className="h-4 w-4 mr-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing" />
-                  )}
+
                   <item.icon
                     className={cn(
                       "flex-shrink-0 h-5 w-5",
@@ -639,21 +612,8 @@ export function Sidebar({
           <div className="border-t border-gray-200 pt-3">
             <Dialog>
               <DialogTrigger asChild>
-                <div className="flex items-center space-x-3 px-3 py-2.5 mb-2 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
-                  <div className="relative">
-                    <Avatar className="h-8 w-8 ring-2 ring-gray-200 rounded-md">
-                      <AvatarImage
-                        src={userProfile?.avatar_url || "/placeholder.svg"}
-                        alt={getDisplayName()}
-                        className="rounded-md"
-                      />
-                      <AvatarFallback className="bg-gray-900 text-white text-xs font-medium rounded-md">
-                        {getInitials()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-                  </div>
-                  <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between px-3 py-2.5 mb-2 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
                     <div className="flex items-center gap-2">
                       <p className="text-xs text-gray-600 truncate">
@@ -883,18 +843,6 @@ export function Sidebar({
 
         {isCollapsed && !isMobile && (
           <div className="border-t border-gray-200 pt-3 space-y-2">
-            <div className="flex justify-center">
-              <Avatar className="h-8 w-8 ring-2 ring-gray-200 rounded-md">
-                <AvatarImage
-                  src={userProfile?.avatar_url || "/placeholder.svg"}
-                  alt={getDisplayName()}
-                  className="rounded-md"
-                />
-                <AvatarFallback className="bg-gray-900 text-white text-xs font-medium rounded-md">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
-            </div>
             <Button
               onClick={handleSignOut}
               variant="ghost"
