@@ -142,7 +142,7 @@ export default function CalendarPage() {
                 </div>
               )
             })}
-          </div>
+                    </div>
         </motion.div>
 
         {/* Enhanced Quick Actions */}
@@ -188,7 +188,6 @@ export default function CalendarPage() {
             <div className="text-xs text-gray-500">Available slots today</div>
           </div>
         </motion.div>
-      </div>
     </div>
-  )
+   )
 }

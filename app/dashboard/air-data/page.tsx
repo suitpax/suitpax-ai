@@ -165,9 +165,8 @@ export default function AirDataPage() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+                    </Card>
         </motion.div>
-      </div>
     </div>
-  )
+   )
 }
