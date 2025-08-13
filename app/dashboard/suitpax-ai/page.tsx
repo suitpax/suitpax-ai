@@ -1,566 +1,378 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { createClient } from "@/lib/supabase/client"
-import {
-  Sparkles,
-  Send,
-  Paperclip,
-  X,
-  MoreHorizontal,
-  Plane,
-  Building2,
-  MapPin,
-  Calendar,
-  CreditCard,
-  Users,
-  ChevronRight,
-  Star,
-  Globe,
-  Clock,
-} from "lucide-react"
+import { motion } from "framer-motion"
+import { Loader2, ArrowUp, Paperclip, X, Square, ArrowRight, File as FileIcon, Image as ImageIcon, FileText, FileCode, FileSpreadsheet, Music, Video, Archive, Mic, Volume2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
+import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
+import Link from "next/link"
+import Markdown from "@/components/prompt-kit/markdown"
+import CodeBlock from "@/components/prompt-kit/code-block"
+import { PromptInput, PromptInputAction, PromptInputActions, PromptInputTextarea } from "@/components/prompt-kit/prompt-input"
+import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from "@/components/prompt-kit/chat-container"
+import { ScrollButton } from "@/components/prompt-kit/scroll-button"
+import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@/components/prompt-kit/reasoning"
+import { Switch } from "@/components/ui/switch"
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import { VoiceAIProvider, useVoiceAI } from "@/contexts/voice-ai-context"
+import VoiceButton from "@/components/prompt-kit/voice-button"
+import DocumentScanner from "@/components/prompt-kit/document-scanner"
+import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
+import SourceList from "@/components/prompt-kit/source-list"
+import { useChatStream } from "@/hooks/use-chat-stream"
+import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
 
 interface Message {
   id: string
-  role: "user" | "assistant"
   content: string
+  role: "user" | "assistant"
   timestamp: Date
   reasoning?: string
-  sources?: Array<{ title: string; url: string }>
+  sources?: Array<{ title: string; url?: string; snippet?: string }>
 }
 
-const aiCapabilities = [
-  { icon: Plane, title: "Flight Search", desc: "Find and book flights worldwide", color: "bg-blue-500" },
-  { icon: Building2, title: "Hotel Booking", desc: "Discover perfect accommodations", color: "bg-emerald-500" },
-  { icon: MapPin, title: "Travel Planning", desc: "Create detailed itineraries", color: "bg-purple-500" },
-  { icon: Calendar, title: "Schedule Management", desc: "Organize meetings and events", color: "bg-orange-500" },
-  { icon: CreditCard, title: "Expense Tracking", desc: "Monitor business expenses", color: "bg-red-500" },
-  { icon: Users, title: "Team Coordination", desc: "Manage team travel needs", color: "bg-indigo-500" },
+const defaultSuggestions = [
+  { id: "s1", title: "Plan a 2-day NYC business trip", prompt: "Plan a 2-day business trip itinerary in NYC with meetings near Midtown and a budget of $400 per night for hotel." },
+  { id: "s2", title: "Find flights MAD→SFO", prompt: "Find the 3 best flights from MAD to SFO on 2025-09-10, 1 adult, business class, direct preferred." },
+  { id: "s3", title: "Summarize attached PDF", prompt: "Summarize the attached PDF in 5 bullets and list key action items." },
 ]
 
-const quickActions = [
-  { icon: Plane, text: "Find flights from Madrid to San Francisco", category: "Travel" },
-  { icon: Building2, text: "Book a hotel in downtown Tokyo for 3 nights", category: "Accommodation" },
-  { icon: Calendar, text: "Plan a 5-day business trip to London", category: "Planning" },
-  { icon: CreditCard, text: "Create an expense report for last month", category: "Finance" },
-  { icon: Users, text: "Schedule team meeting in New York office", category: "Team" },
-  { icon: Globe, text: "What are the visa requirements for Brazil?", category: "Information" },
-]
-
-export default function SuitpaxAIPage() {
+function AIChatView() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
-  const [isUserLoading, setIsUserLoading] = useState(true)
   const [files, setFiles] = useState<File[]>([])
   const [showReasoning, setShowReasoning] = useState(true)
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
   const uploadInputRef = useRef<HTMLInputElement>(null)
+  const supabase = createClient()
+  const { speak, state: voiceState, startListening, stopListening } = useVoiceAI()
+  const { isStreaming, start, cancel } = useChatStream()
 
   useEffect(() => {
     const getUser = async () => {
-      const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
-      setIsUserLoading(false)
     }
     getUser()
-  }, [])
+  }, [supabase])
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  const getFileMeta = (file: File) => {
+    const type = file.type
+    const sizeKB = Math.max(1, Math.round(file.size / 1024))
+    const sizeText = sizeKB > 1024 ? `${(sizeKB / 1024).toFixed(1)} MB` : `${sizeKB} KB`
+
+    let Icon = FileIcon
+    if (type.startsWith("image/")) Icon = ImageIcon
+    else if (type === "application/pdf") Icon = FileText
+    else if (type.includes("spreadsheet") || type.includes("excel")) Icon = FileSpreadsheet
+    else if (type.startsWith("text/") || type === "application/json") Icon = FileText
+    else if (type.startsWith("audio/")) Icon = Music
+    else if (type.startsWith("video/")) Icon = Video
+    else if (type.includes("zip") || type.includes("compressed") || type.includes("rar")) Icon = Archive
+    else if (type.includes("javascript") || type.includes("typescript") || type.includes("python") || type.includes("java") || type.includes("rust")) Icon = FileCode
+
+    return { Icon, sizeText }
+  }
+
+  const validateFiles = (newFiles: File[]) => {
+    const MAX_FILES = 5
+    const MAX_SIZE_MB = 15
+    const allowed = ["application/pdf", "text/plain", "application/json", "image/png", "image/jpeg"]
+
+    if (files.length + newFiles.length > MAX_FILES) {
+      throw new Error(`Maximum ${MAX_FILES} files allowed`)
+    }
+
+    for (const f of newFiles) {
+      if (!allowed.some((t) => f.type === t || f.type.startsWith(t.split("/")[0] + "/"))) {
+        throw new Error(`File type not allowed: ${f.type}`)
+      }
+      if (f.size > MAX_SIZE_MB * 1024 * 1024) {
+        throw new Error(`File too large: ${f.name} (> ${MAX_SIZE_MB} MB)`) 
+      }
+    }
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const newFiles = Array.from(event.target.files)
+      try {
+        validateFiles(newFiles)
+        setFiles((prev) => [...prev, ...newFiles])
+      } catch (e: any) {
+        setMessages((prev) => [...prev, { id: Date.now().toString(), role: "assistant", content: e.message, timestamp: new Date() }])
+      }
+    }
+  }
+
+  const handleRemoveFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index))
+    if (uploadInputRef?.current) {
+      uploadInputRef.current.value = ""
+    }
+  }
+
+  const sendNonStreaming = async (userMessage: Message) => {
+    const response = await fetch("/api/ai-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: userMessage.content,
+        history: messages,
+        context: "travel_booking",
+        includeReasoning: showReasoning,
+      }),
+    })
+    if (!response.ok) throw new Error("Failed to get response")
+    const data = await response.json()
+    const assistantMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      content: data.response,
+      role: "assistant",
+      timestamp: new Date(),
+      reasoning: data.reasoning,
+      sources: data.sources || [],
+    }
+    setMessages((prev) => [...prev, assistantMessage])
+    setTypingMessageId(assistantMessage.id)
+    try { await speak(data.response) } catch {}
+  }
 
   const handleSend = async () => {
-    if ((!input.trim() && files.length === 0) || isLoading) return
+    if (!input.trim() || loading || isStreaming) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
+      content: input.trim(),
       role: "user",
-      content: input,
       timestamp: new Date(),
     }
 
     setMessages((prev) => [...prev, userMessage])
     setInput("")
-    setIsLoading(true)
+    setFiles([])
+    setLoading(true)
+
+    const isFlightIntent = /\b([A-Z]{3})\b.*\b(to|→|-)\b.*\b([A-Z]{3})\b/i.test(userMessage.content) || /\bflight|vuelo|vuelos\b/i.test(userMessage.content)
 
     try {
-      const response = await fetch("/api/suitpax-ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: input,
-          userId: user?.id,
-          sessionId: currentSessionId,
-          conversationHistory: messages.slice(-10),
-        }),
-      })
-
-      if (!response.ok) throw new Error("Failed to get response")
-      const data = await response.json()
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: data.response,
-        timestamp: new Date(),
-        reasoning: data.reasoning,
-        sources: data.sources,
+      if (isFlightIntent) {
+        await sendNonStreaming(userMessage)
+        return
       }
-
-      setMessages((prev) => [...prev, assistantMessage])
-      if (data.sessionId) setCurrentSessionId(data.sessionId)
-    } catch (error) {
-      console.error("Error:", error)
+      // Prefer streaming for better UX
+      let streamed = ""
+      await start({ message: userMessage.content, history: messages }, async (token) => {
+        streamed += token
+        setTypingMessageId("streaming")
+        setMessages((prev) => {
+          const others = prev.filter((m) => m.id !== "streaming-temp")
+          return [
+            ...others,
+            { id: "streaming-temp", content: streamed, role: "assistant", timestamp: new Date() },
+          ]
+        })
+      })
+      setMessages((prev) => {
+        const withoutTemp = prev.filter((m) => m.id !== "streaming-temp")
+        return [
+          ...withoutTemp,
+          { id: (Date.now() + 1).toString(), content: streamed, role: "assistant", timestamp: new Date() },
+        ]
+      })
+      setTypingMessageId(null)
+      try { await speak(streamed) } catch {}
+    } catch (err) {
+      await sendNonStreaming(userMessage)
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
-    }
+  const handleSuggestion = (prompt: string) => {
+    setInput(prompt)
   }
 
-  if (isUserLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-gray-600 mx-auto mb-4"></div>
-          <p className="text-gray-700 font-medium tracking-tight">Initializing Suitpax AI...</p>
-        </motion.div>
-      </div>
-    )
-  }
-
-  const EmptyState = () => (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <motion.div
-                className="w-12 h-12 rounded-md overflow-hidden shadow-sm"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Image
-                  src="/suitpax-bl-logo.webp"
-                  alt="Suitpax"
-                  width={48}
-                  height={48}
-                  className="w-full h-full object-cover"
-                />
-              </motion.div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-medium tracking-tighter text-gray-900">Suitpax AI</h1>
-                <p className="text-xs sm:text-sm text-gray-500">Your intelligent business travel assistant</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Badge variant="secondary" className="bg-gray-200 text-gray-700 border-gray-200">
-                <div className="w-2 h-2 bg-gray-600 rounded-full mr-2 animate-pulse"></div>
-                Online
-              </Badge>
-              <Button variant="ghost" size="sm" className="rounded-xl">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8 lg:py-12">
-        <div className="text-center mb-12 lg:mb-16">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-gray-800 mb-4 lg:mb-6 leading-tight tracking-tighter">
-              Ask anything.
-              <br />
-              <span className="bg-gradient-to-r from-gray-600 to-gray-900 bg-clip-text text-transparent">
-                Travel. Business. Code.
-              </span>
-            </h2>
-            <p className="text-sm sm:text-lg lg:text-xl text-gray-600 mb-8 lg:mb-12 font-light">
-              Powered by advanced AI with memory and business travel expertise
-            </p>
-          </motion.div>
-
-          {/* AI Capabilities Grid */}
-          <motion.div
-            className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-12 lg:mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            {aiCapabilities.map((capability, index) => (
-              <motion.div
-                key={capability.title}
-                className="bg-white/60 backdrop-blur-sm border border-gray-200 rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                whileHover={{ scale: 1.02, y: -2 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <div
-                  className={`w-10 h-10 sm:w-12 sm:h-12 ${capability.color} rounded-xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}
-                >
-                  <capability.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-                </div>
-                <h3 className="text-sm sm:text-base font-medium text-gray-900 mb-1 sm:mb-2">{capability.title}</h3>
-                <p className="text-xs sm:text-sm text-gray-600">{capability.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <h3 className="text-xl sm:text-2xl font-medium text-gray-900 mb-6 sm:mb-8 tracking-tight">
-              Try these examples
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 max-w-4xl mx-auto">
-              {quickActions.map((action, index) => (
-                <motion.button
-                  key={action.text}
-                  onClick={() => setInput(action.text)}
-                  className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-4 sm:p-6 text-left hover:shadow-lg hover:border-gray-300 transition-all duration-300 group"
-                  whileHover={{ scale: 1.02 }}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                >
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                      <action.icon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
-                    </div>
-                    <div className="flex-1">
-                      <Badge variant="outline" className="mb-2 sm:mb-3 text-[10px] sm:text-xs">
-                        {action.category}
-                      </Badge>
-                      <p className="text-sm sm:text-base text-gray-900 font-medium leading-relaxed">{action.text}</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Features Note */}
-          <motion.div
-            className="mt-12 lg:mt-16 p-4 sm:p-6 bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 max-w-2xl mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />
-              <h4 className="text-sm sm:text-base font-medium text-gray-900">Advanced Features</h4>
-            </div>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Supports markdown, code blocks, file attachments, and remembers your preferences across conversations. Use
-              triple backticks with language for syntax highlighting.
-            </p>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Input Area */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-4 sm:p-6">
-        <div className="max-w-4xl mx-auto">
-          <AnimatePresence>
-            {files.length > 0 && (
-              <motion.div
-                className="mb-4 flex flex-wrap gap-2"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-              >
-                {files.map((file, idx) => (
-                  <div key={idx} className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
-                    <span className="text-sm text-gray-700">{file.name}</span>
-                    <button
-                      onClick={() => setFiles(files.filter((_, i) => i !== idx))}
-                      className="text-gray-500 hover:text-gray-700 transition-colors"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="flex items-end gap-3 sm:gap-4">
-            <div className="flex-1 relative">
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask me about flights, hotels, travel planning, or anything else..."
-                disabled={isLoading}
-                className="bg-white border-gray-300 rounded-2xl resize-none min-h-[50px] sm:min-h-[60px] pr-16 sm:pr-20 focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm text-sm sm:text-base"
-                rows={1}
-              />
-              <div className="absolute right-2 sm:right-3 bottom-2 sm:bottom-3 flex items-center gap-2">
-                <input
-                  ref={uploadInputRef}
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={(e) => {
-                    if (e.target.files) {
-                      setFiles([...files, ...Array.from(e.target.files)])
-                    }
-                  }}
-                />
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-gray-100 rounded-full"
-                  onClick={() => uploadInputRef.current?.click()}
-                >
-                  <Paperclip className="h-3 w-3 sm:h-4 sm:w-4" />
-                </Button>
-              </div>
-            </div>
-            <Button
-              onClick={handleSend}
-              disabled={isLoading || (!input.trim() && files.length === 0)}
-              className="bg-gray-900 hover:bg-black text-white rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <Send className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  const handleTypingComplete = () => setTypingMessageId(null)
 
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-        {messages.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="flex flex-col h-screen">
-            {/* Header */}
-            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-gray-200">
-              <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-md overflow-hidden shadow-sm">
-                      <Image
-                        src="/suitpax-bl-logo.webp"
-                        alt="Suitpax"
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <h1 className="text-lg sm:text-xl font-medium text-gray-900">Suitpax AI</h1>
-                      <p className="text-xs text-gray-500">Conversation started</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={showReasoning}
-                        onCheckedChange={setShowReasoning}
-                        className="data-[state=checked]:bg-gray-600"
-                      />
-                      <span className="text-sm text-gray-600 hidden sm:inline">Show reasoning</span>
-                    </div>
-                    <Button
-                      onClick={() => {
-                        setMessages([])
-                        setCurrentSessionId(null)
-                      }}
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-xl"
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </div>
+    <VantaHaloBackground className="fixed inset-0">
+      <div className="absolute inset-0 flex flex-col bg-white/70">
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="bg-white/60 backdrop-blur-sm border-b border-gray-200 flex-shrink-0" style={{ height: 'auto', minHeight: '4rem' }}>
+          <div className="p-3 sm:p-4 lg:p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
+                  <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={40} height={40} className="w-full h-full object-contain p-1" />
+                </div>
+                <div className="min-w-0 flex-1">
+                                     <h1 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tighter truncate"><em className="font-serif italic">Suitpax AI</em></h1>
+                  <p className="text-xs md:text-sm text-gray-600 font-light hidden sm:block">Try the superpowers ✨</p>
                 </div>
               </div>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto">
-              <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
-                {messages.map((message, index) => (
-                  <motion.div
-                    key={message.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    <div className={`max-w-3xl ${message.role === "user" ? "ml-8 sm:ml-12" : "mr-8 sm:mr-12"}`}>
-                      <div
-                        className={`rounded-2xl p-4 sm:p-6 shadow-sm ${
-                          message.role === "user"
-                            ? "bg-gray-900 text-white"
-                            : "bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-900"
-                        }`}
-                      >
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          className={`prose max-w-none text-sm sm:text-base ${
-                            message.role === "user"
-                              ? "prose-invert prose-headings:text-white prose-p:text-white prose-strong:text-white"
-                              : "prose-gray"
-                          }`}
-                        >
-                          {message.content}
-                        </ReactMarkdown>
-
-                        {message.reasoning && showReasoning && (
-                          <details className="mt-4 sm:mt-6 p-3 sm:p-4 rounded-xl bg-gray-50/80 backdrop-blur-sm border border-gray-200">
-                            <summary className="cursor-pointer text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center gap-2 text-gray-700">
-                              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
-                              AI Reasoning Process
-                            </summary>
-                            <div className="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
-                              {message.reasoning}
-                            </div>
-                          </details>
-                        )}
-
-                        <div
-                          className={`flex items-center gap-2 mt-3 sm:mt-4 text-xs ${
-                            message.role === "user" ? "text-white/70" : "text-gray-500"
-                          }`}
-                        >
-                          <Clock className="h-3 w-3" />
-                          {message.timestamp.toLocaleTimeString()}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-
-                <AnimatePresence>
-                  {isLoading && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      className="flex justify-start"
-                    >
-                      <div className="mr-8 sm:mr-12 max-w-3xl">
-                        <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
-                          <div className="flex items-center space-x-3">
-                            <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-gray-200 border-t-gray-600"></div>
-                            <span className="text-xs sm:text-sm text-gray-700">Suitpax AI is thinking...</span>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                <div ref={messagesEndRef} />
-              </div>
-            </div>
-
-            {/* Input Area */}
-            <div className="bg-white/95 backdrop-blur-md border-t border-gray-200 p-4 sm:p-6">
-              <div className="max-w-4xl mx-auto">
-                <AnimatePresence>
-                  {files.length > 0 && (
-                    <motion.div
-                      className="mb-4 flex flex-wrap gap-2"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                    >
-                      {files.map((file, idx) => (
-                        <div key={idx} className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
-                          <span className="text-sm text-gray-700">{file.name}</span>
-                          <button
-                            onClick={() => setFiles(files.filter((_, i) => i !== idx))}
-                            className="text-gray-500 hover:text-gray-700 transition-colors"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <div className="flex items-end gap-3 sm:gap-4">
-                  <div className="flex-1 relative">
-                    <Textarea
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Continue the conversation..."
-                      disabled={isLoading}
-                      className="bg-white border-gray-300 rounded-2xl resize-none min-h-[50px] sm:min-h-[60px] pr-16 sm:pr-20 focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm text-sm sm:text-base"
-                      rows={1}
-                    />
-                    <div className="absolute right-2 sm:right-3 bottom-2 sm:bottom-3 flex items-center gap-2">
-                      <input
-                        ref={uploadInputRef}
-                        type="file"
-                        multiple
-                        className="hidden"
-                        onChange={(e) => {
-                          if (e.target.files) {
-                            setFiles([...files, ...Array.from(e.target.files)])
-                          }
-                        }}
-                      />
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-gray-100 rounded-full"
-                        onClick={() => uploadInputRef.current?.click()}
-                      >
-                        <Paperclip className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={handleSend}
-                    disabled={isLoading || (!input.trim() && files.length === 0)}
-                    className="bg-gray-900 hover:bg-black text-white rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+              <div className="flex items-center space-x-4 sm:space-x-5 flex-shrink-0">
+                <Link href="/dashboard" className="text-xs text-gray-600 hover:text-black inline-flex items-center gap-1">Back to dashboard <ArrowRight className="h-3 w-3" /></Link>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-gray-600 hidden sm:inline">Reasoning…</span>
+                  <Switch checked={showReasoning} onCheckedChange={setShowReasoning} />
+                </div>
+                <div className="inline-flex items-center gap-2">
+                  <span className={`inline-flex items-center rounded-xl px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-medium ${voiceState.isSpeaking ? 'bg-green-500/10 text-green-700' : 'bg-gray-900/5 text-gray-900'}`}>
+                    <span className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${voiceState.isSpeaking ? 'bg-green-600 animate-pulse' : 'bg-gray-900'} mr-1`}></span>
+                    {voiceState.isSpeaking ? 'Speaking' : 'Online'}
+                  </span>
+                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={voiceState.isListening ? stopListening : startListening}>
+                    {voiceState.isListening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
             </div>
           </div>
-        )}
-      </div>
-    </>
-  )
-}
+        </motion.div>
+
+        {/* Chat Container */}
+        <div className="flex-1 min-h-0 relative">
+          <ChatContainerRoot className="h-full">
+            <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 relative min-h-[50vh] md:min-h-[60vh]">
+              {messages.length === 0 && !loading && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-center py-6 sm:py-8">
+                    <div className="text-center">
+                      <motion.h2
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter bg-clip-text text-transparent bg-[linear-gradient(90deg,#111,#7a7a7a,#111)] bg-[length:200%_100%] animate-pulse"
+                      >
+                        Ask anything. Travel. Business. Code.
+                      </motion.h2>
+                      <p className="mt-2 text-xs sm:text-sm text-gray-600">Powered by Suitpax AI</p>
+                    </div>
+                  </div>
+                  <PromptSuggestions suggestions={defaultSuggestions} onSelect={handleSuggestion} />
+                  <div className="text-[11px] text-gray-600">Markdown and code blocks supported. Use triple backticks with language for syntax highlighting and copying.</div>
+                </div>
+              )}
+
+              {messages.map((message, index) => (
+                <motion.div key={message.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.05 }} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`${message.role === "user" ? "max-w-[85%] sm:max-w-sm md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-xl px-4 sm:px-6 py-2 sm:py-2.5 bg-black text-white" : "max-w-[90%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 bg-white/50 backdrop-blur-sm border border-gray-200 text-gray-900"}`}>
+                    {message.role === "assistant" && (
+                      <div className="flex items-center space-x-2 mb-2">
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
+                          <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={24} height={24} className="w-full h-full object-contain p-0.5" />
+                        </div>
+                        <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
+                      </div>
+                    )}
+
+                    {message.role === "assistant" && message.reasoning && (
+                      <div className="mb-3">
+                        <Reasoning>
+                          <ReasoningTrigger className="text-xs text-gray-400 hover:text-gray-600"><span>View AI logic</span></ReasoningTrigger>
+                          <ReasoningContent>
+                            <div className="text-xs text-gray-600 leading-relaxed whitespace-pre-line bg-gray-50 rounded-lg p-2 border border-gray-100">
+                              <ReasoningResponse text={message.reasoning} className="text-xs text-gray-700" />
+                            </div>
+                          </ReasoningContent>
+                        </Reasoning>
+                      </div>
+                    )}
+
+                    <div className="prose prose-sm max-w-none prose-p:mb-2 prose-pre:mb-0">
+                      {message.role === "assistant" && typingMessageId === message.id ? (
+                        <p className="text-sm font-light leading-relaxed text-gray-900">Typing…</p>
+                      ) : (
+                        <>
+                          <Markdown content={message.content} />
+                          {(() => {
+                            const match = message.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
+                            if (!match) return null
+                            try {
+                              const parsed = JSON.parse(match[1])
+                              return <div className="mt-2"><ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => {
+                                // Navigate to booking page
+                                window.location.href = `/dashboard/flights/book/${id}`
+                              }} /></div>
+                            } catch {
+                              return null
+                            }
+                          })()}
+                        </>
+                      )}
+                    </div>
+                    {message.sources && message.sources.length > 0 && <SourceList items={message.sources} />}
+                    <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
+                      {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+
+              {loading && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
+                  <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 max-w-[90%] sm:max-w-xs">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white"></div>
+                      <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
+                      <span className="text-sm text-gray-600 font-light">{showReasoning ? "Analyzing and thinking..." : "Thinking..."}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </ChatContainerContent>
+
+            <ChatContainerScrollAnchor />
+            <ScrollButton className="bottom-24 md:bottom-28 right-4 sm:right-6" />
+          </ChatContainerRoot>
+        </div>
+
+        {/* Input */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="bg-white/60 backdrop-blur-sm border-t border-gray-200 flex-shrink-0" style={{ minHeight: '4rem' }}>
+          <div className="p-3 sm:p-4 lg:p-6">
+            <div className="max-w-4xl mx-auto">
+              <PromptInput value={input} onValueChange={setInput} isLoading={loading || isStreaming} onSubmit={handleSend} className="w-full bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+                {files.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pb-2">
+                    {files.map((file, index) => {
+                      const { Icon, sizeText } = getFileMeta(file)
+                      return (
+                        <div key={index} className="bg-gray-100 flex items-center gap-2 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm" onClick={e => e.stopPropagation()}>
+                          <Icon className="size-3.5 sm:size-4 text-gray-700" />
+                          <span className="max-w-[120px] truncate text-gray-800">{file.name}</span>
+                          <span className="text-[10px] text-gray-600">{sizeText}</span>
+                          <button onClick={() => handleRemoveFile(index)} className="hover:bg-gray-200 rounded-full p-1 transition-colors"><X className="size-3 sm:size-4 text-gray-600" /></button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                <PromptInputTextarea placeholder="Ask me about flights, hotels, travel planning, or code/design…" className="text-gray-900 placeholder-gray-500 font-light text-sm sm:text-base" disabled={loading || isStreaming} />
+
+                <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
+                  <PromptInputAction tooltip="Attach files">
+                    <label htmlFor="file-upload" className="hover:bg-gray-100 flex h-7 w-7 sm:h-8 sm:w-8 cursor-pointer items-center justify-center rounded-2xl transition-colors">
+                      <input ref={uploadInputRef} type="file" multiple onChange={handleFileChange} className="hidden" id="file-upload" />
+                      <Paperclip className="size-3.5 sm:size-4 text-gray-700" />
+                    </label>
+                  </PromptInputAction>
+
+                  <PromptInputAction tooltip="Scan document">
+                    <DocumentScanner onScanned={(r) => { if (r?.raw_text) setInput((prev) => prev ? `${prev}\n\n${r.raw_text}` : r.raw_text || "") }} />
+                  </PromptInputAction>
+
+                  <PromptInputAction tooltip="Speak to type">
+                    <VoiceButton onTranscript={(t) => setInput((prev) => prev ? `${prev} ${t}` : t)} />
+                  </PromptInputAction>
+
+                  <d
