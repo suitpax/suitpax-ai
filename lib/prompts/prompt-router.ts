@@ -1,37 +1,34 @@
-import {
-  SUITPAX_CORE_SYSTEM_PROMPT,
-  TRAVEL_SPECIALIST_PROMPT,
-  CODE_GENERATION_PROMPT,
-  DOCUMENT_AI_PROMPT,
-} from "./system-prompts"
+import { buildKernelSystemPrompt, type KernelOptions } from "./kernel"
 
 export interface PromptContext {
   intent: "travel" | "code" | "document" | "general"
   userPreferences?: any
   conversationHistory?: any[]
   urgency?: "low" | "medium" | "high"
+  language?: "en" | "es"
 }
 
 export class PromptRouter {
   static getSystemPrompt(context: PromptContext): string {
-    const basePrompt = SUITPAX_CORE_SYSTEM_PROMPT
-
-    switch (context.intent) {
-      case "travel":
-        return `${basePrompt}\n\n${TRAVEL_SPECIALIST_PROMPT}`
-      case "code":
-        return `${basePrompt}\n\n${CODE_GENERATION_PROMPT}`
-      case "document":
-        return `${basePrompt}\n\n${DOCUMENT_AI_PROMPT}`
-      default:
-        return basePrompt
+    const options: KernelOptions = {
+      intent: context.intent,
+      language: context.language || "en",
+      style: { tone: "professional", useHeaders: true, useBullets: true, allowTables: true },
+      features: { enforceNoCOT: true, includeFlightJsonWrapper: true },
+      context: {
+        userPreferences: context.userPreferences,
+        recentConversation: context.conversationHistory,
+        urgency: context.urgency,
+      },
     }
+
+    return buildKernelSystemPrompt(options)
   }
 
   static detectIntent(message: string): PromptContext["intent"] {
-    const travelKeywords = ["flight", "hotel", "travel", "booking", "trip", "airport", "airline"]
-    const codeKeywords = ["code", "function", "component", "api", "database", "react", "next"]
-    const documentKeywords = ["document", "pdf", "report", "analysis", "extract", "ocr"]
+    const travelKeywords = ["flight", "hotel", "travel", "booking", "trip", "airport", "airline", "vuelo", "vuelos"]
+    const codeKeywords = ["code", "function", "component", "api", "database", "react", "next", "typescript"]
+    const documentKeywords = ["document", "pdf", "report", "analysis", "extract", "ocr", "documento"]
 
     const lowerMessage = message.toLowerCase()
 
@@ -49,21 +46,15 @@ export class PromptRouter {
   }
 
   static enhancePromptWithContext(basePrompt: string, context: PromptContext): string {
-    let enhancedPrompt = basePrompt
-
-    if (context.userPreferences) {
-      enhancedPrompt += `\n\nUser Preferences:\n${JSON.stringify(context.userPreferences, null, 2)}`
+    const options: KernelOptions = {
+      intent: context.intent,
+      language: context.language || "en",
+      context: {
+        userPreferences: context.userPreferences,
+        recentConversation: context.conversationHistory,
+        urgency: context.urgency,
+      },
     }
-
-    if (context.conversationHistory?.length) {
-      const recentHistory = context.conversationHistory.slice(-3)
-      enhancedPrompt += `\n\nRecent Conversation:\n${recentHistory.map((h) => `${h.role}: ${h.content}`).join("\n")}`
-    }
-
-    if (context.urgency) {
-      enhancedPrompt += `\n\nUrgency Level: ${context.urgency.toUpperCase()}`
-    }
-
-    return enhancedPrompt
+    return buildKernelSystemPrompt(options) + "\n\n" + basePrompt
   }
 }

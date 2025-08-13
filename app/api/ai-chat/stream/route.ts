@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { buildSystemPrompt } from "@/lib/prompts/system"
+import { buildKernelSystemPrompt } from "@/lib/prompts/kernel"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
@@ -15,7 +15,13 @@ export async function POST(req: NextRequest) {
     const supabase = createServerSupabase()
     const { data: { user } } = await supabase.auth.getUser()
 
-    const system = buildSystemPrompt({ domain: ["general", "travel", "coding", "business"] })
+    const system = buildKernelSystemPrompt({
+      intent: /flight|vuelo/i.test(message) ? "travel" : "general",
+      language: "en",
+      style: { tone: "professional", useHeaders: true, useBullets: true, allowTables: true },
+      features: { enforceNoCOT: true, includeFlightJsonWrapper: true },
+      context: { recentConversation: history, urgency: "medium" },
+    })
 
     // We use non-streaming API to get usage, then stream the text to client for UX
     const res = await anthropic.messages.create({

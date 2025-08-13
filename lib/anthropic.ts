@@ -47,7 +47,8 @@ export async function generateAgentResponseByPlan(
         content: msg.content,
       })),
     });
-    return response.content;
+    const textBlock = (response as any).content.find((c: any) => c.type === "text");
+    return textBlock?.text || "";
   } catch (error) {
     console.error("Error generating agent response:", error);
     throw error;

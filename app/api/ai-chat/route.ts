@@ -1,23 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { buildKernelSystemPrompt } from "@/lib/prompts/kernel";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-
-const systemPrompt = `
-You are Suitpax AI, an expert travel and enterprise assistant.
-
-Format rules:
-- Start with 1-2 sentences summary. Never start with a header.
-- Use level-2 markdown headers (##) for sections.
-- Prefer unordered flat lists; avoid nested lists. Use tables for comparisons.
-- Use bold sparingly for emphasis. Include code blocks with proper language tags when needed.
-- Never use emojis. Tone: unbiased, precise, journalistic.
-
-Flight assistance:
-- When the user asks for flights, include a short textual summary and append a structured block with offers using the exact wrapper:
-  :::flight_offers_json\n{"offers":[...]}\n:::
-- Keep prices, airline, IATA, times and stops in the JSON. Show up to 5 best options.
-`.trim();
 
 export async function POST(request: NextRequest) {
   const { message, history = [], includeReasoning = false } = await request.json();
@@ -54,6 +39,14 @@ export async function POST(request: NextRequest) {
       } catch {}
     }
 
+    const systemPrompt = buildKernelSystemPrompt({
+      intent: isFlightIntent ? "travel" : "general",
+      language: "en",
+      style: { tone: "professional", useHeaders: true, useBullets: true, allowTables: true },
+      features: { enforceNoCOT: true, includeFlightJsonWrapper: true },
+      context: { recentConversation: conversationHistory, urgency: "medium" },
+    })
+
     const initial = await anthropic.messages.create({
       model: "claude-3-5-sonnet-20240620",
       max_tokens: 4096,
@@ -61,7 +54,7 @@ export async function POST(request: NextRequest) {
       messages: [...conversationHistory, { role: "user", content: message }],
     });
 
-    text = initial.content.find((c: any) => c.type === "text")?.text || "";
+    text = (initial as any).content.find((c: any) => c.type === "text")?.text || "";
 
     if (offersPayload?.success) {
       text += `\n\n:::flight_offers_json\n${JSON.stringify({ offers: offersPayload.offers })}\n:::`
@@ -75,7 +68,7 @@ export async function POST(request: NextRequest) {
         system: "Give a brief, high-level rationale (3-5 bullets) in Spanish without chain-of-thought.",
         messages: [{ role: "user", content: `Mensaje del usuario: ${message}\n\nRespuesta: ${text}\n\nExplica en 3-5 puntos el razonamiento de alto nivel.` }],
       });
-      reasoning = r.content.find((c: any) => c.type === "text")?.text?.trim();
+      reasoning = (r as any).content.find((c: any) => c.type === "text")?.text?.trim();
     }
 
     return NextResponse.json({ response: text, reasoning });
