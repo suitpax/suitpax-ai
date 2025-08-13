@@ -15,6 +15,8 @@ interface NumberFlowProps {
   prefix?: string
   suffix?: string
   animated?: boolean
+  trend?: "up" | "down" | "neutral"
+  showTrend?: boolean
 }
 
 export function AnimatedNumber({
@@ -24,18 +26,35 @@ export function AnimatedNumber({
   prefix = "",
   suffix = "",
   animated = true,
+  trend = "neutral",
+  showTrend = false,
   ...props
 }: NumberFlowProps) {
+  const trendColors = {
+    up: "text-green-600",
+    down: "text-red-600",
+    neutral: "text-gray-600",
+  }
+
   return (
-    <NumberFlow
-      value={value}
-      format={format}
-      prefix={prefix}
-      suffix={suffix}
-      animated={animated}
-      className={cn("font-medium tabular-nums", className)}
-      {...props}
-    />
+    <div className="flex items-center gap-2">
+      <NumberFlow
+        value={value}
+        format={format}
+        prefix={prefix}
+        suffix={suffix}
+        animated={animated}
+        className={cn("font-medium tabular-nums", className)}
+        {...props}
+      />
+      {showTrend && (
+        <div className={cn("text-xs font-medium", trendColors[trend])}>
+          {trend === "up" && "↗"}
+          {trend === "down" && "↘"}
+          {trend === "neutral" && "→"}
+        </div>
+      )}
+    </div>
   )
 }
 
