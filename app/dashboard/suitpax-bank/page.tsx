@@ -8,12 +8,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BankAccountItem } from "@/components/dashboard/bank-account-item"
-import { TransactionList } from "@/components/dashboard/transaction-list"
-import { BankSelection } from "@/components/dashboard/bank-selection"
+import { BankSelection } from "@/components/dashboard/bank/bank-selection"
 import { ExpenseAnalytics } from "@/components/dashboard/expense-analytics"
 import { AutoCategorizationSettings } from "@/components/dashboard/auto-categorization-settings"
-import { BankNotifications } from "@/components/dashboard/bank-notifications"
 
 interface BankAccount {
   id: string
@@ -54,26 +51,23 @@ export default function SuitpaxBankPage() {
   const handleConnectBank = async (bankData: any) => {
     setIsConnecting(true)
     try {
+      // Following GoCardless flow: redirect to their hosted consent page
       const response = await fetch("/api/gocardless/connect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bankData),
+        body: JSON.stringify({
+          institutionId: bankData.institutionId,
+          reference: `suitpax-${Date.now()}`, // Unique reference as recommended
+          redirectUrl: `${window.location.origin}/dashboard/suitpax-bank?connected=true`,
+        }),
       })
 
       if (response.ok) {
         const data = await response.json()
-        const newAccount: BankAccount = {
-          id: data.connectionId || Date.now().toString(),
-          name: `${bankData.bank} Business Account`,
-          bank: bankData.bank,
-          accountNumber: "****" + Math.floor(Math.random() * 9999),
-          balance: 0,
-          currency: "EUR",
-          status: "connected",
-          lastSync: new Date().toISOString(),
-          type: "business",
+        // Redirect to GoCardless hosted page
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl
         }
-        setAccounts([...accounts, newAccount])
       }
     } catch (error) {
       console.error("Connection failed:", error)
@@ -84,18 +78,10 @@ export default function SuitpaxBankPage() {
 
   const handleInlineBankConnect = async () => {
     if (!selectedBank) return
-
-    setIsConnecting(true)
-    try {
-      await handleConnectBank({
-        country: selectedCountry,
-        bank: selectedBank,
-      })
-      setSelectedBank("")
-      setBankSearchTerm("")
-    } finally {
-      setIsConnecting(false)
-    }
+    await handleConnectBank({
+      institutionId: selectedBank,
+      country: selectedCountry,
+    })
   }
 
   const filteredTransactions = transactions.filter((transaction) => {
@@ -156,6 +142,35 @@ export default function SuitpaxBankPage() {
     </motion.div>
   )
 
+  const ConnectedAccountItem = ({ account }: { account: BankAccount }) => (
+    <div className="flex items-center justify-between p-4 bg-white/80 rounded-xl border border-gray-200">
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+          <Building2 className="w-6 h-6 text-gray-600" />
+        </div>
+        <div>
+          <h3 className="font-medium text-gray-900">{account.name}</h3>
+          <p className="text-sm text-gray-600">****{account.accountNumber}</p>
+        </div>
+      </div>
+      <div className="text-right">
+        <p className="font-medium text-gray-900">€{account.balance.toLocaleString()}</p>
+        <div className="flex items-center gap-1">
+          <div
+            className={`w-2 h-2 rounded-full ${
+              account.status === "connected"
+                ? "bg-green-500"
+                : account.status === "pending"
+                  ? "bg-yellow-500"
+                  : "bg-red-500"
+            }`}
+          />
+          <p className="text-xs text-gray-500 capitalize">{account.status}</p>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className="space-y-6 p-4 lg:p-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 p-4 lg:p-0">
@@ -163,11 +178,6 @@ export default function SuitpaxBankPage() {
           <div>
             <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Suitpax Bank</h1>
             <p className="text-gray-600 font-light">Secure banking connections for automated expense tracking</p>
-          </div>
-          <div className="flex items-center space-x-2">
-            {accounts.length === 0 && (
-              <div className="text-sm text-gray-600 font-light">Connect your first bank account below</div>
-            )}
           </div>
         </div>
       </motion.div>
@@ -211,7 +221,7 @@ export default function SuitpaxBankPage() {
         transition={{ duration: 0.6, delay: 0.16 }}
       >
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200 p-1">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200 p-1">
             <TabsTrigger value="overview" className="rounded-xl text-xs md:text-sm">
               Overview
             </TabsTrigger>
@@ -220,9 +230,6 @@ export default function SuitpaxBankPage() {
             </TabsTrigger>
             <TabsTrigger value="categorization" className="rounded-xl text-xs md:text-sm">
               Auto-Cat
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="rounded-xl text-xs md:text-sm">
-              Alerts
             </TabsTrigger>
             <TabsTrigger value="settings" className="rounded-xl text-xs md:text-sm">
               Settings
@@ -251,7 +258,7 @@ export default function SuitpaxBankPage() {
                   ) : (
                     <div className="space-y-4">
                       {accounts.map((account) => (
-                        <BankAccountItem key={account.id} account={account} />
+                        <ConnectedAccountItem key={account.id} account={account} />
                       ))}
                       <div className="border-t border-gray-200 pt-6 mt-6">
                         <h3 className="text-lg font-medium tracking-tighter text-black mb-4">Connect Another Bank</h3>
@@ -331,7 +338,27 @@ export default function SuitpaxBankPage() {
                   {transactions.length === 0 ? (
                     <EmptyState type="transactions" />
                   ) : (
-                    <TransactionList transactions={filteredTransactions} />
+                    <div className="space-y-3">
+                      {filteredTransactions.map((transaction) => (
+                        <div
+                          key={transaction.id}
+                          className="flex items-center justify-between p-4 bg-white/80 rounded-xl border border-gray-200"
+                        >
+                          <div>
+                            <p className="font-medium text-gray-900">{transaction.description}</p>
+                            <p className="text-sm text-gray-600">
+                              {transaction.date} • {transaction.category}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className={`font-medium ${transaction.amount < 0 ? "text-red-600" : "text-green-600"}`}>
+                              {transaction.amount < 0 ? "-" : "+"}€{Math.abs(transaction.amount).toLocaleString()}
+                            </p>
+                            <p className="text-xs text-gray-500 capitalize">{transaction.status}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -344,10 +371,6 @@ export default function SuitpaxBankPage() {
 
           <TabsContent value="categorization">
             <AutoCategorizationSettings />
-          </TabsContent>
-
-          <TabsContent value="notifications">
-            <BankNotifications />
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">

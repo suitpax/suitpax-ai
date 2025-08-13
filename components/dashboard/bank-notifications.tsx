@@ -1,1 +1,0 @@
-export { BankNotifications } from "./bank/bank-notifications"
