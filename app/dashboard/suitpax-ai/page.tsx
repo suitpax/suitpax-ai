@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Loader2, ArrowUp, Paperclip, X, Square, ArrowRight, File as FileIcon, Image as ImageIcon, FileText, FileCode, FileSpreadsheet, Music, Video, Archive, Mic, Volume2 } from "lucide-react"
+import { Loader2, ArrowUp, Paperclip, X, Square, ArrowLeft, File as FileIcon, Image as ImageIcon, FileText, FileCode, FileSpreadsheet, Music, Video, Archive, Mic, Volume2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
@@ -213,11 +213,14 @@ function AIChatView() {
                 </div>
                 <div className="min-w-0 flex-1">
                                      <h1 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tighter truncate"><em className="font-serif italic">Suitpax AI</em></h1>
-                  <p className="text-xs md:text-sm text-gray-600 font-light hidden sm:block">Try the superpowers ✨</p>
+                  <p className="text-xs md:text-sm text-gray-600 font-light hidden sm:block">Try the superpowers</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4 sm:space-x-5 flex-shrink-0">
-                <Link href="/dashboard" className="text-xs text-gray-600 hover:text-black inline-flex items-center gap-1">Back to dashboard <ArrowRight className="h-3 w-3" /></Link>
+                <Link href="/dashboard" className="text-xs text-gray-600 hover:text-black inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-2 py-1 hover:bg-gray-50" aria-label="Volver al dashboard">
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  <span className="sr-only">Dashboard</span>
+                </Link>
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] text-gray-600 hidden sm:inline">Reasoning…</span>
                   <Switch checked={showReasoning} onCheckedChange={setShowReasoning} />
@@ -371,8 +374,4 @@ function AIChatView() {
                     <DocumentScanner onScanned={(r) => { if (r?.raw_text) setInput((prev) => prev ? `${prev}\n\n${r.raw_text}` : r.raw_text || "") }} />
                   </PromptInputAction>
 
-                  <PromptInputAction tooltip="Speak to type">
-                    <VoiceButton onTranscript={(t) => setInput((prev) => prev ? `${prev} ${t}` : t)} />
-                  </PromptInputAction>
-
-                  <d
+                  <PromptInputAction 
