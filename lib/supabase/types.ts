@@ -237,8 +237,6 @@ export interface Database {
           phone: string | null
           subscription_plan: "free" | "premium" | "enterprise"
           subscription_status: "active" | "inactive" | "cancelled" | "trialing"
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
           onboarding_completed: boolean
           ai_tokens_used: number
           ai_tokens_limit: number
@@ -257,8 +255,6 @@ export interface Database {
           phone?: string | null
           subscription_plan?: "free" | "premium" | "enterprise"
           subscription_status?: "active" | "inactive" | "cancelled" | "trialing"
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
           onboarding_completed?: boolean
           ai_tokens_used?: number
           ai_tokens_limit?: number
@@ -267,6 +263,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          user_id?: string
           username?: string | null
           full_name?: string | null
           first_name?: string | null
@@ -277,8 +274,6 @@ export interface Database {
           phone?: string | null
           subscription_plan?: "free" | "premium" | "enterprise"
           subscription_status?: "active" | "inactive" | "cancelled" | "trialing"
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
           onboarding_completed?: boolean
           ai_tokens_used?: number
           ai_tokens_limit?: number

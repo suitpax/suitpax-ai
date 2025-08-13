@@ -45,43 +45,90 @@ export function getAircraftName(aircraft: any): string {
   return aircraft?.name || "Unknown Aircraft"
 }
 
-export function validatePassengerData(passenger: any): { isValid: boolean; errors: string[] } {
+export function validatePassengerData(passengers: any[]): { valid: boolean; errors: string[] } {
   const errors: string[] = []
 
+  if (!Array.isArray(passengers) || passengers.length === 0) {
+    errors.push("At least one passenger is required")
+    return { valid: false, errors }
+  }
+
+  passengers.forEach((passenger, index) => {
+    const passengerErrors = validateSinglePassenger(passenger, index + 1)
+    errors.push(...passengerErrors)
+  })
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
+}
+
+function validateSinglePassenger(passenger: any, passengerNumber: number): string[] {
+  const errors: string[] = []
+  const prefix = `Passenger ${passengerNumber}: `
+
   if (!passenger.given_name || passenger.given_name.trim().length < 1) {
-    errors.push("First name is required")
+    errors.push(`${prefix}First name is required`)
   }
 
   if (!passenger.family_name || passenger.family_name.trim().length < 1) {
-    errors.push("Last name is required")
+    errors.push(`${prefix}Last name is required`)
   }
 
   if (!passenger.born_on) {
-    errors.push("Date of birth is required")
+    errors.push(`${prefix}Date of birth is required`)
   } else {
     const birthDate = new Date(passenger.born_on)
     const today = new Date()
     const age = today.getFullYear() - birthDate.getFullYear()
 
     if (age < 0 || age > 120) {
-      errors.push("Invalid date of birth")
+      errors.push(`${prefix}Invalid date of birth`)
     }
   }
 
   if (!passenger.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(passenger.email)) {
-    errors.push("Valid email is required")
+    errors.push(`${prefix}Valid email is required`)
   }
 
   if (!passenger.phone_number || passenger.phone_number.trim().length < 10) {
-    errors.push("Valid phone number is required")
+    errors.push(`${prefix}Valid phone number is required`)
   }
 
-  if (!["mr", "ms", "mrs", "dr"].includes(passenger.title)) {
-    errors.push("Valid title is required")
+  if (!["mr", "ms", "mrs", "dr"].includes(passenger.title?.toLowerCase())) {
+    errors.push(`${prefix}Valid title is required (mr, ms, mrs, dr)`)
   }
 
-  return {
-    isValid: errors.length === 0,
-    errors,
+  if (!["male", "female"].includes(passenger.gender?.toLowerCase())) {
+    errors.push(`${prefix}Valid gender is required (male, female)`)
   }
+
+  return errors
+}
+
+export function formatSearchDate(date: string): string {
+  return new Date(date).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  })
+}
+
+export function calculateTotalDuration(slices: any[]): string {
+  const totalMinutes = slices.reduce((total, slice) => {
+    const match = slice.duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/)
+    if (!match) return total
+
+    const hours = Number.parseInt(match[1] || "0")
+    const minutes = Number.parseInt(match[2] || "0")
+    return total + hours * 60 + minutes
+  }, 0)
+
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+
+  if (hours === 0) return `${minutes}m`
+  if (minutes === 0) return `${hours}h`
+  return `${hours}h ${minutes}m`
 }

@@ -14,8 +14,6 @@ interface UserProfile {
   subscription_status: "active" | "inactive" | "cancelled" | "trialing"
   ai_tokens_used: number
   ai_tokens_limit: number
-  stripe_customer_id: string | null
-  stripe_subscription_id: string | null
 }
 
 export default function BillingPage() {
@@ -78,7 +76,7 @@ export default function BillingPage() {
                 Billing & Usage
               </h1>
               <p className="text-gray-600 font-light">
-                <em className="font-serif italic">Manage your corporate travel subscription and monitor usage</em>
+                <em className="font-serif italic">Monitor your corporate travel usage and plan details</em>
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -150,7 +148,7 @@ export default function BillingPage() {
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 mt-4">
-                  {isFreePlan ? "Upgrade for more features" : "Premium features enabled"}
+                  {isFreePlan ? "Basic features available" : "Premium features enabled"}
                 </p>
               </CardContent>
             </Card>
@@ -293,6 +291,17 @@ export default function BillingPage() {
                     <div className="text-center">
                       <div className="text-2xl font-semibold text-gray-900">0</div>
                       <div className="text-xs text-gray-600">Hotels Booked</div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-200">
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 mb-2">
+                        {isFreePlan ? "Enjoying the free plan?" : "Need more features?"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Contact support for enterprise solutions and custom pricing
+                      </p>
                     </div>
                   </div>
                 </div>
