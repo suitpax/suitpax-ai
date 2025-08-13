@@ -30,12 +30,21 @@ import {
   PiShield,
   PiDotsSixVertical,
   PiBank,
+  PiPencil,
+  PiCamera,
+  PiBuilding,
+  PiBriefcase,
+  PiPhone,
+  PiMapTrifold,
 } from "react-icons/pi"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { AnimatedNumber } from "@/components/ui/number-flow"
 import {
   Dialog,
   DialogContent,
@@ -82,10 +91,20 @@ interface SidebarProps {
 }
 
 interface UserProfile {
+  id: string
   full_name?: string
+  first_name?: string
+  last_name?: string
   avatar_url?: string
-  company?: string
+  company_name?: string
   job_title?: string
+  phone?: string
+  subscription_plan: "free" | "premium" | "enterprise"
+  subscription_status: "active" | "inactive" | "cancelled" | "trialing"
+  ai_tokens_used: number
+  ai_tokens_limit: number
+  created_at: string
+  updated_at: string
 }
 
 export function Sidebar({
@@ -103,7 +122,16 @@ export function Sidebar({
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
   const [usageStats, setUsageStats] = useState({
     tokensUsed: 0,
-    maxTokens: userPlan === "premium" ? 100000 : 10000,
+    maxTokens: 10000,
+  })
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [profileForm, setProfileForm] = useState({
+    full_name: "",
+    first_name: "",
+    last_name: "",
+    company_name: "",
+    job_title: "",
+    phone: "",
   })
   const pathname = usePathname()
   const router = useRouter()
@@ -121,7 +149,6 @@ export function Sidebar({
           .map((id: string) => defaultNavigation.find((item) => item.id === id))
           .filter(Boolean)
 
-        // Add any new items that weren't in the saved order
         const existingIds = new Set(orderIds)
         const newItems = defaultNavigation.filter((item) => !existingIds.has(item.id))
 
@@ -132,13 +159,11 @@ export function Sidebar({
     }
   }, [])
 
-  // Initialize AI sidebar manager when user is available
   useEffect(() => {
     if (user?.id) {
       const manager = new AISidebarManager(user.id)
       setAiSidebarManager(manager)
 
-      // Load stored navigation order or optimize based on usage
       const loadNavigationOrder = async () => {
         const storedOrder = await manager.getStoredNavigationOrder()
         if (storedOrder) {
@@ -146,13 +171,11 @@ export function Sidebar({
             .map((id: string) => defaultNavigation.find((item) => item.id === id))
             .filter(Boolean)
 
-          // Add any new items that weren't in the stored order
           const existingIds = new Set(storedOrder)
           const newItems = defaultNavigation.filter((item) => !existingIds.has(item.id))
 
           setNavigation([...reorderedNav, ...newItems])
         } else {
-          // First time user - optimize based on common patterns
           const optimizedNav = await manager.optimizeNavigationForUser(defaultNavigation)
           setNavigation(optimizedNav)
         }
@@ -162,12 +185,10 @@ export function Sidebar({
     }
   }, [user])
 
-  // Enhanced save function that also updates AI preferences
   const saveNavigationOrder = async (newNavigation: typeof navigation) => {
     const orderIds = newNavigation.map((item) => item.id)
     localStorage.setItem("sidebar-navigation-order", JSON.stringify(orderIds))
 
-    // Also save to AI system for cross-device sync
     if (aiSidebarManager) {
       await aiSidebarManager.reorderNavigation(orderIds, "User manual reorder via drag & drop")
     }
@@ -218,16 +239,23 @@ export function Sidebar({
         setUser(user)
         onUserUpdate?.(user)
 
-        // Get user profile
         try {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("full_name, avatar_url, company, job_title")
-            .eq("id", user.id)
-            .single()
+          const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
           if (profile) {
             setUserProfile(profile)
+            setUsageStats({
+              tokensUsed: profile.ai_tokens_used || 0,
+              maxTokens: profile.ai_tokens_limit || 10000,
+            })
+            setProfileForm({
+              full_name: profile.full_name || "",
+              first_name: profile.first_name || "",
+              last_name: profile.last_name || "",
+              company_name: profile.company_name || "",
+              job_title: profile.job_title || "",
+              phone: profile.phone || "",
+            })
           }
         } catch (error) {
           console.error("Error fetching profile:", error)
@@ -236,7 +264,6 @@ export function Sidebar({
     }
     getUser()
 
-    // Listen to profile updates to refresh avatar/name
     const handler = (e: Event) => {
       const detail: any = (e as CustomEvent).detail || {}
       setUserProfile((prev) => ({ ...prev, ...detail }))
@@ -250,6 +277,84 @@ export function Sidebar({
       }
     }
   }, [supabase, onUserUpdate])
+
+  const handleProfileUpdate = async () => {
+    if (!user || !userProfile) return
+
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: profileForm.full_name,
+          first_name: profileForm.first_name,
+          last_name: profileForm.last_name,
+          company_name: profileForm.company_name,
+          job_title: profileForm.job_title,
+          phone: profileForm.phone,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", user.id)
+
+      if (error) throw error
+
+      setUserProfile((prev) => ({
+        ...prev!,
+        ...profileForm,
+        updated_at: new Date().toISOString(),
+      }))
+
+      setEditingProfile(false)
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("profile:updated", {
+            detail: profileForm,
+          }),
+        )
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error)
+      alert("Failed to update profile. Please try again.")
+    }
+  }
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || !user) return
+
+    try {
+      const fileExt = file.name.split(".").pop()
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`
+      const filePath = `avatars/${fileName}`
+
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("avatars").getPublicUrl(filePath)
+
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", user.id)
+
+      if (updateError) throw updateError
+
+      setUserProfile((prev) => ({
+        ...prev!,
+        avatar_url: publicUrl,
+        updated_at: new Date().toISOString(),
+      }))
+    } catch (error) {
+      console.error("Error uploading avatar:", error)
+      alert("Failed to upload avatar. Please try again.")
+    }
+  }
 
   const handleSignOut = async () => {
     try {
@@ -282,6 +387,18 @@ export function Sidebar({
 
   const getPlanDisplayName = () => {
     return userPlan.charAt(0).toUpperCase() + userPlan.slice(1).toLowerCase()
+  }
+
+  const getMembershipDuration = () => {
+    if (!userProfile?.created_at) return "New member"
+    const createdDate = new Date(userProfile.created_at)
+    const now = new Date()
+    const diffTime = Math.abs(now.getTime() - createdDate.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays < 30) return `${diffDays} days`
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months`
+    return `${Math.floor(diffDays / 365)} years`
   }
 
   return (
@@ -346,7 +463,6 @@ export function Sidebar({
       )}
 
       <nav className="flex-1 px-4 py-3 space-y-1 overflow-y-auto">
-        {/* Main Navigation with Drag & Drop */}
         <div className="space-y-0.5">
           {navigation.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
@@ -391,7 +507,6 @@ export function Sidebar({
           })}
         </div>
 
-        {/* AI Section */}
         {(!isCollapsed || isMobile) && (
           <div className="pt-3">
             <div className="space-y-0.5">
@@ -421,7 +536,6 @@ export function Sidebar({
           </div>
         )}
 
-        {/* Collapsed AI icons */}
         {isCollapsed && !isMobile && (
           <div className="pt-3 space-y-0.5">
             {aiNavigation.map((item) => {
@@ -446,12 +560,11 @@ export function Sidebar({
         )}
       </nav>
 
-      {/* Bottom Section */}
       <div className="border-t border-gray-200 p-4 flex-shrink-0 space-y-3">
         {(!isCollapsed || isMobile) && (
           <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-gray-700">Token Usage</span>
+              <span className="text-xs font-medium text-gray-700">AI Token Usage</span>
               <Badge className="bg-gray-200 text-gray-700 text-[10px] px-1.5 py-0.5 rounded-lg">
                 {getPlanDisplayName()}
               </Badge>
@@ -459,56 +572,27 @@ export function Sidebar({
             <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
               <div
                 className="bg-gray-900 h-1.5 rounded-full transition-all duration-300"
-                style={{ width: `${(usageStats.tokensUsed / usageStats.maxTokens) * 100}%` }}
+                style={{ width: `${Math.min((usageStats.tokensUsed / usageStats.maxTokens) * 100, 100)}%` }}
               ></div>
             </div>
             <div className="flex justify-between text-[10px] text-gray-600">
-              <span>{usageStats.tokensUsed.toLocaleString()}</span>
-              <span>{usageStats.maxTokens.toLocaleString()}</span>
+              <AnimatedNumber value={usageStats.tokensUsed} className="text-[10px]" />
+              <AnimatedNumber value={usageStats.maxTokens} className="text-[10px]" />
             </div>
           </div>
         )}
 
         {(!isCollapsed || isMobile) && (
           <div className="space-y-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-xs h-8 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
-                >
-                  <PiCrown className="h-3 w-3 mr-2" />
-                  Plans & Billing
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-medium tracking-tighter">Plans & Billing</DialogTitle>
-                  <DialogDescription className="font-light">
-                    Manage your subscription and billing information
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-900">Current Plan</span>
-                      <Badge className="bg-gray-200 text-gray-700 rounded-lg">{getPlanDisplayName()}</Badge>
-                    </div>
-                    <p className="text-sm text-gray-600 font-light">
-                      {userPlan === "premium"
-                        ? "Unlimited access to all features"
-                        : "Limited access - upgrade for more"}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-xl">Upgrade Plan</Button>
-                    <Button variant="outline" className="flex-1 rounded-xl bg-transparent">
-                      View Billing
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Link href="/dashboard/billing" onClick={isMobile ? onCloseMobile : undefined}>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-xs h-8 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
+              >
+                <PiCrown className="h-3 w-3 mr-2" />
+                Plans & Billing
+              </Button>
+            </Link>
 
             <Dialog>
               <DialogTrigger asChild>
@@ -552,32 +636,238 @@ export function Sidebar({
 
         {(!isCollapsed || isMobile) && (
           <div className="border-t border-gray-200 pt-3">
-            <div className="flex items-center space-x-3 px-3 py-2.5 mb-2 bg-gray-50 rounded-xl border border-gray-200">
-              <Avatar className="h-8 w-8 ring-2 ring-gray-200 rounded-md">
-                <AvatarImage
-                  src={userProfile?.avatar_url || "/placeholder.svg"}
-                  alt={getDisplayName()}
-                  className="rounded-md"
-                />
-                <AvatarFallback className="bg-gray-900 text-white text-xs font-medium rounded-md">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-xs text-gray-600 truncate">
-                    {userProfile?.company ? userProfile.company : getUserEmail()}
-                  </p>
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] px-1.5 py-0.5 rounded-lg bg-gray-200 text-gray-700 border-gray-200"
-                  >
-                    Member
-                  </Badge>
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="flex items-center space-x-3 px-3 py-2.5 mb-2 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
+                  <div className="relative">
+                    <Avatar className="h-8 w-8 ring-2 ring-gray-200 rounded-md">
+                      <AvatarImage
+                        src={userProfile?.avatar_url || "/placeholder.svg"}
+                        alt={getDisplayName()}
+                        className="rounded-md"
+                      />
+                      <AvatarFallback className="bg-gray-900 text-white text-xs font-medium rounded-md">
+                        {getInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-gray-600 truncate">
+                        {userProfile?.company_name ? userProfile.company_name : getUserEmail()}
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] px-1.5 py-0.5 rounded-lg bg-gray-200 text-gray-700 border-gray-200"
+                      >
+                        {subscriptionStatus === "active" ? "Active" : "Member"}
+                      </Badge>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-medium tracking-tighter">User Profile</DialogTitle>
+                  <DialogDescription className="font-light">
+                    Manage your personal information and account details
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <Avatar className="h-16 w-16 ring-4 ring-gray-200 rounded-xl">
+                        <AvatarImage
+                          src={userProfile?.avatar_url || "/placeholder.svg"}
+                          alt={getDisplayName()}
+                          className="rounded-xl"
+                        />
+                        <AvatarFallback className="bg-gray-900 text-white text-lg font-medium rounded-xl">
+                          {getInitials()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <label
+                        htmlFor="avatar-upload"
+                        className="absolute -bottom-1 -right-1 w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors"
+                      >
+                        <PiCamera className="h-3 w-3" />
+                      </label>
+                      <input
+                        id="avatar-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAvatarUpload}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900">{getDisplayName()}</h3>
+                      <p className="text-sm text-gray-600">{getUserEmail()}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge className="bg-gray-200 text-gray-700 text-xs rounded-lg">{getPlanDisplayName()}</Badge>
+                        <span className="text-xs text-gray-500">Member for {getMembershipDuration()}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {!editingProfile ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <Label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+                            <PiUser className="h-3 w-3" />
+                            Full Name
+                          </Label>
+                          <p className="text-sm text-gray-900">{userProfile?.full_name || "Not set"}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+                            <PiPhone className="h-3 w-3" />
+                            Phone
+                          </Label>
+                          <p className="text-sm text-gray-900">{userProfile?.phone || "Not set"}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <Label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+                            <PiBuilding className="h-3 w-3" />
+                            Company
+                          </Label>
+                          <p className="text-sm text-gray-900">{userProfile?.company_name || "Not set"}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+                            <PiBriefcase className="h-3 w-3" />
+                            Job Title
+                          </Label>
+                          <p className="text-sm text-gray-900">{userProfile?.job_title || "Not set"}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+                          <PiMapTrifold className="h-3 w-3" />
+                          Account Status
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span className="text-sm text-gray-900 capitalize">{subscriptionStatus}</span>
+                          <Badge className="bg-green-50 text-green-700 border-green-200 text-xs rounded-lg">
+                            Verified
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={() => setEditingProfile(true)}
+                        variant="outline"
+                        className="w-full rounded-xl border-gray-300 hover:bg-gray-50"
+                      >
+                        <PiPencil className="h-4 w-4 mr-2" />
+                        Edit Profile
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="first_name" className="text-xs font-medium text-gray-600">
+                            First Name
+                          </Label>
+                          <Input
+                            id="first_name"
+                            value={profileForm.first_name}
+                            onChange={(e) => setProfileForm({ ...profileForm, first_name: e.target.value })}
+                            className="rounded-xl border-gray-300"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="last_name" className="text-xs font-medium text-gray-600">
+                            Last Name
+                          </Label>
+                          <Input
+                            id="last_name"
+                            value={profileForm.last_name}
+                            onChange={(e) => setProfileForm({ ...profileForm, last_name: e.target.value })}
+                            className="rounded-xl border-gray-300"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="full_name" className="text-xs font-medium text-gray-600">
+                          Full Name
+                        </Label>
+                        <Input
+                          id="full_name"
+                          value={profileForm.full_name}
+                          onChange={(e) => setProfileForm({ ...profileForm, full_name: e.target.value })}
+                          className="rounded-xl border-gray-300"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-xs font-medium text-gray-600">
+                          Phone Number
+                        </Label>
+                        <Input
+                          id="phone"
+                          value={profileForm.phone}
+                          onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                          className="rounded-xl border-gray-300"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="company_name" className="text-xs font-medium text-gray-600">
+                            Company
+                          </Label>
+                          <Input
+                            id="company_name"
+                            value={profileForm.company_name}
+                            onChange={(e) => setProfileForm({ ...profileForm, company_name: e.target.value })}
+                            className="rounded-xl border-gray-300"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="job_title" className="text-xs font-medium text-gray-600">
+                            Job Title
+                          </Label>
+                          <Input
+                            id="job_title"
+                            value={profileForm.job_title}
+                            onChange={(e) => setProfileForm({ ...profileForm, job_title: e.target.value })}
+                            className="rounded-xl border-gray-300"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handleProfileUpdate}
+                          className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
+                        >
+                          Save Changes
+                        </Button>
+                        <Button
+                          onClick={() => setEditingProfile(false)}
+                          variant="outline"
+                          className="flex-1 rounded-xl border-gray-300 hover:bg-gray-50"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
 
             <Button
               onClick={handleSignOut}

@@ -31,86 +31,28 @@ export default function PolicyRecommendationEngine() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [selectedPolicy, setSelectedPolicy] = useState<PolicyRecommendation | null>(null)
 
-  const mockRecommendations: PolicyRecommendation[] = [
-    {
-      id: "1",
-      name: "Smart Business Travel Policy",
-      type: "premium",
-      confidence: 94,
-      savings: 25000,
-      compliance: 98,
-      features: [
-        "AI-powered booking optimization",
-        "Dynamic expense limits",
-        "Real-time policy compliance",
-        "Automated approval workflows",
-        "Carbon footprint tracking",
-      ],
-      reasoning:
-        "Based on your company size (250+ employees) and high travel frequency, this policy offers optimal cost control while maintaining flexibility for business needs.",
-      metrics: {
-        costReduction: 23,
-        timeEfficiency: 45,
-        riskMitigation: 87,
-        employeeSatisfaction: 92,
-      },
-    },
-    {
-      id: "2",
-      name: "Enterprise Global Policy",
-      type: "enterprise",
-      confidence: 89,
-      savings: 45000,
-      compliance: 99,
-      features: [
-        "Multi-region compliance",
-        "Advanced analytics dashboard",
-        "Custom approval hierarchies",
-        "Integration with ERP systems",
-        "24/7 travel support",
-      ],
-      reasoning:
-        "Your global operations and complex organizational structure would benefit from enterprise-level policy management with advanced customization options.",
-      metrics: {
-        costReduction: 31,
-        timeEfficiency: 38,
-        riskMitigation: 95,
-        employeeSatisfaction: 88,
-      },
-    },
-    {
-      id: "3",
-      name: "Sustainable Travel Policy",
-      type: "standard",
-      confidence: 76,
-      savings: 18000,
-      compliance: 95,
-      features: [
-        "Carbon offset integration",
-        "Sustainable vendor preferences",
-        "Green travel incentives",
-        "Environmental reporting",
-        "Alternative transport options",
-      ],
-      reasoning:
-        "Your company's sustainability goals align well with eco-friendly travel policies that can reduce environmental impact while maintaining cost efficiency.",
-      metrics: {
-        costReduction: 15,
-        timeEfficiency: 28,
-        riskMitigation: 72,
-        employeeSatisfaction: 85,
-      },
-    },
-  ]
-
   useEffect(() => {
-    // Simulate AI analysis
     setIsAnalyzing(true)
-    setTimeout(() => {
-      setRecommendations(mockRecommendations)
-      setSelectedPolicy(mockRecommendations[0])
-      setIsAnalyzing(false)
-    }, 3000)
+
+    const fetchRecommendations = async () => {
+      try {
+        // TODO: Replace with actual AI policy recommendation API
+        // const response = await fetch('/api/policies/recommendations')
+        // const data = await response.json()
+        // setRecommendations(data.recommendations)
+
+        // For now, show empty state until real AI integration
+        setRecommendations([])
+        setSelectedPolicy(null)
+      } catch (error) {
+        console.error("Error fetching policy recommendations:", error)
+        setRecommendations([])
+      } finally {
+        setIsAnalyzing(false)
+      }
+    }
+
+    fetchRecommendations()
   }, [])
 
   const getPolicyColor = (type: string) => {
@@ -128,26 +70,6 @@ export default function PolicyRecommendationEngine() {
     }
   }
 
-  if (isAnalyzing) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 animate-pulse" />
-            AI Policy Recommendation Engine
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-lg font-medium">Analyzing your company data...</p>
-            <p className="text-sm text-gray-500 mt-2">This may take a few moments</p>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
   return (
     <div className="space-y-6">
       <Card>
@@ -158,41 +80,58 @@ export default function PolicyRecommendationEngine() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {recommendations.map((policy, index) => (
-              <motion.div
-                key={policy.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                  selectedPolicy?.id === policy.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-                onClick={() => setSelectedPolicy(policy)}
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <Badge className={getPolicyColor(policy.type)}>{policy.type.toUpperCase()}</Badge>
-                  <div className="text-right">
-                    <div className="text-sm font-medium">{policy.confidence}%</div>
-                    <div className="text-xs text-gray-500">Confidence</div>
+          {isAnalyzing ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-lg font-medium">Analyzing your company data...</p>
+              <p className="text-sm text-gray-500 mt-2">This may take a few moments</p>
+            </div>
+          ) : recommendations.length === 0 ? (
+            <div className="text-center py-12">
+              <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-lg font-medium text-gray-900 mb-2">AI Policy Engine Ready</p>
+              <p className="text-sm text-gray-500 mb-4">
+                Connect your travel data to receive personalized policy recommendations
+              </p>
+              <Button className="bg-gray-900 hover:bg-gray-800 text-white">Connect Data Sources</Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {recommendations.map((policy, index) => (
+                <motion.div
+                  key={policy.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                    selectedPolicy?.id === policy.id
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                  onClick={() => setSelectedPolicy(policy)}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <Badge className={getPolicyColor(policy.type)}>{policy.type.toUpperCase()}</Badge>
+                    <div className="text-right">
+                      <div className="text-sm font-medium">{policy.confidence}%</div>
+                      <div className="text-xs text-gray-500">Confidence</div>
+                    </div>
                   </div>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-2">{policy.name}</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Annual Savings:</span>
-                    <span className="font-medium text-green-600">${policy.savings.toLocaleString()}</span>
+                  <h3 className="font-medium text-gray-900 mb-2">{policy.name}</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Annual Savings:</span>
+                      <span className="font-medium text-green-600">${policy.savings.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Compliance:</span>
+                      <span className="font-medium">{policy.compliance}%</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Compliance:</span>
-                    <span className="font-medium">{policy.compliance}%</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 

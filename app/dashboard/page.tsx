@@ -1,7 +1,8 @@
 "use client"
 
 import { DraggableDashboard } from "@/components/dashboard/draggable-dashboard"
-import { BankConnectionCard } from "@/components/dashboard/bank-connection-card"
+import { BankConnectionSection } from "@/components/dashboard/bank-connection-section"
+import { FlightsVisualization } from "@/components/dashboard/flights-visualization"
 import { TopDestinationsCard } from "@/components/dashboard/top-destinations-card"
 import { RadarChart } from "@/components/charts/radar-chart"
 import { ExpenseTrendsChart } from "@/components/charts/expense-trends-chart"
@@ -9,15 +10,18 @@ import { BusinessMetricsChart } from "@/components/charts/business-metrics-chart
 import { TravelEfficiencyChart } from "@/components/charts/travel-efficiency-chart"
 import { MonthlySpendingChart } from "@/components/charts/monthly-spending-chart"
 import { motion } from "framer-motion"
-import { Calendar, TrendingUp, Building2, Clock, DollarSign, Plane, Sparkles, ArrowRight } from "lucide-react"
+import { Calendar, TrendingUp, Building2, Clock, Sparkles, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { useUserData } from "@/hooks/use-user-data"
 
 const DashboardPage = () => {
-  const getDisplayName = (user: any) => {
-    if (user?.user_metadata?.full_name) return user.user_metadata.full_name
-    if (user?.user_metadata?.name) return user.user_metadata.name
+  const { user, profile, loading } = useUserData()
+
+  const getDisplayName = () => {
+    if (profile?.full_name) return profile.full_name
+    if (profile?.first_name) return profile.first_name
     if (user?.email) return user.email.split("@")[0]
-    return "John"
+    return "User"
   }
 
   const getInitials = (name: string) => {
@@ -29,6 +33,16 @@ const DashboardPage = () => {
       .slice(0, 2)
   }
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
+
+  const displayName = getDisplayName()
+
   const dashboardCards = [
     {
       id: "user-profile",
@@ -39,7 +53,7 @@ const DashboardPage = () => {
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-gray-600 font-medium text-lg shadow-sm">
-                  JD
+                  {getInitials(displayName)}
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-600 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
                   <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
@@ -47,20 +61,20 @@ const DashboardPage = () => {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-lg font-medium tracking-tight text-gray-900">John Doe</h3>
+                  <h3 className="text-lg font-medium tracking-tight text-gray-900">{displayName}</h3>
                   <div className="inline-flex items-center rounded-md bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700">
-                    Free
+                    {profile?.subscription_plan || "Free"}
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 mb-2">Business Travel Manager</p>
+                <p className="text-xs text-gray-600 mb-2">{profile?.job_title || "Business Travel Manager"}</p>
                 <div className="grid grid-cols-2 gap-3 text-[10px]">
                   <div className="flex items-center space-x-1.5">
                     <Building2 className="h-2.5 w-2.5 text-gray-500" />
-                    <span className="text-gray-600">Acme Corp</span>
+                    <span className="text-gray-600">{profile?.company_name || "Your Company"}</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <Clock className="h-2.5 w-2.5 text-gray-500" />
-                    <span className="text-gray-600">Member since Jan 2024</span>
+                    <span className="text-gray-600">Member since {new Date().getFullYear()}</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <Calendar className="h-2.5 w-2.5 text-gray-500" />
@@ -113,66 +127,14 @@ const DashboardPage = () => {
       ),
     },
     {
-      id: "kpi-stats",
-      title: "KPI Statistics",
-      component: (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              title: "Total Trips",
-              value: "0",
-              change: "+0%",
-              icon: Plane,
-              color: "text-gray-600",
-            },
-            {
-              title: "Total Spent",
-              value: "$0",
-              change: "+0%",
-              icon: DollarSign,
-              color: "text-gray-600",
-            },
-            {
-              title: "Avg Trip Cost",
-              value: "$0",
-              change: "+0%",
-              icon: TrendingUp,
-              color: "text-gray-600",
-            },
-            {
-              title: "Active Bookings",
-              value: "0",
-              change: "+0%",
-              icon: Calendar,
-              color: "text-gray-600",
-            },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-medium text-gray-600 mb-1">{stat.title}</p>
-                  <p className="text-lg font-medium tracking-tight text-gray-900">{stat.value}</p>
-                  <p className="text-[10px] text-gray-500 mt-1">{stat.change} from last month</p>
-                </div>
-                <div className={`p-2 rounded-xl bg-gray-100 ${stat.color}`}>
-                  <stat.icon className="h-3.5 w-3.5" />
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      ),
+      id: "bank-connection",
+      title: "Banking & Finance",
+      component: <BankConnectionSection />,
     },
     {
-      id: "bank-connection",
-      title: "Bank Connection",
-      component: <BankConnectionCard />,
+      id: "flights-visualization",
+      title: "Global Flight Tracking",
+      component: <FlightsVisualization />,
     },
     {
       id: "top-destinations",
@@ -274,7 +236,7 @@ const DashboardPage = () => {
       <div className="mb-8">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <h1 className="text-4xl md:text-5xl font-medium leading-none text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-lg font-light tracking-tighter text-gray-600">Welcome back, John</p>
+          <p className="text-lg font-light tracking-tighter text-gray-600">Welcome back, {displayName.split(" ")[0]}</p>
           <p className="text-sm text-gray-500 font-light mt-1">
             Your comprehensive business travel management overview and insights
           </p>

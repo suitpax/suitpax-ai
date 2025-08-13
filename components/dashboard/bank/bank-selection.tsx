@@ -21,18 +21,6 @@ interface Bank {
   country: string
 }
 
-// Mock bank data - in real implementation, this would come from GoCardless institutions API
-const mockBanks: Bank[] = [
-  { id: "hsbc_gb", name: "HSBC", logo: "/hsbc-bank-logo.png", country: "GB" },
-  { id: "barclays_gb", name: "Barclays", logo: "/barclays-logo.png", country: "GB" },
-  { id: "lloyds_gb", name: "Lloyds Bank", logo: "/lloyds-bank-logo.png", country: "GB" },
-  { id: "natwest_gb", name: "NatWest", logo: "/natwest-logo.png", country: "GB" },
-  { id: "santander_gb", name: "Santander", logo: "/santander-logo.png", country: "GB" },
-  { id: "bbva_es", name: "BBVA", logo: "/assets/bbva-logo.png", country: "ES" },
-  { id: "caixabank_es", name: "CaixaBank", logo: "/public/bank-logos/caixabank.png", country: "ES" },
-  { id: "bankia_es", name: "Bankia", logo: "/bankia-logo.png", country: "ES" },
-]
-
 export const BankSelection = ({
   selectedCountry,
   selectedBank,
@@ -41,15 +29,32 @@ export const BankSelection = ({
   onSearchChange,
 }: BankSelectionProps) => {
   const [filteredBanks, setFilteredBanks] = useState<Bank[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    // Filter banks by country and search term
-    const filtered = mockBanks.filter((bank) => {
-      const matchesCountry = bank.country === selectedCountry
-      const matchesSearch = bank.name.toLowerCase().includes(searchTerm.toLowerCase())
-      return matchesCountry && matchesSearch
-    })
-    setFilteredBanks(filtered)
+    const fetchBanks = async () => {
+      if (!selectedCountry) return
+
+      setLoading(true)
+      try {
+        // TODO: Replace with actual GoCardless institutions API call
+        // const response = await fetch(`/api/gocardless/institutions?country=${selectedCountry}`)
+        // const banks = await response.json()
+        // setFilteredBanks(banks.filter(bank =>
+        //   bank.name.toLowerCase().includes(searchTerm.toLowerCase())
+        // ))
+
+        // For now, show empty state until real API is connected
+        setFilteredBanks([])
+      } catch (error) {
+        console.error("Error fetching banks:", error)
+        setFilteredBanks([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBanks()
   }, [selectedCountry, searchTerm])
 
   return (
@@ -88,14 +93,13 @@ export const BankSelection = ({
 
       {/* Bank Selection Grid */}
       <div className="relative">
-        <div
-          className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide max-h-32 pr-8"
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
-        >
-          {filteredBanks.length > 0 ? (
+        <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide max-h-32 pr-8">
+          {loading ? (
+            <div className="flex-shrink-0 w-full text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
+              <p className="text-gray-500 font-light text-sm">Loading banks...</p>
+            </div>
+          ) : filteredBanks.length > 0 ? (
             filteredBanks.map((bank) => (
               <Card
                 key={bank.id}
@@ -123,19 +127,13 @@ export const BankSelection = ({
           ) : (
             <div className="flex-shrink-0 w-full text-center py-8">
               <p className="text-gray-500 font-light">
-                {searchTerm ? "No banks found matching your search" : "No banks available for this country"}
+                {selectedCountry
+                  ? "Connect your bank account to get started with real-time financial data"
+                  : "Select a country to view available banks"}
               </p>
             </div>
           )}
         </div>
-
-        {/* Gradient overlays for scroll indication */}
-        {filteredBanks.length > 3 && (
-          <>
-            <div className="absolute left-0 top-0 bottom-4 w-12 bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none z-10"></div>
-            <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none z-10"></div>
-          </>
-        )}
       </div>
 
       {/* Selected Bank Info */}
