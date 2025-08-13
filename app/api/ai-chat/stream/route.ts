@@ -2,12 +2,15 @@ import { NextRequest } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { buildKernelSystemPrompt } from "@/lib/prompts/kernel"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
+import { createRequestId } from "@/lib/metrics"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
 export const dynamic = "force-dynamic"
 
 export async function POST(req: NextRequest) {
+  const t0 = Date.now()
+  const reqId = createRequestId("chat_stream")
   try {
     const { message, history = [] } = await req.json()
     if (!message) return new Response("Message required", { status: 400 })
@@ -64,9 +67,11 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "no-cache, no-transform",
+        "x-request-id": reqId,
+        "x-latency-ms": String(Date.now() - t0),
       },
     })
   } catch (e: any) {
-    return new Response("Error", { status: 500 })
+    return new Response("Error", { status: 500, headers: { "x-request-id": reqId, "x-latency-ms": String(Date.now() - t0) } })
   }
 }

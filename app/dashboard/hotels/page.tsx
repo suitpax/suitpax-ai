@@ -4,11 +4,13 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import StaysSearchForm, { type StaySearchParams } from "@/components/stays/stays-search-form"
 import StayCard from "@/components/stays/stay-card"
+import { CardSkeleton } from "@/components/ui/skeleton"
 
 export default function HotelsPage() {
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [providerInfo, setProviderInfo] = useState<{ duffel: number; expedia: number } | null>(null)
 
   const onSearch = async (params: StaySearchParams) => {
     setLoading(true)
@@ -16,32 +18,29 @@ export default function HotelsPage() {
     setResults([])
 
     try {
-      // Adapt params to Duffel stays search format as needed
+      // Adapt params to aggregator format
       const payload: any = {
         check_in_date: params.checkIn,
         check_out_date: params.checkOut,
         guests: [{ adults: params.adults || 1 }],
-        // Note: depending on Duffel stays, you may need location filters
-        // For now, pass city if supported by your Duffel account; otherwise requires coordinates/place id
         city_name: params.city,
         rooms: params.rooms || 1,
         limit: 20,
       }
 
-      const res = await fetch("/api/stays/duffel/search", {
+      const res = await fetch("/api/stays/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
 
       const data = await res.json()
-      if (!res.ok) {
+      if (!res.ok || !data?.success) {
         throw new Error(data?.error || "Search failed")
       }
 
-      // Duffel SDK may return shape under data.data; normalize
-      const stays = (data?.data || data?.stays || []).map((s: any) => s)
-      setResults(stays)
+      setResults(data?.stays || [])
+      if (data?.provider_counts) setProviderInfo(data.provider_counts)
     } catch (e: any) {
       setError(e?.message || "Something went wrong")
     } finally {
@@ -75,6 +74,24 @@ export default function HotelsPage() {
               <p className="text-gray-600 font-light">
                 <em className="font-serif italic">Start a search to see available stays</em>
               </p>
+            </div>
+          )}
+
+          {loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <CardSkeleton key={i} />
+              ))}
+            </div>
+          )}
+
+          {!loading && results.length > 0 && (
+            <div className="mb-2 text-xs text-gray-600">
+              {providerInfo && (
+                <span>
+                  Providers: Duffel {providerInfo.duffel} · Expedia {providerInfo.expedia}
+                </span>
+              )}
             </div>
           )}
 

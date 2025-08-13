@@ -1,10 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { buildKernelSystemPrompt } from "@/lib/prompts/kernel";
+import Ajv from "ajv";
+import { FlightOffersBlockSchema } from "@/lib/schemas/flight-offers.schema";
+import { createRequestId } from "@/lib/metrics";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
 export async function POST(request: NextRequest) {
+  const t0 = Date.now();
+  const reqId = createRequestId("chat");
   const { message, history = [], includeReasoning = false } = await request.json();
   if (!message) return NextResponse.json({ error: "Message is required" }, { status: 400 });
 
@@ -21,7 +26,10 @@ export async function POST(request: NextRequest) {
       })
       const data = await res.json()
       if (data?.success && data?.url) {
-        return NextResponse.json({ response: `He generado tu PDF. Puedes descargarlo aquí: ${data.url}` })
+        const resp = NextResponse.json({ response: `He generado tu PDF. Puedes descargarlo aquí: ${data.url}` })
+        resp.headers.set('x-request-id', reqId)
+        resp.headers.set('x-latency-ms', String(Date.now() - t0))
+        return resp
       }
     }
 
@@ -57,7 +65,11 @@ export async function POST(request: NextRequest) {
     text = (initial as any).content.find((c: any) => c.type === "text")?.text || "";
 
     if (offersPayload?.success) {
-      text += `\n\n:::flight_offers_json\n${JSON.stringify({ offers: offersPayload.offers })}\n:::`
+      const ajv = new Ajv({ allErrors: true })
+      const validate = ajv.compile(FlightOffersBlockSchema as any)
+      if (validate({ offers: offersPayload.offers })) {
+        text += `\n\n:::flight_offers_json\n${JSON.stringify({ offers: offersPayload.offers })}\n:::`
+      }
     }
 
     let reasoning: string | undefined
@@ -71,9 +83,16 @@ export async function POST(request: NextRequest) {
       reasoning = (r as any).content.find((c: any) => c.type === "text")?.text?.trim();
     }
 
-    return NextResponse.json({ response: text, reasoning });
+    const resp = NextResponse.json({ response: text, reasoning })
+    resp.headers.set('x-request-id', reqId)
+    resp.headers.set('x-latency-ms', String(Date.now() - t0))
+    if (offersPayload?.success) resp.headers.set('x-tools-used', 'flight-search')
+    return resp
   } catch (e) {
     console.error("AI Chat API Error:", e);
-    return NextResponse.json({ error: "I'm experiencing technical difficulties." }, { status: 500 });
+    const resp = NextResponse.json({ error: "I'm experiencing technical difficulties." }, { status: 500 })
+    resp.headers.set('x-request-id', reqId)
+    resp.headers.set('x-latency-ms', String(Date.now() - t0))
+    return resp
   }
 }

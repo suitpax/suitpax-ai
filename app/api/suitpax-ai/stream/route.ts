@@ -1,33 +1,9 @@
 import { NextRequest } from "next/server"
-import { anthropic } from "@ai-sdk/anthropic"
-import { streamText } from "ai"
-import { buildKernelSystemPrompt } from "@/lib/prompts/kernel"
 
 export const runtime = "edge"
 
 export async function POST(req: NextRequest) {
-  try {
-    const { message, history = [] } = await req.json()
-    if (!message) return new Response("Message is required", { status: 400 })
-
-    const system = buildKernelSystemPrompt({
-      intent: /flight|vuelo/i.test(message) ? "travel" : "general",
-      language: "en",
-      style: { tone: "professional", useHeaders: true, useBullets: true, allowTables: true },
-      features: { enforceNoCOT: true, includeFlightJsonWrapper: true },
-      context: { recentConversation: history, urgency: "medium" },
-    })
-
-    const result = await streamText({
-      model: anthropic("claude-3-5-sonnet-20241022"),
-      system,
-      messages: [...history, { role: "user", content: message }],
-      maxTokens: 1000,
-      temperature: 0.7,
-    })
-
-    return result.toAIStreamResponse()
-  } catch (e: any) {
-    return new Response("Stream error", { status: 500 })
-  }
+  const target = `${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/ai-chat/stream`
+  const res = await fetch(target, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: await req.text() })
+  return new Response(res.body, { status: res.status, headers: { 'Content-Type': res.headers.get('Content-Type') || 'text/plain; charset=utf-8', 'x-aliased-to': '/api/ai-chat/stream' } })
 }
