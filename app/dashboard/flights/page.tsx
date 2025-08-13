@@ -8,15 +8,18 @@ import { FlightSearchForm } from "@/components/flights/flight-search-form"
 import { PlaneIcon, ClockIcon, UsersIcon } from "lucide-react"
 import { formatPrice, formatDuration, getStopDescription } from "@/lib/duffel/utils"
 import type { DuffelOffer } from "@/lib/duffel/client"
+import { SearchResultsLoading } from "@/components/flights/flight-result-skeleton"
 
 export default function FlightsPage() {
   const [searchResults, setSearchResults] = useState<DuffelOffer[]>([])
   const [selectedOffer, setSelectedOffer] = useState<DuffelOffer | null>(null)
   const [showResults, setShowResults] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSearchResults = (results: DuffelOffer[]) => {
     setSearchResults(results)
     setShowResults(true)
+    setIsLoading(false)
   }
 
   const handleSelectOffer = (offer: DuffelOffer) => {
@@ -43,8 +46,11 @@ export default function FlightsPage() {
           <FlightSearchForm onResults={handleSearchResults} />
         </div>
 
+        {/* Loading Skeleton */}
+        {isLoading && <SearchResultsLoading />}
+
         {/* Search Results */}
-        {showResults && (
+        {showResults && !isLoading && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-medium tracking-tighter">Flight Results ({searchResults.length})</h2>
@@ -77,7 +83,7 @@ export default function FlightsPage() {
         )}
 
         {/* Empty State */}
-        {!showResults && (
+        {!showResults && !isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
             <Card className="bg-white/50 backdrop-blur-sm border border-gray-200 shadow-sm">
               <CardHeader>
