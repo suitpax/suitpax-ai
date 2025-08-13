@@ -3,6 +3,227 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export interface Database {
   public: {
     Tables: {
+      bank_connections: {
+        Row: {
+          id: string
+          user_id: string
+          gocardless_requisition_id: string
+          institution_id: string
+          institution_name: string
+          institution_logo: string | null
+          country_code: string
+          status: "pending" | "active" | "expired" | "suspended" | "error"
+          access_valid_for_days: number | null
+          max_historical_days: number | null
+          created_at: string
+          updated_at: string
+          expires_at: string | null
+          last_sync_at: string | null
+          error_message: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          gocardless_requisition_id: string
+          institution_id: string
+          institution_name: string
+          institution_logo?: string | null
+          country_code: string
+          status?: "pending" | "active" | "expired" | "suspended" | "error"
+          access_valid_for_days?: number | null
+          max_historical_days?: number | null
+          created_at?: string
+          updated_at?: string
+          expires_at?: string | null
+          last_sync_at?: string | null
+          error_message?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          gocardless_requisition_id?: string
+          institution_id?: string
+          institution_name?: string
+          institution_logo?: string | null
+          country_code?: string
+          status?: "pending" | "active" | "expired" | "suspended" | "error"
+          access_valid_for_days?: number | null
+          max_historical_days?: number | null
+          created_at?: string
+          updated_at?: string
+          expires_at?: string | null
+          last_sync_at?: string | null
+          error_message?: string | null
+        }
+      }
+      bank_accounts: {
+        Row: {
+          id: string
+          connection_id: string
+          user_id: string
+          gocardless_account_id: string
+          account_name: string | null
+          account_holder_name: string | null
+          iban: string | null
+          account_number: string | null
+          sort_code: string | null
+          currency: string
+          account_type: string | null
+          status: "active" | "inactive" | "closed"
+          current_balance: number | null
+          available_balance: number | null
+          balance_updated_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          connection_id: string
+          user_id: string
+          gocardless_account_id: string
+          account_name?: string | null
+          account_holder_name?: string | null
+          iban?: string | null
+          account_number?: string | null
+          sort_code?: string | null
+          currency?: string
+          account_type?: string | null
+          status?: "active" | "inactive" | "closed"
+          current_balance?: number | null
+          available_balance?: number | null
+          balance_updated_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          connection_id?: string
+          user_id?: string
+          gocardless_account_id?: string
+          account_name?: string | null
+          account_holder_name?: string | null
+          iban?: string | null
+          account_number?: string | null
+          sort_code?: string | null
+          currency?: string
+          account_type?: string | null
+          status?: "active" | "inactive" | "closed"
+          current_balance?: number | null
+          available_balance?: number | null
+          balance_updated_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      bank_transactions: {
+        Row: {
+          id: string
+          account_id: string
+          user_id: string
+          gocardless_transaction_id: string
+          amount: number
+          currency: string
+          transaction_date: string
+          booking_date: string | null
+          value_date: string | null
+          merchant_name: string | null
+          counterparty_name: string | null
+          description: string | null
+          reference: string | null
+          transaction_code: string | null
+          category: string | null
+          auto_category: string | null
+          is_business_expense: boolean | null
+          expense_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          account_id: string
+          user_id: string
+          gocardless_transaction_id: string
+          amount: number
+          currency?: string
+          transaction_date: string
+          booking_date?: string | null
+          value_date?: string | null
+          merchant_name?: string | null
+          counterparty_name?: string | null
+          description?: string | null
+          reference?: string | null
+          transaction_code?: string | null
+          category?: string | null
+          auto_category?: string | null
+          is_business_expense?: boolean | null
+          expense_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          account_id?: string
+          user_id?: string
+          gocardless_transaction_id?: string
+          amount?: number
+          currency?: string
+          transaction_date?: string
+          booking_date?: string | null
+          value_date?: string | null
+          merchant_name?: string | null
+          counterparty_name?: string | null
+          description?: string | null
+          reference?: string | null
+          transaction_code?: string | null
+          category?: string | null
+          auto_category?: string | null
+          is_business_expense?: boolean | null
+          expense_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      bank_categorization_rules: {
+        Row: {
+          id: string
+          user_id: string
+          rule_name: string
+          rule_type: "merchant" | "description" | "amount" | "reference"
+          pattern: string
+          category: string
+          is_business_expense: boolean | null
+          priority: number | null
+          is_active: boolean | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          rule_name: string
+          rule_type: "merchant" | "description" | "amount" | "reference"
+          pattern: string
+          category: string
+          is_business_expense?: boolean | null
+          priority?: number | null
+          is_active?: boolean | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          rule_name?: string
+          rule_type?: "merchant" | "description" | "amount" | "reference"
+          pattern?: string
+          category?: string
+          is_business_expense?: boolean | null
+          priority?: number | null
+          is_active?: boolean | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       profiles: {
         Row: {
           id: string

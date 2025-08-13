@@ -107,7 +107,7 @@
     "cors": "^2.8.5",
     "cross-spawn": "^7.0.5",
     "crypto": "latest",
-    "date-fns": "^4.1.0",
+    "date-fns": "latest",
     "elevenlabs": "latest",
     "embla-carousel-react": "8.6.0",
     "eventsource": "^3.0.2",
