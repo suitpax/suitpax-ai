@@ -36,6 +36,7 @@ import {
   PiBriefcase,
   PiPhone,
   PiMapTrifold,
+  PiRadar,
 } from "react-icons/pi"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
@@ -44,7 +45,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { AnimatedNumber } from "@/components/ui/number-flow"
 import {
   Dialog,
   DialogContent,
@@ -63,6 +63,7 @@ const defaultNavigation = [
   { id: "flights", name: "Flights", href: "/dashboard/flights", icon: PiAirplane },
   { id: "hotels", name: "Hotels", href: "/dashboard/hotels", icon: PiBuildings },
   { id: "suitpax-bank", name: "Suitpax Bank", href: "/dashboard/suitpax-bank", icon: PiBank },
+  { id: "air-data", name: "Air Data", href: "/dashboard/air-data", icon: PiRadar },
   { id: "finance", name: "Finance", href: "/dashboard/finance", icon: PiCreditCard },
   { id: "analytics", name: "Analytics", href: "/dashboard/analytics", icon: PiChartBar },
   { id: "calendar", name: "Calendar", href: "/dashboard/calendar", icon: PiCalendar },
@@ -174,7 +175,7 @@ export function Sidebar({
           const existingIds = new Set(storedOrder)
           const newItems = defaultNavigation.filter((item) => !existingIds.has(item.id))
 
-          setNavigation([...reorderedNav, ...newItems])
+          setNavigation(reorderedNav.concat(newItems))
         } else {
           const optimizedNav = await manager.optimizeNavigationForUser(defaultNavigation)
           setNavigation(optimizedNav)
@@ -576,8 +577,8 @@ export function Sidebar({
               ></div>
             </div>
             <div className="flex justify-between text-[10px] text-gray-600">
-              <AnimatedNumber value={usageStats.tokensUsed} className="text-[10px]" />
-              <AnimatedNumber value={usageStats.maxTokens} className="text-[10px]" />
+              <span className="text-[10px]">{usageStats.tokensUsed.toLocaleString()}</span>
+              <span className="text-[10px]">{usageStats.maxTokens.toLocaleString()}</span>
             </div>
           </div>
         )}

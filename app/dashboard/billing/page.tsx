@@ -5,7 +5,6 @@ import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { AnimatedNumber } from "@/components/ui/number-flow"
 import { Users, Zap, Shield } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -15,6 +14,8 @@ interface UserProfile {
   subscription_status: "active" | "inactive" | "cancelled" | "trialing"
   ai_tokens_used: number
   ai_tokens_limit: number
+  stripe_customer_id: string | null
+  stripe_subscription_id: string | null
 }
 
 export default function BillingPage() {
@@ -65,6 +66,7 @@ export default function BillingPage() {
   }
 
   const aiTokensPercentage = Math.min((profile.ai_tokens_used / profile.ai_tokens_limit) * 100, 100)
+  const isFreePlan = profile.subscription_plan === "free"
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6">
@@ -73,10 +75,10 @@ export default function BillingPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2 text-gray-900">
-                Usage & Plan
+                Billing & Usage
               </h1>
               <p className="text-gray-600 font-light">
-                <em className="font-serif italic">Monitor your corporate travel usage and plan details</em>
+                <em className="font-serif italic">Manage your corporate travel subscription and monitor usage</em>
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -114,7 +116,7 @@ export default function BillingPage() {
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-1">AI Tokens Used</p>
                     <div className="text-2xl font-semibold text-gray-900">
-                      <AnimatedNumber value={profile.ai_tokens_used} />
+                      {profile.ai_tokens_used.toLocaleString()}
                     </div>
                   </div>
                   <div className="p-3 bg-purple-100 rounded-xl">
@@ -148,7 +150,7 @@ export default function BillingPage() {
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 mt-4">
-                  {profile.subscription_plan === "free" ? "Basic features available" : "Premium features enabled"}
+                  {isFreePlan ? "Upgrade for more features" : "Premium features enabled"}
                 </p>
               </CardContent>
             </Card>
@@ -163,7 +165,7 @@ export default function BillingPage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Plan Status</p>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Subscription Status</p>
                     <p className="text-2xl font-semibold text-gray-900 capitalize">{profile.subscription_status}</p>
                   </div>
                   <div className="p-3 bg-green-100 rounded-xl">
@@ -178,71 +180,126 @@ export default function BillingPage() {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Plan Features</CardTitle>
-              <CardDescription className="text-gray-600">Features available in your current plan</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {profile.subscription_plan === "free" ? (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">AI searches per month</span>
-                      <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-200">
-                        5 searches
-                      </Badge>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Plan Features</CardTitle>
+                <CardDescription className="text-gray-600">Features available in your current plan</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {profile.subscription_plan === "free" ? (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">AI searches per month</span>
+                        <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-200">
+                          5 searches
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">Basic expense tracking</span>
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                          Included
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">Email support</span>
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                          Included
+                        </Badge>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">AI searches</span>
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                          Unlimited
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">Advanced expense management</span>
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                          Active
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">Bank integration</span>
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                          Active
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">Priority support</span>
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                          {profile.subscription_plan === "enterprise" ? "24/7" : "Business hours"}
+                        </Badge>
+                      </div>
+                      {profile.subscription_plan === "enterprise" && (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Custom integrations</span>
+                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                              Available
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Dedicated account manager</span>
+                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                              Assigned
+                            </Badge>
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Usage Statistics</CardTitle>
+                <CardDescription className="text-gray-600">Your activity and consumption metrics</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">AI Tokens</span>
+                      <span className="font-medium text-gray-900">
+                        {profile.ai_tokens_used.toLocaleString()} / {profile.ai_tokens_limit.toLocaleString()}
+                      </span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">Basic expense tracking</span>
-                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                        Included
-                      </Badge>
+                    <Progress value={aiTokensPercentage} className="h-2" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                    <div className="text-center">
+                      <div className="text-2xl font-semibold text-gray-900">0</div>
+                      <div className="text-xs text-gray-600">Flights Booked</div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">Email support</span>
-                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                        Included
-                      </Badge>
+                    <div className="text-center">
+                      <div className="text-2xl font-semibold text-gray-900">0</div>
+                      <div className="text-xs text-gray-600">Hotels Booked</div>
                     </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">AI searches</span>
-                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                        Unlimited
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">Advanced expense management</span>
-                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                        Active
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">Bank integration</span>
-                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                        Active
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">Priority support</span>
-                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                        {profile.subscription_plan === "enterprise" ? "24/7" : "Business hours"}
-                      </Badge>
-                    </div>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </div>
   )

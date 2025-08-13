@@ -86,9 +86,6 @@ importers:
       '@next/third-parties':
         specifier: ^15.1.0
         version: 15.1.0(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
-      '@number-flow/react':
-        specifier: latest
-        version: 0.5.10(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@qdrant/js-client-rest':
         specifier: latest
         version: 1.15.0(typescript@5.9.2)
@@ -182,6 +179,12 @@ importers:
       '@remix-run/react':
         specifier: latest
         version: 2.17.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.2)
+      '@stripe/react-stripe-js':
+        specifier: ^2.6.2
+        version: 2.6.2(@stripe/stripe-js@3.4.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@stripe/stripe-js':
+        specifier: ^3.4.1
+        version: 3.4.1
       '@supabase/ssr':
         specifier: latest
         version: 0.6.1(@supabase/supabase-js@2.55.0)
@@ -350,9 +353,6 @@ importers:
       node-latex:
         specifier: ^3.1.0
         version: 3.1.0
-      number-flow:
-        specifier: ^0.4.1
-        version: 0.4.1
       ocr-space-api-wrapper:
         specifier: ^2.1.1
         version: 2.1.1
@@ -449,6 +449,9 @@ importers:
       sqlite3:
         specifier: latest
         version: 5.1.7
+      stripe:
+        specifier: latest
+        version: 18.4.0(@types/node@22.17.1)
       svelte:
         specifier: latest
         version: 5.38.1
@@ -1704,12 +1707,6 @@ packages:
     engines: {node: '>=10'}
     deprecated: This functionality has been moved to @npmcli/fs
 
-  '@number-flow/react@0.5.10':
-    resolution: {integrity: sha512-a8Wh5eNITn7Km4xbddAH7QH8eNmnduR6k34ER1hkHSGO4H2yU1DDnuAWLQM99vciGInFODemSc0tdxrXkJEpbA==}
-    peerDependencies:
-      react: ^18 || ^19
-      react-dom: ^18 || ^19
-
   '@one-ini/wasm@0.1.1':
     resolution: {integrity: sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw==}
 
@@ -2651,6 +2648,17 @@ packages:
 
   '@standard-schema/utils@0.3.0':
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
+
+  '@stripe/react-stripe-js@2.6.2':
+    resolution: {integrity: sha512-FSjNg4v7BiCfojvx25PQ8DugOa09cGk1t816R/DLI/lT+1bgRAYpMvoPirLT4ZQ3ev/0VDtPdWNaabPsLDTOMA==}
+    peerDependencies:
+      '@stripe/stripe-js': ^1.44.1 || ^2.0.0 || ^3.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+
+  '@stripe/stripe-js@3.4.1':
+    resolution: {integrity: sha512-6vFTA7+MzoQyhZDn/D3wWZrUE8M8OSUFJE2Y3O1okfBWr4eCLvMeSoZuYN2xb1KJ3J0bBw96YfKxY75M/H0JZw==}
+    engines: {node: '>=12.16'}
 
   '@supabase/auth-js@2.71.1':
     resolution: {integrity: sha512-mMIQHBRc+SKpZFRB2qtupuzulaUhFYupNyxqDj5Jp/LyPvcWvjaJzZzObv6URtL/O6lPxkanASnotGtNpS3H2Q==}
@@ -7134,12 +7142,6 @@ packages:
   nth-check@1.0.2:
     resolution: {integrity: sha512-WeBOdju8SnzPN5vTUJYxYUxLeXpCaVP5i5e0LF8fg7WORF2Wd7wFX/pk0tYZk7s8T+J7VLy0Da6J1+wCT0AtHg==}
 
-  number-flow@0.4.1:
-    resolution: {integrity: sha512-d39o1tWL7mMMBLuOfHswtQ8r0fj9eUcatb4G1Spdv0ZO/I30kg9DBdSzSPjNG6hrj1slQ6KA3TQXk1RmOq4qOA==}
-
-  number-flow@0.5.8:
-    resolution: {integrity: sha512-FPr1DumWyGi5Nucoug14bC6xEz70A1TnhgSHhKyfqjgji2SOTz+iLJxKtv37N5JyJbteGYCm6NQ9p1O4KZ7iiA==}
-
   number-is-nan@1.0.1:
     resolution: {integrity: sha512-4jbtZXNAsfZbAHiiqjLPBiCl16dES1zI4Hpzzxw61Tk+loF+sBDBKx1ICKKKwIqQ7M0mFn1TmkN7euSncWgHiQ==}
     engines: {node: '>=0.10.0'}
@@ -8764,6 +8766,15 @@ packages:
   strip-json-comments@3.1.1:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
+
+  stripe@18.4.0:
+    resolution: {integrity: sha512-LKFeDnDYo4U/YzNgx2Lc9PT9XgKN0JNF1iQwZxgkS4lOw5NunWCnzyH5RhTlD3clIZnf54h7nyMWkS8VXPmtTQ==}
+    engines: {node: '>=12.*'}
+    peerDependencies:
+      '@types/node': '>=12.x.x'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   strtok3@10.3.4:
     resolution: {integrity: sha512-KIy5nylvC5le1OdaaoCJ07L+8iQzJHGH6pWDuzS+d07Cu7n1MZ2x26P8ZKIWfbK02+XIL8Mp4RkWeqdUCrDMfg==}
@@ -10853,13 +10864,6 @@ snapshots:
       rimraf: 3.0.2
     optional: true
 
-  '@number-flow/react@0.5.10(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
-    dependencies:
-      esm-env: 1.2.2
-      number-flow: 0.5.8
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-
   '@one-ini/wasm@0.1.1': {}
 
   '@opentelemetry/api@1.9.0': {}
@@ -11857,6 +11861,15 @@ snapshots:
   '@standard-schema/spec@1.0.0': {}
 
   '@standard-schema/utils@0.3.0': {}
+
+  '@stripe/react-stripe-js@2.6.2(@stripe/stripe-js@3.4.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@stripe/stripe-js': 3.4.1
+      prop-types: 15.8.1
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
+  '@stripe/stripe-js@3.4.1': {}
 
   '@supabase/auth-js@2.71.1':
     dependencies:
@@ -17525,14 +17538,6 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
 
-  number-flow@0.4.1:
-    dependencies:
-      esm-env: 1.2.2
-
-  number-flow@0.5.8:
-    dependencies:
-      esm-env: 1.2.2
-
   number-is-nan@1.0.1: {}
 
   object-assign@4.1.1: {}
@@ -19596,6 +19601,12 @@ snapshots:
   strip-json-comments@2.0.1: {}
 
   strip-json-comments@3.1.1: {}
+
+  stripe@18.4.0(@types/node@22.17.1):
+    dependencies:
+      qs: 6.14.0
+    optionalDependencies:
+      '@types/node': 22.17.1
 
   strtok3@10.3.4:
     dependencies:
