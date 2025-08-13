@@ -3,8 +3,24 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { CreditCard, Trash2, Building2 } from "lucide-react"
-import type { Institution, BankAccount } from "./types" // Assuming these types are defined in a separate file
-import Button from "./Button" // Assuming Button component is defined in a separate file
+import { Button } from "@/components/ui/button"
+
+interface Institution {
+  id: string
+  name: string
+  logo?: string
+  country: string
+}
+
+interface BankAccount {
+  id: string
+  name: string
+  type: string
+  iban?: string
+  last4?: string
+  balance: number
+  currency: string
+}
 
 export function BankConnectionCard() {
   const [isConnecting, setIsConnecting] = useState(false)

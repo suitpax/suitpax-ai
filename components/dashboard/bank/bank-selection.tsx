@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import Card from "./Card" // Assuming Card is imported from a local file
+import { Card } from "@/components/ui/card"
 
 const BankSelection = () => {
   const [filteredBanks, setFilteredBanks] = useState([
@@ -10,9 +10,9 @@ const BankSelection = () => {
     // Add more banks as needed
   ])
 
-  const [selectedBank, setSelectedBank] = useState(null)
+  const [selectedBank, setSelectedBank] = useState<number | null>(null)
 
-  const onBankSelect = (bankId) => {
+  const onBankSelect = (bankId: number) => {
     setSelectedBank(bankId)
   }
 
