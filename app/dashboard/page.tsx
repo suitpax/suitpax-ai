@@ -1,6 +1,5 @@
 "use client"
 
-import { DraggableDashboard } from "@/components/dashboard/draggable-dashboard"
 import { BankConnectionCard } from "@/components/dashboard/bank-connection-card"
 import { TopDestinationsCard } from "@/components/dashboard/top-destinations-card"
 import { RadarChart } from "@/components/charts/radar-chart"
@@ -9,7 +8,7 @@ import { BusinessMetricsChart } from "@/components/charts/business-metrics-chart
 import { TravelEfficiencyChart } from "@/components/charts/travel-efficiency-chart"
 import { MonthlySpendingChart } from "@/components/charts/monthly-spending-chart"
 import { motion } from "framer-motion"
-import { Calendar, TrendingUp, Building2, Clock, DollarSign, Plane, Sparkles, ArrowRight } from "lucide-react"
+import { Calendar, TrendingUp, Building2, Clock, DollarSign, Plane, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useUserData } from "@/hooks/use-user-data"
 
@@ -42,11 +41,20 @@ const DashboardPage = () => {
 
   const displayName = getDisplayName()
 
-  const dashboardCards = [
-    {
-      id: "user-profile",
-      title: "User Profile",
-      component: (
+  return (
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="mb-8">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <h1 className="text-4xl md:text-5xl font-medium leading-none text-gray-900 mb-2">Dashboard</h1>
+          <p className="text-lg font-light tracking-tighter text-gray-600">Welcome back, {displayName.split(" ")[0]}</p>
+          <p className="text-sm text-gray-500 font-light mt-1">
+            Your comprehensive business travel management overview and insights
+          </p>
+        </motion.div>
+      </div>
+
+      <div className="space-y-6">
+        {/* User Profile */}
         <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-4">
@@ -130,183 +138,52 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
-      ),
-    },
-    {
-      id: "kpi-stats",
-      title: "KPI Statistics",
-      component: (
+
+        {/* KPI */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              title: "Total Trips",
-              value: "0",
-              change: "+0%",
-              icon: Plane,
-              color: "text-gray-600",
-            },
-            {
-              title: "Total Spent",
-              value: "$0",
-              change: "+0%",
-              icon: DollarSign,
-              color: "text-gray-600",
-            },
-            {
-              title: "Avg Trip Cost",
-              value: "$0",
-              change: "+0%",
-              icon: TrendingUp,
-              color: "text-gray-600",
-            },
-            {
-              title: "Active Bookings",
-              value: "0",
-              change: "+0%",
-              icon: Calendar,
-              color: "text-gray-600",
-            },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-gray-200 shadow-sm"
-            >
+          {[{ title: "Total Trips", value: "0", icon: Plane }, { title: "Total Spent", value: "$0", icon: DollarSign }, { title: "Avg Trip Cost", value: "$0", icon: TrendingUp }, { title: "Active Bookings", value: "0", icon: Calendar }].map((stat, index) => (
+            <motion.div key={stat.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-gray-200 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-medium text-gray-600 mb-1">{stat.title}</p>
                   <p className="text-lg font-medium tracking-tight text-gray-900">{stat.value}</p>
-                  <p className="text-[10px] text-gray-500 mt-1">{stat.change} from last month</p>
+                  <p className="text-[10px] text-gray-500 mt-1">+0% from last month</p>
                 </div>
-                <div className={`p-2 rounded-xl bg-gray-100 ${stat.color}`}>
+                <div className="p-2 rounded-xl bg-gray-100 text-gray-600">
                   <stat.icon className="h-3.5 w-3.5" />
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
-      ),
-    },
-    {
-      id: "bank-connection",
-      title: "Bank Connection",
-      component: <BankConnectionCard />,
-    },
-    {
-      id: "top-destinations",
-      title: "Top Destinations",
-      component: <TopDestinationsCard />,
-    },
-    {
-      id: "performance-radar",
-      title: "Performance Radar",
-      component: (
-        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-base font-medium tracking-tight text-gray-900">Travel Performance</h3>
-            <div className="flex items-center space-x-2">
-              <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
-              <span className="text-[10px] text-gray-600">Current Period</span>
-            </div>
-          </div>
-          <RadarChart />
+
+        {/* Charts and Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"><RadarChart /></div>
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"><ExpenseTrendsChart /></div>
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"><BusinessMetricsChart /></div>
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"><TravelEfficiencyChart /></div>
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"><MonthlySpendingChart /></div>
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm"><TopDestinationsCard /></div>
         </div>
-      ),
-    },
-    {
-      id: "expense-trends",
-      title: "Expense Trends",
-      component: <ExpenseTrendsChart />,
-    },
-    {
-      id: "business-metrics",
-      title: "Business Metrics",
-      component: <BusinessMetricsChart />,
-    },
-    {
-      id: "travel-efficiency",
-      title: "Travel Efficiency",
-      component: <TravelEfficiencyChart />,
-    },
-    {
-      id: "monthly-spending",
-      title: "Monthly Spending",
-      component: <MonthlySpendingChart />,
-    },
-    {
-      id: "suitpax-ai",
-      title: "Suitpax AI",
-      component: (
-        <Link href="/dashboard/suitpax-ai" className="block group">
-          <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 p-6 rounded-2xl border border-gray-800 shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:scale-[1.02]">
-            {/* Shining effect overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-out"></div>
 
-            {/* Background pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-gray-600 to-transparent rounded-full blur-2xl"></div>
-              <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-tr from-gray-700 to-transparent rounded-full blur-xl"></div>
+        {/* Next Products marketing card */}
+        <Link href="/pricing" className="block group mt-6">
+          <div className="relative bg-gradient-to-br from-indigo-600 via-blue-600 to-sky-500 p-6 rounded-2xl shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-xl">
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/20 rounded-full blur-3xl"></div>
+              <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-white/20 rounded-full blur-3xl"></div>
             </div>
-
-            <div className="relative z-10 flex items-start space-x-4">
-                              <div className="flex-shrink-0">
-                                <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-600 shadow-inner bg-gray-800">
-                  <img src="/logo/suitpax-cloud-logo.webp" alt="Suitpax" className="w-full h-full object-contain" />
-                </div>
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="min-w-0">
+                <h3 className="text-xl font-medium tracking-tight text-white">Suitpax Next Products</h3>
+                <p className="text-sm text-white/90 mt-1">Explore upcoming modules: Cars, Trains, Meetings AI, and more</p>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-medium tracking-tight text-gray-100">Suitpax AI</h3>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                    <span className="text-[10px] text-gray-400 font-medium">Ready</span>
-                  </div>
-                </div>
-
-                <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-                  Your intelligent travel companion powered by advanced AI. Ready to optimize your business trips and
-                  find the best deals.
-                </p>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="inline-flex items-center rounded-lg bg-gray-800 px-2.5 py-1 text-[10px] font-medium text-gray-300 border border-gray-700">
-                      AI Powered
-                    </div>
-                    <div className="inline-flex items-center rounded-lg bg-gray-800 px-2.5 py-1 text-[10px] font-medium text-gray-300 border border-gray-700">
-                      24/7 Available
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-300 group-hover:translate-x-1 transition-all duration-200" />
-                </div>
-              </div>
+              <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
         </Link>
-      ),
-    },
-  ]
-
-  return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <h1 className="text-4xl md:text-5xl font-medium leading-none text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-lg font-light tracking-tighter text-gray-600">Welcome back, {displayName.split(" ")[0]}</p>
-          <p className="text-sm text-gray-500 font-light mt-1">
-            Your comprehensive business travel management overview and insights
-          </p>
-        </motion.div>
       </div>
-
-      <DraggableDashboard
-        cards={dashboardCards}
-        onReorder={(newOrder) => {
-          console.log("Dashboard reordered:", newOrder)
-        }}
-      />
     </div>
   )
 }
