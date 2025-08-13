@@ -102,7 +102,7 @@ export function Sidebar({
   const [navigation, setNavigation] = useState(defaultNavigation)
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
   const [usageStats, setUsageStats] = useState({
-    tokensUsed: 2450,
+    tokensUsed: 0,
     maxTokens: userPlan === "premium" ? 100000 : 10000,
   })
   const pathname = usePathname()
@@ -291,35 +291,38 @@ export function Sidebar({
         isCollapsed ? "w-16" : "w-64",
       )}
     >
-      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white">
+      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-gradient-to-br from-white via-gray-50 to-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Image
-                src="/suitpax-bl-logo.webp"
-                alt="Suitpax"
-                width={32}
-                height={32}
-                className="w-8 h-8 object-contain"
-              />
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800 rounded-xl blur-sm opacity-20 group-hover:opacity-30 transition-opacity"></div>
+              <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 p-2 rounded-xl shadow-lg border border-gray-800">
+                <Image
+                  src="/suitpax-bl-logo.webp"
+                  alt="Suitpax"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6 object-contain filter invert"
+                />
+              </div>
               <div className="absolute -top-1 -right-1 flex items-center gap-0.5">
-                <div className="w-1.5 h-1.5 bg-gray-900 rounded-full"></div>
-                <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
-                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-900 rounded-full animate-pulse"></div>
+                <div className="w-1 h-1 bg-gray-600 rounded-full animate-pulse delay-100"></div>
+                <div className="w-1 h-1 bg-gray-400 rounded-full animate-pulse delay-200"></div>
               </div>
             </div>
             {(!isCollapsed || isMobile) && (
               <div className="flex flex-col">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium text-gray-900 tracking-tighter">
-                    {getDisplayName().split(" ")[0]}
-                  </span>
-                  <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+                  <span className="text-lg font-medium text-gray-900 tracking-tighter">Suitpax</span>
+                  <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 font-light">Suitpax AI</span>
-                  <Badge className="bg-gray-200 text-gray-700 text-[8px] px-1.5 py-0.5 rounded-md font-medium">
-                    v0.0.1
+                  <span className="text-xs text-gray-500 font-light tracking-tight">
+                    Welcome back, {getDisplayName().split(" ")[0]}
+                  </span>
+                  <Badge className="bg-gradient-to-r from-gray-900 to-gray-700 text-white text-[8px] px-1.5 py-0.5 rounded-md font-medium border-0">
+                    AI
                   </Badge>
                 </div>
               </div>

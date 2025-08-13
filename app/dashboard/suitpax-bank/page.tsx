@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BankAccountItem } from "@/components/dashboard/bank-account-item"
 import { TransactionList } from "@/components/dashboard/transaction-list"
-import { BankConnectionModal } from "@/components/dashboard/bank-connection-modal"
 import { BankSelection } from "@/components/dashboard/bank-selection"
 import { ExpenseAnalytics } from "@/components/dashboard/expense-analytics"
 import { AutoCategorizationSettings } from "@/components/dashboard/auto-categorization-settings"
@@ -43,7 +42,6 @@ export default function SuitpaxBankPage() {
   const [accounts, setAccounts] = useState<BankAccount[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [isConnecting, setIsConnecting] = useState(false)
-  const [showConnectionModal, setShowConnectionModal] = useState(false)
   const [filter, setFilter] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCountry, setSelectedCountry] = useState("GB")
@@ -152,13 +150,6 @@ export default function SuitpaxBankPage() {
                 </>
               )}
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowConnectionModal(true)}
-              className="rounded-xl border-gray-200 hover:bg-gray-50 bg-transparent"
-            >
-              Advanced Setup
-            </Button>
           </div>
         </div>
       )}
@@ -174,25 +165,9 @@ export default function SuitpaxBankPage() {
             <p className="text-gray-600 font-light">Secure banking connections for automated expense tracking</p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button
-              size="sm"
-              variant="outline"
-              className="rounded-xl border-gray-200 hover:bg-gray-50 bg-transparent"
-              onClick={() => setShowConnectionModal(true)}
-              disabled={isConnecting}
-            >
-              {isConnecting ? (
-                <>
-                  <Clock className="h-4 w-4 mr-2 animate-spin" />
-                  Connecting...
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Connect Bank
-                </>
-              )}
-            </Button>
+            {accounts.length === 0 && (
+              <div className="text-sm text-gray-600 font-light">Connect your first bank account below</div>
+            )}
           </div>
         </div>
       </motion.div>
@@ -306,14 +281,6 @@ export default function SuitpaxBankPage() {
                               </>
                             )}
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowConnectionModal(true)}
-                            className="rounded-xl border-gray-200 bg-transparent"
-                          >
-                            Advanced Setup
-                          </Button>
                         </div>
                       </div>
                     </div>
@@ -418,12 +385,6 @@ export default function SuitpaxBankPage() {
           </CardContent>
         </Card>
       </motion.div>
-
-      <BankConnectionModal
-        isOpen={showConnectionModal}
-        onClose={() => setShowConnectionModal(false)}
-        onConnect={handleConnectBank}
-      />
     </div>
   )
 }

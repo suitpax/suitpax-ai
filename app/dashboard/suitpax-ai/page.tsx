@@ -9,7 +9,6 @@ import {
   ArrowUp,
   Paperclip,
   X,
-  Square,
   ArrowLeft,
   FileIcon,
   ImageIcon,
@@ -19,7 +18,6 @@ import {
   Music,
   Video,
   Archive,
-  Mic,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
@@ -41,8 +39,6 @@ import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@/components/prompt-kit/reasoning"
 import { Switch } from "@/components/ui/switch"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-import { VoiceAIProvider, useVoiceAI } from "@/contexts/voice-ai-context"
-import VoiceButton from "@/components/prompt-kit/voice-button"
 import DocumentScanner from "@/components/prompt-kit/document-scanner"
 import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
 import SourceList from "@/components/prompt-kit/source-list"
@@ -87,7 +83,6 @@ function AIChatView() {
   const [showReasoning, setShowReasoning] = useState(true)
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
-  const { speak, state: voiceState, startListening, stopListening } = useVoiceAI()
   const { isStreaming, start, cancel } = useChatStream()
 
   useEffect(() => {
@@ -189,9 +184,6 @@ function AIChatView() {
     }
     setMessages((prev) => [...prev, assistantMessage])
     setTypingMessageId(assistantMessage.id)
-    try {
-      await speak(data.response)
-    } catch {}
   }
 
   const handleSend = async () => {
@@ -235,9 +227,6 @@ function AIChatView() {
         ]
       })
       setTypingMessageId(null)
-      try {
-        await speak(streamed)
-      } catch {}
     } catch (err) {
       await sendNonStreaming(userMessage)
     } finally {
@@ -295,22 +284,10 @@ function AIChatView() {
                   <Switch checked={showReasoning} onCheckedChange={setShowReasoning} />
                 </div>
                 <div className="inline-flex items-center gap-2">
-                  <span
-                    className={`inline-flex items-center rounded-xl px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-medium ${voiceState.isSpeaking ? "bg-green-500/10 text-green-700" : "bg-gray-900/5 text-gray-900"}`}
-                  >
-                    <span
-                      className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${voiceState.isSpeaking ? "bg-green-600 animate-pulse" : "bg-gray-900"} mr-1`}
-                    ></span>
-                    {voiceState.isSpeaking ? "Speaking" : "Online"}
+                  <span className="inline-flex items-center rounded-xl px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-medium bg-gray-900/5 text-gray-900">
+                    <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-gray-900 mr-1"></span>
+                    Online
                   </span>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-7 w-7"
-                    onClick={voiceState.isListening ? stopListening : startListening}
-                  >
-                    {voiceState.isListening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                  </Button>
                 </div>
               </div>
             </div>
@@ -523,8 +500,6 @@ function AIChatView() {
                     />
                   </PromptInputAction>
 
-                  <VoiceButton />
-
                   <PromptInputAction tooltip="Send message">
                     <Button
                       type="submit"
@@ -546,9 +521,5 @@ function AIChatView() {
 }
 
 export default function SuitpaxAIPage() {
-  return (
-    <VoiceAIProvider>
-      <AIChatView />
-    </VoiceAIProvider>
-  )
+  return <AIChatView />
 }

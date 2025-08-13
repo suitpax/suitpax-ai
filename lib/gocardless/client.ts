@@ -38,10 +38,32 @@ export interface Balance {
   referenceDate: string
 }
 
+export interface RateLimitInfo {
+  accountId: string
+  scope: "details" | "balances" | "transactions"
+  requestCount: number
+  resetTime: number
+  dailyLimit: number
+}
+
+export class GoCardlessRateLimitError extends Error {
+  constructor(
+    message: string,
+    public accountId: string,
+    public scope: string,
+    public resetTime: number,
+  ) {
+    super(message)
+    this.name = "GoCardlessRateLimitError"
+  }
+}
+
 export class GoCardlessClient {
   private config: GoCardlessConfig
   private accessToken: string | null = null
   private tokenExpiry = 0
+  private rateLimits = new Map<string, RateLimitInfo>()
+  private readonly DAILY_LIMIT = 10 // Current GoCardless limit per scope per account
 
   constructor(config: GoCardlessConfig) {
     this.config = config
@@ -76,7 +98,60 @@ export class GoCardlessClient {
     return this.accessToken
   }
 
-  private async makeRequest(endpoint: string, options: RequestInit = {}) {
+  private checkRateLimit(accountId: string, scope: "details" | "balances" | "transactions"): void {
+    const key = `${accountId}-${scope}`
+    const now = Date.now()
+    const rateLimitInfo = this.rateLimits.get(key)
+
+    if (rateLimitInfo) {
+      // Reset counter if it's a new day
+      if (now >= rateLimitInfo.resetTime) {
+        rateLimitInfo.requestCount = 0
+        rateLimitInfo.resetTime = this.getNextResetTime()
+      }
+
+      // Check if we've exceeded the limit
+      if (rateLimitInfo.requestCount >= this.DAILY_LIMIT) {
+        throw new GoCardlessRateLimitError(
+          `Rate limit exceeded for account ${accountId} scope ${scope}. Limit resets at ${new Date(rateLimitInfo.resetTime).toISOString()}`,
+          accountId,
+          scope,
+          rateLimitInfo.resetTime,
+        )
+      }
+
+      // Increment counter
+      rateLimitInfo.requestCount++
+    } else {
+      // Initialize rate limit tracking for this account/scope
+      this.rateLimits.set(key, {
+        accountId,
+        scope,
+        requestCount: 1,
+        resetTime: this.getNextResetTime(),
+        dailyLimit: this.DAILY_LIMIT,
+      })
+    }
+  }
+
+  private getNextResetTime(): number {
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    tomorrow.setHours(0, 0, 0, 0)
+    return tomorrow.getTime()
+  }
+
+  private async makeRequest(
+    endpoint: string,
+    options: RequestInit = {},
+    accountId?: string,
+    scope?: "details" | "balances" | "transactions",
+  ) {
+    // Check rate limits before making request
+    if (accountId && scope) {
+      this.checkRateLimit(accountId, scope)
+    }
+
     const token = await this.getAccessToken()
     const url = `${this.config.baseUrl}${endpoint}`
 
@@ -90,6 +165,29 @@ export class GoCardlessClient {
       },
     })
 
+    // Handle rate limit responses from GoCardless
+    if (response.status === 429) {
+      const resetHeader = response.headers.get("HTTP_X_RATELIMIT_ACCOUNT_SUCCESS_RESET")
+      const resetTime = resetHeader ? Number.parseInt(resetHeader) * 1000 : Date.now() + 24 * 60 * 60 * 1000
+
+      if (accountId && scope) {
+        // Update our local rate limit tracking
+        const key = `${accountId}-${scope}`
+        const rateLimitInfo = this.rateLimits.get(key)
+        if (rateLimitInfo) {
+          rateLimitInfo.requestCount = this.DAILY_LIMIT
+          rateLimitInfo.resetTime = resetTime
+        }
+
+        throw new GoCardlessRateLimitError(
+          `Rate limit exceeded for account ${accountId} scope ${scope}. Try again after ${new Date(resetTime).toISOString()}`,
+          accountId,
+          scope,
+          resetTime,
+        )
+      }
+    }
+
     if (!response.ok) {
       const errorText = await response.text()
       console.error("GoCardless API Error:", {
@@ -97,11 +195,47 @@ export class GoCardlessClient {
         statusText: response.statusText,
         body: errorText,
         url,
+        accountId,
+        scope,
       })
+
+      // Provide more specific error messages
+      if (response.status === 400) {
+        throw new Error(`GoCardless API error: Invalid request - ${errorText}`)
+      } else if (response.status === 401) {
+        throw new Error(`GoCardless API error: Authentication failed - check your credentials`)
+      } else if (response.status === 403) {
+        throw new Error(`GoCardless API error: Access forbidden - check your permissions`)
+      } else if (response.status === 404) {
+        throw new Error(`GoCardless API error: Resource not found - ${endpoint}`)
+      } else if (response.status >= 500) {
+        throw new Error(`GoCardless API error: Server error (${response.status}) - please try again later`)
+      }
+
       throw new Error(`GoCardless API error: ${response.status} ${response.statusText}`)
     }
 
     return response.json()
+  }
+
+  public getRateLimitInfo(accountId: string, scope: "details" | "balances" | "transactions"): RateLimitInfo | null {
+    const key = `${accountId}-${scope}`
+    return this.rateLimits.get(key) || null
+  }
+
+  public canMakeRequest(accountId: string, scope: "details" | "balances" | "transactions"): boolean {
+    try {
+      this.checkRateLimit(accountId, scope)
+      // Decrement the counter since we only checked
+      const key = `${accountId}-${scope}`
+      const rateLimitInfo = this.rateLimits.get(key)
+      if (rateLimitInfo) {
+        rateLimitInfo.requestCount--
+      }
+      return true
+    } catch (error) {
+      return false
+    }
   }
 
   // Get available institutions
@@ -141,19 +275,16 @@ export class GoCardlessClient {
     return this.makeRequest(`/api/v2/requisitions/${requisitionId}/`)
   }
 
-  // Get account details
   async getAccountDetails(accountId: string): Promise<BankAccount> {
-    const response = await this.makeRequest(`/api/v2/accounts/${accountId}/details/`)
+    const response = await this.makeRequest(`/api/v2/accounts/${accountId}/details/`, {}, accountId, "details")
     return response.account
   }
 
-  // Get account balances
   async getAccountBalances(accountId: string): Promise<Balance[]> {
-    const response = await this.makeRequest(`/api/v2/accounts/${accountId}/balances/`)
+    const response = await this.makeRequest(`/api/v2/accounts/${accountId}/balances/`, {}, accountId, "balances")
     return response.balances
   }
 
-  // Get account transactions
   async getAccountTransactions(accountId: string, dateFrom?: string, dateTo?: string): Promise<Transaction[]> {
     let endpoint = `/api/v2/accounts/${accountId}/transactions/`
     const params = new URLSearchParams()
@@ -165,7 +296,7 @@ export class GoCardlessClient {
       endpoint += `?${params.toString()}`
     }
 
-    const response = await this.makeRequest(endpoint)
+    const response = await this.makeRequest(endpoint, {}, accountId, "transactions")
     return response.transactions.booked || []
   }
 
