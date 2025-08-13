@@ -30,8 +30,6 @@ import {
   PiShield,
   PiDotsSixVertical,
   PiBank,
-  PiTrain,
-  PiCar,
 } from "react-icons/pi"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
@@ -48,14 +46,14 @@ import {
 } from "@/components/ui/dialog"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import Image from "next/image"
+import { AISidebarManager } from "@/lib/ai-sidebar-manager"
 import AiSearchInput from "@/components/ui/ai-search-input"
 
 const defaultNavigation = [
   { id: "dashboard", name: "Dashboard", href: "/dashboard", icon: PiSquaresFour },
   { id: "flights", name: "Flights", href: "/dashboard/flights", icon: PiAirplane },
-  { id: "trains", name: "Trains", href: "/dashboard/trains", icon: PiTrain },
-  { id: "ride", name: "Ride", href: "/dashboard/ride", icon: PiCar },
   { id: "hotels", name: "Hotels", href: "/dashboard/hotels", icon: PiBuildings },
+  { id: "suitpax-bank", name: "Suitpax Bank", href: "/dashboard/suitpax-bank", icon: PiBank },
   { id: "finance", name: "Finance", href: "/dashboard/finance", icon: PiCreditCard },
   { id: "analytics", name: "Analytics", href: "/dashboard/analytics", icon: PiChartBar },
   { id: "calendar", name: "Calendar", href: "/dashboard/calendar", icon: PiCalendar },
@@ -66,10 +64,6 @@ const defaultNavigation = [
   { id: "expenses", name: "Expenses", href: "/dashboard/expenses", icon: PiReceipt },
   { id: "tasks", name: "Tasks", href: "/dashboard/tasks", icon: PiCheckSquare },
   { id: "policies", name: "Policies", href: "/dashboard/policies", icon: PiShield },
-]
-
-const managementNavigation = [
-  { id: "suitpax-bank", name: "Suitpax Bank", href: "/dashboard/suitpax-bank", icon: PiBank },
 ]
 
 const aiNavigation = [
@@ -114,6 +108,7 @@ export function Sidebar({
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const [aiSidebarManager, setAiSidebarManager] = useState<AISidebarManager | null>(null)
 
   const setIsCollapsed = onToggleCollapse
 
@@ -137,9 +132,45 @@ export function Sidebar({
     }
   }, [])
 
+  // Initialize AI sidebar manager when user is available
+  useEffect(() => {
+    if (user?.id) {
+      const manager = new AISidebarManager(user.id)
+      setAiSidebarManager(manager)
+
+      // Load stored navigation order or optimize based on usage
+      const loadNavigationOrder = async () => {
+        const storedOrder = await manager.getStoredNavigationOrder()
+        if (storedOrder) {
+          const reorderedNav = storedOrder
+            .map((id: string) => defaultNavigation.find((item) => item.id === id))
+            .filter(Boolean)
+
+          // Add any new items that weren't in the stored order
+          const existingIds = new Set(storedOrder)
+          const newItems = defaultNavigation.filter((item) => !existingIds.has(item.id))
+
+          setNavigation([...reorderedNav, ...newItems])
+        } else {
+          // First time user - optimize based on common patterns
+          const optimizedNav = await manager.optimizeNavigationForUser(defaultNavigation)
+          setNavigation(optimizedNav)
+        }
+      }
+
+      loadNavigationOrder()
+    }
+  }, [user])
+
+  // Enhanced save function that also updates AI preferences
   const saveNavigationOrder = async (newNavigation: typeof navigation) => {
     const orderIds = newNavigation.map((item) => item.id)
     localStorage.setItem("sidebar-navigation-order", JSON.stringify(orderIds))
+
+    // Also save to AI system for cross-device sync
+    if (aiSidebarManager) {
+      await aiSidebarManager.reorderNavigation(orderIds, "User manual reorder via drag & drop")
+    }
   }
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
@@ -357,42 +388,9 @@ export function Sidebar({
           })}
         </div>
 
-        {/* Management Section */}
-        {(!isCollapsed || isMobile) && (
-          <div className="pt-4">
-            <div className="px-3 mb-2">
-              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider">Management</h3>
-            </div>
-            <div className="space-y-0.5">
-              {managementNavigation.map((item) => {
-                const isActive = pathname === item.href
-                return (
-                  <Link
-                    key={item.id}
-                    href={item.href}
-                    onClick={isMobile ? onCloseMobile : undefined}
-                    className={cn(
-                      "group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200",
-                      isActive
-                        ? "bg-gray-900 text-white shadow-sm"
-                        : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
-                    )}
-                  >
-                    <item.icon className="flex-shrink-0 h-5 w-5 mr-3" aria-hidden="true" />
-                    <span>{item.name}</span>
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
         {/* AI Section */}
         {(!isCollapsed || isMobile) && (
-          <div className="pt-4">
-            <div className="px-3 mb-2">
-              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider">AI Assistant</h3>
-            </div>
+          <div className="pt-3">
             <div className="space-y-0.5">
               {aiNavigation.map((item) => {
                 const isActive = pathname === item.href
@@ -420,14 +418,14 @@ export function Sidebar({
           </div>
         )}
 
-        {/* Collapsed Management and AI icons */}
+        {/* Collapsed AI icons */}
         {isCollapsed && !isMobile && (
           <div className="pt-3 space-y-0.5">
-            {[...managementNavigation, ...aiNavigation].map((item) => {
+            {aiNavigation.map((item) => {
               const isActive = pathname === item.href
               return (
                 <Link
-                  key={item.name || item.id}
+                  key={item.name}
                   href={item.href}
                   className={cn(
                     "group flex items-center justify-center px-2 py-2 text-sm font-medium rounded-xl transition-all duration-200 relative",

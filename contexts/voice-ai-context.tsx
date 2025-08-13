@@ -127,55 +127,50 @@ export function VoiceAIProvider({
     language: initialLanguage || initialSettings.language,
   })
 
-  const [isClient, setIsClient] = React.useState(false)
-
+  // Restore settings from localStorage
   React.useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  React.useEffect(() => {
-    if (!isClient) return
-
     try {
-      const raw = localStorage.getItem("voiceAISettings")
+      const raw = typeof window !== "undefined" ? localStorage.getItem("voiceAISettings") : null
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<VoiceAISettings>
         setSettings((prev) => ({ ...prev, ...parsed }))
       }
     } catch {}
-  }, [isClient])
+  }, [])
 
+  // Persist settings
   React.useEffect(() => {
-    if (!isClient) return
-
     try {
-      localStorage.setItem("voiceAISettings", JSON.stringify(settings))
+      if (typeof window !== "undefined") {
+        localStorage.setItem("voiceAISettings", JSON.stringify(settings))
+      }
     } catch {}
-  }, [settings, isClient])
+  }, [settings])
 
+  // Auto-adjust language from browser when enabled
   React.useEffect(() => {
-    if (!isClient || !settings.autoDetectLanguage) return
-
-    const lang = navigator.language || "en-US"
-    const mapped = lang.startsWith("es")
-      ? "es-ES"
-      : lang.startsWith("fr")
-        ? "fr-FR"
-        : lang.startsWith("de")
-          ? "de-DE"
-          : "en-US"
-    if (mapped !== settings.language) {
-      setSettings((prev) => ({ ...prev, language: mapped as VoiceAISettings["language"] }))
+    if (settings.autoDetectLanguage && typeof navigator !== "undefined") {
+      const lang = navigator.language || "en-US"
+      // Map common browser language to supported speech codes
+      const mapped = lang.startsWith("es")
+        ? "es-ES"
+        : lang.startsWith("fr")
+          ? "fr-FR"
+          : lang.startsWith("de")
+            ? "de-DE"
+            : "en-US"
+      if (mapped !== settings.language) {
+        setSettings((prev) => ({ ...prev, language: mapped as VoiceAISettings["language"] }))
+      }
     }
-  }, [settings.autoDetectLanguage, isClient])
+  }, [settings.autoDetectLanguage])
 
   // Speech Recognition
   const recognition = React.useRef<SpeechRecognition | null>(null)
 
+  // Initialize speech recognition
   useEffect(() => {
-    if (!isClient) return
-
-    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+    if (typeof window !== "undefined" && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
       const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
       recognition.current = new SpeechRecognition() as SpeechRecognition
 
@@ -203,6 +198,7 @@ export function VoiceAIProvider({
           if (finalTranscript) {
             dispatch({ type: "SET_TRANSCRIPT", payload: finalTranscript })
 
+            // Check for commands
             const matchedCommand = commands.find((cmd) =>
               finalTranscript.toLowerCase().includes(cmd.phrase.toLowerCase()),
             )
@@ -227,7 +223,8 @@ export function VoiceAIProvider({
       }
     }
 
-    if (navigator.mediaDevices) {
+    // Check microphone permission
+    if (typeof navigator !== "undefined" && navigator.mediaDevices) {
       navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then(() => {
@@ -238,10 +235,11 @@ export function VoiceAIProvider({
           dispatch({ type: "SET_ERROR", payload: "Permisos de micrófono requeridos" })
         })
     }
-  }, [settings.language, commands, enableLogging, isClient])
+  }, [settings.language, commands, enableLogging])
 
+  // Start listening
   const startListening = useCallback(async () => {
-    if (!isClient || !recognition.current || !state.permissionGranted) {
+    if (!recognition.current || !state.permissionGranted) {
       dispatch({ type: "SET_ERROR", payload: "Reconocimiento de voz no disponible" })
       return
     }
@@ -254,7 +252,7 @@ export function VoiceAIProvider({
     } finally {
       dispatch({ type: "SET_PROCESSING", payload: false })
     }
-  }, [state.permissionGranted, isClient])
+  }, [state.permissionGranted])
 
   // Stop listening
   const stopListening = useCallback(() => {
@@ -263,14 +261,16 @@ export function VoiceAIProvider({
     }
   }, [])
 
+  // Speak text
   const speak = useCallback(
     async (text: string) => {
-      if (!isClient || !text.trim()) return
+      if (!text.trim()) return
 
       try {
         dispatch({ type: "SET_PROCESSING", payload: true })
         dispatch({ type: "SET_SPEAKING", payload: true })
 
+        // Use ElevenLabs API for better voice quality
         const response = await fetch("/api/elevenlabs/text-to-speech", {
           method: "POST",
           headers: {
@@ -301,6 +301,7 @@ export function VoiceAIProvider({
 
           await audio.play()
         } else {
+          // Fallback to browser speech synthesis
           const utterance = new SpeechSynthesisUtterance(text)
           utterance.lang = settings.language
           utterance.volume = settings.volume
@@ -314,7 +315,9 @@ export function VoiceAIProvider({
             dispatch({ type: "SET_SPEAKING", payload: false })
           }
 
-          window.speechSynthesis.speak(utterance)
+          if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.speak(utterance)
+          }
         }
       } catch (error) {
         dispatch({ type: "SET_ERROR", payload: "Error al generar voz" })
@@ -323,15 +326,16 @@ export function VoiceAIProvider({
         dispatch({ type: "SET_PROCESSING", payload: false })
       }
     },
-    [settings, isClient],
+    [settings],
   )
 
+  // Cancel speech
   const cancelSpeech = useCallback(() => {
-    if (!isClient) return
-
-    window.speechSynthesis.cancel()
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel()
+    }
     dispatch({ type: "SET_SPEAKING", payload: false })
-  }, [isClient])
+  }, [])
 
   // Update settings
   const updateSettings = useCallback((newSettings: Partial<VoiceAISettings>) => {

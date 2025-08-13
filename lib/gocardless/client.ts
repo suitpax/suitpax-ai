@@ -40,18 +40,50 @@ export interface Balance {
 
 export class GoCardlessClient {
   private config: GoCardlessConfig
+  private accessToken: string | null = null
+  private tokenExpiry = 0
 
   constructor(config: GoCardlessConfig) {
     this.config = config
   }
 
+  private async getAccessToken(): Promise<string> {
+    if (this.accessToken && Date.now() < this.tokenExpiry) {
+      return this.accessToken
+    }
+
+    const response = await fetch(`${this.config.baseUrl}/api/v2/token/new/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        secret_id: this.config.secretId,
+        secret_key: this.config.secretKey,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`GoCardless auth error: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    this.accessToken = data.access
+    // Token expires in 1 hour, refresh 5 minutes early
+    this.tokenExpiry = Date.now() + (data.access_expires - 300) * 1000
+
+    return this.accessToken
+  }
+
   private async makeRequest(endpoint: string, options: RequestInit = {}) {
+    const token = await this.getAccessToken()
     const url = `${this.config.baseUrl}${endpoint}`
 
     const response = await fetch(url, {
       ...options,
       headers: {
-        Authorization: `Bearer ${this.config.secretKey}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         Accept: "application/json",
         ...options.headers,
@@ -59,6 +91,13 @@ export class GoCardlessClient {
     })
 
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error("GoCardless API Error:", {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+        url,
+      })
       throw new Error(`GoCardless API error: ${response.status} ${response.statusText}`)
     }
 
@@ -138,15 +177,24 @@ export class GoCardlessClient {
   }
 }
 
-// Singleton instance
 let goCardlessClient: GoCardlessClient | null = null
 
 export function getGoCardlessClient(): GoCardlessClient {
   if (!goCardlessClient) {
+    const secretId = process.env.GOCARDLESS_SECRET_ID
+    const secretKey = process.env.GOCARDLESS_SECRET_KEY
+    const baseUrl = process.env.GOCARDLESS_BASE_URL
+
+    if (!secretId || !secretKey) {
+      throw new Error(
+        "GoCardless credentials not configured. Please set GOCARDLESS_SECRET_ID and GOCARDLESS_SECRET_KEY environment variables.",
+      )
+    }
+
     goCardlessClient = new GoCardlessClient({
-      secretId: process.env.GOCARDLESS_SECRET_ID!,
-      secretKey: process.env.GOCARDLESS_SECRET_KEY!,
-      baseUrl: process.env.GOCARDLESS_BASE_URL || "https://bankaccountdata.gocardless.com",
+      secretId,
+      secretKey,
+      baseUrl: baseUrl || "https://bankaccountdata.gocardless.com",
     })
   }
   return goCardlessClient
