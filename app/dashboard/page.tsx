@@ -3,15 +3,11 @@
 import { DraggableDashboard } from "@/components/dashboard/draggable-dashboard"
 import { BankConnectionCard } from "@/components/dashboard/bank-connection-card"
 import { TopDestinationsCard } from "@/components/dashboard/top-destinations-card"
-import { SpectacularFlightSearch } from "@/components/dashboard/spectacular-flight-search"
 import { RadarChart } from "@/components/charts/radar-chart"
 import { ExpenseTrendsChart } from "@/components/charts/expense-trends-chart"
 import { BusinessMetricsChart } from "@/components/charts/business-metrics-chart"
 import { motion } from "framer-motion"
-import { Calendar, CreditCard, TrendingUp, Building2, Clock, DollarSign, Plane, Sparkles } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { Calendar, CreditCard, TrendingUp, Building2, Clock, DollarSign, Plane } from "lucide-react"
 
 const DashboardPage = () => {
   const getDisplayName = (user: any) => {
@@ -32,90 +28,43 @@ const DashboardPage = () => {
 
   const dashboardCards = [
     {
-      id: "spectacular-flight-search",
-      title: "Flight Search",
-      component: <SpectacularFlightSearch />,
-    },
-    {
       id: "user-profile",
       title: "User Profile",
       component: (
-        <div className="bg-white/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm">
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex items-start space-x-5">
+        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-md flex items-center justify-center text-gray-700 font-semibold text-xl shadow-sm">
+                <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-md flex items-center justify-center text-gray-600 font-medium text-lg">
                   JD
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gray-700 rounded-full border-3 border-white flex items-center justify-center shadow-sm">
-                  <div className="w-2.5 h-2.5 bg-gray-300 rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-600 rounded-full border-2 border-white flex items-center justify-center">
+                  <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
                 </div>
               </div>
-              <div className="flex-1 space-y-3">
-                <div>
-                  <h3 className="text-xl font-medium tracking-tight text-gray-900 mb-1">John Doe</h3>
-                  <p className="text-sm text-gray-600 font-medium">Senior Business Travel Manager</p>
-                </div>
-
-                <div className="flex items-center flex-wrap gap-3 text-xs">
-                  <div className="flex items-center space-x-2 bg-gray-100 px-3 py-1.5 rounded-lg">
-                    <div className="w-2 h-2 bg-gray-700 rounded-full"></div>
-                    <span className="text-gray-800 font-medium">Premium Plan</span>
+              <div className="flex-1">
+                <h3 className="text-lg font-medium tracking-tight text-gray-900">John Doe</h3>
+                <p className="text-sm text-gray-600 mb-2">Business Travel Manager</p>
+                <div className="flex items-center space-x-4 text-xs">
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+                    <span className="text-gray-700 font-medium">Premium Plan</span>
                   </div>
-                  <div className="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 rounded-lg">
-                    <Building2 className="h-3.5 w-3.5 text-gray-600" />
-                    <span className="text-gray-700">Acme Corporation</span>
+                  <div className="flex items-center space-x-1">
+                    <Building2 className="h-3 w-3 text-gray-500" />
+                    <span className="text-gray-600">Acme Corp</span>
                   </div>
-                  <div className="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 rounded-lg">
-                    <Clock className="h-3.5 w-3.5 text-gray-600" />
-                    <span className="text-gray-700">Member since Jan 2024</span>
+                  <div className="flex items-center space-x-1">
+                    <Clock className="h-3 w-3 text-gray-500" />
+                    <span className="text-gray-600">Member since 2024</span>
                   </div>
-                </div>
-
-                <div className="flex items-center space-x-3 pt-2">
-                  <Link href="/dashboard/suitpax-ai">
-                    <Button
-                      size="sm"
-                      className="bg-gray-900 hover:bg-gray-800 text-white rounded-xl px-4 py-2 text-xs font-medium"
-                    >
-                      <Sparkles className="h-3 w-3 mr-1.5" />
-                      Ask Suitpax AI
-                    </Button>
-                  </Link>
-                  <Badge className="bg-gray-200 text-gray-700 text-xs px-2.5 py-1 rounded-lg font-medium">
-                    Travel Expert
-                  </Badge>
                 </div>
               </div>
             </div>
-
-            <div className="text-right space-y-2">
-              <div className="bg-gray-50 rounded-xl p-4 min-w-[140px]">
-                <div className="text-xs text-gray-500 mb-1 font-medium">This Month</div>
-                <div className="text-2xl font-semibold text-gray-900 tracking-tight">$12,450</div>
-                <div className="text-xs text-gray-600 mt-1">Travel Expenses</div>
-              </div>
-              <div className="flex items-center justify-end space-x-2 text-xs">
-                <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
-                <span className="text-gray-600">+15% vs last month</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-200 pt-4">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="space-y-1">
-                <div className="text-lg font-semibold text-gray-900">24</div>
-                <div className="text-xs text-gray-600">Total Trips</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-lg font-semibold text-gray-900">8.5</div>
-                <div className="text-xs text-gray-600">Avg Rating</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-lg font-semibold text-gray-900">$2.1K</div>
-                <div className="text-xs text-gray-600">Saved This Year</div>
-              </div>
+            <div className="text-right">
+              <div className="text-xs text-gray-500 mb-1">This Month</div>
+              <div className="text-lg font-medium text-gray-900">$12,450</div>
+              <div className="text-xs text-gray-600">Travel Expenses</div>
             </div>
           </div>
         </div>
