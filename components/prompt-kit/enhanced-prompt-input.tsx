@@ -3,8 +3,12 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Paperclip, Send, Mic, MicOff, Sparkles } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Paperclip, Send, Mic, MicOff, Settings, ChevronDown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { ConnectionOptionsDialog } from "@/components/ui/connection-options-dialog"
+import { AIModelsDialog } from "@/components/ui/ai-models-dialog"
+import { AIAgentsDialog } from "@/components/ui/ai-agents-dialog"
 
 export interface EnhancedPromptInputProps {
   value: string
@@ -33,6 +37,11 @@ export function EnhancedPromptInput({
 }: EnhancedPromptInputProps) {
   const [isRecording, setIsRecording] = React.useState(false)
   const [isFocused, setIsFocused] = React.useState(false)
+  const [showConnectionDialog, setShowConnectionDialog] = React.useState(false)
+  const [showModelsDialog, setShowModelsDialog] = React.useState(false)
+  const [showAgentsDialog, setShowAgentsDialog] = React.useState(false)
+  const [selectedModel, setSelectedModel] = React.useState("Suitpax AI 1.0")
+  const [selectedAgent, setSelectedAgent] = React.useState("Agent 40")
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   const wordCount = value.trim().split(/\s+/).filter(Boolean).length
@@ -61,120 +70,156 @@ export function EnhancedPromptInput({
   }, [value])
 
   return (
-    <motion.div
-      className={cn(
-        "relative w-full border border-gray-200 rounded-2xl bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-200",
-        isFocused && "ring-2 ring-blue-500/20 border-blue-300 shadow-md",
-        isLoading && "opacity-75",
-        className,
-      )}
-      initial={{ scale: 0.98 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="flex flex-col p-4">
-        <textarea
-          ref={textareaRef}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholder={placeholder}
-          disabled={isLoading}
-          maxLength={maxLength}
-          rows={1}
-          className="w-full resize-none bg-transparent text-gray-900 placeholder:text-gray-500 focus:outline-none disabled:cursor-not-allowed text-sm leading-relaxed min-h-[24px] max-h-[200px] overflow-y-auto"
-        />
-
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+    <>
+      <motion.div
+        className={cn(
+          "relative w-full border border-gray-200 rounded-2xl bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-200",
+          isFocused && "ring-2 ring-blue-500/20 border-blue-300 shadow-md",
+          isLoading && "opacity-75",
+          className,
+        )}
+        initial={{ scale: 0.98 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-gray-100">
           <div className="flex items-center gap-2">
-            {enableAttachments && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-                disabled={isLoading}
-              >
-                <Paperclip className="h-4 w-4" />
-              </Button>
-            )}
-
-            {enableVoice && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleVoiceToggle}
-                className={cn(
-                  "h-8 w-8 p-0 rounded-lg transition-colors",
-                  isRecording
-                    ? "text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100",
-                )}
-                disabled={isLoading}
-              >
-                {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </Button>
-            )}
-
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-              disabled={isLoading}
+            <Badge
+              variant="secondary"
+              className="text-xs cursor-pointer hover:bg-gray-200 transition-colors"
+              onClick={() => setShowModelsDialog(true)}
             >
-              <Sparkles className="h-4 w-4" />
-            </Button>
+              {selectedModel}
+              <ChevronDown className="h-3 w-3 ml-1" />
+            </Badge>
+            <Badge
+              variant="outline"
+              className="text-xs cursor-pointer hover:bg-gray-50 transition-colors"
+              onClick={() => setShowAgentsDialog(true)}
+            >
+              {selectedAgent}
+              <ChevronDown className="h-3 w-3 ml-1" />
+            </Badge>
           </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowConnectionDialog(true)}
+            className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md"
+          >
+            <Settings className="h-3 w-3" />
+          </Button>
+        </div>
 
-          <div className="flex items-center gap-3">
-            {showWordCount && (
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span>{wordCount} words</span>
-                <span className={cn("transition-colors", isNearLimit && "text-orange-500")}>
-                  {charCount}/{maxLength}
-                </span>
-              </div>
-            )}
+        <div className="flex flex-col p-4">
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder={placeholder}
+            disabled={isLoading}
+            maxLength={maxLength}
+            rows={1}
+            className="w-full resize-none bg-transparent text-gray-900 placeholder:text-gray-500 focus:outline-none disabled:cursor-not-allowed text-sm leading-relaxed min-h-[24px] max-h-[200px] overflow-y-auto"
+          />
 
-            <Button
-              type="button"
-              onClick={onSubmit}
-              disabled={!value.trim() || isLoading || charCount > maxLength}
-              size="sm"
-              className="h-8 px-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-2">
+              {enableAttachments && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                  disabled={isLoading}
                 >
-                  <Sparkles className="h-4 w-4" />
-                </motion.div>
-              ) : (
-                <Send className="h-4 w-4" />
+                  <Paperclip className="h-4 w-4" />
+                </Button>
               )}
-            </Button>
+
+              {enableVoice && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleVoiceToggle}
+                  className={cn(
+                    "h-8 w-8 p-0 rounded-lg transition-colors",
+                    isRecording
+                      ? "text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100"
+                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-100",
+                  )}
+                  disabled={isLoading}
+                >
+                  {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </Button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3">
+              {showWordCount && (
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <span>{wordCount} words</span>
+                  <span className={cn("transition-colors", isNearLimit && "text-orange-500")}>
+                    {charCount}/{maxLength}
+                  </span>
+                </div>
+              )}
+
+              <Button
+                type="button"
+                onClick={onSubmit}
+                disabled={!value.trim() || isLoading || charCount > maxLength}
+                size="sm"
+                className="h-8 px-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                  >
+                    <Settings className="h-4 w-4" />
+                  </motion.div>
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <AnimatePresence>
-        {isRecording && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="absolute -top-12 left-4 right-4 bg-red-50 border border-red-200 rounded-lg p-2 flex items-center gap-2"
-          >
-            <div className="h-2 w-2 bg-red-500 rounded-full animate-pulse" />
-            <span className="text-sm text-red-700 font-medium">Recording...</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+        <AnimatePresence>
+          {isRecording && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="absolute -top-12 left-4 right-4 bg-red-50 border border-red-200 rounded-lg p-2 flex items-center gap-2"
+            >
+              <div className="h-2 w-2 bg-red-500 rounded-full animate-pulse" />
+              <span className="text-sm text-red-700 font-medium">Recording...</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      <ConnectionOptionsDialog open={showConnectionDialog} onOpenChange={setShowConnectionDialog} />
+      <AIModelsDialog
+        open={showModelsDialog}
+        onOpenChange={setShowModelsDialog}
+        selectedModel={selectedModel}
+        onSelectModel={setSelectedModel}
+      />
+      <AIAgentsDialog
+        open={showAgentsDialog}
+        onOpenChange={setShowAgentsDialog}
+        selectedAgent={selectedAgent}
+        onSelectAgent={setSelectedAgent}
+      />
+    </>
   )
 }
