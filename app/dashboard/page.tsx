@@ -15,6 +15,7 @@ import { TopDestinationsCard } from "@/components/dashboard/top-destinations-car
 import AiSearchInput from "@/components/ui/ai-search-input"
 import Image from "next/image"
 import { DraggableDashboard } from "@/components/dashboard/draggable-dashboard"
+import { BankConnectionCard } from "@/components/dashboard/bank-connection-card"
 
 interface UserProfile {
   full_name?: string
@@ -397,6 +398,11 @@ export default function DashboardPage() {
           </div>
         </div>
       ),
+    },
+    {
+      id: "bank-connection",
+      title: "Bank Connection",
+      component: <BankConnectionCard />,
     },
   ]
 
