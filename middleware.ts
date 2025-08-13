@@ -1,23 +1,63 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import { createServerClient } from "@supabase/ssr"
+import { NextResponse, type NextRequest } from "next/server"
 
-export function middleware(request: NextRequest) {
+// Check if Supabase environment variables are available
+export const isSupabaseConfigured =
+  typeof process.env.NEXT_PUBLIC_SUPABASE_URL === "string" &&
+  process.env.NEXT_PUBLIC_SUPABASE_URL.length > 0 &&
+  typeof process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === "string" &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.length > 0
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const hostname = request.headers.get('host') || ''
+  const hostname = request.headers.get("host") || ""
 
-  const response = NextResponse.next()
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
 
-  response.headers.set('x-url', pathname)
-  response.headers.set('x-pathname', pathname)
+  if (isSupabaseConfigured) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+            supabaseResponse = NextResponse.next({
+              request,
+            })
+            cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
+          },
+        },
+      },
+    )
 
-  if (process.env.NODE_ENV === 'development') {
+    const code = request.nextUrl.searchParams.get("code")
+    if (code) {
+      await supabase.auth.exchangeCodeForSession(code)
+      const url = request.nextUrl.clone()
+      url.pathname = "/dashboard"
+      url.searchParams.delete("code")
+      return NextResponse.redirect(url)
+    }
+
+    await supabase.auth.getUser()
+  }
+
+  const response = supabaseResponse
+  response.headers.set("x-url", pathname)
+  response.headers.set("x-pathname", pathname)
+
+  if (process.env.NODE_ENV === "development") {
     console.log("Middleware - Setting pathname header:", pathname)
   }
 
   const isAppSubdomain =
-    hostname.includes('app.suitpax.com') ||
-    hostname.startsWith('app.') ||
-    hostname.includes('localhost')
+    hostname.includes("app.suitpax.com") || hostname.startsWith("app.") || hostname.includes("localhost")
 
   const isStaticRoute =
     pathname.startsWith("/_next") ||
@@ -32,20 +72,47 @@ export function middleware(request: NextRequest) {
     return response
   }
 
-  if (isAppSubdomain) {
-    const allowedAppPaths = ['/login', '/signup', '/dashboard', '/api', '/auth']
-    const isAllowedAppPath = allowedAppPaths.some(path => pathname.startsWith(path))
+  if (isSupabaseConfigured && (pathname.startsWith("/dashboard") || pathname.startsWith("/api/user"))) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
+          },
+        },
+      },
+    )
 
-    if (pathname === '/') {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user && !pathname.startsWith("/auth/")) {
       const url = request.nextUrl.clone()
-      url.pathname = '/login'
+      url.pathname = "/auth/login"
+      return NextResponse.redirect(url)
+    }
+  }
+
+  if (isAppSubdomain) {
+    const allowedAppPaths = ["/login", "/signup", "/dashboard", "/api", "/auth"]
+    const isAllowedAppPath = allowedAppPaths.some((path) => pathname.startsWith(path))
+
+    if (pathname === "/") {
+      const url = request.nextUrl.clone()
+      url.pathname = "/auth/login"
       return NextResponse.redirect(url)
     }
 
     if (!isAllowedAppPath) {
       const url = request.nextUrl.clone()
-      url.pathname = '/login'
-      if (pathname !== '/login') {
+      url.pathname = "/auth/login"
+      if (pathname !== "/auth/login") {
         return NextResponse.redirect(url)
       }
     }
@@ -61,12 +128,10 @@ export function middleware(request: NextRequest) {
     "/contact",
     "/solutions",
     "/public",
-    "/api/public"
+    "/api/public",
   ]
 
-  const isPublicPath = publicPaths.some(path =>
-    pathname === path || pathname.startsWith(path + "/")
-  )
+  const isPublicPath = publicPaths.some((path) => pathname === path || pathname.startsWith(path + "/"))
 
   if (isPublicPath) {
     return response

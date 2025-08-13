@@ -49,7 +49,14 @@ export default function DashboardLayout({
       try {
         const {
           data: { user },
+          error,
         } = await supabase.auth.getUser()
+
+        if (error) {
+          console.error("Auth error:", error)
+          router.push("/auth/login")
+          return
+        }
 
         if (!user) {
           router.push("/auth/login")
@@ -59,9 +66,16 @@ export default function DashboardLayout({
         setUser(user)
 
         // Get user profile and subscription info
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single()
 
-        if (profileData) {
+        if (profileError) {
+          console.error("Profile fetch error:", profileError)
+          // Continue with default values if profile doesn't exist
+        } else if (profileData) {
           setUserPlan(profileData.plan || "free")
           setSubscriptionStatus(profileData.subscription_status || "inactive")
         }
@@ -83,6 +97,7 @@ export default function DashboardLayout({
         router.push("/auth/login")
       } else if (event === "SIGNED_IN" && session?.user) {
         setUser(session.user)
+        window.location.reload()
       }
     })
 
