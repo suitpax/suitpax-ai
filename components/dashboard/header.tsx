@@ -61,7 +61,7 @@ const getPageTitle = (pathname: string) => {
     "/dashboard/expenses": { title: "Expenses", description: "Track and manage travel expenses" },
     "/dashboard/analytics": { title: "Analytics", description: "Travel insights and reports" },
     "/dashboard/cost-center": { title: "Cost Centers", description: "Budgets and spending by department" },
-    "/dashboard/calendar": { title: "Calendar", description: "Schedule and manage trips" },
+    "/dashboard/trains": { title: "Trains", description: "Search and book business trains" },
     "/dashboard/locations": { title: "Locations", description: "Saved places and destinations" },
     "/dashboard/team": { title: "Team", description: "Manage team members" },
     "/dashboard/mail": { title: "Mail", description: "Travel communications" },
@@ -79,7 +79,7 @@ const quickActions = [
   { name: "Book Flight", href: "/dashboard/flights", shortcut: "⌘F" },
   { name: "Add Expense", href: "/dashboard/expenses", shortcut: "⌘E" },
   { name: "Suitpax AI", href: "/dashboard/ai-chat", shortcut: "⌘A" },
-  { name: "Calendar", href: "/dashboard/calendar", shortcut: "⌘C" },
+  { name: "Trains", href: "/dashboard/trains", shortcut: "⌘T" },
   { name: "Analytics", href: "/dashboard/analytics", shortcut: "⌘R" },
 ]
 

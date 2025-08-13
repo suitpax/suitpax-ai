@@ -51,8 +51,15 @@ const DashboardPage = () => {
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-gray-600 font-medium text-lg shadow-sm">
-                  {getInitials(displayName)}
+                <div className="w-16 h-16 rounded-xl overflow-hidden ring-2 ring-gray-200">
+                  {profile?.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={profile.avatar_url} alt={displayName} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-600 font-medium text-lg">
+                      {getInitials(displayName)}
+                    </div>
+                  )}
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-600 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
                   <div className="w-2 h-2 bg-gray-300 rounded-full"></div>

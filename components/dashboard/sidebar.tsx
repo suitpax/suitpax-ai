@@ -66,7 +66,7 @@ const defaultNavigation = [
   { id: "air-data", name: "Air Data", href: "/dashboard/air-data", icon: PiAirplane },
   { id: "finance", name: "Finance", href: "/dashboard/finance", icon: PiCreditCard },
   { id: "analytics", name: "Analytics", href: "/dashboard/analytics", icon: PiChartBar },
-  { id: "calendar", name: "Calendar", href: "/dashboard/calendar", icon: PiCalendar },
+  { id: "trains", name: "Trains", href: "/dashboard/trains", icon: PiCalendar },
   { id: "mail", name: "Mail", href: "/dashboard/mail", icon: PiEnvelope },
   { id: "meetings", name: "Meetings", href: "/dashboard/meetings", icon: PiVideoCamera },
   { id: "locations", name: "Locations", href: "/dashboard/locations", icon: PiMapPin },
