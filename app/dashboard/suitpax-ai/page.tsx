@@ -394,26 +394,42 @@ function AIChatView() {
                       ) : (
                         <>
                           <Markdown content={message.content} />
-                          {(() => {
-                            const match = message.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
-                            if (!match) return null
-                            try {
-                              const parsed = JSON.parse(match[1])
-                              return (
-                                <div className="mt-2">
-                                  <ChatFlightOffers
-                                    offers={parsed.offers || []}
-                                    onSelect={(id) => {
-                                      // Navigate to booking page
-                                      window.location.href = `/dashboard/flights/book/${id}`
-                                    }}
-                                  />
-                                </div>
-                              )
-                            } catch {
+                                                    {(() => {
+                              const flightMatch = message.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
+                              if (flightMatch) {
+                                try {
+                                  const parsed = JSON.parse(flightMatch[1])
+                                  return (
+                                    <div className="mt-2">
+                                      <ChatFlightOffers
+                                        offers={parsed.offers || []}
+                                        onSelect={(id) => {
+                                          window.location.href = `/dashboard/flights/book/${id}`
+                                        }}
+                                      />
+                                    </div>
+                                  )
+                                } catch {}
+                              }
+                              const stayMatch = message.content.match(/:::stay_offers_json\n([\s\S]*?)\n:::/)
+                              if (stayMatch) {
+                                try {
+                                  const parsed = JSON.parse(stayMatch[1])
+                                  const ChatStayOffers = require('@/components/prompt-kit/chat-stay-offers').default
+                                  return (
+                                    <div className="mt-2">
+                                      <ChatStayOffers
+                                        stays={parsed.stays || []}
+                                        onSelect={(id: string) => {
+                                          window.location.href = `/dashboard/hotels/book/${id}`
+                                        }}
+                                      />
+                                    </div>
+                                  )
+                                } catch {}
+                              }
                               return null
-                            }
-                          })()}
+                            })()}
                         </>
                       )}
                     </div>
