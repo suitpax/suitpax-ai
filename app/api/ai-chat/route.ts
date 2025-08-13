@@ -108,6 +108,16 @@ export async function POST(request: NextRequest) {
       reasoning = (r as any).content.find((c: any) => c.type === "text")?.text?.trim();
     }
 
+    // Optional: persist conversation to Mem0 if available
+    try {
+      if (process.env.MEM0_API_KEY) {
+        const userId = (history?.find?.((m: any) => m?.role === 'user' && m?.userId)?.userId) || 'anonymous'
+        const { MemoryService } = await import("@/lib/intelligence/memory/memory-service")
+        const mem = new MemoryService(userId)
+        await mem.addConversationWithContext(message, text)
+      }
+    } catch {}
+
     const resp = NextResponse.json({ response: text, reasoning })
     resp.headers.set('x-request-id', reqId)
     resp.headers.set('x-latency-ms', String(Date.now() - t0))
