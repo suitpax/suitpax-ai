@@ -4,6 +4,7 @@ import { buildKernelSystemPrompt } from "@/lib/prompts/kernel";
 import Ajv from "ajv";
 import { FlightOffersBlockSchema } from "@/lib/schemas/flight-offers.schema";
 import { createRequestId } from "@/lib/metrics";
+import { StayOffersBlockSchema } from "@/lib/schemas/stay-offers.schema";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
@@ -33,9 +34,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Flight intent heuristic
+    // Intent heuristics
     const isFlightIntent = /\b([A-Z]{3})\b.*\b(to|→|-)\b.*\b([A-Z]{3})\b/i.test(message) || /\bflight|vuelo|vuelos\b/i.test(message)
+    const isStayIntent = /\b(hotel|stay|stays|hotel\s+in|habitaci[oó]n|alojamiento)\b/i.test(message)
+
     let offersPayload: any = null
+    let staysPayload: any = null
+
     if (isFlightIntent) {
       try {
         const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/ai-chat/tools/flight-search`, {
@@ -47,8 +52,20 @@ export async function POST(request: NextRequest) {
       } catch {}
     }
 
+    if (isStayIntent) {
+      try {
+        // naive parse city and dates later; for now pass the raw query
+        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/stays/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: message })
+        })
+        staysPayload = await toolRes.json()
+      } catch {}
+    }
+
     const systemPrompt = buildKernelSystemPrompt({
-      intent: isFlightIntent ? "travel" : "general",
+      intent: isFlightIntent ? "travel" : isStayIntent ? "business" : "general",
       language: "en",
       style: { tone: "professional", useHeaders: true, useBullets: true, allowTables: true },
       features: { enforceNoCOT: true, includeFlightJsonWrapper: true },
@@ -64,11 +81,19 @@ export async function POST(request: NextRequest) {
 
     text = (initial as any).content.find((c: any) => c.type === "text")?.text || "";
 
+    const ajv = new Ajv({ allErrors: true })
+
     if (offersPayload?.success) {
-      const ajv = new Ajv({ allErrors: true })
-      const validate = ajv.compile(FlightOffersBlockSchema as any)
-      if (validate({ offers: offersPayload.offers })) {
+      const validateFlights = ajv.compile(FlightOffersBlockSchema as any)
+      if (validateFlights({ offers: offersPayload.offers })) {
         text += `\n\n:::flight_offers_json\n${JSON.stringify({ offers: offersPayload.offers })}\n:::`
+      }
+    }
+
+    if (staysPayload?.success) {
+      const validateStays = ajv.compile(StayOffersBlockSchema as any)
+      if (validateStays({ stays: staysPayload.stays })) {
+        text += `\n\n:::stay_offers_json\n${JSON.stringify({ stays: staysPayload.stays })}\n:::`
       }
     }
 
@@ -86,7 +111,10 @@ export async function POST(request: NextRequest) {
     const resp = NextResponse.json({ response: text, reasoning })
     resp.headers.set('x-request-id', reqId)
     resp.headers.set('x-latency-ms', String(Date.now() - t0))
-    if (offersPayload?.success) resp.headers.set('x-tools-used', 'flight-search')
+    const tools: string[] = []
+    if (offersPayload?.success) tools.push('flight-search')
+    if (staysPayload?.success) tools.push('stay-search')
+    if (tools.length) resp.headers.set('x-tools-used', tools.join(','))
     return resp
   } catch (e) {
     console.error("AI Chat API Error:", e);
