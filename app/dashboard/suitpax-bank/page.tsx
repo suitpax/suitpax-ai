@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, TrendingUp, DollarSign, Download, Settings, CheckCircle, Clock, Building2 } from "lucide-react"
+import { motion } from "framer-motion"
+import { Plus, DollarSign, Download, Settings, CheckCircle, Clock, Building2, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -38,64 +39,8 @@ interface Transaction {
 }
 
 export default function SuitpaxBankPage() {
-  const [accounts, setAccounts] = useState<BankAccount[]>([
-    {
-      id: "1",
-      name: "Business Current Account",
-      bank: "HSBC Business",
-      accountNumber: "****1234",
-      balance: 45280.5,
-      currency: "EUR",
-      status: "connected",
-      lastSync: "2024-01-15T10:30:00Z",
-      type: "business",
-    },
-    {
-      id: "2",
-      name: "Company Expenses",
-      bank: "Santander Business",
-      accountNumber: "****5678",
-      balance: 12450.75,
-      currency: "EUR",
-      status: "connected",
-      lastSync: "2024-01-15T09:15:00Z",
-      type: "business",
-    },
-  ])
-
-  const [transactions, setTransactions] = useState<Transaction[]>([
-    {
-      id: "1",
-      amount: -450.0,
-      currency: "EUR",
-      description: "Hotel Booking - Madrid",
-      date: "2024-01-15T08:30:00Z",
-      category: "Accommodation",
-      status: "completed",
-      accountId: "1",
-    },
-    {
-      id: "2",
-      amount: -89.5,
-      currency: "EUR",
-      description: "Flight Booking Fee",
-      date: "2024-01-14T14:20:00Z",
-      category: "Transportation",
-      status: "completed",
-      accountId: "1",
-    },
-    {
-      id: "3",
-      amount: -125.3,
-      currency: "EUR",
-      description: "Business Lunch - Client Meeting",
-      date: "2024-01-14T12:45:00Z",
-      category: "Meals",
-      status: "completed",
-      accountId: "2",
-    },
-  ])
-
+  const [accounts, setAccounts] = useState<BankAccount[]>([])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
   const [isConnecting, setIsConnecting] = useState(false)
   const [showConnectionModal, setShowConnectionModal] = useState(false)
   const [filter, setFilter] = useState("all")
@@ -106,22 +51,33 @@ export default function SuitpaxBankPage() {
 
   const handleConnectBank = async (bankData: any) => {
     setIsConnecting(true)
-    // Simulate GoCardless API call
-    setTimeout(() => {
-      const newAccount: BankAccount = {
-        id: Date.now().toString(),
-        name: `${bankData.bank} Business Account`,
-        bank: bankData.bank,
-        accountNumber: "****" + Math.floor(Math.random() * 9999),
-        balance: Math.floor(Math.random() * 50000),
-        currency: "EUR",
-        status: "connected",
-        lastSync: new Date().toISOString(),
-        type: "business",
+    try {
+      const response = await fetch("/api/gocardless/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bankData),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const newAccount: BankAccount = {
+          id: data.connectionId || Date.now().toString(),
+          name: `${bankData.bank} Business Account`,
+          bank: bankData.bank,
+          accountNumber: "****" + Math.floor(Math.random() * 9999),
+          balance: 0,
+          currency: "EUR",
+          status: "connected",
+          lastSync: new Date().toISOString(),
+          type: "business",
+        }
+        setAccounts([...accounts, newAccount])
       }
-      setAccounts([...accounts, newAccount])
+    } catch (error) {
+      console.error("Connection failed:", error)
+    } finally {
       setIsConnecting(false)
-    }, 2000)
+    }
   }
 
   const filteredTransactions = transactions.filter((transaction) => {
@@ -130,147 +86,206 @@ export default function SuitpaxBankPage() {
     return matchesSearch && matchesFilter
   })
 
+  const EmptyState = ({ type }: { type: "accounts" | "transactions" }) => (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
+      <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        {type === "accounts" ? (
+          <Building2 className="h-8 w-8 text-gray-500" />
+        ) : (
+          <DollarSign className="h-8 w-8 text-gray-500" />
+        )}
+      </div>
+      <h3 className="text-xl font-medium tracking-tighter text-gray-900 mb-2">
+        {type === "accounts" ? "No bank accounts connected" : "No transactions yet"}
+      </h3>
+      <p className="text-gray-600 font-light mb-6 max-w-md mx-auto">
+        {type === "accounts"
+          ? "Connect your first business bank account to start tracking expenses automatically."
+          : "Your transaction history will appear here after connecting a bank account."}
+      </p>
+      {type === "accounts" && (
+        <Button
+          onClick={() => setShowConnectionModal(true)}
+          className="bg-gray-900 text-white hover:bg-black rounded-xl"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Connect Bank Account
+        </Button>
+      )}
+    </motion.div>
+  )
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="space-y-6 p-4 lg:p-0">
+      {/* Header - Following expense page pattern */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
-            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter text-black">Suitpax Bank</h1>
-            <p className="text-gray-600 font-light mt-2">
-              Manage your business banking connections and expense tracking
-            </p>
+            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Suitpax Bank</h1>
+            <p className="text-gray-600 font-light">Secure banking connections for automated expense tracking</p>
           </div>
-          <Button
-            onClick={() => setShowConnectionModal(true)}
-            disabled={isConnecting}
-            className="bg-black text-white hover:bg-gray-800 rounded-2xl px-6 py-3"
-          >
-            {isConnecting ? (
-              <>
-                <Clock className="w-4 h-4 mr-2 animate-spin" />
-                Connecting...
-              </>
-            ) : (
-              <>
-                <Plus className="w-4 h-4 mr-2" />
-                Connect Bank Account
-              </>
-            )}
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-xl border-gray-200 hover:bg-gray-50 bg-transparent"
+              onClick={() => setShowConnectionModal(true)}
+              disabled={isConnecting}
+            >
+              {isConnecting ? (
+                <>
+                  <Clock className="h-4 w-4 mr-2 animate-spin" />
+                  Connecting...
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Connect Bank
+                </>
+              )}
+            </Button>
+          </div>
         </div>
+      </motion.div>
 
-        {/* Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Balance</p>
-                <p className="text-2xl font-medium tracking-tighter text-black mt-1">
-                  €{totalBalance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-              <div className="p-3 bg-gray-200 rounded-xl">
-                <DollarSign className="w-5 h-5 text-gray-700" />
-              </div>
-            </div>
+      {/* KPIs - Following expense page pattern */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.08 }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+            <CardContent className="p-6">
+              <p className="text-sm font-medium text-gray-600">Total Balance</p>
+              <p className="text-2xl font-medium tracking-tighter">€{totalBalance.toLocaleString()}</p>
+            </CardContent>
           </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Monthly Spending</p>
-                <p className="text-2xl font-medium tracking-tighter text-black mt-1">
-                  €{monthlySpending.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-              <div className="p-3 bg-gray-200 rounded-xl">
-                <TrendingUp className="w-5 h-5 text-gray-700" />
-              </div>
-            </div>
+          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+            <CardContent className="p-6">
+              <p className="text-sm font-medium text-gray-600">Monthly Spending</p>
+              <p className="text-2xl font-medium tracking-tighter">€{monthlySpending.toLocaleString()}</p>
+            </CardContent>
           </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Connected Accounts</p>
-                <p className="text-2xl font-medium tracking-tighter text-black mt-1">{accounts.length}</p>
-              </div>
-              <div className="p-3 bg-gray-200 rounded-xl">
-                <Building2 className="w-5 h-5 text-gray-700" />
-              </div>
-            </div>
+          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+            <CardContent className="p-6">
+              <p className="text-sm font-medium text-gray-600">Connected Accounts</p>
+              <p className="text-2xl font-medium tracking-tighter">{accounts.length}</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+            <CardContent className="p-6">
+              <p className="text-sm font-medium text-gray-600">This Month</p>
+              <p className="text-2xl font-medium tracking-tighter">€0</p>
+            </CardContent>
           </Card>
         </div>
+      </motion.div>
 
-        {/* Main Content Tabs */}
+      {/* Main Content Tabs - Improved responsive design */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.16 }}
+      >
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-1">
-            <TabsTrigger value="overview" className="rounded-xl">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200 p-1">
+            <TabsTrigger value="overview" className="rounded-xl text-xs md:text-sm">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="rounded-xl">
+            <TabsTrigger value="analytics" className="rounded-xl text-xs md:text-sm">
               Analytics
             </TabsTrigger>
-            <TabsTrigger value="categorization" className="rounded-xl">
-              Auto-Categorization
+            <TabsTrigger value="categorization" className="rounded-xl text-xs md:text-sm">
+              Auto-Cat
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="rounded-xl">
-              Notifications
+            <TabsTrigger value="notifications" className="rounded-xl text-xs md:text-sm">
+              Alerts
             </TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-xl">
+            <TabsTrigger value="settings" className="rounded-xl text-xs md:text-sm">
               Settings
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             {/* Connected Accounts */}
-            <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-medium tracking-tighter text-black">Connected Accounts</h2>
-                <Button variant="outline" size="sm" className="rounded-xl bg-transparent">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Manage
-                </Button>
-              </div>
-              <div className="space-y-4">
-                {accounts.map((account) => (
-                  <BankAccountItem key={account.id} account={account} />
-                ))}
-              </div>
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.24 }}
+            >
+              <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-medium tracking-tighter text-black">Connected Accounts</h2>
+                    {accounts.length > 0 && (
+                      <Button variant="outline" size="sm" className="rounded-xl bg-transparent border-gray-200">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Manage
+                      </Button>
+                    )}
+                  </div>
+                  {accounts.length === 0 ? (
+                    <EmptyState type="accounts" />
+                  ) : (
+                    <div className="space-y-4">
+                      {accounts.map((account) => (
+                        <BankAccountItem key={account.id} account={account} />
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
 
             {/* Transactions */}
-            <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-                <h2 className="text-xl font-medium tracking-tighter text-black">Recent Transactions</h2>
-                <div className="flex items-center gap-3">
-                  <Input
-                    placeholder="Search transactions..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-64 rounded-xl border-gray-200"
-                  />
-                  <Select value={filter} onValueChange={setFilter}>
-                    <SelectTrigger className="w-40 rounded-xl border-gray-200">
-                      <SelectValue placeholder="Filter by category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      <SelectItem value="accommodation">Accommodation</SelectItem>
-                      <SelectItem value="transportation">Transportation</SelectItem>
-                      <SelectItem value="meals">Meals</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline" size="sm" className="rounded-xl bg-transparent">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export
-                  </Button>
-                </div>
-              </div>
-              <TransactionList transactions={filteredTransactions} />
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.32 }}
+            >
+              <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                    <h2 className="text-xl font-medium tracking-tighter text-black">Recent Transactions</h2>
+                    {transactions.length > 0 && (
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <Input
+                            placeholder="Search transactions..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 w-64 rounded-xl border-gray-200"
+                          />
+                        </div>
+                        <Select value={filter} onValueChange={setFilter}>
+                          <SelectTrigger className="w-40 rounded-xl border-gray-200">
+                            <SelectValue placeholder="Filter" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Categories</SelectItem>
+                            <SelectItem value="accommodation">Accommodation</SelectItem>
+                            <SelectItem value="transportation">Transportation</SelectItem>
+                            <SelectItem value="meals">Meals</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button variant="outline" size="sm" className="rounded-xl bg-transparent border-gray-200">
+                          <Download className="w-4 h-4 mr-2" />
+                          Export
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  {transactions.length === 0 ? (
+                    <EmptyState type="transactions" />
+                  ) : (
+                    <TransactionList transactions={filteredTransactions} />
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
           </TabsContent>
 
           <TabsContent value="analytics">
@@ -286,36 +301,48 @@ export default function SuitpaxBankPage() {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-medium tracking-tighter text-black mb-4">Bank Connection Settings</h2>
-              <p className="text-gray-600">Advanced settings and account management options coming soon.</p>
+            <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+              <CardContent className="p-6">
+                <h2 className="text-xl font-medium tracking-tighter text-black mb-4">Bank Connection Settings</h2>
+                <p className="text-gray-600 font-light">
+                  Advanced settings and account management options coming soon.
+                </p>
+              </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
+      </motion.div>
 
-        {/* Security Notice */}
-        <Card className="bg-blue-50/80 backdrop-blur-sm p-6 rounded-2xl border border-blue-200 shadow-sm">
-          <div className="flex items-start gap-4">
-            <div className="p-2 bg-blue-100 rounded-xl">
-              <CheckCircle className="w-5 h-5 text-blue-600" />
+      {/* Security Notice - Improved design */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <Card className="bg-blue-50/60 backdrop-blur-sm border-blue-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-blue-100 rounded-xl flex-shrink-0">
+                <CheckCircle className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-medium text-blue-900 mb-2">Bank-Level Security</h3>
+                <p className="text-sm text-blue-700 font-light">
+                  Your banking data is protected with 256-bit SSL encryption and never stored on our servers. We use
+                  secure APIs to access read-only transaction data with your explicit consent.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-medium text-blue-900 mb-2">Bank-Level Security</h3>
-              <p className="text-sm text-blue-700 font-light">
-                Your banking data is protected with 256-bit SSL encryption and never stored on our servers. We use
-                GoCardless's secure API to access read-only transaction data with your explicit consent.
-              </p>
-            </div>
-          </div>
+          </CardContent>
         </Card>
+      </motion.div>
 
-        {/* Bank Connection Modal */}
-        <BankConnectionModal
-          isOpen={showConnectionModal}
-          onClose={() => setShowConnectionModal(false)}
-          onConnect={handleConnectBank}
-        />
-      </div>
+      {/* Bank Connection Modal */}
+      <BankConnectionModal
+        isOpen={showConnectionModal}
+        onClose={() => setShowConnectionModal(false)}
+        onConnect={handleConnectBank}
+      />
     </div>
   )
 }

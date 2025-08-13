@@ -6,6 +6,8 @@ import { TopDestinationsCard } from "@/components/dashboard/top-destinations-car
 import { RadarChart } from "@/components/charts/radar-chart"
 import { ExpenseTrendsChart } from "@/components/charts/expense-trends-chart"
 import { BusinessMetricsChart } from "@/components/charts/business-metrics-chart"
+import { TravelEfficiencyChart } from "@/components/charts/travel-efficiency-chart"
+import { MonthlySpendingChart } from "@/components/charts/monthly-spending-chart"
 import { motion } from "framer-motion"
 import { Calendar, CreditCard, TrendingUp, Building2, Clock, DollarSign, Plane } from "lucide-react"
 
@@ -32,39 +34,80 @@ const DashboardPage = () => {
       title: "User Profile",
       component: (
         <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-          <div className="flex items-start justify-between">
+          {/* Enhanced user profile card with more attractive details and plan information */}
+          <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-md flex items-center justify-center text-gray-600 font-medium text-lg">
+                <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-gray-600 font-medium text-xl shadow-sm">
                   JD
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-600 rounded-full border-2 border-white flex items-center justify-center">
-                  <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gray-600 rounded-full border-3 border-white flex items-center justify-center shadow-sm">
+                  <div className="w-2.5 h-2.5 bg-gray-300 rounded-full"></div>
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-medium tracking-tight text-gray-900">John Doe</h3>
-                <p className="text-sm text-gray-600 mb-2">Business Travel Manager</p>
-                <div className="flex items-center space-x-4 text-xs">
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
-                    <span className="text-gray-700 font-medium">Premium Plan</span>
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 className="text-xl font-medium tracking-tight text-gray-900">John Doe</h3>
+                  <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
+                    Premium
                   </div>
-                  <div className="flex items-center space-x-1">
+                </div>
+                <p className="text-sm text-gray-600 mb-3">Senior Business Travel Manager</p>
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div className="flex items-center space-x-2">
                     <Building2 className="h-3 w-3 text-gray-500" />
-                    <span className="text-gray-600">Acme Corp</span>
+                    <span className="text-gray-600">Acme Corporation</span>
                   </div>
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center space-x-2">
                     <Clock className="h-3 w-3 text-gray-500" />
-                    <span className="text-gray-600">Member since 2024</span>
+                    <span className="text-gray-600">Member since Jan 2024</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-3 w-3 text-gray-500" />
+                    <span className="text-gray-600">Last trip: Dec 15</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <TrendingUp className="h-3 w-3 text-gray-500" />
+                    <span className="text-gray-600">Travel Score: 0/100</span>
                   </div>
                 </div>
               </div>
             </div>
             <div className="text-right">
               <div className="text-xs text-gray-500 mb-1">This Month</div>
-              <div className="text-lg font-medium text-gray-900">$12,450</div>
-              <div className="text-xs text-gray-600">Travel Expenses</div>
+              <div className="text-2xl font-medium text-gray-900 mb-1">$0</div>
+              <div className="text-xs text-gray-600 mb-3">Travel Expenses</div>
+              <div className="flex items-center justify-end space-x-1">
+                <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+                <span className="text-xs text-gray-600 font-medium">Active</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Added progress bars and additional metrics */}
+          <div className="border-t border-gray-100 pt-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-lg font-medium text-gray-900 mb-1">0</div>
+                <div className="text-xs text-gray-500">Trips Completed</div>
+                <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
+                  <div className="bg-gray-600 h-1.5 rounded-full" style={{ width: "0%" }}></div>
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-medium text-gray-900 mb-1">$0</div>
+                <div className="text-xs text-gray-500">Total Saved</div>
+                <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
+                  <div className="bg-gray-500 h-1.5 rounded-full" style={{ width: "0%" }}></div>
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-medium text-gray-900 mb-1">0%</div>
+                <div className="text-xs text-gray-500">Policy Compliance</div>
+                <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
+                  <div className="bg-gray-400 h-1.5 rounded-full" style={{ width: "0%" }}></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -164,6 +207,16 @@ const DashboardPage = () => {
       component: <BusinessMetricsChart />,
     },
     {
+      id: "travel-efficiency",
+      title: "Travel Efficiency",
+      component: <TravelEfficiencyChart />,
+    },
+    {
+      id: "monthly-spending",
+      title: "Monthly Spending",
+      component: <MonthlySpendingChart />,
+    },
+    {
       id: "suitpax-ai",
       title: "Suitpax AI",
       component: (
@@ -220,8 +273,13 @@ const DashboardPage = () => {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-8">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <h1 className="text-2xl font-medium tracking-tight text-gray-900 mb-2">Welcome back, John</h1>
-          <p className="text-gray-600 text-sm">Here's what's happening with your business travel today.</p>
+          {/* Updated header title format as requested */}
+          <h1 className="text-3xl md:text-4xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
+            Dashboard - Welcome back, John
+          </h1>
+          <p className="text-gray-600 font-light">
+            Your comprehensive business travel management overview and insights
+          </p>
         </motion.div>
       </div>
 
