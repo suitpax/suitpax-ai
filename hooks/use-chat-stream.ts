@@ -16,7 +16,7 @@ export function useChatStream() {
     abortRef.current = controller
 
     try {
-      const res = await fetch("/api/suitpax-ai/stream", {
+      const res = await fetch("/api/ai-chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
