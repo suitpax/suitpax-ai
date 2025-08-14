@@ -695,7 +695,81 @@ export interface Database {
       }
     }
     Views: {
-      [_ in never]: never
+      users: {
+        Row: {
+          id: string
+          first_name: string | null
+          last_name: string | null
+          company: string | null
+          job_title: string | null
+          phone: string | null
+          timezone: string | null
+          seat_preference: "aisle" | "window" | "middle" | "no_preference" | null
+          meal_preference: string | null
+          notification_settings: Json | null
+          onboarding_completed: boolean | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          first_name?: string | null
+          last_name?: string | null
+          company?: string | null
+          job_title?: string | null
+          phone?: string | null
+          timezone?: string | null
+          seat_preference?: "aisle" | "window" | "middle" | "no_preference" | null
+          meal_preference?: string | null
+          notification_settings?: Json | null
+          onboarding_completed?: boolean | null
+        }
+        Update: {
+          id?: string
+          first_name?: string | null
+          last_name?: string | null
+          company?: string | null
+          job_title?: string | null
+          phone?: string | null
+          timezone?: string | null
+          seat_preference?: "aisle" | "window" | "middle" | "no_preference" | null
+          meal_preference?: string | null
+          notification_settings?: Json | null
+          onboarding_completed?: boolean | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      user_profiles: {
+        Row: {
+          user_id: string
+          full_name: string | null
+          company: string | null
+          phone: string | null
+          timezone: string | null
+          preferences: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id?: string
+          full_name?: string | null
+          company?: string | null
+          phone?: string | null
+          timezone?: string | null
+          preferences?: Json | null
+        }
+        Update: {
+          user_id?: string
+          full_name?: string | null
+          company?: string | null
+          phone?: string | null
+          timezone?: string | null
+          preferences?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Functions: {
       increment_ai_tokens: {
