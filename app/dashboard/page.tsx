@@ -255,43 +255,15 @@ const DashboardPage = () => {
 			id: "suitpax-ai",
 			title: "Suitpax AI",
 			component: (
-				<Link href="/dashboard/suitpax-ai" className="block group">
+				<Link href="/dashboard/ai-core" className="block group">
 					<div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 p-6 rounded-2xl border border-gray-800 shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:scale-[1.02]">
 						<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-out"></div>
-						<div className="absolute inset-0 opacity-10">
-							<div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-gray-600 to-transparent rounded-full blur-2xl"></div>
-							<div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-tr from-gray-700 to-transparent rounded-full blur-xl"></div>
-						</div>
-						<div className="relative z-10 flex items-start space-x-4">
-							<div className="flex-shrink-0">
-								<div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-600 shadow-inner bg-gray-800">
-									<img src="/logo/suitpax-cloud-logo.webp" alt="Suitpax" className="w-full h-full object-contain" />
-								</div>
+						<div className="flex items-center justify-between">
+							<div>
+								<h3 className="text-base font-medium tracking-tight text-white">Suitpax AI</h3>
+								<p className="text-xs text-gray-300">Ask, plan, and manage with AI</p>
 							</div>
-							<div className="flex-1 min-w-0">
-								<div className="flex items-center justify-between mb-3">
-									<h3 className="text-lg font-medium tracking-tight text-gray-100">Suitpax AI</h3>
-									<div className="flex items-center space-x-2">
-										<div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-										<span className="text-[10px] text-gray-400 font-medium">Ready</span>
-									</div>
-								</div>
-								<p className="text-sm text-gray-400 mb-4 leading-relaxed">
-									Your intelligent travel companion powered by advanced AI. Ready to optimize your business trips and
-									find the best deals.
-								</p>
-								<div className="flex items-center justify-between">
-									<div className="flex items-center space-x-3">
-										<div className="inline-flex items-center rounded-lg bg-gray-800 px-2.5 py-1 text-[10px] font-medium text-gray-300 border border-gray-700">
-											AI Powered
-										</div>
-										<div className="inline-flex items-center rounded-lg bg-gray-800 px-2.5 py-1 text-[10px] font-medium text-gray-300 border border-gray-700">
-											24/7 Available
-										</div>
-									</div>
-									<ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-300 group-hover:translate-x-1 transition-all duration-200" />
-								</div>
-							</div>
+							<div className="text-white text-opacity-80 text-xs">↗</div>
 						</div>
 					</div>
 				</Link>
@@ -318,7 +290,7 @@ const DashboardPage = () => {
 						</div>
 						<PromptInput value={quickInput} onValueChange={setQuickInput} onSubmit={() => {
 							if (!quickInput.trim()) return
-							window.location.href = `/dashboard/suitpax-ai?prompt=${encodeURIComponent(quickInput)}`
+							window.location.href = `/dashboard/ai-core?prompt=${encodeURIComponent(quickInput)}`
 						}} isLoading={false} className="bg-white border-gray-200 shadow-sm">
 							<PromptInputTextarea placeholder="Ask the AI to plan a trip, analyze an expense, or draft an email…" />
 							<PromptInputActions>
