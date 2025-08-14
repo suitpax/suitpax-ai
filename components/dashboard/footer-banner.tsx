@@ -10,8 +10,7 @@ export default function FooterBanner({ version, userName }: FooterBannerProps) {
     <div className="border-t border-gray-200 bg-white/80 backdrop-blur-sm">
       <div className="flex items-center justify-between h-10 px-4">
         <div className="flex items-center gap-2 text-xs text-gray-700">
-          <Image src="/logo/suitpax-cloud-logo.webp" alt="Suitpax Cloud" width={18} height={18} />
-          <span>Suitpax Cloud</span>
+          <span>Suitpax AI</span>
           <span className="text-gray-400">•</span>
           <span className="text-gray-600">{version}</span>
         </div>
