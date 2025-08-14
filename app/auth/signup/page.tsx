@@ -163,8 +163,9 @@ export default function SignupPage() {
 							</div>
 
 							<div className="pt-2">
-								<button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight">
-									{loading ? "Creating account..." : "Create account"}
+								<button type="submit" disabled={loading} className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight">
+									{loading && <span className="inline-block w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin"></span>}
+									<span>{loading ? "Creating account..." : "Create account"}</span>
 								</button>
 							</div>
 

@@ -200,17 +200,12 @@ export default function SuitpaxBankPage() {
       </div>
       <div className="text-right">
         <p className="font-medium text-gray-900">€{account.balance.toLocaleString()}</p>
-        <div className="flex items-center gap-1">
-          <div
-            className={`w-2 h-2 rounded-full ${
-              account.status === "connected"
-                ? "bg-green-500"
-                : account.status === "pending"
-                  ? "bg-yellow-500"
-                  : "bg-red-500"
-            }`}
-          />
-          <p className="text-xs text-gray-500 capitalize">{account.status}</p>
+        <div className="flex items-center gap-2 justify-end">
+          <span className={`text-[10px] px-2 py-0.5 rounded-lg border ${account.status === 'connected' ? 'bg-green-50 text-green-700 border-green-200' : account.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-red-50 text-red-700 border-red-200'}`}>{account.status}</span>
+          <Button size="sm" variant="outline" className="h-7 px-2 rounded-lg" onClick={async () => {
+            await fetch('/api/gocardless/default-account', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accountId: account.id }) })
+          }}>Default</Button>
+          <Button size="sm" variant="outline" className="h-7 px-2 rounded-lg" onClick={() => handleConnectBank({ institutionId: selectedBank, institutionName: selectedBankName })}>Re-consent</Button>
         </div>
       </div>
     </div>
@@ -431,7 +426,7 @@ export default function SuitpaxBankPage() {
                         </Select>
                         <Button variant="outline" size="sm" className="rounded-xl bg-transparent border-gray-200">
                           <Download className="w-4 h-4 mr-2" />
-                          Export
+                          Export CSV
                         </Button>
                       </div>
                     )}
@@ -440,6 +435,23 @@ export default function SuitpaxBankPage() {
                     <EmptyState type="transactions" />
                   ) : (
                     <div className="space-y-3">
+                      <div>
+                        <Button variant="outline" size="sm" className="rounded-xl bg-transparent border-gray-200 mb-2" onClick={() => {
+                          const header = ['date','description','amount','currency','category']
+                          const rows = filteredTransactions.map((t) => [t.date, (t.description||'').replace(/,/g,' '), t.amount, 'EUR', t.category||''])
+                          const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n')
+                          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                          const url = URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = `transactions-${new Date().toISOString().slice(0,10)}.csv`
+                          a.click()
+                          URL.revokeObjectURL(url)
+                        }}>
+                          <Download className="w-4 h-4 mr-2" />
+                          Download CSV
+                        </Button>
+                      </div>
                       {filteredTransactions.map((transaction) => (
                         <div
                           key={transaction.id}
