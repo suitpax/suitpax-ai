@@ -197,7 +197,7 @@ export default function VoiceAIPage() {
 
   return (
     <VantaHaloBackground className="fixed inset-0">
-      <div className="absolute inset-0 bg-white/70 min-h-screen">
+      <div className="absolute inset-0 bg-white/85 min-h-screen">
         <div className="max-w-7xl mx-auto p-6 space-y-6">
           {/* Header */}
           <motion.div
@@ -251,7 +251,7 @@ export default function VoiceAIPage() {
             transition={{ delay: 0.1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+                         <Card className="bg-white/70 backdrop-blur-lg p-6 rounded-2xl border border-gray-200/70 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <Badge variant="secondary" className="bg-gray-200 text-gray-700 text-[10px] font-medium">
                   CONVERSATIONS
@@ -267,7 +267,7 @@ export default function VoiceAIPage() {
               </div>
             </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+                         <Card className="bg-white/70 backdrop-blur-lg p-6 rounded-2xl border border-gray-200/70 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <Badge variant="secondary" className="bg-gray-200 text-gray-700 text-[10px] font-medium">
                   VOICE TIME
@@ -283,7 +283,7 @@ export default function VoiceAIPage() {
               </div>
             </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+                         <Card className="bg-white/70 backdrop-blur-lg p-6 rounded-2xl border border-gray-200/70 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <Badge variant="secondary" className="bg-gray-200 text-gray-700 text-[10px] font-medium">
                   AI RESPONSES
@@ -299,7 +299,7 @@ export default function VoiceAIPage() {
               </div>
             </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+                         <Card className="bg-white/70 backdrop-blur-lg p-6 rounded-2xl border border-gray-200/70 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <Badge variant="secondary" className="bg-gray-200 text-gray-700 text-[10px] font-medium">
                   VOICE QUALITY
@@ -322,11 +322,11 @@ export default function VoiceAIPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto"
           >
             {/* Voice Control Panel */}
             <div className="lg:col-span-2">
-              <Card className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-sm">
+              <Card className="bg-white/70 backdrop-blur-lg p-8 rounded-2xl border border-gray-200/70 shadow-lg">
                 <div className="text-center space-y-6">
                   <div className="space-y-2">
                     <h2 className="text-3xl font-medium tracking-tighter text-gray-900">Ready to assist you</h2>

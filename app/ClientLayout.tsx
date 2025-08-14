@@ -46,46 +46,38 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <AppErrorBoundary>
-      <Suspense
-        fallback={
-          <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-200 flex items-center justify-center">
-            <div className="w-8 h-8 border-3 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
-          </div>
-        }
-      >
-        <LayoutContent>{children}</LayoutContent>
-        <IntercomProvider />
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
+      <LayoutContent>{children}</LayoutContent>
+      <IntercomProvider />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#ffffff",
+            color: "#374151",
+            border: "1px solid #e5e7eb",
+            borderRadius: "16px",
+            boxShadow: "0 10px 20px rgba(0,0,0,0.06)",
+            fontSize: "14px",
+          },
+          success: {
             style: {
-              background: "#ffffff",
-              color: "#374151",
-              border: "1px solid #e5e7eb",
-              borderRadius: "16px",
-              boxShadow: "0 10px 20px rgba(0,0,0,0.06)",
-              fontSize: "14px",
+              background: "#ecfdf5",
+              color: "#065f46",
+              border: "1px solid #a7f3d0",
             },
-            success: {
-              style: {
-                background: "#ecfdf5",
-                color: "#065f46",
-                border: "1px solid #a7f3d0",
-              },
+          },
+          error: {
+            style: {
+              background: "#fef2f2",
+              color: "#7f1d1d",
+              border: "1px solid #fecaca",
             },
-            error: {
-              style: {
-                background: "#fef2f2",
-                color: "#7f1d1d",
-                border: "1px solid #fecaca",
-              },
-            },
-          }}
-        />
-        <Analytics />
-        <SpeedInsights />
-      </Suspense>
+          },
+        }}
+      />
+      <Analytics />
+      <SpeedInsights />
     </AppErrorBoundary>
   )
 }

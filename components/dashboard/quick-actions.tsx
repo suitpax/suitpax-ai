@@ -25,7 +25,7 @@ export function QuickActions() {
     {
       title: "Ask Suitpax AI",
       description: "Get travel assistance",
-      href: "/dashboard/ai-chat",
+      href: "/dashboard/suitpax-ai",
       icon: ChatBubbleLeftRightIcon,
       primary: false,
       color: "bg-purple-50 text-purple-700 hover:bg-purple-100",
