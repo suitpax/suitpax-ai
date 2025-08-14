@@ -90,7 +90,12 @@ export default function SignupPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <div className="bg-white/50 backdrop-blur-sm py-6 px-6 shadow-sm rounded-2xl border border-gray-200">
+          <div className="relative bg-white/50 backdrop-blur-sm py-6 px-6 shadow-sm rounded-2xl border border-gray-200">
+            {loading && (
+              <div className="absolute inset-0 z-10 rounded-2xl bg-white/70 backdrop-blur-sm flex items-center justify-center">
+                <div className="w-6 h-6 border-3 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
+              </div>
+            )}
             <form className="space-y-5" onSubmit={handleSignup}>
               {error && (
                 <motion.div

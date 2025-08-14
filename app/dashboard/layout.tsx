@@ -145,7 +145,7 @@ export default function DashboardLayout({
   const isActuallyCollapsed = !isMobile && sidebarCollapsed && !sidebarHovered
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white overflow-hidden">
       {/* Mobile backdrop */}
       {isMobile && mobileMenuOpen && (
         <motion.div

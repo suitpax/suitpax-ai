@@ -49,13 +49,13 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-100/20 via-transparent to-transparent"></div>
       </div>
 
-      <div className="relative z-10">
+      <div className="relative z-10 w-full max-w-md mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="sm:mx-auto sm:w-full sm:max-w-md"
+          className="text-center mb-8"
         >
           <div className="flex justify-center mb-6">
             <div className="inline-flex items-center rounded-xl bg-white/80 backdrop-blur-sm px-3 py-1.5 border border-gray-200 shadow-sm">
@@ -72,7 +72,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-<h2 className="text-center text-3xl md:text-4xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
+          <h2 className="text-center text-3xl md:text-4xl font-medium tracking-tighter leading-none text-gray-900 mb-2">
             Sign in
           </h2>
           <p className="text-center text-gray-600 font-light">Access your business travel dashboard</p>
@@ -83,9 +83,13 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
         >
-          <div className="bg-white/50 backdrop-blur-sm py-8 px-6 shadow-sm rounded-2xl border border-gray-200 sm:px-10">
+          <div className="relative bg-white/50 backdrop-blur-sm py-8 px-6 shadow-sm rounded-2xl border border-gray-200 sm:px-10">
+            {loading && (
+              <div className="absolute inset-0 z-10 rounded-2xl bg-white/70 backdrop-blur-sm flex items-center justify-center">
+                <div className="w-6 h-6 border-3 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
+              </div>
+            )}
             <form className="space-y-6" onSubmit={handleLogin}>
               {error && (
                 <motion.div

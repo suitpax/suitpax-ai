@@ -62,7 +62,7 @@ export function TravelEfficiencyChart() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={efficiencyData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={0.5} />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6B7280" }} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6B7280" }} interval={0} tickMargin={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6B7280" }} />
                 <Tooltip
                   contentStyle={{
