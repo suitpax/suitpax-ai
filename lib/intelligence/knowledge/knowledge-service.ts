@@ -1,4 +1,4 @@
-import { VectorStoreIndex, Document, Settings } from "llamaindex"
+// Lightweight in-memory knowledge service to avoid heavy deps during build
 
 export interface KnowledgeDocument {
   id: string
@@ -12,26 +12,11 @@ export interface KnowledgeDocument {
 }
 
 export class SuitpaxKnowledgeService {
-  private vectorIndex: VectorStoreIndex | null = null
   private documents: KnowledgeDocument[] = []
-
-  constructor() {
-    // Configure LlamaIndex settings
-    Settings.llm = null // We'll use Anthropic through AI SDK instead
-  }
 
   async initializeKnowledgeBase(documents: KnowledgeDocument[]) {
     try {
       this.documents = documents
-      const llamaDocs = documents.map(
-        (doc) =>
-          new Document({
-            text: doc.content,
-            metadata: doc.metadata,
-          }),
-      )
-
-      this.vectorIndex = await VectorStoreIndex.fromDocuments(llamaDocs)
       return true
     } catch (error) {
       console.error("Error initializing knowledge base:", error)
@@ -43,14 +28,6 @@ export class SuitpaxKnowledgeService {
     try {
       this.documents.push(document)
 
-      if (this.vectorIndex) {
-        const llamaDoc = new Document({
-          text: document.content,
-          metadata: document.metadata,
-        })
-        await this.vectorIndex.insert(llamaDoc)
-      }
-
       return true
     } catch (error) {
       console.error("Error adding document:", error)
@@ -59,20 +36,21 @@ export class SuitpaxKnowledgeService {
   }
 
   async searchKnowledge(query: string, limit = 3): Promise<KnowledgeDocument[]> {
-    if (!this.vectorIndex) {
-      console.warn("Knowledge base not initialized")
-      return []
-    }
-
     try {
-      const retriever = this.vectorIndex.asRetriever({ similarityTopK: limit })
-      const relevantNodes = await retriever.retrieve(query)
-
-      return relevantNodes.map((node) => ({
-        id: node.id_ || "",
-        content: node.text,
-        metadata: node.metadata as any,
-      }))
+      const q = query.toLowerCase()
+      const results = this.documents
+        .map((doc) => ({
+          doc,
+          score:
+            (doc.metadata.title.toLowerCase().includes(q) ? 2 : 0) +
+            (doc.content.toLowerCase().includes(q) ? 1 : 0) +
+            (doc.metadata.category?.toLowerCase().includes(q) ? 1 : 0),
+        }))
+        .filter((r) => r.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit)
+        .map((r) => r.doc)
+      return results
     } catch (error) {
       console.error("Error searching knowledge:", error)
       return []

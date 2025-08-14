@@ -55,7 +55,6 @@ import {
 } from "@/components/ui/dialog"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import Image from "next/image"
-import { AISidebarManager } from "@/lib/ai-sidebar-manager"
 import AiSearchInput from "@/components/ui/ai-search-input"
 
 const defaultNavigation = [
@@ -137,7 +136,7 @@ export function Sidebar({
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
-  const [aiSidebarManager, setAiSidebarManager] = useState<AISidebarManager | null>(null)
+  const [aiSidebarManager, setAiSidebarManager] = useState<null>(null)
 
   const setIsCollapsed = onToggleCollapse
 
@@ -161,38 +160,21 @@ export function Sidebar({
   }, [])
 
   useEffect(() => {
-    if (user?.id) {
-      const manager = new AISidebarManager(user.id)
-      setAiSidebarManager(manager)
-
-      const loadNavigationOrder = async () => {
-        const storedOrder = await manager.getStoredNavigationOrder()
-        if (storedOrder) {
-          const reorderedNav = storedOrder
-            .map((id: string) => defaultNavigation.find((item) => item.id === id))
-            .filter(Boolean)
-
-          const existingIds = new Set(storedOrder)
-          const newItems = defaultNavigation.filter((item) => !existingIds.has(item.id))
-
-          setNavigation(reorderedNav.concat(newItems))
-        } else {
-          const optimizedNav = await manager.optimizeNavigationForUser(defaultNavigation)
-          setNavigation(optimizedNav)
-        }
-      }
-
-      loadNavigationOrder()
+    const stored = localStorage.getItem("sidebar-navigation-order")
+    if (stored) {
+      try {
+        const ids = JSON.parse(stored)
+        const reordered = ids.map((id: string) => defaultNavigation.find((n) => n.id === id)).filter(Boolean)
+        const existing = new Set(ids)
+        const rest = defaultNavigation.filter((n) => !existing.has(n.id))
+        setNavigation(reordered.concat(rest))
+      } catch {}
     }
   }, [user])
 
   const saveNavigationOrder = async (newNavigation: typeof navigation) => {
     const orderIds = newNavigation.map((item) => item.id)
     localStorage.setItem("sidebar-navigation-order", JSON.stringify(orderIds))
-
-    if (aiSidebarManager) {
-      await aiSidebarManager.reorderNavigation(orderIds, "User manual reorder via drag & drop")
-    }
   }
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {

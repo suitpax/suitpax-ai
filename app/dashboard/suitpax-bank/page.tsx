@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { Plus, DollarSign, Download, Settings, CheckCircle, Clock, Building2, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -43,7 +44,12 @@ export default function SuitpaxBankPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCountry, setSelectedCountry] = useState("GB")
   const [selectedBank, setSelectedBank] = useState("")
+  const [selectedBankName, setSelectedBankName] = useState("")
   const [bankSearchTerm, setBankSearchTerm] = useState("")
+  const searchParams = useSearchParams()
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("")
+  const [dateFrom, setDateFrom] = useState<string>("")
+  const [dateTo, setDateTo] = useState<string>("")
 
   const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0)
   const monthlySpending = transactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0)
@@ -57,6 +63,7 @@ export default function SuitpaxBankPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           institutionId: bankData.institutionId,
+          institutionName: bankData.institutionName || selectedBankName || "",
           reference: `suitpax-${Date.now()}`, // Unique reference as recommended
           redirectUrl: `${window.location.origin}/dashboard/suitpax-bank?connected=true`,
         }),
@@ -64,9 +71,14 @@ export default function SuitpaxBankPage() {
 
       if (response.ok) {
         const data = await response.json()
+        try {
+          if (data.requisitionId) {
+            localStorage.setItem("gocardless:last_requisition_id", data.requisitionId)
+          }
+        } catch {}
         // Redirect to GoCardless hosted page
-        if (data.redirectUrl) {
-          window.location.href = data.redirectUrl
+        if (data.authLink) {
+          window.location.href = data.authLink
         }
       }
     } catch (error) {
@@ -75,6 +87,36 @@ export default function SuitpaxBankPage() {
       setIsConnecting(false)
     }
   }
+
+  // After redirect from consent page, load accounts using last requisition id
+  useEffect(() => {
+    const isConnected = searchParams?.get("connected") === "true"
+    if (!isConnected) return
+    let requisitionId: string | null = null
+    try {
+      requisitionId = localStorage.getItem("gocardless:last_requisition_id")
+    } catch {}
+    if (!requisitionId) return
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/gocardless/accounts?requisitionId=${encodeURIComponent(requisitionId!)}`)
+        const data = await res.json()
+        const list = Array.isArray(data.accounts) ? data.accounts : []
+        setAccounts(list as any)
+        // Optionally load transactions for the first account
+        const first = list[0]
+        if (first?.id) {
+          setSelectedAccountId(first.id)
+          const txRes = await fetch(`/api/gocardless/transactions?accountId=${encodeURIComponent(first.id)}`)
+          const txData = await txRes.json()
+          setTransactions(Array.isArray(txData.transactions) ? txData.transactions : [])
+        }
+      } catch (e) {
+        console.error("Failed to load accounts after connect", e)
+      }
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
 
   const handleInlineBankConnect = async () => {
     if (!selectedBank) return
@@ -113,7 +155,10 @@ export default function SuitpaxBankPage() {
             <BankSelection
               selectedCountry={selectedCountry}
               selectedBank={selectedBank}
-              onBankSelect={setSelectedBank}
+              onBankSelect={(id, name) => {
+                setSelectedBank(id)
+                setSelectedBankName(name)
+              }}
               searchTerm={bankSearchTerm}
               onSearchChange={setBankSearchTerm}
             />
@@ -155,17 +200,12 @@ export default function SuitpaxBankPage() {
       </div>
       <div className="text-right">
         <p className="font-medium text-gray-900">€{account.balance.toLocaleString()}</p>
-        <div className="flex items-center gap-1">
-          <div
-            className={`w-2 h-2 rounded-full ${
-              account.status === "connected"
-                ? "bg-green-500"
-                : account.status === "pending"
-                  ? "bg-yellow-500"
-                  : "bg-red-500"
-            }`}
-          />
-          <p className="text-xs text-gray-500 capitalize">{account.status}</p>
+        <div className="flex items-center gap-2 justify-end">
+          <span className={`text-[10px] px-2 py-0.5 rounded-lg border ${account.status === 'connected' ? 'bg-green-50 text-green-700 border-green-200' : account.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-red-50 text-red-700 border-red-200'}`}>{account.status}</span>
+          <Button size="sm" variant="outline" className="h-7 px-2 rounded-lg" onClick={async () => {
+            await fetch('/api/gocardless/default-account', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accountId: account.id }) })
+          }}>Default</Button>
+          <Button size="sm" variant="outline" className="h-7 px-2 rounded-lg" onClick={() => handleConnectBank({ institutionId: selectedBank, institutionName: selectedBankName })}>Re-consent</Button>
         </div>
       </div>
     </div>
@@ -188,25 +228,25 @@ export default function SuitpaxBankPage() {
         transition={{ duration: 0.6, delay: 0.08 }}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="p-6">
               <p className="text-sm font-medium text-gray-600">Total Balance</p>
               <p className="text-2xl font-medium tracking-tighter">€{totalBalance.toLocaleString()}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="p-6">
               <p className="text-sm font-medium text-gray-600">Monthly Spending</p>
               <p className="text-2xl font-medium tracking-tighter">€{monthlySpending.toLocaleString()}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="p-6">
               <p className="text-sm font-medium text-gray-600">Connected Accounts</p>
               <p className="text-2xl font-medium tracking-tighter">{accounts.length}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="p-6">
               <p className="text-sm font-medium text-gray-600">This Month</p>
               <p className="text-2xl font-medium tracking-tighter">€0</p>
@@ -242,8 +282,61 @@ export default function SuitpaxBankPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.24 }}
             >
-              <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6">
+                  {accounts.length > 0 && (
+                    <div className="flex flex-col md:flex-row md:items-end gap-3 mb-4">
+                      <div className="flex-1">
+                        <label className="text-xs text-gray-600">Account</label>
+                        <select
+                          value={selectedAccountId}
+                          onChange={async (e) => {
+                            const id = e.target.value
+                            setSelectedAccountId(id)
+                            const url = new URL(`/api/gocardless/transactions`, window.location.origin)
+                            url.searchParams.set('accountId', id)
+                            if (dateFrom) url.searchParams.set('dateFrom', dateFrom)
+                            if (dateTo) url.searchParams.set('dateTo', dateTo)
+                            const res = await fetch(url.toString())
+                            const data = await res.json()
+                            setTransactions(Array.isArray(data.transactions) ? data.transactions : [])
+                          }}
+                          className="w-full border border-gray-200 rounded-xl h-10 px-3"
+                        >
+                          {accounts.map((a: any) => (
+                            <option key={a.id} value={a.id}>{a.name || a.accountName || a.iban || a.id}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600">From</label>
+                        <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="border border-gray-200 rounded-xl h-10 px-3" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600">To</label>
+                        <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="border border-gray-200 rounded-xl h-10 px-3" />
+                      </div>
+                      <div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-xl bg-transparent border-gray-200 mt-5"
+                          onClick={async () => {
+                            if (!selectedAccountId) return
+                            const url = new URL(`/api/gocardless/transactions`, window.location.origin)
+                            url.searchParams.set('accountId', selectedAccountId)
+                            if (dateFrom) url.searchParams.set('dateFrom', dateFrom)
+                            if (dateTo) url.searchParams.set('dateTo', dateTo)
+                            const res = await fetch(url.toString())
+                            const data = await res.json()
+                            setTransactions(Array.isArray(data.transactions) ? data.transactions : [])
+                          }}
+                        >
+                          Refresh
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-medium tracking-tighter text-black">Connected Accounts</h2>
                     {accounts.length > 0 && (
@@ -258,14 +351,17 @@ export default function SuitpaxBankPage() {
                   ) : (
                     <div className="space-y-4">
                       {accounts.map((account) => (
-                        <ConnectedAccountItem key={account.id} account={account} />
+                        <ConnectedAccountItem key={account.id} account={account as any} />
                       ))}
                       <div className="border-t border-gray-200 pt-6 mt-6">
                         <h3 className="text-lg font-medium tracking-tighter text-black mb-4">Connect Another Bank</h3>
                         <BankSelection
                           selectedCountry={selectedCountry}
                           selectedBank={selectedBank}
-                          onBankSelect={setSelectedBank}
+                          onBankSelect={(id, name) => {
+                            setSelectedBank(id)
+                            setSelectedBankName(name)
+                          }}
                           searchTerm={bankSearchTerm}
                           onSearchChange={setBankSearchTerm}
                         />
@@ -301,7 +397,7 @@ export default function SuitpaxBankPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.32 }}
             >
-              <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                     <h2 className="text-xl font-medium tracking-tighter text-black">Recent Transactions</h2>
@@ -330,7 +426,7 @@ export default function SuitpaxBankPage() {
                         </Select>
                         <Button variant="outline" size="sm" className="rounded-xl bg-transparent border-gray-200">
                           <Download className="w-4 h-4 mr-2" />
-                          Export
+                          Export CSV
                         </Button>
                       </div>
                     )}
@@ -339,6 +435,23 @@ export default function SuitpaxBankPage() {
                     <EmptyState type="transactions" />
                   ) : (
                     <div className="space-y-3">
+                      <div>
+                        <Button variant="outline" size="sm" className="rounded-xl bg-transparent border-gray-200 mb-2" onClick={() => {
+                          const header = ['date','description','amount','currency','category']
+                          const rows = filteredTransactions.map((t) => [t.date, (t.description||'').replace(/,/g,' '), t.amount, 'EUR', t.category||''])
+                          const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n')
+                          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                          const url = URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = `transactions-${new Date().toISOString().slice(0,10)}.csv`
+                          a.click()
+                          URL.revokeObjectURL(url)
+                        }}>
+                          <Download className="w-4 h-4 mr-2" />
+                          Download CSV
+                        </Button>
+                      </div>
                       {filteredTransactions.map((transaction) => (
                         <div
                           key={transaction.id}
@@ -374,7 +487,7 @@ export default function SuitpaxBankPage() {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardContent className="p-6">
                 <h2 className="text-xl font-medium tracking-tighter text-black mb-4">Bank Connection Settings</h2>
                 <p className="text-gray-600 font-light">
@@ -391,7 +504,7 @@ export default function SuitpaxBankPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
       >
-        <Card className="bg-blue-50/60 backdrop-blur-sm border-blue-200 shadow-sm">
+        <Card className="bg-blue-50 border-blue-200 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <div className="p-2 bg-blue-100 rounded-xl flex-shrink-0">

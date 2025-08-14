@@ -9,9 +9,10 @@ import { Search } from "lucide-react"
 interface BankSelectionProps {
   selectedCountry: string
   selectedBank: string
-  onBankSelect: (bankId: string) => void
+  onBankSelect: (bankId: string, bankName: string) => void
   searchTerm: string
   onSearchChange: (term: string) => void
+  onBankNameResolve?: (name: string) => void
 }
 
 interface Bank {
@@ -27,6 +28,7 @@ export const BankSelection = ({
   onBankSelect,
   searchTerm,
   onSearchChange,
+  onBankNameResolve,
 }: BankSelectionProps) => {
   const [filteredBanks, setFilteredBanks] = useState<Bank[]>([])
   const [loading, setLoading] = useState(false)
@@ -37,15 +39,20 @@ export const BankSelection = ({
 
       setLoading(true)
       try {
-        // TODO: Replace with actual GoCardless institutions API call
-        // const response = await fetch(`/api/gocardless/institutions?country=${selectedCountry}`)
-        // const banks = await response.json()
-        // setFilteredBanks(banks.filter(bank =>
-        //   bank.name.toLowerCase().includes(searchTerm.toLowerCase())
-        // ))
-
-        // For now, show empty state until real API is connected
-        setFilteredBanks([])
+        const response = await fetch(`/api/gocardless/institutions?country=${encodeURIComponent(selectedCountry)}`)
+        const data = await response.json()
+        const institutions = Array.isArray(data) ? data : []
+        const mapped: Bank[] = institutions.map((i: any) => ({
+          id: i.id,
+          name: i.name,
+          logo: i.logo || i.logo_url || "/generic-bank-logo.png",
+          country: selectedCountry,
+        }))
+        const term = searchTerm.trim().toLowerCase()
+        const filtered = term
+          ? mapped.filter((b) => b.name.toLowerCase().includes(term))
+          : mapped
+        setFilteredBanks(filtered)
       } catch (error) {
         console.error("Error fetching banks:", error)
         setFilteredBanks([])
@@ -65,7 +72,7 @@ export const BankSelection = ({
           value={selectedCountry}
           onValueChange={(value) => {
             // Reset selected bank when country changes
-            onBankSelect("")
+            onBankSelect("", "")
           }}
         >
           <SelectTrigger className="w-full sm:w-48 rounded-xl border-gray-200">
@@ -108,7 +115,7 @@ export const BankSelection = ({
                     ? "border-black bg-gray-50 shadow-md"
                     : "border-gray-200 hover:border-gray-300 bg-white/80 backdrop-blur-sm"
                 }`}
-                onClick={() => onBankSelect(bank.id)}
+                onClick={() => onBankSelect(bank.id, bank.name)}
               >
                 <div className="flex items-center space-x-3">
                   <img

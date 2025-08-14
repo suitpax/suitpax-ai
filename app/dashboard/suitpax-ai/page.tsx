@@ -325,7 +325,7 @@ function AIChatView() {
 										{message.role === "assistant" && (
 											<div className="flex items-center space-x-2 mb-2">
 												<div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-													<Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={24} height={24} className="w-full h-full object-contain p-0.5" />
+													<img src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={24} height={24} className="w-full h-full object-contain p-0.5" loading="eager" fetchpriority="high" />
 												</div>
 												<span className="text-xs font-medium text-gray-700">Suitpax AI</span>
 											</div>
@@ -387,7 +387,9 @@ function AIChatView() {
 								<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
 									<div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 max-w-[90%] sm:max-w-xs">
 										<div className="flex items-center space-x-2 mb-2">
-											<div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white"></div>
+											<div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
+												<img src="/logo/suitpax-bl-logo.webp" alt="Suitpax AI" width={24} height={24} className="w-full h-full object-contain p-0.5" loading="eager" fetchpriority="high" />
+											</div>
 											<span className="text-xs font-medium text-gray-700">Suitpax AI</span>
 										</div>
 										<div className="flex items-center space-x-2">
