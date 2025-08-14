@@ -347,3 +347,5 @@ export default function VoiceAIDemoPage() {
     </div>
   )
 }
+
+export const dynamic = "force-dynamic"
