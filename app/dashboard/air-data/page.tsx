@@ -6,19 +6,10 @@ import { AirportInfo } from "@/components/dashboard/airlabs/airport-info"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plane, MapPin, Building2, Globe, TrendingUp, Clock } from "lucide-react"
-import SoftHero from "@/components/ui/soft-hero"
 
 export default function AirDataPage() {
   return (
     <div className="p-0">
-      <SoftHero
-        eyebrow="AirData"
-        title={<span>Live aviation intelligence</span>}
-        description="Track global flights, airports and airlines in real time."
-        primaryCta={{ label: "Explore flights" }}
-        secondaryCta={{ label: "API Docs" }}
-        className="pb-2"
-      />
       <div className="p-6 max-w-7xl mx-auto space-y-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <div className="flex items-center justify-between">

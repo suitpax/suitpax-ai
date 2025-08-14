@@ -32,7 +32,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import SoftHero from "@/components/ui/soft-hero"
 
 const teamMembers = [
   {
@@ -167,14 +166,6 @@ export default function TeamPage() {
 
   return (
     <div className="min-h-screen p-0">
-      <SoftHero
-        eyebrow="Teams"
-        title={<span>Create real-time collaboration without complexity</span>}
-        description="Manage members, investors, and network with a calm, focused UI."
-        primaryCta={{ label: "Invite member" }}
-        secondaryCta={{ label: "Learn more" }}
-        className="pb-2"
-      />
       <div className="px-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}

@@ -44,7 +44,6 @@ import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
 import SourceList from "@/components/prompt-kit/source-list"
 import { useChatStream } from "@/hooks/use-chat-stream"
 import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
-import SoftHero from "@/components/ui/soft-hero"
 
 interface Message {
   id: string
@@ -270,14 +269,6 @@ function AIChatView() {
   return (
     <VantaHaloBackground className="fixed inset-0">
       <div className="absolute inset-0 flex flex-col">
-        <SoftHero
-          eyebrow="Suitpax AI"
-          title={<span>Create real-time dashboards without writing code</span>}
-          description="Ask anything about travel, finance and operations. Attach docs, get reasoning and sources."
-          primaryCta={{ label: "Watch Demo", href: "/dashboard/voice-ai" }}
-          secondaryCta={{ label: "Back to dashboard", href: "/dashboard" }}
-          className="pt-8 pb-4"
-        />
         {/* Chat Container */}
         <div className="flex-1 min-h-0 relative bg-gradient-to-br from-gray-50/60 via-white/70 to-gray-200/60">
           <ChatContainerRoot className="h-full">
