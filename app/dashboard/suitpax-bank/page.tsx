@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { Plus, DollarSign, Download, Settings, CheckCircle, Clock, Building2, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -44,6 +45,7 @@ export default function SuitpaxBankPage() {
   const [selectedCountry, setSelectedCountry] = useState("GB")
   const [selectedBank, setSelectedBank] = useState("")
   const [bankSearchTerm, setBankSearchTerm] = useState("")
+  const searchParams = useSearchParams()
 
   const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0)
   const monthlySpending = transactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0)
@@ -64,6 +66,11 @@ export default function SuitpaxBankPage() {
 
       if (response.ok) {
         const data = await response.json()
+        try {
+          if (data.requisitionId) {
+            localStorage.setItem("gocardless:last_requisition_id", data.requisitionId)
+          }
+        } catch {}
         // Redirect to GoCardless hosted page
         if (data.authLink) {
           window.location.href = data.authLink
@@ -75,6 +82,35 @@ export default function SuitpaxBankPage() {
       setIsConnecting(false)
     }
   }
+
+  // After redirect from consent page, load accounts using last requisition id
+  useEffect(() => {
+    const isConnected = searchParams?.get("connected") === "true"
+    if (!isConnected) return
+    let requisitionId: string | null = null
+    try {
+      requisitionId = localStorage.getItem("gocardless:last_requisition_id")
+    } catch {}
+    if (!requisitionId) return
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/gocardless/accounts?requisitionId=${encodeURIComponent(requisitionId!)}`)
+        const data = await res.json()
+        const list = Array.isArray(data.accounts) ? data.accounts : []
+        setAccounts(list as any)
+        // Optionally load transactions for the first account
+        const first = list[0]
+        if (first?.id) {
+          const txRes = await fetch(`/api/gocardless/transactions?accountId=${encodeURIComponent(first.id)}`)
+          const txData = await txRes.json()
+          setTransactions(Array.isArray(txData.transactions) ? txData.transactions : [])
+        }
+      } catch (e) {
+        console.error("Failed to load accounts after connect", e)
+      }
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
 
   const handleInlineBankConnect = async () => {
     if (!selectedBank) return

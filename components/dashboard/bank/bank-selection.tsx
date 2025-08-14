@@ -37,15 +37,20 @@ export const BankSelection = ({
 
       setLoading(true)
       try {
-        // TODO: Replace with actual GoCardless institutions API call
-        // const response = await fetch(`/api/gocardless/institutions?country=${selectedCountry}`)
-        // const banks = await response.json()
-        // setFilteredBanks(banks.filter(bank =>
-        //   bank.name.toLowerCase().includes(searchTerm.toLowerCase())
-        // ))
-
-        // For now, show empty state until real API is connected
-        setFilteredBanks([])
+        const response = await fetch(`/api/gocardless/institutions?country=${encodeURIComponent(selectedCountry)}`)
+        const data = await response.json()
+        const institutions = Array.isArray(data) ? data : []
+        const mapped: Bank[] = institutions.map((i: any) => ({
+          id: i.id,
+          name: i.name,
+          logo: i.logo || i.logo_url || "/generic-bank-logo.png",
+          country: selectedCountry,
+        }))
+        const term = searchTerm.trim().toLowerCase()
+        const filtered = term
+          ? mapped.filter((b) => b.name.toLowerCase().includes(term))
+          : mapped
+        setFilteredBanks(filtered)
       } catch (error) {
         console.error("Error fetching banks:", error)
         setFilteredBanks([])

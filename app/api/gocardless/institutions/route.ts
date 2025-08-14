@@ -13,7 +13,12 @@ export async function GET(request: NextRequest) {
     const client = getGoCardlessClient()
     const institutions = await client.getInstitutions(country)
 
-    return NextResponse.json(institutions)
+    return new NextResponse(JSON.stringify(institutions), {
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "s-maxage=3600, stale-while-revalidate=86400",
+      },
+    })
   } catch (error) {
     console.error("Error fetching institutions:", error)
 
