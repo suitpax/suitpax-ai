@@ -5,7 +5,6 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "preinstall": "node scripts/enforce-pnpm.js",
     "lint": "next lint",
     "mcp:server": "node lib/mcp/server.js",
     "start": "next start",
