@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { motion } from "framer-motion"
 import {
   Users,
@@ -156,13 +156,16 @@ export default function TeamPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedIndustry, setSelectedIndustry] = useState("all")
 
-  const filteredOpportunities = investorOpportunities.filter((opp) => {
-    const matchesSearch =
-      opp.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      opp.industry.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesIndustry = selectedIndustry === "all" || opp.industry.toLowerCase() === selectedIndustry.toLowerCase()
-    return matchesSearch && matchesIndustry
-  })
+  const filteredOpportunities = useMemo(() => {
+    return investorOpportunities.filter((opportunity) => {
+      const matchesSearch =
+        opportunity.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        opportunity.industry.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesIndustry =
+        selectedIndustry === "all" || opportunity.industry.toLowerCase() === selectedIndustry.toLowerCase()
+      return matchesSearch && matchesIndustry
+    })
+  }, [searchQuery, selectedIndustry])
 
   return (
     <div className="min-h-screen p-0">
@@ -297,8 +300,6 @@ export default function TeamPage() {
         </motion.div>
 
         {/* Tabs */}
-        </div>
-      </div>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full px-6">
           <TabsList className="grid w-full grid-cols-4 rounded-xl">
             <TabsTrigger value="team" className="rounded-lg">
@@ -569,6 +570,7 @@ export default function TeamPage() {
           </TabsContent>
         </Tabs>
       </div>
+    </div>
     </div>
   )
 }

@@ -23,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
+import { useMemo } from "react"
 
 interface Meeting {
   id: string
@@ -358,7 +359,7 @@ export default function MeetingsPage() {
   const totalDuration = meetings.reduce((acc, m) => acc + m.duration, 0)
   const isEmpty = meetings.length === 0
 
-  const compactAgenda = (() => {
+  const compactAgenda = useMemo(() => {
     const today = new Date()
     const days = Array.from({ length: 7 }, (_, i) => {
       const d = new Date(today)
@@ -367,16 +368,16 @@ export default function MeetingsPage() {
       return { key, label: d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) }
     })
 
-    const map: Record<string, Meeting[]> = {}
-    for (const day of days) map[day.key] = []
-    for (const m of meetings) {
-      const key = m.date
-      if (key in map) map[key].push(m)
+    const daysMap: Record<string, Meeting[]> = {}
+    for (const day of days) daysMap[day.key] = []
+    for (const meeting of meetings) {
+      const key = meeting.date
+      if (key in daysMap) daysMap[key].push(meeting)
     }
 
-    const thisWeekCount = Object.values(map).reduce((acc, meetings) => acc + meetings.length, 0)
-    return { days, map, thisWeekCount }
-  })()
+    const thisWeekCount = Object.values(daysMap).reduce((acc, dayMeetings) => acc + dayMeetings.length, 0)
+    return { days, daysMap, thisWeekCount }
+  }, [meetings])
 
   return (
     <div className="min-h-screen p-0">
@@ -639,10 +640,10 @@ export default function MeetingsPage() {
                   <div key={d.key} className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl p-3">
                     <div className="text-xs font-medium text-gray-700 mb-2">{d.label}</div>
                     <div className="space-y-2">
-                      {compactAgenda.map[d.key].length === 0 ? (
+                      {compactAgenda.daysMap[d.key].length === 0 ? (
                         <div className="text-xs text-gray-500">No meetings</div>
                       ) : (
-                        compactAgenda.map[d.key].map((m) => (
+                        compactAgenda.daysMap[d.key].map((m) => (
                           <div key={m.id} className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
                               <span className="text-gray-900 font-medium">{m.time}</span>
@@ -855,6 +856,7 @@ export default function MeetingsPage() {
             </motion.div>
           )}
         </motion.div>
+        </div>
       </div>
     </div>
   )
