@@ -29,7 +29,7 @@ export default function SplashScreen() {
     <AnimatePresence>
       {showSplash && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-200"
           initial={{ opacity: 1 }}
           exit={{
             opacity: 0,

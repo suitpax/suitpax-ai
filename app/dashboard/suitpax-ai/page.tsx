@@ -44,6 +44,7 @@ import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
 import SourceList from "@/components/prompt-kit/source-list"
 import { useChatStream } from "@/hooks/use-chat-stream"
 import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
+import SoftHero from "@/components/ui/soft-hero"
 
 interface Message {
   id: string
@@ -268,60 +269,17 @@ function AIChatView() {
 
   return (
     <VantaHaloBackground className="fixed inset-0">
-      <div className="absolute inset-0 flex flex-col bg-white/70">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="bg-white/60 backdrop-blur-sm border-b border-gray-200 flex-shrink-0"
-          style={{ height: "auto", minHeight: "4rem" }}
-        >
-          <div className="p-3 sm:p-4 lg:p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3 sm:space-x-4">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-md overflow-hidden border border-gray-200 bg-white flex-shrink-0">
-                  <Image
-                    src="/logo/suitpax-bl-logo.webp"
-                    alt="Suitpax AI"
-                    width={40}
-                    height={40}
-                    className="w-full h-full object-contain p-1"
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h1 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tighter truncate">
-                    <em className="font-serif italic">Suitpax AI</em>
-                  </h1>
-                  <p className="text-xs md:text-sm text-gray-600 font-light hidden sm:block">Try the superpowers</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4 sm:space-x-5 flex-shrink-0">
-                <Link
-                  href="/dashboard"
-                  className="text-xs text-gray-600 hover:text-black inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-2 py-1 hover:bg-gray-50"
-                  aria-label="Volver al dashboard"
-                >
-                  <ArrowLeft className="h-3.5 w-3.5" />
-                  <span className="sr-only">Dashboard</span>
-                </Link>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-gray-600 hidden sm:inline">Reasoning…</span>
-                  <Switch checked={showReasoning} onCheckedChange={setShowReasoning} />
-                </div>
-                <div className="inline-flex items-center gap-2">
-                  <span className="inline-flex items-center rounded-xl px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-medium bg-gray-900/5 text-gray-900">
-                    <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-gray-900 mr-1"></span>
-                    Online
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
+      <div className="absolute inset-0 flex flex-col">
+        <SoftHero
+          eyebrow="Suitpax AI"
+          title={<span>Create real-time dashboards without writing code</span>}
+          description="Ask anything about travel, finance and operations. Attach docs, get reasoning and sources."
+          primaryCta={{ label: "Watch Demo", href: "/dashboard/voice-ai" }}
+          secondaryCta={{ label: "Back to dashboard", href: "/dashboard" }}
+          className="pt-8 pb-4"
+        />
         {/* Chat Container */}
-        <div className="flex-1 min-h-0 relative">
+        <div className="flex-1 min-h-0 relative bg-gradient-to-br from-gray-50/60 via-white/70 to-gray-200/60">
           <ChatContainerRoot className="h-full">
             <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 relative min-h-[50vh] md:min-h-[60vh]">
               {messages.length === 0 && !loading && (
@@ -336,7 +294,10 @@ function AIChatView() {
                       >
                         Ask anything. Travel. Business. Code.
                       </motion.h2>
-                      <p className="mt-2 text-xs sm:text-sm text-gray-600">Powered by Suitpax AI</p>
+                      <div className="mt-2 flex items-center gap-3">
+                     <div className="text-[11px] text-gray-600 hidden sm:inline">Reasoning</div>
+                     <Switch checked={showReasoning} onCheckedChange={setShowReasoning} />
+                   </div>
                     </div>
                   </div>
                   <PromptSuggestions suggestions={defaultSuggestions} onSelect={handleSuggestion} />

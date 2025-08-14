@@ -23,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
+import SoftHero from "@/components/ui/soft-hero"
 
 interface Meeting {
   id: string
@@ -379,7 +380,16 @@ export default function MeetingsPage() {
   })()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4 md:p-6">
+    <div className="min-h-screen p-0">
+      <SoftHero
+        eyebrow="Meetings"
+        title={<span>Organize meetings with clarity</span>}
+        description="Templates, calendar sync and quick actions in a minimal interface."
+        primaryCta={{ label: "New meeting" }}
+        secondaryCta={{ label: "Connect Calendar" }}
+        className="pb-2"
+      />
+      <div className="px-4 md:px-6">
       <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
