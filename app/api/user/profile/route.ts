@@ -25,7 +25,7 @@ const profileUpdateSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
 
     const {
       data: { user },
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
 
     const {
       data: { user },

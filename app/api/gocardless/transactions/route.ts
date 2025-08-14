@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     // Persist transactions
     try {
-      const supabase = await createClient()
+      const supabase = createClient()
       const { data: account } = await supabase
         .from("bank_accounts")
         .select("id, user_id")

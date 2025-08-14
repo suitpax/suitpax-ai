@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Resolve current user and connection
-    const supabase = await createClient()
+    const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     const { data: connection } = await supabase

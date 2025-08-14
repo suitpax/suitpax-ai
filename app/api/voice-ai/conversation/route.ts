@@ -9,7 +9,7 @@ const anthropic = new Anthropic({
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
-    const supabase = await createClient()
+    const supabase = createClient()
 
     const {
       data: { user },

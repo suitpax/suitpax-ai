@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     // Persist connection stub for current user
     try {
-      const supabase = await createClient()
+      const supabase = createClient()
       const {
         data: { user },
       } = await supabase.auth.getUser()

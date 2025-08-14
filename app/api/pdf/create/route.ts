@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
     const pdf = await generatePDF(content, reasoning)
 
-    const supabase = await createClient()
+    const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     const userId = user?.id || 'anonymous'
 
