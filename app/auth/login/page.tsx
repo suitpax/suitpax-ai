@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import Image from "next/image"
+import { FcGoogle } from "react-icons/fc"
 
 export default function LoginPage() {
 	const [email, setEmail] = useState("")
@@ -72,7 +73,7 @@ export default function LoginPage() {
 					className="text-center mb-8"
 				>
 					<div className="flex justify-center mb-6">
-						<div className="inline-flex items-center rounded-xl bg-white/80 backdrop-blur-sm px-3 py-1.5 border border-gray-200 shadow-sm">
+						<div className="inline-flex items-center rounded-xl bg-white px-3 py-1.5 border border-gray-200 shadow-sm">
 							<Image
 								src="/logo/suitpax-bl-logo.webp"
 								alt="Suitpax"
@@ -93,9 +94,9 @@ export default function LoginPage() {
 				</motion.div>
 
 				<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}>
-					<div className="relative bg-white/50 backdrop-blur-sm py-8 px-6 shadow-sm rounded-2xl border border-gray-200 sm:px-10">
+					<div className="relative bg-white py-8 px-6 shadow-sm rounded-2xl border border-gray-200 sm:px-10">
 						{loading && (
-							<div className="absolute inset-0 z-10 rounded-2xl bg-white/70 backdrop-blur-sm flex items-center justify-center">
+							<div className="absolute inset-0 z-10 rounded-2xl bg-white/90 flex items-center justify-center">
 								<div className="w-6 h-6 border-3 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
 							</div>
 						)}
@@ -161,7 +162,7 @@ export default function LoginPage() {
 
 							<div className="pt-2">
 								<button type="button" onClick={handleGoogle} className="w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 rounded-xl text-sm font-medium bg-white hover:bg-gray-50 transition-colors">
-									<Image src="/logo/google.svg" alt="Google" width={16} height={16} />
+									<FcGoogle className="h-4 w-4" />
 									<span>Continue with Google</span>
 								</button>
 							</div>

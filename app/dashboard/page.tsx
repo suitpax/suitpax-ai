@@ -1,6 +1,5 @@
 "use client"
 
-import { DraggableDashboard } from "@/components/dashboard/draggable-dashboard"
 import { BankConnectionCard } from "@/components/dashboard/bank-connection-card"
 import { TopDestinationsCard } from "@/components/dashboard/top-destinations-card"
 import { RadarChart } from "@/components/charts/radar-chart"
@@ -334,12 +333,11 @@ const DashboardPage = () => {
 				</div>
 			</div>
 
-			<DraggableDashboard
-				cards={dashboardCards}
-				onReorder={(newOrder) => {
-					console.log("Dashboard reordered:", newOrder)
-				}}
-			/>
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+				{dashboardCards.map((card) => (
+					<div key={card.id}>{card.component}</div>
+				))}
+			</div>
 		</div>
 	)
 }
