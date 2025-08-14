@@ -12,6 +12,19 @@ import { motion } from "framer-motion"
 import { Calendar, TrendingUp, Building2, Clock, DollarSign, Plane, Sparkles, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useUserData } from "@/hooks/use-user-data"
+import { IncomeTrackerCard } from "@/components/dashboard/income-tracker-card"
+import { RecentProjectsCard } from "@/components/dashboard/recent-projects-card"
+import { ProposalProgressCard } from "@/components/dashboard/proposal-progress-card"
+import { ConnectPeopleCard } from "@/components/dashboard/connect-people-card"
+import { UnlockPremiumCard } from "@/components/dashboard/unlock-premium-card"
+import { InsightsSummaryCard } from "@/components/dashboard/insights-summary-card"
+import { KpiMiniCards } from "@/components/dashboard/kpi-mini-cards"
+import { RevenueForecastCard } from "@/components/dashboard/revenue-forecast-card"
+import { ActivityFeedCard } from "@/components/dashboard/activity-feed-card"
+import { AiSuggestionsCard } from "@/components/dashboard/ai-suggestions-card"
+import { SystemHealthCard } from "@/components/dashboard/system-health-card"
+import { GoalTrackerCard } from "@/components/dashboard/goal-tracker-card"
+import { DailyTasksMiniCard } from "@/components/dashboard/daily-tasks-mini-card"
 
 const DashboardPage = () => {
   const { user, profile, loading } = useUserData()
@@ -43,6 +56,21 @@ const DashboardPage = () => {
   const displayName = getDisplayName()
 
   const dashboardCards = [
+    {
+      id: "income-tracker",
+      title: "Income Tracker",
+      component: <IncomeTrackerCard />,
+    },
+    {
+      id: "kpi-mini",
+      title: "KPI Mini Cards",
+      component: <KpiMiniCards />,
+    },
+    {
+      id: "insights-summary",
+      title: "Quick Insights",
+      component: <InsightsSummaryCard />,
+    },
     {
       id: "user-profile",
       title: "User Profile",
@@ -128,59 +156,7 @@ const DashboardPage = () => {
     {
       id: "kpi-stats",
       title: "KPI Statistics",
-      component: (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              title: "Total Trips",
-              value: "0",
-              change: "+0%",
-              icon: Plane,
-              color: "text-gray-600",
-            },
-            {
-              title: "Total Spent",
-              value: "$0",
-              change: "+0%",
-              icon: DollarSign,
-              color: "text-gray-600",
-            },
-            {
-              title: "Avg Trip Cost",
-              value: "$0",
-              change: "+0%",
-              icon: TrendingUp,
-              color: "text-gray-600",
-            },
-            {
-              title: "Active Bookings",
-              value: "0",
-              change: "+0%",
-              icon: Calendar,
-              color: "text-gray-600",
-            },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-gray-200 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-medium text-gray-600 mb-1">{stat.title}</p>
-                  <p className="text-lg font-medium tracking-tight text-gray-900">{stat.value}</p>
-                  <p className="text-[10px] text-gray-500 mt-1">{stat.change} from last month</p>
-                </div>
-                <div className={`p-2 rounded-xl bg-gray-100 ${stat.color}`}>
-                  <stat.icon className="h-3.5 w-3.5" />
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      ),
+      component: <KpiMiniCards />,
     },
     {
       id: "bank-connection",
@@ -229,6 +205,51 @@ const DashboardPage = () => {
       component: <MonthlySpendingChart />,
     },
     {
+      id: "proposal-progress",
+      title: "Proposal Progress",
+      component: <ProposalProgressCard />,
+    },
+    {
+      id: "connect-people",
+      title: "Connect People",
+      component: <ConnectPeopleCard />,
+    },
+    {
+      id: "unlock-premium",
+      title: "Unlock Premium",
+      component: <UnlockPremiumCard />,
+    },
+    {
+      id: "revenue-forecast",
+      title: "Revenue Forecast",
+      component: <RevenueForecastCard />,
+    },
+    {
+      id: "activity-feed",
+      title: "Recent Activity",
+      component: <ActivityFeedCard />,
+    },
+    {
+      id: "ai-suggestions",
+      title: "AI Suggestions",
+      component: <AiSuggestionsCard />,
+    },
+    {
+      id: "system-health",
+      title: "System Health",
+      component: <SystemHealthCard />,
+    },
+    {
+      id: "goal-tracker",
+      title: "Goal Tracker",
+      component: <GoalTrackerCard />,
+    },
+    {
+      id: "daily-tasks-mini",
+      title: "Daily Tasks",
+      component: <DailyTasksMiniCard />,
+    },
+    {
       id: "suitpax-ai",
       title: "Suitpax AI",
       component: (
@@ -244,8 +265,8 @@ const DashboardPage = () => {
             </div>
 
             <div className="relative z-10 flex items-start space-x-4">
-                              <div className="flex-shrink-0">
-                                <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-600 shadow-inner bg-gray-800">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-600 shadow-inner bg-gray-800">
                   <img src="/logo/suitpax-cloud-logo.webp" alt="Suitpax" className="w-full h-full object-contain" />
                 </div>
               </div>
@@ -286,7 +307,7 @@ const DashboardPage = () => {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-8">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <h1 className="text-4xl md:text-5xl font-medium leading-none text-gray-900 mb-2">Dashboard</h1>
+          <h1 className="text-5xl md:text-6xl font-medium leading-none text-gray-900 mb-2">Dashboard</h1>
           <p className="text-lg font-light tracking-tighter text-gray-600">Welcome back, {displayName.split(" ")[0]}</p>
           <p className="text-sm text-gray-500 font-light mt-1">
             Your comprehensive business travel management overview and insights

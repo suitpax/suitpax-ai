@@ -163,7 +163,7 @@ export default function Header({
 
             {/* Page Info */}
             <div className="hidden sm:block">
-              <h1 className="text-xl font-medium text-gray-900 tracking-tight">{pageInfo.title}</h1>
+              <h1 className="text-[1.35rem] md:text-2xl font-medium text-gray-900 tracking-tight">{pageInfo.title}</h1>
               {pageInfo.description && <p className="text-sm text-gray-500 mt-0.5">{pageInfo.description}</p>}
             </div>
           </div>
@@ -228,7 +228,7 @@ export default function Header({
                   variant="ghost"
                   className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100/80 transition-colors"
                 >
-                  <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500 ring-2 ring-blue-200/50">
+                  <div className="w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500 ring-2 ring-blue-200/50">
                     {userProfile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img

@@ -129,7 +129,7 @@ export function ExpenseAnalytics({ className }: ExpenseAnalyticsProps) {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
+                <XAxis dataKey="month" stroke="#6b7280" fontSize={12} interval={0} tickMargin={10} />
                 <YAxis stroke="#6b7280" fontSize={12} />
                 <Bar dataKey="amount" fill="#374151" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -176,7 +176,7 @@ export function ExpenseAnalytics({ className }: ExpenseAnalyticsProps) {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                <XAxis dataKey="week" stroke="#6b7280" fontSize={12} />
+                <XAxis dataKey="week" stroke="#6b7280" fontSize={12} interval={0} tickMargin={10} />
                 <YAxis stroke="#6b7280" fontSize={12} />
                 <Line
                   type="monotone"

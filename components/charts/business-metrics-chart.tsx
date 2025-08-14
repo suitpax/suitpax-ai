@@ -86,15 +86,15 @@ export function BusinessMetricsChart() {
           {/* Chart */}
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={metricsData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+              <BarChart data={metricsData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={0.5} />
                 <XAxis
                   dataKey="category"
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 10, fill: "#6B7280" }}
-                  angle={-45}
-                  textAnchor="end"
+                  interval={0}
+                  tickMargin={12}
                   height={60}
                 />
                 <YAxis

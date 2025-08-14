@@ -405,11 +405,11 @@ export function Sidebar({
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300",
+        "flex flex-col h-full bg-gray-100 border-r border-gray-200 transition-all duration-300",
         isCollapsed ? "w-16" : "w-64",
       )}
     >
-      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white">
+      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-gray-100">
         <div className="flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center">
             <Image

@@ -27,8 +27,7 @@ export function RadarChart() {
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <PolarAngleAxis
               dataKey="category"
-              tick={{ fill: "#6b7280", fontSize: 10 }}
-              className="text-xs font-medium"
+              tick={{ fill: "#6b7280", fontSize: 9 }}
             />
             <PolarGrid stroke="#e5e7eb" strokeWidth={1} />
             <Radar
