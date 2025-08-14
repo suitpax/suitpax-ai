@@ -65,8 +65,8 @@ export default function SuitpaxBankPage() {
       if (response.ok) {
         const data = await response.json()
         // Redirect to GoCardless hosted page
-        if (data.redirectUrl) {
-          window.location.href = data.redirectUrl
+        if (data.authLink) {
+          window.location.href = data.authLink
         }
       }
     } catch (error) {
@@ -188,25 +188,25 @@ export default function SuitpaxBankPage() {
         transition={{ duration: 0.6, delay: 0.08 }}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="p-6">
               <p className="text-sm font-medium text-gray-600">Total Balance</p>
               <p className="text-2xl font-medium tracking-tighter">€{totalBalance.toLocaleString()}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="p-6">
               <p className="text-sm font-medium text-gray-600">Monthly Spending</p>
               <p className="text-2xl font-medium tracking-tighter">€{monthlySpending.toLocaleString()}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="p-6">
               <p className="text-sm font-medium text-gray-600">Connected Accounts</p>
               <p className="text-2xl font-medium tracking-tighter">{accounts.length}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="p-6">
               <p className="text-sm font-medium text-gray-600">This Month</p>
               <p className="text-2xl font-medium tracking-tighter">€0</p>
@@ -374,7 +374,7 @@ export default function SuitpaxBankPage() {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardContent className="p-6">
                 <h2 className="text-xl font-medium tracking-tighter text-black mb-4">Bank Connection Settings</h2>
                 <p className="text-gray-600 font-light">
@@ -391,7 +391,7 @@ export default function SuitpaxBankPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
       >
-        <Card className="bg-blue-50/60 backdrop-blur-sm border-blue-200 shadow-sm">
+        <Card className="bg-blue-50 border-blue-200 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <div className="p-2 bg-blue-100 rounded-xl flex-shrink-0">

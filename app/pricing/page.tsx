@@ -39,6 +39,12 @@ export const metadata: Metadata = {
 }
 
 export default function PricingPage() {
+  const TEXT = {
+    heroTitleStart: "Simple, transparent",
+    heroTitleEmphasis: "pricing",
+    heroSubtitle:
+      "Choose the perfect plan for your business travel needs. No hidden fees, no surprises—just powerful AI-driven travel management that scales with you.",
+  }
   return (
     <>
       <Script
@@ -69,18 +75,27 @@ export default function PricingPage() {
           
           <div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
-              <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl">
-                Simple, transparent{" "}
-                <span className="bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
-                  pricing
-                </span>
-              </h1>
-              <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
-                Choose the perfect plan for your business travel needs. No hidden fees, 
-                no surprises—just powerful AI-driven travel management that scales with you.
-              </p>
-              
-
+              <div className="relative inline-block">
+                <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl relative">
+                  {TEXT.heroTitleStart}{" "}
+                  <span className="relative bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
+                    {TEXT.heroTitleEmphasis}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 -skew-x-12"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)",
+                        WebkitMaskImage: "linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent)",
+                        animation: "shine 1.8s linear infinite",
+                        mixBlendMode: "plus-lighter",
+                      }}
+                    />
+                  </span>
+                </h1>
+              </div>
+              <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">{TEXT.heroSubtitle}</p>
+              <style>{`@keyframes shine { from { transform: translateX(-150%); } to { transform: translateX(150%); } }`}</style>
             </div>
           </div>
         </section>
