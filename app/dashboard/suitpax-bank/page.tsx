@@ -44,6 +44,7 @@ export default function SuitpaxBankPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCountry, setSelectedCountry] = useState("GB")
   const [selectedBank, setSelectedBank] = useState("")
+  const [selectedBankName, setSelectedBankName] = useState("")
   const [bankSearchTerm, setBankSearchTerm] = useState("")
   const searchParams = useSearchParams()
 
@@ -59,6 +60,7 @@ export default function SuitpaxBankPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           institutionId: bankData.institutionId,
+          institutionName: bankData.institutionName || selectedBankName || "",
           reference: `suitpax-${Date.now()}`, // Unique reference as recommended
           redirectUrl: `${window.location.origin}/dashboard/suitpax-bank?connected=true`,
         }),
@@ -149,7 +151,10 @@ export default function SuitpaxBankPage() {
             <BankSelection
               selectedCountry={selectedCountry}
               selectedBank={selectedBank}
-              onBankSelect={setSelectedBank}
+              onBankSelect={(id, name) => {
+                setSelectedBank(id)
+                setSelectedBankName(name)
+              }}
               searchTerm={bankSearchTerm}
               onSearchChange={setBankSearchTerm}
             />
@@ -301,7 +306,10 @@ export default function SuitpaxBankPage() {
                         <BankSelection
                           selectedCountry={selectedCountry}
                           selectedBank={selectedBank}
-                          onBankSelect={setSelectedBank}
+                          onBankSelect={(id, name) => {
+                            setSelectedBank(id)
+                            setSelectedBankName(name)
+                          }}
                           searchTerm={bankSearchTerm}
                           onSearchChange={setBankSearchTerm}
                         />

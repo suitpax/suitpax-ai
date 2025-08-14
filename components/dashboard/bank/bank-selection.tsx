@@ -9,9 +9,10 @@ import { Search } from "lucide-react"
 interface BankSelectionProps {
   selectedCountry: string
   selectedBank: string
-  onBankSelect: (bankId: string) => void
+  onBankSelect: (bankId: string, bankName: string) => void
   searchTerm: string
   onSearchChange: (term: string) => void
+  onBankNameResolve?: (name: string) => void
 }
 
 interface Bank {
@@ -27,6 +28,7 @@ export const BankSelection = ({
   onBankSelect,
   searchTerm,
   onSearchChange,
+  onBankNameResolve,
 }: BankSelectionProps) => {
   const [filteredBanks, setFilteredBanks] = useState<Bank[]>([])
   const [loading, setLoading] = useState(false)
@@ -70,7 +72,7 @@ export const BankSelection = ({
           value={selectedCountry}
           onValueChange={(value) => {
             // Reset selected bank when country changes
-            onBankSelect("")
+            onBankSelect("", "")
           }}
         >
           <SelectTrigger className="w-full sm:w-48 rounded-xl border-gray-200">
@@ -113,7 +115,7 @@ export const BankSelection = ({
                     ? "border-black bg-gray-50 shadow-md"
                     : "border-gray-200 hover:border-gray-300 bg-white/80 backdrop-blur-sm"
                 }`}
-                onClick={() => onBankSelect(bank.id)}
+                onClick={() => onBankSelect(bank.id, bank.name)}
               >
                 <div className="flex items-center space-x-3">
                   <img
