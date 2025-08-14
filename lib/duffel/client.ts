@@ -76,7 +76,6 @@ export interface DuffelOrder {
 export class DuffelClient {
   private config: DuffelConfig
   private baseUrl: string
-  private supabase = createClient()
 
   constructor(config: DuffelConfig) {
     this.config = config
@@ -137,7 +136,8 @@ export class DuffelClient {
     }
 
     // Store search in database
-    await this.supabase.from("flight_searches").insert({
+    const supabase = createClient()
+    await supabase.from("flight_searches").insert({
       search_params: payload,
       created_at: new Date().toISOString(),
     })
@@ -189,7 +189,8 @@ export class DuffelClient {
     })
 
     // Store booking in database
-    await this.supabase.from("flight_bookings").insert({
+    const supabase = createClient()
+    await supabase.from("flight_bookings").insert({
       duffel_order_id: response.data.id,
       booking_reference: response.data.booking_reference,
       total_amount: response.data.total_amount,
@@ -212,7 +213,8 @@ export class DuffelClient {
     }
 
     // Store search in database
-    await this.supabase.from("hotel_searches").insert({
+    const supabase = createClient()
+    await supabase.from("hotel_searches").insert({
       search_params: payload,
       created_at: new Date().toISOString(),
     })
@@ -266,7 +268,8 @@ export class DuffelClient {
     })
 
     // Store booking in database
-    await this.supabase.from("hotel_bookings").insert({
+    const supabase = createClient()
+    await supabase.from("hotel_bookings").insert({
       duffel_booking_id: response.data.id,
       confirmation_number: response.data.confirmation_number,
       total_amount: response.data.total_amount,

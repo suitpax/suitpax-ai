@@ -1,3 +1,5 @@
+export const runtime = "nodejs"
+
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { TRAVEL_OPTIMIZATION_PROMPT } from "@/lib/prompts/enhanced-system"

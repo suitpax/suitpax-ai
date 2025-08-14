@@ -1,3 +1,5 @@
+export const runtime = "nodejs"
+
 import { type NextRequest, NextResponse } from "next/server"
 import { getGoCardlessClient } from "@/lib/gocardless/client"
 import { createClient } from "@/lib/supabase/server"

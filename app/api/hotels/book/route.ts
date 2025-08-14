@@ -1,3 +1,5 @@
+export const runtime = "nodejs"
+
 import { type NextRequest, NextResponse } from "next/server"
 import { getDuffelClient } from "@/lib/duffel/client"
 import { createClient } from "@/lib/supabase/server"
@@ -63,13 +65,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Hotel booking error:", error)
 
-    if (error.name === "DuffelError") {
+    if ((error as any).name === "DuffelError") {
       return NextResponse.json(
         {
           error: "Booking failed",
-          details: error.message,
+          details: (error as any).message,
         },
-        { status: error.status || 500 },
+        { status: (error as any).status || 500 },
       )
     }
 

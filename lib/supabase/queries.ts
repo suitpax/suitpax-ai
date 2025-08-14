@@ -8,11 +8,12 @@ type Expense = Tables["expenses"]["Row"]
 type UserPreferences = Tables["user_preferences"]["Row"]
 
 export class SupabaseQueries {
-  private supabase = createClient()
+  // Removed global client instance to ensure client is created per-request context
 
   // Profile queries
   async getProfile(userId: string): Promise<Profile | null> {
-    const { data, error } = await this.supabase.from("profiles").select("*").eq("id", userId).single()
+    const supabase = createClient()
+    const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single()
 
     if (error) {
       console.error("Error fetching profile:", error)
@@ -23,7 +24,8 @@ export class SupabaseQueries {
   }
 
   async updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile | null> {
-    const { data, error } = await this.supabase.from("profiles").update(updates).eq("id", userId).select().single()
+    const supabase = createClient()
+    const { data, error } = await supabase.from("profiles").update(updates).eq("id", userId).select().single()
 
     if (error) {
       console.error("Error updating profile:", error)
@@ -35,7 +37,8 @@ export class SupabaseQueries {
 
   // Flight booking queries
   async getFlightBookings(userId: string): Promise<FlightBooking[]> {
-    const { data, error } = await this.supabase
+    const supabase = createClient()
+    const { data, error } = await supabase
       .from("flight_bookings")
       .select("*")
       .eq("user_id", userId)
@@ -50,7 +53,8 @@ export class SupabaseQueries {
   }
 
   async getUpcomingFlights(userId: string): Promise<FlightBooking[]> {
-    const { data, error } = await this.supabase
+    const supabase = createClient()
+    const { data, error } = await supabase
       .from("flight_bookings")
       .select("*")
       .eq("user_id", userId)
@@ -67,7 +71,8 @@ export class SupabaseQueries {
   }
 
   async createFlightBooking(booking: Tables["flight_bookings"]["Insert"]): Promise<FlightBooking | null> {
-    const { data, error } = await this.supabase.from("flight_bookings").insert(booking).select().single()
+    const supabase = createClient()
+    const { data, error } = await supabase.from("flight_bookings").insert(booking).select().single()
 
     if (error) {
       console.error("Error creating flight booking:", error)
@@ -79,7 +84,8 @@ export class SupabaseQueries {
 
   // Expense queries
   async getExpenses(userId: string): Promise<Expense[]> {
-    const { data, error } = await this.supabase
+    const supabase = createClient()
+    const { data, error } = await supabase
       .from("expenses")
       .select("*")
       .eq("user_id", userId)
@@ -94,7 +100,8 @@ export class SupabaseQueries {
   }
 
   async createExpense(expense: Tables["expenses"]["Insert"]): Promise<Expense | null> {
-    const { data, error } = await this.supabase.from("expenses").insert(expense).select().single()
+    const supabase = createClient()
+    const { data, error } = await supabase.from("expenses").insert(expense).select().single()
 
     if (error) {
       console.error("Error creating expense:", error)
@@ -105,7 +112,8 @@ export class SupabaseQueries {
   }
 
   async updateExpense(expenseId: string, updates: Partial<Expense>): Promise<Expense | null> {
-    const { data, error } = await this.supabase.from("expenses").update(updates).eq("id", expenseId).select().single()
+    const supabase = createClient()
+    const { data, error } = await supabase.from("expenses").update(updates).eq("id", expenseId).select().single()
 
     if (error) {
       console.error("Error updating expense:", error)
@@ -117,7 +125,8 @@ export class SupabaseQueries {
 
   // User preferences queries
   async getUserPreferences(userId: string): Promise<UserPreferences | null> {
-    const { data, error } = await this.supabase.from("user_preferences").select("*").eq("user_id", userId).single()
+    const supabase = createClient()
+    const { data, error } = await supabase.from("user_preferences").select("*").eq("user_id", userId).single()
 
     if (error) {
       console.error("Error fetching user preferences:", error)
@@ -128,7 +137,8 @@ export class SupabaseQueries {
   }
 
   async updateUserPreferences(userId: string, preferences: Partial<UserPreferences>): Promise<UserPreferences | null> {
-    const { data, error } = await this.supabase
+    const supabase = createClient()
+    const { data, error } = await supabase
       .from("user_preferences")
       .upsert({ user_id: userId, ...preferences })
       .select()
@@ -144,15 +154,16 @@ export class SupabaseQueries {
 
   // Dashboard stats
   async getDashboardStats(userId: string) {
+    const supabase = createClient()
     try {
       // Get flight count
-      const { count: flightCount } = await this.supabase
+      const { count: flightCount } = await supabase
         .from("flight_bookings")
         .select("*", { count: "exact", head: true })
         .eq("user_id", userId)
 
       // Get expenses
-      const { data: expenses } = await this.supabase
+      const { data: expenses } = await supabase
         .from("expenses")
         .select("amount, status, created_at")
         .eq("user_id", userId)
@@ -190,7 +201,8 @@ export class SupabaseQueries {
 
   // AI Chat logs
   async logAIChat(log: Tables["ai_chat_logs"]["Insert"]) {
-    const { error } = await this.supabase.from("ai_chat_logs").insert(log)
+    const supabase = createClient()
+    const { error } = await supabase.from("ai_chat_logs").insert(log)
 
     if (error) {
       console.error("Error logging AI chat:", error)
@@ -198,7 +210,8 @@ export class SupabaseQueries {
   }
 
   async incrementAITokens(userId: string, tokens: number) {
-    const { error } = await this.supabase.rpc("increment_ai_tokens", {
+    const supabase = createClient()
+    const { error } = await supabase.rpc("increment_ai_tokens", {
       user_id: userId,
       tokens: tokens,
     })
@@ -209,4 +222,4 @@ export class SupabaseQueries {
   }
 }
 
-export const supabaseQueries = new SupabaseQueries()
+// Removed global exported instance to avoid any accidental client creation at import time

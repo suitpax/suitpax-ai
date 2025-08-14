@@ -1,3 +1,5 @@
+export const runtime = "nodejs"
+
 import { type NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
@@ -13,22 +15,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Brave API key not configured" }, { status: 500 })
     }
 
-    const response = await fetch("https://api.search.brave.com/res/v1/web/search", {
+    const url = new URL("https://api.search.brave.com/res/v1/web/search")
+    url.searchParams.set("q", query)
+    url.searchParams.set("count", String(count))
+    url.searchParams.set("offset", String(offset))
+    url.searchParams.set("search_lang", "en")
+    url.searchParams.set("country", "US")
+    url.searchParams.set("safesearch", "moderate")
+    url.searchParams.set("freshness", "pw") // Past week for business travel relevance
+
+    const response = await fetch(url.toString(), {
       method: "GET",
       headers: {
         Accept: "application/json",
         "Accept-Encoding": "gzip",
         "X-Subscription-Token": braveApiKey,
       },
-      params: new URLSearchParams({
-        q: query,
-        count: count.toString(),
-        offset: offset.toString(),
-        search_lang: "en",
-        country: "US",
-        safesearch: "moderate",
-        freshness: "pw", // Past week for business travel relevance
-      }),
     })
 
     if (!response.ok) {
