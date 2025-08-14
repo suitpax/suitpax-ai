@@ -47,6 +47,9 @@ export default function SuitpaxBankPage() {
   const [selectedBankName, setSelectedBankName] = useState("")
   const [bankSearchTerm, setBankSearchTerm] = useState("")
   const searchParams = useSearchParams()
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("")
+  const [dateFrom, setDateFrom] = useState<string>("")
+  const [dateTo, setDateTo] = useState<string>("")
 
   const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0)
   const monthlySpending = transactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0)
@@ -103,6 +106,7 @@ export default function SuitpaxBankPage() {
         // Optionally load transactions for the first account
         const first = list[0]
         if (first?.id) {
+          setSelectedAccountId(first.id)
           const txRes = await fetch(`/api/gocardless/transactions?accountId=${encodeURIComponent(first.id)}`)
           const txData = await txRes.json()
           setTransactions(Array.isArray(txData.transactions) ? txData.transactions : [])
@@ -283,8 +287,61 @@ export default function SuitpaxBankPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.24 }}
             >
-              <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6">
+                  {accounts.length > 0 && (
+                    <div className="flex flex-col md:flex-row md:items-end gap-3 mb-4">
+                      <div className="flex-1">
+                        <label className="text-xs text-gray-600">Account</label>
+                        <select
+                          value={selectedAccountId}
+                          onChange={async (e) => {
+                            const id = e.target.value
+                            setSelectedAccountId(id)
+                            const url = new URL(`/api/gocardless/transactions`, window.location.origin)
+                            url.searchParams.set('accountId', id)
+                            if (dateFrom) url.searchParams.set('dateFrom', dateFrom)
+                            if (dateTo) url.searchParams.set('dateTo', dateTo)
+                            const res = await fetch(url.toString())
+                            const data = await res.json()
+                            setTransactions(Array.isArray(data.transactions) ? data.transactions : [])
+                          }}
+                          className="w-full border border-gray-200 rounded-xl h-10 px-3"
+                        >
+                          {accounts.map((a: any) => (
+                            <option key={a.id} value={a.id}>{a.name || a.accountName || a.iban || a.id}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600">From</label>
+                        <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="border border-gray-200 rounded-xl h-10 px-3" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600">To</label>
+                        <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="border border-gray-200 rounded-xl h-10 px-3" />
+                      </div>
+                      <div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-xl bg-transparent border-gray-200 mt-5"
+                          onClick={async () => {
+                            if (!selectedAccountId) return
+                            const url = new URL(`/api/gocardless/transactions`, window.location.origin)
+                            url.searchParams.set('accountId', selectedAccountId)
+                            if (dateFrom) url.searchParams.set('dateFrom', dateFrom)
+                            if (dateTo) url.searchParams.set('dateTo', dateTo)
+                            const res = await fetch(url.toString())
+                            const data = await res.json()
+                            setTransactions(Array.isArray(data.transactions) ? data.transactions : [])
+                          }}
+                        >
+                          Refresh
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-medium tracking-tighter text-black">Connected Accounts</h2>
                     {accounts.length > 0 && (
@@ -299,7 +356,7 @@ export default function SuitpaxBankPage() {
                   ) : (
                     <div className="space-y-4">
                       {accounts.map((account) => (
-                        <ConnectedAccountItem key={account.id} account={account} />
+                        <ConnectedAccountItem key={account.id} account={account as any} />
                       ))}
                       <div className="border-t border-gray-200 pt-6 mt-6">
                         <h3 className="text-lg font-medium tracking-tighter text-black mb-4">Connect Another Bank</h3>
@@ -345,7 +402,7 @@ export default function SuitpaxBankPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.32 }}
             >
-              <Card className="bg-white/60 backdrop-blur-sm border-gray-200 shadow-sm">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                     <h2 className="text-xl font-medium tracking-tighter text-black">Recent Transactions</h2>
