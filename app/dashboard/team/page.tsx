@@ -32,6 +32,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import SoftHero from "@/components/ui/soft-hero"
 
 const teamMembers = [
   {
@@ -165,7 +166,16 @@ export default function TeamPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6">
+    <div className="min-h-screen p-0">
+      <SoftHero
+        eyebrow="Teams"
+        title={<span>Create real-time collaboration without complexity</span>}
+        description="Manage members, investors, and network with a calm, focused UI."
+        primaryCta={{ label: "Invite member" }}
+        secondaryCta={{ label: "Learn more" }}
+        className="pb-2"
+      />
+      <div className="px-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
@@ -296,7 +306,9 @@ export default function TeamPage() {
         </motion.div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        </div>
+      </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full px-6">
           <TabsList className="grid w-full grid-cols-4 rounded-xl">
             <TabsTrigger value="team" className="rounded-lg">
               Team Members
