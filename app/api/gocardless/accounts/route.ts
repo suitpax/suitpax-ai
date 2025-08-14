@@ -71,6 +71,28 @@ export async function GET(request: NextRequest) {
 
     const validAccounts = accountsWithDetails.filter((account) => account !== null)
 
+    // Auto-set default account if not configured
+    try {
+      if (connection?.user_id && validAccounts.length > 0) {
+        const { data: existingPref } = await supabase
+          .from('user_preferences')
+          .select('preference_value')
+          .eq('user_id', connection.user_id)
+          .eq('preference_key', 'default_bank_account_id')
+          .single()
+        if (!existingPref) {
+          await supabase.from('user_preferences').upsert({
+            user_id: connection.user_id,
+            preference_key: 'default_bank_account_id',
+            preference_value: (validAccounts[0] as any).id,
+            updated_at: new Date().toISOString(),
+          })
+        }
+      }
+    } catch (e) {
+      console.error('Auto default account error', e)
+    }
+
     return NextResponse.json({ accounts: validAccounts })
   } catch (error) {
     console.error("Error fetching accounts:", error)
