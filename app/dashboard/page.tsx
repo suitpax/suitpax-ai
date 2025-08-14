@@ -294,7 +294,8 @@ const DashboardPage = () => {
 								</div>
 							</div>
 						</div>
-					</Link>
+					</div>
+				</Link>
 			),
 		},
 	]
