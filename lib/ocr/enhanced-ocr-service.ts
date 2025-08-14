@@ -97,7 +97,7 @@ export class EnhancedOCRService {
       amount: /(?:total|amount|sum|cost|price)[:\s]*\$?([0-9,]+\.?\d*)/i,
       date: /(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/,
       email: /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/,
-      phone: /(\+?\d{1,3}[-.\s]?$$?\d{3}$$?[-.\s]?\d{3}[-.\s]?\d{4})/,
+      phone: /(\+?\d{1,3}[-.\s]?\d{3}[-.\s]?\d{3,4}[-.\s]?\d{0,4})/,
       companyName: /(?:company|corporation|corp|inc|ltd)[:\s]*([^\n\r]+)/i,
       address: /(?:address|location)[:\s]*([^\n\r]+)/i,
     }

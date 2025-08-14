@@ -594,7 +594,7 @@ export default function PoliciesPage() {
   const avgCompliance = Math.round(policies.reduce((sum, p) => sum + p.compliance, 0) / policies.length)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
         <div className="px-6 py-8">
@@ -629,15 +629,15 @@ export default function PoliciesPage() {
         </div>
       </div>
 
-      <div className="px-6 py-6">
+              <div className="px-4 md:px-6">
         {/* AI-powered tools section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8 max-w-7xl mx-auto">
           <DocumentUploadZone onDocumentAnalyzed={handleDocumentAnalyzed} />
           <AIPolicyGenerator />
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center justify-between">
@@ -738,7 +738,7 @@ export default function PoliciesPage() {
         </Card>
 
         {/* Policies Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 max-w-7xl mx-auto">
           {filteredPolicies.map((policy, index) => (
             <motion.div
               key={policy.id}
@@ -803,7 +803,7 @@ export default function PoliciesPage() {
         </div>
 
         {filteredPolicies.length === 0 && (
-          <Card className="bg-white/80 backdrop-blur-sm p-12 border border-gray-200 shadow-sm text-center">
+          <Card className="bg-white/80 backdrop-blur-sm p-12 border border-gray-200 shadow-sm text-center max-w-4xl mx-auto">
             <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium tracking-tighter text-black mb-2">No policies found</h3>
             <p className="text-gray-600 font-light mb-6">

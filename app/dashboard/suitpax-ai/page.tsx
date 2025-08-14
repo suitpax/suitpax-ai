@@ -270,8 +270,8 @@ function AIChatView() {
     <VantaHaloBackground className="fixed inset-0">
       <div className="absolute inset-0 flex flex-col">
         {/* Chat Container */}
-        <div className="flex-1 min-h-0 relative bg-gradient-to-br from-gray-50/60 via-white/70 to-gray-200/60">
-          <ChatContainerRoot className="h-full">
+        <div className="flex-1 min-h-0 relative bg-gradient-to-br from-gray-50 via-white to-gray-100">
+          <ChatContainerRoot className="h-full max-w-5xl mx-auto w-full">
             <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 relative min-h-[50vh] md:min-h-[60vh]">
               {messages.length === 0 && !loading && (
                 <div className="space-y-4">
@@ -409,12 +409,12 @@ function AIChatView() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white/60 backdrop-blur-sm border-t border-gray-200 flex-shrink-0"
+          className="bg-white border-t border-gray-200 flex-shrink-0"
           style={{ minHeight: "4rem" }}
         >
-          <div className="p-3 sm:p-4 lg:p-6">
-            <div className="max-w-4xl mx-auto">
-              <PromptInput
+                      <div className="p-3 sm:p-4 lg:p-6">
+              <div className="max-w-4xl mx-auto w-full">
+                <PromptInput
                 value={input}
                 onValueChange={setInput}
                 isLoading={loading || isStreaming}

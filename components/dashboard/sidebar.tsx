@@ -13,7 +13,7 @@ import {
   PiUsers,
   PiGear,
   PiChartBar,
-  PiCalendar,
+
   PiMapPin,
   PiChatCircle,
   PiMicrophone,
@@ -66,7 +66,7 @@ const defaultNavigation = [
   { id: "air-data", name: "Air Data", href: "/dashboard/air-data", icon: PiAirplane },
   { id: "finance", name: "Finance", href: "/dashboard/finance", icon: PiCreditCard },
   { id: "analytics", name: "Analytics", href: "/dashboard/analytics", icon: PiChartBar },
-  { id: "calendar", name: "Calendar", href: "/dashboard/calendar", icon: PiCalendar },
+
   { id: "mail", name: "Mail", href: "/dashboard/mail", icon: PiEnvelope },
   { id: "meetings", name: "Meetings", href: "/dashboard/meetings", icon: PiVideoCamera },
   { id: "locations", name: "Locations", href: "/dashboard/locations", icon: PiMapPin },
@@ -78,7 +78,7 @@ const defaultNavigation = [
 
 const aiNavigation = [
   { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatCircle, badge: "AI" },
-  { name: "Voice AI", href: "/dashboard/voice-ai", icon: PiMicrophone, badge: "NEW" },
+  { name: "Voice AI", href: "/dashboard/voice-ai", icon: PiMicrophone, badge: "NEW" }
 ]
 
 interface SidebarProps {
@@ -623,18 +623,24 @@ export function Sidebar({
             <Dialog>
               <DialogTrigger asChild>
                 <div className="flex items-center justify-between px-3 py-2.5 mb-2 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-600 truncate">
-                        {userProfile?.company_name ? userProfile.company_name : getUserEmail()}
-                      </p>
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] px-1.5 py-0.5 rounded-lg bg-gray-200 text-gray-700 border-gray-200"
-                      >
-                        {subscriptionStatus === "active" ? "Active" : "Member"}
-                      </Badge>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Avatar className="h-8 w-8 rounded-md ring-2 ring-gray-200">
+                      <AvatarImage src={userProfile?.avatar_url || "/placeholder.svg"} alt={getDisplayName()} className="rounded-md" />
+                      <AvatarFallback className="rounded-md text-xs">{getInitials()}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-gray-600 truncate">
+                          {userProfile?.company_name ? userProfile.company_name : getUserEmail()}
+                        </p>
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] px-1.5 py-0.5 rounded-lg bg-gray-200 text-gray-700 border-gray-200"
+                        >
+                          {subscriptionStatus === "active" ? "Active" : "Member"}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -380,7 +380,7 @@ export default function MeetingsPage() {
   }, [meetings])
 
   return (
-    <div className="min-h-screen p-0">
+    <div className="min-h-screen p-0 bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <div className="px-4 md:px-6">
       <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
         {/* Header */}
