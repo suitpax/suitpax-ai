@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { Duffel } from "@duffel/api";
+import { SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/enhanced-system";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -14,33 +15,18 @@ const duffel = new Duffel({
 });
 
 const systemPrompt = `
-You are Suitpax AI, a world-class autonomous travel agent. Your purpose is to assist users with their business travel needs by leveraging available tools.
+${SUITPAX_AI_SYSTEM_PROMPT}
 
-Core Persona:
-- Professional, efficient, and highly capable.
-- Detect and respond in the user's language.
-- Follow strict data privacy and avoid inventing facts.
+## Formatting & Travel Output Rules
+- Detect the user's language and respond accordingly (default to concise Spanish if unclear).
+- Use clean Markdown. No emojis.
+- When the user asks for flights, present a short textual summary and a compact comparison (bullets or a small table). Then ALWAYS append a structured block containing the normalized offers using this exact wrapper so the UI can render rich cards:
 
-Tool Usage Protocol:
-1. Analyze the user's request and identify intent.
-2. Check available tools. You have a tool called search_flights.
-3. Extract parameters for flight search: origin, destination, departure_date, return_date (optional), passengers. If any are missing, ask the user for the missing info first.
-4. Invoke the tool when parameters are complete. Use real-time flight data.
-5. Synthesize and respond in clean Markdown (no emojis). Present the top 3 options using headings and a table.
+:::flight_offers_json
+{"offers": [{"id":"...","price":"...","airline":"...","airline_iata":"...","logo":"...","depart":"ISO","arrive":"ISO","origin":"IATA","destination":"IATA","stops":0}]}
+:::
 
-Example Flight Card Format (no emojis):
-
-### [Airline Name] — [Origin IATA] → [Destination IATA]
-
-| Feature        | Details                                     |
-| -------------- | ------------------------------------------- |
-| Price          | $[Total Amount] [Currency]                  |
-| Duration       | [Total Duration]                            |
-| Stops          | [Number of stops]                           |
-| Departure      | [Departure Time] at [Origin Airport]        |
-| Arrival        | [Arrival Time] at [Destination Airport]     |
-
-If the user's request is not about flights, answer as a business travel assistant.
+- Only include up to 5 best options in the JSON. Prices, airline, IATA codes, times, and stops must be accurate from real-time data.
 `.trim();
 
 const tools: Anthropic.Tool[] = [
@@ -68,6 +54,58 @@ const tools: Anthropic.Tool[] = [
   },
 ];
 
+function buildAirlineLogoUrl(iata?: string | null): string | null {
+  if (!iata) return null;
+  return `https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${iata}.svg`;
+}
+
+function normalizeFlightOffers(raw: any[]): Array<{
+  id: string;
+  price: string;
+  airline?: string;
+  airline_iata?: string;
+  logo?: string | null;
+  depart?: string;
+  arrive?: string;
+  origin?: string;
+  destination?: string;
+  stops?: number;
+}> {
+  try {
+    return raw.slice(0, 5).map((o: any) => {
+      const firstSlice = o?.slices?.[0];
+      const lastSlice = o?.slices?.[o?.slices?.length - 1];
+      const firstSeg = firstSlice?.segments?.[0];
+      const lastSeg = lastSlice?.segments?.[lastSlice?.segments?.length - 1];
+
+      const carrier = firstSeg?.marketing_carrier || firstSeg?.operating_carrier || {};
+      const airlineName = carrier?.name || undefined;
+      const airlineIata = carrier?.iata_code || carrier?.iata || undefined;
+
+      const originIata = firstSeg?.origin?.iata_code || firstSlice?.origin?.iata_code || firstSeg?.origin?.iata || undefined;
+      const destinationIata = lastSeg?.destination?.iata_code || lastSlice?.destination?.iata_code || lastSeg?.destination?.iata || undefined;
+
+      const segmentsCount = (firstSlice?.segments?.length || 1);
+      const stops = Math.max(0, segmentsCount - 1);
+
+      return {
+        id: o?.id,
+        price: `${o?.total_amount || o?.total_amount?.toString() || ""} ${o?.total_currency || ""}`.trim(),
+        airline: airlineName,
+        airline_iata: airlineIata,
+        logo: buildAirlineLogoUrl(airlineIata || null),
+        depart: firstSeg?.departing_at || firstSlice?.departing_at,
+        arrive: lastSeg?.arriving_at || lastSlice?.arriving_at,
+        origin: originIata,
+        destination: destinationIata,
+        stops,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
 async function flightSearchTool(
   origin: string,
   destination: string,
@@ -88,7 +126,7 @@ async function flightSearchTool(
     });
 
     const offers = await duffel.offers.list({ offer_request_id: offerRequest.id });
-    return offers.data.slice(0, 3); // Return top 3 offers
+    return offers.data.slice(0, 5);
   } catch (error) {
     console.error("Duffel API Error:", error);
     return { error: "Failed to retrieve flight information from our provider." };
@@ -96,7 +134,7 @@ async function flightSearchTool(
 }
 
 export async function POST(request: NextRequest) {
-  const { message, history = [] } = await request.json();
+  const { message, history = [], includeReasoning = false } = await request.json();
 
   if (!message) {
     return NextResponse.json({ error: "Message is required" }, { status: 400 });
@@ -120,11 +158,12 @@ export async function POST(request: NextRequest) {
     const stopReason = (initialResponse as any).stop_reason;
     const toolUseContent = (initialResponse as any).content.find((c: any) => c.type === "tool_use");
 
+    let reasoningText: string | undefined;
+
     if (stopReason === "tool_use" && toolUseContent && toolUseContent.type === "tool_use") {
       const { name, input } = toolUseContent;
       if (name === "search_flights") {
         const { origin, destination, departure_date, return_date, passengers } = input as any;
-        
         const flightData = await flightSearchTool(origin, destination, departure_date, return_date, passengers);
 
         const finalResponse = await anthropic.messages.create({
@@ -138,15 +177,43 @@ export async function POST(request: NextRequest) {
             { role: "user", content: [ { type: "tool_result", tool_use_id: toolUseContent.id, content: JSON.stringify(flightData) } ] }
           ],
         });
-        
+
         const text = (finalResponse as any).content?.find((c: any) => c.type === "text")?.text || "";
-        return NextResponse.json({ response: text });
+        const normalized = Array.isArray(flightData) ? normalizeFlightOffers(flightData) : [];
+        const offersBlock = `:::flight_offers_json\n${JSON.stringify({ offers: normalized }, null, 2)}\n:::`;
+
+        if (includeReasoning) {
+          try {
+            const r = await anthropic.messages.create({
+              model: "claude-3-haiku-20240307",
+              max_tokens: 512,
+              system: "You are Suitpax AI. Provide a brief high-level rationale (3–5 bullets) in Spanish without chain-of-thought.",
+              messages: [ { role: "user", content: `Explica en 3–5 viñetas el razonamiento de alto nivel para esta solicitud: ${message}` } ],
+            });
+            reasoningText = (r as any).content?.find((c: any) => c.type === "text")?.text || undefined;
+          } catch {}
+        }
+
+        return NextResponse.json({ response: `${text}\n\n${offersBlock}`, reasoning: reasoningText });
       }
     }
 
     const textResponse = (initialResponse as any).content?.find((c: any) => c.type === "text")?.text || 
       "I'm sorry, I couldn't process that request.";
-    return NextResponse.json({ response: textResponse });
+
+    if (includeReasoning) {
+      try {
+        const r = await anthropic.messages.create({
+          model: "claude-3-haiku-20240307",
+          max_tokens: 512,
+          system: "You are Suitpax AI. Provide a brief high-level rationale (3–5 bullets) in Spanish without chain-of-thought.",
+          messages: [ { role: "user", content: `Explica en 3–5 viñetas el razonamiento de alto nivel para esta solicitud: ${message}` } ],
+        });
+        reasoningText = (r as any).content?.find((c: any) => c.type === "text")?.text || undefined;
+      } catch {}
+    }
+
+    return NextResponse.json({ response: textResponse, reasoning: reasoningText });
 
   } catch (error) {
     console.error("AI Chat API Error:", error);

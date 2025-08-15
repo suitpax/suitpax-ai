@@ -13,14 +13,16 @@ export interface NewsResponse {
   total: number
 }
 
-export async function fetchNews(query: string, count = 6): Promise<NewsResponse> {
+export type BraveFreshness = "d1" | "d7" | "m1"
+
+export async function fetchNews(query: string, count = 6, freshness: BraveFreshness = "d7"): Promise<NewsResponse> {
   try {
     const response = await fetch("/api/brave/news", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ query, count, freshness: "d7" }),
+      body: JSON.stringify({ query, count, freshness }),
     })
 
     if (!response.ok) {
