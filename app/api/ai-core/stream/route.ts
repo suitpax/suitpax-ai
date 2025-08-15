@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server"
 import { anthropic } from "@ai-sdk/anthropic"
 import { streamText } from "ai"
+import { buildSystemPrompt } from "@/lib/prompts/system"
 
 export const runtime = "edge"
 
@@ -9,10 +10,11 @@ export async function POST(req: NextRequest) {
     const { message, history = [] } = await req.json()
     if (!message) return new Response("Message is required", { status: 400 })
 
+    const system = buildSystemPrompt({ domain: ["general", "travel", "business", "coding"] })
+
     const result = await streamText({
       model: anthropic("claude-3-5-sonnet-20241022"),
-      system:
-        "You are Suitpax AI. Respond clearly with short paragraphs and bullets. Never include chain-of-thought. If user asks for flights, just answer normally here; the non-streaming endpoint will append offers.",
+      system,
       messages: [...history, { role: "user", content: message }],
       maxTokens: 1000,
       temperature: 0.7,

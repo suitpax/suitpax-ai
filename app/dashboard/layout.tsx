@@ -13,6 +13,7 @@ import type { User } from "@supabase/supabase-js"
 import AISearchInput from "@/components/ui/ai-search-input"
 import FooterBanner from "@/components/dashboard/footer-banner"
 import { SUITPAX_VERSION } from "@/lib/version"
+import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton"
 
 export default function DashboardLayout({
 	children,
@@ -76,9 +77,8 @@ export default function DashboardLayout({
 
 				if (profileError) {
 					console.error("Profile fetch error:", profileError)
-					// Continue with default values if profile doesn't exist
 				} else if (profileData) {
-					setUserPlan(profileData.plan || "free")
+					setUserPlan((profileData as any).subscription_plan || (profileData as any).plan || "free")
 					setSubscriptionStatus(profileData.subscription_status || "inactive")
 				}
 			} catch (error) {
@@ -122,7 +122,15 @@ export default function DashboardLayout({
 		setMobileMenuOpen(false)
 	}
 
-	if (!user && !loading) {
+	if (loading) {
+		return (
+			<div className="p-6 max-w-7xl mx-auto">
+				<DashboardSkeleton />
+			</div>
+		)
+	}
+
+	if (!user) {
 		return null
 	}
 

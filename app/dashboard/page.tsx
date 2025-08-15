@@ -28,6 +28,7 @@ import { useState } from "react"
 import { PromptInput, PromptInputActions, PromptInputTextarea, PromptInputAction } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
 import { ArrowUp } from "lucide-react"
+import { TravelIntelRadarWidget } from "@/components/dashboard/travel-intel-radar-widget"
 
 const DashboardPage = () => {
 	const { user, profile, loading } = useUserData()
@@ -255,7 +256,7 @@ const DashboardPage = () => {
 			id: "suitpax-ai",
 			title: "Suitpax AI",
 			component: (
-				<Link href="/dashboard/ai-core" className="block group">
+									<Link href="/dashboard/suitpax-ai" className="block group">
 					<div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 p-6 rounded-2xl border border-gray-800 shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:scale-[1.02]">
 						<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-out"></div>
 						<div className="flex items-center justify-between">
@@ -306,6 +307,7 @@ const DashboardPage = () => {
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<div><TravelIntelRadarWidget /></div>
 				{dashboardCards.map((card) => (
 					<div key={card.id}>{card.component}</div>
 				))}

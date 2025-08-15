@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Sparkles } from "lucide-react"
+import Link from "next/link"
 
 export function AiSuggestionsCard() {
   const suggestions = [
@@ -24,6 +25,9 @@ export function AiSuggestionsCard() {
             {s}
           </div>
         ))}
+        <div className="text-xs text-gray-600">
+          New: Check real-time advisories in <Link className="underline" href="/dashboard/radar">Radar</Link>.
+        </div>
       </CardContent>
     </Card>
   )

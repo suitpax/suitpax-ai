@@ -61,7 +61,7 @@ export default function Header() {
   const quickLinks = [
     { name: "Book Flight", href: "/dashboard/flights", shortcut: "⌘F" },
     { name: "Add Expense", href: "/dashboard/expenses", shortcut: "⌘E" },
-    { name: "Suitpax AI", href: "/dashboard/ai-core", shortcut: "⌘A" },
+    { name: "Suitpax AI", href: "/dashboard/suitpax-ai", shortcut: "⌘A" },
     { name: "Analytics", href: "/dashboard/analytics", shortcut: "⌘R" },
   ]
 

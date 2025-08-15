@@ -1,7 +1,6 @@
-import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
+import { createSupabaseFromRequest, ensureAuthenticated } from "@/lib/supabase/middleware"
 
-// Check if Supabase environment variables are available
 export const isSupabaseConfigured =
   typeof process.env.NEXT_PUBLIC_SUPABASE_URL === "string" &&
   process.env.NEXT_PUBLIC_SUPABASE_URL.length > 0 &&
@@ -12,53 +11,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hostname = request.headers.get("host") || ""
 
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
-
-  if (isSupabaseConfigured) {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-            supabaseResponse = NextResponse.next({
-              request,
-            })
-            cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
-          },
-        },
-      },
-    )
-
-    const code = request.nextUrl.searchParams.get("code")
-    if (code) {
-      await supabase.auth.exchangeCodeForSession(code)
-      const url = request.nextUrl.clone()
-      url.pathname = "/dashboard"
-      url.searchParams.delete("code")
-      return NextResponse.redirect(url)
-    }
-
-    await supabase.auth.getUser()
-  }
-
-  const response = supabaseResponse
-  response.headers.set("x-url", pathname)
-  response.headers.set("x-pathname", pathname)
-
-  if (process.env.NODE_ENV === "development") {
-    console.log("Middleware - Setting pathname header:", pathname)
-  }
-
-  const isAppSubdomain =
-    hostname.includes("app.suitpax.com") || hostname.startsWith("app.") || hostname.includes("localhost")
-
+  // Skip static and public assets
   const isStaticRoute =
     pathname.startsWith("/_next") ||
     pathname.startsWith("/static") ||
@@ -69,36 +22,30 @@ export async function middleware(request: NextRequest) {
     pathname === "/sitemap.xml"
 
   if (isStaticRoute) {
-    return response
+    return NextResponse.next()
   }
 
-  if (isSupabaseConfigured && (pathname.startsWith("/dashboard") || pathname.startsWith("/api/user"))) {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
-          },
-        },
-      },
-    )
+  // Initialize Supabase cookies bridge (only if configured)
+  let response = NextResponse.next({ request })
+  if (isSupabaseConfigured) {
+    const { supabase, response: supaResponse } = createSupabaseFromRequest(request, response)
+    response = supaResponse
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user && !pathname.startsWith("/auth/")) {
+    // OAuth code exchange -> redirect to dashboard
+    const code = request.nextUrl.searchParams.get("code")
+    if (code) {
+      try {
+        await supabase.auth.exchangeCodeForSession(code)
+      } catch {}
       const url = request.nextUrl.clone()
-      url.pathname = "/auth/login"
+      url.pathname = "/dashboard"
+      url.searchParams.delete("code")
       return NextResponse.redirect(url)
     }
   }
 
+  // Subdomain routing (app.* or localhost) keeps only app paths
+  const isAppSubdomain = hostname.includes("app.suitpax.com") || hostname.startsWith("app.") || hostname.includes("localhost")
   if (isAppSubdomain) {
     const allowedAppPaths = ["/login", "/signup", "/dashboard", "/api", "/auth"]
     const isAllowedAppPath = allowedAppPaths.some((path) => pathname.startsWith(path))
@@ -112,29 +59,18 @@ export async function middleware(request: NextRequest) {
     if (!isAllowedAppPath) {
       const url = request.nextUrl.clone()
       url.pathname = "/auth/login"
-      if (pathname !== "/auth/login") {
-        return NextResponse.redirect(url)
-      }
+      return NextResponse.redirect(url)
     }
-
-    return response
   }
 
-  const publicPaths = [
-    "/",
-    "/manifesto",
-    "/pricing",
-    "/travel-expense-management",
-    "/contact",
-    "/solutions",
-    "/public",
-    "/api/public",
-  ]
+  // Protected areas
+  const requiresAuth =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/api/user")
 
-  const isPublicPath = publicPaths.some((path) => pathname === path || pathname.startsWith(path + "/"))
-
-  if (isPublicPath) {
-    return response
+  if (isSupabaseConfigured && requiresAuth) {
+    const authResult = await ensureAuthenticated(request, "/auth/login")
+    return authResult
   }
 
   return response
