@@ -1,290 +1,377 @@
-# DocumentaciÃ³n de IntegraciÃ³n con Duffel API
+# Duffel API Integration Documentation
 
-## IntroducciÃ³n
+## Overview
 
-Esta documentaciÃ³n describe la implementaciÃ³n de la integraciÃ³n con Duffel API para bÃºsqueda y reserva de vuelos, siguiendo todas las mejores prÃ¡cticas recomendadas por Duffel.
+This documentation describes the implementation of Duffel API integration for flight search and booking, following all best practices recommended by Duffel.
 
-## Ãndice
+## Table of Contents
 
-1. [ConfiguraciÃ³n General](#configuraciÃ³n-general)
-2. [Endpoints Implementados](#endpoints-implementados)
-3. [BÃºsqueda de Vuelos](#bÃºsqueda-de-vuelos)
-4. [Tarifas Privadas](#tarifas-privadas)
-5. [VisualizaciÃ³n de Condiciones](#visualizaciÃ³n-de-condiciones)
-6. [VisualizaciÃ³n de Escalas](#visualizaciÃ³n-de-escalas)
-7. [Programas de Fidelidad](#programas-de-fidelidad)
+1. [General Configuration](#general-configuration)
+2. [Implemented Endpoints](#implemented-endpoints)
+3. [Flight Search](#flight-search)
+4. [Private Fares](#private-fares)
+5. [Conditions Display](#conditions-display)
+6. [Layover Visualization](#layover-visualization)
+7. [Loyalty Programs](#loyalty-programs)
 8. [Webhooks](#webhooks)
-9. [Base de Datos](#base-de-datos)
-10. [Mejores PrÃ¡cticas](#mejores-prÃ¡cticas)
+9. [Database](#database)
+10. [Best Practices](#best-practices)
 
-## ConfiguraciÃ³n General
+## General Configuration
 
-### ConfiguraciÃ³n del Cliente
+### Environment Variables
+```env
+DUFFEL_API_KEY=your_duffel_api_key
+DUFFEL_WEBHOOK_SECRET=your_webhook_secret
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
+```
 
-La integraciÃ³n utiliza un cliente Duffel centralizado para estandarizar todas las peticiones:
+### API Client Setup
+```typescript
+// lib/duffel/client.ts
+import { DuffelApi } from '@duffel/api';
 
-\`\`\`typescript
-// lib/duffel.ts
-import { Duffel } from "@duffel/api";
+export const duffel = new DuffelApi({
+  token: process.env.DUFFEL_API_KEY!,
+  version: 'v1'
+});
+```
 
-export const createDuffelClient = (options?: { 
-  token?: string; 
-  environment?: 'test' | 'production';
-}) => {
-  const isProduction = process.env.NODE_ENV === 'production';
-  const token = options?.token || process.env.DUFFEL_API_KEY || "";
-  const environment = options?.environment || (isProduction ? 'production' : 'test');
-  
-  // Usar cliente en cachÃ© si existe...
+## Implemented Endpoints
+
+### Flight Search Endpoints
+- `POST /api/flights/search` - Flight search with offer requests
+- `GET /api/flights/offers/:id` - Get specific offer details
+- `POST /api/flights/book` - Book selected flights
+- `GET /api/flights/orders/:id` - Get booking details
+
+### Webhook Endpoints
+- `POST /api/webhooks/duffel` - Handle Duffel webhooks
+- `GET /api/webhooks/duffel/verify` - Webhook verification
+
+## Flight Search
+
+### Search Request Structure
+```typescript
+interface FlightSearchRequest {
+  origin: string;          // IATA code (e.g., "MAD")
+  destination: string;     // IATA code (e.g., "BCN")
+  departure_date: string;  // YYYY-MM-DD format
+  return_date?: string;    // Optional for round-trip
+  passengers: {
+    adults: number;
+    children?: number;
+    infants?: number;
+  };
+  cabin_class?: 'economy' | 'premium_economy' | 'business' | 'first';
+  private_fares?: boolean;
 }
-\`\`\`
+```
 
-### Variables de Entorno Requeridas
+### Implementation
+```typescript
+// app/api/flights/search/route.ts
+export async function POST(request: Request) {
+  try {
+    const searchParams = await request.json();
+    
+    const offerRequest = await duffel.offerRequests.create({
+      slices: [
+        {
+          origin: searchParams.origin,
+          destination: searchParams.destination,
+          departure_date: searchParams.departure_date,
+        }
+      ],
+      passengers: [
+        ...Array(searchParams.passengers.adults).fill({ type: 'adult' })
+      ],
+      cabin_class: searchParams.cabin_class || 'economy',
+      private_fares: searchParams.private_fares || false
+    });
 
-\`\`\`
-DUFFEL_API_KEY=duffel_test_...       # Clave API de Duffel
-DUFFEL_WEBHOOK_SECRET=whsec_...       # Secreto para verificar webhooks
-\`\`\`
+    return Response.json({
+      request_id: offerRequest.data.id,
+      offers: offerRequest.data.offers
+    });
+  } catch (error) {
+    return Response.json(
+      { error: 'Flight search failed' },
+      { status: 500 }
+    );
+  }
+}
+```
 
-## Endpoints Implementados
+## Private Fares
 
-| Endpoint                                      | MÃ©todo | DescripciÃ³n                                             |
-|-----------------------------------------------|--------|---------------------------------------------------------|
-| `/api/flights/duffel/optimized-search`        | POST   | BÃºsqueda optimizada de vuelos con todas las mejores prÃ¡cticas |
-| `/api/flights/duffel/private-fares`           | POST   | BÃºsqueda de vuelos con tarifas privadas                |
-| `/api/flights/duffel/conditions`              | GET    | Obtener condiciones detalladas de ofertas y Ã³rdenes    |
-| `/api/flights/duffel/stops`                   | GET    | Obtener informaciÃ³n detallada de escalas               |
-| `/api/flights/duffel/loyalty`                 | GET, POST, DELETE | GestiÃ³n de programas de fidelidad personales |
-| `/api/flights/duffel/airports`                | GET    | BÃºsqueda de aeropuertos (incluye bÃºsqueda por Ã¡rea)    |
-| `/api/flights/duffel/airlines`                | GET    | BÃºsqueda de aerolÃ­neas                                 |
-| `/api/flights/duffel/offers/[offerId]`        | GET    | Obtener detalles de una oferta especÃ­fica              |
-| `/api/flights/duffel/orders/[orderId]`        | GET    | Obtener detalles de una orden especÃ­fica               |
-| `/api/flights/duffel/baggage`                 | GET, POST, DELETE | GestiÃ³n de servicios de equipaje            |
-| `/api/flights/duffel/seats`                   | GET, POST, DELETE | GestiÃ³n de selecciÃ³n de asientos            |
-| `/api/flights/duffel/order-cancellations`     | GET, POST, PUT, DELETE | GestiÃ³n de cancelaciones de Ã³rdenes    |
-| `/api/flights/duffel/order-changes`           | GET, POST, PUT   | GestiÃ³n de cambios en Ã³rdenes                |
-| `/api/flights/duffel/webhooks`                | POST   | Receptor de webhooks de Duffel                         |
-
-## BÃºsqueda de Vuelos
-
-La implementaciÃ³n de bÃºsqueda de vuelos incluye todas las mejores prÃ¡cticas recomendadas por Duffel:
-
-### CaracterÃ­sticas Principales
-
-- **Cacheo de datos:** ImplementaciÃ³n de cachÃ© para aerolÃ­neas y aeropuertos
-- **PaginaciÃ³n:** Soporte para paginaciÃ³n con tokens `after` y `before`
-- **Enriquecimiento de datos:** Enriquecimiento de ofertas con informaciÃ³n de aerolÃ­neas y aeropuertos
-- **Manejo de errores:** Tratamiento estandarizado de errores de Duffel
-- **OptimizaciÃ³n de rendimiento:** Procesamiento paralelo con `Promise.all`
-- **Opciones avanzadas:** Soporte para filtrado, ordenaciÃ³n y criterios especÃ­ficos
-
-### Ejemplo de Uso
-
-\`\`\`typescript
-// Ejemplo de peticiÃ³n de bÃºsqueda optimizada
-const searchRequest = {
-  origin: "MAD",
-  destination: "LHR",
-  departure_date: "2025-10-01",
-  return_date: "2025-10-08",
-  passengers: {
-    adults: 1
-  },
-  cabin_class: "economy",
-  use_loyalty_programs: true,
-  max_connections: 1
+### Configuration
+```typescript
+// Enable private fares in search
+const searchWithPrivateFares = {
+  private_fares: true,
+  // Other search parameters...
 };
+```
 
-// POST /api/flights/duffel/optimized-search
-\`\`\`
+### Corporate Account Setup
+Private fares require:
+1. Corporate agreement with airlines
+2. Duffel corporate account configuration
+3. Proper authentication headers
 
-## Tarifas Privadas
+## Conditions Display
 
-La integraciÃ³n soporta bÃºsqueda con tarifas privadas (corporativas y programas de fidelidad):
+### Fare Conditions
+```typescript
+interface FareConditions {
+  change_before_departure?: {
+    allowed: boolean;
+    penalty_amount?: string;
+    penalty_currency?: string;
+  };
+  cancel_before_departure?: {
+    allowed: boolean;
+    penalty_amount?: string;
+    penalty_currency?: string;
+  };
+  advance_seat_selection?: boolean;
+  priority_check_in?: boolean;
+  priority_boarding?: boolean;
+}
+```
 
-### CaracterÃ­sticas
+### UI Implementation
+```tsx
+// components/flights/FareConditions.tsx
+export function FareConditions({ conditions }: { conditions: FareConditions }) {
+  return (
+    <div className="fare-conditions">
+      <h3>Fare Conditions</h3>
+      
+      {conditions.change_before_departure && (
+        <div className="condition">
+          <span>Changes: </span>
+          {conditions.change_before_departure.allowed ? 'Allowed' : 'Not Allowed'}
+          {conditions.change_before_departure.penalty_amount && (
+            <span> (Fee: {conditions.change_before_departure.penalty_amount})</span>
+          )}
+        </div>
+      )}
+      
+      {/* Additional conditions... */}
+    </div>
+  );
+}
+```
 
-- **Programas de fidelidad personales:** Asociados a cada usuario
-- **CÃ³digos corporativos:** Soporte para diferentes tipos (corporate_code, tour_code, discount_code)
-- **VisualizaciÃ³n de descuentos:** CÃ¡lculo y visualizaciÃ³n de descuentos respecto a tarifas pÃºblicas
+## Layover Visualization
 
-### Ejemplo de Uso
+### Layover Information
+```typescript
+interface LayoverInfo {
+  airport: {
+    iata_code: string;
+    name: string;
+    city_name: string;
+  };
+  duration: string; // ISO 8601 duration
+  arrival_time: string;
+  departure_time: string;
+}
+```
 
-\`\`\`typescript
-// Ejemplo de bÃºsqueda con tarifas privadas
-const privateSearchRequest = {
-  origin: "MAD",
-  destination: "LHR",
-  departure_date: "2025-10-01",
-  passengers: {
-    adults: 1
-  },
-  use_loyalty_programs: true,
-  use_corporate_codes: true
+### Duration Calculation
+```typescript
+// utils/flight-helpers.ts
+export function calculateLayoverDuration(arrival: string, departure: string): string {
+  const arrivalTime = new Date(arrival);
+  const departureTime = new Date(departure);
+  const duration = departureTime.getTime() - arrivalTime.getTime();
+  
+  const hours = Math.floor(duration / (1000 * 60 * 60));
+  const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
+  
+  return `${hours}h ${minutes}m`;
+}
+```
+
+## Loyalty Programs
+
+### Supported Programs
+```typescript
+interface LoyaltyProgram {
+  airline_iata_code: string;
+  account_number: string;
+}
+
+// Add to booking request
+const bookingRequest = {
+  // ... other booking data
+  loyalty_programme_accounts: [
+    {
+      airline_iata_code: "BA",
+      account_number: "123456789"
+    }
+  ]
 };
-
-// POST /api/flights/duffel/private-fares
-\`\`\`
-
-## VisualizaciÃ³n de Condiciones
-
-ImplementaciÃ³n optimizada para visualizar condiciones de ofertas y Ã³rdenes:
-
-### CaracterÃ­sticas
-
-- **InformaciÃ³n de reembolso:** PolÃ­ticas detalladas de reembolso con penalizaciones
-- **Cambios permitidos:** InformaciÃ³n sobre cambios permitidos y sus costos
-- **Equipaje incluido:** Detalle de equipaje incluido por tipo de pasajero
-- **Textos amigables:** GeneraciÃ³n de textos legibles para el usuario final
-
-### Ejemplo de Uso
-
-\`\`\`typescript
-// Obtener condiciones de una oferta
-// GET /api/flights/duffel/conditions?offer_id=off_123
-
-// Obtener condiciones de una orden
-// GET /api/flights/duffel/conditions?order_id=ord_123
-\`\`\`
-
-## VisualizaciÃ³n de Escalas
-
-ImplementaciÃ³n completa para visualizar informaciÃ³n detallada de escalas:
-
-### CaracterÃ­sticas
-
-- **Detalle de aeropuertos:** InformaciÃ³n completa de aeropuertos de escala
-- **Tiempos de conexiÃ³n:** CÃ¡lculo de tiempos entre vuelos
-- **ClasificaciÃ³n de conexiones:** ClasificaciÃ³n por duraciÃ³n (corta, estÃ¡ndar, larga)
-- **DetecciÃ³n de conexiones nocturnas:** IdentificaciÃ³n de conexiones que requieren pasar la noche
-
-### Ejemplo de Uso
-
-\`\`\`typescript
-// Obtener detalles de escalas de una oferta
-// GET /api/flights/duffel/stops?offer_id=off_123
-
-// Obtener detalles de escalas de un slice especÃ­fico
-// GET /api/flights/duffel/stops?offer_id=off_123&slice_id=sli_123
-\`\`\`
-
-## Programas de Fidelidad
-
-La integraciÃ³n incluye soporte completo para programas de fidelidad personales:
-
-### CaracterÃ­sticas
-
-- **GestiÃ³n completa:** CreaciÃ³n, actualizaciÃ³n y eliminaciÃ³n de programas
-- **MÃºltiples aerolÃ­neas:** Soporte para todas las aerolÃ­neas disponibles en Duffel
-- **Datos detallados:** Almacenamiento de informaciÃ³n completa del titular de la cuenta
-- **IntegraciÃ³n con bÃºsqueda:** Uso automÃ¡tico en bÃºsquedas cuando se solicita
-
-### Ejemplo de Uso
-
-\`\`\`typescript
-// Crear un programa de fidelidad personal
-const loyaltyProgram = {
-  type: "loyalty_program",
-  airline_iata_code: "IB",
-  account_number: "123456789",
-  account_holder_title: "mr",
-  account_holder_first_name: "John",
-  account_holder_last_name: "Doe"
-};
-
-// POST /api/flights/duffel/loyalty
-\`\`\`
+```
 
 ## Webhooks
 
-La integraciÃ³n incluye un sistema completo para manejar webhooks de Duffel:
+### Webhook Handler
+```typescript
+// app/api/webhooks/duffel/route.ts
+import crypto from 'crypto';
 
-### CaracterÃ­sticas
+export async function POST(request: Request) {
+  const signature = request.headers.get('x-duffel-signature');
+  const body = await request.text();
+  
+  // Verify webhook signature
+  const expectedSignature = crypto
+    .createHmac('sha256', process.env.DUFFEL_WEBHOOK_SECRET!)
+    .update(body)
+    .digest('hex');
+  
+  if (signature !== `sha256=${expectedSignature}`) {
+    return new Response('Invalid signature', { status: 401 });
+  }
+  
+  const event = JSON.parse(body);
+  
+  switch (event.type) {
+    case 'order.created':
+      await handleOrderCreated(event.data);
+      break;
+    case 'order.cancelled':
+      await handleOrderCancelled(event.data);
+      break;
+    // Handle other event types...
+  }
+  
+  return new Response('OK', { status: 200 });
+}
+```
 
-- **VerificaciÃ³n de firma:** ComprobaciÃ³n criptogrÃ¡fica de la autenticidad del webhook
-- **Registro de eventos:** Almacenamiento de todos los eventos recibidos
-- **ActualizaciÃ³n automÃ¡tica:** SincronizaciÃ³n del estado de Ã³rdenes y servicios
-- **Manejo de errores:** Tratamiento robusto de errores durante el procesamiento
+### Event Types
+- `order.created` - New booking created
+- `order.cancelled` - Booking cancelled
+- `order.updated` - Booking updated
+- `payment.succeeded` - Payment completed
+- `payment.failed` - Payment failed
 
-### Eventos Soportados
+## Database
 
-- `order.created`
-- `order.updated`
-- `order.cancelled`
-- `payment.created`
-- `payment.updated`
-- `passenger.updated`
-- `service.created`
-- `service.updated`
-- `order_change_request.created`
-- `order_change_request.updated`
+### Orders Table
+```sql
+CREATE TABLE flight_orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  duffel_order_id VARCHAR NOT NULL UNIQUE,
+  user_id UUID REFERENCES auth.users(id),
+  booking_reference VARCHAR NOT NULL,
+  total_amount DECIMAL(10,2) NOT NULL,
+  currency VARCHAR(3) NOT NULL,
+  status VARCHAR(50) NOT NULL,
+  passengers JSONB NOT NULL,
+  slices JSONB NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
 
-## Base de Datos
+### Offers Cache Table
+```sql
+CREATE TABLE flight_offers_cache (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  offer_request_id VARCHAR NOT NULL,
+  offers JSONB NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
 
-La implementaciÃ³n incluye un esquema de base de datos completo para Supabase:
+-- Index for fast lookups
+CREATE INDEX idx_flight_offers_cache_request_id ON flight_offers_cache(offer_request_id);
+CREATE INDEX idx_flight_offers_cache_expires_at ON flight_offers_cache(expires_at);
+```
 
-### Tablas Principales
+## Best Practices
 
-- `flight_searches`: Registro de bÃºsquedas realizadas
-- `flight_bookings`: Reservas de vuelos
-- `user_loyalty_programs`: Programas de fidelidad de usuarios
-- `user_corporate_codes`: CÃ³digos corporativos de usuarios
-- `order_cancellations`: Registro de cancelaciones de Ã³rdenes
-- `order_changes`: Registro de cambios en Ã³rdenes
-- `webhook_events`: Registro de eventos webhook recibidos
-- `airport_cache`: CachÃ© de datos de aeropuertos
-- `airline_cache`: CachÃ© de datos de aerolÃ­neas
+### 1. Caching Strategy
+- Cache offer requests for 30 minutes
+- Store frequently searched routes
+- Implement Redis for production caching
 
-### Seguridad
+### 2. Error Handling
+```typescript
+// Implement comprehensive error handling
+try {
+  const result = await duffel.offerRequests.create(params);
+  return result;
+} catch (error) {
+  if (error.code === 'invalid_request') {
+    // Handle validation errors
+  } else if (error.code === 'rate_limited') {
+    // Handle rate limiting
+  } else {
+    // Handle other API errors
+  }
+  throw error;
+}
+```
 
-- **Row Level Security (RLS):** PolÃ­ticas de seguridad a nivel de fila para proteger datos
-- **ActualizaciÃ³n automÃ¡tica:** Triggers para mantener campos de fecha actualizados
-- **Ãndices optimizados:** Ãndices para consultas frecuentes
+### 3. Rate Limiting
+- Implement client-side rate limiting
+- Monitor API usage quotas
+- Use exponential backoff for retries
 
-## Mejores PrÃ¡cticas
+### 4. Security
+- Validate all input parameters
+- Sanitize user data before API calls
+- Use environment variables for sensitive data
+- Implement proper authentication
 
-La implementaciÃ³n sigue todas las mejores prÃ¡cticas recomendadas por Duffel:
+### 5. Performance
+- Implement connection pooling
+- Use compression for large responses
+- Monitor API response times
+- Cache static data (airports, airlines)
 
-### BÃºsqueda de Vuelos
+### 6. Testing
+```typescript
+// Mock Duffel API for testing
+jest.mock('@duffel/api', () => ({
+  DuffelApi: jest.fn().mockImplementation(() => ({
+    offerRequests: {
+      create: jest.fn().mockResolvedValue(mockOfferRequest),
+      get: jest.fn().mockResolvedValue(mockOffer)
+    }
+  }))
+}));
+```
 
-- **client_request_tracking_id:** Uso de IDs de seguimiento para todas las peticiones
-- **Filtrado por aerolÃ­neas:** Soporte para preferencias y exclusiones
-- **Manejo de moneda:** Soporte para bÃºsquedas en diferentes monedas
+## API Reference
 
-### Tarifas Privadas
+### Key Duffel API Endpoints Used
+- `POST /offer_requests` - Search flights
+- `GET /offers/:id` - Get offer details
+- `POST /orders` - Create booking
+- `GET /orders/:id` - Get booking details
+- `POST /payments` - Process payment
 
-- **MÃºltiples programas:** EnvÃ­o de todos los programas de fidelidad aplicables
-- **CÃ³digos corporativos:** InclusiÃ³n de cÃ³digos corporativos cuando estÃ¡n disponibles
-- **VisualizaciÃ³n de descuentos:** ComparaciÃ³n con tarifas pÃºblicas
+### Response Formats
+All API responses follow Duffel's standard format:
+```typescript
+interface DuffelResponse<T> {
+  data: T;
+  meta?: {
+    after?: string;
+    before?: string;
+    limit?: number;
+  };
+}
+```
 
-### Aeropuertos
+---
 
-- **BÃºsqueda por Ã¡rea:** ImplementaciÃ³n de bÃºsqueda por coordenadas y radio
-- **PuntuaciÃ³n inteligente:** Algoritmo de puntuaciÃ³n para ordenar resultados
-- **CachÃ© eficiente:** Sistema de cachÃ© con expiraciÃ³n para mejorar rendimiento
-
-### Condiciones y Escalas
-
-- **Procesamiento detallado:** ExtracciÃ³n de toda la informaciÃ³n relevante
-- **Textos amigables:** GeneraciÃ³n de textos legibles para el usuario final
-- **DetecciÃ³n de caracterÃ­sticas:** IdentificaciÃ³n de conexiones nocturnas, cambios de terminal, etc.
-
-## GuÃ­a de MigraciÃ³n
-
-Para implementar esta integraciÃ³n en un proyecto existente:
-
-1. Ejecutar el script de migraciÃ³n de base de datos `migrations/duffel_schema.sql`
-2. Configurar las variables de entorno necesarias
-3. Copiar los archivos de API a la estructura del proyecto
-4. Actualizar el cliente de Duffel centralizado
-5. Implementar los componentes de frontend necesarios para interactuar con la API
-
-## Recursos Adicionales
-
-- [DocumentaciÃ³n oficial de Duffel API](https://duffel.com/docs)
-- [GuÃ­a de mejores prÃ¡cticas de bÃºsqueda](https://duffel.com/docs/guides/following-search-best-practices)
-- [GuÃ­a de tarifas privadas](https://duffel.com/docs/guides/accessing-private-fares)
-- [GuÃ­a de programas de fidelidad corporativos](https://duffel.com/docs/guides/adding-corporate-loyalty-programme-accounts)
-- [GuÃ­a de visualizaciÃ³n de condiciones](https://duffel.com/docs/guides/displaying-offer-and-order-conditions)
-- [GuÃ­a de visualizaciÃ³n de escalas](https://duffel.com/docs/guides/displaying-stops)
-- [GuÃ­a de bÃºsqueda de aeropuertos por Ã¡rea](https://duffel.com/docs/guides/finding-airports-within-an-area)
+For more detailed information, refer to the [official Duffel API documentation](https://duffel.com/docs/api).
