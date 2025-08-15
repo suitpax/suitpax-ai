@@ -1,12 +1,49 @@
-# 🚀 Suitpax AI - Business Travel Intelligence Platform
+# 🚀 SuitPax AI - Intelligent Business Travel Platform
 
-Suitpax AI is a cutting-edge business travel management platform that leverages artificial intelligence to revolutionize corporate travel planning and execution. Our platform combines natural language processing, voice assistance, and intelligent automation to provide a seamless travel management experience.
+[![Next.js](https://img.shields.io/badge/Next.js-15.2-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.0-blue?logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![TurboRepo](https://img.shields.io/badge/TurboRepo-Latest-red?logo=vercel)](https://turbo.build/)
+[![License](https://img.shields.io/badge/License-Private-red.svg)](https://github.com/suitpax/suitpax-ai)
+
+SuitPax AI is a cutting-edge business travel management platform that leverages artificial intelligence to revolutionize corporate travel planning and execution. Built as a modern monorepo with TurboRepo, our platform combines natural language processing, voice assistance, and intelligent automation to provide a seamless travel management experience.
+
+## 🏗️ Architecture
+
+This project is structured as a **TurboRepo monorepo** with multiple applications and shared packages:
+
+```
+suitpax-ai/
+├── apps/
+│   ├── web/                    # Public website (Port 3000)
+│   └── dashboard/              # Business dashboard (Port 3001)
+├── packages/
+│   ├── ui/                     # Shared UI components
+│   ├── utils/                  # Utility functions
+│   ├── domains/                # Business logic
+│   └── shared/                 # Common types & configs
+└── packages.json               # Workspace configuration
+```
+
+### 🌐 Applications
+
+#### **Web App** (`apps/web`)
+- **Purpose**: Public-facing website and marketing pages
+- **Port**: 3000
+- **Features**: Landing pages, marketing content, public API
+- **Tech**: Next.js 15.2, React 19, TailwindCSS
+
+#### **Dashboard App** (`apps/dashboard`)
+- **Purpose**: Business intelligence and management dashboard
+- **Port**: 3001
+- **Features**: Travel management, expense tracking, AI chat, analytics
+- **Tech**: Next.js 15.2, React 19, Zustand state management
 
 ## ✨ Key Features
 
 ### 🤖 AI-Powered Intelligence
 - **AI Voice Assistant**: Natural language interaction with ElevenLabs integration
-- **Suitpax AI Chat**: Advanced conversational AI with Mem0 memory persistence
+- **SuitPax AI Chat**: Advanced conversational AI with Mem0 memory persistence
 - **Smart Policy Management**: AI-powered document analysis and policy recommendations
 - **Intelligent Expense Processing**: OCR-powered receipt scanning and categorization
 
@@ -30,63 +67,80 @@ Suitpax AI is a cutting-edge business travel management platform that leverages 
 
 ## 🛠 Technology Stack
 
-### Frontend
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS v4
-- **Components**: Radix UI + shadcn/ui
-- **Animations**: Framer Motion
-- **Rich Text**: TipTap Editor
-- **Charts**: Recharts
+### **Core Framework**
+- **Monorepo**: TurboRepo for build optimization and caching
+- **Frontend**: Next.js 15.2 with App Router
+- **Language**: TypeScript 5.9
+- **Runtime**: Node.js 20.x
+- **Package Manager**: pnpm 9.0+
 
-### Backend & AI
+### **Frontend & UI**
+- **Styling**: TailwindCSS 3.4+
+- **Components**: Radix UI + shadcn/ui
+- **Animations**: Framer Motion 11.11+
+- **Rich Text**: TipTap Editor
+- **Charts**: Recharts 2.15+
+- **State Management**: Zustand 5.0+
+
+### **Backend & Database**
 - **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **AI Models**: Anthropic Claude, Grok (xAI)
+- **Authentication**: Supabase Auth with JWT
+- **File Storage**: Supabase Storage
+- **Real-time**: Supabase Realtime subscriptions
+
+### **AI & Machine Learning**
+- **Primary AI**: Anthropic Claude (latest)
+- **Alternative AI**: xAI Grok, Google Gemini
 - **Voice Processing**: ElevenLabs
 - **Memory**: Mem0 for persistent AI memory
-- **Document Processing**: Google Cloud Vision, OCR.space
-- **Travel APIs**: Duffel for flights
+- **Document AI**: Google Cloud Vision, OCR.space
 
-### Development Tools
-- **Package Manager**: pnpm
-- **Linting**: ESLint
-- **Type Checking**: TypeScript
-- **Analytics**: Vercel Analytics
-- **Monitoring**: Sentry
+### **External APIs**
+- **Travel**: Duffel API (flights, hotels)
+- **Email**: Brevo for transactional emails
+- **Maps**: Google Maps API
+- **Payments**: Stripe (planned integration)
 
-## 🚀 Getting Started
+### **Development & DevOps**
+- **Build System**: TurboRepo with caching
+- **Linting**: ESLint 9.0+ with TypeScript rules
+- **Testing**: Jest + Testing Library + Playwright
+- **Analytics**: Vercel Analytics + Speed Insights
+- **Monitoring**: Sentry for error tracking
+- **Deployment**: Vercel + Docker support
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18.x or later
-- pnpm 8.x or later
-- Supabase account and project
-- Required API keys (see Environment Variables)
+- **Node.js**: 20.x or later
+- **pnpm**: 9.0 or later
+- **Git**: Latest version
+- **Supabase account**: For database and auth
 
 ### Installation
 
-1. Clone the repository:
-\`\`\`bash
+1. **Clone the repository**:
+```bash
 git clone https://github.com/suitpax/suitpax-ai.git
 cd suitpax-ai
-\`\`\`
+```
 
-2. Install dependencies:
-\`\`\`bash
+2. **Install dependencies**:
+```bash
 pnpm install
-\`\`\`
+```
 
-3. Set up environment variables:
-\`\`\`bash
+3. **Environment setup**:
+```bash
 cp .env.example .env.local
-\`\`\`
+```
 
-Configure the following variables in `.env.local`:
-\`\`\`env
+Configure your `.env.local`:
+```env
 # App Configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_DASHBOARD_URL=http://localhost:3001
 
 # Database & Authentication (Supabase)
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -107,112 +161,159 @@ OCR_SPACE_API_KEY=your_ocr_space_key
 DUFFEL_API_KEY=your_duffel_key
 DUFFEL_WEBHOOK_SECRET=your_duffel_webhook_secret
 
-# Email Services
+# Email & Communication
 BREVO_API_KEY=your_brevo_key
 
 # Analytics & Monitoring
 NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
 SENTRY_AUTH_TOKEN=your_sentry_token
-\`\`\`
+```
 
-4. Run the development server:
-\`\`\`bash
+### Development Commands
+
+```bash
+# Start all applications
 pnpm dev
-\`\`\`
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+# Start specific application
+pnpm dev:web          # Web app only (port 3000)
+pnpm dev:dashboard    # Dashboard only (port 3001)
 
-## 📁 Project Structure
+# Build and test
+pnpm build            # Build all apps and packages
+pnpm lint             # Lint all code
+pnpm test             # Run all tests
+pnpm type-check       # TypeScript validation
 
-\`\`\`
-suitpax-ai/
-├── app/                          # Next.js app directory
-│   ├── (auth)/                  # Authentication routes
-│   ├── dashboard/               # Dashboard routes
-│   │   ├── flights/            # Flight management
-│   │   ├── expenses/           # Expense tracking
-│   │   ├── policies/           # Policy management
-│   │   ├── suitpax-ai/         # AI chat interface
-│   │   ├── voice-ai/           # Voice AI features
-│   │   └── analytics/          # Business analytics
-│   ├── api/                    # API routes
-│   │   ├── ai/                 # AI processing endpoints
-│   │   ├── flights/            # Flight API routes
-│   │   ├── elevenlabs/         # Voice processing
-│   │   └── suitpax-ai/         # AI chat API
-│   └── layout.tsx              # Root layout
-├── components/                  # React components
-│   ├── dashboard/              # Dashboard components
-│   ├── flights/                # Flight-related components
-│   ├── marketing/              # Landing page components
-│   └── ui/                     # Reusable UI components
-├── lib/                        # Utility functions and services
-│   ├── intelligence/           # AI services (Mem0, etc.)
-│   ├── ocr/                    # Document processing
-│   ├── supabase/               # Database clients
-│   └── utils/                  # Utility functions
-├── contexts/                   # React contexts
-├── hooks/                      # Custom React hooks
-├── scripts/                    # Database scripts
-└── public/                     # Static assets
-\`\`\`
+# Clean and reset
+pnpm clean            # Clean all build artifacts
+```
 
-## 🔧 Key Integrations
+### Access Points
 
-### AI & Intelligence
-- **Anthropic Claude**: Primary AI model for conversations
-- **Mem0**: Persistent memory for AI agents
-- **ElevenLabs**: Voice synthesis and speech recognition
-- **Google Cloud Vision**: Advanced document OCR
-- **OCR.space**: Backup OCR service
+- **Web App**: [http://localhost:3000](http://localhost:3000)
+- **Dashboard**: [http://localhost:3001](http://localhost:3001)
 
-### Travel & Business
-- **Duffel**: Flight search and booking API
-- **Supabase**: Database and authentication
-- **Brevo**: Email automation
-- **Vercel**: Hosting and analytics
+## 📦 Package Structure
 
-## 🧪 Testing
+### **@suitpax/ui**
+Shared UI components library with consistent design system
+- Radix UI primitives
+- shadcn/ui components
+- Custom business components
+- Theme configuration
 
-\`\`\`bash
-# Run unit tests
-pnpm test
+### **@suitpax/utils**
+Common utility functions and helpers
+- Date/time utilities
+- String manipulation
+- API helpers
+- Validation schemas
 
-# Run integration tests
+### **@suitpax/domains**
+Business logic and domain models
+- Travel booking logic
+- Expense management
+- User management
+- Policy enforcement
+
+### **@suitpax/shared**
+Shared types, constants, and configurations
+- TypeScript definitions
+- API response types
+- Configuration constants
+- Shared schemas
+
+## 🧪 Testing Strategy
+
+```bash
+# Unit tests
+pnpm test:unit
+
+# Integration tests
 pnpm test:integration
 
-# Run e2e tests
+# End-to-end tests
 pnpm test:e2e
 
-# Run all tests with coverage
+# Coverage report
 pnpm test:coverage
-\`\`\`
+
+# Watch mode
+pnpm test:watch
+```
 
 ## 🚀 Deployment
 
-The application is deployed using Vercel:
+### **Vercel (Recommended)**
 
-1. Connect your GitHub repository to Vercel
-2. Configure environment variables in Vercel dashboard
-3. Deploy using the Vercel CLI:
-\`\`\`bash
+1. **Connect repository** to Vercel
+2. **Configure environment variables** in dashboard
+3. **Deploy**:
+```bash
 vercel --prod
-\`\`\`
+```
 
-## 📊 Features Overview
+### **Docker Deployment**
 
-### Dashboard Pages
-- **Main Dashboard**: Overview with user stats and quick actions
-- **Flights**: Search, book, and manage flights with Duffel integration
-- **Expenses**: OCR-powered expense tracking and reporting
-- **Policies**: AI-driven policy management and compliance
-- **Voice AI**: Advanced voice interaction capabilities
-- **Suitpax AI**: Conversational AI with persistent memory
-- **Analytics**: Business intelligence and reporting
-- **Calendar**: Meeting and travel scheduling
-- **Team**: Collaboration and user management
+```bash
+# Development
+docker-compose up --build
 
-### AI Capabilities
+# Production
+docker-compose -f docker-compose.prod.yml up --build -d
+
+# Health check
+curl http://localhost:3000/api/health
+curl http://localhost:3001/api/health
+```
+
+### **Manual Deployment**
+
+```bash
+# Build for production
+pnpm build
+
+# Start production servers
+pnpm start
+```
+
+For detailed deployment instructions, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
+
+## 🔧 Key Integrations
+
+### **AI & Intelligence**
+- **Anthropic Claude**: Primary conversational AI
+- **Mem0**: Persistent memory for AI agents
+- **ElevenLabs**: Voice synthesis and recognition
+- **Google Cloud Vision**: Advanced document OCR
+- **OCR.space**: Backup OCR service
+
+### **Travel & Business**
+- **Duffel**: Flight search and booking
+- **Google Maps**: Location and mapping services
+- **Supabase**: Database, auth, and real-time features
+- **Brevo**: Email automation and marketing
+
+### **Development & Analytics**
+- **Vercel**: Hosting and edge functions
+- **Sentry**: Error monitoring and performance
+- **Vercel Analytics**: User behavior tracking
+
+## 🎯 Dashboard Features
+
+### **Core Modules**
+- **🏠 Overview**: Dashboard with KPIs and quick actions
+- **✈️ Flights**: Search, book, and manage business travel
+- **💰 Expenses**: OCR-powered expense tracking and reporting
+- **📋 Policies**: AI-driven policy management and compliance
+- **🤖 SuitPax AI**: Conversational AI with persistent memory
+- **🎙️ Voice AI**: Advanced voice interaction capabilities
+- **📊 Analytics**: Business intelligence and reporting
+- **📅 Calendar**: Meeting and travel scheduling
+- **👥 Team**: Collaboration and user management
+
+### **AI Capabilities**
 - **Natural Language Processing**: Advanced conversation handling
 - **Document Analysis**: Intelligent policy and receipt processing
 - **Voice Interaction**: Speech-to-text and text-to-speech
@@ -226,26 +327,35 @@ vercel --prod
 - **Data Encryption**: End-to-end encryption for sensitive data
 - **API Security**: Rate limiting and request validation
 - **Compliance**: GDPR and SOC 2 ready
+- **Privacy**: Data minimization and user consent management
 
 ## 📈 Performance & Monitoring
 
+- **Build Optimization**: TurboRepo caching and parallelization
+- **Code Splitting**: Automatic route-based splitting
 - **Analytics**: Vercel Analytics integration
 - **Error Tracking**: Sentry for error monitoring
 - **Performance**: Core Web Vitals optimization
-- **Caching**: Smart caching with LRU and persistence
+- **Caching**: Smart caching with persistence
 - **Rate Limiting**: API protection and abuse prevention
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. **Fork** the repository
+2. **Create** your feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'feat: add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### **Development Guidelines**
+- Follow conventional commit messages
+- Add tests for new features
+- Update documentation as needed
+- Ensure all checks pass
 
 ## 📄 License
 
-This project is private and proprietary. All rights reserved.
+This project is **private and proprietary**. All rights reserved.
 
 ## 👥 Team
 
@@ -253,53 +363,25 @@ This project is private and proprietary. All rights reserved.
 
 ## 🙏 Acknowledgments
 
-- [Next.js Team](https://nextjs.org/)
-- [Supabase](https://supabase.com/)
-- [Anthropic](https://www.anthropic.com/)
-- [ElevenLabs](https://elevenlabs.io/)
-- [Mem0](https://mem0.ai/)
-- [Duffel](https://duffel.com/)
-- [Vercel](https://vercel.com/)
-
-## 🚀 Production Deployment
-
-### Quick Deploy
-```bash
-# Make script executable
-chmod +x scripts/deploy.sh
-
-# Deploy to production
-./scripts/deploy.sh deploy
-```
-
-### Docker Deployment
-```bash
-# Using Docker Compose
-docker-compose up --build -d
-
-# Health check
-curl http://localhost:3000/api/health
-curl http://localhost:3001/api/health
-```
-
-### Available Commands
-```bash
-./scripts/deploy.sh deploy    # Full deployment
-./scripts/deploy.sh rollback  # Rollback to previous version
-./scripts/deploy.sh health    # Health check
-./scripts/deploy.sh logs      # View logs
-./scripts/deploy.sh stop      # Stop services
-./scripts/deploy.sh restart   # Restart services
-```
-
-For complete deployment instructions, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
+- [Next.js Team](https://nextjs.org/) - React framework
+- [TurboRepo](https://turbo.build/) - Monorepo build system
+- [Supabase](https://supabase.com/) - Backend as a Service
+- [Anthropic](https://www.anthropic.com/) - AI language models
+- [ElevenLabs](https://elevenlabs.io/) - Voice AI technology
+- [Mem0](https://mem0.ai/) - AI memory platform
+- [Duffel](https://duffel.com/) - Travel booking API
+- [Vercel](https://vercel.com/) - Deployment platform
 
 ## 📞 Support
 
-For support, email support@suitpax.com or visit our documentation.
+For support and questions:
+- 📧 **Email**: support@suitpax.com
+- 📖 **Documentation**: [docs.suitpax.com](https://docs.suitpax.com)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/suitpax/suitpax-ai/issues)
 
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by the Suitpax Team</sub>
+  <sub>Built with ❤️ by the SuitPax Team</sub><br>
+  <sub>Powered by AI • Made for the Future of Business Travel</sub>
 </div>
