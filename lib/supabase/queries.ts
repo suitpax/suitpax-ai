@@ -1,5 +1,5 @@
 import { createClient } from "./client"
-import type { Database } from "./types"
+import type { Database } from "@/types/database.types"
 
 type Tables = Database["public"]["Tables"]
 type Profile = Tables["profiles"]["Row"]

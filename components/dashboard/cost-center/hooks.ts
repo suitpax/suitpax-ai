@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import type { Database } from "@/lib/supabase/types"
+import type { Database } from "@/types/database.types"
 import type { CostCenter, CostCenterComputed, ExpenseLike, UpsertCostCenterInput } from "./types"
 
 // MVP: keep local cost centers, compute spend by expenses.project_code from Supabase

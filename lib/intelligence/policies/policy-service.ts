@@ -37,10 +37,8 @@ export interface PolicyViolation {
 }
 
 export class PolicyService {
-  private supabasePromise = createServerSupabaseClient()
-
   private async getSupabase() {
-    return await this.supabasePromise
+    return createServerSupabaseClient()
   }
 
   async createPolicy(policy: Omit<TravelPolicy, "id" | "created_at" | "updated_at">): Promise<TravelPolicy> {
@@ -235,4 +233,7 @@ export class PolicyService {
   }
 }
 
-export const policyService = new PolicyService()
+// Avoid exporting a module-scoped singleton that might initialize clients at import time
+export function getPolicyService() {
+  return new PolicyService()
+}

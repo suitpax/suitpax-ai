@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       sources: result.sources,
     })
   } catch (error) {
-    console.error("Error in Suitpax AI API:", error)
+    console.error("Error in AI Core API:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
