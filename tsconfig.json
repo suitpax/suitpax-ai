@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "ES6"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -21,21 +21,25 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@/shared/*": ["./shared/*"],
-      "@/domains/*": ["./domains/*"],
-      "@/infrastructure/*": ["./infrastructure/*"],
-      "@/components/*": ["./components/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/app/*": ["./app/*"],
-      "@/public/*": ["./public/*"]
+      "@/*": ["./src/*"],
+      "ui": ["./packages/ui"],
+      "ui/*": ["./packages/ui/*"],
+      "shared": ["./packages/shared"],
+      "shared/*": ["./packages/shared/*"],
+      "utils": ["./packages/utils"],
+      "utils/*": ["./packages/utils/*"],
+      "domains": ["./packages/domains"],
+      "domains/*": ["./packages/domains/*"]
     }
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts", 
+    "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "dist"
+  ]
 }
