@@ -1,0 +1,1 @@
+export const SUITPAX_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || "v0.1.0"

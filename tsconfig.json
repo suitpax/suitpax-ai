@@ -21,7 +21,14 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/shared/*": ["./shared/*"],
+      "@/domains/*": ["./domains/*"],
+      "@/infrastructure/*": ["./infrastructure/*"],
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/app/*": ["./app/*"],
+      "@/public/*": ["./public/*"]
     }
   },
   "include": [
