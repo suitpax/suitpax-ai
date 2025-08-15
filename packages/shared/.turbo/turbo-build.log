@@ -1073,75 +1073,75 @@
 [7m318[0m                     onChange={(e) => setCompanyName(e.target.value)}
 [7m   [0m [91m                               ~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m22[0m:[93m24[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/button' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m22[0m:[93m24[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/button' or its corresponding type declarations.
 
-[7m22[0m import { Button } from "@/components/ui/button"
-[7m  [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m22[0m import { Button } from "@suitpax/ui/button"
+[7m  [0m [91m                       ~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m23[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/supabase/client' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m23[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/utils/supabase/client' or its corresponding type declarations.
 
-[7m23[0m import { createClient } from "@/lib/supabase/client"
-[7m  [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m23[0m import { createClient } from "@suitpax/utils/supabase/client"
+[7m  [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m26[0m:[93m22[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/prompt-kit/markdown' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m26[0m:[93m22[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/prompt-kit/markdown' or its corresponding type declarations.
 
-[7m26[0m import Markdown from "@/components/prompt-kit/markdown"
-[7m  [0m [91m                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m26[0m import Markdown from "@suitpax/ui/prompt-kit/markdown"
+[7m  [0m [91m                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m32[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/prompt-kit/prompt-input' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m32[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/prompt-kit/prompt-input' or its corresponding type declarations.
 
-[7m32[0m } from "@/components/prompt-kit/prompt-input"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m32[0m } from "@suitpax/ui/prompt-kit/prompt-input"
+[7m  [0m [91m       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m37[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/prompt-kit/chat-container' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m37[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/prompt-kit/chat-container' or its corresponding type declarations.
 
-[7m37[0m } from "@/components/prompt-kit/chat-container"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m37[0m } from "@suitpax/ui/prompt-kit/chat-container"
+[7m  [0m [91m       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m38[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/prompt-kit/scroll-button' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m38[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/prompt-kit/scroll-button' or its corresponding type declarations.
 
-[7m38[0m import { ScrollButton } from "@/components/prompt-kit/scroll-button"
-[7m  [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m38[0m import { ScrollButton } from "@suitpax/ui/prompt-kit/scroll-button"
+[7m  [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m39[0m:[93m82[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/prompt-kit/reasoning' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m39[0m:[93m82[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/prompt-kit/reasoning' or its corresponding type declarations.
 
-[7m39[0m import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@/components/prompt-kit/reasoning"
-[7m  [0m [91m                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m39[0m import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@suitpax/ui/prompt-kit/reasoning"
+[7m  [0m [91m                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m40[0m:[93m24[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/switch' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m40[0m:[93m24[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/switch' or its corresponding type declarations.
 
-[7m40[0m import { Switch } from "@/components/ui/switch"
-[7m  [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m40[0m import { Switch } from "@suitpax/ui/switch"
+[7m  [0m [91m                       ~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m41[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/vanta-halo-background' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m41[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/vanta-halo-background' or its corresponding type declarations.
 
-[7m41[0m import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-[7m  [0m [91m                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m41[0m import VantaHaloBackground from "@suitpax/ui/vanta-halo-background"
+[7m  [0m [91m                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m42[0m:[93m29[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/prompt-kit/document-scanner' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m42[0m:[93m29[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/prompt-kit/document-scanner' or its corresponding type declarations.
 
-[7m42[0m import DocumentScanner from "@/components/prompt-kit/document-scanner"
-[7m  [0m [91m                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m42[0m import DocumentScanner from "@suitpax/ui/prompt-kit/document-scanner"
+[7m  [0m [91m                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m43[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/prompt-kit/prompt-suggestions' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m43[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/prompt-kit/prompt-suggestions' or its corresponding type declarations.
 
-[7m43[0m import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
-[7m  [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m43[0m import PromptSuggestions from "@suitpax/ui/prompt-kit/prompt-suggestions"
+[7m  [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m44[0m:[93m24[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/prompt-kit/source-list' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m44[0m:[93m24[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/prompt-kit/source-list' or its corresponding type declarations.
 
-[7m44[0m import SourceList from "@/components/prompt-kit/source-list"
-[7m  [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m44[0m import SourceList from "@suitpax/ui/prompt-kit/source-list"
+[7m  [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m45[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/hooks/use-chat-stream' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m45[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/hooks/use-chat-stream' or its corresponding type declarations.
 
-[7m45[0m import { useChatStream } from "@/hooks/use-chat-stream"
-[7m  [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m45[0m import { useChatStream } from "@suitpax/ui/hooks/use-chat-stream"
+[7m  [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m46[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/prompt-kit/chat-flight-offers' or its corresponding type declarations.
+[96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m46[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@suitpax/ui/prompt-kit/chat-flight-offers' or its corresponding type declarations.
 
-[7m46[0m import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
-[7m  [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m46[0m import ChatFlightOffers from "@suitpax/ui/prompt-kit/chat-flight-offers"
+[7m  [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/dashboard/app/suitpax-ai/page.tsx[0m:[93m247[0m:[93m94[0m - [91merror[0m[90m TS7006: [0mParameter 'token' implicitly has an 'any' type.
 
@@ -1585,11 +1585,6 @@
 [7m10[0m import { ArrowLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 [7m  [0m [91m                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/app/auth/login/page.tsx[0m:[93m12[0m:[93m26[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/fc' or its corresponding type declarations.
-
-[7m12[0m import { FcGoogle } from "react-icons/fc"
-[7m  [0m [91m                         ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/app/auth/reset-password/page.tsx[0m:[93m12[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-hot-toast' or its corresponding type declarations.
 
 [7m12[0m import toast from "react-hot-toast"
@@ -1604,11 +1599,6 @@
 
 [7m10[0m import { ArrowLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 [7m  [0m [91m                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/app/auth/signup/page.tsx[0m:[93m12[0m:[93m26[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/fc' or its corresponding type declarations.
-
-[7m12[0m import { FcGoogle } from "react-icons/fc"
-[7m  [0m [91m                         ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/app/contact/page.tsx[0m:[93m2[0m:[93m25[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/marketing/contact-form' or its corresponding type declarations.
 
@@ -1704,11 +1694,6 @@
 
 [7m7[0m import { MicrophoneIcon, SpeakerWaveIcon, StopIcon, PlayIcon, ArrowLeftIcon } from "@heroicons/react/24/outline"
 [7m [0m [91m                                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/app/voice-ai-demo/page.tsx[0m:[93m8[0m:[93m27[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m8[0m import { PiSparkle } from "react-icons/pi"
-[7m [0m [91m                          ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/charts/business-metrics-chart.tsx[0m:[93m5[0m:[93m90[0m - [91merror[0m[90m TS2307: [0mCannot find module 'recharts' or its corresponding type declarations.
 
@@ -2860,11 +2845,6 @@
 [7m28[0m               <Tooltip formatter={(v) => [`$${v}`, "Revenue"]} />
 [7m  [0m [91m                                   ~[0m
 
-[96m../../apps/web/components/dashboard/sidebar.tsx[0m:[93m40[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m40[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/dashboard/sidebar.tsx[0m:[93m41[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/supabase/client' or its corresponding type declarations.
 
 [7m41[0m import { createClient } from "@/lib/supabase/client"
@@ -3144,26 +3124,6 @@
 
 [7m4[0m import { Button } from "@/components/ui/button"
 [7m [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/demo-product/business-travel-platform.tsx[0m:[93m6[0m:[93m103[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m6[0m import { SiAmericanairlines, SiUnitedairlines, SiMarriott, SiDelta, SiBritishairways, SiHilton } from "react-icons/si"
-[7m [0m [91m                                                                                                      ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/demo-product/business-travel-platform.tsx[0m:[93m18[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m18[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/demo-product/expense-management.tsx[0m:[93m6[0m:[93m56[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m6[0m import { SiRevolut, SiBrex, SiWise, SiExpensify } from "react-icons/si"
-[7m [0m [91m                                                       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/demo-product/expense-management.tsx[0m:[93m20[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m20[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/flights/airport-search.tsx[0m:[93m4[0m:[93m23[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/input' or its corresponding type declarations.
 
@@ -3615,11 +3575,6 @@
 [7m6[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/marketing/ai-agent-voice.tsx[0m:[93m15[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m15[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/ai-agent-voice.tsx[0m:[93m16[0m:[93m34[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/hooks/use-audio-recorder' or its corresponding type declarations.
 
 [7m16[0m import { useAudioRecorder } from "@/hooks/use-audio-recorder"
@@ -3660,11 +3615,6 @@
 [7m411[0m     const language = supportedLanguages.find((lang) => lang.speechCode === code)
 [7m   [0m [91m                                              ~~~~[0m
 
-[96m../../apps/web/components/marketing/ai-meetings-attachment.tsx[0m:[93m16[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m16[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/ai-meetings-attachment.tsx[0m:[93m92[0m:[93m34[0m - [91merror[0m[90m TS7031: [0mBinding element 'Icon' implicitly has an 'any' type.
 
 [7m92[0m const IntegrationIcon = ({ icon: Icon, name }) => {
@@ -3679,16 +3629,6 @@
 
 [7m6[0m import AIChat from "@/components/ui/ai-chat"
 [7m [0m [91m                   ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/ai-voice-assistant.tsx[0m:[93m6[0m:[93m61[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/md' or its corresponding type declarations.
-
-[7m6[0m import { MdMic, MdMicOff, MdVolumeUp, MdSend, MdStop } from "react-icons/md"
-[7m [0m [91m                                                            ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/ai-voice-assistant.tsx[0m:[93m7[0m:[93m51[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m7[0m import { PiGlobeSimpleBold, PiWaveformBold } from "react-icons/pi"
-[7m [0m [91m                                                  ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/marketing/ai-voice-assistant.tsx[0m:[93m8[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/hooks/use-speech-recognition' or its corresponding type declarations.
 
@@ -3710,26 +3650,6 @@
 [7m56[0m     onEnd: (finalTranscript) => {
 [7m  [0m [91m            ~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/marketing/ai-voice-calling-hub.tsx[0m:[93m6[0m:[93m78[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiPhoneFill, PiMicrophoneFill, PiStopFill, PiSpeakerHighFill } from "react-icons/pi"
-[7m [0m [91m                                                                             ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/approval-workflow.tsx[0m:[93m22[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/ri' or its corresponding type declarations.
-
-[7m22[0m } from "react-icons/ri"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/approval-workflow.tsx[0m:[93m23[0m:[93m57[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m23[0m import { SiBritishairways, SiMastercard, SiSlack } from "react-icons/si"
-[7m  [0m [91m                                                        ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/bank-connection.tsx[0m:[93m6[0m:[93m70[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiLightningBold, PiArrowRightBold, PiCheckCircleBold } from "react-icons/pi"
-[7m [0m [91m                                                                     ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/bank-connection.tsx[0m:[93m7[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/bank-connection-modal' or its corresponding type declarations.
 
 [7m7[0m import BankConnectionModal from "@/components/ui/bank-connection-modal"
@@ -3739,46 +3659,6 @@
 
 [7m6[0m import TravelChatInput from "../ui/travel-chat-input"
 [7m [0m [91m                            ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/business-chat-demo.tsx[0m:[93m16[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m16[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/business-chat-demo.tsx[0m:[93m113[0m:[93m74[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m113[0m import { SiHubspot, SiGooglecalendar, SiZoom, SiGmail, SiIntercom } from "react-icons/si"
-[7m   [0m [91m                                                                         ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/business-flight-booking.tsx[0m:[93m17[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m17[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/business-flight-booking.tsx[0m:[93m18[0m:[93m104[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m18[0m import { SiAmericanairlines, SiDelta, SiUnitedairlines, SiLufthansa, SiQatarairways, SiEmirates } from "react-icons/si"
-[7m  [0m [91m                                                                                                       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/business-flight-booking.tsx[0m:[93m19[0m:[93m29[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m19[0m import { SiExpensify } from "react-icons/si"
-[7m  [0m [91m                            ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/business-intelligence.tsx[0m:[93m26[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m26[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/business-travel-slider.tsx[0m:[93m6[0m:[93m62[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m6[0m import { SiElevenlabs, SiAnthropic, SiHubspot, SiNike } from "react-icons/si"
-[7m [0m [91m                                                             ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/business-travel-slider.tsx[0m:[93m23[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m23[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/marketing/business-travel-slider.tsx[0m:[93m557[0m:[93m28[0m - [91merror[0m[90m TS7053: [0mElement implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ ElevenLabs: string[]; Anthropic: string[]; HubSpot: string[]; Nike: string[]; }'.
   No index signature with a parameter of type 'string' was found on type '{ ElevenLabs: string[]; Anthropic: string[]; HubSpot: string[]; Nike: string[]; }'.
@@ -3791,16 +3671,6 @@
 
 [7m557[0m                   message={companyTravelMessages[company.name][index % companyTravelMessages[company.name].length]}
 [7m   [0m [91m                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/cloud-ai-showcase.tsx[0m:[93m7[0m:[93m43[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m7[0m import { SiBritishairways, SiTesla } from "react-icons/si"
-[7m [0m [91m                                          ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/cloud-ai-showcase.tsx[0m:[93m8[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/md' or its corresponding type declarations.
-
-[7m8[0m import { MdMic, MdMicOff } from "react-icons/md"
-[7m [0m [91m                                ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/marketing/cloud-ai-showcase.tsx[0m:[93m9[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/hooks/use-speech-recognition' or its corresponding type declarations.
 
@@ -3822,65 +3692,15 @@
 [7m54[0m     onEnd: (finalTranscript) => {
 [7m  [0m [91m            ~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/marketing/community-showcase.tsx[0m:[93m6[0m:[93m98[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiRocketLaunchBold, PiChartLineUpBold, PiUsersBold, PiGlobeBold, PiDotsThreeBold } from "react-icons/pi"
-[7m [0m [91m                                                                                                 ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/compare-plans.tsx[0m:[93m7[0m:[93m74[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/tooltip' or its corresponding type declarations.
 
 [7m7[0m import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
 [7m [0m [91m                                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/marketing/expense-management.tsx[0m:[93m14[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/ri' or its corresponding type declarations.
-
-[7m14[0m } from "react-icons/ri"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/expense-management.tsx[0m:[93m36[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m36[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/flight-booking-showcase.tsx[0m:[93m13[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m13[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/flight-teams.tsx[0m:[93m13[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m13[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/flight-teams.tsx[0m:[93m14[0m:[93m47[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m14[0m import { SiBritishairways, SiLufthansa } from "react-icons/si"
-[7m  [0m [91m                                              ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/footer.tsx[0m:[93m5[0m:[93m77[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m5[0m import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail, SiDiscord } from "react-icons/si"
-[7m [0m [91m                                                                            ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/footer.tsx[0m:[93m6[0m:[93m57[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiArrowUpRightBold, PiCalendarCheckBold } from "react-icons/pi"
-[7m [0m [91m                                                        ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/founders-vision.tsx[0m:[93m7[0m:[93m26[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/counter-badge' or its corresponding type declarations.
 
 [7m7[0m import CounterBadge from "@/components/ui/counter-badge"
 [7m [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/future-legacy-vision.tsx[0m:[93m7[0m:[93m37[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m7[0m import { SiSouthwestairlines } from "react-icons/si"
-[7m [0m [91m                                    ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/global-business-access.tsx[0m:[93m16[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m16[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/marketing/hero.tsx[0m:[93m3[0m:[93m24[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/button' or its corresponding type declarations.
 
@@ -3927,45 +3747,15 @@
 [7m5[0m import { Button } from "@/components/ui/button"
 [7m [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/marketing/hiring.tsx[0m:[93m6[0m:[93m82[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiDotsNineBold, PiDotsSixBold, PiDotsThreeBold, PiArrowRightBold } from "react-icons/pi"
-[7m [0m [91m                                                                                 ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/hiring.tsx[0m:[93m7[0m:[93m29[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/bs' or its corresponding type declarations.
-
-[7m7[0m import { BsHeartFill } from "react-icons/bs"
-[7m [0m [91m                            ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/hiring.tsx[0m:[93m8[0m:[93m27[0m - [91merror[0m[90m TS2307: [0mCannot find module '@emotion/react' or its corresponding type declarations.
 
 [7m8[0m import { keyframes } from "@emotion/react"
 [7m [0m [91m                          ~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/marketing/hyperspeed-booking.tsx[0m:[93m8[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m8[0m import { PiCheckCircle } from "react-icons/pi"
-[7m [0m [91m                              ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/integrations-showcase.tsx[0m:[93m27[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m27[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/intelligent-policy-showcase.tsx[0m:[93m7[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '../ui/zia-chat-input' or its corresponding type declarations.
 
 [7m7[0m import { ZiaChatInput } from "../ui/zia-chat-input"
 [7m [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/launch-hero.tsx[0m:[93m6[0m:[93m25[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m6[0m import { SiSlack } from "react-icons/si"
-[7m [0m [91m                        ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/manifesto-showcase-alt.tsx[0m:[93m14[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m14[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/marketing/manifesto-showcase-alt.tsx[0m:[93m130[0m:[93m21[0m - [91merror[0m[90m TS7031: [0mBinding element 'skill' implicitly has an 'any' type.
 
@@ -4012,26 +3802,6 @@
 [7m266[0m const MilestoneCard = ({ milestone }) => (
 [7m   [0m [91m                         ~~~~~~~~~[0m
 
-[96m../../apps/web/components/marketing/mcp-ai-agents.tsx[0m:[93m16[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m16[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/mcp-ai-agents.tsx[0m:[93m29[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m29[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/mcp-ai-agents.tsx[0m:[93m30[0m:[93m32[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/tb' or its corresponding type declarations.
-
-[7m30[0m import { TbBrandBooking } from "react-icons/tb"
-[7m  [0m [91m                               ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/mcp-ai-agents.tsx[0m:[93m31[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/fa' or its corresponding type declarations.
-
-[7m31[0m import { FaMoneyCheckAlt } from "react-icons/fa"
-[7m  [0m [91m                                ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/mcp-ai-agents.tsx[0m:[93m598[0m:[93m25[0m - [91merror[0m[90m TS2322: [0mType 'string | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 
@@ -4075,16 +3845,6 @@
     [7m13[0m     alt: string;
     [7m  [0m [96m    ~~~[0m
     The expected type comes from property 'alt' which is declared here on type 'IntrinsicAttributes & Omit<DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>, "loading" | ... 5 more ... | "srcSet"> & { ...; } & RefAttributes<...>'
-
-[96m../../apps/web/components/marketing/mcp-flights-ai-agents.tsx[0m:[93m4[0m:[93m95[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m4[0m import { PiSparkle, PiAirplane, PiCalendar, PiCreditCard, PiUsers, PiChartBar, PiGlobe } from "react-icons/pi"
-[7m [0m [91m                                                                                              ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/modern-manifesto-showcase.tsx[0m:[93m6[0m:[93m96[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiGlobeBold, PiLightningBold, PiShieldCheckBold, PiDotsSixBold, PiDotsNineBold } from "react-icons/pi"
-[7m [0m [91m                                                                                               ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/marketing/modern-manifesto-showcase.tsx[0m:[93m250[0m:[93m27[0m - [91merror[0m[90m TS7031: [0mBinding element 'point' implicitly has an 'any' type.
 
@@ -4168,21 +3928,6 @@
 [7m549[0m                     onHover={(id) => setHoveredManifesto(id)}
 [7m   [0m [91m                              ~~[0m
 
-[96m../../apps/web/components/marketing/navigation.tsx[0m:[93m7[0m:[93m47[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m7[0m import { PiDotsNineBold, PiDotsSixBold } from "react-icons/pi"
-[7m [0m [91m                                              ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/navigation.tsx[0m:[93m8[0m:[93m66[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m8[0m import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
-[7m [0m [91m                                                                 ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/navigation.tsx[0m:[93m9[0m:[93m27[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/fa' or its corresponding type declarations.
-
-[7m9[0m import { FaDiscord } from "react-icons/fa"
-[7m [0m [91m                          ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/navigation.tsx[0m:[93m10[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/hooks/use-media-query' or its corresponding type declarations.
 
 [7m10[0m import { useMediaQuery } from "@/hooks/use-media-query"
@@ -4217,16 +3962,6 @@
 
 [7m7[0m import ExpenseManagement from "@/components/demo-product/expense-management"
 [7m [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/smart-reporting.tsx[0m:[93m5[0m:[93m103[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m5[0m import { SiJapanairlines, SiTurkishairlines, SiUnitedairlines, SiEtihadairways, SiQatarairways } from "react-icons/si"
-[7m [0m [91m                                                                                                      ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/smart-reporting.tsx[0m:[93m22[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m22[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/marketing/suitpax-ai-section.tsx[0m:[93m8[0m:[93m29[0m - [91merror[0m[90m TS2307: [0mCannot find module '../ui/shining-text' or its corresponding type declarations.
 
@@ -4273,11 +4008,6 @@
 [7m351[0m                                 {msg.actions.map((action, i) => (
 [7m   [0m [91m                                                          ~[0m
 
-[96m../../apps/web/components/marketing/trm-management.tsx[0m:[93m4[0m:[93m65[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m4[0m import { PiHandshakeBold, PiChartLineUpBold, PiUsersBold } from "react-icons/pi"
-[7m [0m [91m                                                                ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/video-showcase.tsx[0m:[93m7[0m:[93m25[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/video-player' or its corresponding type declarations.
 
 [7m7[0m import VideoPlayer from "@/components/video-player"
@@ -4288,20 +4018,10 @@
 [7m28[0m const FeatureBadge = ({ text, isActive = false }) => {
 [7m  [0m [91m                        ~~~~[0m
 
-[96m../../apps/web/components/marketing/vip-membership.tsx[0m:[93m14[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m14[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/marketing/vip-membership.tsx[0m:[93m17[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '../ui-crm/tab-navigation' or its corresponding type declarations.
 
 [7m17[0m import { TabNavigation } from "../ui-crm/tab-navigation"
 [7m  [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/marketing/visual-recognition-demo.tsx[0m:[93m6[0m:[93m45[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCheckCircle, PiPlusCircle } from "react-icons/pi"
-[7m [0m [91m                                            ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/onboarding/onboarding-flow.tsx[0m:[93m5[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/supabase/client' or its corresponding type declarations.
 
@@ -4556,11 +4276,6 @@
 [7m8[0m import { useVoiceAI } from "@/contexts/voice-ai-context"
 [7m [0m [91m                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/shared/agent-card.tsx[0m:[93m5[0m:[93m46[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m5[0m import { PiStarFill, PiChatCircleFill } from "react-icons/pi"
-[7m [0m [91m                                             ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/shared/agent-card.tsx[0m:[93m6[0m:[93m23[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/badge' or its corresponding type declarations.
 
 [7m6[0m import { Badge } from "@/components/ui/badge"
@@ -4630,11 +4345,6 @@
 
 [7m3[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/ui/badge.tsx[0m:[93m6[0m:[93m36[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/ri' or its corresponding type declarations.
-
-[7m6[0m import { RiArrowRightUpLine } from "react-icons/ri"
-[7m [0m [91m                                   ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/ui/button.tsx[0m:[93m2[0m:[93m22[0m - [91merror[0m[90m TS2307: [0mCannot find module '@radix-ui/react-slot' or its corresponding type declarations.
 
@@ -4746,11 +4456,6 @@
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/ui/checkbox.tsx[0m:[93m6[0m:[93m29[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCheckBold } from "react-icons/pi"
-[7m [0m [91m                            ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/ui/collapsible.tsx[0m:[93m3[0m:[93m39[0m - [91merror[0m[90m TS2307: [0mCannot find module '@radix-ui/react-collapsible' or its corresponding type declarations.
 
 [7m3[0m import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
@@ -4771,11 +4476,6 @@
 [7m6[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/ui/command.tsx[0m:[93m8[0m:[93m39[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m8[0m import { PiMagnifyingGlassBold } from "react-icons/pi"
-[7m [0m [91m                                      ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/ui/command.tsx[0m:[93m24[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'children' does not exist on type 'CommandDialogProps'.
 
 [7m24[0m const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
@@ -4791,11 +4491,6 @@
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/ui/dialog.tsx[0m:[93m6[0m:[93m25[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiXBold } from "react-icons/pi"
-[7m [0m [91m                        ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/ui/dropdown-menu.tsx[0m:[93m4[0m:[93m40[0m - [91merror[0m[90m TS2307: [0mCannot find module '@radix-ui/react-dropdown-menu' or its corresponding type declarations.
 
 [7m4[0m import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
@@ -4805,11 +4500,6 @@
 
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/ui/dropdown-menu.tsx[0m:[93m6[0m:[93m65[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCheckBold, PiCaretRightBold, PiDotOutlineBold } from "react-icons/pi"
-[7m [0m [91m                                                                ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/ui/input.tsx[0m:[93m3[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
@@ -4870,11 +4560,6 @@
 
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/ui/select.tsx[0m:[93m6[0m:[93m48[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCaretUpDownBold, PiCheckBold } from "react-icons/pi"
-[7m [0m [91m                                               ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/ui/separator.tsx[0m:[93m4[0m:[93m37[0m - [91merror[0m[90m TS2307: [0mCannot find module '@radix-ui/react-separator' or its corresponding type declarations.
 
@@ -4946,11 +4631,6 @@
 [7m5[0m import { Separator } from "@/components/ui/separator"
 [7m [0m [91m                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../../apps/web/components/voice-ai/conversation-interface.tsx[0m:[93m11[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m11[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../../apps/web/components/voice-ai/conversation-interface.tsx[0m:[93m12[0m:[93m24[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/button' or its corresponding type declarations.
 
 [7m12[0m import { Button } from "@/components/ui/button"
@@ -4975,16 +4655,6 @@
 
 [7m6[0m import { useVoiceAI } from "@/contexts/voice-ai-context"
 [7m [0m [91m                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/voice-ai/voice-control-panel.tsx[0m:[93m7[0m:[93m90[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/md' or its corresponding type declarations.
-
-[7m7[0m import { MdMic, MdMicOff, MdVolumeUp, MdVolumeOff, MdSettings, MdError, MdWarning } from "react-icons/md"
-[7m [0m [91m                                                                                         ~~~~~~~~~~~~~~~~[0m
-
-[96m../../apps/web/components/workspace/unified-workspace.tsx[0m:[93m18[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m18[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../../apps/web/components/workspace/unified-workspace.tsx[0m:[93m174[0m:[93m33[0m - [91merror[0m[90m TS7031: [0mBinding element 'project' implicitly has an 'any' type.
 
@@ -5591,11 +5261,6 @@
 [7m4[0m import Link from "next/link"
 [7m [0m [91m                 ~~~~~~~~~~~[0m
 
-[96m../ui/src/components/badge.tsx[0m:[93m6[0m:[93m36[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/ri' or its corresponding type declarations.
-
-[7m6[0m import { RiArrowRightUpLine } from "react-icons/ri"
-[7m [0m [91m                                   ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/button.tsx[0m:[93m5[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
 [7m5[0m import { cn } from "@/lib/utils"
@@ -5737,20 +5402,10 @@
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/checkbox.tsx[0m:[93m6[0m:[93m29[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCheckBold } from "react-icons/pi"
-[7m [0m [91m                            ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/command.tsx[0m:[93m6[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
 [7m6[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/command.tsx[0m:[93m8[0m:[93m39[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m8[0m import { PiMagnifyingGlassBold } from "react-icons/pi"
-[7m [0m [91m                                      ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/dashboard/activity-feed-card.tsx[0m:[93m3[0m:[93m58[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/card' or its corresponding type declarations.
 
@@ -6777,11 +6432,6 @@
 [7m7[0m import { usePathname, useRouter } from "next/navigation"
 [7m [0m [91m                                       ~~~~~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/dashboard/sidebar.tsx[0m:[93m40[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m40[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/dashboard/sidebar.tsx[0m:[93m41[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/supabase/client' or its corresponding type declarations.
 
 [7m41[0m import { createClient } from "@/lib/supabase/client"
@@ -7082,50 +6732,20 @@
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/demo-product/business-travel-platform.tsx[0m:[93m6[0m:[93m103[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m6[0m import { SiAmericanairlines, SiUnitedairlines, SiMarriott, SiDelta, SiBritishairways, SiHilton } from "react-icons/si"
-[7m [0m [91m                                                                                                      ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/demo-product/business-travel-platform.tsx[0m:[93m18[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m18[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/demo-product/expense-management.tsx[0m:[93m4[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/demo-product/expense-management.tsx[0m:[93m6[0m:[93m56[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m6[0m import { SiRevolut, SiBrex, SiWise, SiExpensify } from "react-icons/si"
-[7m [0m [91m                                                       ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/demo-product/expense-management.tsx[0m:[93m20[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m20[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/dialog.tsx[0m:[93m5[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/dialog.tsx[0m:[93m6[0m:[93m25[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiXBold } from "react-icons/pi"
-[7m [0m [91m                        ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/dropdown-menu.tsx[0m:[93m5[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/dropdown-menu.tsx[0m:[93m6[0m:[93m65[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCheckBold, PiCaretRightBold, PiDotOutlineBold } from "react-icons/pi"
-[7m [0m [91m                                                                ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/flights/airport-search.tsx[0m:[93m4[0m:[93m23[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/input' or its corresponding type declarations.
 
@@ -7612,11 +7232,6 @@
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/ai-agent-voice.tsx[0m:[93m15[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m15[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/ai-agent-voice.tsx[0m:[93m16[0m:[93m34[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/hooks/use-audio-recorder' or its corresponding type declarations.
 
 [7m16[0m import { useAudioRecorder } from "@/hooks/use-audio-recorder"
@@ -7662,11 +7277,6 @@
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/ai-meetings-attachment.tsx[0m:[93m16[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m16[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/ai-meetings-attachment.tsx[0m:[93m92[0m:[93m34[0m - [91merror[0m[90m TS7031: [0mBinding element 'Icon' implicitly has an 'any' type.
 
 [7m92[0m const IntegrationIcon = ({ icon: Icon, name }) => {
@@ -7691,16 +7301,6 @@
 
 [7m5[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/ai-voice-assistant.tsx[0m:[93m6[0m:[93m61[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/md' or its corresponding type declarations.
-
-[7m6[0m import { MdMic, MdMicOff, MdVolumeUp, MdSend, MdStop } from "react-icons/md"
-[7m [0m [91m                                                            ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/ai-voice-assistant.tsx[0m:[93m7[0m:[93m51[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m7[0m import { PiGlobeSimpleBold, PiWaveformBold } from "react-icons/pi"
-[7m [0m [91m                                                  ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/ai-voice-assistant.tsx[0m:[93m8[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/hooks/use-speech-recognition' or its corresponding type declarations.
 
@@ -7727,11 +7327,6 @@
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/ai-voice-calling-hub.tsx[0m:[93m6[0m:[93m78[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiPhoneFill, PiMicrophoneFill, PiStopFill, PiSpeakerHighFill } from "react-icons/pi"
-[7m [0m [91m                                                                             ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/airlines-slider.tsx[0m:[93m5[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
 [7m5[0m import Image from "next/image"
@@ -7752,16 +7347,6 @@
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/approval-workflow.tsx[0m:[93m22[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/ri' or its corresponding type declarations.
-
-[7m22[0m } from "react-icons/ri"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/approval-workflow.tsx[0m:[93m23[0m:[93m57[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m23[0m import { SiBritishairways, SiMastercard, SiSlack } from "react-icons/si"
-[7m  [0m [91m                                                        ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/automated-travel-policies.tsx[0m:[93m4[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
 [7m4[0m import Image from "next/image"
@@ -7771,11 +7356,6 @@
 
 [7m5[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/bank-connection.tsx[0m:[93m6[0m:[93m70[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiLightningBold, PiArrowRightBold, PiCheckCircleBold } from "react-icons/pi"
-[7m [0m [91m                                                                     ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/bank-connection.tsx[0m:[93m7[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/bank-connection-modal' or its corresponding type declarations.
 
@@ -7792,45 +7372,15 @@
 [7m6[0m import TravelChatInput from "../ui/travel-chat-input"
 [7m [0m [91m                            ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/business-chat-demo.tsx[0m:[93m16[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m16[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/business-chat-demo.tsx[0m:[93m113[0m:[93m74[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m113[0m import { SiHubspot, SiGooglecalendar, SiZoom, SiGmail, SiIntercom } from "react-icons/si"
-[7m   [0m [91m                                                                         ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/business-flight-booking.tsx[0m:[93m4[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/business-flight-booking.tsx[0m:[93m17[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m17[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/business-flight-booking.tsx[0m:[93m18[0m:[93m104[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m18[0m import { SiAmericanairlines, SiDelta, SiUnitedairlines, SiLufthansa, SiQatarairways, SiEmirates } from "react-icons/si"
-[7m  [0m [91m                                                                                                       ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/business-flight-booking.tsx[0m:[93m19[0m:[93m29[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m19[0m import { SiExpensify } from "react-icons/si"
-[7m  [0m [91m                            ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/business-intelligence.tsx[0m:[93m7[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
 [7m7[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/business-intelligence.tsx[0m:[93m26[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m26[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/business-travel-revolution.tsx[0m:[93m4[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
@@ -7846,16 +7396,6 @@
 
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/business-travel-slider.tsx[0m:[93m6[0m:[93m62[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m6[0m import { SiElevenlabs, SiAnthropic, SiHubspot, SiNike } from "react-icons/si"
-[7m [0m [91m                                                             ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/business-travel-slider.tsx[0m:[93m23[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m23[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/business-travel-slider.tsx[0m:[93m557[0m:[93m28[0m - [91merror[0m[90m TS7053: [0mElement implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ ElevenLabs: string[]; Anthropic: string[]; HubSpot: string[]; Nike: string[]; }'.
   No index signature with a parameter of type 'string' was found on type '{ ElevenLabs: string[]; Anthropic: string[]; HubSpot: string[]; Nike: string[]; }'.
@@ -7873,16 +7413,6 @@
 
 [7m5[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/cloud-ai-showcase.tsx[0m:[93m7[0m:[93m43[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m7[0m import { SiBritishairways, SiTesla } from "react-icons/si"
-[7m [0m [91m                                          ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/cloud-ai-showcase.tsx[0m:[93m8[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/md' or its corresponding type declarations.
-
-[7m8[0m import { MdMic, MdMicOff } from "react-icons/md"
-[7m [0m [91m                                ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/cloud-ai-showcase.tsx[0m:[93m9[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/hooks/use-speech-recognition' or its corresponding type declarations.
 
@@ -7909,11 +7439,6 @@
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/community-showcase.tsx[0m:[93m6[0m:[93m98[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiRocketLaunchBold, PiChartLineUpBold, PiUsersBold, PiGlobeBold, PiDotsThreeBold } from "react-icons/pi"
-[7m [0m [91m                                                                                                 ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/compare-plans.tsx[0m:[93m7[0m:[93m74[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/tooltip' or its corresponding type declarations.
 
 [7m7[0m import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
@@ -7929,21 +7454,6 @@
 [7m5[0m import Link from "next/link"
 [7m [0m [91m                 ~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/expense-management.tsx[0m:[93m14[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/ri' or its corresponding type declarations.
-
-[7m14[0m } from "react-icons/ri"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/expense-management.tsx[0m:[93m36[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m36[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/flight-booking-showcase.tsx[0m:[93m13[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m13[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/flight-booking-showcase.tsx[0m:[93m14[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
 [7m14[0m import Image from "next/image"
@@ -7954,16 +7464,6 @@
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/flight-teams.tsx[0m:[93m13[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m13[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/flight-teams.tsx[0m:[93m14[0m:[93m47[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m14[0m import { SiBritishairways, SiLufthansa } from "react-icons/si"
-[7m  [0m [91m                                              ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/footer.tsx[0m:[93m3[0m:[93m18[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/link' or its corresponding type declarations.
 
 [7m3[0m import Link from "next/link"
@@ -7973,16 +7473,6 @@
 
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/footer.tsx[0m:[93m5[0m:[93m77[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m5[0m import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail, SiDiscord } from "react-icons/si"
-[7m [0m [91m                                                                            ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/footer.tsx[0m:[93m6[0m:[93m57[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiArrowUpRightBold, PiCalendarCheckBold } from "react-icons/pi"
-[7m [0m [91m                                                        ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/founders-open-letter.tsx[0m:[93m4[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
@@ -8013,16 +7503,6 @@
 
 [7m6[0m import Link from "next/link"
 [7m [0m [91m                 ~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/future-legacy-vision.tsx[0m:[93m7[0m:[93m37[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m7[0m import { SiSouthwestairlines } from "react-icons/si"
-[7m [0m [91m                                    ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/global-business-access.tsx[0m:[93m16[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m16[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/hero.tsx[0m:[93m3[0m:[93m24[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/button' or its corresponding type declarations.
 
@@ -8079,16 +7559,6 @@
 [7m5[0m import { Button } from "@/components/ui/button"
 [7m [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/hiring.tsx[0m:[93m6[0m:[93m82[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiDotsNineBold, PiDotsSixBold, PiDotsThreeBold, PiArrowRightBold } from "react-icons/pi"
-[7m [0m [91m                                                                                 ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/hiring.tsx[0m:[93m7[0m:[93m29[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/bs' or its corresponding type declarations.
-
-[7m7[0m import { BsHeartFill } from "react-icons/bs"
-[7m [0m [91m                            ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/hiring.tsx[0m:[93m8[0m:[93m27[0m - [91merror[0m[90m TS2307: [0mCannot find module '@emotion/react' or its corresponding type declarations.
 
 [7m8[0m import { keyframes } from "@emotion/react"
@@ -8099,20 +7569,10 @@
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/hyperspeed-booking.tsx[0m:[93m8[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m8[0m import { PiCheckCircle } from "react-icons/pi"
-[7m [0m [91m                              ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/integrations-showcase.tsx[0m:[93m5[0m:[93m18[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/link' or its corresponding type declarations.
 
 [7m5[0m import Link from "next/link"
 [7m [0m [91m                 ~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/integrations-showcase.tsx[0m:[93m27[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m27[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/intelligent-policy-showcase.tsx[0m:[93m5[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
@@ -8129,20 +7589,10 @@
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/launch-hero.tsx[0m:[93m6[0m:[93m25[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m6[0m import { SiSlack } from "react-icons/si"
-[7m [0m [91m                        ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/manifesto-showcase-alt.tsx[0m:[93m5[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
 [7m5[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/manifesto-showcase-alt.tsx[0m:[93m14[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m14[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/manifesto-showcase-alt.tsx[0m:[93m15[0m:[93m18[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/link' or its corresponding type declarations.
 
@@ -8199,40 +7649,10 @@
 [7m5[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/mcp-ai-agents.tsx[0m:[93m16[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m16[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/mcp-ai-agents.tsx[0m:[93m29[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m29[0m } from "react-icons/si"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/mcp-ai-agents.tsx[0m:[93m30[0m:[93m32[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/tb' or its corresponding type declarations.
-
-[7m30[0m import { TbBrandBooking } from "react-icons/tb"
-[7m  [0m [91m                               ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/mcp-ai-agents.tsx[0m:[93m31[0m:[93m33[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/fa' or its corresponding type declarations.
-
-[7m31[0m import { FaMoneyCheckAlt } from "react-icons/fa"
-[7m  [0m [91m                                ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/mcp-flights-ai-agents.tsx[0m:[93m4[0m:[93m95[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m4[0m import { PiSparkle, PiAirplane, PiCalendar, PiCreditCard, PiUsers, PiChartBar, PiGlobe } from "react-icons/pi"
-[7m [0m [91m                                                                                              ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/modern-manifesto-showcase.tsx[0m:[93m5[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
 [7m5[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/modern-manifesto-showcase.tsx[0m:[93m6[0m:[93m96[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiGlobeBold, PiLightningBold, PiShieldCheckBold, PiDotsSixBold, PiDotsNineBold } from "react-icons/pi"
-[7m [0m [91m                                                                                               ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/modern-manifesto-showcase.tsx[0m:[93m250[0m:[93m27[0m - [91merror[0m[90m TS7031: [0mBinding element 'point' implicitly has an 'any' type.
 
@@ -8326,21 +7746,6 @@
 [7m5[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/navigation.tsx[0m:[93m7[0m:[93m47[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m7[0m import { PiDotsNineBold, PiDotsSixBold } from "react-icons/pi"
-[7m [0m [91m                                              ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/navigation.tsx[0m:[93m8[0m:[93m66[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m8[0m import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
-[7m [0m [91m                                                                 ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/navigation.tsx[0m:[93m9[0m:[93m27[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/fa' or its corresponding type declarations.
-
-[7m9[0m import { FaDiscord } from "react-icons/fa"
-[7m [0m [91m                          ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/navigation.tsx[0m:[93m10[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/hooks/use-media-query' or its corresponding type declarations.
 
 [7m10[0m import { useMediaQuery } from "@/hooks/use-media-query"
@@ -8405,16 +7810,6 @@
 
 [7m3[0m import Link from "next/link"
 [7m [0m [91m                 ~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/smart-reporting.tsx[0m:[93m5[0m:[93m103[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/si' or its corresponding type declarations.
-
-[7m5[0m import { SiJapanairlines, SiTurkishairlines, SiUnitedairlines, SiEtihadairways, SiQatarairways } from "react-icons/si"
-[7m [0m [91m                                                                                                      ~~~~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/smart-reporting.tsx[0m:[93m22[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m22[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/marketing/suitpax-ai-section.tsx[0m:[93m6[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
@@ -8496,11 +7891,6 @@
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/trm-management.tsx[0m:[93m4[0m:[93m65[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m4[0m import { PiHandshakeBold, PiChartLineUpBold, PiUsersBold } from "react-icons/pi"
-[7m [0m [91m                                                                ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/video-showcase.tsx[0m:[93m4[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
 [7m4[0m import Image from "next/image"
@@ -8521,11 +7911,6 @@
 [7m5[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/marketing/vip-membership.tsx[0m:[93m14[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m14[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/marketing/vip-membership.tsx[0m:[93m17[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '../ui-crm/tab-navigation' or its corresponding type declarations.
 
 [7m17[0m import { TabNavigation } from "../ui-crm/tab-navigation"
@@ -8535,11 +7920,6 @@
 
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/marketing/visual-recognition-demo.tsx[0m:[93m6[0m:[93m45[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCheckCircle, PiPlusCircle } from "react-icons/pi"
-[7m [0m [91m                                            ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/mini-chat.tsx[0m:[93m4[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
@@ -8728,7 +8108,8 @@
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/prompt-kit/jsx-preview.tsx[0m:[93m4[0m:[93m26[0m - [91merror[0m[90m TS2307: [0mCannot find module 'sanitize-html' or its corresponding type declarations.
+[96m../ui/src/components/prompt-kit/jsx-preview.tsx[0m:[93m4[0m:[93m26[0m - [91merror[0m[90m TS7016: [0mCould not find a declaration file for module 'sanitize-html'. '/workspace/node_modules/.pnpm/sanitize-html@2.17.0/node_modules/sanitize-html/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/sanitize-html` if it exists or add a new declaration (.d.ts) file containing `declare module 'sanitize-html';`
 
 [7m4[0m import sanitizeHtml from "sanitize-html"
 [7m [0m [91m                         ~~~~~~~~~~~~~~~[0m
@@ -8849,11 +8230,6 @@
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/select.tsx[0m:[93m6[0m:[93m48[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCaretUpDownBold, PiCheckBold } from "react-icons/pi"
-[7m [0m [91m                                               ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/separator.tsx[0m:[93m6[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
 [7m6[0m import { cn } from "@/lib/utils"
@@ -8863,11 +8239,6 @@
 
 [7m4[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/shared/agent-card.tsx[0m:[93m5[0m:[93m46[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m5[0m import { PiStarFill, PiChatCircleFill } from "react-icons/pi"
-[7m [0m [91m                                             ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/shared/agent-card.tsx[0m:[93m6[0m:[93m23[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/badge' or its corresponding type declarations.
 
@@ -8999,11 +8370,6 @@
 [7m4[0m import Link from "next/link"
 [7m [0m [91m                 ~~~~~~~~~~~[0m
 
-[96m../ui/src/components/ui/badge.tsx[0m:[93m6[0m:[93m36[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/ri' or its corresponding type declarations.
-
-[7m6[0m import { RiArrowRightUpLine } from "react-icons/ri"
-[7m [0m [91m                                   ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/ui/button.tsx[0m:[93m5[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
 [7m5[0m import { cn } from "@/lib/utils"
@@ -9075,40 +8441,20 @@
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/ui/checkbox.tsx[0m:[93m6[0m:[93m29[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCheckBold } from "react-icons/pi"
-[7m [0m [91m                            ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/ui/command.tsx[0m:[93m6[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
 [7m6[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/ui/command.tsx[0m:[93m8[0m:[93m39[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m8[0m import { PiMagnifyingGlassBold } from "react-icons/pi"
-[7m [0m [91m                                      ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/ui/dialog.tsx[0m:[93m5[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/ui/dialog.tsx[0m:[93m6[0m:[93m25[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiXBold } from "react-icons/pi"
-[7m [0m [91m                        ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/ui/dropdown-menu.tsx[0m:[93m5[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/ui/dropdown-menu.tsx[0m:[93m6[0m:[93m65[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCheckBold, PiCaretRightBold, PiDotOutlineBold } from "react-icons/pi"
-[7m [0m [91m                                                                ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/ui/hacker-news-badge.tsx[0m:[93m2[0m:[93m18[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/link' or its corresponding type declarations.
 
@@ -9149,11 +8495,6 @@
 
 [7m5[0m import { cn } from "@/lib/utils"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/ui/select.tsx[0m:[93m6[0m:[93m48[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m6[0m import { PiCaretUpDownBold, PiCheckBold } from "react-icons/pi"
-[7m [0m [91m                                               ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/ui/separator.tsx[0m:[93m6[0m:[93m20[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/lib/utils' or its corresponding type declarations.
 
@@ -9265,11 +8606,6 @@
 [7m6[0m import Script from "next/script"
 [7m [0m [91m                   ~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/voice-ai/conversation-interface.tsx[0m:[93m11[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m11[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/voice-ai/conversation-interface.tsx[0m:[93m12[0m:[93m24[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/components/ui/button' or its corresponding type declarations.
 
 [7m12[0m import { Button } from "@/components/ui/button"
@@ -9295,20 +8631,10 @@
 [7m6[0m import { useVoiceAI } from "@/contexts/voice-ai-context"
 [7m [0m [91m                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96m../ui/src/components/voice-ai/voice-control-panel.tsx[0m:[93m7[0m:[93m90[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/md' or its corresponding type declarations.
-
-[7m7[0m import { MdMic, MdMicOff, MdVolumeUp, MdVolumeOff, MdSettings, MdError, MdWarning } from "react-icons/md"
-[7m [0m [91m                                                                                         ~~~~~~~~~~~~~~~~[0m
-
 [96m../ui/src/components/workspace/unified-workspace.tsx[0m:[93m5[0m:[93m19[0m - [91merror[0m[90m TS2307: [0mCannot find module 'next/image' or its corresponding type declarations.
 
 [7m5[0m import Image from "next/image"
 [7m [0m [91m                  ~~~~~~~~~~~~[0m
-
-[96m../ui/src/components/workspace/unified-workspace.tsx[0m:[93m18[0m:[93m8[0m - [91merror[0m[90m TS2307: [0mCannot find module 'react-icons/pi' or its corresponding type declarations.
-
-[7m18[0m } from "react-icons/pi"
-[7m  [0m [91m       ~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/components/workspace/unified-workspace.tsx[0m:[93m174[0m:[93m33[0m - [91merror[0m[90m TS7031: [0mBinding element 'project' implicitly has an 'any' type.
 
@@ -9329,6 +8655,26 @@
 
 [7m5[0m import type { SpeechRecognition, SpeechRecognitionEvent, SpeechRecognitionErrorEvent } from "@/types/speech-recognition"
 [7m [0m [91m                                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96m../ui/src/hooks/index.ts[0m:[93m7[0m:[93m15[0m - [91merror[0m[90m TS2307: [0mCannot find module './use-scroll-anchor' or its corresponding type declarations.
+
+[7m7[0m export * from './use-scroll-anchor';
+[7m [0m [91m              ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96m../ui/src/hooks/index.ts[0m:[93m10[0m:[93m15[0m - [91merror[0m[90m TS2307: [0mCannot find module './use-clipboard' or its corresponding type declarations.
+
+[7m10[0m export * from './use-clipboard';
+[7m  [0m [91m              ~~~~~~~~~~~~~~~~~[0m
+
+[96m../ui/src/hooks/index.ts[0m:[93m11[0m:[93m15[0m - [91merror[0m[90m TS2307: [0mCannot find module './use-debounce' or its corresponding type declarations.
+
+[7m11[0m export * from './use-debounce';
+[7m  [0m [91m              ~~~~~~~~~~~~~~~~[0m
+
+[96m../ui/src/hooks/index.ts[0m:[93m12[0m:[93m15[0m - [91merror[0m[90m TS2307: [0mCannot find module './use-local-storage' or its corresponding type declarations.
+
+[7m12[0m export * from './use-local-storage';
+[7m  [0m [91m              ~~~~~~~~~~~~~~~~~~~~~[0m
 
 [96m../ui/src/hooks/use-audio-player.ts[0m:[93m33[0m:[93m29[0m - [91merror[0m[90m TS2554: [0mExpected 1 arguments, but got 0.
 
@@ -10816,7 +10162,7 @@
 [7m  [0m [91m      ~~~~~~[0m
 
 
-Found 2121 errors in 515 files.
+Found 1990 errors in 493 files.
 
 Errors  Files
      4  ../../apps/dashboard/app/air-data/page.tsx[90m:4[0m
@@ -10848,14 +10194,14 @@ Errors  Files
      5  ../../apps/web/app/ClientLayout.tsx[90m:5[0m
      1  ../../apps/web/app/auth/callback/route.ts[90m:4[0m
      1  ../../apps/web/app/auth/forgot-password/page.tsx[90m:11[0m
-     3  ../../apps/web/app/auth/login/page.tsx[90m:7[0m
+     2  ../../apps/web/app/auth/login/page.tsx[90m:7[0m
      1  ../../apps/web/app/auth/reset-password/page.tsx[90m:12[0m
-     3  ../../apps/web/app/auth/signup/page.tsx[90m:7[0m
+     2  ../../apps/web/app/auth/signup/page.tsx[90m:7[0m
      2  ../../apps/web/app/contact/page.tsx[90m:2[0m
      2  ../../apps/web/app/manifesto/page.tsx[90m:2[0m
     12  ../../apps/web/app/page.tsx[90m:1[0m
      2  ../../apps/web/app/pricing/page.tsx[90m:2[0m
-     2  ../../apps/web/app/voice-ai-demo/page.tsx[90m:7[0m
+     1  ../../apps/web/app/voice-ai-demo/page.tsx[90m:7[0m
      6  ../../apps/web/components/charts/business-metrics-chart.tsx[90m:5[0m
      6  ../../apps/web/components/charts/expense-trends-chart.tsx[90m:5[0m
      2  ../../apps/web/components/charts/flight-usage-chart.tsx[90m:3[0m
@@ -10910,7 +10256,7 @@ Errors  Files
      1  ../../apps/web/components/dashboard/quick-actions.tsx[90m:5[0m
      2  ../../apps/web/components/dashboard/recent-projects-card.tsx[90m:3[0m
      3  ../../apps/web/components/dashboard/revenue-forecast-card.tsx[90m:3[0m
-    18  ../../apps/web/components/dashboard/sidebar.tsx[90m:40[0m
+    17  ../../apps/web/components/dashboard/sidebar.tsx[90m:41[0m
      6  ../../apps/web/components/dashboard/stats-overview.tsx[90m:5[0m
      1  ../../apps/web/components/dashboard/system-health-card.tsx[90m:3[0m
     10  ../../apps/web/components/dashboard/task-detail-modal.tsx[90m:4[0m
@@ -10919,8 +10265,6 @@ Errors  Files
      2  ../../apps/web/components/dashboard/transaction-list.tsx[90m:5[0m
      6  ../../apps/web/components/dashboard/travel-intel-radar-widget.tsx[90m:4[0m
      2  ../../apps/web/components/dashboard/unlock-premium-card.tsx[90m:3[0m
-     2  ../../apps/web/components/demo-product/business-travel-platform.tsx[90m:6[0m
-     2  ../../apps/web/components/demo-product/expense-management.tsx[90m:6[0m
      4  ../../apps/web/components/flights/airport-search.tsx[90m:4[0m
      1  ../../apps/web/components/flights/booking-summary.tsx[90m:3[0m
      5  ../../apps/web/components/flights/flight-card.tsx[90m:3[0m
@@ -10936,47 +10280,29 @@ Errors  Files
      4  ../../apps/web/components/flights/search-analytics.tsx[90m:13[0m
      8  ../../apps/web/components/hotels/hotel-search-form.tsx[90m:5[0m
      1  ../../apps/web/components/layout/page-header.tsx[90m:6[0m
-     9  ../../apps/web/components/marketing/ai-agent-voice.tsx[90m:15[0m
-     3  ../../apps/web/components/marketing/ai-meetings-attachment.tsx[90m:16[0m
+     8  ../../apps/web/components/marketing/ai-agent-voice.tsx[90m:16[0m
+     2  ../../apps/web/components/marketing/ai-meetings-attachment.tsx[90m:92[0m
      1  ../../apps/web/components/marketing/ai-travel-agents.tsx[90m:6[0m
-     6  ../../apps/web/components/marketing/ai-voice-assistant.tsx[90m:6[0m
-     1  ../../apps/web/components/marketing/ai-voice-calling-hub.tsx[90m:6[0m
-     2  ../../apps/web/components/marketing/approval-workflow.tsx[90m:22[0m
-     2  ../../apps/web/components/marketing/bank-connection.tsx[90m:6[0m
-     3  ../../apps/web/components/marketing/business-chat-demo.tsx[90m:6[0m
-     3  ../../apps/web/components/marketing/business-flight-booking.tsx[90m:17[0m
-     1  ../../apps/web/components/marketing/business-intelligence.tsx[90m:26[0m
-     4  ../../apps/web/components/marketing/business-travel-slider.tsx[90m:6[0m
-     6  ../../apps/web/components/marketing/cloud-ai-showcase.tsx[90m:7[0m
-     1  ../../apps/web/components/marketing/community-showcase.tsx[90m:6[0m
+     4  ../../apps/web/components/marketing/ai-voice-assistant.tsx[90m:8[0m
+     1  ../../apps/web/components/marketing/bank-connection.tsx[90m:7[0m
+     1  ../../apps/web/components/marketing/business-chat-demo.tsx[90m:6[0m
+     2  ../../apps/web/components/marketing/business-travel-slider.tsx[90m:557[0m
+     4  ../../apps/web/components/marketing/cloud-ai-showcase.tsx[90m:9[0m
      1  ../../apps/web/components/marketing/compare-plans.tsx[90m:7[0m
-     2  ../../apps/web/components/marketing/expense-management.tsx[90m:14[0m
-     1  ../../apps/web/components/marketing/flight-booking-showcase.tsx[90m:13[0m
-     2  ../../apps/web/components/marketing/flight-teams.tsx[90m:13[0m
-     2  ../../apps/web/components/marketing/footer.tsx[90m:5[0m
      1  ../../apps/web/components/marketing/founders-vision.tsx[90m:7[0m
-     1  ../../apps/web/components/marketing/future-legacy-vision.tsx[90m:7[0m
-     1  ../../apps/web/components/marketing/global-business-access.tsx[90m:16[0m
      8  ../../apps/web/components/marketing/hero.tsx[90m:3[0m
-     4  ../../apps/web/components/marketing/hiring.tsx[90m:5[0m
-     1  ../../apps/web/components/marketing/hyperspeed-booking.tsx[90m:8[0m
-     1  ../../apps/web/components/marketing/integrations-showcase.tsx[90m:27[0m
+     2  ../../apps/web/components/marketing/hiring.tsx[90m:5[0m
      1  ../../apps/web/components/marketing/intelligent-policy-showcase.tsx[90m:7[0m
-     1  ../../apps/web/components/marketing/launch-hero.tsx[90m:6[0m
-    10  ../../apps/web/components/marketing/manifesto-showcase-alt.tsx[90m:14[0m
-     8  ../../apps/web/components/marketing/mcp-ai-agents.tsx[90m:16[0m
-     1  ../../apps/web/components/marketing/mcp-flights-ai-agents.tsx[90m:4[0m
-    17  ../../apps/web/components/marketing/modern-manifesto-showcase.tsx[90m:6[0m
-     8  ../../apps/web/components/marketing/navigation.tsx[90m:7[0m
+     9  ../../apps/web/components/marketing/manifesto-showcase-alt.tsx[90m:130[0m
+     4  ../../apps/web/components/marketing/mcp-ai-agents.tsx[90m:598[0m
+    16  ../../apps/web/components/marketing/modern-manifesto-showcase.tsx[90m:250[0m
+     5  ../../apps/web/components/marketing/navigation.tsx[90m:10[0m
      2  ../../apps/web/components/marketing/product.tsx[90m:6[0m
-     2  ../../apps/web/components/marketing/smart-reporting.tsx[90m:5[0m
      1  ../../apps/web/components/marketing/suitpax-ai-section.tsx[90m:8[0m
      1  ../../apps/web/components/marketing/task-management.tsx[90m:4[0m
      7  ../../apps/web/components/marketing/team-collaboration-showcase.tsx[90m:18[0m
-     1  ../../apps/web/components/marketing/trm-management.tsx[90m:4[0m
      2  ../../apps/web/components/marketing/video-showcase.tsx[90m:7[0m
-     2  ../../apps/web/components/marketing/vip-membership.tsx[90m:14[0m
-     1  ../../apps/web/components/marketing/visual-recognition-demo.tsx[90m:6[0m
+     1  ../../apps/web/components/marketing/vip-membership.tsx[90m:17[0m
     12  ../../apps/web/components/onboarding/onboarding-flow.tsx[90m:5[0m
      1  ../../apps/web/components/partners-showcase.tsx[90m:5[0m
      2  ../../apps/web/components/prompt-kit/chat-container.tsx[90m:3[0m
@@ -10996,27 +10322,27 @@ Errors  Files
      2  ../../apps/web/components/prompt-kit/token-indicator.tsx[90m:4[0m
      1  ../../apps/web/components/prompt-kit/tool-selector.tsx[90m:3[0m
      2  ../../apps/web/components/prompt-kit/voice-button.tsx[90m:7[0m
-     2  ../../apps/web/components/shared/agent-card.tsx[90m:5[0m
+     1  ../../apps/web/components/shared/agent-card.tsx[90m:6[0m
      1  ../../apps/web/components/shared/section-container.tsx[90m:6[0m
      8  ../../apps/web/components/stays/stays-search-form.tsx[90m:4[0m
      1  ../../apps/web/components/ui/ai-search-input.tsx[90m:7[0m
      2  ../../apps/web/components/ui/avatar.tsx[90m:4[0m
-     2  ../../apps/web/components/ui/badge.tsx[90m:3[0m
+     1  ../../apps/web/components/ui/badge.tsx[90m:3[0m
      5  ../../apps/web/components/ui/button.tsx[90m:2[0m
      9  ../../apps/web/components/ui/calendar.tsx[90m:9[0m
      1  ../../apps/web/components/ui/card.tsx[90m:3[0m
      5  ../../apps/web/components/ui/chart.tsx[90m:4[0m
-     3  ../../apps/web/components/ui/checkbox.tsx[90m:4[0m
+     2  ../../apps/web/components/ui/checkbox.tsx[90m:4[0m
      1  ../../apps/web/components/ui/collapsible.tsx[90m:3[0m
-     5  ../../apps/web/components/ui/command.tsx[90m:4[0m
-     3  ../../apps/web/components/ui/dialog.tsx[90m:4[0m
-     3  ../../apps/web/components/ui/dropdown-menu.tsx[90m:4[0m
+     4  ../../apps/web/components/ui/command.tsx[90m:4[0m
+     2  ../../apps/web/components/ui/dialog.tsx[90m:4[0m
+     2  ../../apps/web/components/ui/dropdown-menu.tsx[90m:4[0m
      1  ../../apps/web/components/ui/input.tsx[90m:3[0m
      3  ../../apps/web/components/ui/label.tsx[90m:4[0m
      2  ../../apps/web/components/ui/popover.tsx[90m:4[0m
      2  ../../apps/web/components/ui/progress.tsx[90m:4[0m
      2  ../../apps/web/components/ui/scroll-area.tsx[90m:4[0m
-     3  ../../apps/web/components/ui/select.tsx[90m:4[0m
+     2  ../../apps/web/components/ui/select.tsx[90m:4[0m
      2  ../../apps/web/components/ui/separator.tsx[90m:4[0m
      1  ../../apps/web/components/ui/skeleton.tsx[90m:1[0m
      2  ../../apps/web/components/ui/switch.tsx[90m:4[0m
@@ -11024,10 +10350,10 @@ Errors  Files
      1  ../../apps/web/components/ui/textarea.tsx[90m:3[0m
      2  ../../apps/web/components/ui/tooltip.tsx[90m:4[0m
      4  ../../apps/web/components/ui/unified-dialog.tsx[90m:2[0m
-     3  ../../apps/web/components/voice-ai/conversation-interface.tsx[90m:11[0m
+     2  ../../apps/web/components/voice-ai/conversation-interface.tsx[90m:12[0m
      2  ../../apps/web/components/voice-ai/voice-ai-demo.tsx[90m:2[0m
-     2  ../../apps/web/components/voice-ai/voice-control-panel.tsx[90m:6[0m
-     4  ../../apps/web/components/workspace/unified-workspace.tsx[90m:18[0m
+     1  ../../apps/web/components/voice-ai/voice-control-panel.tsx[90m:6[0m
+     3  ../../apps/web/components/workspace/unified-workspace.tsx[90m:174[0m
      4  ../../infrastructure/duffel/repository.factory.ts[90m:4[0m
      8  ../domains/src/domains/flights/services/flight-search.service.ts[90m:8[0m
      7  ../domains/src/domains/flights/stores/flight-search.store.ts[90m:88[0m
@@ -11052,7 +10378,7 @@ Errors  Files
      1  ../ui/src/components/ai-chat.tsx[90m:5[0m
      2  ../ui/src/components/ai-search-input.tsx[90m:6[0m
      1  ../ui/src/components/avatar.tsx[90m:6[0m
-     3  ../ui/src/components/badge.tsx[90m:3[0m
+     2  ../ui/src/components/badge.tsx[90m:3[0m
      1  ../ui/src/components/button.tsx[90m:5[0m
      2  ../ui/src/components/calendar.tsx[90m:11[0m
      1  ../ui/src/components/card.tsx[90m:3[0m
@@ -11065,8 +10391,8 @@ Errors  Files
      2  ../ui/src/components/charts/token-usage-chart.tsx[90m:2[0m
      1  ../ui/src/components/charts/travel-efficiency-chart.tsx[90m:5[0m
      2  ../ui/src/components/charts/user-stats-chart.tsx[90m:3[0m
-     2  ../ui/src/components/checkbox.tsx[90m:5[0m
-     2  ../ui/src/components/command.tsx[90m:6[0m
+     1  ../ui/src/components/checkbox.tsx[90m:5[0m
+     1  ../ui/src/components/command.tsx[90m:6[0m
      1  ../ui/src/components/dashboard/activity-feed-card.tsx[90m:3[0m
     11  ../ui/src/components/dashboard/advanced-editor.tsx[90m:3[0m
      2  ../ui/src/components/dashboard/ai-suggestions-card.tsx[90m:3[0m
@@ -11114,7 +10440,7 @@ Errors  Files
      2  ../ui/src/components/dashboard/quick-actions.tsx[90m:4[0m
      2  ../ui/src/components/dashboard/recent-projects-card.tsx[90m:3[0m
      1  ../ui/src/components/dashboard/revenue-forecast-card.tsx[90m:3[0m
-    22  ../ui/src/components/dashboard/sidebar.tsx[90m:6[0m
+    21  ../ui/src/components/dashboard/sidebar.tsx[90m:6[0m
      6  ../ui/src/components/dashboard/stats-overview.tsx[90m:5[0m
      1  ../ui/src/components/dashboard/system-health-card.tsx[90m:3[0m
     10  ../ui/src/components/dashboard/task-detail-modal.tsx[90m:4[0m
@@ -11123,10 +10449,10 @@ Errors  Files
      2  ../ui/src/components/dashboard/transaction-list.tsx[90m:5[0m
      6  ../ui/src/components/dashboard/travel-intel-radar-widget.tsx[90m:4[0m
      2  ../ui/src/components/dashboard/unlock-premium-card.tsx[90m:3[0m
-     3  ../ui/src/components/demo-product/business-travel-platform.tsx[90m:4[0m
-     3  ../ui/src/components/demo-product/expense-management.tsx[90m:4[0m
-     2  ../ui/src/components/dialog.tsx[90m:5[0m
-     2  ../ui/src/components/dropdown-menu.tsx[90m:5[0m
+     1  ../ui/src/components/demo-product/business-travel-platform.tsx[90m:4[0m
+     1  ../ui/src/components/demo-product/expense-management.tsx[90m:4[0m
+     1  ../ui/src/components/dialog.tsx[90m:5[0m
+     1  ../ui/src/components/dropdown-menu.tsx[90m:5[0m
      4  ../ui/src/components/flights/airport-search.tsx[90m:4[0m
      1  ../ui/src/components/flights/booking-summary.tsx[90m:3[0m
      5  ../ui/src/components/flights/flight-card.tsx[90m:3[0m
@@ -11146,56 +10472,53 @@ Errors  Files
      1  ../ui/src/components/label.tsx[90m:7[0m
      2  ../ui/src/components/layout/page-header.tsx[90m:6[0m
      2  ../ui/src/components/marketing/agentic-disruption.tsx[90m:4[0m
-    10  ../ui/src/components/marketing/ai-agent-voice.tsx[90m:4[0m
-     4  ../ui/src/components/marketing/ai-meetings-attachment.tsx[90m:4[0m
+     9  ../ui/src/components/marketing/ai-agent-voice.tsx[90m:4[0m
+     3  ../ui/src/components/marketing/ai-meetings-attachment.tsx[90m:4[0m
      2  ../ui/src/components/marketing/ai-travel-agents.tsx[90m:4[0m
-     7  ../ui/src/components/marketing/ai-voice-assistant.tsx[90m:5[0m
-     2  ../ui/src/components/marketing/ai-voice-calling-hub.tsx[90m:4[0m
+     5  ../ui/src/components/marketing/ai-voice-assistant.tsx[90m:5[0m
+     1  ../ui/src/components/marketing/ai-voice-calling-hub.tsx[90m:4[0m
      2  ../ui/src/components/marketing/airlines-slider.tsx[90m:5[0m
      1  ../ui/src/components/marketing/airport-lounge-experience.tsx[90m:4[0m
-     3  ../ui/src/components/marketing/approval-workflow.tsx[90m:4[0m
+     1  ../ui/src/components/marketing/approval-workflow.tsx[90m:4[0m
      1  ../ui/src/components/marketing/automated-travel-policies.tsx[90m:4[0m
-     3  ../ui/src/components/marketing/bank-connection.tsx[90m:5[0m
-     4  ../ui/src/components/marketing/business-chat-demo.tsx[90m:5[0m
-     4  ../ui/src/components/marketing/business-flight-booking.tsx[90m:4[0m
-     2  ../ui/src/components/marketing/business-intelligence.tsx[90m:7[0m
+     2  ../ui/src/components/marketing/bank-connection.tsx[90m:5[0m
+     2  ../ui/src/components/marketing/business-chat-demo.tsx[90m:5[0m
+     1  ../ui/src/components/marketing/business-flight-booking.tsx[90m:4[0m
+     1  ../ui/src/components/marketing/business-intelligence.tsx[90m:7[0m
      2  ../ui/src/components/marketing/business-travel-revolution.tsx[90m:4[0m
-     5  ../ui/src/components/marketing/business-travel-slider.tsx[90m:4[0m
-     7  ../ui/src/components/marketing/cloud-ai-showcase.tsx[90m:5[0m
-     2  ../ui/src/components/marketing/community-showcase.tsx[90m:4[0m
+     3  ../ui/src/components/marketing/business-travel-slider.tsx[90m:4[0m
+     5  ../ui/src/components/marketing/cloud-ai-showcase.tsx[90m:5[0m
+     1  ../ui/src/components/marketing/community-showcase.tsx[90m:4[0m
      1  ../ui/src/components/marketing/compare-plans.tsx[90m:7[0m
-     4  ../ui/src/components/marketing/expense-management.tsx[90m:4[0m
-     2  ../ui/src/components/marketing/flight-booking-showcase.tsx[90m:13[0m
-     3  ../ui/src/components/marketing/flight-teams.tsx[90m:4[0m
-     4  ../ui/src/components/marketing/footer.tsx[90m:3[0m
+     2  ../ui/src/components/marketing/expense-management.tsx[90m:4[0m
+     1  ../ui/src/components/marketing/flight-booking-showcase.tsx[90m:14[0m
+     1  ../ui/src/components/marketing/flight-teams.tsx[90m:4[0m
+     2  ../ui/src/components/marketing/footer.tsx[90m:3[0m
      1  ../ui/src/components/marketing/founders-open-letter.tsx[90m:4[0m
      3  ../ui/src/components/marketing/founders-vision.tsx[90m:5[0m
-     3  ../ui/src/components/marketing/future-legacy-vision.tsx[90m:4[0m
-     1  ../ui/src/components/marketing/global-business-access.tsx[90m:16[0m
+     2  ../ui/src/components/marketing/future-legacy-vision.tsx[90m:4[0m
      9  ../ui/src/components/marketing/hero.tsx[90m:3[0m
-     5  ../ui/src/components/marketing/hiring.tsx[90m:4[0m
-     2  ../ui/src/components/marketing/hyperspeed-booking.tsx[90m:4[0m
-     2  ../ui/src/components/marketing/integrations-showcase.tsx[90m:5[0m
+     3  ../ui/src/components/marketing/hiring.tsx[90m:4[0m
+     1  ../ui/src/components/marketing/hyperspeed-booking.tsx[90m:4[0m
+     1  ../ui/src/components/marketing/integrations-showcase.tsx[90m:5[0m
      2  ../ui/src/components/marketing/intelligent-policy-showcase.tsx[90m:5[0m
-     2  ../ui/src/components/marketing/launch-hero.tsx[90m:4[0m
-    12  ../ui/src/components/marketing/manifesto-showcase-alt.tsx[90m:5[0m
-     5  ../ui/src/components/marketing/mcp-ai-agents.tsx[90m:5[0m
-     1  ../ui/src/components/marketing/mcp-flights-ai-agents.tsx[90m:4[0m
-    18  ../ui/src/components/marketing/modern-manifesto-showcase.tsx[90m:5[0m
-    11  ../ui/src/components/marketing/navigation.tsx[90m:4[0m
+     1  ../ui/src/components/marketing/launch-hero.tsx[90m:4[0m
+    11  ../ui/src/components/marketing/manifesto-showcase-alt.tsx[90m:5[0m
+     1  ../ui/src/components/marketing/mcp-ai-agents.tsx[90m:5[0m
+    17  ../ui/src/components/marketing/modern-manifesto-showcase.tsx[90m:5[0m
+     8  ../ui/src/components/marketing/navigation.tsx[90m:4[0m
      1  ../ui/src/components/marketing/plans.tsx[90m:7[0m
      1  ../ui/src/components/marketing/policy-cta.tsx[90m:2[0m
      3  ../ui/src/components/marketing/product.tsx[90m:4[0m
-     4  ../ui/src/components/marketing/smart-reporting.tsx[90m:2[0m
+     2  ../ui/src/components/marketing/smart-reporting.tsx[90m:2[0m
      3  ../ui/src/components/marketing/suitpax-ai-section.tsx[90m:6[0m
      2  ../ui/src/components/marketing/task-management.tsx[90m:2[0m
      8  ../ui/src/components/marketing/team-collaboration-showcase.tsx[90m:5[0m
      2  ../ui/src/components/marketing/team-expense-guide.tsx[90m:6[0m
      1  ../ui/src/components/marketing/travel-rewards.tsx[90m:4[0m
-     1  ../ui/src/components/marketing/trm-management.tsx[90m:4[0m
      3  ../ui/src/components/marketing/video-showcase.tsx[90m:4[0m
-     3  ../ui/src/components/marketing/vip-membership.tsx[90m:5[0m
-     2  ../ui/src/components/marketing/visual-recognition-demo.tsx[90m:4[0m
+     2  ../ui/src/components/marketing/vip-membership.tsx[90m:5[0m
+     1  ../ui/src/components/marketing/visual-recognition-demo.tsx[90m:4[0m
      1  ../ui/src/components/mini-chat.tsx[90m:4[0m
     12  ../ui/src/components/onboarding/onboarding-flow.tsx[90m:5[0m
      1  ../ui/src/components/partners-showcase.tsx[90m:5[0m
@@ -11219,9 +10542,9 @@ Errors  Files
      1  ../ui/src/components/prompt-kit/tool-selector.tsx[90m:3[0m
      2  ../ui/src/components/prompt-kit/voice-button.tsx[90m:7[0m
      1  ../ui/src/components/scroll-area.tsx[90m:6[0m
-     2  ../ui/src/components/select.tsx[90m:5[0m
+     1  ../ui/src/components/select.tsx[90m:5[0m
      1  ../ui/src/components/separator.tsx[90m:6[0m
-     3  ../ui/src/components/shared/agent-card.tsx[90m:4[0m
+     2  ../ui/src/components/shared/agent-card.tsx[90m:4[0m
      1  ../ui/src/components/shared/section-container.tsx[90m:6[0m
      1  ../ui/src/components/skeleton.tsx[90m:1[0m
      2  ../ui/src/components/soft-hero.tsx[90m:3[0m
@@ -11236,15 +10559,15 @@ Errors  Files
      1  ../ui/src/components/ui/ai-chat.tsx[90m:5[0m
      2  ../ui/src/components/ui/ai-search-input.tsx[90m:6[0m
      1  ../ui/src/components/ui/avatar.tsx[90m:6[0m
-     3  ../ui/src/components/ui/badge.tsx[90m:3[0m
+     2  ../ui/src/components/ui/badge.tsx[90m:3[0m
      1  ../ui/src/components/ui/button.tsx[90m:5[0m
      2  ../ui/src/components/ui/calendar.tsx[90m:11[0m
      1  ../ui/src/components/ui/card.tsx[90m:3[0m
      9  ../ui/src/components/ui/chart.tsx[90m:6[0m
-     2  ../ui/src/components/ui/checkbox.tsx[90m:5[0m
-     2  ../ui/src/components/ui/command.tsx[90m:6[0m
-     2  ../ui/src/components/ui/dialog.tsx[90m:5[0m
-     2  ../ui/src/components/ui/dropdown-menu.tsx[90m:5[0m
+     1  ../ui/src/components/ui/checkbox.tsx[90m:5[0m
+     1  ../ui/src/components/ui/command.tsx[90m:6[0m
+     1  ../ui/src/components/ui/dialog.tsx[90m:5[0m
+     1  ../ui/src/components/ui/dropdown-menu.tsx[90m:5[0m
      1  ../ui/src/components/ui/hacker-news-badge.tsx[90m:2[0m
      1  ../ui/src/components/ui/input.tsx[90m:3[0m
      1  ../ui/src/components/ui/label.tsx[90m:7[0m
@@ -11252,7 +10575,7 @@ Errors  Files
      1  ../ui/src/components/ui/popover.tsx[90m:5[0m
      1  ../ui/src/components/ui/progress.tsx[90m:6[0m
      1  ../ui/src/components/ui/scroll-area.tsx[90m:6[0m
-     2  ../ui/src/components/ui/select.tsx[90m:5[0m
+     1  ../ui/src/components/ui/select.tsx[90m:5[0m
      1  ../ui/src/components/ui/separator.tsx[90m:6[0m
      1  ../ui/src/components/ui/skeleton.tsx[90m:1[0m
      2  ../ui/src/components/ui/soft-hero.tsx[90m:3[0m
@@ -11266,11 +10589,12 @@ Errors  Files
      5  ../ui/src/components/unified-dialog.tsx[90m:2[0m
      1  ../ui/src/components/vanta-clouds-background.tsx[90m:6[0m
      1  ../ui/src/components/vanta-halo-background.tsx[90m:6[0m
-     3  ../ui/src/components/voice-ai/conversation-interface.tsx[90m:11[0m
+     2  ../ui/src/components/voice-ai/conversation-interface.tsx[90m:12[0m
      2  ../ui/src/components/voice-ai/voice-ai-demo.tsx[90m:2[0m
-     2  ../ui/src/components/voice-ai/voice-control-panel.tsx[90m:6[0m
-     5  ../ui/src/components/workspace/unified-workspace.tsx[90m:5[0m
+     1  ../ui/src/components/voice-ai/voice-control-panel.tsx[90m:6[0m
+     4  ../ui/src/components/workspace/unified-workspace.tsx[90m:5[0m
      1  ../ui/src/contexts/voice-ai-context.tsx[90m:5[0m
+     4  ../ui/src/hooks/index.ts[90m:7[0m
      1  ../ui/src/hooks/use-audio-player.ts[90m:33[0m
      1  ../ui/src/hooks/use-flight-booking.ts[90m:4[0m
      1  ../ui/src/hooks/use-onboarding.ts[90m:4[0m
@@ -11334,4 +10658,4 @@ Errors  Files
      3  ../../tests/mocks/server.ts[90m:2[0m
     40  ../../tests/setup.ts[90m:3[0m
     23  ../../tests/unit/components/existing-button.test.tsx[90m:1[0m
-[41m[30m ELIFECYCLE [39m[49m [31mCommand failed with exit code 2.[39m
+[41m[30m ELIFECYCLE [39m[49m [31mCommand failed with exit code 1.[39m
