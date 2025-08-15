@@ -3,6 +3,7 @@ export const runtime = "nodejs"
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { createClient } from "@/lib/supabase/server"
+import { AutoApprovalEngine, type TravelRequest } from "@/lib/intelligence/auto-approval"
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -152,6 +153,45 @@ const tools: Anthropic.Tool[] = [
         },
       },
       required: ["booking_details"],
+    },
+  },
+  {
+    name: "evaluate_auto_approval",
+    description: "Evaluates a travel request for automatic approval based on company policies and AI intelligence.",
+    input_schema: {
+      type: "object",
+      properties: {
+        user_id: { type: "string", description: "User ID making the travel request" },
+        employee_level: {
+          type: "string",
+          enum: ["standard", "manager", "executive", "c_level"],
+          description: "Employee level for policy rules",
+        },
+        trip_purpose: {
+          type: "string",
+          enum: ["business", "training", "conference", "client_meeting"],
+          description: "Purpose of travel",
+        },
+        destination: { type: "string", description: "Travel destination" },
+        departure_date: { type: "string", description: "Departure date in YYYY-MM-DD format" },
+        return_date: { type: "string", description: "Return date in YYYY-MM-DD format (optional)" },
+        flight_cost: { type: "number", description: "Total flight cost" },
+        hotel_cost: { type: "number", description: "Hotel cost per night (optional)" },
+        cabin_class: {
+          type: "string",
+          enum: ["economy", "premium_economy", "business", "first"],
+          description: "Flight cabin class",
+        },
+      },
+      required: [
+        "user_id",
+        "employee_level",
+        "trip_purpose",
+        "destination",
+        "departure_date",
+        "flight_cost",
+        "cabin_class",
+      ],
     },
   },
 ]
@@ -321,6 +361,36 @@ async function checkTravelPolicyTool(booking_details: any, employee_level = "sta
   }
 }
 
+async function evaluateAutoApprovalTool(input: any) {
+  try {
+    const autoApproval = new AutoApprovalEngine()
+
+    const departureDate = new Date(input.departure_date)
+    const today = new Date()
+    const advanceBookingDays = Math.ceil((departureDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+    const travelRequest: TravelRequest = {
+      user_id: input.user_id,
+      employee_level: input.employee_level,
+      trip_purpose: input.trip_purpose,
+      destination: input.destination,
+      departure_date: input.departure_date,
+      return_date: input.return_date,
+      flight_cost: input.flight_cost,
+      hotel_cost: input.hotel_cost,
+      cabin_class: input.cabin_class,
+      advance_booking_days: advanceBookingDays,
+      total_cost: input.flight_cost + (input.hotel_cost || 0),
+    }
+
+    const result = await autoApproval.evaluateTravel(travelRequest)
+    return result
+  } catch (error) {
+    console.error("Auto-approval evaluation error:", error)
+    return { error: "Failed to evaluate travel request for auto-approval" }
+  }
+}
+
 export async function POST(request: NextRequest) {
   const { message, history = [], includeReasoning = false, userId } = await request.json()
 
@@ -417,6 +487,9 @@ export async function POST(request: NextRequest) {
         case "check_travel_policy":
           const { booking_details, employee_level, trip_purpose } = input as any
           toolResult = await checkTravelPolicyTool(booking_details, employee_level, trip_purpose)
+          break
+        case "evaluate_auto_approval":
+          toolResult = await evaluateAutoApprovalTool(input)
           break
         default:
           toolResult = { error: "Unknown tool requested" }
