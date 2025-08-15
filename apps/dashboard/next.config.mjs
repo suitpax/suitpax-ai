@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['@suitpax/ui', '@suitpax/utils', '@suitpax/domains', '@suitpax/shared'],
+  transpilePackages: ['ui', 'utils', 'domains', 'shared'],
   experimental: {
-    optimizePackageImports: ['@suitpax/ui']
+    optimizePackageImports: ['ui']
   },
   images: {
     domains: ['images.unsplash.com', 'api.qrserver.com', 'ui-avatars.com'],
@@ -11,13 +11,12 @@ const nextConfig = {
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@/components/ui': '../../packages/ui/src/components',
-      '@/components/prompt-kit': '../../packages/ui/src/components/prompt-kit',
-      '@/lib': '../../packages/utils/src',
-      '@/hooks': '../../packages/ui/src/hooks',
-      '@/contexts': '../../packages/ui/src/contexts',
-      '@/types': '../../packages/shared/src/types',
-      '@/domains': '../../packages/domains/src'
+      '@/components/ui': '../../packages/ui/components',
+      '@/lib': '../../packages/utils',
+      '@/hooks': '../../packages/ui/hooks',
+      '@/contexts': '../../packages/ui/contexts',
+      '@/types': '../../packages/shared/types',
+      '@/domains': '../../packages/domains'
     };
     return config;
   },

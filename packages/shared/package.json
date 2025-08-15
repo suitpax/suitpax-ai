@@ -1,23 +1,30 @@
 {
-  "name": "@suitpax/shared",
-  "version": "0.1.0",
+  "name": "shared",
+  "version": "1.0.0",
   "private": true,
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./index.ts",
+  "types": "./index.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "lint": "eslint src/",
+    "build": "tsc --noEmit && echo 'Shared types built'",
+    "dev": "tsc --noEmit --watch",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react-dom": "19.0.0",
+    "next": "15.2.4",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
-    "@types/node": "^22.10.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.9.2",
+    "eslint": "^9.17.0"
+  },
+  "peerDependencies": {
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
   }
 }

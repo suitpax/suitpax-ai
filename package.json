@@ -1,35 +1,37 @@
 {
   "name": "suitpax-ai",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "description": "Suitpax AI - Business Travel Platform",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
-  "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "dev:web": "turbo run dev --filter=@suitpax/web",
-    "dev:dashboard": "turbo run dev --filter=@suitpax/dashboard",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
-    "type-check": "turbo run type-check",
-    "clean": "turbo run clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "mcp:server": "node lib/mcp/server.js"
+    "dev": "concurrently \"pnpm dev:web\" \"pnpm dev:dashboard\"",
+    "dev:web": "pnpm --filter web dev",
+    "dev:dashboard": "pnpm --filter dashboard dev",
+    "build": "pnpm build:packages && pnpm build:apps",
+    "build:packages": "pnpm --filter './packages/*' build",
+    "build:apps": "pnpm --filter './apps/*' build",
+    "build:web": "pnpm --filter web build",
+    "build:dashboard": "pnpm --filter dashboard build",
+    "start": "concurrently \"pnpm start:web\" \"pnpm start:dashboard\"",
+    "start:web": "pnpm --filter web start",
+    "start:dashboard": "pnpm --filter dashboard start",
+    "lint": "pnpm --filter './apps/*' lint",
+    "type-check": "pnpm --filter './apps/*' type-check",
+    "clean": "rm -rf apps/*/node_modules packages/*/node_modules apps/*/.next packages/*/dist"
   },
   "devDependencies": {
-    "@changesets/cli": "latest",
-    "prettier": "latest",
-    "turbo": "latest",
-    "typescript": "^5.9.2",
-    "eslint": "^9.33.0",
-    "@typescript-eslint/eslint-plugin": "^8.39.0",
-    "@typescript-eslint/parser": "^8.39.0"
+    "@types/node": "^22.10.2",
+    "concurrently": "^8.2.2",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2"
   },
+  "packageManager": "pnpm@9.0.0",
   "engines": {
-    "node": "20.x",
-    "pnpm": ">=9.0.0"
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
   }
 }

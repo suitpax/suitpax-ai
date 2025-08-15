@@ -3,24 +3,25 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./app/*", "./components/*", "./lib/*"],
-      "@/components/ui": ["../../packages/ui/src/components"],
-      "@/components/ui/*": ["../../packages/ui/src/components/*"],
-      "@/components/prompt-kit/*": ["../../packages/ui/src/components/prompt-kit/*"],
-      "@/lib/*": ["../../packages/utils/src/*"],
-      "@/hooks/*": ["../../packages/ui/src/hooks/*"],
-      "@/contexts/*": ["../../packages/ui/src/contexts/*"],
-      "@/types/*": ["../../packages/shared/src/types/*"],
-      "@/domains/*": ["../../packages/domains/src/*"]
+      "@/*": ["./*"],
+      "@/components/*": ["./components/*"],
+      "@/app/*": ["./app/*"],
+      "@/lib/*": ["./lib/*"],
+      "ui": ["../../packages/ui"],
+      "ui/*": ["../../packages/ui/*"],
+      "shared": ["../../packages/shared"],
+      "shared/*": ["../../packages/shared/*"],
+      "utils": ["../../packages/utils"],
+      "utils/*": ["../../packages/utils/*"],
+      "domains": ["../../packages/domains"],
+      "domains/*": ["../../packages/domains/*"]
     }
   },
   "include": [
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "../../packages/ui/src/**/*",
-    "../../packages/utils/src/**/*",
-    "../../packages/shared/src/**/*",
-    "../../packages/domains/src/**/*"
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
