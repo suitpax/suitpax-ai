@@ -132,8 +132,15 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <DashboardSkeleton />
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="p-4 sm:p-6 max-w-7xl mx-auto"
+        >
+          <DashboardSkeleton />
+        </motion.div>
       </div>
     )
   }
@@ -186,19 +193,19 @@ export default function DashboardLayout({
 
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <div className="lg:hidden">
-          <div className="flex items-center justify-between h-16 px-4 bg-white/80 backdrop-blur-sm border-b border-gray-200">
+          <div className="flex items-center justify-between h-14 px-4 bg-white/90 backdrop-blur-sm border-b border-gray-200/80">
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-900/20 transition-colors"
+              className="inline-flex items-center justify-center p-2.5 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-900/20 transition-all duration-200 active:scale-95"
               onClick={toggleSidebar}
             >
               <span className="sr-only">Open sidebar</span>
-              <Menu className="h-6 w-6" aria-hidden="true" />
+              <Menu className="h-5 w-5" aria-hidden="true" />
             </button>
-            <div className="flex-1 max-w-xs mx-4">
+            <div className="flex-1 max-w-xs mx-3">
               <AISearchInput size="sm" />
             </div>
-            <div className="w-4"></div>
+            <div className="w-2"></div>
           </div>
         </div>
 
@@ -213,17 +220,20 @@ export default function DashboardLayout({
           />
         </div>
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto overscroll-y-contain">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="h-full"
+            className="h-full min-h-0"
           >
-            {children}
+            <div className="px-4 py-4 sm:px-6 sm:py-6 lg:px-6 lg:py-6">{children}</div>
           </motion.div>
         </main>
-        <FooterBanner version={SUITPAX_VERSION} userName={user?.email?.split("@")[0]} />
+
+        <div className="hidden sm:block">
+          <FooterBanner version={SUITPAX_VERSION} userName={user?.email?.split("@")[0]} />
+        </div>
       </div>
 
       <Toaster

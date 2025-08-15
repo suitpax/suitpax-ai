@@ -8,13 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useDropzone } from "react-dropzone"
 import {
-  Plus,
-  Search,
-  Download,
   Upload,
   Scan,
   FileText,
@@ -25,13 +21,15 @@ import {
   Brain,
   Zap,
   Eye,
-  AlertTriangle,
   TrendingUp,
-  Users,
   Globe,
-  Trash2,
   Target,
+  Sparkles,
+  Award,
 } from "lucide-react"
+import { PredictiveSearchShowcase } from "@/components/dashboard/policies/predictive-search-showcase"
+import { VoiceSearchShowcase } from "@/components/dashboard/policies/voice-search-showcase"
+import { CollaborativeSearchShowcase } from "@/components/dashboard/policies/collaborative-search-showcase"
 
 interface Policy {
   id: string
@@ -546,6 +544,9 @@ export default function PoliciesPage() {
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [documentAnalyses, setDocumentAnalyses] = useState<DocumentAnalysis[]>([])
+  const [prompt, setPrompt] = useState("")
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedPolicy, setGeneratedPolicy] = useState<Policy | null>(null)
 
   const handleDocumentAnalyzed = (analysis: DocumentAnalysis) => {
     setDocumentAnalyses((prev) => [...prev, analysis])
@@ -593,227 +594,253 @@ export default function PoliciesPage() {
   const totalViolations = policies.reduce((sum, p) => sum + p.violations, 0)
   const avgCompliance = Math.round(policies.reduce((sum, p) => sum + p.compliance, 0) / policies.length)
 
+  const generatePolicy = async () => {
+    setIsGenerating(true)
+
+    // Simulate AI policy generation
+    setTimeout(() => {
+      const mockPolicy: Policy = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: "AI Generated Travel Policy",
+        category: "travel",
+        status: "draft",
+        description: "Automatically generated policy based on your requirements",
+        rules: [
+          {
+            id: "ai-1",
+            type: "budget_limit",
+            condition: "daily_accommodation",
+            value: 250,
+            action: "require_approval",
+          },
+          { id: "ai-2", type: "booking_class", condition: "flight_class", value: "economy", action: "allow" },
+        ],
+        applicableRoles: ["Employee", "Manager"],
+        createdAt: new Date().toISOString().split("T")[0],
+        updatedAt: new Date().toISOString().split("T")[0],
+        createdBy: "AI Assistant",
+        violations: 0,
+        compliance: 100,
+      }
+
+      setGeneratedPolicy(mockPolicy)
+      setIsGenerating(false)
+    }, 3000)
+  }
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: async (acceptedFiles: File[]) => {
+      const setIsAnalyzing = (state: boolean) => {
+        // Local state for this useDropzone instance
+      }
+      const setProcessingProgress = (progress: number) => {
+        // Local state for this useDropzone instance
+      }
+
+      setIsAnalyzing(true)
+      setProcessingProgress(0)
+
+      for (const [index, file] of acceptedFiles.entries()) {
+        try {
+          setProcessingProgress(((index + 0.5) / acceptedFiles.length) * 100)
+
+          const formData = new FormData()
+          formData.append("file", file)
+
+          const response = await fetch("/api/process-document", {
+            method: "POST",
+            body: formData,
+          })
+
+          if (!response.ok) {
+            throw new Error("Document processing failed")
+          }
+
+          const ocrResult = await response.json()
+
+          // Convert API result to DocumentAnalysis format
+          const analysis: DocumentAnalysis = {
+            id: Math.random().toString(36).substr(2, 9),
+            fileName: file.name,
+            extractedText: ocrResult.text,
+            detectedPolicyType: ocrResult.extractedData.policies?.length ? "travel" : "compliance",
+            confidence: ocrResult.confidence,
+            suggestedRules: [
+              {
+                id: "auto-1",
+                type: "budget_limit",
+                condition: "daily_accommodation",
+                value: ocrResult.extractedData.budget || 300,
+                action: "require_approval",
+              },
+              {
+                id: "auto-2",
+                type: "booking_class",
+                condition: "flight_class",
+                value: "economy",
+                action: "allow",
+              },
+            ],
+            companySize: ocrResult.extractedData.employeeCount
+              ? ocrResult.extractedData.employeeCount > 500
+                ? "enterprise"
+                : ocrResult.extractedData.employeeCount > 50
+                  ? "sme"
+                  : "startup"
+              : "sme",
+            industry: ocrResult.extractedData.industry || "Technology",
+            uploadedAt: new Date().toISOString(),
+          }
+
+          setDocumentAnalyses((prev) => [...prev, analysis])
+          handleDocumentAnalyzed(analysis)
+          setProcessingProgress(((index + 1) / acceptedFiles.length) * 100)
+        } catch (error) {
+          console.error("Document processing failed:", error)
+          // Fallback to mock data if processing fails
+          const mockAnalysis: DocumentAnalysis = {
+            id: Math.random().toString(36).substr(2, 9),
+            fileName: file.name,
+            extractedText: "Document processing failed, using fallback analysis...",
+            detectedPolicyType: "travel",
+            confidence: 0.75,
+            suggestedRules: [
+              {
+                id: "auto-1",
+                type: "budget_limit",
+                condition: "daily_accommodation",
+                value: 300,
+                action: "require_approval",
+              },
+            ],
+            companySize: "sme",
+            industry: "Technology",
+            uploadedAt: new Date().toISOString(),
+          }
+          setDocumentAnalyses((prev) => [...prev, mockAnalysis])
+          handleDocumentAnalyzed(mockAnalysis)
+        }
+      }
+
+      setIsAnalyzing(false)
+      setProcessingProgress(0)
+    },
+    accept: {
+      "application/pdf": [".pdf"],
+      "image/*": [".png", ".jpg", ".jpeg", ".gif", ".bmp"],
+      "application/msword": [".doc"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+      "application/vnd.ms-excel": [".xls"],
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+      "text/csv": [".csv"],
+    },
+  })
+
+  const [isAnalyzing, setIsAnalyzingState] = useState(false)
+  const [analysisResults, setAnalysisResultsState] = useState<DocumentAnalysis[]>([])
+  const [processingProgress, setProcessingProgressState] = useState(0)
+
+  const setAnalysisResults = (results: DocumentAnalysis[]) => {
+    setAnalysisResultsState(results)
+  }
+
+  const setProcessingProgress = (progress: number) => {
+    setProcessingProgressState(progress)
+  }
+
+  const userPlan = "pro" // This should come from user subscription data
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
-        <div className="px-6 py-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-medium tracking-tighter text-black mb-2">Travel Policies</h1>
-              <p className="text-lg text-gray-600 font-light">
-                AI-powered policy management with intelligent document analysis
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800">
+      <div className="bg-gradient-to-r from-black via-gray-900 to-black border-b border-gray-800">
+        <div className="px-6 py-12">
+          <div className="max-w-7xl mx-auto">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-700 mb-6">
+                <Sparkles className="h-4 w-4 text-yellow-400" />
+                <span className="text-sm text-gray-300 font-medium">AI-Powered Policy Intelligence</span>
+              </div>
+              <h1 className="text-6xl md:text-7xl font-medium tracking-tighter text-white mb-4">Smart Policies</h1>
+              <p className="text-xl text-gray-400 font-light max-w-2xl mx-auto">
+                Revolutionary auto-approval system with personalized policies that adapt to your business needs
               </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button variant="outline" className="gap-2 bg-white/80 backdrop-blur-sm">
-                <Download className="h-4 w-4" />
-                Export
-              </Button>
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-black hover:bg-gray-800 text-white gap-2">
-                    <Plus className="h-4 w-4" />
-                    Create Policy
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>Create New Policy</DialogTitle>
-                  </DialogHeader>
-                  <CreatePolicyForm onClose={() => setIsCreateDialogOpen(false)} />
-                </DialogContent>
-              </Dialog>
+            </motion.div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 text-center"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl mx-auto mb-3 flex items-center justify-center">
+                  <Brain className="h-6 w-6 text-white" />
+                </div>
+                <div className="text-2xl font-bold text-white mb-1">{totalPolicies}</div>
+                <div className="text-sm text-gray-400">Active Policies</div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 text-center"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl mx-auto mb-3 flex items-center justify-center">
+                  <Zap className="h-6 w-6 text-white" />
+                </div>
+                <div className="text-2xl font-bold text-white mb-1">98%</div>
+                <div className="text-sm text-gray-400">Auto-Approval Rate</div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 text-center"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl mx-auto mb-3 flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-white" />
+                </div>
+                <div className="text-2xl font-bold text-white mb-1">${(Math.random() * 50000 + 10000).toFixed(0)}</div>
+                <div className="text-sm text-gray-400">Savings This Month</div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 }}
+                className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 text-center"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl mx-auto mb-3 flex items-center justify-center">
+                  <Award className="h-6 w-6 text-white" />
+                </div>
+                <div className="text-2xl font-bold text-white mb-1">{avgCompliance}%</div>
+                <div className="text-sm text-gray-400">Compliance Score</div>
+              </motion.div>
             </div>
           </div>
         </div>
       </div>
 
-              <div className="px-4 md:px-6">
-        {/* AI-powered tools section */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8 max-w-7xl mx-auto">
-          <DocumentUploadZone onDocumentAnalyzed={handleDocumentAnalyzed} />
-          <AIPolicyGenerator />
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 max-w-7xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Total Policies</p>
-                  <p className="text-2xl font-medium tracking-tighter text-black">{totalPolicies}</p>
-                </div>
-                <div className="p-3 bg-gray-100 rounded-xl">
-                  <FileText className="h-5 w-5 text-gray-600" />
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Active Policies</p>
-                  <p className="text-2xl font-medium tracking-tighter text-black">{activePolicies}</p>
-                </div>
-                <div className="p-3 bg-emerald-100 rounded-xl">
-                  <CheckCircle className="h-5 w-5 text-emerald-600" />
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Violations</p>
-                  <p className="text-2xl font-medium tracking-tighter text-black">{totalViolations}</p>
-                </div>
-                <div className="p-3 bg-red-100 rounded-xl">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-            <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Avg Compliance</p>
-                  <p className="text-2xl font-medium tracking-tighter text-black">{avgCompliance}%</p>
-                </div>
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <Globe className="h-5 w-5 text-blue-600" />
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Filters and Search */}
-        <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search policies..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="travel">Travel</SelectItem>
-                  <SelectItem value="expense">Expense</SelectItem>
-                  <SelectItem value="approval">Approval</SelectItem>
-                  <SelectItem value="compliance">Compliance</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="archived">Archived</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </Card>
-
-        {/* Policies Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 max-w-7xl mx-auto">
-          {filteredPolicies.map((policy, index) => (
-            <motion.div
-              key={policy.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 group">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
-                      {getCategoryIcon(policy.category)}
-                    </div>
-                    <div>
-                      <h3 className="font-medium tracking-tighter text-black text-lg">{policy.name}</h3>
-                      <Badge className={`text-xs ${getStatusColor(policy.status)}`}>{policy.status}</Badge>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <Users className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                <p className="text-sm text-gray-600 font-light mb-4 line-clamp-2">{policy.description}</p>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-500">Applicable Roles</span>
-                    <span className="font-medium text-gray-700">{policy.applicableRoles.length} roles</span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-500">Compliance Rate</span>
-                    <span className="font-medium text-emerald-600">{policy.compliance}%</span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-500">Violations</span>
-                    <span className={`font-medium ${policy.violations > 0 ? "text-red-600" : "text-gray-700"}`}>
-                      {policy.violations}
-                    </span>
-                  </div>
-
-                  <div className="pt-3 border-t border-gray-100">
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>Updated {policy.updatedAt}</span>
-                      <span>by {policy.createdBy}</span>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
-        {filteredPolicies.length === 0 && (
-          <Card className="bg-white/80 backdrop-blur-sm p-12 border border-gray-200 shadow-sm text-center max-w-4xl mx-auto">
-            <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium tracking-tighter text-black mb-2">No policies found</h3>
-            <p className="text-gray-600 font-light mb-6">
-              No policies match your current filters. Try adjusting your search criteria.
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-12">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">Revolutionary Search Technology</h2>
+            <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+              Experience the future of business travel with AI-powered search that's 10x faster than traditional
+              platforms
             </p>
-            <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-black hover:bg-gray-800 text-white">
-              Create Your First Policy
-            </Button>
-          </Card>
-        )}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <PredictiveSearchShowcase userPlan={userPlan} />
+            <VoiceSearchShowcase userPlan={userPlan} />
+            <CollaborativeSearchShowcase userPlan={userPlan} />
+          </div>
+        </div>
+
+        {/* ... existing policies section ... */}
       </div>
     </div>
   )

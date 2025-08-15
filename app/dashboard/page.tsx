@@ -33,6 +33,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { ArrowUp } from "lucide-react"
 import { TravelIntelRadarWidget } from "@/components/dashboard/travel-intel-radar-widget"
+import Image from "next/image"
 
 const DashboardPage = () => {
   const { user, profile, loading } = useUserData()
@@ -66,21 +67,6 @@ const DashboardPage = () => {
 
   const dashboardCards = [
     {
-      id: "income-tracker",
-      title: "Income Tracker",
-      component: <IncomeTrackerCard />,
-    },
-    {
-      id: "kpi-mini",
-      title: "KPI Mini Cards",
-      component: <KpiMiniCards />,
-    },
-    {
-      id: "insights-summary",
-      title: "Quick Insights",
-      component: <InsightsSummaryCard />,
-    },
-    {
       id: "user-profile",
       title: "User Profile",
       component: (
@@ -88,9 +74,19 @@ const DashboardPage = () => {
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-gray-600 font-medium text-lg shadow-sm">
-                  {getInitials(displayName)}
-                </div>
+                {profile?.avatar_url ? (
+                  <Image
+                    src={profile.avatar_url || "/placeholder.svg"}
+                    alt="Profile"
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 rounded-xl object-cover border-2 border-gray-200 shadow-sm"
+                  />
+                ) : (
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-gray-600 font-medium text-lg shadow-sm">
+                    {getInitials(displayName)}
+                  </div>
+                )}
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-600 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
                   <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
                 </div>
@@ -98,7 +94,7 @@ const DashboardPage = () => {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-lg font-medium tracking-tight text-gray-900">{displayName}</h3>
-                  <div className="inline-flex items-center rounded-md bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700">
+                  <div className="inline-flex items-center rounded-full bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-900">
                     {profile?.subscription_plan || "Free"}
                   </div>
                 </div>
@@ -160,6 +156,21 @@ const DashboardPage = () => {
           </div>
         </div>
       ),
+    },
+    {
+      id: "income-tracker",
+      title: "Income Tracker",
+      component: <IncomeTrackerCard />,
+    },
+    {
+      id: "kpi-mini",
+      title: "KPI Mini Cards",
+      component: <KpiMiniCards />,
+    },
+    {
+      id: "insights-summary",
+      title: "Quick Insights",
+      component: <InsightsSummaryCard />,
     },
     {
       id: "kpi-stats",
@@ -278,18 +289,23 @@ const DashboardPage = () => {
   ]
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8">
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-6 sm:mb-8">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <h1 className="text-5xl md:text-6xl font-medium leading-none text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-lg font-light tracking-tighter text-gray-600">Welcome back, {displayName.split(" ")[0]}</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium leading-none tracking-tighter text-gray-900 mb-2">
+            Dashboard
+          </h1>
+          <p className="text-base sm:text-lg font-light tracking-tighter text-gray-600">
+            Welcome back, {displayName.split(" ")[0]}
+          </p>
           <p className="text-sm text-gray-500 font-light mt-1">
             Your comprehensive business travel management overview and insights
           </p>
         </motion.div>
-        <div className="mt-6">
-          <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-3xl p-4 sm:p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
+
+        <div className="mt-4 sm:mt-6">
+          <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl sm:rounded-3xl p-3 sm:p-4 lg:p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
               <p className="text-xs text-gray-600 font-medium">Suitpax AI — Ask anything. Travel. Business. Code.</p>
               <div className="flex items-center gap-1">
                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
@@ -304,20 +320,20 @@ const DashboardPage = () => {
                 window.location.href = `/dashboard/suitpax-ai?prompt=${encodeURIComponent(quickInput)}`
               }}
               isLoading={false}
-              className="bg-white border-gray-200 shadow-sm rounded-2xl"
+              className="bg-white border-gray-200 shadow-sm rounded-xl sm:rounded-2xl"
             >
               <PromptInputTextarea
                 placeholder="Ask the AI to plan a trip, analyze an expense, or draft an email…"
-                className="rounded-2xl"
+                className="rounded-xl sm:rounded-2xl text-sm sm:text-base"
               />
               <PromptInputActions>
                 <PromptInputAction tooltip="Send">
                   <Button
                     type="submit"
                     size="sm"
-                    className="bg-black text-white hover:bg-gray-800 rounded-full h-8 w-8 p-0 shadow-sm hover:shadow-md transition-all"
+                    className="bg-black text-white hover:bg-gray-800 rounded-full h-7 w-7 sm:h-8 sm:w-8 p-0 shadow-sm hover:shadow-md transition-all"
                   >
-                    <ArrowUp className="size-3.5" />
+                    <ArrowUp className="size-3 sm:size-3.5" />
                   </Button>
                 </PromptInputAction>
               </PromptInputActions>
@@ -326,8 +342,8 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        <div className="sm:col-span-2 xl:col-span-2">
           <TravelIntelRadarWidget />
         </div>
         {dashboardCards.map((card) => (

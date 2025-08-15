@@ -449,7 +449,7 @@ export function Sidebar({
       )}
     >
       <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-gradient-to-r from-gray-50 to-white">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-3">
           <Link href="/dashboard" className="flex items-center group">
             <Image
               src="/suitpax-bl-logo.webp"
@@ -464,31 +464,75 @@ export function Sidebar({
             />
           </Link>
           {!isCollapsed && !isMobile && (
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-[10px] text-gray-500 font-medium">Online</span>
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsCollapsed?.(!isCollapsed)}
-            className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl transition-all hover:scale-110"
-          >
-            {isCollapsed ? <PiCaretRight className="h-4 w-4" /> : <PiCaretLeft className="h-4 w-4" />}
-          </Button>
-        </div>
-        {!isCollapsed && (
-          <div className="mt-3 flex items-center justify-between">
-            <Badge
-              variant="outline"
-              className="bg-gray-100 text-gray-700 text-[10px] px-2 py-1 rounded-lg border-gray-200"
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsCollapsed?.(!isCollapsed)}
+              className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl transition-all hover:scale-110"
             >
-              Suitpax AI {process.env.NEXT_PUBLIC_APP_VERSION || "v0.1.0"}
-            </Badge>
-            <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-1 rounded-lg">
-              {getPlanDisplayName()}
-            </Badge>
+              <PiCaretLeft className="h-4 w-4" />
+            </Button>
+          )}
+          {isCollapsed && !isMobile && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsCollapsed?.(!isCollapsed)}
+              className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl transition-all hover:scale-110"
+            >
+              <PiCaretRight className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+
+        {!isCollapsed && !isMobile && (
+          <div className="space-y-3">
+            {/* User info section */}
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                {userProfile?.avatar_url ? (
+                  <Image
+                    src={userProfile.avatar_url || "/placeholder.svg"}
+                    alt="Profile"
+                    width={40}
+                    height={40}
+                    className="rounded-full object-cover border-2 border-gray-200"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200">
+                    <span className="text-sm font-medium text-gray-600">{getInitials()}</span>
+                  </div>
+                )}
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
+                <p className="text-xs text-gray-500 truncate">{userProfile?.company_name || "Personal Account"}</p>
+              </div>
+            </div>
+
+            {/* Plan badge and status */}
+            <div className="flex items-center justify-between">
+              <Badge className="bg-gray-200 text-gray-900 text-xs px-3 py-1 rounded-full font-medium border-0">
+                {getPlanDisplayName()}
+              </Badge>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-[10px] text-gray-500 font-medium">Online</span>
+              </div>
+            </div>
+
+            {/* Additional info */}
+            <div className="text-xs text-gray-500 space-y-1">
+              <div className="flex justify-between">
+                <span>Member for</span>
+                <span className="font-medium">{getMembershipDuration()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Status</span>
+                <span className="font-medium capitalize text-green-600">{subscriptionStatus}</span>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -562,7 +606,7 @@ export function Sidebar({
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold text-gray-700">AI Token Usage</span>
-              <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-1 rounded-lg">
+              <Badge className="bg-gray-200 text-gray-900 text-[10px] px-2 py-1 rounded-full font-medium border-0">
                 {getPlanDisplayName()}
               </Badge>
             </div>
@@ -580,70 +624,77 @@ export function Sidebar({
         )}
 
         {(!isCollapsed || isMobile) && (
-          <div className="space-y-2">
-            <Link href="/dashboard/billing" onClick={isMobile ? onCloseMobile : undefined}>
+          <Dialog>
+            <DialogTrigger asChild>
               <Button
-                variant="outline"
-                className="w-full justify-start text-xs h-8 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
+                variant="ghost"
+                className="w-full p-3 h-auto rounded-xl hover:bg-gray-50 transition-all duration-200"
               >
-                <PiCrown className="h-3 w-3 mr-2" />
-                Plans & Billing
-              </Button>
-            </Link>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-xs h-8 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
-                >
-                  <PiGear className="h-3 w-3 mr-2" />
-                  Settings
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-medium tracking-tighter">Settings</DialogTitle>
-                  <DialogDescription className="font-light">Quick access to your account settings</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-3">
-                  <Link href="/dashboard/profile" onClick={isMobile ? onCloseMobile : undefined}>
-                    <Button variant="ghost" className="w-full justify-start rounded-xl">
-                      <PiUser className="h-4 w-4 mr-3" />
-                      Profile Settings
-                    </Button>
-                  </Link>
-                  <Link href="/dashboard/settings" onClick={isMobile ? onCloseMobile : undefined}>
-                    <Button variant="ghost" className="w-full justify-start rounded-xl">
-                      <PiGear className="h-4 w-4 mr-3" />
-                      Account Settings
-                    </Button>
-                  </Link>
-                  <Link href="/dashboard/company" onClick={isMobile ? onCloseMobile : undefined}>
-                    <Button variant="ghost" className="w-full justify-start rounded-xl">
-                      <PiOfficeChair className="h-4 w-4 mr-3" />
-                      Company Settings
-                    </Button>
-                  </Link>
+                <div className="flex items-center gap-3 w-full">
+                  {userProfile?.avatar_url ? (
+                    <Image
+                      src={userProfile.avatar_url || "/placeholder.svg"}
+                      alt="Profile"
+                      width={32}
+                      height={32}
+                      className="rounded-full object-cover border border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center border border-gray-200">
+                      <span className="text-xs font-medium text-gray-600">{getInitials()}</span>
+                    </div>
+                  )}
+                  <div className="flex-1 text-left min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
+                    <p className="text-xs text-gray-500 truncate">{getUserEmail()}</p>
+                  </div>
+                  <PiGear className="h-4 w-4 text-gray-400" />
                 </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
-
-        {(!isCollapsed || isMobile) && (
-          <div className="border-t border-gray-200 pt-3 space-y-2">
-            <Button
-              onClick={handleSignOut}
-              variant="ghost"
-              size="icon"
-              className="w-full h-8 rounded-xl hover:bg-gray-50"
-              title="Sign Out"
-            >
-              <PiSignOut className="h-4 w-4" />
-              <span className="sr-only">Sign Out</span>
-            </Button>
-          </div>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-medium tracking-tighter">Account Settings</DialogTitle>
+                <DialogDescription className="font-light">Manage your account and preferences</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3">
+                <Link href="/dashboard/profile" onClick={isMobile ? onCloseMobile : undefined}>
+                  <Button variant="ghost" className="w-full justify-start rounded-xl">
+                    <PiUser className="h-4 w-4 mr-3" />
+                    Profile Settings
+                  </Button>
+                </Link>
+                <Link href="/dashboard/settings" onClick={isMobile ? onCloseMobile : undefined}>
+                  <Button variant="ghost" className="w-full justify-start rounded-xl">
+                    <PiGear className="h-4 w-4 mr-3" />
+                    Account Settings
+                  </Button>
+                </Link>
+                <Link href="/dashboard/billing" onClick={isMobile ? onCloseMobile : undefined}>
+                  <Button variant="ghost" className="w-full justify-start rounded-xl">
+                    <PiCrown className="h-4 w-4 mr-3" />
+                    Plans & Billing
+                  </Button>
+                </Link>
+                <Link href="/dashboard/company" onClick={isMobile ? onCloseMobile : undefined}>
+                  <Button variant="ghost" className="w-full justify-start rounded-xl">
+                    <PiOfficeChair className="h-4 w-4 mr-3" />
+                    Company Settings
+                  </Button>
+                </Link>
+                <div className="border-t pt-2">
+                  <Button
+                    onClick={handleSignOut}
+                    variant="ghost"
+                    className="w-full justify-start rounded-xl text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <PiSignOut className="h-4 w-4 mr-3" />
+                    Sign Out
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
     </div>

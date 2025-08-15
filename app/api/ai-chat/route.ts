@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { createClient } from "@/lib/supabase/server"
 import { AutoApprovalEngine, type TravelRequest } from "@/lib/intelligence/auto-approval"
+import { employeeScoringService } from "@/lib/intelligence/employee-scoring"
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -369,6 +370,14 @@ async function evaluateAutoApprovalTool(input: any) {
     const today = new Date()
     const advanceBookingDays = Math.ceil((departureDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
+    // Get employee scoring data
+    const employeeScore = await employeeScoringService.getEmployeeScore(input.user_id)
+    const approvalEligibility = await employeeScoringService.calculateAutoApprovalEligibility(
+      input.user_id,
+      input.flight_cost,
+      "flight",
+    )
+
     const travelRequest: TravelRequest = {
       user_id: input.user_id,
       employee_level: input.employee_level,
@@ -384,7 +393,35 @@ async function evaluateAutoApprovalTool(input: any) {
     }
 
     const result = await autoApproval.evaluateTravel(travelRequest)
-    return result
+
+    // Enhanced result with employee scoring
+    const enhancedResult = {
+      ...result,
+      employee_scoring: {
+        trust_level: employeeScore?.trust_level || "new",
+        compliance_score: employeeScore?.compliance_score || 85,
+        auto_approval_eligible: approvalEligibility.eligible,
+        confidence: approvalEligibility.confidence,
+        max_auto_amount: approvalEligibility.maxAmount,
+        scoring_reason: approvalEligibility.reason,
+      },
+    }
+
+    // Record the approval decision
+    await employeeScoringService.recordBookingApproval({
+      user_id: input.user_id,
+      approval_type: result.auto_approved ? "auto" : "manual",
+      status: result.auto_approved ? "approved" : "pending",
+      decision_reason: result.reason,
+      confidence_score: result.confidence_score,
+      policy_checks: result.policy_compliance || {},
+      violated_policies: result.violations || [],
+      amount: input.flight_cost,
+      currency: "USD",
+      ai_model_used: "claude-3-5-sonnet-20241022",
+    })
+
+    return enhancedResult
   } catch (error) {
     console.error("Auto-approval evaluation error:", error)
     return { error: "Failed to evaluate travel request for auto-approval" }
