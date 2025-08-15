@@ -104,10 +104,11 @@ const pricingPlans = [
     id: "basic",
     name: "Basic",
     description: "For growing teams ready to optimize their travel experience",
-    price: "€49",
-    annualPrice: "€39",
+    price: "€39", // Reduced from €49 to €39 for monthly
+    annualPrice: "€31", // 20% discount: €39 * 0.8 = €31.20 ≈ €31
     period: "per month",
     annualPeriod: "per month, billed annually",
+    savings: "Save €96/year", // Added savings calculation
     features: [
       "15,000 AI tokens/month",
       "30 AI travel searches per month",
@@ -131,9 +132,10 @@ const pricingPlans = [
     name: "Pro",
     description: "For businesses ready to fully optimize their travel operations",
     price: "€89",
-    annualPrice: "€71",
+    annualPrice: "€71", // 20% discount: €89 * 0.8 = €71.20 ≈ €71
     period: "per month",
     annualPeriod: "per month, billed annually",
+    savings: "Save €216/year", // Added savings calculation
     features: [
       "25,000 AI tokens/month",
       "50 AI travel searches per month",
@@ -430,6 +432,9 @@ export const Plans = () => {
                     /{isAnnual ? plan.annualPeriod : plan.period}
                   </span>
                 </div>
+                {isAnnual && plan.savings && (
+                  <div className="text-[9px] text-emerald-700 font-medium mt-1">{plan.savings}</div>
+                )}
               </div>
 
               {/* Features más compactas */}

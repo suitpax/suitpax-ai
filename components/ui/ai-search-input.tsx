@@ -14,7 +14,12 @@ interface AISearchInputProps {
   onSubmit?: (query: string) => void
 }
 
-export default function AISearchInput({ placeholder = "Ask Suitpax AI...", className, size = "md", onSubmit }: AISearchInputProps) {
+export default function AISearchInput({
+  placeholder = "Ask Suitpax AI...",
+  className,
+  size = "md",
+  onSubmit,
+}: AISearchInputProps) {
   const [query, setQuery] = useState("")
   const router = useRouter()
 
@@ -35,10 +40,19 @@ export default function AISearchInput({ placeholder = "Ask Suitpax AI...", class
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder}
-        className={cn("flex-1 rounded-xl border border-gray-200 px-3 bg-white/90", sizeClasses)}
+        className={cn(
+          "flex-1 rounded-full border border-gray-200 px-4 bg-white/90 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all",
+          sizeClasses,
+        )}
       />
-      <button type="submit" className={cn("inline-flex items-center gap-1 px-3 rounded-xl bg-black text-white hover:bg-gray-800 transition-colors", size === "sm" ? "h-8 text-xs" : size === "lg" ? "h-12 text-sm" : "h-10 text-sm")}
-        aria-label="Ask Suitpax AI">
+      <button
+        type="submit"
+        className={cn(
+          "inline-flex items-center gap-1 px-4 rounded-full bg-black text-white hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md",
+          size === "sm" ? "h-8 text-xs" : size === "lg" ? "h-12 text-sm" : "h-10 text-sm",
+        )}
+        aria-label="Ask Suitpax AI"
+      >
         Ask <ArrowRight className={cn(size === "sm" ? "h-3 w-3" : "h-4 w-4")} />
       </button>
     </form>

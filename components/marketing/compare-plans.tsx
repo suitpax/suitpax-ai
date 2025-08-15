@@ -211,10 +211,11 @@ export function ComparePlans() {
                     <th className="py-6 px-6 text-center w-1/5 bg-gray-50 relative">
                       <div className="relative flex flex-col items-center">
                         <span className="text-lg font-medium text-black mb-1">Basic</span>
-                        <span className="text-sm text-gray-500 mb-2">{isAnnual ? "€39/month" : "€49/month"}</span>
+                        <span className="text-sm text-gray-500 mb-2">{isAnnual ? "€31/month" : "€39/month"}</span>
                         <span className="inline-flex items-center rounded-full bg-white border border-black px-4 py-1 text-xs font-medium text-black">
                           Most Popular
                         </span>
+                        {isAnnual && <div className="text-xs text-emerald-700 font-medium mt-1">Save €96/year</div>}
                       </div>
                     </th>
                     <th className="py-6 px-6 text-center w-1/5">
@@ -311,7 +312,7 @@ export function ComparePlans() {
             <p className="text-base text-gray-500 mb-4">Need help choosing the right plan for your business?</p>
             {isAnnual && (
               <p className="text-sm text-gray-800 font-medium mb-6 bg-gray-100 inline-block px-4 py-2 rounded-full">
-                Annual plans include a 20% discount compared to monthly billing
+                Annual plans include a 20% discount • Basic saves €96/year • Pro saves €216/year
               </p>
             )}
             <a

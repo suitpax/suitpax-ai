@@ -64,8 +64,10 @@ END $$;
 -- =========================
 -- Core tables
 -- =========================
-CREATE TABLE IF NOT EXISTS public.profiles (
+-- Users table with comprehensive user information (consolidated from profiles)
+CREATE TABLE IF NOT EXISTS public.users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT UNIQUE NOT NULL,
   username TEXT UNIQUE,
   full_name TEXT,
   first_name TEXT,
@@ -76,32 +78,33 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   phone TEXT,
   subscription_plan TEXT DEFAULT 'free',
   subscription_status TEXT DEFAULT 'inactive',
+  stripe_customer_id TEXT UNIQUE,
   onboarding_completed BOOLEAN DEFAULT FALSE,
   ai_tokens_used INTEGER DEFAULT 0,
-  ai_tokens_limit INTEGER DEFAULT 100,
+  ai_tokens_limit INTEGER DEFAULT 5000,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 DO $$ BEGIN
-  ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 EXCEPTION WHEN others THEN NULL; END $$;
 
 DO $$ BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='profiles' AND policyname='Users can view own profile'
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='users' AND policyname='Users can view own profile'
   ) THEN
-    CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
+    CREATE POLICY "Users can view own profile" ON public.users FOR SELECT USING (auth.uid() = id);
   END IF;
   IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='profiles' AND policyname='Users can update own profile'
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='users' AND policyname='Users can update own profile'
   ) THEN
-    CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+    CREATE POLICY "Users can update own profile" ON public.users FOR UPDATE USING (auth.uid() = id);
   END IF;
   IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='profiles' AND policyname='Users can insert own profile'
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='users' AND policyname='Users can insert own profile'
   ) THEN
-    CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+    CREATE POLICY "Users can insert own profile" ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
   END IF;
 END $$;
 
@@ -747,44 +750,13 @@ END $$;
 -- =========================
 -- Memory analytics (optional)
 -- =========================
-CREATE TABLE IF NOT EXISTS public.user_memory_analytics (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  memory_type TEXT NOT NULL,
-  memory_count INTEGER DEFAULT 0,
-  last_updated TIMESTAMPTZ DEFAULT NOW(),
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS public.user_travel_preferences (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  preference_type TEXT NOT NULL,
-  preference_value TEXT NOT NULL,
-  confidence_score FLOAT DEFAULT 1.0,
-  mem0_memory_id TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-DO $$ BEGIN
-  ALTER TABLE public.user_memory_analytics ENABLE ROW LEVEL SECURITY;
-  ALTER TABLE public.user_travel_preferences ENABLE ROW LEVEL SECURITY;
-EXCEPTION WHEN others THEN NULL; END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_memory_analytics' AND policyname='Users can view own memory analytics') THEN
-    CREATE POLICY "Users can view own memory analytics" ON public.user_memory_analytics FOR SELECT USING (auth.uid() = user_id);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_travel_preferences' AND policyname='Users can view own travel preferences') THEN
-    CREATE POLICY "Users can view own travel preferences" ON public.user_travel_preferences FOR ALL USING (auth.uid() = user_id);
-  END IF;
-END $$;
+-- Remove user_memory_analytics and user_travel_preferences tables as they're redundant
+-- The user_preferences table already handles travel preferences
 
 -- =========================
 -- Indexes (performance)
 -- =========================
-CREATE INDEX IF NOT EXISTS idx_profiles_onboarding ON public.profiles(onboarding_completed);
+CREATE INDEX IF NOT EXISTS idx_profiles_onboarding ON public.users(onboarding_completed);
 CREATE INDEX IF NOT EXISTS idx_flight_bookings_user_id ON public.flight_bookings(user_id);
 CREATE INDEX IF NOT EXISTS idx_flight_bookings_departure_date ON public.flight_bookings(departure_date);
 CREATE INDEX IF NOT EXISTS idx_flight_bookings_status ON public.flight_bookings(status);
@@ -821,6 +793,8 @@ CREATE INDEX IF NOT EXISTS idx_webhook_events_event_type ON public.webhook_event
 CREATE INDEX IF NOT EXISTS idx_webhook_events_status ON public.webhook_events(status);
 CREATE INDEX IF NOT EXISTS idx_webhook_events_processed_at ON public.webhook_events(processed_at);
 CREATE INDEX IF NOT EXISTS idx_webhook_events_resource_id ON public.webhook_events(resource_id);
+CREATE INDEX IF NOT EXISTS -- Indexes (performance)
+-- =========================
 CREATE INDEX IF NOT EXISTS idx_user_memory_analytics_user_id ON public.user_memory_analytics(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_travel_preferences_user_id ON public.user_travel_preferences(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_travel_preferences_type ON public.user_travel_preferences(preference_type);
@@ -830,7 +804,7 @@ CREATE INDEX IF NOT EXISTS idx_user_travel_preferences_type ON public.user_trave
 -- =========================
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'handle_updated_at_profiles') THEN
-    CREATE TRIGGER handle_updated_at_profiles BEFORE UPDATE ON public.profiles
+    CREATE TRIGGER handle_updated_at_profiles BEFORE UPDATE ON public.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'handle_updated_at_user_preferences') THEN
@@ -893,13 +867,14 @@ END $$;
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name, avatar_url, first_name, last_name)
+  INSERT INTO public.users (id, full_name, avatar_url, first_name, last_name, email)
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
     COALESCE(NEW.raw_user_meta_data->>'avatar_url', ''),
     COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'last_name', '')
+    COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
+    NEW.email
   )
   ON CONFLICT (id) DO NOTHING;
 
@@ -933,7 +908,7 @@ END $$;
 CREATE OR REPLACE FUNCTION public.increment_ai_tokens(user_id UUID, tokens INTEGER)
 RETURNS VOID AS $$
 BEGIN
-  UPDATE public.profiles
+  UPDATE public.users
   SET ai_tokens_used = COALESCE(ai_tokens_used, 0) + tokens
   WHERE id = user_id;
 END;
@@ -943,15 +918,15 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Compatibility views for existing app code
 -- =========================
 -- View: public.users (maps profiles + user_preferences into one updatable view)
-CREATE OR REPLACE VIEW public.users AS
+CREATE OR REPLACE VIEW public.users_view AS
 SELECT
-  p.id,
-  p.first_name,
-  p.last_name,
-  p.company_name AS company,
-  p.job_title,
-  p.phone,
-  p.onboarding_completed,
+  u.id,
+  u.first_name,
+  u.last_name,
+  u.company_name AS company,
+  u.job_title,
+  u.phone,
+  u.onboarding_completed,
   up.timezone,
   up.seat_preference,
   up.meal_preference,
@@ -960,10 +935,10 @@ SELECT
     'sms', up.sms_notifications,
     'push', up.push_notifications
   ) AS notification_settings,
-  p.created_at,
-  GREATEST(p.updated_at, COALESCE(up.updated_at, p.updated_at)) AS updated_at
-FROM public.profiles p
-LEFT JOIN public.user_preferences up ON up.user_id = p.id;
+  u.created_at,
+  GREATEST(u.updated_at, COALESCE(up.updated_at, u.updated_at)) AS updated_at
+FROM public.users u
+LEFT JOIN public.user_preferences up ON up.user_id = u.id;
 
 -- Updatable view trigger for UPDATEs on public.users
 CREATE OR REPLACE FUNCTION public.users_view_update()
@@ -974,16 +949,16 @@ DECLARE
   v_push BOOLEAN;
 BEGIN
   -- Update profiles
-  UPDATE public.profiles p
+  UPDATE public.users u
   SET
-    first_name = COALESCE(NEW.first_name, p.first_name),
-    last_name = COALESCE(NEW.last_name, p.last_name),
-    company_name = COALESCE(NEW.company, p.company_name),
-    job_title = COALESCE(NEW.job_title, p.job_title),
-    phone = COALESCE(NEW.phone, p.phone),
-    onboarding_completed = COALESCE(NEW.onboarding_completed, p.onboarding_completed),
+    first_name = COALESCE(NEW.first_name, u.first_name),
+    last_name = COALESCE(NEW.last_name, u.last_name),
+    company_name = COALESCE(NEW.company, u.company_name),
+    job_title = COALESCE(NEW.job_title, u.job_title),
+    phone = COALESCE(NEW.phone, u.phone),
+    onboarding_completed = COALESCE(NEW.onboarding_completed, u.onboarding_completed),
     updated_at = NOW()
-  WHERE p.id = OLD.id;
+  WHERE u.id = OLD.id;
 
   -- Extract notification flags if provided
   v_email := COALESCE((NEW.notification_settings->>'email')::boolean, NULL);
@@ -1017,18 +992,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS users_view_instead_of_update ON public.users;
+DROP TRIGGER IF EXISTS users_view_instead_of_update ON public.users_view;
 CREATE TRIGGER users_view_instead_of_update
-INSTEAD OF UPDATE ON public.users
+INSTEAD OF UPDATE ON public.users_view
 FOR EACH ROW EXECUTE FUNCTION public.users_view_update();
 
 -- View: public.user_profiles for API compatibility (GET/PUT upsert)
 CREATE OR REPLACE VIEW public.user_profiles AS
 SELECT
-  p.id AS user_id,
-  p.full_name,
-  p.company_name AS company,
-  p.phone,
+  u.id AS user_id,
+  u.full_name,
+  u.company_name AS company,
+  u.phone,
   up.timezone,
   jsonb_build_object(
     'seat_preference', up.seat_preference,
@@ -1039,10 +1014,10 @@ SELECT
       'push', up.push_notifications
     )
   ) AS preferences,
-  p.created_at,
-  p.updated_at
-FROM public.profiles p
-LEFT JOIN public.user_preferences up ON up.user_id = p.id;
+  u.created_at,
+  u.updated_at
+FROM public.users u
+LEFT JOIN public.user_preferences up ON up.user_id = u.id;
 
 -- Updatable view triggers for INSERT/UPDATE on public.user_profiles
 CREATE OR REPLACE FUNCTION public.user_profiles_view_upsert()
@@ -1055,13 +1030,13 @@ DECLARE
   v_push BOOLEAN;
 BEGIN
   -- Update profiles
-  UPDATE public.profiles p
+  UPDATE public.users u
   SET
-    full_name = COALESCE(NEW.full_name, p.full_name),
-    company_name = COALESCE(NEW.company, p.company_name),
-    phone = COALESCE(NEW.phone, p.phone),
+    full_name = COALESCE(NEW.full_name, u.full_name),
+    company_name = COALESCE(NEW.company, u.company_name),
+    phone = COALESCE(NEW.phone, u.phone),
     updated_at = NOW()
-  WHERE p.id = COALESCE(NEW.user_id, OLD.user_id);
+  WHERE u.id = COALESCE(NEW.user_id, OLD.user_id);
 
   -- Extract preferences fields if provided
   IF NEW.preferences IS NOT NULL THEN
