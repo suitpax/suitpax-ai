@@ -1,7 +1,6 @@
 export const runtime = "nodejs";
 
 import { type NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { Duffel } from "@duffel/api";
 import { SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/enhanced-system";
@@ -10,9 +9,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const duffel = new Duffel({
-  token: process.env.DUFFEL_API_KEY!,
-});
+
 
 const systemPrompt = `
 ${SUITPAX_AI_SYSTEM_PROMPT}
@@ -114,6 +111,9 @@ async function flightSearchTool(
   passengers?: any[]
 ) {
   try {
+    const { Duffel } = await import("@duffel/api")
+    const duffel = new Duffel({ token: process.env.DUFFEL_API_KEY! })
+
     const slices = [{ origin, destination, departure_date }];
     if (return_date) {
       slices.push({ origin: destination, destination: origin, departure_date: return_date });
