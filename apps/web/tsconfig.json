@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./app/*", "./components/*", "./lib/*"],
+      "@/components/ui": ["../../packages/ui/src/components"],
+      "@/components/ui/*": ["../../packages/ui/src/components/*"],
+      "@/components/prompt-kit/*": ["../../packages/ui/src/components/prompt-kit/*"],
+      "@/lib/*": ["../../packages/utils/src/*"],
+      "@/hooks/*": ["../../packages/ui/src/hooks/*"],
+      "@/contexts/*": ["../../packages/ui/src/contexts/*"],
+      "@/types/*": ["../../packages/shared/src/types/*"],
+      "@/domains/*": ["../../packages/domains/src/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../../packages/ui/src/**/*",
+    "../../packages/utils/src/**/*",
+    "../../packages/shared/src/**/*",
+    "../../packages/domains/src/**/*"
+  ],
+  "exclude": ["node_modules"]
+}

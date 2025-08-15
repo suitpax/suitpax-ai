@@ -5,14 +5,27 @@ const nextConfig = {
     optimizePackageImports: ['@suitpax/ui']
   },
   images: {
-    domains: ['images.unsplash.com', 'api.qrserver.com'],
+    domains: ['images.unsplash.com', 'api.qrserver.com', 'ui-avatars.com'],
     unoptimized: false
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@/components/ui': '../../packages/ui/src/components',
+      '@/components/prompt-kit': '../../packages/ui/src/components/prompt-kit',
+      '@/lib': '../../packages/utils/src',
+      '@/hooks': '../../packages/ui/src/hooks',
+      '@/contexts': '../../packages/ui/src/contexts',
+      '@/types': '../../packages/shared/src/types',
+      '@/domains': '../../packages/domains/src'
+    };
+    return config;
   },
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: '/api/:path*'
+        source: '/api/travel/:path*',
+        destination: '/api/travel/:path*'
       }
     ];
   }

@@ -19,31 +19,31 @@ import {
 	Video,
 	Archive,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { createClient } from "@/lib/supabase/client"
+import { Button } from "@suitpax/ui/button"
+import { createClient } from "@suitpax/utils/supabase/client"
 import Image from "next/image"
 import Link from "next/link"
-import Markdown from "@/components/prompt-kit/markdown"
+import Markdown from "@suitpax/ui/prompt-kit/markdown"
 import {
 	PromptInput,
 	PromptInputAction,
 	PromptInputActions,
 	PromptInputTextarea,
-} from "@/components/prompt-kit/prompt-input"
+} from "@suitpax/ui/prompt-kit/prompt-input"
 import {
 	ChatContainerRoot,
 	ChatContainerContent,
 	ChatContainerScrollAnchor,
-} from "@/components/prompt-kit/chat-container"
-import { ScrollButton } from "@/components/prompt-kit/scroll-button"
-import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@/components/prompt-kit/reasoning"
-import { Switch } from "@/components/ui/switch"
-import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-import DocumentScanner from "@/components/prompt-kit/document-scanner"
-import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
-import SourceList from "@/components/prompt-kit/source-list"
-import { useChatStream } from "@/hooks/use-chat-stream"
-import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
+} from "@suitpax/ui/prompt-kit/chat-container"
+import { ScrollButton } from "@suitpax/ui/prompt-kit/scroll-button"
+import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@suitpax/ui/prompt-kit/reasoning"
+import { Switch } from "@suitpax/ui/switch"
+import VantaHaloBackground from "@suitpax/ui/vanta-halo-background"
+import DocumentScanner from "@suitpax/ui/prompt-kit/document-scanner"
+import PromptSuggestions from "@suitpax/ui/prompt-kit/prompt-suggestions"
+import SourceList from "@suitpax/ui/prompt-kit/source-list"
+import { useChatStream } from "@suitpax/ui/hooks/use-chat-stream"
+import ChatFlightOffers from "@suitpax/ui/prompt-kit/chat-flight-offers"
 import { useSearchParams } from "next/navigation"
 
 interface Message {
