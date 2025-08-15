@@ -31,6 +31,27 @@ export interface Permission {
   action: 'create' | 'read' | 'update' | 'delete' | 'execute';
 }
 
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  timezone: string;
+  currency: string;
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
+  travel: {
+    preferredAirlines: string[];
+    seatPreference: 'aisle' | 'window' | 'middle';
+    mealPreference: string;
+    loyaltyPrograms: Array<{
+      airline: string;
+      number: string;
+    }>;
+  };
+}
+
 export interface Company {
   id: string;
   name: string;

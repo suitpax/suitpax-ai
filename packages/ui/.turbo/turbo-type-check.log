@@ -1,0 +1,4 @@
+
+> @suitpax/ui@0.1.0 type-check /workspace/packages/ui
+> tsc --noEmit
+

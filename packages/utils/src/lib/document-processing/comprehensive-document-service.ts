@@ -3,7 +3,7 @@ import * as pdfjsLib from "pdfjs-dist"
 import pdfParse from "pdf-parse"
 import mammoth from "mammoth"
 import * as XLSX from "xlsx"
-import Jimp from "jimp"
+import { Jimp } from "jimp"
 
 export class ComprehensiveDocumentService {
   private static instance: ComprehensiveDocumentService

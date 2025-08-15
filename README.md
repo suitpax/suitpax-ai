@@ -261,6 +261,39 @@ This project is private and proprietary. All rights reserved.
 - [Duffel](https://duffel.com/)
 - [Vercel](https://vercel.com/)
 
+## 🚀 Production Deployment
+
+### Quick Deploy
+```bash
+# Make script executable
+chmod +x scripts/deploy.sh
+
+# Deploy to production
+./scripts/deploy.sh deploy
+```
+
+### Docker Deployment
+```bash
+# Using Docker Compose
+docker-compose up --build -d
+
+# Health check
+curl http://localhost:3000/api/health
+curl http://localhost:3001/api/health
+```
+
+### Available Commands
+```bash
+./scripts/deploy.sh deploy    # Full deployment
+./scripts/deploy.sh rollback  # Rollback to previous version
+./scripts/deploy.sh health    # Health check
+./scripts/deploy.sh logs      # View logs
+./scripts/deploy.sh stop      # Stop services
+./scripts/deploy.sh restart   # Restart services
+```
+
+For complete deployment instructions, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
+
 ## 📞 Support
 
 For support, email support@suitpax.com or visit our documentation.

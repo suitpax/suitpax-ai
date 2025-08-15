@@ -95,7 +95,7 @@ export class GoCardlessClient {
     // Token expires in 1 hour, refresh 5 minutes early
     this.tokenExpiry = Date.now() + (data.access_expires - 300) * 1000
 
-    return this.accessToken
+    return this.accessToken || ''
   }
 
   private checkRateLimit(accountId: string, scope: "details" | "balances" | "transactions"): void {

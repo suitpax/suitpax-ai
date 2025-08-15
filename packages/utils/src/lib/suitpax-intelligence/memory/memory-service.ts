@@ -17,7 +17,7 @@ export class SuitpaxMemoryService {
   constructor(userId: string) {
     this.userId = userId
     this.memoryClient = new MemoryClient({
-      apiKey: process.env.MEM0_API_KEY,
+      apiKey: process.env.MEM0_API_KEY || 'demo-key',
     })
   }
 

@@ -1,0 +1,4 @@
+
+> @suitpax/domains@0.1.0 type-check /workspace/packages/domains
+> tsc --noEmit
+
