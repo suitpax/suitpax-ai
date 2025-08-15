@@ -76,7 +76,7 @@ const defaultNavigation = [
 ]
 
 const aiNavigation = [
-  { name: "Suitpax AI", href: "/dashboard/ai-core", icon: PiChatCircle, badge: "AI" },
+  { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatCircle, badge: "AI" },
   { name: "Voice AI", href: "/dashboard/voice-ai", icon: PiMicrophone, badge: "NEW" },
   { name: "Radar", href: "/dashboard/radar", icon: PiRadar, badge: "NEW" }
 ]
