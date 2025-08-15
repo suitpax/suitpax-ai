@@ -1,4 +1,4 @@
-export const runtime = "nodejs"
+export const runtime = "nodejs";
 
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +29,7 @@ Tool Usage Protocol:
 5. Synthesize and respond in clean Markdown (no emojis). Present the top 3 options using headings and a table.
 
 Example Flight Card Format (no emojis):
-```markdown
+
 ### [Airline Name] — [Origin IATA] → [Destination IATA]
 
 | Feature        | Details                                     |
@@ -39,7 +39,6 @@ Example Flight Card Format (no emojis):
 | Stops          | [Number of stops]                           |
 | Departure      | [Departure Time] at [Origin Airport]        |
 | Arrival        | [Arrival Time] at [Destination Airport]     |
-```
 
 If the user's request is not about flights, answer as a business travel assistant.
 `.trim();
@@ -69,7 +68,13 @@ const tools: Anthropic.Tool[] = [
   },
 ];
 
-async function flightSearchTool(origin: string, destination: string, departure_date: string, return_date?: string, passengers?: any[]) {
+async function flightSearchTool(
+  origin: string,
+  destination: string,
+  departure_date: string,
+  return_date?: string,
+  passengers?: any[]
+) {
   try {
     const slices = [{ origin, destination, departure_date }];
     if (return_date) {
@@ -103,9 +108,8 @@ export async function POST(request: NextRequest) {
   }));
 
   try {
-    // First call to Anthropic to see if a tool should be used
     const initialResponse = await anthropic.messages.create({
-      model: "claude-3-opus-20240229", // Opus is best for tool use
+      model: "claude-3-opus-20240229",
       max_tokens: 4096,
       system: systemPrompt,
       messages: [...conversationHistory, { role: "user", content: message }],
@@ -114,46 +118,34 @@ export async function POST(request: NextRequest) {
     });
 
     const stopReason = (initialResponse as any).stop_reason;
-    const toolUseContent = (initialResponse as any).content.find((c: any) => c.type === 'tool_use');
+    const toolUseContent = (initialResponse as any).content.find((c: any) => c.type === "tool_use");
 
-    if (stopReason === 'tool_use' && toolUseContent && toolUseContent.type === 'tool_use') {
+    if (stopReason === "tool_use" && toolUseContent && toolUseContent.type === "tool_use") {
       const { name, input } = toolUseContent;
-      if (name === 'search_flights') {
+      if (name === "search_flights") {
         const { origin, destination, departure_date, return_date, passengers } = input as any;
         
-        // Call the actual flight search tool
         const flightData = await flightSearchTool(origin, destination, departure_date, return_date, passengers);
 
-        // Second call to Anthropic with the tool results to generate a user-friendly response
         const finalResponse = await anthropic.messages.create({
-          model: "claude-3-sonnet-20240229", // Sonnet is fine for summarizing
+          model: "claude-3-sonnet-20240229",
           max_tokens: 4096,
           system: systemPrompt,
           messages: [
             ...conversationHistory,
             { role: "user", content: message },
-            {
-              role: "assistant",
-              content: [
-                { type: "tool_use", id: toolUseContent.id, name: toolUseContent.name, input: toolUseContent.input }
-              ]
-            },
-            {
-              role: "user",
-              content: [
-                { type: "tool_result", tool_use_id: toolUseContent.id, content: JSON.stringify(flightData) }
-              ]
-            }
+            { role: "assistant", content: [ { type: "tool_use", id: toolUseContent.id, name: toolUseContent.name, input: toolUseContent.input } ] },
+            { role: "user", content: [ { type: "tool_result", tool_use_id: toolUseContent.id, content: JSON.stringify(flightData) } ] }
           ],
         });
         
-        const text = (finalResponse as any).content?.find((c: any) => c.type === 'text')?.text || ''
+        const text = (finalResponse as any).content?.find((c: any) => c.type === "text")?.text || "";
         return NextResponse.json({ response: text });
       }
     }
 
-    // If no tool is used, return the standard text response
-    const textResponse = (initialResponse as any).content?.find((c: any) => c.type === 'text')?.text || "I'm sorry, I couldn't process that request.";
+    const textResponse = (initialResponse as any).content?.find((c: any) => c.type === "text")?.text || 
+      "I'm sorry, I couldn't process that request.";
     return NextResponse.json({ response: textResponse });
 
   } catch (error) {
