@@ -9,6 +9,7 @@
     "mcp:server": "node lib/mcp/server.js",
     "start": "next start",
     "test": "echo \"No hay tests configurados aún\" && exit 0",
+    "test:brave": "echo \"Brave Search integration available - check /docs/integrations/brave-search.md for usage\"",
     "test:coverage": "echo \"No hay cobertura configurada aún\" && exit 0",
     "test:e2e": "echo \"No hay tests E2E configurados aún\" && exit 0",
     "test:integration": "echo \"No hay tests de integración configurados aún\" && exit 0",

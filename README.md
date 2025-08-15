@@ -24,6 +24,7 @@ Suitpax AI is a cutting-edge business travel management platform that leverages 
 
 ### 🎯 Advanced Features
 - **Voice AI Integration**: Speech-to-text and text-to-speech capabilities
+- **Web Intelligence**: Real-time news and web search with Brave Search API
 - **Document Processing**: Advanced OCR with Google Cloud Vision and OCR.space
 - **Multi-language Support**: Global travel assistance in multiple languages
 - **Calendar Integration**: Seamless meeting and travel scheduling
@@ -110,6 +111,9 @@ DUFFEL_WEBHOOK_SECRET=your_duffel_webhook_secret
 # Email Services
 BREVO_API_KEY=your_brevo_key
 
+# Web Search & Intelligence
+BRAVE_API_KEY=your_brave_search_api_key
+
 # Analytics & Monitoring
 NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
 SENTRY_AUTH_TOKEN=your_sentry_token
@@ -168,6 +172,7 @@ suitpax-ai/
 
 ### Travel & Business
 - **Duffel**: Flight search and booking API
+- **Brave Search**: Real-time news and web intelligence for travel insights
 - **Supabase**: Database and authentication
 - **Brevo**: Email automation
 - **Vercel**: Hosting and analytics
@@ -177,6 +182,9 @@ suitpax-ai/
 \`\`\`bash
 # Run unit tests
 pnpm test
+
+# Test Brave Search integration
+pnpm test:brave
 
 # Run integration tests
 pnpm test:integration
