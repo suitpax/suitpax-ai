@@ -36,7 +36,7 @@ import {
   PiBriefcase,
   PiPhone,
   PiMapTrifold,
-  PiRadar,
+  PiDiscThin,
 } from "react-icons/pi"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
@@ -78,7 +78,7 @@ const defaultNavigation = [
 const aiNavigation = [
   { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatCircle, badge: "AI" },
   { name: "Voice AI", href: "/dashboard/voice-ai", icon: PiMicrophone, badge: "NEW" },
-  { name: "Radar", href: "/dashboard/radar", icon: PiRadar, badge: "NEW" }
+  { name: "Radar", href: "/dashboard/radar", icon: PiDiscThin, badge: "NEW" }
 ]
 
 interface SidebarProps {
