@@ -1,5 +1,3 @@
-export const runtime = "nodejs"
-
 import { NextRequest, NextResponse } from "next/server"
 import { generatePDF } from "@/lib/pdf-generator"
 import { createClient } from "@/lib/supabase/server"

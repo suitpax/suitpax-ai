@@ -20,5 +20,3 @@ export default function ContactPage() {
     </main>
   )
 }
-
-export const dynamic = "force-dynamic"

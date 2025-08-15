@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import Image from "next/image"
-import { FcGoogle } from "react-icons/fc"
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("")
@@ -49,25 +48,15 @@ export default function SignupPage() {
     }
   }
 
-  const handleGoogle = async () => {
-    setLoading(true)
-    setError("")
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-      if (error) setError(error.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-100/20 via-transparent to-transparent"></div>
+      </div>
+
       <div className="relative z-10 w-full max-w-md mx-auto">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -75,7 +64,7 @@ export default function SignupPage() {
           className="text-center mb-8"
         >
           <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center rounded-xl bg-white px-3 py-1.5 border border-gray-200 shadow-sm">
+            <div className="inline-flex items-center rounded-xl bg-white/80 backdrop-blur-sm px-3 py-1.5 border border-gray-200 shadow-sm">
               <Image
                 src="/logo/suitpax-bl-logo.webp"
                 alt="Suitpax"
@@ -95,17 +84,13 @@ export default function SignupPage() {
           <p className="text-center text-gray-600 font-light text-sm">Create your business travel account</p>
         </motion.div>
 
+        {/* Form */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <div className="relative bg-white py-6 px-6 shadow-sm rounded-2xl border border-gray-200">
-            {loading && (
-              <div className="absolute inset-0 z-10 rounded-2xl bg-white flex items-center justify-center">
-                <div className="w-6 h-6 border-3 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
-              </div>
-            )}
+          <div className="bg-white/50 backdrop-blur-sm py-6 px-6 shadow-sm rounded-2xl border border-gray-200">
             <form className="space-y-5" onSubmit={handleSignup}>
               {error && (
                 <motion.div
@@ -128,7 +113,7 @@ export default function SignupPage() {
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Enter your full name"
+                  placeholder="John Doe"
                   className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light transition-all"
                 />
               </div>
@@ -145,7 +130,7 @@ export default function SignupPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your work email"
+                  placeholder="john@company.com"
                   className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-light transition-all"
                 />
               </div>
@@ -180,23 +165,9 @@ export default function SignupPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
                 >
-                  {loading && (
-                    <span className="inline-block w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin"></span>
-                  )}
-                  <span>{loading ? "Creating account..." : "Create account"}</span>
-                </button>
-              </div>
-
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={handleGoogle}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 rounded-xl text-sm font-medium bg-white hover:bg-gray-50 transition-colors"
-                >
-                  <FcGoogle className="h-4 w-4" />
-                  <span>Continue with Google</span>
+                  {loading ? "Creating account..." : "Create account"}
                 </button>
               </div>
 
@@ -213,6 +184,7 @@ export default function SignupPage() {
           </div>
         </motion.div>
 
+        {/* Back to Home */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -231,5 +203,3 @@ export default function SignupPage() {
     </div>
   )
 }
-
-export const dynamic = "force-dynamic"

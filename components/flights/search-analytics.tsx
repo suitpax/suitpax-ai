@@ -4,12 +4,13 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import {
   ChartBarIcon,
+  ClockIcon,
   CurrencyDollarIcon,
   PaperAirplaneIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
   CalendarIcon,
-  MapPinIcon,
+  MapPinIcon
 } from "@heroicons/react/24/outline"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,7 +21,7 @@ interface SearchAnalytics {
     route: string
     searches: number
     avgPrice: number
-    trend: "up" | "down" | "stable"
+    trend: 'up' | 'down' | 'stable'
   }>
   priceAlerts: Array<{
     route: string
@@ -50,53 +51,68 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
   const [isExpanded, setIsExpanded] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    setLoading(true)
-
-    const fetchAnalytics = async () => {
-      try {
-        // TODO: Replace with actual flight analytics API
-        // const response = await fetch('/api/flights/analytics')
-        // const data = await response.json()
-        // setAnalytics(data)
-
-        // For now, show empty state until real data is available
-        setAnalytics(null)
-      } catch (error) {
-        console.error("Error fetching flight analytics:", error)
-        setAnalytics(null)
-      } finally {
-        setLoading(false)
-      }
+  // Datos mock para demostración - en producción vendría de una API
+  const mockAnalytics: SearchAnalytics = {
+    popularRoutes: [
+      { route: "JFK → LHR", searches: 1247, avgPrice: 654, trend: 'down' },
+      { route: "LAX → NRT", searches: 983, avgPrice: 892, trend: 'up' },
+      { route: "SFO → CDG", searches: 756, avgPrice: 723, trend: 'stable' },
+      { route: "MIA → BCN", searches: 634, avgPrice: 445, trend: 'down' },
+      { route: "ORD → FRA", searches: 567, avgPrice: 598, trend: 'up' }
+    ],
+    priceAlerts: [
+      { route: "JFK → LHR", currentPrice: 654, targetPrice: 600, savings: 54 },
+      { route: "LAX → NRT", currentPrice: 892, targetPrice: 800, savings: 92 },
+      { route: "SFO → CDG", currentPrice: 723, targetPrice: 650, savings: 73 }
+    ],
+    bestDays: [
+      { day: "Tuesday", avgSavings: 18 },
+      { day: "Wednesday", avgSavings: 15 },
+      { day: "Saturday", avgSavings: 12 },
+      { day: "Thursday", avgSavings: 9 },
+      { day: "Sunday", avgSavings: 6 }
+    ],
+    searchTrends: {
+      totalSearches: 15420,
+      avgSearchTime: 2.3,
+      cacheHitRate: 34,
+      popularFilters: ["Non-stop", "Morning departure", "Refundable", "Business class"]
     }
+  }
 
-    fetchAnalytics()
+  useEffect(() => {
+    // Simular carga de analytics
+    setLoading(true)
+    setTimeout(() => {
+      setAnalytics(mockAnalytics)
+      setLoading(false)
+    }, 1000)
   }, [])
 
   const handleRouteClick = (route: string) => {
-    const [origin, destination] = route.split(" → ")
+    const [origin, destination] = route.split(' → ')
     onRouteSelect?.(origin, destination)
   }
 
-  const getTrendIcon = (trend: "up" | "down" | "stable") => {
+  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case "up":
+      case 'up':
         return <ArrowTrendingUpIcon className="h-3 w-3 text-red-500" />
-      case "down":
+      case 'down':
         return <ArrowTrendingDownIcon className="h-3 w-3 text-green-500" />
       default:
         return <div className="h-3 w-3 bg-gray-400 rounded-full" />
     }
   }
 
-  const getTrendColor = (trend: "up" | "down" | "stable") => {
+  const getTrendColor = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case "up":
-        return "text-red-600"
-      case "down":
-        return "text-green-600"
+      case 'up':
+        return 'text-red-600'
+      case 'down':
+        return 'text-green-600'
       default:
-        return "text-gray-600"
+        return 'text-gray-600'
     }
   }
 
@@ -119,30 +135,7 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
     )
   }
 
-  if (!analytics) {
-    return (
-      <div className={`space-y-6 ${className}`}>
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-medium flex items-center">
-              <ChartBarIcon className="h-5 w-5 mr-2 text-gray-600" />
-              Flight Market Insights
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-12">
-              <ChartBarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-lg font-medium text-gray-900 mb-2">Analytics Ready</p>
-              <p className="text-sm text-gray-500 mb-4">
-                Start searching for flights to see market insights and trends
-              </p>
-              <Button className="bg-gray-900 hover:bg-gray-800 text-white">Search Flights</Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
+  if (!analytics) return null
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -163,15 +156,21 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
               <div className="text-xs text-blue-600">Total searches</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-medium text-blue-900">{analytics.searchTrends.avgSearchTime}s</div>
+              <div className="text-2xl font-medium text-blue-900">
+                {analytics.searchTrends.avgSearchTime}s
+              </div>
               <div className="text-xs text-blue-600">Avg search time</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-medium text-blue-900">{analytics.searchTrends.cacheHitRate}%</div>
+              <div className="text-2xl font-medium text-blue-900">
+                {analytics.searchTrends.cacheHitRate}%
+              </div>
               <div className="text-xs text-blue-600">Cache hit rate</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-medium text-blue-900">{analytics.popularRoutes.length}</div>
+              <div className="text-2xl font-medium text-blue-900">
+                {analytics.popularRoutes.length}
+              </div>
               <div className="text-xs text-blue-600">Popular routes</div>
             </div>
           </div>
@@ -205,20 +204,28 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
                 >
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-white rounded-lg border border-gray-200 flex items-center justify-center">
-                      <span className="text-xs font-medium text-gray-700">{index + 1}</span>
+                      <span className="text-xs font-medium text-gray-700">
+                        {index + 1}
+                      </span>
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{route.route}</div>
-                      <div className="text-xs text-gray-600">{route.searches} searches</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {route.route}
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {route.searches} searches
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="text-right">
-                      <div className="text-sm font-medium text-gray-900">${route.avgPrice}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        ${route.avgPrice}
+                      </div>
                       <div className={`text-xs flex items-center ${getTrendColor(route.trend)}`}>
                         {getTrendIcon(route.trend)}
                         <span className="ml-1">
-                          {route.trend === "stable" ? "stable" : route.trend === "up" ? "+5%" : "-3%"}
+                          {route.trend === 'stable' ? 'stable' : route.trend === 'up' ? '+5%' : '-3%'}
                         </span>
                       </div>
                     </div>
@@ -253,13 +260,17 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
                   className="flex items-center justify-between p-3 bg-green-50 rounded-xl border border-green-200"
                 >
                   <div>
-                    <div className="text-sm font-medium text-gray-900">{alert.route}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {alert.route}
+                    </div>
                     <div className="text-xs text-green-700">
                       Target: ${alert.targetPrice} (Save ${alert.savings})
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-medium text-gray-900">${alert.currentPrice}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      ${alert.currentPrice}
+                    </div>
                     <Button size="sm" className="text-xs bg-green-600 hover:bg-green-700 text-white mt-1">
                       Set Alert
                     </Button>
@@ -294,9 +305,15 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 className="text-center p-4 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors cursor-pointer"
               >
-                <div className="text-sm font-medium text-gray-900 mb-1">{day.day}</div>
-                <div className="text-lg font-medium text-blue-600">{day.avgSavings}%</div>
-                <div className="text-xs text-gray-500">savings</div>
+                <div className="text-sm font-medium text-gray-900 mb-1">
+                  {day.day}
+                </div>
+                <div className="text-lg font-medium text-blue-600">
+                  {day.avgSavings}%
+                </div>
+                <div className="text-xs text-gray-500">
+                  savings
+                </div>
               </motion.div>
             ))}
           </div>
@@ -320,8 +337,8 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                <Badge
-                  variant="outline"
+                <Badge 
+                  variant="outline" 
                   className="bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 cursor-pointer rounded-xl"
                 >
                   {filter}
@@ -329,7 +346,7 @@ export function SearchAnalytics({ onRouteSelect, className = "" }: SearchAnalyti
               </motion.div>
             ))}
           </div>
-
+          
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between text-sm text-gray-600">
               <span>Search performance</span>

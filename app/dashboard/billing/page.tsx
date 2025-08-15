@@ -1,70 +1,45 @@
 "use client"
-
-import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Users, Zap, Shield } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
+import { CreditCard, DollarSign, TrendingUp, Users, Zap, Shield, Building, ArrowUpRight } from "lucide-react"
 
-interface UserProfile {
-  id: string
-  subscription_plan: "free" | "premium" | "enterprise"
-  subscription_status: "active" | "inactive" | "cancelled" | "trialing"
-  ai_tokens_used: number
-  ai_tokens_limit: number
+const mockStatus = {
+  planName: "Professional",
+  monthlySpend: 12450,
+  aiTokensLimit: 50000,
+  aiTokensUsed: 12500,
+  teamMembersLimit: 25,
+  teamMembersUsed: 8,
+  travelSearchesLimit: -1,
+  travelSearchesUsed: 47,
+  features: {
+    hasAiExpenseManagement: true,
+    hasCustomPolicies: true,
+    hasPrioritySupport: true,
+    hasBankIntegration: true,
+    hasCrmIntegration: false,
+  },
+  usage: {
+    aiTokensPercentage: 25,
+    travelSearchesPercentage: 30,
+  },
+  nextBillingDate: "2024-02-15",
+  paymentMethod: "**** 4242",
 }
 
 export default function BillingPage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const status = mockStatus
 
-  useEffect(() => {
-    loadProfile()
-  }, [])
-
-  const loadProfile = async () => {
-    try {
-      const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) return
-
-      const { data: profileData, error } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-
-      if (error) throw error
-      setProfile(profileData)
-    } catch (error) {
-      console.error("Error loading profile:", error)
-    } finally {
-      setLoading(false)
-    }
+  const handleUpgrade = (plan: string) => {
+    window.location.href = `mailto:hello@suitpax.com?subject=Upgrade to ${plan} plan`
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
-      </div>
-    )
+  const handleManageBilling = () => {
+    window.location.href = "mailto:hello@suitpax.com?subject=Billing Management Request"
   }
-
-  if (!profile) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Profile not found</h1>
-          <p className="text-gray-600">Please try refreshing the page.</p>
-        </div>
-      </div>
-    )
-  }
-
-  const aiTokensPercentage = Math.min((profile.ai_tokens_used / profile.ai_tokens_limit) * 100, 100)
-  const isFreePlan = profile.subscription_plan === "free"
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6">
@@ -76,33 +51,19 @@ export default function BillingPage() {
                 Billing & Usage
               </h1>
               <p className="text-gray-600 font-light">
-                <em className="font-serif italic">Monitor your corporate travel usage and plan details</em>
+                <em className="font-serif italic">Manage your corporate travel subscription and monitor usage</em>
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Badge
-                variant="outline"
-                className={`rounded-lg px-3 py-1 ${
-                  profile.subscription_status === "active"
-                    ? "bg-green-50 text-green-700 border-green-200"
-                    : "bg-gray-50 text-gray-700 border-gray-200"
-                }`}
-              >
-                <div
-                  className={`w-2 h-2 rounded-full mr-2 ${
-                    profile.subscription_status === "active" ? "bg-green-500" : "bg-gray-400"
-                  }`}
-                ></div>
-                {profile.subscription_status === "active" ? "Active" : "Inactive"}
-              </Badge>
-              <Badge className="bg-blue-100 text-blue-800 border-blue-200 rounded-lg px-3 py-1 capitalize">
-                {profile.subscription_plan}
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 rounded-lg px-3 py-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                Active
               </Badge>
             </div>
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,20 +73,17 @@ export default function BillingPage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">AI Tokens Used</p>
-                    <div className="text-2xl font-semibold text-gray-900">
-                      {profile.ai_tokens_used.toLocaleString()}
-                    </div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Monthly Spend</p>
+                    <p className="text-2xl font-semibold text-gray-900">${status.monthlySpend.toLocaleString()}</p>
                   </div>
-                  <div className="p-3 bg-purple-100 rounded-xl">
-                    <Zap className="h-6 w-6 text-purple-600" />
+                  <div className="p-3 bg-blue-100 rounded-xl">
+                    <DollarSign className="h-6 w-6 text-blue-600" />
                   </div>
                 </div>
-                <div className="mt-4">
-                  <Progress value={aiTokensPercentage} className="h-2" />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {Math.round(aiTokensPercentage)}% of {profile.ai_tokens_limit.toLocaleString()} limit
-                  </p>
+                <div className="flex items-center mt-4 text-sm">
+                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                  <span className="text-green-600 font-medium">+12%</span>
+                  <span className="text-gray-500 ml-1">vs last month</span>
                 </div>
               </CardContent>
             </Card>
@@ -140,16 +98,19 @@ export default function BillingPage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Current Plan</p>
-                    <p className="text-2xl font-semibold text-gray-900 capitalize">{profile.subscription_plan}</p>
+                    <p className="text-sm font-medium text-gray-600 mb-1">AI Tokens Used</p>
+                    <p className="text-2xl font-semibold text-gray-900">{status.aiTokensUsed.toLocaleString()}</p>
                   </div>
-                  <div className="p-3 bg-blue-100 rounded-xl">
-                    <Shield className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 bg-purple-100 rounded-xl">
+                    <Zap className="h-6 w-6 text-purple-600" />
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
-                  {isFreePlan ? "Basic features available" : "Premium features enabled"}
-                </p>
+                <div className="mt-4">
+                  <Progress value={status.usage.aiTokensPercentage} className="h-2" />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {status.usage.aiTokensPercentage}% of {status.aiTokensLimit.toLocaleString()} limit
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
@@ -163,16 +124,35 @@ export default function BillingPage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Subscription Status</p>
-                    <p className="text-2xl font-semibold text-gray-900 capitalize">{profile.subscription_status}</p>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Team Members</p>
+                    <p className="text-2xl font-semibold text-gray-900">{status.teamMembersUsed}</p>
                   </div>
                   <div className="p-3 bg-green-100 rounded-xl">
                     <Users className="h-6 w-6 text-green-600" />
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
-                  {profile.subscription_status === "active" ? "All features available" : "Limited access"}
-                </p>
+                <p className="text-xs text-gray-500 mt-4">of {status.teamMembersLimit} available seats</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Travel Searches</p>
+                    <p className="text-2xl font-semibold text-gray-900">{status.travelSearchesUsed}</p>
+                  </div>
+                  <div className="p-3 bg-orange-100 rounded-xl">
+                    <Building className="h-6 w-6 text-orange-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-4">Unlimited searches this month</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -182,80 +162,49 @@ export default function BillingPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
           >
             <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Plan Features</CardTitle>
-                <CardDescription className="text-gray-600">Features available in your current plan</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Current Plan</CardTitle>
+                    <CardDescription className="text-gray-600">
+                      Your subscription details and billing information
+                    </CardDescription>
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 rounded-lg px-3 py-1">
+                    {status.planName}
+                  </Badge>
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {profile.subscription_plan === "free" ? (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-700">AI searches per month</span>
-                        <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-200">
-                          5 searches
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-700">Basic expense tracking</span>
-                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                          Included
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-700">Email support</span>
-                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                          Included
-                        </Badge>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-700">AI searches</span>
-                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                          Unlimited
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-700">Advanced expense management</span>
-                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                          Active
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-700">Bank integration</span>
-                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                          Active
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-700">Priority support</span>
-                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                          {profile.subscription_plan === "enterprise" ? "24/7" : "Business hours"}
-                        </Badge>
-                      </div>
-                      {profile.subscription_plan === "enterprise" && (
-                        <>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-700">Custom integrations</span>
-                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                              Available
-                            </Badge>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-700">Dedicated account manager</span>
-                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                              Assigned
-                            </Badge>
-                          </div>
-                        </>
-                      )}
-                    </>
-                  )}
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <CreditCard className="h-5 w-5 text-gray-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Payment Method</p>
+                      <p className="text-xs text-gray-600">Visa ending in {status.paymentMethod}</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg text-gray-700 border-gray-300 hover:bg-gray-100 bg-transparent"
+                  >
+                    Update
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Next billing date</span>
+                    <span className="font-medium text-gray-900">{status.nextBillingDate}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Billing cycle</span>
+                    <span className="font-medium text-gray-900">Monthly</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -264,51 +213,143 @@ export default function BillingPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
           >
             <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Usage Statistics</CardTitle>
-                <CardDescription className="text-gray-600">Your activity and consumption metrics</CardDescription>
+                <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">
+                  Enterprise Features
+                </CardTitle>
+                <CardDescription className="text-gray-600">Advanced capabilities included in your plan</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">AI Tokens</span>
-                      <span className="font-medium text-gray-900">
-                        {profile.ai_tokens_used.toLocaleString()} / {profile.ai_tokens_limit.toLocaleString()}
-                      </span>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className={`w-2 h-2 rounded-full ${status.features.hasAiExpenseManagement ? "bg-green-500" : "bg-gray-300"}`}
+                      ></div>
+                      <span className="text-sm font-medium text-gray-900">AI Expense Management</span>
                     </div>
-                    <Progress value={aiTokensPercentage} className="h-2" />
+                    {status.features.hasAiExpenseManagement && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs bg-green-50 text-green-700 border-green-200 rounded-lg"
+                      >
+                        Active
+                      </Badge>
+                    )}
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                    <div className="text-center">
-                      <div className="text-2xl font-semibold text-gray-900">0</div>
-                      <div className="text-xs text-gray-600">Flights Booked</div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className={`w-2 h-2 rounded-full ${status.features.hasCustomPolicies ? "bg-green-500" : "bg-gray-300"}`}
+                      ></div>
+                      <span className="text-sm font-medium text-gray-900">Custom Travel Policies</span>
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-semibold text-gray-900">0</div>
-                      <div className="text-xs text-gray-600">Hotels Booked</div>
-                    </div>
+                    {status.features.hasCustomPolicies && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs bg-green-50 text-green-700 border-green-200 rounded-lg"
+                      >
+                        Active
+                      </Badge>
+                    )}
                   </div>
-
-                  <div className="pt-4 border-t border-gray-200">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600 mb-2">
-                        {isFreePlan ? "Enjoying the free plan?" : "Need more features?"}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Contact support for enterprise solutions and custom pricing
-                      </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className={`w-2 h-2 rounded-full ${status.features.hasPrioritySupport ? "bg-green-500" : "bg-gray-300"}`}
+                      ></div>
+                      <span className="text-sm font-medium text-gray-900">Priority Support</span>
                     </div>
+                    {status.features.hasPrioritySupport && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs bg-green-50 text-green-700 border-green-200 rounded-lg"
+                      >
+                        24/7
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className={`w-2 h-2 rounded-full ${status.features.hasBankIntegration ? "bg-green-500" : "bg-gray-300"}`}
+                      ></div>
+                      <span className="text-sm font-medium text-gray-900">Bank Integration</span>
+                    </div>
+                    {status.features.hasBankIntegration && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs bg-green-50 text-green-700 border-green-200 rounded-lg"
+                      >
+                        Connected
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className={`w-2 h-2 rounded-full ${status.features.hasCrmIntegration ? "bg-green-500" : "bg-gray-300"}`}
+                      ></div>
+                      <span className="text-sm font-medium text-gray-900">CRM Integration</span>
+                    </div>
+                    {!status.features.hasCrmIntegration && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs rounded-lg text-blue-600 border-blue-200 hover:bg-blue-50 bg-transparent"
+                      >
+                        Upgrade
+                        <ArrowUpRight className="h-3 w-3 ml-1" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
+          <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Manage Subscription</CardTitle>
+              <CardDescription className="text-gray-600">
+                Upgrade your plan, manage billing, or contact support
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col sm:flex-row gap-4">
+              <Button
+                onClick={() => handleUpgrade("enterprise")}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Upgrade to Enterprise
+              </Button>
+              <Button
+                onClick={handleManageBilling}
+                variant="outline"
+                className="flex-1 rounded-xl border-gray-300 text-gray-700 hover:bg-gray-100 bg-transparent"
+              >
+                <CreditCard className="h-4 w-4 mr-2" />
+                Manage Billing
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => (window.location.href = "/pricing")}
+                className="flex-1 rounded-xl border-gray-300 text-gray-700 hover:bg-gray-100"
+              >
+                View All Plans
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </div>
   )

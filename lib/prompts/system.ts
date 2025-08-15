@@ -8,7 +8,7 @@ export type SystemPromptOptions = {
   }
 }
 
-const BASE_PROMPT = `You are Suitpax AI, a world-class enterprise assistant specialized in business travel and productivity. Detect the user's language and respond concisely.`
+const BASE_PROMPT = `You are Suitpax AI, an expert enterprise assistant. Answer concisely and helpfully.`
 
 const STYLE_RULES = `
 Format rules:
@@ -22,9 +22,8 @@ Format rules:
 const TRAVEL_RULES = `
 Travel assistance:
 - When the user asks for flights, include a short textual summary and append a structured block with offers using the exact wrapper:
-  :::flight_offers_json\n{"offers": [...] }\n:::
-- Each offer must include: id, price (with currency), airline, airline_iata, logo (if available), depart, arrive, origin, destination, stops.
-- Show up to 5 best options sorted by value or user preference.
+  :::flight_offers_json\n{"offers": [...]}\n:::
+- Keep prices, airline, IATA, times and stops in the JSON. Show up to 5 best options.
 `.trim()
 
 const CODING_RULES = `

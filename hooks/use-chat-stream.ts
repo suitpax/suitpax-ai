@@ -1,32 +1,26 @@
-"use client"
-
-import { useState, useRef } from "react"
-
-interface StreamOptions {
-  message: string
-  history?: any[]
-  userId?: string
-}
+import { useCallback, useRef, useState } from "react"
 
 export function useChatStream() {
   const [isStreaming, setIsStreaming] = useState(false)
-  const controllerRef = useRef<AbortController | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
-  const start = async (options: StreamOptions, onToken: (token: string) => void) => {
-    if (isStreaming) return
+  const start = useCallback(async (body: any, onToken: (t: string) => void) => {
     setIsStreaming(true)
+    setError(null)
 
-    controllerRef.current = new AbortController()
+    if (abortRef.current) abortRef.current.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
 
     try {
-      const res = await fetch("/api/ai-core/stream", {
+      const res = await fetch("/api/ai-chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: options.message, history: options.history || [], userId: options.userId }),
-        signal: controllerRef.current.signal,
+        body: JSON.stringify(body),
+        signal: controller.signal,
       })
-
-      if (!res.ok || !res.body) throw new Error("Stream failed")
+      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`)
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -34,23 +28,20 @@ export function useChatStream() {
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-        const chunk = decoder.decode(value, { stream: true })
+        const chunk = decoder.decode(value)
         onToken(chunk)
       }
-    } catch (e) {
-      // Swallow; fallback handled by caller
+    } catch (e: any) {
+      if (e?.name !== "AbortError") setError(e?.message || "Stream error")
     } finally {
       setIsStreaming(false)
+      abortRef.current = null
     }
-  }
+  }, [])
 
-  const cancel = () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort()
-      controllerRef.current = null
-    }
-    setIsStreaming(false)
-  }
+  const cancel = useCallback(() => {
+    if (abortRef.current) abortRef.current.abort()
+  }, [])
 
-  return { isStreaming, start, cancel }
+  return { isStreaming, error, start, cancel }
 }

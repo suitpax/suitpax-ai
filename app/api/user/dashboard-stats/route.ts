@@ -1,11 +1,17 @@
-export const runtime = "nodejs"
-
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createServerClient } from "@supabase/ssr"
+import type { Database } from "@/lib/supabase/types"
+import { cookieStore } from "@/lib/supabase/cookies"
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: cookieStore
+      }
+    )
 
     const {
       data: { user },

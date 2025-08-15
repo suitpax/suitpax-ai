@@ -1,8 +1,8 @@
-export const runtime = "nodejs"
-
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createDuffelClient } from "@/lib/duffel"
+
+const duffel = createDuffelClient()
 
 interface BaggageSearchRequest {
   orderId: string
@@ -32,17 +32,125 @@ export async function GET(request: NextRequest) {
     const orderId = searchParams.get('orderId')
 
     if (!orderId) {
-      return NextResponse.json({ error: 'orderId is required' }, { status: 400 })
+      return NextResponse.json({
+        success: false,
+        error: "Order ID is required"
+      }, { status: 400 })
     }
 
-    const duffel = createDuffelClient()
+    // Verificar que la orden pertenece al usuario
+    const { data: booking } = await supabase
+      .from("flight_bookings")
+      .select("*")
+      .eq("duffel_order_id", orderId)
+      .eq("user_id", user.id)
+      .single()
 
-    const servicesResponse = await duffel.getBaggageServices(orderId)
+    if (!booking) {
+      return NextResponse.json({
+        success: false,
+        error: "Order not found"
+      }, { status: 404 })
+    }
 
-    return NextResponse.json({ success: true, services: servicesResponse })
+    try {
+      // Obtener acciones disponibles para la orden
+      const available = await duffel.orderChangeRequests.create({
+        order_id: orderId,
+        slices: { add: [], remove: [] }
+      } as any)
+
+      const actions = (available as any)?.data?.available_actions || []
+
+      // Filtrar solo servicios de equipaje
+      const baggageServices = actions.filter(
+        (action: any) => action.type === 'add_service' && 
+        (action.service?.type === 'baggage' || action.service?.metadata?.type === 'baggage')
+      )
+
+      // Procesar y categorizar servicios de equipaje
+      const processedServices = baggageServices.map((service: any) => {
+        const serviceData = service.service || service
+
+        return {
+          id: serviceData.id,
+          type: serviceData.type,
+          name: serviceData.metadata?.name || serviceData.name || 'Extra Baggage',
+          description: serviceData.metadata?.description || serviceData.description,
+          price: {
+            amount: serviceData.total_amount,
+            currency: serviceData.total_currency
+          },
+          weight_limit: serviceData.metadata?.weight_kg || null,
+          size_limits: serviceData.metadata?.dimensions || null,
+          category: categorize_baggage(serviceData),
+          segment_applicable: serviceData.segment_ids || [],
+          passenger_applicable: serviceData.passenger_ids || [],
+          restrictions: serviceData.metadata?.restrictions || [],
+          included_services: serviceData.metadata?.included || []
+        }
+      })
+
+      // Agrupar servicios por categoría
+      const categorizedServices = {
+        checked_bags: processedServices.filter((s: any) => s.category === 'checked'),
+        carry_on: processedServices.filter((s: any) => s.category === 'carry_on'),
+        overweight: processedServices.filter((s: any) => s.category === 'overweight'),
+        oversized: processedServices.filter((s: any) => s.category === 'oversized'),
+        sports_equipment: processedServices.filter((s: any) => s.category === 'sports'),
+        other: processedServices.filter((s: any) => s.category === 'other')
+      }
+
+      return NextResponse.json({
+        success: true,
+        order_id: orderId,
+        services: categorizedServices,
+        total_available: processedServices.length,
+        currency: booking.total_currency,
+        booking_reference: booking.booking_reference
+      })
+
+    } catch (duffelError: any) {
+      console.error("Duffel baggage services error:", duffelError)
+
+      if (duffelError.message?.includes('order not found')) {
+        return NextResponse.json({
+          success: false,
+          error: "Order not found in airline system",
+          error_code: "ORDER_NOT_FOUND"
+        }, { status: 404 })
+      }
+
+      if (duffelError.message?.includes('no services available')) {
+        return NextResponse.json({
+          success: true,
+          order_id: orderId,
+          services: {
+            checked_bags: [],
+            carry_on: [],
+            overweight: [],
+            oversized: [],
+            sports_equipment: [],
+            other: []
+          },
+          total_available: 0,
+          message: "No additional baggage services available for this booking"
+        })
+      }
+
+      return NextResponse.json({
+        success: false,
+        error: "Failed to retrieve baggage options",
+        error_code: "BAGGAGE_FETCH_FAILED"
+      }, { status: 500 })
+    }
+
   } catch (error) {
-    console.error("Baggage services error:", error)
-    return NextResponse.json({ error: "Failed to get baggage services" }, { status: 500 })
+    console.error("Baggage API Error:", error)
+    return NextResponse.json({
+      success: false,
+      error: "Internal server error"
+    }, { status: 500 })
   }
 }
 
@@ -56,21 +164,146 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
 
-    const body: BaggageAddRequest = await request.json()
-    const { orderId, services } = body
+    const {
+      orderId,
+      services
+    }: BaggageAddRequest = await request.json()
 
-    if (!orderId || !Array.isArray(services) || services.length === 0) {
-      return NextResponse.json({ error: 'orderId and services are required' }, { status: 400 })
+    if (!orderId || !services || services.length === 0) {
+      return NextResponse.json({
+        success: false,
+        error: "Order ID and services are required"
+      }, { status: 400 })
     }
 
-    const duffel = createDuffelClient()
+    // Verificar que la orden pertenece al usuario
+    const { data: booking } = await supabase
+      .from("flight_bookings")
+      .select("*")
+      .eq("duffel_order_id", orderId)
+      .eq("user_id", user.id)
+      .single()
 
-    const addResponse = await duffel.addBaggageServices(orderId, services)
+    if (!booking) {
+      return NextResponse.json({
+        success: false,
+        error: "Order not found"
+      }, { status: 404 })
+    }
 
-    return NextResponse.json({ success: true, details: addResponse })
+    try {
+      // Crear change request para agregar servicios de equipaje
+      const changeRequest = await duffel.orderChangeRequests.create({
+        order_id: orderId,
+        slices: {
+          add: [],
+          remove: []
+        },
+        services: {
+          add: services.map(service => ({
+            id: service.id,
+            quantity: service.quantity,
+            passenger_id: service.passenger_id,
+            segment_id: service.segment_id
+          })),
+          remove: []
+        }
+      } as any)
+
+      if (!changeRequest.data) {
+        throw new Error("No change request data received")
+      }
+
+      // Confirmar el cambio si es automáticamente aprobado
+      let confirmedChange = changeRequest as any
+      if ((changeRequest as any).data?.requires_confirmation) {
+        const bestOffer = (changeRequest as any).data?.order_change_offers?.[0]
+        if (bestOffer) {
+          confirmedChange = await (duffel as any).orderChangeOffers.create({
+            order_change_request_id: (changeRequest as any).data.id,
+            selected_order_change_offer: bestOffer.id
+          })
+        }
+      }
+
+      // Actualizar la base de datos
+      const { error: dbError } = await supabase
+        .from("flight_bookings")
+        .update({
+          metadata: {
+            ...booking.metadata,
+            baggage_services: services,
+            last_updated: new Date().toISOString()
+          }
+        })
+        .eq("duffel_order_id", orderId)
+
+      if (dbError) {
+        console.error("Database update error:", dbError)
+      }
+
+      // Calcular costos adicionales
+      const additionalCost = (confirmedChange.data?.total_amount || '0') as string
+      const newTotalAmount = (
+        parseFloat(booking.total_amount) + parseFloat(additionalCost)
+      ).toString()
+
+      return NextResponse.json({
+        success: true,
+        change_request: {
+          id: confirmedChange.data?.id || changeRequest.data.id,
+          status: confirmedChange.data?.status || 'confirmed',
+          additional_cost: {
+            amount: additionalCost,
+            currency: booking.total_currency
+          },
+          new_total: {
+            amount: newTotalAmount,
+            currency: booking.total_currency
+          },
+          services_added: services.length,
+          confirmation_required: (changeRequest as any).data?.requires_confirmation || false
+        },
+        services: services.map(service => ({
+          id: service.id,
+          quantity: service.quantity,
+          status: 'confirmed'
+        }))
+      })
+
+    } catch (duffelError: any) {
+      console.error("Duffel baggage add error:", duffelError)
+
+      if (duffelError.message?.includes('service not available')) {
+        return NextResponse.json({
+          success: false,
+          error: "One or more baggage services are no longer available",
+          error_code: "SERVICE_UNAVAILABLE"
+        }, { status: 409 })
+      }
+
+      if (duffelError.message?.includes('payment required')) {
+        return NextResponse.json({
+          success: false,
+          error: "Payment is required to add baggage services",
+          error_code: "PAYMENT_REQUIRED"
+        }, { status: 402 })
+      }
+
+      return NextResponse.json({
+        success: false,
+        error: "Failed to add baggage services",
+        error_code: "BAGGAGE_ADD_FAILED",
+        details: process.env.NODE_ENV === 'development' ? duffelError.message : undefined
+      }, { status: 500 })
+    }
+
   } catch (error) {
-    console.error("Baggage add error:", error)
-    return NextResponse.json({ error: "Failed to add baggage" }, { status: 500 })
+    console.error("Baggage add API Error:", error)
+    return NextResponse.json({
+      success: false,
+      error: "Internal server error"
+    }, { status: 500 })
   }
 }
 
@@ -114,7 +347,10 @@ export async function DELETE(request: NextRequest) {
     const serviceId = searchParams.get('serviceId')
 
     if (!orderId || !serviceId) {
-      return NextResponse.json({ success: false, error: 'Order ID and serviceId are required' }, { status: 400 })
+      return NextResponse.json({
+        success: false,
+        error: "Order ID and Service ID are required"
+      }, { status: 400 })
     }
 
     // Verificar que la orden pertenece al usuario
@@ -126,10 +362,11 @@ export async function DELETE(request: NextRequest) {
       .single()
 
     if (!booking) {
-      return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 })
+      return NextResponse.json({
+        success: false,
+        error: "Order not found"
+      }, { status: 404 })
     }
-
-    const duffel = createDuffelClient()
 
     try {
       // Crear change request para remover servicio de equipaje
@@ -137,22 +374,35 @@ export async function DELETE(request: NextRequest) {
         order_id: orderId,
         slices: {
           add: [],
-          remove: [],
+          remove: []
         },
-        // @ts-expect-error services typing can differ
         services: {
           add: [],
-          remove: [{ id: serviceId }],
-        },
+          remove: [{ id: serviceId }]
+        }
       } as any)
 
-      return NextResponse.json({ success: true, change_request_id: (changeRequest as any).data?.id })
-    } catch (error) {
-      console.error('Duffel API Error (baggage DELETE):', error)
-      return NextResponse.json({ success: false, error: 'Failed to remove baggage service' }, { status: 500 })
+      return NextResponse.json({
+        success: true,
+        message: "Baggage service removed successfully",
+        change_request_id: changeRequest.data.id
+      })
+
+    } catch (duffelError: any) {
+      console.error("Duffel baggage remove error:", duffelError)
+
+      return NextResponse.json({
+        success: false,
+        error: "Failed to remove baggage service",
+        error_code: "BAGGAGE_REMOVE_FAILED"
+      }, { status: 500 })
     }
+
   } catch (error) {
-    console.error('Auth/validation error (baggage DELETE):', error)
-    return NextResponse.json({ success: false, error: 'Failed to process request' }, { status: 500 })
+    console.error("Baggage remove API Error:", error)
+    return NextResponse.json({
+      success: false,
+      error: "Internal server error"
+    }, { status: 500 })
   }
 }

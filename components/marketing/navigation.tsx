@@ -127,20 +127,14 @@ export default function Navigation() {
           )}
 
           {isMobile && (
-            <motion.button
+            <button
               onClick={() => setIsOpen(!isOpen)}
-              className={cn(
-                "p-1.5 rounded-lg text-gray-700 border border-black/10 bg-gray-100",
-                isOpen ? "bg-gray-200" : "hover:bg-gray-100 hover:text-black"
-              )}
-              whileTap={{ scale: 0.95 }}
-              aria-expanded={isOpen}
-              aria-label="Toggle navigation menu"
+              className="p-1.5 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
             >
-              <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ type: "spring", stiffness: 260, damping: 20 }}>
+              <div className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
                 {isOpen ? <PiDotsSixBold size={20} /> : <PiDotsNineBold size={20} />}
-              </motion.div>
-            </motion.button>
+              </div>
+            </button>
           )}
         </div>
       </motion.nav>
@@ -148,10 +142,9 @@ export default function Navigation() {
       <AnimatePresence>
         {isOpen && isMobile && (
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 260, damping: 22 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             className="fixed top-20 left-4 right-4 z-40 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-xl md:hidden"
           >
             <div className="px-4 py-6 space-y-4">
@@ -166,7 +159,7 @@ export default function Navigation() {
                 </Link>
               ))}
 
-              <div className="pt-2 border-top border-gray-200/30">
+              <div className="pt-2 border-t border-gray-200/30">
                 <Link
                   href="https://discord.gg/suitpax"
                   onClick={() => setIsOpen(false)}
@@ -229,10 +222,7 @@ export default function Navigation() {
       </AnimatePresence>
 
       {isOpen && isMobile && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+        <div
           className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm md:hidden"
           onClick={() => setIsOpen(false)}
         />

@@ -4,15 +4,13 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { User, Bell, CreditCard, Shield, Globe, Camera, Loader2, X } from "lucide-react"
+import { User, Bell, CreditCard, Shield, Globe, Camera } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import toast from "react-hot-toast"
+import Image from "next/image"
 
 const settingsSections = [
   {
@@ -53,14 +51,10 @@ export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState("profile")
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [fullName, setFullName] = useState("")
   const [username, setUsername] = useState("")
   const [companyName, setCompanyName] = useState("")
   const [avatarUrl, setAvatarUrl] = useState("")
-  const [previewPhoto, setPreviewPhoto] = useState<string | null>(null)
-  const [showPreviewDialog, setShowPreviewDialog] = useState(false)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -104,6 +98,7 @@ export default function SettingsPage() {
       if (error) {
         console.error("Error updating profile:", error)
       } else {
+        // Update local state
         setProfile((prev: any) => ({
           ...prev,
           full_name: fullName,
@@ -111,10 +106,9 @@ export default function SettingsPage() {
           company_name: companyName,
           avatar_url: avatarUrl,
         }))
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(
-            new CustomEvent("profile:updated", { detail: { full_name: fullName, avatar_url: avatarUrl } }),
-          )
+        // Notify other parts of the app
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('profile:updated', { detail: { full_name: fullName, avatar_url: avatarUrl } }))
         }
       }
     } catch (error) {
@@ -128,62 +122,27 @@ export default function SettingsPage() {
     const file = event.target.files?.[0]
     if (!file || !user) return
 
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setPreviewPhoto(e.target?.result as string)
-      setSelectedFile(file)
-      setShowPreviewDialog(true)
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const confirmPhotoUpload = async () => {
-    if (!selectedFile || !user) return
-
-    setUploadingAvatar(true)
-    setShowPreviewDialog(false)
-
     try {
-      const fileExt = selectedFile.name.split(".").pop()
-      const fileName = `${user.id}-${Math.random()}.${fileExt}`
+      const fileExt = file.name.split(".").pop()
+      const fileName = `${user.id}.${fileExt}`
       const filePath = `avatars/${fileName}`
 
-      const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, selectedFile)
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file, { upsert: true })
 
       if (uploadError) {
-        toast.error("Failed to upload photo")
+        console.error("Error uploading avatar:", uploadError)
         return
       }
 
       const { data } = supabase.storage.from("avatars").getPublicUrl(filePath)
       setAvatarUrl(data.publicUrl)
-
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ avatar_url: data.publicUrl })
-        .eq("id", user.id)
-
-      if (updateError) {
-        toast.error("Failed to update profile")
-      } else {
-        toast.success("Photo updated successfully")
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("profile:updated", { detail: { avatar_url: data.publicUrl } }))
-        }
+      // Optimistically notify UI to reflect avatar change immediately
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('profile:updated', { detail: { avatar_url: data.publicUrl } }))
       }
     } catch (error) {
-      toast.error("Error uploading photo")
-    } finally {
-      setUploadingAvatar(false)
-      setPreviewPhoto(null)
-      setSelectedFile(null)
+      console.error("Error:", error)
     }
-  }
-
-  const cancelPhotoUpload = () => {
-    setShowPreviewDialog(false)
-    setPreviewPhoto(null)
-    setSelectedFile(null)
   }
 
   if (loading) {
@@ -199,12 +158,14 @@ export default function SettingsPage() {
 
   return (
     <div className="p-4 lg:p-6 space-y-8">
+      {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
         <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Settings</h1>
         <p className="text-gray-600 font-light">Manage your account and preferences</p>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Settings Navigation */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -232,6 +193,7 @@ export default function SettingsPage() {
           </div>
         </motion.div>
 
+        {/* Settings Content */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -243,23 +205,27 @@ export default function SettingsPage() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-medium tracking-tighter">Profile Information</h2>
 
+                {/* Avatar Upload */}
                 <div className="flex items-center space-x-6">
                   <div className="relative">
-                    <Avatar className="w-20 h-20">
-                      <AvatarImage src={avatarUrl || "/placeholder.svg"} alt="Profile" />
-                      <AvatarFallback className="text-lg bg-black text-white">
-                        {user?.email?.charAt(0).toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
+                    {avatarUrl ? (
+                      <Image
+                        src={avatarUrl || "/placeholder.svg"}
+                        alt="Profile"
+                        width={80}
+                        height={80}
+                        className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-black flex items-center justify-center">
+                        <span className="text-white text-2xl font-medium">{user?.email?.charAt(0).toUpperCase()}</span>
+                      </div>
+                    )}
                     <label
                       htmlFor="avatar-upload"
-                      className="absolute -bottom-1 -right-1 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors shadow-sm"
+                      className="absolute -bottom-1 -right-1 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
                     >
-                      {uploadingAvatar ? (
-                        <Loader2 className="h-4 w-4 text-gray-600 animate-spin" />
-                      ) : (
-                        <Camera className="h-4 w-4 text-gray-600" />
-                      )}
+                      <Camera className="h-4 w-4 text-gray-600" />
                     </label>
                     <input
                       id="avatar-upload"
@@ -267,14 +233,11 @@ export default function SettingsPage() {
                       accept="image/*"
                       onChange={handleAvatarUpload}
                       className="hidden"
-                      disabled={uploadingAvatar}
                     />
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-900">Profile Photo</h3>
-                    <p className="text-sm text-gray-600 font-light">
-                      Upload a photo to personalize your account. You'll see a preview before saving.
-                    </p>
+                    <p className="text-sm text-gray-600 font-light">Upload a photo to personalize your account</p>
                   </div>
                 </div>
 
@@ -353,35 +316,21 @@ export default function SettingsPage() {
                   <div className="space-y-3">
                     <Label>Email Notifications</Label>
                     <div className="space-y-2 text-sm text-gray-700">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked /> Booking updates
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked /> Expense approvals
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" /> Weekly analytics report
-                      </label>
+                      <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> Booking updates</label>
+                      <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> Expense approvals</label>
+                      <label className="flex items-center gap-2"><input type="checkbox" /> Weekly analytics report</label>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <Label>Push Notifications</Label>
                     <div className="space-y-2 text-sm text-gray-700">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked /> Flight status alerts
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" /> Meeting reminders
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked /> Budget threshold alerts
-                      </label>
+                      <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> Flight status alerts</label>
+                      <label className="flex items-center gap-2"><input type="checkbox" /> Meeting reminders</label>
+                      <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> Budget threshold alerts</label>
                     </div>
                   </div>
                 </div>
-                <Button className="px-6 py-3 bg-black text-white font-medium rounded-xl hover:bg-gray-800">
-                  Save Preferences
-                </Button>
+                <Button className="px-6 py-3 bg-black text-white font-medium rounded-xl hover:bg-gray-800">Save Preferences</Button>
               </div>
             )}
 
@@ -392,18 +341,14 @@ export default function SettingsPage() {
                   <div className="space-y-4">
                     <div>
                       <Label>Plan</Label>
-                      <p className="text-sm text-gray-600 mt-1">{profile?.plan?.toUpperCase() || "FREE"}</p>
+                      <p className="text-sm text-gray-600 mt-1">{profile?.plan?.toUpperCase() || 'FREE'}</p>
                     </div>
                     <Button className="w-fit">Update Plan</Button>
                   </div>
                   <div className="space-y-4">
                     <Label>Payment Method</Label>
-                    <div className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700">
-                      Visa ending in 4242 • Exp 04/28
-                    </div>
-                    <Button variant="outline" className="w-fit bg-transparent">
-                      Change Card
-                    </Button>
+                    <div className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700">Visa ending in 4242 • Exp 04/28</div>
+                    <Button variant="outline" className="w-fit">Change Card</Button>
                   </div>
                 </div>
               </div>
@@ -422,9 +367,7 @@ export default function SettingsPage() {
                     <Label>Two-Factor Authentication</Label>
                     <div className="rounded-xl border border-gray-200 p-4 flex items-center justify-between">
                       <span className="text-sm text-gray-700">Authenticator App</span>
-                      <Button variant="outline" className="text-sm bg-transparent">
-                        Enable
-                      </Button>
+                      <Button variant="outline" className="text-sm">Enable</Button>
                     </div>
                   </div>
                 </div>
@@ -457,49 +400,6 @@ export default function SettingsPage() {
           </div>
         </motion.div>
       </div>
-
-      <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-medium tracking-tight">Preview Profile Photo</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6">
-            <div className="flex justify-center">
-              {previewPhoto && (
-                <div className="relative">
-                  <Avatar className="w-32 h-32">
-                    <AvatarImage src={previewPhoto || "/placeholder.svg"} alt="Preview" />
-                    <AvatarFallback>Preview</AvatarFallback>
-                  </Avatar>
-                </div>
-              )}
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-4">
-                This is how your profile photo will appear. Do you want to save this photo?
-              </p>
-              <div className="flex gap-3 justify-center">
-                <Button variant="outline" onClick={cancelPhotoUpload} className="border-gray-200 bg-transparent">
-                  <X className="w-4 h-4 mr-2" />
-                  Cancel
-                </Button>
-                <Button
-                  onClick={confirmPhotoUpload}
-                  disabled={uploadingAvatar}
-                  className="bg-black hover:bg-gray-800 text-white"
-                >
-                  {uploadingAvatar ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Camera className="w-4 h-4 mr-2" />
-                  )}
-                  {uploadingAvatar ? "Saving..." : "Save Photo"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

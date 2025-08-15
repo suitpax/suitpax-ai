@@ -1,5 +1,3 @@
-export const runtime = "nodejs"
-
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { DOCUMENT_AI_PROMPT } from "@/lib/prompts/enhanced-system"

@@ -1,5 +1,3 @@
-export const runtime = "nodejs"
-
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
@@ -12,7 +10,7 @@ export async function GET(req: NextRequest) {
     const offerId = url.searchParams.get('offerId')
     if (!offerId) return NextResponse.json({ success: false, error: 'offerId required' }, { status: 400 })
     const { data, error } = await supabase.from('flight_services_pending').select('*').eq('user_id', user.id).eq('offer_id', offerId).maybeSingle()
-    if (error && (error as any).code !== 'PGRST116') throw error
+    if (error && error.code !== 'PGRST116') throw error
     return NextResponse.json({ success: true, data: data || null })
   } catch (e) {
     return NextResponse.json({ success: false, error: 'Failed to fetch pending services' }, { status: 500 })
@@ -44,10 +42,9 @@ export async function DELETE(req: NextRequest) {
     const url = new URL(req.url)
     const offerId = url.searchParams.get('offerId')
     if (!offerId) return NextResponse.json({ success: false, error: 'offerId required' }, { status: 400 })
-    const { error } = await supabase.from('flight_services_pending').delete().eq('user_id', user.id).eq('offer_id', offerId)
-    if (error) throw error
+    await supabase.from('flight_services_pending').delete().eq('user_id', user.id).eq('offer_id', offerId)
     return NextResponse.json({ success: true })
   } catch (e) {
-    return NextResponse.json({ success: false, error: 'Failed to delete pending services' }, { status: 500 })
+    return NextResponse.json({ success: false, error: 'Failed to clear pending services' }, { status: 500 })
   }
 }

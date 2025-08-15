@@ -8,6 +8,8 @@ export interface Airport {
   time_zone?: string
   latitude?: number
   longitude?: number
+  is_major?: boolean
+  search_score?: number
 }
 
 export interface Airline {
@@ -27,8 +29,18 @@ export interface Aircraft {
 
 export interface FlightSegment {
   id: string
-  origin: Airport
-  destination: Airport
+  origin: {
+    iata_code: string
+    name: string
+    city_name?: string
+    time_zone?: string
+  }
+  destination: {
+    iata_code: string
+    name: string
+    city_name?: string
+    time_zone?: string
+  }
   departing_at: string
   arriving_at: string
   duration: string
@@ -40,16 +52,24 @@ export interface FlightSegment {
 
 export interface FlightSlice {
   id: string
-  origin: Airport
-  destination: Airport
+  origin: {
+    iata_code: string
+    name: string
+    city_name?: string
+  }
+  destination: {
+    iata_code: string
+    name: string
+    city_name?: string
+  }
   duration: string
   segments: FlightSegment[]
 }
 
 export interface FlightPassenger {
   id?: string
-  type: "adult" | "child" | "infant_without_seat"
-  title?: "mr" | "ms" | "mrs" | "miss" | "dr"
+  type: 'adult' | 'child' | 'infant_without_seat'
+  title?: 'mr' | 'ms' | 'mrs' | 'miss' | 'dr'
   given_name?: string
   family_name?: string
   born_on?: string
@@ -83,9 +103,17 @@ export interface FlightSearchParams {
     children: number
     infants: number
   }
-  cabin_class: "economy" | "premium_economy" | "business" | "first"
+  cabin_class: 'economy' | 'premium_economy' | 'business' | 'first'
   currency?: string
-  max_connections?: number
+  filters?: {
+    max_connections?: number
+    airlines?: string[]
+    departure_time_window?: [string, string]
+    arrival_time_window?: [string, string]
+    direct_only?: boolean
+  }
+  loyalty_programmes?: Array<{ airline_iata_code: string; account_number: string }>
+  sort_by?: 'price' | 'duration' | 'relevance'
 }
 
 export interface FlightSearchResponse {

@@ -2,8 +2,6 @@
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from "react"
 
-import type { SpeechRecognition, SpeechRecognitionEvent, SpeechRecognitionErrorEvent } from "@/types/speech-recognition"
-
 // Types
 export interface VoiceCommand {
   phrase: string
@@ -130,7 +128,7 @@ export function VoiceAIProvider({
   // Restore settings from localStorage
   React.useEffect(() => {
     try {
-      const raw = typeof window !== "undefined" ? localStorage.getItem("voiceAISettings") : null
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('voiceAISettings') : null
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<VoiceAISettings>
         setSettings((prev) => ({ ...prev, ...parsed }))
@@ -141,38 +139,32 @@ export function VoiceAIProvider({
   // Persist settings
   React.useEffect(() => {
     try {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("voiceAISettings", JSON.stringify(settings))
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('voiceAISettings', JSON.stringify(settings))
       }
     } catch {}
   }, [settings])
 
   // Auto-adjust language from browser when enabled
   React.useEffect(() => {
-    if (settings.autoDetectLanguage && typeof navigator !== "undefined") {
-      const lang = navigator.language || "en-US"
+    if (settings.autoDetectLanguage && typeof navigator !== 'undefined') {
+      const lang = navigator.language || 'en-US'
       // Map common browser language to supported speech codes
-      const mapped = lang.startsWith("es")
-        ? "es-ES"
-        : lang.startsWith("fr")
-          ? "fr-FR"
-          : lang.startsWith("de")
-            ? "de-DE"
-            : "en-US"
+      const mapped = lang.startsWith('es') ? 'es-ES' : lang.startsWith('fr') ? 'fr-FR' : lang.startsWith('de') ? 'de-DE' : 'en-US'
       if (mapped !== settings.language) {
-        setSettings((prev) => ({ ...prev, language: mapped as VoiceAISettings["language"] }))
+        setSettings((prev) => ({ ...prev, language: mapped as VoiceAISettings['language'] }))
       }
     }
   }, [settings.autoDetectLanguage])
 
   // Speech Recognition
-  const recognition = React.useRef<SpeechRecognition | null>(null)
+  const recognition = React.useRef<any>(null)
 
   // Initialize speech recognition
   useEffect(() => {
     if (typeof window !== "undefined" && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
-      recognition.current = new SpeechRecognition() as SpeechRecognition
+      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition
+      recognition.current = new SpeechRecognition()
 
       if (recognition.current) {
         recognition.current.continuous = true
@@ -185,7 +177,7 @@ export function VoiceAIProvider({
           if (enableLogging) console.log("Speech recognition started")
         }
 
-        recognition.current.onresult = (event: SpeechRecognitionEvent) => {
+        recognition.current.onresult = (event: any) => {
           let finalTranscript = ""
 
           for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -210,7 +202,7 @@ export function VoiceAIProvider({
           }
         }
 
-        recognition.current.onerror = (event: SpeechRecognitionErrorEvent) => {
+        recognition.current.onerror = (event: any) => {
           dispatch({ type: "SET_ERROR", payload: `Error de reconocimiento: ${event.error}` })
           dispatch({ type: "SET_LISTENING", payload: false })
           if (enableLogging) console.error("Speech recognition error:", event.error)

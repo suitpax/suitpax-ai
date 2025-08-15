@@ -3,227 +3,6 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export interface Database {
   public: {
     Tables: {
-      bank_connections: {
-        Row: {
-          id: string
-          user_id: string
-          gocardless_requisition_id: string
-          institution_id: string
-          institution_name: string
-          institution_logo: string | null
-          country_code: string
-          status: "pending" | "active" | "expired" | "suspended" | "error"
-          access_valid_for_days: number | null
-          max_historical_days: number | null
-          created_at: string
-          updated_at: string
-          expires_at: string | null
-          last_sync_at: string | null
-          error_message: string | null
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          gocardless_requisition_id: string
-          institution_id: string
-          institution_name: string
-          institution_logo?: string | null
-          country_code: string
-          status?: "pending" | "active" | "expired" | "suspended" | "error"
-          access_valid_for_days?: number | null
-          max_historical_days?: number | null
-          created_at?: string
-          updated_at?: string
-          expires_at?: string | null
-          last_sync_at?: string | null
-          error_message?: string | null
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          gocardless_requisition_id?: string
-          institution_id?: string
-          institution_name?: string
-          institution_logo?: string | null
-          country_code?: string
-          status?: "pending" | "active" | "expired" | "suspended" | "error"
-          access_valid_for_days?: number | null
-          max_historical_days?: number | null
-          created_at?: string
-          updated_at?: string
-          expires_at?: string | null
-          last_sync_at?: string | null
-          error_message?: string | null
-        }
-      }
-      bank_accounts: {
-        Row: {
-          id: string
-          connection_id: string
-          user_id: string
-          gocardless_account_id: string
-          account_name: string | null
-          account_holder_name: string | null
-          iban: string | null
-          account_number: string | null
-          sort_code: string | null
-          currency: string
-          account_type: string | null
-          status: "active" | "inactive" | "closed"
-          current_balance: number | null
-          available_balance: number | null
-          balance_updated_at: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          connection_id: string
-          user_id: string
-          gocardless_account_id: string
-          account_name?: string | null
-          account_holder_name?: string | null
-          iban?: string | null
-          account_number?: string | null
-          sort_code?: string | null
-          currency?: string
-          account_type?: string | null
-          status?: "active" | "inactive" | "closed"
-          current_balance?: number | null
-          available_balance?: number | null
-          balance_updated_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          connection_id?: string
-          user_id?: string
-          gocardless_account_id?: string
-          account_name?: string | null
-          account_holder_name?: string | null
-          iban?: string | null
-          account_number?: string | null
-          sort_code?: string | null
-          currency?: string
-          account_type?: string | null
-          status?: "active" | "inactive" | "closed"
-          current_balance?: number | null
-          available_balance?: number | null
-          balance_updated_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      bank_transactions: {
-        Row: {
-          id: string
-          account_id: string
-          user_id: string
-          gocardless_transaction_id: string
-          amount: number
-          currency: string
-          transaction_date: string
-          booking_date: string | null
-          value_date: string | null
-          merchant_name: string | null
-          counterparty_name: string | null
-          description: string | null
-          reference: string | null
-          transaction_code: string | null
-          category: string | null
-          auto_category: string | null
-          is_business_expense: boolean | null
-          expense_id: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          account_id: string
-          user_id: string
-          gocardless_transaction_id: string
-          amount: number
-          currency?: string
-          transaction_date: string
-          booking_date?: string | null
-          value_date?: string | null
-          merchant_name?: string | null
-          counterparty_name?: string | null
-          description?: string | null
-          reference?: string | null
-          transaction_code?: string | null
-          category?: string | null
-          auto_category?: string | null
-          is_business_expense?: boolean | null
-          expense_id?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          account_id?: string
-          user_id?: string
-          gocardless_transaction_id?: string
-          amount?: number
-          currency?: string
-          transaction_date?: string
-          booking_date?: string | null
-          value_date?: string | null
-          merchant_name?: string | null
-          counterparty_name?: string | null
-          description?: string | null
-          reference?: string | null
-          transaction_code?: string | null
-          category?: string | null
-          auto_category?: string | null
-          is_business_expense?: boolean | null
-          expense_id?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      bank_categorization_rules: {
-        Row: {
-          id: string
-          user_id: string
-          rule_name: string
-          rule_type: "merchant" | "description" | "amount" | "reference"
-          pattern: string
-          category: string
-          is_business_expense: boolean | null
-          priority: number | null
-          is_active: boolean | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          rule_name: string
-          rule_type: "merchant" | "description" | "amount" | "reference"
-          pattern: string
-          category: string
-          is_business_expense?: boolean | null
-          priority?: number | null
-          is_active?: boolean | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          rule_name?: string
-          rule_type?: "merchant" | "description" | "amount" | "reference"
-          pattern?: string
-          category?: string
-          is_business_expense?: boolean | null
-          priority?: number | null
-          is_active?: boolean | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
       profiles: {
         Row: {
           id: string
@@ -237,6 +16,8 @@ export interface Database {
           phone: string | null
           subscription_plan: "free" | "premium" | "enterprise"
           subscription_status: "active" | "inactive" | "cancelled" | "trialing"
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           onboarding_completed: boolean
           ai_tokens_used: number
           ai_tokens_limit: number
@@ -255,6 +36,8 @@ export interface Database {
           phone?: string | null
           subscription_plan?: "free" | "premium" | "enterprise"
           subscription_status?: "active" | "inactive" | "cancelled" | "trialing"
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           onboarding_completed?: boolean
           ai_tokens_used?: number
           ai_tokens_limit?: number
@@ -263,7 +46,6 @@ export interface Database {
         }
         Update: {
           id?: string
-          user_id?: string
           username?: string | null
           full_name?: string | null
           first_name?: string | null
@@ -274,6 +56,8 @@ export interface Database {
           phone?: string | null
           subscription_plan?: "free" | "premium" | "enterprise"
           subscription_status?: "active" | "inactive" | "cancelled" | "trialing"
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           onboarding_completed?: boolean
           ai_tokens_used?: number
           ai_tokens_limit?: number
@@ -695,81 +479,7 @@ export interface Database {
       }
     }
     Views: {
-      users: {
-        Row: {
-          id: string
-          first_name: string | null
-          last_name: string | null
-          company: string | null
-          job_title: string | null
-          phone: string | null
-          timezone: string | null
-          seat_preference: "aisle" | "window" | "middle" | "no_preference" | null
-          meal_preference: string | null
-          notification_settings: Json | null
-          onboarding_completed: boolean | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          first_name?: string | null
-          last_name?: string | null
-          company?: string | null
-          job_title?: string | null
-          phone?: string | null
-          timezone?: string | null
-          seat_preference?: "aisle" | "window" | "middle" | "no_preference" | null
-          meal_preference?: string | null
-          notification_settings?: Json | null
-          onboarding_completed?: boolean | null
-        }
-        Update: {
-          id?: string
-          first_name?: string | null
-          last_name?: string | null
-          company?: string | null
-          job_title?: string | null
-          phone?: string | null
-          timezone?: string | null
-          seat_preference?: "aisle" | "window" | "middle" | "no_preference" | null
-          meal_preference?: string | null
-          notification_settings?: Json | null
-          onboarding_completed?: boolean | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      user_profiles: {
-        Row: {
-          user_id: string
-          full_name: string | null
-          company: string | null
-          phone: string | null
-          timezone: string | null
-          preferences: Json | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          user_id?: string
-          full_name?: string | null
-          company?: string | null
-          phone?: string | null
-          timezone?: string | null
-          preferences?: Json | null
-        }
-        Update: {
-          user_id?: string
-          full_name?: string | null
-          company?: string | null
-          phone?: string | null
-          timezone?: string | null
-          preferences?: Json | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
+      [_ in never]: never
     }
     Functions: {
       increment_ai_tokens: {

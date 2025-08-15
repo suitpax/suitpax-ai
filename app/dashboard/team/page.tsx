@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { motion } from "framer-motion"
 import {
   Users,
@@ -32,7 +32,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api"
 
 const teamMembers = [
   {
@@ -157,36 +156,16 @@ export default function TeamPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedIndustry, setSelectedIndustry] = useState("all")
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+  const filteredOpportunities = investorOpportunities.filter((opp) => {
+    const matchesSearch =
+      opp.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      opp.industry.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesIndustry = selectedIndustry === "all" || opp.industry.toLowerCase() === selectedIndustry.toLowerCase()
+    return matchesSearch && matchesIndustry
   })
 
-  const mapCenter = useMemo(() => ({ lat: 20, lng: 0 }), [])
-  const mapMarkers = useMemo(
-    () => [
-      { id: "nyc", position: { lat: 40.7128, lng: -74.006 }, label: "New York" },
-      { id: "sf", position: { lat: 37.7749, lng: -122.4194 }, label: "San Francisco" },
-      { id: "london", position: { lat: 51.5074, lng: -0.1278 }, label: "London" },
-      { id: "boston", position: { lat: 42.3601, lng: -71.0589 }, label: "Boston" },
-      { id: "austin", position: { lat: 30.2672, lng: -97.7431 }, label: "Austin" },
-    ],
-    [],
-  )
-
-  const filteredOpportunities = useMemo(() => {
-    return investorOpportunities.filter((opportunity) => {
-      const matchesSearch =
-        opportunity.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        opportunity.industry.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesIndustry =
-        selectedIndustry === "all" || opportunity.industry.toLowerCase() === selectedIndustry.toLowerCase()
-      return matchesSearch && matchesIndustry
-    })
-  }, [searchQuery, selectedIndustry])
-
   return (
-    <div className="min-h-screen p-0 bg-gradient-to-br from-blue-50 via-white to-blue-50">
-      <div className="px-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
@@ -317,7 +296,7 @@ export default function TeamPage() {
         </motion.div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full px-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 rounded-xl">
             <TabsTrigger value="team" className="rounded-lg">
               Team Members
@@ -586,39 +565,7 @@ export default function TeamPage() {
             </motion.div>
           </TabsContent>
         </Tabs>
-
-        {/* Global Network Map */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.05 }}
-          className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden"
-        >
-          <div className="p-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-medium tracking-tighter text-gray-900">Global Network Map</h2>
-              <p className="text-sm text-gray-600">See your team and opportunities around the world</p>
-            </div>
-          </div>
-          <div className="h-[380px] w-full">
-            {isLoaded ? (
-              <GoogleMap
-                mapContainerStyle={{ width: "100%", height: "100%" }}
-                center={mapCenter}
-                zoom={2}
-                options={{ disableDefaultUI: true }}
-              >
-                {mapMarkers.map((m) => (
-                  <Marker key={m.id} position={m.position} title={m.label} />
-                ))}
-              </GoogleMap>
-            ) : (
-              <div className="h-full w-full flex items-center justify-center text-gray-500 text-sm">Loading map…</div>
-            )}
-          </div>
-        </motion.div>
       </div>
-    </div>
     </div>
   )
 }

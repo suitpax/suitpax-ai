@@ -11,9 +11,6 @@ import { motion } from "framer-motion"
 import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 import AISearchInput from "@/components/ui/ai-search-input"
-import FooterBanner from "@/components/dashboard/footer-banner"
-import { SUITPAX_VERSION } from "@/lib/version"
-import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton"
 
 export default function DashboardLayout({
   children,
@@ -52,14 +49,7 @@ export default function DashboardLayout({
       try {
         const {
           data: { user },
-          error,
         } = await supabase.auth.getUser()
-
-        if (error) {
-          console.error("Auth error:", error)
-          router.push("/auth/login")
-          return
-        }
 
         if (!user) {
           router.push("/auth/login")
@@ -68,30 +58,15 @@ export default function DashboardLayout({
 
         setUser(user)
 
-        try {
-          const { data: userData, error: userError } = await supabase
-            .from("users")
-            .select("subscription_plan, subscription_status, plan")
-            .eq("id", user.id)
-            .single()
+        // Get user profile and subscription info
+        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
-          if (userError) {
-            console.warn("User data fetch error:", userError)
-            // Continue with defaults if user record doesn't exist yet
-            setUserPlan("free")
-            setSubscriptionStatus("inactive")
-          } else if (userData) {
-            setUserPlan(userData.subscription_plan || userData.plan || "free")
-            setSubscriptionStatus(userData.subscription_status || "inactive")
-          }
-        } catch (userFetchError) {
-          console.warn("Error fetching user data:", userFetchError)
-          // Set defaults and continue
-          setUserPlan("free")
-          setSubscriptionStatus("inactive")
+        if (profileData) {
+          setUserPlan(profileData.plan || "free")
+          setSubscriptionStatus(profileData.subscription_status || "inactive")
         }
       } catch (error) {
-        console.error("Error in getUser:", error)
+        console.error("Error fetching user:", error)
         router.push("/auth/login")
       } finally {
         setLoading(false)
@@ -100,6 +75,7 @@ export default function DashboardLayout({
 
     getUser()
 
+    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -107,7 +83,6 @@ export default function DashboardLayout({
         router.push("/auth/login")
       } else if (event === "SIGNED_IN" && session?.user) {
         setUser(session.user)
-        setLoading(false)
       }
     })
 
@@ -132,14 +107,15 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="p-4 sm:p-6 max-w-7xl mx-auto"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
         >
-          <DashboardSkeleton />
+          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-700 font-medium tracking-tight">Loading your workspace...</p>
         </motion.div>
       </div>
     )
@@ -152,7 +128,8 @@ export default function DashboardLayout({
   const isActuallyCollapsed = !isMobile && sidebarCollapsed && !sidebarHovered
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white overflow-hidden">
+    <div className="flex h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden">
+      {/* Mobile backdrop */}
       {isMobile && mobileMenuOpen && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -163,16 +140,17 @@ export default function DashboardLayout({
         />
       )}
 
+      {/* Sidebar */}
       <div
         className={`
-					${
+          ${
             isMobile
               ? `fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${
                   mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
                 }`
               : `relative transition-all duration-300 ${isActuallyCollapsed ? "w-16" : "w-64"}`
           }
-				`}
+        `}
         onMouseEnter={() => {
           if (!isMobile && sidebarCollapsed) setSidebarHovered(true)
         }}
@@ -186,32 +164,33 @@ export default function DashboardLayout({
           isMobile={isMobile}
           onCloseMobile={closeMobileMenu}
           onToggleCollapse={toggleSidebar}
-          userPlan={userPlan}
-          subscriptionStatus={subscriptionStatus}
         />
       </div>
 
+      {/* Main content */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        {/* Mobile Header with Menu Button */}
         <div className="lg:hidden">
-          <div className="flex items-center justify-between h-14 px-4 bg-white/90 backdrop-blur-sm border-b border-gray-200/80">
+          <div className="flex items-center justify-between h-16 px-4 bg-white/70 backdrop-blur-sm border-b border-white/20">
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2.5 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-900/20 transition-all duration-200 active:scale-95"
+              className="inline-flex items-center justify-center p-2 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500/20 transition-colors"
               onClick={toggleSidebar}
             >
               <span className="sr-only">Open sidebar</span>
-              <Menu className="h-5 w-5" aria-hidden="true" />
+              <Menu className="h-6 w-6" aria-hidden="true" />
             </button>
-            <div className="flex-1 max-w-xs mx-3">
+            <div className="flex-1 max-w-xs mx-4">
               <AISearchInput size="sm" />
             </div>
-            <div className="w-2"></div>
+            <div className="w-4"></div>
           </div>
         </div>
 
+        {/* Desktop Header */}
         <div className="hidden lg:block">
           <Header
-            user={user as User}
+            user={user}
             userPlan={userPlan}
             subscriptionStatus={subscriptionStatus}
             onToggleSidebar={toggleSidebar}
@@ -220,20 +199,17 @@ export default function DashboardLayout({
           />
         </div>
 
-        <main className="flex-1 overflow-y-auto overscroll-y-contain">
+        {/* Main content area */}
+        <main className="flex-1 overflow-y-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="h-full min-h-0"
+            className="h-full"
           >
-            <div className="px-4 py-4 sm:px-6 sm:py-6 lg:px-6 lg:py-6">{children}</div>
+            {children}
           </motion.div>
         </main>
-
-        <div className="hidden sm:block">
-          <FooterBanner version={SUITPAX_VERSION} userName={user?.email?.split("@")[0]} />
-        </div>
       </div>
 
       <Toaster

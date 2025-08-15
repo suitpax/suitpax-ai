@@ -18,7 +18,7 @@ const communityMembers = [
   { id: 9, image: "/agents/agent-9.png" }, // Actualizado con la nueva imagen
   { id: 10, image: "/agents/agent-10.png" },
   { id: 11, image: "/agents/agent-11.png" },
-  { id: 12, image: "/agents/agent-42.png" }, // Replaced agent-12.png with agent-42.png
+  { id: 12, image: "/agents/agent-12.png" },
   { id: 13, image: "/agents/agent-13.png" },
   { id: 14, image: "/agents/kahn-avatar.png" },
   { id: 15, image: "/agents/agent-15.png" },

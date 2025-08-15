@@ -1,7 +1,6 @@
-export const runtime = "nodejs"
-
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createServerClient } from "@supabase/ssr"
+import { cookieStore } from "@/lib/supabase/cookies"
 import Anthropic from "@anthropic-ai/sdk"
 
 const anthropic = new Anthropic({
@@ -11,7 +10,13 @@ const anthropic = new Anthropic({
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
-    const supabase = createClient()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: cookieStore
+      }
+    )
 
     const {
       data: { user },
@@ -50,12 +55,15 @@ export async function POST(request: NextRequest) {
     })
 
     const aiResponse = response.content[0]?.type === "text" 
-      ? response.content[0].text
-      : "I'm sorry, I couldn't process that. Could you try again?"
+      ? response.content[0].text 
+      : "I apologize, but I couldn't process your request properly. Please try again."
 
-    return NextResponse.json({ response: aiResponse })
+    return NextResponse.json({
+      response: aiResponse,
+      tokens_used: (response.usage?.input_tokens || 0) + (response.usage?.output_tokens || 0),
+    })
   } catch (error) {
-    console.error("Voice AI conversation error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Voice AI error:", error)
+    return NextResponse.json({ error: "Failed to process voice request" }, { status: 500 })
   }
 }
