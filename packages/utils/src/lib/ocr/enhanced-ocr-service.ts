@@ -42,7 +42,7 @@ export class EnhancedOCRService {
       const processedImage = await this.preprocessImage(imageBuffer)
 
       const formData = new FormData()
-      formData.append("file", new Blob([processedImage]), "image.png")
+      formData.append("file", new Blob([new Uint8Array(processedImage)]), "image.png")
       formData.append("apikey", this.ocrSpaceApiKey)
       formData.append("language", "eng")
       formData.append("isOverlayRequired", "false")

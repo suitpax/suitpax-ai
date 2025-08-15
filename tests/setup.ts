@@ -52,7 +52,9 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock environment variables
-process.env.NODE_ENV = 'test';
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'test';
+}
 process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
 
 // Mock window.matchMedia
@@ -101,7 +103,7 @@ afterAll(() => {
 // Global test utilities
 global.console = {
   ...console,
-  // Suppress console.error for tests unless NODE_ENV is debug
-  error: process.env.NODE_ENV === 'debug' ? console.error : jest.fn(),
-  warn: process.env.NODE_ENV === 'debug' ? console.warn : jest.fn(),
+  // Suppress console.error for tests unless DEBUG is set
+  error: process.env.DEBUG ? console.error : jest.fn(),
+  warn: process.env.DEBUG ? console.warn : jest.fn(),
 };

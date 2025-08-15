@@ -2,7 +2,7 @@ import { FileType } from "file-type"
 import * as pdfjsLib from "pdfjs-dist"
 import mammoth from "mammoth"
 import * as XLSX from "xlsx"
-import Jimp from "jimp"
+import { Jimp } from "jimp"
 
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
@@ -91,13 +91,13 @@ export class NextJSDocumentService {
         text: fullText,
         metadata: {
           pages: pdf.numPages,
-          title: metadata.info?.Title,
-          author: metadata.info?.Author,
-          subject: metadata.info?.Subject,
-          creator: metadata.info?.Creator,
-          producer: metadata.info?.Producer,
-          creationDate: metadata.info?.CreationDate,
-          modificationDate: metadata.info?.ModDate,
+          title: (metadata.info as any)?.Title || undefined,
+          author: (metadata.info as any)?.Author || undefined,
+          subject: (metadata.info as any)?.Subject || undefined,
+          creator: (metadata.info as any)?.Creator || undefined,
+          producer: (metadata.info as any)?.Producer || undefined,
+          creationDate: (metadata.info as any)?.CreationDate || undefined,
+          modificationDate: (metadata.info as any)?.ModDate || undefined,
         },
         images,
         confidence: 0.95,
@@ -170,7 +170,7 @@ export class NextJSDocumentService {
 
       // Use OCR.space API for text extraction
       const formData = new FormData()
-      formData.append("file", new Blob([processedBuffer], { type: "image/png" }))
+      formData.append("file", new Blob([new Uint8Array(processedBuffer)], { type: "image/png" }))
       formData.append("apikey", process.env.OCR_SPACE_API_KEY || "")
       formData.append("language", "eng")
       formData.append("isOverlayRequired", "false")

@@ -68,7 +68,7 @@ Provide helpful, contextual responses for business travel needs. Be concise and 
         system: systemPrompt,
         prompt: message,
         temperature: 0.7,
-        maxTokens: 1000,
+        maxCompletionTokens: 1000,
       })
 
       // Store conversation in memory

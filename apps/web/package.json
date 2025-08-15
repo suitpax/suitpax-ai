@@ -10,10 +10,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@suitpax/ui": "*",
-    "@suitpax/utils": "*",
-    "@suitpax/domains": "*",
-    "@suitpax/shared": "*",
+    "@suitpax/ui": "workspace:*",
+    "@suitpax/utils": "workspace:*",
+    "@suitpax/domains": "workspace:*",
+    "@suitpax/shared": "workspace:*",
     "next": "15.1.3",
     "react": "19.0.0",
     "react-dom": "19.0.0",
