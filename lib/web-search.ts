@@ -15,7 +15,7 @@ export interface NewsResponse {
 
 export async function fetchNews(query: string, count = 6): Promise<NewsResponse> {
   try {
-    const response = await fetch("/api/web-search/brave", {
+    const response = await fetch("/api/brave/news", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

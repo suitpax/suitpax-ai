@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     url.searchParams.set("q", query)
     url.searchParams.set("count", String(count))
     url.searchParams.set("offset", String(offset))
-    url.searchParams.set("freshness", freshness) // d1, d7, d30 per docs
+    url.searchParams.set("freshness", freshness)
     url.searchParams.set("source", "news")
     url.searchParams.set("spellcheck", "1")
 
