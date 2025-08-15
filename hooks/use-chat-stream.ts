@@ -1,28 +1,32 @@
 "use client"
 
-import { useCallback, useRef, useState } from "react"
+import { useState, useRef } from "react"
+
+interface StreamOptions {
+  message: string
+  history?: any[]
+  userId?: string
+}
 
 export function useChatStream() {
   const [isStreaming, setIsStreaming] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const abortRef = useRef<AbortController | null>(null)
+  const controllerRef = useRef<AbortController | null>(null)
 
-  const start = useCallback(async (body: any, onToken: (t: string) => void) => {
+  const start = async (options: StreamOptions, onToken: (token: string) => void) => {
+    if (isStreaming) return
     setIsStreaming(true)
-    setError(null)
 
-    if (abortRef.current) abortRef.current.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
+    controllerRef.current = new AbortController()
 
     try {
-      const res = await fetch("/api/suitpax-ai/stream", {
+      const res = await fetch("/api/ai-core/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-        signal: controller.signal,
+        body: JSON.stringify({ message: options.message, history: options.history || [], userId: options.userId }),
+        signal: controllerRef.current.signal,
       })
-      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`)
+
+      if (!res.ok || !res.body) throw new Error("Stream failed")
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -30,20 +34,23 @@ export function useChatStream() {
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-        const chunk = decoder.decode(value)
+        const chunk = decoder.decode(value, { stream: true })
         onToken(chunk)
       }
-    } catch (e: any) {
-      if (e?.name !== "AbortError") setError(e?.message || "Stream error")
+    } catch (e) {
+      // Swallow; fallback handled by caller
     } finally {
       setIsStreaming(false)
-      abortRef.current = null
     }
-  }, [])
+  }
 
-  const cancel = useCallback(() => {
-    if (abortRef.current) abortRef.current.abort()
-  }, [])
+  const cancel = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+      controllerRef.current = null
+    }
+    setIsStreaming(false)
+  }
 
-  return { isStreaming, error, start, cancel }
+  return { isStreaming, start, cancel }
 }

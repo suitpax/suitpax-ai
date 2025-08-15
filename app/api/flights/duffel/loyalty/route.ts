@@ -1,3 +1,5 @@
+export const runtime = "nodejs"
+
 import { NextRequest, NextResponse } from "next/server";
 import { createDuffelClient, handleDuffelError } from "@/lib/duffel";
 import { createClient } from "@/lib/supabase/server";
@@ -333,8 +335,8 @@ export async function DELETE(request: NextRequest) {
       }, { status: 400 });
     }
 
-    if (result.error) {
-      console.error(`Error deleting ${type}:`, result.error);
+    if ((result as any).error) {
+      console.error(`Error deleting ${type}:`, (result as any).error);
       return NextResponse.json({ 
         success: false, 
         error: `Error deleting ${type}` 

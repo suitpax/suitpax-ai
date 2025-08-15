@@ -308,9 +308,11 @@ export const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-8 bg-white/70 backdrop-blur-sm p-6 rounded-xl border border-gray-200 relative"
+              className="mt-8 rounded-2xl border border-white/60 bg-white/40 backdrop-blur-xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.6)] ring-1 ring-black/5"
             >
-              <CityAnimateText cities={cities} />
+              <div className="p-6">
+                <CityAnimateText cities={cities} />
+              </div>
             </motion.div>
 
             <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mx-auto">
@@ -352,7 +354,7 @@ export const Hero = () => {
               transition: { duration: 0.2 },
             }}
           >
-            <div className="bg-white/80 backdrop-blur-md rounded-xl border border-gray-200 overflow-hidden">
+            <div className="bg-white/70 backdrop-blur-xl rounded-2xl border border-white/60 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.6)] ring-1 ring-black/5 overflow-hidden">
               <MiniChat />
             </div>
           </motion.div>

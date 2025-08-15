@@ -1,8 +1,10 @@
+export const runtime = "nodejs"
+
 import { type NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
   try {
-    const { query, count = 10, offset = 0 } = await request.json()
+    const { query, count = 10, offset = 0, freshness = "d7" } = await request.json()
 
     if (!query) {
       return NextResponse.json({ error: "Query is required" }, { status: 400 })
@@ -13,26 +15,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Brave API key not configured" }, { status: 500 })
     }
 
-    const response = await fetch("https://api.search.brave.com/res/v1/web/search", {
+    const url = new URL("https://api.search.brave.com/res/v1/news/search")
+    url.searchParams.set("q", query)
+    url.searchParams.set("count", String(count))
+    url.searchParams.set("offset", String(offset))
+    url.searchParams.set("freshness", freshness) // d1, d7, d30 per docs
+    url.searchParams.set("source", "news")
+    url.searchParams.set("spellcheck", "1")
+
+    const response = await fetch(url.toString(), {
       method: "GET",
       headers: {
         Accept: "application/json",
         "Accept-Encoding": "gzip",
         "X-Subscription-Token": braveApiKey,
       },
-      params: new URLSearchParams({
-        q: query,
-        count: count.toString(),
-        offset: offset.toString(),
-        search_lang: "en",
-        country: "US",
-        safesearch: "moderate",
-        freshness: "pw", // Past week for business travel relevance
-      }),
     })
 
     if (!response.ok) {
-      throw new Error(`Brave API error: ${response.status}`)
+      const text = await response.text().catch(() => "")
+      throw new Error(`Brave News API error: ${response.status} ${text}`)
     }
 
     const data = await response.json()
@@ -40,19 +42,20 @@ export async function POST(request: NextRequest) {
     const formattedResults = {
       query,
       results:
-        data.web?.results?.map((result: any) => ({
-          title: result.title,
-          url: result.url,
-          description: result.description,
-          published: result.age,
-          favicon: result.profile?.img,
+        data.news?.results?.map((item: any) => ({
+          title: item.title,
+          url: item.url,
+          description: item.description,
+          published: item.published?.toString(),
+          outlet: item.outlet?.title,
+          image: item.thumbnail?.src,
         })) || [],
-      total: data.web?.results?.length || 0,
+      total: data.news?.results?.length || 0,
     }
 
     return NextResponse.json(formattedResults)
   } catch (error) {
-    console.error("Brave search error:", error)
-    return NextResponse.json({ error: "Failed to perform web search" }, { status: 500 })
+    console.error("Brave News search error:", error)
+    return NextResponse.json({ error: "Failed to perform news search" }, { status: 500 })
   }
 }

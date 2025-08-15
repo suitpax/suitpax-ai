@@ -55,11 +55,11 @@ const quickActions: QuickAction[] = [
     color: "default",
   },
   {
-    id: "schedule-meeting",
-    title: "AI Assistant",
+    id: 4,
+    title: "Ask Suitpax AI",
     description: "Get help with travel planning",
     icon: <Zap className="w-5 h-5" />,
-    href: "/dashboard/suitpax-ai",
+    href: "/dashboard/ai-core",
     color: "primary",
   },
   {

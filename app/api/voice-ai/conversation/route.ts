@@ -1,3 +1,5 @@
+export const runtime = "nodejs"
+
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import Anthropic from "@anthropic-ai/sdk"
@@ -48,15 +50,12 @@ export async function POST(request: NextRequest) {
     })
 
     const aiResponse = response.content[0]?.type === "text" 
-      ? response.content[0].text 
-      : "I apologize, but I couldn't process your request properly. Please try again."
+      ? response.content[0].text
+      : "I'm sorry, I couldn't process that. Could you try again?"
 
-    return NextResponse.json({
-      response: aiResponse,
-      tokens_used: (response.usage?.input_tokens || 0) + (response.usage?.output_tokens || 0),
-    })
+    return NextResponse.json({ response: aiResponse })
   } catch (error) {
-    console.error("Voice AI error:", error)
-    return NextResponse.json({ error: "Failed to process voice request" }, { status: 500 })
+    console.error("Voice AI conversation error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

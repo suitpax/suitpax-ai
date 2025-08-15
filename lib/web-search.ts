@@ -1,34 +1,35 @@
-export interface WebSearchResult {
+export interface NewsResult {
   title: string
   url: string
   description: string
   published?: string
-  favicon?: string
+  outlet?: string
+  image?: string
 }
 
-export interface WebSearchResponse {
+export interface NewsResponse {
   query: string
-  results: WebSearchResult[]
+  results: NewsResult[]
   total: number
 }
 
-export async function searchWeb(query: string, count = 5): Promise<WebSearchResponse> {
+export async function fetchNews(query: string, count = 6): Promise<NewsResponse> {
   try {
     const response = await fetch("/api/web-search/brave", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ query, count }),
+      body: JSON.stringify({ query, count, freshness: "d7" }),
     })
 
     if (!response.ok) {
-      throw new Error("Web search failed")
+      throw new Error("News search failed")
     }
 
     return await response.json()
   } catch (error) {
-    console.error("Web search error:", error)
+    console.error("News search error:", error)
     return {
       query,
       results: [],
@@ -37,12 +38,14 @@ export async function searchWeb(query: string, count = 5): Promise<WebSearchResp
   }
 }
 
-export function formatSearchResultsForAI(results: WebSearchResult[]): string {
+export function formatNewsForAI(results: NewsResult[]): string {
   if (results.length === 0) {
-    return "No web search results found."
+    return "No relevant news found."
   }
 
   return results
-    .map((result, index) => `${index + 1}. **${result.title}**\n   ${result.description}\n   Source: ${result.url}\n`)
-    .join("\n")
+    .map(
+      (r, i) => `${i + 1}. ${r.title}\n   ${r.description}\n   Source: ${r.outlet || "Unknown"} - ${r.url}`,
+    )
+    .join("\n\n")
 }

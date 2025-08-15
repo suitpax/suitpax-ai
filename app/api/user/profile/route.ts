@@ -1,3 +1,5 @@
+export const runtime = "nodejs"
+
 import { type NextRequest, NextResponse } from "next/server"
 import { cookieStore } from "@/lib/supabase/cookies"
 import { z } from "zod"

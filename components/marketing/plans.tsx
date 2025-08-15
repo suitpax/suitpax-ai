@@ -94,7 +94,7 @@ const pricingPlans = [
       "Basic travel policy templates",
     ],
     cta: "Get Started",
-    badge: "Free",
+    badge: "",
     popular: false,
     agentImage: "/agents/agent-sophia.jpeg",
     communityImages: ["/community/jordan-burgess.webp", "/community/bec-ferguson.webp"],
@@ -120,7 +120,7 @@ const pricingPlans = [
       "Basic CRM integration",
     ],
     cta: "Start 14-day trial",
-    badge: "Starter",
+    badge: "",
     popular: true,
     agentImage: "/agents/agent-emma.jpeg",
     communityImages: ["/community/kelsey-lowe.webp", "/community/brianna-ware.webp", "/community/harriet-rojas.jpg"],
@@ -146,8 +146,8 @@ const pricingPlans = [
       "Basic bank API integration",
       "Advanced CRM intelligence",
     ],
-    cta: "Contact us",
-    badge: "Advanced",
+    cta: "Contact sales",
+    badge: "",
     popular: false,
     agentImage: "/agents/agent-marcus.jpeg",
     communityImages: [
@@ -179,8 +179,8 @@ const pricingPlans = [
       "Full bank API integration",
       "Multi-currency management",
     ],
-    cta: "Contact us",
-    badge: "Enterprise",
+    cta: "Contact sales",
+    badge: "",
     popular: false,
     agentImage: "/agents/agent-alex.jpeg",
     communityImages: [
@@ -324,39 +324,7 @@ const CommunityCarousel = ({ images }: { images: string[] }) => {
   )
 }
 
-// Testimonial Component
-const MissionValues = () => {
-  return (
-    <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm mt-12 mb-16">
-      <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-4 text-center">
-        Our Mission and Values
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
-          <h4 className="text-sm font-medium mb-2">Constant Innovation</h4>
-          <p className="text-xs text-gray-600">
-            We are committed to redefining business travel management with cutting-edge technology and user-centered
-            solutions.
-          </p>
-        </div>
-        <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
-          <h4 className="text-sm font-medium mb-2">Efficiency and Simplicity</h4>
-          <p className="text-xs text-gray-600">
-            We believe technology should simplify, not complicate. Our solutions eliminate friction at every stage of
-            the travel process.
-          </p>
-        </div>
-        <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">
-          <h4 className="text-sm font-medium mb-2">Sustainability</h4>
-          <p className="text-xs text-gray-600">
-            We are committed to responsible travel practices that minimize environmental impact while maximizing value
-            for our customers.
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-}
+// Testimonial Component (retirado para simplificar coherencia visual)
 
 export const Plans = () => {
   const [randomTitle, setRandomTitle] = useState("")
@@ -375,19 +343,16 @@ export const Plans = () => {
 
   const handlePlanSelect = async (planId: string) => {
     if (planId === "free") {
-      // Redirect to sign up for free plan
       window.location.href = "https://app.suitpax.com/sign-up"
       return
     }
 
     if (planId === "enterprise" || planId === "pro") {
-      // Send email for custom plans
       window.location.href = "mailto:hello@suitpax.com"
       return
     }
 
     if (planId === "basic") {
-      // Redirect to sign up page for now
       window.location.href = "https://app.suitpax.com/sign-up"
     }
   }
@@ -401,57 +366,35 @@ export const Plans = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex flex-wrap items-center justify-center gap-3 mb-4 sm:mb-6 bg-gray-50 px-3 py-2 rounded-full">
-            <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
-              Suitpax Pricing
-            </span>
-            <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
-              Updated Q2 2025
-            </span>
-          </div>
-
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
             {randomTitle}
           </h2>
           <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6 sm:mb-8">{randomSubtitle}</p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
-            <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
-              <span className="font-medium">Flexible Solutions</span>
-            </div>
-            <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
-              <span className="font-medium">Artificial Intelligence</span>
-            </div>
-            <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
-              <span className="font-medium">Scalability</span>
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center bg-gray-100 p-1 rounded-full">
+              <button
+                onClick={() => setIsAnnual(false)}
+                className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
+                  !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setIsAnnual(true)}
+                className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
+                  isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
+                }`}
+              >
+                Annual
+                <span className="ml-1 inline-flex items-center rounded-full bg-black px-2 py-0.5 text-[9px] font-medium text-white">
+                  Save 20%
+                </span>
+              </button>
             </div>
           </div>
         </motion.div>
-
-        <div className="flex justify-center mb-8">
-          <div className="flex items-center bg-gray-100 p-1 rounded-full">
-            <button
-              onClick={() => setIsAnnual(false)}
-              className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
-                !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setIsAnnual(true)}
-              className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
-                isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
-              }`}
-            >
-              Annual
-              <span className="ml-1 inline-flex items-center rounded-full bg-black px-2 py-0.5 text-[9px] font-medium text-white">
-                Save 20%
-              </span>
-            </button>
-          </div>
-        </div>
 
         {/* Grid modificado para 2x2 en pantallas grandes */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
@@ -476,11 +419,6 @@ export const Plans = () => {
                   <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">{plan.name}</h3>
                   <p className="text-[9px] sm:text-[10px] text-gray-600 mt-0.5 line-clamp-2">{plan.description}</p>
                 </div>
-                {plan.badge && (
-                  <span className="inline-flex items-center rounded-xl bg-transparent border border-black px-2 py-0.5 text-[8px] sm:text-[9px] font-medium text-black">
-                    {plan.badge}
-                  </span>
-                )}
               </div>
 
               <div className="mb-2 sm:mb-3">
@@ -524,7 +462,7 @@ export const Plans = () => {
                   className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors ${
                     plan.popular
                       ? "bg-black text-white hover:bg-gray-800"
-                      : "bg-white text-black border border-black hover:bg-gray-100"
+                      : "bg-white text-black border border-black hover:bg_gray-100"
                   } block mx-auto max-w-[220px]`}
                 >
                   {plan.cta}
