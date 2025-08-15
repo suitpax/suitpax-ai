@@ -16,11 +16,13 @@ const customJestConfig = {
   // Module name mapping for path aliases
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
-    '^@/src/(.*)$': '<rootDir>/src/$1',
     '^@/components/(.*)$': '<rootDir>/components/$1',
     '^@/lib/(.*)$': '<rootDir>/lib/$1',
     '^@/app/(.*)$': '<rootDir>/app/$1',
     '^@/public/(.*)$': '<rootDir>/public/$1',
+    '^@/shared/(.*)$': '<rootDir>/shared/$1',
+    '^@/domains/(.*)$': '<rootDir>/domains/$1',
+    '^@/infrastructure/(.*)$': '<rootDir>/infrastructure/$1',
   },
   
   // Test patterns

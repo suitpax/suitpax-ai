@@ -4,7 +4,7 @@ import React, { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
-import { BaseComponentProps, SizeVariant } from '@/src/shared/types';
+import { BaseComponentProps, SizeVariant } from '@/shared/types';
 
 // Button variants using CVA for better type safety and performance
 const buttonVariants = cva(

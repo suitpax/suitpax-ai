@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Button, ButtonGroup } from '@/src/shared/components/ui/atoms/Button';
+import { Button, ButtonGroup } from '@/shared/components/ui/atoms/Button';
 import { Download, Plus } from 'lucide-react';
 
 describe('Button Component', () => {

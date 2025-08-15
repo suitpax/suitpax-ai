@@ -37,7 +37,8 @@
 ### 🏗️ **1. Nueva Arquitectura Domain Driven Design**
 
 ```
-src/
+suitpax-ai/
+├── app/                        # ✅ Next.js App Router 
 ├── domains/                    # 🆕 Dominios de negocio
 │   ├── flights/               # Gestión de vuelos
 │   │   ├── components/        # UI específico del dominio

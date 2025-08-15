@@ -4,7 +4,7 @@ import React, { forwardRef, useState, useId } from 'react';
 import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Eye, EyeOff, AlertCircle, CheckCircle, X } from 'lucide-react';
-import { BaseComponentProps } from '@/src/shared/types';
+import { BaseComponentProps } from '@/shared/types';
 
 // Input variants
 const inputVariants = cva(

@@ -40,14 +40,13 @@
 
 ```
 suitpax-ai/
-├── 📦 src/                                 # Código fuente principal
-│   ├── 🌐 app/                            # Next.js App Router (solo routing)
-│   │   ├── (auth)/                        # Grupo de autenticación
-│   │   ├── (marketing)/                   # Landing pages
-│   │   ├── (dashboard)/                   # App principal
-│   │   └── api/                           # API routes (mínimo)
-│   │
-│   ├── 🏢 domains/                        # Dominios de negocio
+├── 🌐 app/                                # Next.js App Router
+│   ├── (auth)/                           # Grupo de autenticación
+│   ├── (marketing)/                      # Landing pages
+│   ├── (dashboard)/                      # App principal
+│   └── api/                              # API routes
+│
+├── 🏢 domains/                           # Dominios de negocio
 │   │   ├── auth/                          # Autenticación y autorización
 │   │   │   ├── components/                # UI específico de auth
 │   │   │   ├── hooks/                     # Hooks específicos
@@ -120,7 +119,7 @@ suitpax-ai/
 │   │       ├── services/
 │   │       └── ...
 │   │
-│   ├── 🎨 shared/                         # Código compartido
+├── 🎨 shared/                            # Código compartido
 │   │   ├── components/                    # Design System
 │   │   │   ├── ui/                        # Componentes base
 │   │   │   │   ├── atoms/                 # Button, Input, Badge
@@ -161,7 +160,7 @@ suitpax-ai/
 │   │       ├── ui-store.ts
 │   │       └── app-store.ts
 │   │
-│   ├── 🔧 infrastructure/                 # Infraestructura
+├── 🔧 infrastructure/                    # Infraestructura
 │   │   ├── database/                      # Configuración DB
 │   │   │   ├── supabase/
 │   │   │   ├── migrations/
@@ -184,10 +183,10 @@ suitpax-ai/
 │   │       ├── constants.ts
 │   │       └── feature-flags.ts
 │   │
-│   └── 📄 pages/                          # Páginas específicas
-│       ├── _app.tsx                       # App wrapper
-│       ├── _document.tsx                  # Document config
-│       └── api/                           # API routes legacy
+├── components/                           # Componentes existentes (migrar gradualmente)
+├── lib/                                  # Utilidades existentes  
+├── public/                               # Assets estáticos
+├── styles/                               # Estilos globales
 │
 ├── 🧪 tests/                              # Testing completo
 │   ├── __mocks__/                         # Mocks globales

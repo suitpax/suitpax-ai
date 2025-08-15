@@ -1,5 +1,5 @@
 // Flight search service implementing Repository pattern
-import { ApiClient } from '@/src/shared/types';
+import { ApiClient } from '@/shared/types';
 import { 
   FlightSearchParams, 
   FlightSearchResult, 
