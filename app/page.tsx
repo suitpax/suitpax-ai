@@ -8,7 +8,7 @@ import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
 import AgenticDisruption from "@/components/marketing/agentic-disruption"
 import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
 import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
-import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
+
 import ContactForm from "@/components/marketing/contact-form"
 import { default as LaunchHero } from "@/components/marketing/launch-hero"
 import TeamCollaborationShowcase from "@/components/marketing/team-collaboration-showcase"
@@ -108,7 +108,6 @@ export default function Home() {
         <AITravelAgents />
         <BusinessTravelRevolution />
         <AIVoiceCallingHub />
-        <MCPFlightsAIAgents />
         <CloudAIShowcase />
         <AgenticDisruption />
         <AIVoiceAssistant />
