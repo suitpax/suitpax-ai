@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { buildSystemPrompt, buildReasoningInstruction } from "@/lib/prompts/system"
+import { buildSystemPrompt, buildReasoningInstruction, buildToolContext } from "@/lib/prompts/system"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 import { SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/enhanced-system"
 
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
 
     let enhancedMessage = message
     if (toolData?.success) {
-      enhancedMessage += `\n\nTool results:\n${JSON.stringify(toolData, null, 2)}`
+      enhancedMessage += buildToolContext(toolType, toolData)
     }
 
     const initial = await anthropic.messages.create({

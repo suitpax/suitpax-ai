@@ -190,7 +190,7 @@
   "devDependencies": {
     "@types/eslint": "^9.6.1",
     "@types/file-saver": "^2.0.7",
-    "@types/node": "^22",
+    "@types/node": "^22.17.1",
     "@types/papaparse": "^5.3.16",
     "@types/pdf-parse": "^1.1.4",
     "@types/qrcode": "^1.5.5",
@@ -205,7 +205,7 @@
     "papaparse": "^5.5.3",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5",
+    "typescript": "^5.9.2",
     "unpdf": "^1.1.0"
   },
   "packageManager": "pnpm@9.0.0",
