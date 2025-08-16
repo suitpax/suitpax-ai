@@ -2,7 +2,11 @@ import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { SUITPAX_CODE_SYSTEM_PROMPT } from "@/lib/prompts/code"
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
+function getAnthropic() {
+  const key = process.env.ANTHROPIC_API_KEY
+  if (!key) return null
+  return new Anthropic({ apiKey: key })
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +15,10 @@ export async function POST(request: NextRequest) {
 
     const enhanced = `\n${SUITPAX_CODE_SYSTEM_PROMPT}\n\n## Request\n- User request: ${query}\n- Language: ${language || "best-fit"}\n- Framework: ${framework || "best-fit"}\n\nProvide concise, production-ready code with minimal explanation. Include imports.`
 
-    const res = await anthropic.messages.create({
+    const client = getAnthropic()
+    if (!client) return NextResponse.json({ success: false, error: "AI not configured" }, { status: 500 })
+
+    const res = await client.messages.create({
       model: "claude-3-7-sonnet-20250219",
       max_tokens: 2000,
       system: SUITPAX_CODE_SYSTEM_PROMPT,

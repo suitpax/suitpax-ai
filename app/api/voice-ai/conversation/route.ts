@@ -4,9 +4,11 @@ import { cookieStore } from "@/lib/supabase/cookies"
 import Anthropic from "@anthropic-ai/sdk"
 import { SUITPAX_VOICE_SYSTEM_PROMPT } from "@/lib/prompts/voice"
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-})
+function getAnthropic() {
+  const key = process.env.ANTHROPIC_API_KEY
+  if (!key) return null
+  return new Anthropic({ apiKey: key })
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,8 +35,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Transcript is required" }, { status: 400 })
     }
 
-    const response = await anthropic.messages.create({
-      model: "claude-3-7-sonnet-latest",
+    const client = getAnthropic()
+    if (!client) return NextResponse.json({ error: "AI not configured" }, { status: 500 })
+
+    const response = await client.messages.create({
+      model: "claude-3-7-sonnet-20250219",
       max_tokens: 500,
       temperature: 0.7,
       system: `${SUITPAX_VOICE_SYSTEM_PROMPT}

@@ -1,9 +1,16 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-const apiKey = process.env.ANTHROPIC_API_KEY;
-if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set");
-
-const anthropic = new Anthropic({ apiKey });
+let anthropicClient: Anthropic | null = null;
+function getAnthropicClient(): Anthropic {
+  if (!anthropicClient) {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new Error("ANTHROPIC_API_KEY is not set");
+    }
+    anthropicClient = new Anthropic({ apiKey });
+  }
+  return anthropicClient;
+}
 
 export interface ConversationMessage {
   role: "user" | "assistant";
@@ -44,6 +51,7 @@ export async function generateAgentResponseByPlan(
 ): Promise<{ text: string; inputTokens?: number; outputTokens?: number; model: string }> {
   const config = PLAN_CONFIGS[userPlan] || PLAN_CONFIGS["free"];
   try {
+    const anthropic = getAnthropicClient();
     const response = await anthropic.messages.create({
       model: config.model,
       max_tokens: config.maxTokens,
@@ -77,6 +85,7 @@ export async function streamAgentResponse(
   const max_tokens = options?.maxTokens || PLAN_CONFIGS.free.maxTokens
   const temperature = options?.temperature ?? 0.7
 
+  const anthropic = getAnthropicClient();
   const res = await anthropic.messages.create({
     model,
     max_tokens,

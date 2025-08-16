@@ -1,28 +1,50 @@
 import { NextRequest } from "next/server"
-import { routeChat } from "@/lib/chat/router"
+import Anthropic from "@anthropic-ai/sdk"
+import { buildSystemPrompt } from "@/lib/prompts/system"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 export const dynamic = "force-dynamic"
 
+function getAnthropic() {
+  const key = process.env.ANTHROPIC_API_KEY
+  if (!key) return null
+  return new Anthropic({ apiKey: key })
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { message, history = [], includeReasoning = false } = await req.json()
+    const { message, history = [] } = await req.json()
     if (!message) return new Response("Message required", { status: 400 })
 
     const supabase = createServerSupabase()
     const { data: { user } } = await supabase.auth.getUser()
 
-    const result = await routeChat({ message, history, includeReasoning, userId: user?.id, baseUrl: process.env.NEXT_PUBLIC_BASE_URL })
+    const system = buildSystemPrompt({ domain: ["general", "travel", "coding", "business"] })
+
+    const client = getAnthropic()
+    if (!client) return new Response("AI not configured", { status: 500 })
+
+    // We use non-streaming API to get usage, then stream the text to client for UX
+    const res = await client.messages.create({
+      model: "claude-3-7-sonnet-20250219",
+      max_tokens: 4096,
+      system,
+      messages: [...history.map((m: any) => ({ role: m.role, content: m.content })), { role: "user", content: message }],
+    })
+
+    const text = (res.content.find((c: any) => c.type === "text") as any)?.text || ""
 
     // Log usage
     try {
+      const inputTokens = (res as any)?.usage?.input_tokens || 0
+      const outputTokens = (res as any)?.usage?.output_tokens || Math.ceil(text.length / 4)
       if (user?.id) {
         await supabase.from('ai_usage').insert({
           user_id: user.id,
           model: "claude-3-7-sonnet-20250219",
-          input_tokens: result.tokenUsage?.inputTokens || 0,
-          output_tokens: result.tokenUsage?.outputTokens || Math.ceil(result.text.length / 4),
-          context_type: (result.toolUsed || 'general'),
+          input_tokens: inputTokens,
+          output_tokens: outputTokens,
+          context_type: /flight|vuelo/i.test(message) ? 'flight_search' : 'general',
         })
       }
     } catch {}
@@ -30,10 +52,9 @@ export async function POST(req: NextRequest) {
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
       start(controller) {
-        const content = result.text
         const chunkSize = 64
-        for (let i = 0; i < content.length; i += chunkSize) {
-          const slice = content.slice(i, i + chunkSize)
+        for (let i = 0; i < text.length; i += chunkSize) {
+          const slice = text.slice(i, i + chunkSize)
           controller.enqueue(encoder.encode(slice))
         }
         controller.close()
