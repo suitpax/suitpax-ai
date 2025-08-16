@@ -28,6 +28,7 @@ import AIFlightSection from "@/components/marketing/ai-flight-section"
 import Plans from "@/components/marketing/plans"
 import type { Metadata } from "next"
 import HyperspeedBooking from "@/components/marketing/hyperspeed-booking"
+import Startup from "@/components/marketing/startup"
 
 export const metadata: Metadata = {
   title: "Suitpax | AI-Powered Business Travel Platform",
@@ -94,6 +95,7 @@ export default function Home() {
         <BusinessTravelSlider />
         <HyperspeedBooking />
         <AirlinesSlider />
+        <Startup />
         <MCPAIAgents />
                  {/* Suitpax AI now included in Suitpax Platform */}
         <AIFlightSection />
