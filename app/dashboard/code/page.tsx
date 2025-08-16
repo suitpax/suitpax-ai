@@ -25,6 +25,8 @@ export default function SuitpaxCodePage() {
   const [isSending, setIsSending] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [previewHtml, setPreviewHtml] = useState<string>("")
+  const [limits, setLimits] = useState<any>(null)
+  const [showLimitModal, setShowLimitModal] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -33,9 +35,16 @@ export default function SuitpaxCodePage() {
         router.push("/auth/login")
         return
       }
-      const { data } = await supabase.rpc("get_user_plan_limits", { user_uuid: user.id })
-      const p = data?.[0]?.plan_name?.toLowerCase?.() || "free"
+      const { data } = await supabase.rpc("get_user_subscription_limits", { user_uuid: user.id })
+      const l = data?.[0] || null
+      setLimits(l)
+      const p = (l?.plan_id || "free").toLowerCase?.() || "free"
       setPlan(p)
+      // Near limit modal
+      if (l?.code_tokens_limit && l?.code_tokens_limit > 0) {
+        const ratio = (l.code_tokens_used || 0) / l.code_tokens_limit
+        if (ratio >= 0.8) setShowLimitModal(true)
+      }
       setLoading(false)
       if (p === "free") {
         router.push("/dashboard/billing?upgrade=code")
@@ -151,6 +160,21 @@ export default function SuitpaxCodePage() {
           />
         </div>
       </div>
+
+      {showLimitModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-xl w-[520px] max-w-[92vw] p-5">
+            <div className="text-lg font-semibold mb-2">You're nearing your Suitpax Code limit</div>
+            <div className="text-sm text-gray-600 mb-4">
+              Code tokens used: {limits?.code_tokens_used || 0} / {limits?.code_tokens_limit || 0}
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              <button onClick={() => setShowLimitModal(false)} className="px-3 py-1.5 text-sm border rounded-lg">Later</button>
+              <a href="/dashboard/billing?upgrade=code" className="px-3 py-1.5 text-sm border rounded-lg bg-black text-white">Upgrade</a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
