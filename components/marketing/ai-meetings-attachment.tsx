@@ -15,6 +15,7 @@ import {
   SiHubspot,
 } from "react-icons/si"
 import { CalendarIcon, Mail, Clock, Users, Video, CheckCircle } from "lucide-react"
+import ProgressCalendar from "@/components/ui/progress-calendar"
 
 // Breakpoint personalizado para pantallas muy pequeñas
 const useExtraSmallScreen = () => {
@@ -209,49 +210,23 @@ export const AIMeetingsAttachment = () => {
           {/* Calendar Showcase */}
           <div className="mb-12 max-w-2xl mx-auto">
             <div className="rounded-2xl border border-gray-500/20 p-4 bg-black/20 backdrop-blur-sm">
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-gray-200/10">
-                <div className="w-full h-full bg-gradient-to-br from-gray-900 to-black p-6">
-                  {/* Calendar Header */}
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-white text-lg font-medium">October 2025</h3>
-                    <div className="flex gap-2">
-                      <button className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
-                        <CalendarIcon className="w-4 h-4 text-white" />
-                      </button>
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-gray-200/10 p-4">
+                {/* Reemplazado por ProgressCalendar */}
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-white text-sm font-medium">Team activity</h3>
+                    <div className="flex items-center gap-2 text-[10px] text-white/60">
+                      <CalendarIcon className="w-3.5 h-3.5" />
+                      Synced
                     </div>
                   </div>
-
-                  {/* Calendar Grid */}
-                  <div className="grid grid-cols-7 gap-2 mb-4">
-                    {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
-                      <div key={day} className="text-center text-xs text-gray-400 font-medium p-2">
-                        {day}
-                      </div>
-                    ))}
-                    {Array.from({ length: 35 }, (_, i) => {
-                      const day = i - 6 + 1
-                      const isToday = day === 15
-                      const hasMeeting = [8, 12, 18, 22, 25].includes(day)
-
-                      return (
-                        <div
-                          key={i}
-                          className={`
-                            aspect-square flex items-center justify-center text-xs rounded-lg transition-all
-                            ${day > 0 && day <= 31 ? "text-white hover:bg-white/10" : "text-transparent"}
-                            ${isToday ? "bg-blue-500 text-white font-medium" : ""}
-                            ${hasMeeting ? "bg-emerald-500/20 border border-emerald-500/30" : ""}
-                          `}
-                        >
-                          {day > 0 && day <= 31 ? day : ""}
-                          {hasMeeting && <div className="absolute w-1 h-1 bg-emerald-400 rounded-full mt-3"></div>}
-                        </div>
-                      )
-                    })}
+                  <div className="bg-black/20 rounded-xl border border-white/10 p-3">
+                    <ProgressCalendar weeks={5} />
                   </div>
 
                   {/* Upcoming meetings */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 mt-3">
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
                       <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                       <div className="flex-1">

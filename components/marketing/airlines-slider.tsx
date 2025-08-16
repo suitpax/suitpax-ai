@@ -4,7 +4,9 @@ import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 
-const AirlinesSlider = () => {
+type AirlinesSliderProps = { variant?: "light" | "dark"; showHeader?: boolean }
+
+const AirlinesSlider = ({ variant = "light", showHeader = true }: AirlinesSliderProps) => {
   const sliderRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const [isClient, setIsClient] = useState(false)
@@ -63,30 +65,51 @@ const AirlinesSlider = () => {
 
   if (!isClient) {
     return (
-      <div className="w-full overflow-hidden bg-gray-100 rounded-2xl border border-gray-200">
-        <div className="px-4 pt-4 text-center">
-          <div className="inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700 mb-1.5">
-            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={14} height={14} className="mr-1 h-3 w-auto" />
-            Airline Partners
+      <div className={
+        "w-full overflow-hidden rounded-2xl " +
+        (variant === "dark" ? "bg-transparent border border-transparent" : "bg-gray-100 border border-gray-200")
+      }>
+        {showHeader && (
+          <div className={
+            "px-4 pt-4 text-center " +
+            (variant === "dark" ? "text-white" : "text-gray-900")
+          }>
+            <div className={
+              (variant === "dark"
+                ? "inline-flex items-center rounded-xl bg-white/10 backdrop-blur-sm px-2 py-0.5 text-[9px] font-medium text-white border border-white/20 mb-1.5"
+                : "inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700 mb-1.5")
+            }>
+              <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={14} height={14} className="mr-1 h-3 w-auto" />
+              Airline Partners
+            </div>
+            <h3 className={variant === "dark" ? "text-sm font-medium text-white" : "text-sm font-medium text-gray-900"}>Connected with leading airlines</h3>
+            <p className={variant === "dark" ? "text-[10px] text-white/70 mt-1" : "text-[10px] text-gray-600 mt-1"}>Direct integrations for faster, more reliable bookings</p>
           </div>
-          <h3 className="text-sm font-medium text-gray-900">Connected with leading airlines</h3>
-          <p className="text-[10px] text-gray-600 mt-1">Direct integrations for faster, more reliable bookings</p>
-        </div>
+        )}
         <div className="py-6 h-16" />
       </div>
     )
   }
 
   return (
-    <div className="w-full overflow-hidden bg-gray-100 rounded-2xl border border-gray-200">
-      <div className="px-4 pt-4 text-center">
-        <div className="inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700 mb-1.5">
-          <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={14} height={14} className="mr-1 h-3 w-auto" />
-          Airline Partners
+    <div className={
+      "w-full overflow-hidden rounded-2xl " +
+      (variant === "dark" ? "bg-transparent border border-transparent" : "bg-gray-100 border border-gray-200")
+    }>
+      {showHeader && (
+        <div className="px-4 pt-4 text-center">
+          <div className={
+            variant === "dark"
+              ? "inline-flex items-center rounded-xl bg-white/10 backdrop-blur-sm px-2 py-0.5 text-[9px] font-medium text-white border border-white/20 mb-1.5"
+              : "inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700 mb-1.5"
+          }>
+            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={14} height={14} className="mr-1 h-3 w-auto" />
+            Airline Partners
+          </div>
+          <h3 className={variant === "dark" ? "text-sm sm:text-base font-medium text-white" : "text-sm sm:text-base font-medium text-gray-900"}>Connected with leading airlines</h3>
+          <p className={variant === "dark" ? "text-[10px] sm:text-xs text-white/70 mt-1" : "text-[10px] sm:text-xs text-gray-600 mt-1"}>Direct integrations for faster, more reliable bookings</p>
         </div>
-        <h3 className="text-sm sm:text-base font-medium text-gray-900">Connected with leading airlines</h3>
-        <p className="text-[10px] sm:text-xs text-gray-600 mt-1">Direct integrations for faster, more reliable bookings</p>
-      </div>
+      )}
       <div className="py-5 relative overflow-hidden" ref={sliderRef}>
         <div 
           ref={contentRef}
@@ -100,19 +123,27 @@ const AirlinesSlider = () => {
               style={{ width: "72px" }}
               title={airline.name}
             >
-              <div className="relative h-7 flex items-center justify-center rounded-lg bg-white/70 border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow">
+              <div className={
+                variant === "dark"
+                  ? "relative h-7 flex items-center justify-center rounded-lg bg-white/10 border border-white/15 shadow-sm group-hover:shadow-md transition-shadow"
+                  : "relative h-7 flex items-center justify-center rounded-lg bg-white/70 border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow"
+              }>
                 <Image
                   src={airline.logo || "/placeholder.svg"}
                   alt={airline.name}
                   width={72}
                   height={28}
-                  className="h-3.5 w-auto object-contain invert-[0.85] saturate-0 contrast-150"
+                  className={
+                    variant === "dark"
+                      ? "h-3.5 w-auto object-contain invert"
+                      : "h-3.5 w-auto object-contain invert-[0.85] saturate-0 contrast-150"
+                  }
                   priority={index < airlines.length}
                   onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg" }}
                 />
               </div>
               <div className="mt-1.5 text-center">
-                <span className="text-[8px] text-gray-600 font-medium line-clamp-1">{airline.name}</span>
+                <span className={variant === "dark" ? "text-[8px] text-white/70 font-medium line-clamp-1" : "text-[8px] text-gray-600 font-medium line-clamp-1"}>{airline.name}</span>
               </div>
             </div>
           ))}

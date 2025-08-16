@@ -414,13 +414,13 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
       react:
-        specifier: ^19
+        specifier: ^19.1.0
         version: 19.1.0
       react-day-picker:
         specifier: 9.8.1
         version: 9.8.1(react@19.1.0)
       react-dom:
-        specifier: ^19
+        specifier: ^19.1.0
         version: 19.1.0(react@19.1.0)
       react-dropzone:
         specifier: latest
