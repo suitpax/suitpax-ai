@@ -3,6 +3,27 @@ import Plans from "@/components/marketing/plans"
 import ComparePlans from "@/components/marketing/compare-plans"
 import Script from "next/script"
 
+// Dynamic titles and subtitles (moved from Plans)
+const titleVariations = [
+	"Business travel plans for every team size.",
+	"AI-powered travel management for modern businesses.",
+	"Flexible plans for your business travel needs.",
+	"Scale your travel operations effortlessly.",
+	"Travel management that grows with your business.",
+	"Simple pricing for powerful travel tools.",
+	"Choose the right plan for your business.",
+	"Transparent pricing, exceptional value.",
+	"Plans designed for modern business travel.",
+	"Pricing that scales with your success.",
+]
+
+const subtitles = [
+	"Choose the plan that fits your business travel requirements and team size",
+	"Transparent pricing with no hidden fees, designed for business travel",
+	"Powerful AI travel agents with plans that scale as your team grows",
+	"Enterprise-grade travel management at startup-friendly prices",
+]
+
 export const metadata: Metadata = {
   title: "Pricing & Plans | Suitpax - AI-powered Business Travel Management",
   description:
@@ -39,6 +60,9 @@ export const metadata: Metadata = {
 }
 
 export default function PricingPage() {
+	const selectedTitle = titleVariations[Math.floor(Math.random() * titleVariations.length)]
+	const selectedSubtitle = subtitles[Math.floor(Math.random() * subtitles.length)]
+
   return (
     <>
       <Script
@@ -63,14 +87,16 @@ export default function PricingPage() {
       />
       
       <main className="flex min-h-screen flex-col pt-14 md:pt-16">
-        {/* Badge only; dynamic titles moved into Plans header */}
+        {/* Badge + dynamic titles (moved here) */}
         <section className="relative overflow-hidden bg-white">
           <div className="relative mx-auto max-w-7xl px-6 py-10 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
+            <div className="mx-auto max-w-3xl text-center">
               <div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
                 <span className="text-xs font-medium text-gray-700">Suitpax Pricing</span>
                 <span className="text-[10px] text-gray-500">Updated Q2 2025</span>
               </div>
+              <h1 className="mt-4 text-4xl font-semibold tracking-tighter text-black sm:text-6xl">{selectedTitle}</h1>
+              <p className="mt-3 text-base sm:text-lg font-medium text-gray-600">{selectedSubtitle}</p>
             </div>
           </div>
         </section>
