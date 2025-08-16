@@ -10,6 +10,7 @@ import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
 import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
 import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
 import ContactForm from "@/components/marketing/contact-form"
+import { default as LaunchHero } from "@/components/marketing/launch-hero"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -69,6 +70,7 @@ export default function Home() {
     <>
       <main id="main-content" className="w-full">
         <Hero />
+        <LaunchHero />
         <PartnersShowcase />
         <AITravelAgents />
         <BusinessTravelRevolution />
