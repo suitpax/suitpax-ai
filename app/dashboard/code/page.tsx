@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { EnhancedPromptInput } from "@/components/prompt-kit/enhanced-prompt-input"
 import { ChatContainer } from "@/components/prompt-kit/chat-container"
 import { createClient } from "@/lib/supabase/client"
+import { MCPRemoteServerList } from "@/components/dashboard/code/server-list"
 
 interface Message {
   id: string
@@ -76,9 +77,12 @@ export default function SuitpaxCodePage() {
         <p className="text-sm text-gray-600">Advanced coding assistant powered by Claude 3.7 Sonnet</p>
       </div>
 
-      <div className="flex-1 grid grid-rows-[1fr_auto] bg-white">
+      <div className="flex-1 grid grid-rows-[auto_1fr_auto] bg-white">
+        <div className="p-4 border-b border-gray-200 bg-white">
+          <MCPRemoteServerList />
+        </div>
         <div className="overflow-hidden">
-          <ChatContainer messages={messages} className="h-[calc(100vh-220px)]" />
+          <ChatContainer messages={messages} className="h-[calc(100vh-320px)]" />
         </div>
         <div className="p-4 border-t border-gray-200 bg-white">
           <EnhancedPromptInput
