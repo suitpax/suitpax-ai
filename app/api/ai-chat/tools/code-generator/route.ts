@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const enhanced = `\n${CODE_GENERATION_PROMPT}\n\n## Request\n- User request: ${query}\n- Language: ${language || "best-fit"}\n- Framework: ${framework || "best-fit"}\n\nProvide concise, production-ready code with minimal explanation. Include imports.`
 
     const res = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-7-sonnet-latest",
       max_tokens: 2000,
       system: CODE_GENERATION_PROMPT,
       messages: [{ role: "user", content: enhanced }],

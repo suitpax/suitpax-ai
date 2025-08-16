@@ -13,7 +13,7 @@ const featureCategories = [
     features: [
       {
         name: "Monthly AI Tokens",
-        description: "Number of AI tokens available for use each month",
+        description: "Number of AI tokens available for use each month (Claude 3.7 Sonnet across all plans)",
         free: "5,000",
         basic: "15,000",
         pro: "25,000",
@@ -21,7 +21,7 @@ const featureCategories = [
       },
       {
         name: "AI Travel Searches",
-        description: "Number of AI-powered travel searches per month",
+        description: "Number of AI-powered travel searches per month (same model, different limits)",
         free: "10/month",
         basic: "30/month",
         pro: "50/month",

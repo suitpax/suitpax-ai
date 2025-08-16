@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await anthropic.messages.create({
-      model: "claude-3-5-haiku-20241022",
+      model: "claude-3-7-sonnet-latest",
       max_tokens: 500,
       temperature: 0.7,
       system: `You are Suitpax Voice AI, a conversational travel assistant. You're designed for voice interactions, so:

@@ -19,10 +19,10 @@ export async function POST(req: NextRequest) {
       if (user?.id) {
         await supabase.from('ai_usage').insert({
           user_id: user.id,
-          model: result.model,
+          model: "claude-3-7-sonnet-latest",
           input_tokens: result.tokenUsage?.inputTokens || 0,
           output_tokens: result.tokenUsage?.outputTokens || Math.ceil(result.text.length / 4),
-          context_type: result.toolUsed || 'general',
+          context_type: (result.toolUsed || 'general'),
         })
       }
     } catch {}

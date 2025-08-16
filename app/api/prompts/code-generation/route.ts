@@ -42,7 +42,7 @@ Please provide a complete solution with all necessary files, configurations, and
     `
 
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-7-sonnet-latest",
       max_tokens: 8192,
       system: CODE_GENERATION_PROMPT,
       messages: [{ role: "user", content: enhancedPrompt }],
@@ -55,7 +55,7 @@ Please provide a complete solution with all necessary files, configurations, and
 
     await supabase.from("ai_usage").insert({
       user_id: user.id,
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-7-sonnet-latest",
       input_tokens: (response.usage as any)?.input_tokens || 0,
       output_tokens: (response.usage as any)?.output_tokens || 0,
       total_tokens: tokensUsed,

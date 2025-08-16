@@ -84,7 +84,7 @@ const pricingPlans = [
     period: "forever",
     annualPeriod: "forever",
     features: [
-      "5,000 AI tokens/month",
+      "5,000 AI tokens/month (Claude 3.7 Sonnet)",
       "10 AI travel searches per month",
       "Up to 5 team members",
       "Basic AI travel planning",
@@ -109,7 +109,7 @@ const pricingPlans = [
     period: "per month",
     annualPeriod: "per month, billed annually",
     features: [
-      "15,000 AI tokens/month",
+      "15,000 AI tokens/month (Claude 3.7 Sonnet)",
       "30 AI travel searches per month",
       "Up to 15 team members",
       "Standard AI travel planning",
@@ -135,7 +135,7 @@ const pricingPlans = [
     period: "per month",
     annualPeriod: "per month, billed annually",
     features: [
-      "25,000 AI tokens/month",
+      "25,000 AI tokens/month (Claude 3.7 Sonnet)",
       "50 AI travel searches per month",
       "Up to 25 team members",
       "AI-powered expense management",
@@ -167,7 +167,7 @@ const pricingPlans = [
     period: "tailored for enterprise",
     annualPeriod: "tailored for enterprise",
     features: [
-      "Unlimited AI tokens",
+      "Unlimited AI tokens (Claude 3.7 Sonnet)",
       "Unlimited AI travel searches",
       "Unlimited team members",
       "Full AI travel intelligence suite",

@@ -67,6 +67,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Determine per-request max_tokens based on plan (same model for all)
+    const { data: planLimitsOk } = await supabase.rpc("get_user_plan_limits", { user_uuid: user.id })
+    const planName = planLimitsOk?.[0]?.plan_name?.toLowerCase?.() || "free"
+    const planToMaxTokens: Record<string, number> = { free: 1024, basic: 2048, premium: 4096, pro: 4096, enterprise: 8192 }
+    const maxTokensForResponse = planToMaxTokens[planName] ?? 2048
+
     const isFlightIntent =
       /\b([A-Z]{3})\b.*\b(to|→|-|from)\b.*\b([A-Z]{3})\b/i.test(message) ||
       /\b(flight|flights|vuelo|vuelos|fly|flying|book|search)\b/i.test(message) ||
@@ -168,8 +174,8 @@ export async function POST(request: NextRequest) {
     }
 
     const initial = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
-      max_tokens: 4096,
+      model: "claude-3-7-sonnet-latest",
+      max_tokens: maxTokensForResponse,
       system: systemPrompt,
       messages: [...conversationHistory, { role: "user", content: enhancedMessage }],
     })
@@ -271,7 +277,7 @@ export async function POST(request: NextRequest) {
         : `Mensaje del usuario: ${message}\n\nRespuesta: ${text}\n\nExplica en 3–5 puntos el razonamiento de alto nivel.`
 
       const r = await anthropic.messages.create({
-        model: "claude-3-5-haiku-20241022",
+        model: "claude-3-7-sonnet-latest",
         max_tokens: 300,
         system: buildReasoningInstruction("es"),
         messages: [{ role: "user", content: reasoningPrompt }],
@@ -288,13 +294,13 @@ export async function POST(request: NextRequest) {
     try {
       await supabase.from("ai_usage").insert({
         user_id: user.id,
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-3-7-sonnet-latest",
         input_tokens: actualInputTokens,
         output_tokens: actualOutputTokens,
         total_tokens: totalTokensUsed,
         context_type: toolType,
         provider: "anthropic",
-        cost_usd: calculateTokenCost(totalTokensUsed, "claude-3-5-sonnet-20241022"),
+        cost_usd: calculateTokenCost(totalTokensUsed, "claude-3-7-sonnet-latest"),
       })
 
       // Also log to ai_chat_logs for backward compatibility
@@ -303,7 +309,7 @@ export async function POST(request: NextRequest) {
         message: message,
         response: text,
         tokens_used: totalTokensUsed,
-        model_used: "claude-3-5-sonnet-20241022",
+        model_used: "claude-3-7-sonnet-latest",
         context_type: toolType,
       })
     } catch (e) {

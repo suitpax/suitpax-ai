@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const { text } = await request.json()
 
     const { object } = await generateObject({
-      model: anthropic("claude-3-5-sonnet-20241022"),
+      model: anthropic("claude-3-7-sonnet-latest"),
       schema: PolicyDataSchema,
       prompt: `
         Analyze the following document text and extract structured data about the company's travel policies and requirements:
