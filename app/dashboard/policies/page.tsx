@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -32,7 +32,7 @@ import {
   Trash2,
   Target,
 } from "lucide-react"
-import { AdvancedOCRService } from "@/lib/ocr/advanced-ocr-service"
+// // import { AdvancedOCRService } from "@/lib/ocr/advanced-ocr-service"
 
 interface Policy {
   id: string
@@ -126,33 +126,41 @@ const DocumentUploadZone = ({ onDocumentAnalyzed }: { onDocumentAnalyzed: (analy
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisResults, setAnalysisResults] = useState<DocumentAnalysis[]>([])
   const [processingProgress, setProcessingProgress] = useState(0)
-  const ocrService = AdvancedOCRService.getInstance()
+  const [ocrReady, setOcrReady] = useState(false)
+  let ocrService: any = null
+  useEffect(() => {
+    // OCR now handled server-side in /api/ocr/process
+    setOcrReady(true)
+  }, [])
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       setIsAnalyzing(true)
       setProcessingProgress(0)
 
+      const form = new FormData()
       for (const [index, file] of acceptedFiles.entries()) {
+        form.set("file", file)
+        const res = await fetch("/api/ocr/process", { method: "POST", body: form })
+        const analysis = await res.json()
+
         try {
           setProcessingProgress(((index + 0.5) / acceptedFiles.length) * 100)
 
-          // Use real OCR service
-          const ocrResult = await ocrService.processDocument(file)
+          const analysis = await ocrService.processDocument(file)
 
-          // Convert OCR result to DocumentAnalysis format
-          const analysis: DocumentAnalysis = {
+          const documentAnalysis: DocumentAnalysis = {
             id: Math.random().toString(36).substr(2, 9),
             fileName: file.name,
-            extractedText: ocrResult.text,
-            detectedPolicyType: ocrResult.extractedData.policies?.length ? "travel" : "compliance",
-            confidence: ocrResult.confidence,
+            extractedText: analysis.text,
+            detectedPolicyType: analysis.extractedData.policies?.length ? "travel" : "compliance",
+            confidence: analysis.confidence,
             suggestedRules: [
               {
                 id: "auto-1",
                 type: "budget_limit",
                 condition: "daily_accommodation",
-                value: ocrResult.extractedData.budget || 300,
+                value: analysis.extractedData.budget || 300,
                 action: "require_approval",
               },
               {
@@ -163,19 +171,19 @@ const DocumentUploadZone = ({ onDocumentAnalyzed }: { onDocumentAnalyzed: (analy
                 action: "allow",
               },
             ],
-            companySize: ocrResult.extractedData.employeeCount
-              ? ocrResult.extractedData.employeeCount > 500
+            companySize: analysis.extractedData.employeeCount
+              ? analysis.extractedData.employeeCount > 500
                 ? "enterprise"
-                : ocrResult.extractedData.employeeCount > 50
+                : analysis.extractedData.employeeCount > 50
                   ? "sme"
                   : "startup"
               : "sme",
-            industry: ocrResult.extractedData.industry || "Technology",
+            industry: analysis.extractedData.industry || "Technology",
             uploadedAt: new Date().toISOString(),
           }
 
-          setAnalysisResults((prev) => [...prev, analysis])
-          onDocumentAnalyzed(analysis)
+          setAnalysisResults((prev) => [...prev, documentAnalysis])
+          onDocumentAnalyzed(documentAnalysis)
           setProcessingProgress(((index + 1) / acceptedFiles.length) * 100)
         } catch (error) {
           console.error("Document processing failed:", error)
@@ -207,7 +215,7 @@ const DocumentUploadZone = ({ onDocumentAnalyzed }: { onDocumentAnalyzed: (analy
       setIsAnalyzing(false)
       setProcessingProgress(0)
     },
-    [onDocumentAnalyzed, ocrService],
+    [onDocumentAnalyzed],
   )
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
