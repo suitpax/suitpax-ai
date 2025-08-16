@@ -11,13 +11,12 @@ import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
 import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
 import ContactForm from "@/components/marketing/contact-form"
 import { default as LaunchHero } from "@/components/marketing/launch-hero"
-import Product from "@/components/marketing/product"
 import TeamCollaborationShowcase from "@/components/marketing/team-collaboration-showcase"
 import IntelligentPolicyShowcase from "@/components/marketing/intelligent-policy-showcase"
 import BusinessTravelSlider from "@/components/marketing/business-travel-slider"
 import AirlinesSlider from "@/components/marketing/airlines-slider"
 import MCPAIAgents from "@/components/marketing/mcp-ai-agents"
-import SuitpaxAISection from "@/components/marketing/suitpax-ai-section"
+import SuitpaxPlatform from "@/components/marketing/suitpax-platform"
 import BusinessIntelligence from "@/components/marketing/business-intelligence"
 import SmartTravel from "@/components/marketing/smart-reporting"
 import GlobalBusinessAccess from "@/components/marketing/global-business-access"
@@ -92,13 +91,13 @@ export default function Home() {
         <OpsCopilot />
         <AgentCode />
         {/* Newly added blocks */}
-        <Product />
+        <SuitpaxPlatform />
         <TeamCollaborationShowcase />
         <IntelligentPolicyShowcase />
         <BusinessTravelSlider />
         <AirlinesSlider />
         <MCPAIAgents />
-        <SuitpaxAISection />
+                 {/* Suitpax AI now included in Suitpax Platform */}
         <AIFlightSection />
         <BusinessIntelligence />
         <SmartTravel />

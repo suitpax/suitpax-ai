@@ -25,8 +25,8 @@ const AirlinesSlider = () => {
     let position = 0
     const speed = 0.6
 
-    const cardWidth = 120
-    const gap = 32
+    const cardWidth = 88
+    const gap = 24
     const singleSetWidth = (cardWidth + gap) * airlines.length
 
     const animate = () => {
@@ -80,23 +80,23 @@ const AirlinesSlider = () => {
           {duplicatedAirlines.map((airline, index) => (
             <div
               key={`airline-${airline.name}-${index}`}
-              className="flex-shrink-0 mx-4 group"
-              style={{ width: "120px" }}
+              className="flex-shrink-0 mx-3 group"
+              style={{ width: "88px" }}
               title={airline.name}
             >
-              <div className="relative h-10 flex items-center justify-center rounded-lg bg-white/70 border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow">
+              <div className="relative h-8 flex items-center justify-center rounded-lg bg-white/70 border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow">
                 <Image
                   src={airline.logo || "/placeholder.svg"}
                   alt={airline.name}
-                  width={120}
-                  height={40}
-                  className="h-6 w-auto object-contain invert-[0.8] saturate-0 contrast-150"
+                  width={88}
+                  height={32}
+                  className="h-4.5 w-auto object-contain invert-[0.85] saturate-0 contrast-150"
                   priority={index < airlines.length}
                   onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg" }}
                 />
               </div>
               <div className="mt-2 text-center">
-                <span className="text-[10px] text-gray-600 font-medium line-clamp-1">{airline.name}</span>
+                <span className="text-[9px] text-gray-600 font-medium line-clamp-1">{airline.name}</span>
               </div>
             </div>
           ))}
