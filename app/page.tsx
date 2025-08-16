@@ -28,6 +28,7 @@ import PolicyCTA from "@/components/marketing/policy-cta"
 import OpsCopilot from "@/components/marketing/ops-copilot"
 import AgentCode from "@/components/marketing/agent-code"
 import AIFlightSection from "@/components/marketing/ai-flight-section"
+import Plans from "@/components/marketing/plans"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -107,6 +108,7 @@ export default function Home() {
         <TeamExpenseGuide />
         <TravelRewards />
         <PolicyCTA />
+        <Plans />
 
         {/* Existing order retained below */}
         <PartnersShowcase />

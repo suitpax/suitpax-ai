@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { PiDotsSixBold } from "react-icons/pi"
+import { PiDotsSixBold, PiDotsNineBold } from "react-icons/pi"
 import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
 import { FaDiscord } from "react-icons/fa"
 import { useMediaQuery } from "@/hooks/use-media-query"
@@ -148,7 +148,7 @@ export default function Navigation() {
               className="p-1.5 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
             >
               <div className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
-                <PiDotsSixBold size={18} />
+                {isOpen ? <PiDotsSixBold size={18} /> : <PiDotsNineBold size={18} />}
               </div>
             </button>
           )}
