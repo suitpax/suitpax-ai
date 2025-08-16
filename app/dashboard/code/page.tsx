@@ -7,6 +7,8 @@ import { ChatContainer } from "@/components/prompt-kit/chat-container"
 import { createClient } from "@/lib/supabase/client"
 import { MCPRemoteServerList } from "@/components/dashboard/code/server-list"
 import { MCPToolRunner } from "@/components/dashboard/code/tool-runner"
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import { useTheme } from "next-themes"
 
 interface Message {
   id: string
@@ -19,6 +21,7 @@ interface Message {
 export default function SuitpaxCodePage() {
   const supabase = createClient()
   const router = useRouter()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const [plan, setPlan] = useState<string>("free")
   const [loading, setLoading] = useState(true)
   const [input, setInput] = useState("")
@@ -27,6 +30,16 @@ export default function SuitpaxCodePage() {
   const [previewHtml, setPreviewHtml] = useState<string>("")
   const [limits, setLimits] = useState<any>(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
+
+  // Auto theme by time (after mount)
+  useEffect(() => {
+    const hour = new Date().getHours()
+    const auto = hour >= 21 || hour < 6 ? "dark" : "light"
+    // Only set if user hasn't changed manually in this session
+    if (typeof window !== "undefined" && !sessionStorage.getItem("suitpax.theme.manual")) {
+      setTheme(auto)
+    }
+  }, [setTheme])
 
   useEffect(() => {
     const load = async () => {
@@ -135,16 +148,29 @@ export default function SuitpaxCodePage() {
   if (loading) return null
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <VantaHaloBackground className="relative min-h-screen">
       {/* Header */}
-      <div className="px-5 pt-5 pb-3 border-b border-gray-200 bg-white">
-        <h1 className="text-lg font-medium tracking-tighter text-black">Suitpax Code</h1>
-        <p className="text-[12px] text-gray-600">An AI coding agent to design and ship real UIs. Copy, download or preview your code.</p>
+      <div className="px-5 pt-6 pb-3 border-b border-gray-200/60 bg-white/80 backdrop-blur-md">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-medium tracking-tighter text-black">Suitpax Code</h1>
+            <p className="text-[12px] text-gray-600">AI coding agent for business travelers — design real UIs and ship.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { sessionStorage.setItem("suitpax.theme.manual", "1"); setTheme(resolvedTheme === "dark" ? "light" : "dark") }}
+              className="px-3 py-1.5 text-xs border rounded-lg bg-white/70 hover:bg-white"
+              aria-label="Toggle theme"
+            >
+              {resolvedTheme === "dark" ? "Light" : "Dark"}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Tools */}
       <div className="grid grid-rows-[auto_1fr_auto]">
-        <div className="p-4 border-b border-gray-200 bg-white">
+        <div className="p-4 border-b border-gray-200/60 bg-white/80 backdrop-blur-md">
           <div className="grid gap-3 md:grid-cols-2">
             <MCPRemoteServerList />
             <div className="hidden md:block" />
@@ -157,7 +183,7 @@ export default function SuitpaxCodePage() {
         {/* Chat + Preview */}
         <div className="overflow-hidden grid grid-cols-1 xl:grid-cols-2">
           <ChatContainer messages={messages} className="h-[calc(100vh-330px)] p-6" />
-          <div className="border-t xl:border-t-0 xl:border-l border-gray-200 bg-white">
+          <div className="border-t xl:border-t-0 xl:border-l border-gray-200/60 bg-white/80 backdrop-blur-md">
             <div className="flex items-center justify-between p-3">
               <div className="text-xs font-medium">Preview</div>
               <div className="flex gap-2">
@@ -171,13 +197,13 @@ export default function SuitpaxCodePage() {
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t border-gray-200 bg-white">
+        <div className="p-4 border-t border-gray-200/60 bg-white/80 backdrop-blur-md">
           <EnhancedPromptInput
             value={input}
             onChange={setInput}
             onSubmit={send}
             isLoading={isSending}
-            placeholder={"Design a responsive landing hero for a B2B SaaS in Tailwind (with CTA). Return ONLY a full HTML page or a full TSX component."}
+            placeholder={"Design a responsive travel expense dashboard widget (Tailwind). Return ONLY a full HTML page or a full TSX component."}
           />
         </div>
       </div>
@@ -196,6 +222,6 @@ export default function SuitpaxCodePage() {
           </div>
         </div>
       )}
-    </div>
+    </VantaHaloBackground>
   )
 }
