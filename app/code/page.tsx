@@ -12,7 +12,7 @@ export default function CodePage() {
   return (
     <main className="min-h-screen bg-white">
       <section className="relative overflow-hidden bg-white">
-        <div className="relative mx-auto max-w-7xl px-6 py-10 lg:px-8">
+        <div className="relative mx-auto max-w-7xl px-6 pt-10 pb-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
               <span className="text-[10px] font-medium text-gray-700">Suitpax</span>
@@ -39,12 +39,14 @@ export default function CodePage() {
       </section>
 
       {/* Live demos already built */}
-      <LaunchHero />
-      <OpsCopilot />
-      <AgentCode />
+      <div className="space-y-6 lg:space-y-8">
+        <LaunchHero />
+        <OpsCopilot />
+        <AgentCode />
+      </div>
 
       {/* Capabilities */}
-      <section className="py-12">
+      <section className="py-10 md:py-12">
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="text-2xl md:text-3xl font-medium tracking-tighter text-black mb-4">What you can build</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -67,7 +69,7 @@ export default function CodePage() {
       </section>
 
       {/* SDK + CLI */}
-      <section className="py-8 bg-gray-50">
+      <section className="py-8 md:py-10 bg-gray-50">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="rounded-2xl border border-gray-200 p-5 bg-white">
@@ -96,7 +98,7 @@ cd app && pnpm dev`}
       </section>
 
       {/* CTA */}
-      <section className="py-12">
+      <section className="py-10 md:py-12">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <p className="text-sm text-gray-600">Get early access</p>
           <h3 className="text-2xl md:text-3xl font-medium tracking-tighter text-black mt-1">Try Suitpax Code</h3>

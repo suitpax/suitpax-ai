@@ -16,13 +16,10 @@ import IntelligentPolicyShowcase from "@/components/marketing/intelligent-policy
 import BusinessTravelSlider from "@/components/marketing/business-travel-slider"
 import AirlinesSlider from "@/components/marketing/airlines-slider"
 import MCPAIAgents from "@/components/marketing/mcp-ai-agents"
-import SuitpaxPlatform from "@/components/marketing/suitpax-platform"
 import BusinessIntelligence from "@/components/marketing/business-intelligence"
 import SmartTravel from "@/components/marketing/smart-reporting"
-import GlobalBusinessAccess from "@/components/marketing/global-business-access"
 import ExpenseManagement from "@/components/marketing/expense-management"
 import TRMManagement from "@/components/marketing/trm-management"
-import TeamExpenseGuide from "@/components/marketing/team-expense-guide"
 import TravelRewards from "@/components/marketing/travel-rewards"
 import PolicyCTA from "@/components/marketing/policy-cta"
 import OpsCopilot from "@/components/marketing/ops-copilot"
@@ -91,8 +88,6 @@ export default function Home() {
         <LaunchHero />
         <OpsCopilot />
         <AgentCode />
-        {/* Newly added blocks */}
-        <SuitpaxPlatform />
         <TeamCollaborationShowcase />
         <IntelligentPolicyShowcase />
         <BusinessTravelSlider />
@@ -102,10 +97,8 @@ export default function Home() {
         <AIFlightSection />
         <BusinessIntelligence />
         <SmartTravel />
-        <GlobalBusinessAccess />
         <ExpenseManagement />
         <TRMManagement />
-        <TeamExpenseGuide />
         <TravelRewards />
         <PolicyCTA />
         <Plans />

@@ -108,7 +108,7 @@ export const LaunchHero = () => {
 						<span className="text-[10px] font-medium text-gray-700">Suitpax Code</span>
 						<span className="text-[10px] text-gray-500">Private preview</span>
 					</div>
-					<h1 className="mt-4 text-5xl sm:text-6xl tracking-tight text-gray-900">
+					<h1 className="mt-4 text-4xl sm:text-5xl tracking-tight text-gray-900">
 						<span className="font-serif italic">Build</span> faster with <span className="font-medium">Suitpax Code</span>
 					</h1>
 					<p className="mt-3 text-lg text-gray-600 font-medium max-w-3xl mx-auto">
