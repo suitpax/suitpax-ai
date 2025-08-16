@@ -3,209 +3,124 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { SiSlack } from "react-icons/si"
 
-// Componente de contador
-const LaunchCountdown = () => {
-  // Fecha de lanzamiento (72 días desde el 28 de abril de 2025)
-  const launchDate = new Date("2025-07-09T00:00:00")
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  })
-
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date()
-      const difference = launchDate.getTime() - now.getTime()
-
-      if (difference > 0) {
-        setTimeLeft({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((difference / 1000 / 60) % 60),
-          seconds: Math.floor((difference / 1000) % 60),
-        })
-      }
-    }
-
-    calculateTimeLeft()
-    const timer = setInterval(calculateTimeLeft, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
-
-  return (
-    <div className="flex items-center justify-center gap-4 mt-6">
-      <div className="flex flex-col items-center">
-        <div className="text-2xl md:text-2xl font-medium text-white">{timeLeft.days}</div>
-        <div className="text-xs text-gray-400 uppercase tracking-wider font-light">Days</div>
-      </div>
-      <div className="text-xl text-gray-500">:</div>
-      <div className="flex flex-col items-center">
-        <div className="text-2xl md:text-2xl font-medium text-white">{timeLeft.hours}</div>
-        <div className="text-xs text-gray-400 uppercase tracking-wider font-light">Hours</div>
-      </div>
-      <div className="text-xl text-gray-500">:</div>
-      <div className="flex flex-col items-center">
-        <div className="text-2xl md:text-2xl font-medium text-white">{timeLeft.minutes}</div>
-        <div className="text-xs text-gray-400 uppercase tracking-wider font-light">Minutes</div>
-      </div>
-      <div className="text-xl text-gray-500">:</div>
-      <div className="flex flex-col items-center">
-        <div className="text-2xl md:text-2xl font-medium text-white">{timeLeft.seconds}</div>
-        <div className="text-xs text-gray-400 uppercase tracking-wider font-light">Seconds</div>
-      </div>
-    </div>
-  )
+const Countdown = () => {
+	const launchDate = new Date("2026-01-15T00:00:00")
+	const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+	useEffect(() => {
+		const tick = () => {
+			const now = new Date()
+			const diff = launchDate.getTime() - now.getTime()
+			if (diff > 0) {
+				setTimeLeft({
+					days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+					hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+					minutes: Math.floor((diff / 1000 / 60) % 60),
+					seconds: Math.floor((diff / 1000) % 60),
+				})
+			}
+		}
+		tick()
+		const t = setInterval(tick, 1000)
+		return () => clearInterval(t)
+	}, [])
+	return (
+		<div className="mt-6 inline-flex items-center gap-4 text-gray-600">
+			<div className="flex flex-col items-center">
+				<div className="text-2xl font-medium text-gray-900">{timeLeft.days}</div>
+				<div className="text-[10px] uppercase tracking-wide">Days</div>
+			</div>
+			<div className="text-lg">:</div>
+			<div className="flex flex-col items-center">
+				<div className="text-2xl font-medium text-gray-900">{timeLeft.hours}</div>
+				<div className="text-[10px] uppercase tracking-wide">Hours</div>
+			</div>
+			<div className="text-lg">:</div>
+			<div className="flex flex-col items-center">
+				<div className="text-2xl font-medium text-gray-900">{timeLeft.minutes}</div>
+				<div className="text-[10px] uppercase tracking-wide">Minutes</div>
+			</div>
+			<div className="text-lg">:</div>
+			<div className="flex flex-col items-center">
+				<div className="text-2xl font-medium text-gray-900">{timeLeft.seconds}</div>
+				<div className="text-[10px] uppercase tracking-wide">Seconds</div>
+			</div>
+		</div>
+	)
 }
 
-// Mini Chat para Launch Hero (estilo Hyperspeed)
-const LaunchMiniChat = () => {
-  const [isHovered, setIsHovered] = useState(false)
-  const [agentId, setAgentId] = useState(15)
-
-  useEffect(() => {
-    // Seleccionar un agente aleatorio entre varios IDs
-    const agentIds = [10, 15, 22, 33, 40, 42]
-    const randomIndex = Math.floor(Math.random() * agentIds.length)
-    setAgentId(agentIds[randomIndex])
-  }, [])
-
-  return (
-    <motion.div
-      className="relative flex items-center gap-3 p-2 px-4 rounded-xl border border-gray-700/50 bg-black/80 backdrop-blur-md shadow-lg w-auto max-w-[420px] mx-auto"
-      whileHover={{ scale: 1.05 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-    >
-      <div className="relative w-8 h-8 overflow-hidden rounded-xl border border-gray-600/50">
-        <Image
-          src={`/agents/agent-${agentId}.png`}
-          alt="Suitpax AI Agent"
-          width={32}
-          height={32}
-          className="w-full h-full object-cover object-center"
-        />
-      </div>
-      <div className="flex-1 py-0.5 px-1.5 text-xs text-gray-200 h-8 flex items-center overflow-hidden">
-        <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-          Welcome to the open-world of business travel
-        </span>
-      </div>
-      <motion.div
-        animate={isHovered ? { x: [0, 3, 0] } : {}}
-        transition={{ repeat: isHovered ? Number.POSITIVE_INFINITY : 0, duration: 1 }}
-      >
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-gray-200 mr-1"
-        >
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </motion.div>
-
-      {/* Pulse effect on hover */}
-      {isHovered && (
-        <motion.div
-          className="absolute inset-0 rounded-xl bg-emerald-500/10"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 0.2, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.2 }}
-          transition={{ duration: 0.5, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }}
-        />
-      )}
-    </motion.div>
-  )
+const AgentMiniBlock = () => {
+	const [agentSrc, setAgentSrc] = useState("/agents/agent-emma.jpeg")
+	useEffect(() => {
+		const pool = [
+			"/agents/agent-emma.jpeg",
+			"/agents/agent-marcus.jpeg",
+			"/agents/agent-sophia.jpeg",
+			"/agents/agent-alex.jpeg",
+		]
+		setAgentSrc(pool[Math.floor(Math.random() * pool.length)])
+	}, [])
+	return (
+		<div className="w-full max-w-xl mx-auto bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-2 shadow-sm">
+			<div className="flex items-center gap-3">
+				<div className="relative w-12 h-12 rounded-xl overflow-hidden border border-gray-200">
+					<Image src={agentSrc} alt="AI Agent" width={48} height={48} className="w-full h-full object-cover" />
+					<div className="absolute -top-1 -right-1 flex items-center gap-1">
+						<span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+						<span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse [animation-delay:150ms]"></span>
+						<span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse [animation-delay:300ms]"></span>
+					</div>
+				</div>
+				<div className="flex-1 min-w-0">
+					<div className="text-[11px] text-gray-500">Suitpax Code Agent</div>
+					<div className="text-sm font-medium text-gray-900 truncate">Build a UI for a travel policy editor in React</div>
+				</div>
+			</div>
+			<div className="mt-2 flex items-center gap-2">
+				<div className="flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600">
+					<span className="text-gray-400">Prompt</span>: Create a minimal settings panel with tabs for Company, Policies, and Approvals
+				</div>
+				<div className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700">▶︎ 00:12</div>
+			</div>
+		</div>
+	)
 }
 
 export const LaunchHero = () => {
-  return (
-    <section className="w-full bg-black py-20 relative overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-[0.02] bg-repeat bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px]"></div>
-
-      {/* Elementos disruptivos */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Orbes tecnológicos */}
-        <div className="absolute top-1/4 right-[5%] w-64 h-64 rounded-full bg-gradient-to-br from-sky-500/5 to-purple-500/5 blur-3xl"></div>
-        <div className="absolute bottom-1/4 left-[5%] w-80 h-80 rounded-full bg-gradient-to-tr from-emerald-500/5 to-sky-500/5 blur-3xl"></div>
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto">
-          {/* Header con título mejorado */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center rounded-xl bg-black/80 border border-gray-800 backdrop-blur-md px-3 py-1 text-[10px] font-medium text-gray-300 mb-3">
-              <Image
-                src="/logo/suitpax-cloud-logo.webp"
-                alt="Suitpax"
-                width={16}
-                height={16}
-                className="mr-1.5 h-3.5 w-auto"
-              />
-              Launching Soon
-            </div>
-
-            {/* Título impactante */}
-            <h2 className="text-2xl font-medium tracking-tighter leading-tight mb-4 py-2">
-              <span className="bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text">
-                The next-gen of business travel
-              </span>
-            </h2>
-
-            <p className="text-gray-400 text-sm sm:text-base font-medium max-w-2xl mx-auto mb-2">
-              Support our project with technical collaboration and feedback. Join us in creating the most intelligent,
-              seamless travel experience ever designed.
-            </p>
-
-            <p className="text-gray-500 text-xs sm:text-sm font-light max-w-xl mx-auto">
-              Join the waitlist today and be among the first pioneers to experience the future of business travel
-              management.
-            </p>
-
-            {/* Contador de lanzamiento */}
-            <LaunchCountdown />
-
-            {/* Mini Chat para Launch */}
-            <div className="mt-8 max-w-xs mx-auto">
-              <LaunchMiniChat />
-            </div>
-
-            {/* Botones de acción */}
-            <div className="flex justify-center mt-10">
-              <a
-                href="https://join.slack.com/t/suitpax/shared_invite/zt-2f0iqxw3h-KjHPE9hTkakzG9XJfpZmXQ"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center rounded-xl bg-black/80 border border-gray-700 backdrop-blur-md px-4 py-2 text-xs font-medium text-gray-300 hover:bg-black/60 transition-all duration-300 hover:scale-105 shadow-[0_0_15px_rgba(229,231,235,0.15)] hover:shadow-[0_0_20px_rgba(229,231,235,0.25)]"
-              >
-                <Image
-                  src="/logo/suitpax-cloud-logo.webp"
-                  alt="Suitpax"
-                  width={20}
-                  height={20}
-                  className="mr-2 h-4 w-auto"
-                />
-                <SiSlack className="mr-2 h-4 w-4 text-gray-300" />
-                Collaborate with us
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
+	return (
+		<section className="w-full bg-white py-16 sm:py-20 relative overflow-hidden">
+			<div className="absolute inset-0 pointer-events-none">
+				<div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-gray-100 blur-3xl" />
+				<div className="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-gray-100 blur-3xl" />
+			</div>
+			<div className="container mx-auto px-4 relative z-10">
+				<div className="max-w-5xl mx-auto text-center">
+					<div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
+						<span className="text-[10px] font-medium text-gray-700">Suitpax Code</span>
+						<span className="text-[10px] text-gray-500">Private preview</span>
+					</div>
+					<h1 className="mt-4 text-5xl sm:text-6xl tracking-tight text-gray-900">
+						<span className="font-serif italic">Build</span> faster with <span className="font-medium">Suitpax Code</span>
+					</h1>
+					<p className="mt-3 text-lg text-gray-600 font-medium max-w-3xl mx-auto">
+						Create production-grade UIs, tools, and dashboards in minutes. Collaborate with AI agents that understand your
+						business and your stack.
+					</p>
+					<div className="mt-4">
+						<Countdown />
+					</div>
+					<div className="mt-8">
+						<AgentMiniBlock />
+					</div>
+					<div className="mt-8 flex items-center justify-center gap-3">
+						<a href="/pricing#code" className="rounded-xl border border-black bg-black text-white px-4 py-2 text-sm font-medium hover:bg-gray-800 transition-colors">Join waitlist</a>
+						<a href="/dashboard/code" className="rounded-xl border border-gray-300 bg-white text-gray-900 px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors">See preview</a>
+					</div>
+					<div className="mt-6 text-[11px] text-gray-500">Custom pricing planned Q1 2026</div>
+				</div>
+			</div>
+		</section>
+	)
 }
 
 export default LaunchHero
