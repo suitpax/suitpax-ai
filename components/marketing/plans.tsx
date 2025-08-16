@@ -359,7 +359,7 @@ const MissionValues = () => {
   )
 }
 
-export const Plans = () => {
+export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
   const [randomTitle, setRandomTitle] = useState("")
   const [randomSubtitle, setRandomSubtitle] = useState("")
   const [isAnnual, setIsAnnual] = useState(false)
@@ -397,39 +397,41 @@ export const Plans = () => {
     <>
       <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto px-4 md:px-6">
-          <motion.div
-            className="flex flex-col items-center justify-center text-center mb-12 sm:mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-flex flex-wrap items-center justify-center gap-3 mb-4 sm:mb-6 bg-gray-50 border border-gray-200 px-3 py-2 rounded-full">
-              <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
-                Suitpax Pricing
-              </span>
-              <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
-                Updated Q2 2025
-              </span>
-            </div>
+          {!hideHeader && (
+            <motion.div
+              className="flex flex-col items-center justify-center text-center mb-12 sm:mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="inline-flex flex-wrap items-center justify-center gap-3 mb-4 sm:mb-6 bg-gray-50 border border-gray-200 px-3 py-2 rounded-full">
+                <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
+                  Suitpax Pricing
+                </span>
+                <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
+                  Updated Q2 2025
+                </span>
+              </div>
 
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
-              {randomTitle}
-            </h2>
-            <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6 sm:mb-8">{randomSubtitle}</p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
+                {randomTitle}
+              </h2>
+              <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6 sm:mb-8">{randomSubtitle}</p>
 
-            <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
-              <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
-                <span className="font-medium">Flexible Solutions</span>
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
+                <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
+                  <span className="font-medium">Flexible Solutions</span>
+                </div>
+                <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
+                  <span className="font-medium">Artificial Intelligence</span>
+                </div>
+                <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
+                  <span className="font-medium">Scalability</span>
+                </div>
               </div>
-              <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
-                <span className="font-medium">Artificial Intelligence</span>
-              </div>
-              <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
-                <span className="font-medium">Scalability</span>
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
 
           <div className="flex justify-center mb-8">
             <div className="flex items-center bg-gray-100 p-1 rounded-full">

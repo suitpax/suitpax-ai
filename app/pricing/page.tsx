@@ -63,20 +63,14 @@ export default function PricingPage() {
       />
       
       <main className="flex min-h-screen flex-col pt-14 md:pt-16">
-        {/* Hero Section modern black/gray/white */}
+        {/* Badge only; dynamic titles moved into Plans header */}
         <section className="relative overflow-hidden bg-white">
-          <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="relative mx-auto max-w-7xl px-6 py-10 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
-              <div className="inline-flex items-center gap-2 mb-4 bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
+              <div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
                 <span className="text-xs font-medium text-gray-700">Suitpax Pricing</span>
                 <span className="text-[10px] text-gray-500">Updated Q2 2025</span>
               </div>
-              <h1 className="text-4xl font-semibold tracking-tighter text-black sm:text-6xl">
-                Transparent pricing, exceptional value
-              </h1>
-              <p className="mt-4 text-base sm:text-lg font-medium text-gray-600">
-                Choose the plan that fits your team. No hidden fees. Simple black/gray/white aesthetics.
-              </p>
             </div>
           </div>
         </section>
@@ -86,7 +80,7 @@ export default function PricingPage() {
           <h2 id="pricing-plans-heading" className="sr-only">
             Suitpax Pricing Plans
           </h2>
-          <Plans />
+          <Plans hideHeader />
         </section>
 
         {/* Compare Plans Section */}
