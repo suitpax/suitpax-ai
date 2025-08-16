@@ -616,9 +616,7 @@ export const HyperspeedBooking = () => {
 
           {/* Airlines Slider sin borde */}
           <div className="mt-10 sm:mt-12">
-            <p className="text-center text-gray-400 text-[10px] sm:text-xs mb-2 sm:mb-3">
-              Connected with leading airlines worldwide
-            </p>
+
             <AirlinesSlider />
           </div>
         </div>

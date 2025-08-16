@@ -501,9 +501,8 @@ export const MCPAIAgents = () => {
           </div>
 
           <div className="relative inline-block">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-black mb-3 leading-none">
-              {typingText}
-              {isTyping && <span className="inline-block w-1 h-12 bg-black ml-1 animate-blink"></span>}
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter text-black mb-3 leading-none">
+              Model context protocol for AI Agents
             </h2>
           </div>
 
