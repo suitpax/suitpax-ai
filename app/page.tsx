@@ -27,7 +27,6 @@ import TeamExpenseGuide from "@/components/marketing/team-expense-guide"
 import TravelRewards from "@/components/marketing/travel-rewards"
 import PolicyCTA from "@/components/marketing/policy-cta"
 import OpsCopilot from "@/components/marketing/ops-copilot"
-import Hiring from "@/components/marketing/hiring"
 import AgentCode from "@/components/marketing/agent-code"
 import AIFlightSection from "@/components/marketing/ai-flight-section"
 import type { Metadata } from "next"
@@ -120,7 +119,6 @@ export default function Home() {
         <AgenticDisruption />
         <AIVoiceAssistant />
         <AIMeetingsAttachment />
-        <Hiring />
         <ContactForm />
         <FoundersOpenLetter />
       </main>
