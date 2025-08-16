@@ -61,8 +61,8 @@ export default function Product() {
               Demo
             </span>
           </div>
-          <h2 className="text-2xl md:text-2xl lg:text-2xl font-medium tracking-tighter text-black leading-none mb-4">
-            Our Products & Services
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none mb-4">
+            <em className="font-serif italic">Our Products & Services</em>
           </h2>
           <p className="text-sm text-gray-600 max-w-2xl">
             Discover how our solutions transform corporate travel and expense management for businesses of all sizes.
