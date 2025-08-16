@@ -29,6 +29,7 @@ import PolicyCTA from "@/components/marketing/policy-cta"
 import OpsCopilot from "@/components/marketing/ops-copilot"
 import Hiring from "@/components/marketing/hiring"
 import AgentCode from "@/components/marketing/agent-code"
+import AIFlightSection from "@/components/marketing/ai-flight-section"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -99,6 +100,7 @@ export default function Home() {
         <AirlinesSlider />
         <MCPAIAgents />
         <SuitpaxAISection />
+        <AIFlightSection />
         <BusinessIntelligence />
         <SmartTravel />
         <GlobalBusinessAccess />
