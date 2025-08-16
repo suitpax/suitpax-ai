@@ -1,5 +1,5 @@
 export type SystemPromptOptions = {
-  domain?: Array<"travel" | "coding" | "business" | "general">
+  domain?: Array<"travel" | "coding" | "business" | "general" | "documents" | "expenses">
   language?: "es" | "en"
   style?: {
     tone?: "journalistic" | "friendly" | "technical"
@@ -8,7 +8,7 @@ export type SystemPromptOptions = {
   }
 }
 
-const BASE_PROMPT = `You are Suitpax AI, an expert enterprise assistant. Answer concisely and helpfully.`
+const BASE_PROMPT = `You are Suitpax AI, an expert enterprise assistant. Answer concisely and helpfully. Default to the user's language when clear (es or en).`
 
 const STYLE_RULES = `
 Format rules:
@@ -24,6 +24,8 @@ Travel assistance:
 - When the user asks for flights, include a short textual summary and append a structured block with offers using the exact wrapper:
   :::flight_offers_json\n{"offers": [...]}\n:::
 - Keep prices, airline, IATA, times and stops in the JSON. Show up to 5 best options.
+- For airport codes, use IATA (3 letters). If the user mentions city names, infer the most likely airport.
+- Maintain policy awareness if user/company policies are provided.
 `.trim()
 
 const CODING_RULES = `
@@ -46,6 +48,16 @@ export function buildSystemPrompt(options: SystemPromptOptions = {}): string {
   if (domain.has("coding")) parts.push(CODING_RULES)
   if (domain.has("business")) parts.push(BUSINESS_RULES)
   return parts.join("\n\n").trim()
+}
+
+export function buildToolContext(toolType?: string, toolData?: any) {
+  if (!toolType || !toolData?.success) return ""
+  try {
+    const clean = JSON.stringify(toolData)
+    return `\n\nTool results (${toolType}):\n${clean}`
+  } catch {
+    return ""
+  }
 }
 
 export function buildReasoningInstruction(language: "es" | "en" = "es"): string {

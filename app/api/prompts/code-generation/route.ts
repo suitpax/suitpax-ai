@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { CODE_GENERATION_PROMPT } from "@/lib/prompts/enhanced-system"
+import { SUITPAX_CODE_SYSTEM_PROMPT } from "@/lib/prompts/code"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
@@ -22,8 +22,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
 
+    // Check Code add-on token limits
+    const estInput = Math.ceil((prompt + (language || "") + (framework || "")).length / 4)
+    const estOutput = 2000
+    const { data: canUseCode } = await supabase.rpc("can_use_code_tokens", { user_uuid: user.id, tokens_needed: estInput + estOutput })
+    if (!canUseCode) {
+      const { data: limits } = await supabase.rpc("get_user_subscription_limits", { user_uuid: user.id })
+      return NextResponse.json({ error: "Code add-on limit exceeded", limits: limits?.[0] || null, upgradeRequired: true }, { status: 429 })
+    }
+
     const enhancedPrompt = `
-${CODE_GENERATION_PROMPT}
+${SUITPAX_CODE_SYSTEM_PROMPT}
 
 ## Request Details
 - **Language/Framework**: ${language || "Best choice for the task"} ${framework ? `with ${framework}` : ""}
@@ -33,18 +42,15 @@ ${CODE_GENERATION_PROMPT}
 ## Requirements
 1. Generate complete, production-ready code
 2. Include proper error handling and validation
-3. Add comprehensive comments and documentation
-4. Provide setup and deployment instructions
-5. Follow best practices for the chosen technology stack
-6. Include testing strategies where applicable
-
-Please provide a complete solution with all necessary files, configurations, and documentation.
+3. Provide setup and deployment instructions
+4. Follow best practices for the chosen technology stack
+5. Include testing strategies where applicable
     `
 
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-7-sonnet-20250219",
       max_tokens: 8192,
-      system: CODE_GENERATION_PROMPT,
+      system: SUITPAX_CODE_SYSTEM_PROMPT,
       messages: [{ role: "user", content: enhancedPrompt }],
     })
 
@@ -55,7 +61,7 @@ Please provide a complete solution with all necessary files, configurations, and
 
     await supabase.from("ai_usage").insert({
       user_id: user.id,
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-7-sonnet-20250219",
       input_tokens: (response.usage as any)?.input_tokens || 0,
       output_tokens: (response.usage as any)?.output_tokens || 0,
       total_tokens: tokensUsed,
@@ -63,6 +69,9 @@ Please provide a complete solution with all necessary files, configurations, and
       provider: "anthropic",
       cost_usd: (tokensUsed / 1000) * 0.003,
     })
+
+    // Increment Code tokens usage
+    await supabase.rpc("increment_code_tokens", { p_user: user.id, p_tokens: tokensUsed })
 
     return NextResponse.json({
       code: generatedCode,

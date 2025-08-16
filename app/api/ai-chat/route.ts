@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { buildSystemPrompt, buildReasoningInstruction } from "@/lib/prompts/system"
+import { buildSystemPrompt, buildReasoningInstruction, buildToolContext } from "@/lib/prompts/system"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 import { SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/enhanced-system"
 
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const estimatedOutputTokens = 1000 // Conservative estimate for response
 
     // Check if user can use AI tokens
-    const { data: canUseTokens, error: tokenCheckError } = await supabase.rpc("can_use_ai_tokens", {
+    const { data: canUseTokens, error: tokenCheckError } = await supabase.rpc("can_use_ai_tokens_v2", {
       user_uuid: user.id,
       tokens_needed: estimatedInputTokens + estimatedOutputTokens,
     })
@@ -66,6 +66,12 @@ export async function POST(request: NextRequest) {
         { status: 429 },
       )
     }
+
+    // Determine per-request max_tokens based on plan (same model for all)
+    const { data: planLimitsOk } = await supabase.rpc("get_user_plan_limits", { user_uuid: user.id })
+    const planName = planLimitsOk?.[0]?.plan_name?.toLowerCase?.() || "free"
+    const planToMaxTokens: Record<string, number> = { free: 1024, basic: 2048, premium: 4096, pro: 4096, enterprise: 8192 }
+    const maxTokensForResponse = planToMaxTokens[planName] ?? 2048
 
     const isFlightIntent =
       /\b([A-Z]{3})\b.*\b(to|→|-|from)\b.*\b([A-Z]{3})\b/i.test(message) ||
@@ -158,18 +164,29 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // If Code generation, check code add-on
+    if (isCodeIntent) {
+      const estInput = Math.ceil((message + JSON.stringify(conversationHistory)).length / 4)
+      const estOutput = 2000
+      const { data: canUseCode } = await supabase.rpc("can_use_code_tokens", { user_uuid: user.id, tokens_needed: estInput + estOutput })
+      if (!canUseCode) {
+        const { data: limits } = await supabase.rpc("get_user_subscription_limits", { user_uuid: user.id })
+        return NextResponse.json({ error: "Code add-on limit exceeded", limits: limits?.[0] || null, upgradeRequired: true }, { status: 429 })
+      }
+    }
+
     const systemPrompt = isFlightIntent
       ? TRAVEL_AGENT_SYSTEM_PROMPT
       : buildSystemPrompt({ domain: ["general", "travel", "coding", "business", "documents"] })
 
     let enhancedMessage = message
     if (toolData?.success) {
-      enhancedMessage += `\n\nTool results:\n${JSON.stringify(toolData, null, 2)}`
+      enhancedMessage += buildToolContext(toolType, toolData)
     }
 
     const initial = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
-      max_tokens: 4096,
+      model: "claude-3-7-sonnet-20250219",
+      max_tokens: maxTokensForResponse,
       system: systemPrompt,
       messages: [...conversationHistory, { role: "user", content: enhancedMessage }],
     })
@@ -271,7 +288,7 @@ export async function POST(request: NextRequest) {
         : `Mensaje del usuario: ${message}\n\nRespuesta: ${text}\n\nExplica en 3–5 puntos el razonamiento de alto nivel.`
 
       const r = await anthropic.messages.create({
-        model: "claude-3-5-haiku-20241022",
+        model: "claude-3-7-sonnet-20250219",
         max_tokens: 300,
         system: buildReasoningInstruction("es"),
         messages: [{ role: "user", content: reasoningPrompt }],
@@ -288,14 +305,20 @@ export async function POST(request: NextRequest) {
     try {
       await supabase.from("ai_usage").insert({
         user_id: user.id,
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-3-7-sonnet-20250219",
         input_tokens: actualInputTokens,
         output_tokens: actualOutputTokens,
         total_tokens: totalTokensUsed,
         context_type: toolType,
         provider: "anthropic",
-        cost_usd: calculateTokenCost(totalTokensUsed, "claude-3-5-sonnet-20241022"),
+        cost_usd: calculateTokenCost(totalTokensUsed, "claude-3-7-sonnet-20250219"),
       })
+
+      // Increment token usage (AI and optionally Code)
+      await supabase.rpc("increment_ai_tokens_v2", { user_uuid: user.id, tokens_needed: totalTokensUsed })
+      if (isCodeIntent) {
+        await supabase.rpc("increment_code_tokens", { p_user: user.id, p_tokens: totalTokensUsed })
+      }
 
       // Also log to ai_chat_logs for backward compatibility
       await supabase.from("ai_chat_logs").insert({
@@ -303,7 +326,7 @@ export async function POST(request: NextRequest) {
         message: message,
         response: text,
         tokens_used: totalTokensUsed,
-        model_used: "claude-3-5-sonnet-20241022",
+        model_used: "claude-3-7-sonnet-latest",
         context_type: toolType,
       })
     } catch (e) {

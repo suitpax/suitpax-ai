@@ -3,9 +3,13 @@ import Anthropic from "@anthropic-ai/sdk"
 import { buildSystemPrompt } from "@/lib/prompts/system"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
-
 export const dynamic = "force-dynamic"
+
+function getAnthropic() {
+  const key = process.env.ANTHROPIC_API_KEY
+  if (!key) return null
+  return new Anthropic({ apiKey: key })
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,9 +21,12 @@ export async function POST(req: NextRequest) {
 
     const system = buildSystemPrompt({ domain: ["general", "travel", "coding", "business"] })
 
+    const client = getAnthropic()
+    if (!client) return new Response("AI not configured", { status: 500 })
+
     // We use non-streaming API to get usage, then stream the text to client for UX
-    const res = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20240620",
+    const res = await client.messages.create({
+      model: "claude-3-7-sonnet-20250219",
       max_tokens: 4096,
       system,
       messages: [...history.map((m: any) => ({ role: m.role, content: m.content })), { role: "user", content: message }],
@@ -34,7 +41,7 @@ export async function POST(req: NextRequest) {
       if (user?.id) {
         await supabase.from('ai_usage').insert({
           user_id: user.id,
-          model: "claude-3-5-sonnet-20240620",
+          model: "claude-3-7-sonnet-20250219",
           input_tokens: inputTokens,
           output_tokens: outputTokens,
           context_type: /flight|vuelo/i.test(message) ? 'flight_search' : 'general',

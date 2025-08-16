@@ -50,7 +50,7 @@ Generate a comprehensive document that meets professional business standards.
     `
 
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-7-sonnet-latest",
       max_tokens: 6144,
       system: DOCUMENT_AI_PROMPT,
       messages: [{ role: "user", content: enhancedPrompt }],
@@ -63,7 +63,7 @@ Generate a comprehensive document that meets professional business standards.
 
     await supabase.from("ai_usage").insert({
       user_id: user.id,
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-7-sonnet-latest",
       input_tokens: (response.usage as any)?.input_tokens || 0,
       output_tokens: (response.usage as any)?.output_tokens || 0,
       total_tokens: tokensUsed,

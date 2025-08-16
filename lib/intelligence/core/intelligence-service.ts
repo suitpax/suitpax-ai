@@ -23,7 +23,7 @@ export class SuitpaxIntelligenceService {
   constructor(config: IntelligenceConfig) {
     this.memoryService = new MemoryService(config.userId)
     this.knowledgeService = new SuitpaxKnowledgeService()
-    this.model = config.model || "claude-3-5-sonnet-20241022"
+    this.model = config.model || "claude-3-7-sonnet-latest"
   }
 
   async initializeKnowledge(documents: any[]) {

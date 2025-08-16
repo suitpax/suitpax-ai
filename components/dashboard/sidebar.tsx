@@ -61,11 +61,13 @@ const navigation = [
   { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
   { name: "Tasks", href: "/dashboard/tasks", icon: CheckSquare },
   { name: "Policies", href: "/dashboard/policies", icon: Shield },
+  { name: "Integrations", href: "/dashboard/integrations", icon: Settings },
 ]
 
 const aiNavigation = [
   { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: MessageSquare, badge: "AI" },
   { name: "Voice AI", href: "/dashboard/voice-ai", icon: Mic, badge: "NEW" },
+  { name: "Suitpax Code X", href: "/dashboard/code", icon: MessageSquare, badge: "Development" },
 ]
 
 interface SidebarProps {
