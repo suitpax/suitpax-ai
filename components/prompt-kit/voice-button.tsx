@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useEffect } from "react"
 import { Mic, MicOff, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -12,7 +10,7 @@ export type VoiceButtonProps = {
   className?: string
 }
 
-export function VoiceButton({ onTranscript, className }: VoiceButtonProps) {
+export default function VoiceButton({ onTranscript, className }: VoiceButtonProps) {
   const { state, startListening, stopListening } = useVoiceAI()
 
   useEffect(() => {
@@ -39,7 +37,7 @@ export function VoiceButton({ onTranscript, className }: VoiceButtonProps) {
       className={cn(
         "flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-2xl transition-colors",
         state.isListening ? "bg-red-600 text-white" : "hover:bg-gray-100 text-gray-700",
-        className,
+        className
       )}
     >
       {state.isListening ? (
@@ -52,6 +50,3 @@ export function VoiceButton({ onTranscript, className }: VoiceButtonProps) {
     </button>
   )
 }
-
-// Keep default export for backward compatibility
-export default VoiceButton

@@ -26,27 +26,17 @@ export default function CodeBlock({ code, language, className, showHeader = true
   const langLabel = (language || "").replace("language-", "").toUpperCase()
 
   return (
-    <div
-      className={cn(
-        "rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm overflow-hidden shadow-lg",
-        className,
-      )}
-    >
+    <div className={cn("rounded-xl border border-gray-200 bg-gray-50 overflow-hidden", className)}>
       {showHeader && (
-        <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/10">
-          <span className="text-xs font-medium text-white/80 tracking-wider">{langLabel || "CODE"}</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-3 text-white/70 hover:bg-white/10 hover:text-white/90 rounded-lg transition-all"
-            onClick={handleCopy}
-          >
+        <div className="flex items-center justify-between px-3 py-2 bg-white border-b border-gray-200">
+          <span className="text-[11px] font-medium text-gray-600">{langLabel || "CODE"}</span>
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-gray-700 hover:bg-gray-100" onClick={handleCopy}>
             {copied ? <Check className="h-4 w-4" /> : <ClipboardCopy className="h-4 w-4" />}
             <span className="sr-only">Copy</span>
           </Button>
         </div>
       )}
-      <pre className="m-0 overflow-auto p-4 text-sm leading-relaxed text-white/90 font-mono">
+      <pre className="m-0 overflow-auto p-3 text-[12px] leading-relaxed text-gray-900">
         <code className={cn(language)}>{code}</code>
       </pre>
     </div>

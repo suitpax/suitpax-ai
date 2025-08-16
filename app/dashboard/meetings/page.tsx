@@ -12,6 +12,7 @@ import {
   PlusIcon,
   MagnifyingGlassIcon,
   EllipsisVerticalIcon,
+  CheckCircleIcon,
   PlayIcon,
 } from "@heroicons/react/24/outline"
 import { Button } from "@/components/ui/button"
@@ -86,21 +87,19 @@ export default function MeetingsPage() {
   const loadFromSupabase = async (uid: string) => {
     try {
       const { data, error } = await supabase
-        .from("meetings")
-        .select("*")
-        .eq("user_id", uid)
-        .order("starts_at", { ascending: false })
+        .from('meetings')
+        .select('*')
+        .eq('user_id', uid)
+        .order('starts_at', { ascending: false })
       if (!error && Array.isArray(data)) {
         const mapped: Meeting[] = data.map((m: any) => ({
           id: m.id,
           title: m.title,
           type: m.type,
           status: m.status,
-          date: new Date(m.starts_at).toISOString().slice(0, 10),
-          time: new Date(m.starts_at).toTimeString().slice(0, 5),
-          duration:
-            m.duration_minutes ||
-            Math.max(15, Math.round((new Date(m.ends_at).getTime() - new Date(m.starts_at).getTime()) / 60000)),
+          date: new Date(m.starts_at).toISOString().slice(0,10),
+          time: new Date(m.starts_at).toTimeString().slice(0,5),
+          duration: m.duration_minutes || Math.max(15, Math.round((new Date(m.ends_at).getTime() - new Date(m.starts_at).getTime())/60000)),
           attendees: m.attendees || [],
           location: m.location || undefined,
           description: m.description || undefined,
@@ -209,7 +208,7 @@ export default function MeetingsPage() {
     })
     try {
       if (userId) {
-        await supabase.from("meetings").update({ status }).eq("id", id).eq("user_id", userId)
+        await supabase.from('meetings').update({ status }).eq('id', id).eq('user_id', userId)
       } else {
         persist(meetings)
       }
@@ -274,22 +273,18 @@ export default function MeetingsPage() {
         const startISO = `${newMeeting.date}T${newMeeting.time}:00`
         const endDate = new Date(startISO)
         endDate.setMinutes(endDate.getMinutes() + (newMeeting.duration || 30))
-        const { data, error } = await supabase
-          .from("meetings")
-          .insert({
-            user_id: userId,
-            title: newMeeting.title,
-            type: newMeeting.type,
-            status: "upcoming",
-            starts_at: new Date(startISO).toISOString(),
-            ends_at: endDate.toISOString(),
-            attendees,
-            location: newMeeting.location || null,
-            description: newMeeting.description || null,
-            meeting_url: newMeeting.type === "video" ? `https://meet.suitpax.com/${Date.now()}` : null,
-          })
-          .select()
-          .single()
+        const { data, error } = await supabase.from('meetings').insert({
+          user_id: userId,
+          title: newMeeting.title,
+          type: newMeeting.type,
+          status: 'upcoming',
+          starts_at: new Date(startISO).toISOString(),
+          ends_at: endDate.toISOString(),
+          attendees,
+          location: newMeeting.location || null,
+          description: newMeeting.description || null,
+          meeting_url: newMeeting.type === 'video' ? `https://meet.suitpax.com/${Date.now()}` : null,
+        }).select().single()
         if (!error && data) {
           await loadFromSupabase(userId)
         }
@@ -373,488 +368,334 @@ export default function MeetingsPage() {
       const key = m.date
       if (key in map) map[key].push(m)
     }
-
-    const thisWeekCount = Object.values(map).reduce((acc, meetings) => acc + meetings.length, 0)
-    return { days, map, thisWeekCount }
+    return { days, map }
   })()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-none mb-2">
-                Meetings
-              </h1>
-              <p className="text-gray-600 font-light">
-                <em className="font-serif italic">Manage your business meetings and video calls</em>
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              {!googleToken && (
-                <Button className="bg-black text-white hover:bg-gray-800 rounded-xl px-4 py-2">
-                  Connect Google Calendar
-                </Button>
-              )}
-              <Dialog open={showNewMeetingModal} onOpenChange={setShowNewMeetingModal}>
-                <DialogTrigger asChild>
-                  <Button className="bg-black text-white hover:bg-gray-800 rounded-xl px-4 py-2">
-                    <PlusIcon className="h-4 w-4 mr-2" />
-                    Schedule Meeting
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-lg">
-                  <DialogHeader>
-                    <DialogTitle>Schedule New Meeting</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="title">Meeting Title</Label>
-                      <Input
-                        id="title"
-                        value={newMeeting.title}
-                        onChange={(e) => setNewMeeting({ ...newMeeting, title: e.target.value })}
-                        placeholder="Enter meeting title"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="type">Meeting Type</Label>
-                        <Select
-                          value={newMeeting.type}
-                          onValueChange={(value: Meeting["type"]) => setNewMeeting({ ...newMeeting, type: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="video">Video Call</SelectItem>
-                            <SelectItem value="phone">Phone Call</SelectItem>
-                            <SelectItem value="in-person">In Person</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="duration">Duration (minutes)</Label>
-                        <Input
-                          id="duration"
-                          type="number"
-                          value={newMeeting.duration}
-                          onChange={(e) =>
-                            setNewMeeting({ ...newMeeting, duration: Number.parseInt(e.target.value) || 60 })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="date">Date</Label>
-                        <Input
-                          id="date"
-                          type="date"
-                          value={newMeeting.date}
-                          onChange={(e) => setNewMeeting({ ...newMeeting, date: e.target.value })}
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="time">Time</Label>
-                        <Input
-                          id="time"
-                          type="time"
-                          value={newMeeting.time}
-                          onChange={(e) => setNewMeeting({ ...newMeeting, time: e.target.value })}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="attendees">Attendees (comma separated)</Label>
-                      <Input
-                        id="attendees"
-                        value={newMeeting.attendees}
-                        onChange={(e) => setNewMeeting({ ...newMeeting, attendees: e.target.value })}
-                        placeholder="john@example.com, sarah@example.com"
-                      />
-                    </div>
-
-                    {newMeeting.type === "in-person" && (
-                      <div>
-                        <Label htmlFor="location">Location</Label>
-                        <Input
-                          id="location"
-                          value={newMeeting.location}
-                          onChange={(e) => setNewMeeting({ ...newMeeting, location: e.target.value })}
-                          placeholder="Enter meeting location"
-                        />
-                      </div>
-                    )}
-
-                    <div>
-                      <Label htmlFor="description">Description</Label>
-                      <Textarea
-                        id="description"
-                        value={newMeeting.description}
-                        onChange={(e) => setNewMeeting({ ...newMeeting, description: e.target.value })}
-                        placeholder="Meeting agenda or description"
-                        rows={3}
-                      />
-                    </div>
-
-                    <div className="flex justify-end space-x-2 pt-4">
-                      <Button variant="outline" onClick={() => setShowNewMeetingModal(false)}>
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={handleCreateMeeting}
-                        disabled={!newMeeting.title || !newMeeting.date || !newMeeting.time}
-                      >
-                        Schedule Meeting
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+    <div className="space-y-8">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Meetings</h1>
+            <p className="text-gray-600 font-light">Manage your business meetings and video calls</p>
           </div>
-        </motion.div>
 
-        {/* Stats Cards - New responsive section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
-        >
-          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Meetings</p>
-                  <p className="text-2xl font-medium tracking-tight">{meetings.length}</p>
-                </div>
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                  <VideoCameraIcon className="h-5 w-5 text-gray-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Upcoming</p>
-                  <p className="text-2xl font-medium tracking-tight">{upcomingMeetings}</p>
-                </div>
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                  <CalendarIcon className="h-5 w-5 text-gray-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">This Week</p>
-                  <p className="text-2xl font-medium tracking-tight">{compactAgenda.thisWeekCount}</p>
-                </div>
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                  <ClockIcon className="h-5 w-5 text-gray-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Completed</p>
-                  <p className="text-2xl font-medium tracking-tight">{completedMeetings}</p>
-                </div>
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                  <UserGroupIcon className="h-5 w-5 text-gray-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Templates + Compact agenda */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6"
-        >
-          <Card className="lg:col-span-2 bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-medium tracking-tight">Meeting Templates</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {TEMPLATES.map((t) => (
-                  <button
-                    key={t.title}
-                    className="text-left p-4 rounded-xl border border-gray-200 hover:bg-white/50 backdrop-blur-sm transition-all hover:shadow-sm"
-                    onClick={() => {
-                      setShowNewMeetingModal(true)
-                      setNewMeeting((prev) => ({
-                        ...prev,
-                        title: t.title,
-                        description: t.description,
-                        duration: t.duration,
-                        type: t.type,
-                      }))
-                    }}
-                  >
-                    <div className="font-medium text-sm mb-1">{t.title}</div>
-                    <div className="text-xs text-gray-600 mb-2">{t.description}</div>
-                    <div className="text-xs text-gray-500">
-                      {t.duration} minutes • {t.type}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-white/20 shadow-sm rounded-2xl">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-medium tracking-tight">Next 7 Days</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {compactAgenda.days.map((d) => (
-                  <div key={d.key} className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl p-3">
-                    <div className="text-xs font-medium text-gray-700 mb-2">{d.label}</div>
-                    <div className="space-y-2">
-                      {compactAgenda.map[d.key].length === 0 ? (
-                        <div className="text-xs text-gray-500">No meetings</div>
-                      ) : (
-                        compactAgenda.map[d.key].map((m) => (
-                          <div key={m.id} className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-900 font-medium">{m.time}</span>
-                              <span className="text-gray-600 truncate">{m.title}</span>
-                            </div>
-                            <span className="text-gray-500 text-xs">{m.duration}m</span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white/70 backdrop-blur-sm p-4 md:p-6 rounded-2xl border border-white/20 shadow-sm sticky top-4 z-10"
-        >
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 gap-4">
-            <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <div className="relative flex-1 sm:flex-initial sm:w-80">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Search meetings..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 rounded-xl border-gray-200"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-40 rounded-xl">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="upcoming">Upcoming</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-full sm:w-40 rounded-xl">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="video">Video Call</SelectItem>
-                  <SelectItem value="phone">Phone Call</SelectItem>
-                  <SelectItem value="in-person">In Person</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Meetings List */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="space-y-4"
-        >
-          {filteredMeetings.length > 0 ? (
-            filteredMeetings.map((meeting, index) => {
-              const TypeIcon = getTypeIcon(meeting.type)
-              return (
-                <motion.div
-                  key={meeting.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.05 }}
-                  className="bg-white/70 backdrop-blur-sm p-4 md:p-6 rounded-2xl border border-white/20 shadow-sm hover:shadow-md transition-all"
-                >
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <TypeIcon className="h-6 w-6 text-gray-600" />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 mb-2">
-                          <h3 className="text-lg font-medium tracking-tight text-gray-900 truncate">{meeting.title}</h3>
-                          <Badge className={getStatusColor(meeting.status)}>
-                            {meeting.status.charAt(0).toUpperCase() + meeting.status.slice(1)}
-                          </Badge>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
-                          <div className="flex items-center space-x-1">
-                            <CalendarIcon className="h-4 w-4" />
-                            <span>{new Date(meeting.date).toLocaleDateString()}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <ClockIcon className="h-4 w-4" />
-                            <span>
-                              {meeting.time} ({meeting.duration}min)
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <UserGroupIcon className="h-4 w-4" />
-                            <span>{meeting.attendees.length} attendees</span>
-                          </div>
-                        </div>
-
-                        {meeting.description && (
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{meeting.description}</p>
-                        )}
-
-                        {meeting.location && (
-                          <div className="flex items-center space-x-1 text-sm text-gray-600 mb-3">
-                            <MapPinIcon className="h-4 w-4" />
-                            <span className="truncate">{meeting.location}</span>
-                          </div>
-                        )}
-
-                        <div className="flex items-center space-x-2">
-                          {meeting.attendees.slice(0, 3).map((attendee, i) => (
-                            <div key={i} className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                              <span className="text-xs font-medium text-gray-600">
-                                {attendee.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                          ))}
-                          {meeting.attendees.length > 3 && (
-                            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                              <span className="text-xs font-medium text-gray-600">+{meeting.attendees.length - 3}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                      {meeting.status === "upcoming" && meeting.meetingUrl && (
-                        <Button size="sm" className="bg-black hover:bg-gray-800 text-white rounded-xl">
-                          <PlayIcon className="h-4 w-4 mr-2" />
-                          Join
-                        </Button>
-                      )}
-                      {meeting.status === "upcoming" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateMeetingStatus(meeting.id, "completed")}
-                          className="rounded-xl border-gray-200"
-                        >
-                          Mark Done
-                        </Button>
-                      )}
-                      {meeting.status !== "cancelled" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateMeetingStatus(meeting.id, "cancelled")}
-                          className="rounded-xl border-gray-200"
-                        >
-                          Cancel
-                        </Button>
-                      )}
-                      <Button variant="ghost" size="sm" className="rounded-xl">
-                        <EllipsisVerticalIcon className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
-              )
-            })
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="bg-white/70 backdrop-blur-sm p-8 md:p-12 rounded-2xl border border-white/20 shadow-sm text-center"
-            >
-              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <VideoCameraIcon className="h-8 w-8 text-gray-500" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2 tracking-tight">
-                {searchQuery || statusFilter !== "all" || typeFilter !== "all"
-                  ? "No meetings found"
-                  : "No meetings scheduled"}
-              </h3>
-              <p className="text-gray-600 font-light mb-6 max-w-md mx-auto">
-                <em className="font-serif italic">
-                  {searchQuery || statusFilter !== "all" || typeFilter !== "all"
-                    ? "Try adjusting your search or filters to find meetings."
-                    : "Schedule your first meeting to get started with team collaboration."}
-                </em>
-              </p>
-              {!searchQuery && statusFilter === "all" && typeFilter === "all" && (
-                <Button
-                  onClick={() => setShowNewMeetingModal(true)}
-                  className="bg-black text-white hover:bg-gray-800 rounded-xl"
-                >
+          <div className="flex items-center gap-2">
+            {!googleToken && (
+              <Button className="bg-black text-white hover:bg-gray-800">Connect Google Calendar</Button>
+            )}
+            <Dialog open={showNewMeetingModal} onOpenChange={setShowNewMeetingModal}>
+              <DialogTrigger asChild>
+                <Button className="bg-black text-white hover:bg-gray-800">
                   <PlusIcon className="h-4 w-4 mr-2" />
                   Schedule Meeting
                 </Button>
-              )}
-            </motion.div>
-          )}
-        </motion.div>
-      </div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Schedule New Meeting</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="title">Meeting Title</Label>
+                    <Input id="title" value={newMeeting.title} onChange={(e) => setNewMeeting({ ...newMeeting, title: e.target.value })} placeholder="Enter meeting title" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="type">Meeting Type</Label>
+                      <Select value={newMeeting.type} onValueChange={(value: Meeting["type"]) => setNewMeeting({ ...newMeeting, type: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="video">Video Call</SelectItem>
+                          <SelectItem value="phone">Phone Call</SelectItem>
+                          <SelectItem value="in-person">In Person</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="duration">Duration (minutes)</Label>
+                      <Input id="duration" type="number" value={newMeeting.duration} onChange={(e) => setNewMeeting({ ...newMeeting, duration: Number.parseInt(e.target.value) || 60 })} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="date">Date</Label>
+                      <Input id="date" type="date" value={newMeeting.date} onChange={(e) => setNewMeeting({ ...newMeeting, date: e.target.value })} />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="time">Time</Label>
+                      <Input id="time" type="time" value={newMeeting.time} onChange={(e) => setNewMeeting({ ...newMeeting, time: e.target.value })} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="attendees">Attendees (comma separated)</Label>
+                    <Input id="attendees" value={newMeeting.attendees} onChange={(e) => setNewMeeting({ ...newMeeting, attendees: e.target.value })} placeholder="john@example.com, sarah@example.com" />
+                  </div>
+
+                  {newMeeting.type === "in-person" && (
+                    <div>
+                      <Label htmlFor="location">Location</Label>
+                      <Input id="location" value={newMeeting.location} onChange={(e) => setNewMeeting({ ...newMeeting, location: e.target.value })} placeholder="Enter meeting location" />
+                    </div>
+                  )}
+
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea id="description" value={newMeeting.description} onChange={(e) => setNewMeeting({ ...newMeeting, description: e.target.value })} placeholder="Meeting agenda or description" rows={3} />
+                  </div>
+
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button variant="outline" onClick={() => setShowNewMeetingModal(false)}>Cancel</Button>
+                    <Button onClick={handleCreateMeeting} disabled={!newMeeting.title || !newMeeting.date || !newMeeting.time}>Schedule Meeting</Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Stats */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Upcoming Meetings</p>
+              <p className="text-3xl font-medium tracking-tighter text-gray-900 mt-1">{upcomingMeetings}</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <CalendarIcon className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Completed</p>
+              <p className="text-3xl font-medium tracking-tighter text-gray-900 mt-1">{completedMeetings}</p>
+            </div>
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+              <CheckCircleIcon className="h-6 w-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg:white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Hours</p>
+              <p className="text-3xl font-medium tracking-tighter text-gray-900 mt-1">{Math.round(totalDuration / 60)}</p>
+            </div>
+            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+              <ClockIcon className="h-6 w-6 text-purple-600" />
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Templates + Compact agenda */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-lg tracking-tight">Meeting templates</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {TEMPLATES.map((t) => (
+                <button
+                  key={t.title}
+                  className="text-xs px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50"
+                  onClick={() => {
+                    setShowNewMeetingModal(true)
+                    setNewMeeting((prev) => ({ ...prev, title: t.title, description: t.description, duration: t.duration, type: t.type }))
+                  }}
+                >
+                  {t.title}
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg tracking-tight">Next 7 days</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {compactAgenda.days.map((d) => (
+                <div key={d.key} className="bg-gray-50 border border-gray-100 rounded-lg p-3">
+                  <div className="text-xs font-medium text-gray-700 mb-2">{d.label}</div>
+                  <div className="space-y-2">
+                    {compactAgenda.map[d.key].length === 0 ? (
+                      <div className="text-[11px] text-gray-500">No meetings</div>
+                    ) : (
+                      compactAgenda.map[d.key].map((m) => (
+                        <div key={m.id} className="flex items-center justify-between text-[11px]">
+                          <div className="flex items-center gap-2">
+                            <span className="text-gray-900 font-medium">{m.time}</span>
+                            <span className="text-gray-600">{m.title}</span>
+                          </div>
+                          <span className="text-gray-500">{m.duration}m</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Filters */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm sticky top-20 z-10">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input type="text" placeholder="Search meetings..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 w-64" />
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="upcoming">Upcoming</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="video">Video</SelectItem>
+                <SelectItem value="phone">Phone</SelectItem>
+                <SelectItem value="in-person">In Person</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Meetings List */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="space-y-4">
+        {filteredMeetings.length > 0 ? (
+          filteredMeetings.map((meeting, index) => {
+            const TypeIcon = getTypeIcon(meeting.type)
+            return (
+              <motion.div key={meeting.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: index * 0.1 }} className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                      <TypeIcon className="h-6 w-6 text-gray-600" />
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h3 className="text-lg font-medium tracking-tight text-gray-900">{meeting.title}</h3>
+                        <Badge className={getStatusColor(meeting.status)}>{meeting.status.charAt(0).toUpperCase() + meeting.status.slice(1)}</Badge>
+                      </div>
+
+                      <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                        <div className="flex items-center space-x-1">
+                          <CalendarIcon className="h-4 w-4" />
+                          <span>{new Date(meeting.date).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <ClockIcon className="h-4 w-4" />
+                          <span>
+                            {meeting.time} ({meeting.duration}min)
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <UserGroupIcon className="h-4 w-4" />
+                          <span>{meeting.attendees.length} attendees</span>
+                        </div>
+                      </div>
+
+                      {meeting.description && <p className="text-sm text-gray-600 mb-3">{meeting.description}</p>}
+
+                      {meeting.location && (
+                        <div className="flex items-center space-x-1 text-sm text-gray-600 mb-3">
+                          <MapPinIcon className="h-4 w-4" />
+                          <span>{meeting.location}</span>
+                        </div>
+                      )}
+
+                      <div className="flex items-center space-x-2">
+                        {meeting.attendees.slice(0, 3).map((attendee, i) => (
+                          <div key={i} className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
+                            <span className="text-xs font-medium text-gray-600">{attendee.charAt(0).toUpperCase()}</span>
+                          </div>
+                        ))}
+                        {meeting.attendees.length > 3 && (
+                          <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                            <span className="text-xs font-medium text-gray-600">+{meeting.attendees.length - 3}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    {meeting.status === "upcoming" && meeting.meetingUrl && (
+                      <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                        <PlayIcon className="h-4 w-4 mr-2" />
+                        Join
+                      </Button>
+                    )}
+                    {meeting.status === "upcoming" && (
+                      <Button size="sm" variant="outline" onClick={() => updateMeetingStatus(meeting.id, "completed")}>Mark done</Button>
+                    )}
+                    {meeting.status !== "cancelled" && (
+                      <Button size="sm" variant="outline" onClick={() => updateMeetingStatus(meeting.id, "cancelled")}>Cancel</Button>
+                    )}
+                    <Button variant="ghost" size="sm">
+                      <EllipsisVerticalIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })
+        ) : (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="bg-white/50 backdrop-blur-sm p-12 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <VideoCameraIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2 tracking-tight">
+              {searchQuery || statusFilter !== "all" || typeFilter !== "all" ? "No meetings found" : "No meetings scheduled"}
+            </h3>
+            <p className="text-gray-600 font-light mb-6">
+              {searchQuery || statusFilter !== "all" || typeFilter !== "all"
+                ? "Try adjusting your search or filters to find meetings."
+                : "Schedule your first meeting to get started with team collaboration."}
+            </p>
+            {!searchQuery && statusFilter === "all" && typeFilter === "all" && (
+              <Button onClick={() => setShowNewMeetingModal(true)} className="bg-black text-white hover:bg-gray-800">
+                <PlusIcon className="h-4 w-4 mr-2" />
+                Schedule Meeting
+              </Button>
+            )}
+          </motion.div>
+        )}
+      </motion.div>
     </div>
   )
 }

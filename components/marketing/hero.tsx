@@ -111,18 +111,12 @@ const getBadgeMessage = () => {
     return "Our AI Agents are sleeping..."
   }
 
-  // Random selection for other times with more variety
+  // Random selection for other times
   const messages = [
-    "Update: MCP Integration Live",
-    "New: AI Context Protocol",
-    "Update: Enhanced AI Agents",
-    "New: Model Context Protocol",
     "Launching October 2025.",
     "Our AI Agents are at the gym...",
     "Building the AI context...",
     "The next-gen of traveltech.",
-    "Update: Smarter AI Responses",
-    "New: Context-Aware Agents",
   ]
 
   return messages[Math.floor(Math.random() * messages.length)]

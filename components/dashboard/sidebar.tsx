@@ -22,8 +22,8 @@ import {
   User,
   Building,
   Mail,
-  CalendarIcon as Meeting,
-  Receipt,
+  VideoIcon as Meeting,
+  PieChart,
 } from "lucide-react"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
@@ -45,7 +45,6 @@ const navigation = [
   { name: "Meetings", href: "/dashboard/meetings", icon: Meeting },
   { name: "Locations", href: "/dashboard/locations", icon: MapPin },
   { name: "Team", href: "/dashboard/team", icon: Users },
-  { name: "Tasks", href: "/dashboard/tasks", icon: Receipt },
 ]
 
 const aiNavigation = [
@@ -56,8 +55,6 @@ const aiNavigation = [
 const settingsNavigation = [
   { name: "Profile", href: "/dashboard/profile", icon: User },
   { name: "Company", href: "/dashboard/company", icon: Building },
-  { name: "Billing", href: "/dashboard/billing", icon: Receipt },
-  { name: "Google Drive", href: "/dashboard/google-drive", icon: Building },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
@@ -85,13 +82,11 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
 
   useEffect(() => {
     const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUser(user)
         onUserUpdate?.(user)
-
+        
         // Get user profile
         try {
           const { data: profile } = await supabase
@@ -115,12 +110,12 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
       const detail: any = (e as CustomEvent).detail || {}
       setUserProfile((prev) => ({ ...prev, ...detail }))
     }
-    if (typeof window !== "undefined") {
-      window.addEventListener("profile:updated", handler)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('profile:updated', handler)
     }
     return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("profile:updated", handler)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('profile:updated', handler)
       }
     }
   }, [supabase, onUserUpdate])
@@ -141,12 +136,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
 
   const getInitials = () => {
     const name = getDisplayName()
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2)
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
   }
 
   const getUserEmail = () => {
@@ -157,23 +147,30 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
   return (
     <div
       className={cn(
-        "flex flex-col bg-white/90 backdrop-blur-sm border-r border-white/20 h-full shadow-2xl shadow-black/10",
-        isMobile ? "w-64" : isCollapsed ? "w-16" : "w-64",
+        "flex flex-col bg-gray-100 border-r border-gray-200 h-full shadow-xl lg:shadow-none", // stronger gray bg
+        isMobile ? "w-64" : isCollapsed ? "w-16" : "w-64"
       )}
     >
       {/* Header */}
-      <div className="flex h-16 items-center justify-between px-4 border-b border-gray-100/50 flex-shrink-0">
+      <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 flex-shrink-0">
         {(!isCollapsed || isMobile) && (
           <Link href="/dashboard" className="flex items-center gap-2" onClick={isMobile ? onCloseMobile : undefined}>
-            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={88} height={20} className="h-5 w-auto" />
+            <Image 
+              src="/logo/suitpax-bl-logo.webp" 
+              alt="Suitpax" 
+              width={88} 
+              height={20} 
+              className="h-5 w-auto" 
+            />
           </Link>
         )}
+        {/* Removed collapsed symbol logo intentionally */}
         {isMobile ? (
           <Button
             variant="ghost"
             size="icon"
             onClick={onCloseMobile}
-            className="h-8 w-8 rounded-xl hover:bg-gray-100/80"
+            className="h-8 w-8 rounded-lg hover:bg-gray-200"
           >
             <X className="h-4 w-4" />
             <span className="sr-only">Close sidebar</span>
@@ -182,7 +179,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-xl hover:bg-gray-100/80"
+            className="h-8 w-8 rounded-lg hover:bg-gray-200"
             onClick={onToggleCollapse}
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -192,7 +189,7 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
       </div>
 
       {(!isCollapsed || isMobile) && (
-        <div className="px-3 pt-3 border-b border-gray-100/50">
+        <div className="px-3 pt-3 border-b border-gray-200">
           <AISearchInput size="sm" />
         </div>
       )}
@@ -209,27 +206,34 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
                 href={item.href}
                 onClick={isMobile ? onCloseMobile : undefined}
                 className={cn(
-                  "group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 relative",
-                  isActive
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25"
-                    : "text-gray-700 hover:bg-gray-100/80 hover:text-gray-900",
-                  isCollapsed && !isMobile && "justify-center px-2",
+                  "group flex items-center px-3 py-2.5 text-xs font-medium rounded-lg transition-all duration-200 relative", // smaller text
+                  isActive 
+                    ? "bg-gray-900 text-white shadow-sm" 
+                    : "text-gray-800 hover:bg-gray-200 hover:text-gray-900",
+                  (isCollapsed && !isMobile) && "justify-center px-2"
                 )}
-                title={isCollapsed && !isMobile ? item.name : ""}
+                title={(isCollapsed && !isMobile) ? item.name : ""}
               >
-                <item.icon
-                  className={cn("flex-shrink-0 h-5 w-5", isCollapsed && !isMobile ? "mx-auto" : "mr-3")}
-                  aria-hidden="true"
+                <item.icon 
+                  className={cn(
+                    "flex-shrink-0 h-5 w-5", 
+                    (isCollapsed && !isMobile) ? "mx-auto" : "mr-3"
+                  )} 
+                  aria-hidden="true" 
                 />
                 {(!isCollapsed || isMobile) && <span>{item.name}</span>}
+                {isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full" />
+                )}
               </Link>
             )
           })}
         </div>
 
-        {/* AI Section */}
+        {/* AI Section (sin fila de agentes ni badges) */}
         {(!isCollapsed || isMobile) && (
           <div className="pt-4">
+
             <div className="space-y-1">
               {aiNavigation.map((item) => {
                 const isActive = pathname === item.href
@@ -239,10 +243,10 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
                     href={item.href}
                     onClick={isMobile ? onCloseMobile : undefined}
                     className={cn(
-                      "group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
-                      isActive
-                        ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25"
-                        : "text-gray-700 hover:bg-gray-100/80 hover:text-gray-900",
+                      "group flex items-center justify-between px-3 py-2.5 text-xs font-medium rounded-lg transition-all duration-200",
+                      isActive 
+                        ? "bg-gray-900 text-white shadow-sm" 
+                        : "text-gray-800 hover:bg-gray-200 hover:text-gray-900"
                     )}
                   >
                     <div className="flex items-center">
@@ -256,8 +260,8 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
           </div>
         )}
 
-        {/* Collapsed AI icons */}
-        {isCollapsed && !isMobile && (
+        {/* Collapsed AI icons (sin indicadores/badges) */}
+        {(isCollapsed && !isMobile) && (
           <div className="pt-4 space-y-1">
             {aiNavigation.map((item) => {
               const isActive = pathname === item.href
@@ -266,10 +270,10 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "group flex items-center justify-center px-2 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 relative",
-                    isActive
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25"
-                      : "text-gray-700 hover:bg-gray-100/80 hover:text-gray-900",
+                    "group flex items-center justify-center px-2 py-2.5 text-xs font-medium rounded-lg transition-all duration-200 relative",
+                    isActive 
+                      ? "bg-gray-900 text-white shadow-sm" 
+                      : "text-gray-800 hover:bg-gray-200 hover:text-gray-900"
                   )}
                   title={item.name}
                 >
@@ -282,78 +286,82 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
       </nav>
 
       {/* Settings Section */}
-      <div className="border-t border-gray-100/50 p-3 flex-shrink-0">
+      <div className="border-t border-gray-200 p-3 flex-shrink-0">
         {/* Settings Navigation */}
         <nav className="space-y-1 mb-3">
-          {!isCollapsed || isMobile
-            ? settingsNavigation.map((item) => {
-                const isActive = pathname.startsWith(item.href)
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    onClick={isMobile ? onCloseMobile : undefined}
-                    className={cn(
-                      "group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200",
-                      isActive
-                        ? "bg-gray-100/80 text-gray-900"
-                        : "text-gray-600 hover:bg-gray-50/80 hover:text-gray-900",
-                    )}
-                  >
-                    <item.icon className="flex-shrink-0 h-4 w-4 mr-3" aria-hidden="true" />
-                    <span>{item.name}</span>
-                  </Link>
-                )
-              })
-            : settingsNavigation.map((item) => {
-                const isActive = pathname.startsWith(item.href)
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={cn(
-                      "group flex items-center justify-center px-2 py-2 text-sm font-medium rounded-xl transition-all duration-200",
-                      isActive
-                        ? "bg-gray-100/80 text-gray-900"
-                        : "text-gray-600 hover:bg-gray-50/80 hover:text-gray-900",
-                    )}
-                    title={item.name}
-                  >
-                    <item.icon className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                )
-              })}
+          {(!isCollapsed || isMobile) ? (
+            settingsNavigation.map((item) => {
+              const isActive = pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={isMobile ? onCloseMobile : undefined}
+                  className={cn(
+                    "group flex items-center px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200",
+                    isActive 
+                      ? "bg-gray-200 text-gray-900" 
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  )}
+                >
+                  <item.icon className="flex-shrink-0 h-4 w-4 mr-3" aria-hidden="true" />
+                  <span>{item.name}</span>
+                </Link>
+              )
+            })
+          ) : (
+            settingsNavigation.map((item) => {
+              const isActive = pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "group flex items-center justify-center px-2 py-2 text-xs font-medium rounded-lg transition-all duration-200",
+                    isActive 
+                      ? "bg-gray-200 text-gray-900" 
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  )}
+                  title={item.name}
+                >
+                  <item.icon className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              )
+            })
+          )}
         </nav>
 
         {/* User Profile & Sign Out */}
         {(!isCollapsed || isMobile) && (
-          <div className="border-t border-gray-100/50 pt-3">
+          <div className="border-t border-gray-100 pt-3">
             <div className="flex items-center space-x-3 px-3 py-2 mb-2">
-              <Avatar className="h-10 w-10 ring-2 ring-blue-400/40 rounded-xl">
-                <AvatarImage
-                  src={userProfile?.avatar_url || "/placeholder.svg"}
-                  alt={getDisplayName()}
-                  className="rounded-xl"
-                />
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-medium rounded-xl">
+              <Avatar className="h-10 w-10 ring-2 ring-purple-400/40 rounded-xl">
+                <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} className="rounded-xl" />
+                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium rounded-xl">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{getDisplayName()}</p>
+                <p className="text-[12px] font-medium text-gray-900 truncate">
+                  {getDisplayName()}
+                </p>
                 <div className="flex items-center gap-2">
-                  <p className="text-xs text-gray-600 truncate">{userProfile?.company || getUserEmail()}</p>
-                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 rounded-lg">
-                    Member
-                  </Badge>
+                  <p className="text-[10px] text-gray-600 truncate">
+                    {userProfile?.company || getUserEmail()}
+                  </p>
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0.5">Member</Badge>
                 </div>
               </div>
             </div>
-
+            <div className="px-3 pb-2 flex items-center gap-2">
+              <Link href="/dashboard/profile" className="text-[10px] px-2 py-1 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Profile</Link>
+              <Link href="/dashboard/settings" className="text-[10px] px-2 py-1 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Settings</Link>
+            </div>
+            
             <Button
               onClick={handleSignOut}
               variant="ghost"
-              className="w-full justify-start px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 rounded-xl"
+              className="w-full justify-start px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
             >
               <LogOut className="h-4 w-4 mr-3" />
               Sign Out
@@ -362,25 +370,21 @@ export function Sidebar({ onUserUpdate, isCollapsed, isMobile, onCloseMobile, on
         )}
 
         {/* Collapsed state user profile */}
-        {isCollapsed && !isMobile && (
-          <div className="border-t border-gray-100/50 pt-3 space-y-2">
+        {(isCollapsed && !isMobile) && (
+          <div className="border-t border-gray-100 pt-3 space-y-2">
             <div className="flex justify-center">
-              <Avatar className="h-10 w-10 ring-2 ring-blue-400/40 rounded-xl">
-                <AvatarImage
-                  src={userProfile?.avatar_url || "/placeholder.svg"}
-                  alt={getDisplayName()}
-                  className="rounded-xl"
-                />
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-medium rounded-xl">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
-            </div>
+              <Avatar className="h-10 w-10 ring-2 ring-purple-400/40 rounded-xl">
+                 <AvatarImage src={userProfile?.avatar_url} alt={getDisplayName()} className="rounded-xl" />
+                 <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium rounded-xl">
+                   {getInitials()}
+                 </AvatarFallback>
+               </Avatar>
+             </div>
             <Button
               onClick={handleSignOut}
               variant="ghost"
               size="icon"
-              className="w-full h-10 rounded-xl hover:bg-gray-100/80"
+              className="w-full h-10 rounded-lg hover:bg-gray-100"
               title="Sign Out"
             >
               <LogOut className="h-4 w-4" />

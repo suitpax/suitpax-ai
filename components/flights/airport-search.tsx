@@ -1,11 +1,9 @@
-"use client"
+'use client'
 
-import type React from "react"
-
-import { useState, useEffect, useRef } from "react"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { MapPinIcon, CheckIcon } from "@heroicons/react/24/outline"
+import { useState, useEffect, useRef } from 'react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { MapPinIcon, CheckIcon } from '@heroicons/react/24/outline'
 
 interface Airport {
   id: string
@@ -23,8 +21,14 @@ interface AirportSearchProps {
   error?: string
 }
 
-export function AirportSearch({ label, placeholder, value, onChange, error }: AirportSearchProps) {
-  const [query, setQuery] = useState("")
+export default function AirportSearch({ 
+  label, 
+  placeholder, 
+  value, 
+  onChange, 
+  error 
+}: AirportSearchProps) {
+  const [query, setQuery] = useState('')
   const [airports, setAirports] = useState<Airport[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -41,26 +45,22 @@ export function AirportSearch({ label, placeholder, value, onChange, error }: Ai
 
       setIsLoading(true)
       try {
-        const response = await fetch(
-          `/api/flights/duffel/places?q=${encodeURIComponent(query)}&limit=10&types=airport,city`,
-        )
+        const response = await fetch(`/api/flights/duffel/places?q=${encodeURIComponent(query)}&limit=10&types=airport,city`)
         const data = await response.json()
-
+        
         if (data.success) {
-          setAirports(
-            (data.places || []).map((p: any) => ({
-              id: p.id,
-              iata_code: p.iata_code,
-              name: p.name,
-              city_name: p.city_name || (p.type === "city" ? p.name : ""),
-              country_name: p.country_name || "",
-            })),
-          )
+          setAirports((data.places || []).map((p: any) => ({
+            id: p.id,
+            iata_code: p.iata_code,
+            name: p.name,
+            city_name: p.city_name || (p.type === 'city' ? p.name : ''),
+            country_name: p.country_name || ''
+          })))
         } else {
           setAirports([])
         }
       } catch (error) {
-        console.error("Airport search error:", error)
+        console.error('Airport search error:', error)
         setAirports([])
       } finally {
         setIsLoading(false)
@@ -74,7 +74,7 @@ export function AirportSearch({ label, placeholder, value, onChange, error }: Ai
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        dropdownRef.current &&
+        dropdownRef.current && 
         !dropdownRef.current.contains(event.target as Node) &&
         inputRef.current &&
         !inputRef.current.contains(event.target as Node)
@@ -83,8 +83,8 @@ export function AirportSearch({ label, placeholder, value, onChange, error }: Ai
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   // Mantener sincronizado el valor externo con el input visible
@@ -99,11 +99,11 @@ export function AirportSearch({ label, placeholder, value, onChange, error }: Ai
     const newQuery = e.target.value
     setQuery(newQuery)
     setIsOpen(true)
-
+    
     // Si el usuario borra todo, limpiar la selección
     if (!newQuery) {
       setSelectedAirport(null)
-      onChange("")
+      onChange('')
     }
   }
 
@@ -131,23 +131,27 @@ export function AirportSearch({ label, placeholder, value, onChange, error }: Ai
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           placeholder={placeholder}
-          className={`pl-10 rounded-full border-gray-300/60 bg-white/70 backdrop-blur-sm shadow-sm ${error ? "border-red-500" : ""}`}
+          className={`pl-10 rounded-full border-gray-300/60 bg-white/70 backdrop-blur-sm shadow-sm ${error ? 'border-red-500' : ''}`}
         />
         {selectedAirport && (
           <CheckIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-500" />
         )}
       </div>
 
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && (
+        <p className="mt-1 text-xs text-red-500">{error}</p>
+      )}
 
       {/* Dropdown de resultados */}
       {isOpen && (
-        <div
+        <div 
           ref={dropdownRef}
           className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
         >
           {isLoading ? (
-            <div className="px-4 py-3 text-sm text-gray-500">Searching airports...</div>
+            <div className="px-4 py-3 text-sm text-gray-500">
+              Searching airports...
+            </div>
           ) : airports.length > 0 ? (
             airports.map((airport) => (
               <button
@@ -157,7 +161,9 @@ export function AirportSearch({ label, placeholder, value, onChange, error }: Ai
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="font-medium text-sm text-gray-900">{airport.name}</div>
+                    <div className="font-medium text-sm text-gray-900">
+                      {airport.name}
+                    </div>
                     <div className="text-xs text-gray-500">
                       {airport.city_name}, {airport.country_name}
                     </div>
@@ -169,13 +175,12 @@ export function AirportSearch({ label, placeholder, value, onChange, error }: Ai
               </button>
             ))
           ) : query.length >= 2 ? (
-            <div className="px-4 py-3 text-sm text-gray-500">No airports found for "{query}"</div>
+            <div className="px-4 py-3 text-sm text-gray-500">
+              No airports found for "{query}"
+            </div>
           ) : null}
         </div>
       )}
     </div>
   )
 }
-
-// Keep default export for backward compatibility
-export default AirportSearch

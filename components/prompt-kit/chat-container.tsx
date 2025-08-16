@@ -1,9 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import type React from "react"
-import { createContext, useContext, useEffect, useRef, useState } from "react"
-import { ChatMessage } from "./chat-message"
+import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 
 // Context para compartir el estado del scroll
 type ChatContainerContextType = {
@@ -27,7 +25,11 @@ export type ChatContainerRootProps = {
   className?: string
 } & React.HTMLAttributes<HTMLDivElement>
 
-export function ChatContainerRoot({ children, className, ...props }: ChatContainerRootProps) {
+export function ChatContainerRoot({
+  children,
+  className,
+  ...props
+}: ChatContainerRootProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true)
 
@@ -67,7 +69,12 @@ export function ChatContainerRoot({ children, className, ...props }: ChatContain
     <ChatContainerContext.Provider value={contextValue}>
       <div
         ref={containerRef}
-        className={cn("relative overflow-y-auto", "no-scrollbar", "pb-safe", className)}
+        className={cn(
+          "relative overflow-y-auto",
+          "no-scrollbar",
+          "pb-safe",
+          className
+        )}
         {...props}
       >
         {children}
@@ -81,7 +88,11 @@ export type ChatContainerContentProps = {
   className?: string
 } & React.HTMLAttributes<HTMLDivElement>
 
-export function ChatContainerContent({ children, className, ...props }: ChatContainerContentProps) {
+export function ChatContainerContent({
+  children,
+  className,
+  ...props
+}: ChatContainerContentProps) {
   return (
     <div className={cn("w-full", className)} {...props}>
       {children}
@@ -93,7 +104,10 @@ export type ChatContainerScrollAnchorProps = {
   className?: string
 } & React.HTMLAttributes<HTMLDivElement>
 
-export function ChatContainerScrollAnchor({ className, ...props }: ChatContainerScrollAnchorProps) {
+export function ChatContainerScrollAnchor({
+  className,
+  ...props
+}: ChatContainerScrollAnchorProps) {
   const { isScrolledToBottom, scrollToBottom } = useChatContainer()
   const anchorRef = useRef<HTMLDivElement>(null)
 
@@ -113,52 +127,11 @@ export function ChatContainerScrollAnchor({ className, ...props }: ChatContainer
     }
   }, [isScrolledToBottom, scrollToBottom])
 
-  return <div ref={anchorRef} className={cn("h-1 w-full", className)} {...props} />
-}
-
-interface Message {
-  id: string
-  content: string
-  role: "user" | "assistant"
-  timestamp: Date
-  reasoning?: string
-  sources?: Array<{ title: string; url?: string; snippet?: string }>
-}
-
-interface ChatContainerProps {
-  messages: Message[]
-  isLoading?: boolean
-  onRetry?: () => void
-  className?: string
-}
-
-export function ChatContainer({ messages, isLoading, onRetry, className }: ChatContainerProps) {
   return (
-    <ChatContainerRoot className={cn("flex-1 p-6", className)}>
-      <ChatContainerContent>
-        <div className="max-w-4xl mx-auto space-y-6">
-          {messages.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-white/40 text-lg mb-4">Start a conversation</div>
-              <div className="text-white/30 text-sm">Ask me about flights, travel planning, or anything else</div>
-            </div>
-          ) : (
-            messages.map((message) => (
-              <ChatMessage
-                key={message.id}
-                message={message}
-                onRetry={message.role === "assistant" ? onRetry : undefined}
-              />
-            ))
-          )}
-          {isLoading && (
-            <div className="flex justify-center py-4">
-              <div className="animate-pulse text-white/60">Thinking...</div>
-            </div>
-          )}
-        </div>
-      </ChatContainerContent>
-      <ChatContainerScrollAnchor />
-    </ChatContainerRoot>
+    <div
+      ref={anchorRef}
+      className={cn("h-1 w-full", className)}
+      {...props}
+    />
   )
 }
