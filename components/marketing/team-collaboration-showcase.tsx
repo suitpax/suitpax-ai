@@ -254,8 +254,8 @@ const TeamCollaborationShowcase = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center justify-center text-center mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700">
-              <Image src="/logo/suitpax-green-logo.webp" alt="Suitpax" width={16} height={16} className="mr-1.5" />
+            <span className="inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700">
+              <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={12} height={12} className="mr-1.5 h-3 w-auto" />
               Suitpax Teams
             </span>
             <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">

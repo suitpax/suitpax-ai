@@ -25,8 +25,8 @@ const AirlinesSlider = () => {
     let position = 0
     const speed = 0.6
 
-    const cardWidth = 88
-    const gap = 24
+    const cardWidth = 72
+    const gap = 20
     const singleSetWidth = (cardWidth + gap) * airlines.length
 
     const animate = () => {
@@ -64,14 +64,30 @@ const AirlinesSlider = () => {
   if (!isClient) {
     return (
       <div className="w-full overflow-hidden bg-gray-100 rounded-2xl border border-gray-200">
-        <div className="py-10 h-20" />
+        <div className="px-4 pt-4 text-center">
+          <div className="inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700 mb-1.5">
+            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={14} height={14} className="mr-1 h-3 w-auto" />
+            Airline Partners
+          </div>
+          <h3 className="text-sm font-medium text-gray-900">Connected with leading airlines</h3>
+          <p className="text-[10px] text-gray-600 mt-1">Direct integrations for faster, more reliable bookings</p>
+        </div>
+        <div className="py-6 h-16" />
       </div>
     )
   }
 
   return (
     <div className="w-full overflow-hidden bg-gray-100 rounded-2xl border border-gray-200">
-      <div className="py-8 relative overflow-hidden" ref={sliderRef}>
+      <div className="px-4 pt-4 text-center">
+        <div className="inline-flex items-center rounded-xl bg-gray-200 px-2 py-0.5 text-[9px] font-medium text-gray-700 mb-1.5">
+          <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={14} height={14} className="mr-1 h-3 w-auto" />
+          Airline Partners
+        </div>
+        <h3 className="text-sm sm:text-base font-medium text-gray-900">Connected with leading airlines</h3>
+        <p className="text-[10px] sm:text-xs text-gray-600 mt-1">Direct integrations for faster, more reliable bookings</p>
+      </div>
+      <div className="py-5 relative overflow-hidden" ref={sliderRef}>
         <div 
           ref={contentRef}
           className="flex"
@@ -80,23 +96,23 @@ const AirlinesSlider = () => {
           {duplicatedAirlines.map((airline, index) => (
             <div
               key={`airline-${airline.name}-${index}`}
-              className="flex-shrink-0 mx-3 group"
-              style={{ width: "88px" }}
+              className="flex-shrink-0 mx-2.5 group"
+              style={{ width: "72px" }}
               title={airline.name}
             >
-              <div className="relative h-8 flex items-center justify-center rounded-lg bg-white/70 border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow">
+              <div className="relative h-7 flex items-center justify-center rounded-lg bg-white/70 border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow">
                 <Image
                   src={airline.logo || "/placeholder.svg"}
                   alt={airline.name}
-                  width={88}
-                  height={32}
-                  className="h-4.5 w-auto object-contain invert-[0.85] saturate-0 contrast-150"
+                  width={72}
+                  height={28}
+                  className="h-3.5 w-auto object-contain invert-[0.85] saturate-0 contrast-150"
                   priority={index < airlines.length}
                   onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg" }}
                 />
               </div>
-              <div className="mt-2 text-center">
-                <span className="text-[9px] text-gray-600 font-medium line-clamp-1">{airline.name}</span>
+              <div className="mt-1.5 text-center">
+                <span className="text-[8px] text-gray-600 font-medium line-clamp-1">{airline.name}</span>
               </div>
             </div>
           ))}

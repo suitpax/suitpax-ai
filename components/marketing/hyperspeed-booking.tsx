@@ -153,7 +153,7 @@ export const HyperspeedBooking = () => {
 
         {/* Orbes tecnológicos */}
         <div className="absolute top-1/4 right-[5%] w-64 h-64 rounded-full bg-gradient-to-br from-sky-500/5 to-purple-500/5 blur-3xl"></div>
-        <div className="absolute bottom-1/4 left-[5%] w-80 h-80 rounded-full bg-gradient-to-tr from-emerald-500/5 to-sky-500/5 blur-3xl"></div>
+        <div className="absolute bottom-1/4 left-[5%] w-80 h-80 rounded-full bg-gradient-to-tr from-white/5 to-sky-500/5 blur-3xl"></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -600,7 +600,7 @@ export const HyperspeedBooking = () => {
                       <p className="text-gray-300 font-medium">
                         Total package: <span className="text-white">$3,950</span>
                       </p>
-                      <p className="text-emerald-400 text-[8px]">Policy compliant ✓</p>
+                      <p className="text-gray-300 text-[8px]">Policy compliant ✓</p>
                     </div>
                     <p className="text-gray-300 italic mt-1">Shall I proceed with booking?</p>
                   </div>
@@ -616,9 +616,7 @@ export const HyperspeedBooking = () => {
 
           {/* Airlines Slider sin borde */}
           <div className="mt-10 sm:mt-12">
-            <p className="text-center text-gray-400 text-[10px] sm:text-xs mb-2 sm:mb-3">
-              Connected with leading airlines worldwide
-            </p>
+
             <AirlinesSlider />
           </div>
         </div>
