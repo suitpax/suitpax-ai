@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 const navigationItems = [
   { name: "Manifesto", href: "/manifesto" },
   { name: "Pricing", href: "/pricing" },
+  { name: "Suitpax Code X", href: "/pricing#code", badge: "Development" },
   { name: "Talk to founder", href: "/contact" },
 ]
 
@@ -87,6 +88,11 @@ export default function Navigation() {
                   className="px-3 py-1.5 text-sm hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors text-black"
                 >
                   {item.name}
+                  {item.badge && (
+                    <span className="ml-1 inline-flex items-center rounded-full border border-black px-2 py-0.5 text-[10px] font-medium text-black">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               ))}
               <Link

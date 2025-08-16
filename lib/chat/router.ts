@@ -1,6 +1,7 @@
 import { SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/enhanced-system"
 import { buildSystemPrompt, buildReasoningInstruction, buildToolContext } from "@/lib/prompts/system"
 import { generateAgentResponseByPlan, toAnthropicMessages, type ConversationMessage, type UserPlan } from "@/lib/anthropic"
+import { SUITPAX_CODE_SYSTEM_PROMPT } from "@/lib/prompts/code"
 
 export type ChatIntent = "flight_search" | "code_generation" | "document_processing" | "expense_analysis" | "general"
 
@@ -84,6 +85,7 @@ async function callTool(intent: ChatIntent, message: string, baseUrl: string, us
 
 function buildSystemForIntent(intent: ChatIntent): string {
   if (intent === "flight_search") return SUITPAX_AI_SYSTEM_PROMPT
+  if (intent === "code_generation") return SUITPAX_CODE_SYSTEM_PROMPT
   return buildSystemPrompt({ domain: ["general", "travel", "coding", "business", "documents", "expenses"] })
 }
 
