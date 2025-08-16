@@ -28,18 +28,17 @@ export default function TeamExpenseGuide() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <span className="text-sm font-medium text-white">GUÍA ESTRATÉGICA</span>
+              <span className="text-sm font-medium text-white">STRATEGY GUIDE</span>
             </div>
 
-            <h2 className="mb-3 text-xl font-medium tracking-tight text-white/80">LA GUÍA DEFINITIVA PARA</h2>
+            <h2 className="mb-3 text-xl font-medium tracking-tight text-white/80"><em className="font-serif italic">THE DEFINITIVE GUIDE TO</em></h2>
 
             <h1 className="mb-6 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-white leading-none max-w-4xl">
-              Transforma la gestión de gastos de tu equipo
+              <em className="font-serif italic">Transform your team's expense management</em>
             </h1>
 
             <p className="mt-4 text-xs sm:text-sm font-medium text-white/70 max-w-2xl mb-8">
-              Descubre cómo las empresas líderes están utilizando IA para simplificar la gestión de gastos, mejorar la
-              colaboración en equipo y aumentar la productividad.
+              Learn how leading companies use AI to simplify expense management, improve team collaboration, and boost productivity.
             </p>
 
             <motion.div
@@ -54,7 +53,7 @@ export default function TeamExpenseGuide() {
                 className="group flex items-center rounded-full bg-white px-6 py-3 text-base font-medium text-[#0a1a12] transition-all hover:shadow-lg hover:shadow-blue-500/20"
               >
                 <Download className="mr-2 h-5 w-5 text-blue-600" />
-                <span>DESCARGAR GUÍA</span>
+                <span>DOWNLOAD GUIDE</span>
               </Link>
             </motion.div>
           </div>
