@@ -8,7 +8,7 @@ import CounterBadge from "@/components/ui/counter-badge"
 
 // Variaciones de títulos para los productos
 const productTitles = [
-  "Our product ecosystem for modern business travel",
+  "My product ecosystem for modern business travel",
   "AI-powered solutions for every travel need",
   "The complete business travel management suite",
   "Transforming corporate travel with intelligent products",

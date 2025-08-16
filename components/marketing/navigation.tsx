@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 const navigationItems = [
   { name: "Manifesto", href: "/manifesto" },
   { name: "Pricing", href: "/pricing" },
-  { name: "Suitpax Code X", href: "/pricing#code", badge: "Development" },
+  { name: "Suitpax Code X", href: "/pricing#code", badge: "Mobile Only" },
   { name: "Talk to founder", href: "/contact" },
 ]
 
@@ -58,13 +58,13 @@ export default function Navigation() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-2 pb-2",
+                     "fixed top-0 left-0 right-0 z-50 flex justify-center px-3 pt-1.5 pb-1.5",
           "transition-all duration-300"
         )}
       >
         <div
           className={cn(
-            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-white/85 border border-black/5 px-4 py-1",
+            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-white/90 border border-black/5 px-3 py-1",
             isScrolled ? "shadow-lg border-black/10" : ""
           )}
         >
@@ -72,29 +72,31 @@ export default function Navigation() {
             <Image
               src="/logo/suitpax-bl-logo.webp"
               alt="Suitpax"
-              width={120}
-              height={25}
+              width={110}
+              height={22}
               priority
-              className="h-6 w-auto"
+              className="h-5 w-auto"
             />
           </Link>
 
           {!isMobile && (
             <div className="hidden md:flex items-center space-x-5">
-              {navigationItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="px-3 py-1.5 text-sm hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors text-black"
-                >
-                  {item.name}
-                  {item.badge && (
-                    <span className="ml-1 inline-flex items-center rounded-full border border-black px-2 py-0.5 text-[10px] font-medium text-black">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              ))}
+              {navigationItems
+                .filter((i) => i.name !== "Suitpax Code X")
+                .map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="px-3 py-1.5 text-sm hover:bg-black/5 rounded-lg font-medium tracking-tighter transition-colors text-black"
+                  >
+                    {item.name}
+                    {item.badge && (
+                      <span className="ml-1 inline-flex items-center rounded-full border border-black px-2 py-0.5 text-[10px] font-medium text-black">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                ))}
               <Link
                 href="https://discord.gg/suitpax"
                 target="_blank"
@@ -135,10 +137,10 @@ export default function Navigation() {
           {isMobile && (
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-1.5 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
+              className="p-1 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
             >
               <div className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
-                {isOpen ? <PiDotsSixBold size={20} /> : <PiDotsNineBold size={20} />}
+                {isOpen ? <PiDotsSixBold size={16} /> : <PiDotsNineBold size={16} />}
               </div>
             </button>
           )}
@@ -162,6 +164,9 @@ export default function Navigation() {
                   className="block text-sm font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
                 >
                   {item.name}
+                  {item.name === "Suitpax Code X" && (
+                    <span className="ml-1 inline-flex items-center rounded-full border border-black px-2 py-0.5 text-[10px] font-medium text-black">Mobile Only</span>
+                  )}
                 </Link>
               ))}
 
@@ -204,6 +209,23 @@ export default function Navigation() {
                 </div>
               </div>
 
+              {!loading && user && (
+                <div className="pt-4 border-t border-gray-200 space-y-3">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full text-center px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-xl transition-colors tracking-tight"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={async () => { await supabase.auth.signOut(); setUser(null); setIsOpen(false) }}
+                    className="block w-full text-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors tracking-tight"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
               {!loading && !user && (
                 <div className="pt-4 border-t border-gray-200 space-y-3">
                   <Link

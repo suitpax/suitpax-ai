@@ -20,7 +20,7 @@ const passions = [
     id: 1,
     title: "Programming",
     description:
-      "Programming is the art of turning ideas into reality. At Suitpax, we embrace elegant code, innovative architectures, and cutting-edge technologies to build systems that scale and adapt. Our passion for clean, efficient code drives us to create solutions that are both powerful and maintainable.",
+      "Programming is the art of turning ideas into reality. I embrace elegant code, innovative architectures, and cutting-edge technologies to build systems that scale and adapt. My passion for clean, efficient code drives me to create solutions that are both powerful and maintainable.",
     icon: PiDotsThreeCircleThin,
     color: "gray-400",
   },
@@ -28,7 +28,7 @@ const passions = [
     id: 2,
     title: "Machine Learning",
     description:
-      "Machine Learning transforms data into intelligence. We're obsessed with creating AI systems that learn, adapt, and provide increasingly personalized experiences. From natural language processing to predictive analytics, our ML models power the intelligence behind every aspect of the Suitpax platform.",
+      "Machine Learning transforms data into intelligence. I'm obsessed with creating AI systems that learn, adapt, and provide increasingly personalized experiences. From natural language processing to predictive analytics, my models power the intelligence behind every aspect of the Suitpax platform.",
     icon: PiDotsThreeOutlineThin,
     color: "gray-400",
   },
@@ -36,7 +36,7 @@ const passions = [
     id: 3,
     title: "Travel",
     description:
-      "Travel connects people, cultures, and ideas. We believe business travel should be more than just getting from A to B—it should be efficient, personalized, and even enjoyable. Our deep understanding of the travel industry's challenges and opportunities informs every feature we build.",
+      "Travel connects people, cultures, and ideas. I believe business travel should be more than just getting from A to B—it should be efficient, personalized, and even enjoyable. My understanding of the travel industry's challenges and opportunities informs every feature I build.",
     icon: PiDotsThreeVerticalThin,
     color: "gray-400",
   },
@@ -69,7 +69,7 @@ const intersections = [
     id: 4,
     title: "The Perfect Convergence",
     description:
-      "At the intersection of all three passions is Suitpax—a platform that combines technical excellence, artificial intelligence, and travel expertise to transform how businesses manage travel. This unique convergence enables us to solve problems that others can't even identify.",
+      "At the intersection of all three passions is Suitpax—a platform that combines technical excellence, artificial intelligence, and travel expertise to transform how businesses manage travel. This unique convergence enables me to solve problems that others can't even identify.",
     icon: PiRocketLaunchLight,
   },
 ]
@@ -79,17 +79,17 @@ const visionStatements = [
   {
     id: 1,
     quote:
-      "We envision a future where business travel is not just efficient, but truly intelligent—anticipating needs, removing friction, and adapting to each traveler's preferences.",
+      "I envision a future where business travel is not just efficient, but truly intelligent—anticipating needs, removing friction, and adapting to each traveler's preferences.",
   },
   {
     id: 2,
     quote:
-      "The convergence of programming, machine learning, and travel expertise will create experiences that seem magical—where complexity disappears and travelers can focus on what matters.",
+      "The convergence of programming, machine learning, and travel expertise will create experiences that seem magical—where complexity disappears and travelers can focus on what matters most.",
   },
   {
     id: 3,
     quote:
-      "Our mission is to build technology that understands the human aspects of travel while leveraging the power of AI to make every journey better than the last.",
+      "My mission is to build technology that understands the human aspects of travel while leveraging the power of AI to make every journey better than the last.",
   },
 ]
 

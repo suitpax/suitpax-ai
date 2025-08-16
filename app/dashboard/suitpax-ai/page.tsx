@@ -27,6 +27,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { EnhancedPromptInput } from "@/components/prompt-kit/enhanced-prompt-input"
+import { ChatMessage } from "@/components/prompt-kit/chat-message"
 
 interface Message {
   id: string
@@ -304,47 +306,42 @@ export default function SuitpaxAIPage() {
             )}
           </AnimatePresence>
 
-          <div className="flex items-end gap-4">
-            <div className="flex-1 relative">
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask me about flights, hotels, travel planning, or anything else..."
-                disabled={isLoading}
-                className="bg-white border-gray-300 rounded-2xl resize-none min-h-[60px] pr-20 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-                rows={1}
-              />
-              <div className="absolute right-3 bottom-3 flex items-center gap-2">
-                <input
-                  ref={uploadInputRef}
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={(e) => {
-                    if (e.target.files) {
-                      setFiles([...files, ...Array.from(e.target.files)])
-                    }
-                  }}
-                />
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 w-8 p-0 hover:bg-gray-100 rounded-full"
-                  onClick={() => uploadInputRef.current?.click()}
-                >
-                  <Paperclip className="h-4 w-4" />
-                </Button>
+                      <div className="flex items-end gap-4">
+              <div className="flex-1">
+                <div className="hidden sm:block">
+                  <div className="max-w-3xl mx-auto">
+                    <div className="mb-2 text-xs text-gray-500 font-medium">Ask Suitpax AI</div>
+                    <EnhancedPromptInput
+                      value={input}
+                      onChange={setInput}
+                      onSubmit={handleSend}
+                      isLoading={isLoading}
+                      placeholder="Ask me about flights, hotels, travel planning, or anything else..."
+                      enableAttachments
+                      enableVoice
+                    />
+                  </div>
+                </div>
+                <div className="sm:hidden">
+                  <Textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Ask me about flights, hotels, travel planning, or anything else..."
+                    disabled={isLoading}
+                    className="bg-white border-gray-300 rounded-2xl resize-none min-h-[56px] pr-20 focus:ring-2 focus:ring-gray-900 focus:border-transparent shadow-sm"
+                    rows={1}
+                  />
+                </div>
               </div>
+              <Button
+                onClick={handleSend}
+                disabled={isLoading || (!input.trim() && files.length === 0)}
+                className="bg-black hover:bg-gray-800 text-white rounded-2xl px-6 py-3 shadow-sm transition-all"
+              >
+                <Send className="h-5 w-5" />
+              </Button>
             </div>
-            <Button
-              onClick={handleSend}
-              disabled={isLoading || (!input.trim() && files.length === 0)}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <Send className="h-5 w-5" />
-            </Button>
-          </div>
         </div>
       </div>
     </div>
@@ -400,55 +397,7 @@ export default function SuitpaxAIPage() {
             <div className="flex-1 overflow-y-auto">
               <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
                 {messages.map((message, index) => (
-                  <motion.div
-                    key={message.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    <div className={`max-w-3xl ${message.role === "user" ? "ml-12" : "mr-12"}`}>
-                      <div
-                        className={`rounded-2xl p-6 shadow-sm ${
-                          message.role === "user"
-                            ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                            : "bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-900"
-                        }`}
-                      >
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          className={`prose max-w-none ${
-                            message.role === "user"
-                              ? "prose-invert prose-headings:text-white prose-p:text-white prose-strong:text-white"
-                              : "prose-gray"
-                          }`}
-                        >
-                          {message.content}
-                        </ReactMarkdown>
-
-                        {message.reasoning && showReasoning && (
-                          <details className="mt-6 p-4 rounded-xl bg-gray-50/80 backdrop-blur-sm border border-gray-200">
-                            <summary className="cursor-pointer text-sm font-medium mb-3 flex items-center gap-2 text-gray-700">
-                              <Sparkles className="h-4 w-4" />
-                              AI Reasoning Process
-                            </summary>
-                            <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
-                              {message.reasoning}
-                            </div>
-                          </details>
-                        )}
-
-                        <div
-                          className={`flex items-center gap-2 mt-4 text-xs ${
-                            message.role === "user" ? "text-white/70" : "text-gray-500"
-                          }`}
-                        >
-                          <Clock className="h-3 w-3" />
-                          {message.timestamp.toLocaleTimeString()}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
+                  <ChatMessage message={message as any} showReasoning={showReasoning} />
                 ))}
 
                 <AnimatePresence>

@@ -77,6 +77,9 @@ export const Footer = () => {
               <Link href="/pricing" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Pricing
               </Link>
+              <Link href="/code" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                Suitpax Code
+              </Link>
               <Link
                 href="https://app.suitpax.com/auth/signup"
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
@@ -111,6 +114,15 @@ export const Footer = () => {
               <Link href="/manifesto" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Manifesto
               </Link>
+              <Link href="/careers" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                Careers
+              </Link>
+              <Link href="/changelog" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                Changelog
+              </Link>
+              <Link href="/ai-ethics" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                AI Ethics
+              </Link>
               <Link
                 href="https://cal.com/team/founders/partnership"
                 className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
@@ -135,6 +147,12 @@ export const Footer = () => {
               >
                 Trust Center
                 <PiArrowUpRightBold className="h-3 w-3 text-gray-400" />
+              </Link>
+              <Link href="/terms" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                Terms
+              </Link>
+              <Link href="/privacy" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                Privacy
               </Link>
             </div>
 

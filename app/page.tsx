@@ -10,6 +10,26 @@ import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
 import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
 import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
 import ContactForm from "@/components/marketing/contact-form"
+import { default as LaunchHero } from "@/components/marketing/launch-hero"
+import Product from "@/components/marketing/product"
+import TeamCollaborationShowcase from "@/components/marketing/team-collaboration-showcase"
+import IntelligentPolicyShowcase from "@/components/marketing/intelligent-policy-showcase"
+import BusinessTravelSlider from "@/components/marketing/business-travel-slider"
+import AirlinesSlider from "@/components/marketing/airlines-slider"
+import MCPAIAgents from "@/components/marketing/mcp-ai-agents"
+import SuitpaxAISection from "@/components/marketing/suitpax-ai-section"
+import BusinessIntelligence from "@/components/marketing/business-intelligence"
+import SmartTravel from "@/components/marketing/smart-reporting"
+import GlobalBusinessAccess from "@/components/marketing/global-business-access"
+import ExpenseManagement from "@/components/marketing/expense-management"
+import TRMManagement from "@/components/marketing/trm-management"
+import TeamExpenseGuide from "@/components/marketing/team-expense-guide"
+import TravelRewards from "@/components/marketing/travel-rewards"
+import PolicyCTA from "@/components/marketing/policy-cta"
+import OpsCopilot from "@/components/marketing/ops-copilot"
+import Hiring from "@/components/marketing/hiring"
+import AgentCode from "@/components/marketing/agent-code"
+import AIFlightSection from "@/components/marketing/ai-flight-section"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -69,6 +89,28 @@ export default function Home() {
     <>
       <main id="main-content" className="w-full">
         <Hero />
+        <LaunchHero />
+        <OpsCopilot />
+        <AgentCode />
+        {/* Newly added blocks */}
+        <Product />
+        <TeamCollaborationShowcase />
+        <IntelligentPolicyShowcase />
+        <BusinessTravelSlider />
+        <AirlinesSlider />
+        <MCPAIAgents />
+        <SuitpaxAISection />
+        <AIFlightSection />
+        <BusinessIntelligence />
+        <SmartTravel />
+        <GlobalBusinessAccess />
+        <ExpenseManagement />
+        <TRMManagement />
+        <TeamExpenseGuide />
+        <TravelRewards />
+        <PolicyCTA />
+
+        {/* Existing order retained below */}
         <PartnersShowcase />
         <AITravelAgents />
         <BusinessTravelRevolution />
@@ -78,6 +120,7 @@ export default function Home() {
         <AgenticDisruption />
         <AIVoiceAssistant />
         <AIMeetingsAttachment />
+        <Hiring />
         <ContactForm />
         <FoundersOpenLetter />
       </main>

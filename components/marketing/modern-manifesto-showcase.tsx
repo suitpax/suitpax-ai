@@ -107,13 +107,13 @@ const manifestoPoints = [
     id: 3,
     title: "Data is Power.",
     description:
-      "Our decisions are guided by data, not assumptions. Every action we take is rooted in real-time analytics, insights, and machine learning. Our platform evolves by learning from the data, continuously improving, and adapting to meet user needs with pinpoint accuracy.",
+      "My decisions are guided by data, not assumptions. Every action I take is rooted in real-time analytics, insights, and machine learning. The platform evolves by learning from the data, continuously improving, and adapting to meet user needs with pinpoint accuracy.",
   },
   {
     id: 4,
     title: "Scalability is in Our DNA.",
     description:
-      "We build with the future in mind. Suitpax isn't designed for today's needs – it's built to scale for tomorrow's challenges. Whether it's processing millions of data points or integrating new technologies, we prepare our platform to grow without limits.",
+      "I build with the future in mind. Suitpax isn't designed for today's needs – it's built to scale for tomorrow's challenges. Whether it's processing millions of data points or integrating new technologies, I prepare the platform to grow without limits.",
   },
   {
     id: 5,
@@ -125,91 +125,91 @@ const manifestoPoints = [
     id: 6,
     title: "Users Are the Heartbeat.",
     description:
-      "We are relentless in our pursuit of the best possible user experience. Every design, every interaction, every feature is crafted with the end-user in mind. Our goal is to make business travel not just efficient, but seamless, enjoyable, and intuitive.",
+      "I am relentless in my pursuit of the best possible user experience. Every design, every interaction, every feature is crafted with the end-user in mind. My goal is to make business travel not just efficient, but seamless, enjoyable, and intuitive.",
   },
   {
     id: 7,
     title: "Security is Non-Negotiable.",
     description:
-      "In an age where data breaches are common, security is our top priority. We build systems that protect user data with the highest standards. Our users trust us with sensitive information, and we deliver on that trust with uncompromising security.",
+      "In an age where data breaches are common, security is my top priority. I build systems that protect user data with the highest standards. Users trust me with sensitive information, and I deliver on that trust with uncompromising security.",
   },
   {
     id: 8,
     title: "Collaboration > Ego.",
     description:
-      "We're a team of doers, not talkers. Our success is driven by collaboration, not individual accolades. The best ideas come from the collective, and we embrace diverse perspectives to build the most innovative solutions. Ego has no place here – only results.",
+      "I am a doer, not a talker. Success is driven by collaboration and results, not individual accolades. I embrace diverse perspectives to build innovative solutions. Ego has no place here – only results.",
   },
   {
     id: 9,
     title: "Disrupt or Be Disrupted.",
     description:
-      "Innovation is in our DNA. We're here to challenge the status quo, to break down barriers and push the boundaries of what's possible. Disruption is our goal, and we won't stop until we've reshaped the business travel landscape for good.",
+      "Innovation is in my DNA. I'm here to challenge the status quo, break down barriers and push the boundaries of what's possible. Disruption is my goal, and I won't stop until I've reshaped the business travel landscape for good.",
   },
   {
     id: 10,
     title: "Keep it Simple.",
     description:
-      "Complexity doesn't always lead to better solutions. We believe in elegant, simple designs that pack power beneath the surface. Our technology may be sophisticated, but the experience is straightforward, easy to use, and intuitive.",
+      "Complexity doesn't always lead to better solutions. I believe in elegant, simple designs that pack power beneath the surface. The technology may be sophisticated, but the experience is straightforward, easy to use, and intuitive.",
   },
   {
     id: 11,
     title: "Own the Outcome.",
     description:
-      "We take full responsibility for our impact. Every decision, every line of code, every interaction, and every result is owned by the team. We don't pass blame—we learn, we adapt, and we own our success and failure.",
+      "I take full responsibility for my impact. Every decision, every line of code, every interaction, and every result is owned. I don't pass blame—I learn, I adapt, and I own my success and failure.",
   },
   {
     id: 12,
     title: "Build with Purpose.",
     description:
-      "Every feature we develop, every product we launch, has a purpose. We're not just building for the sake of building; we're creating solutions that solve real problems in the business travel world. Our mission is clear: to make travel smarter, more efficient, and more personalized for everyone.",
+      "Every feature I develop, every product I launch, has a purpose. I'm not just building for the sake of building; I'm creating solutions that solve real problems in the business travel world. My mission is clear: to make travel smarter, more efficient, and more personalized for everyone.",
   },
   {
     id: 13,
     title: "Innovate Relentlessly.",
     description:
-      "We never stop pushing the boundaries of what's possible. Whether it's integrating the latest AI advancements, building smarter automation workflows, or optimizing user experiences, we're always looking ahead. The next big idea is just around the corner.",
+      "I never stop pushing the boundaries of what's possible. Whether it's integrating the latest AI advancements, building smarter automation workflows, or optimizing user experiences, I'm always looking ahead. The next big idea is just around the corner.",
   },
   {
     id: 14,
     title: "No Boundaries.",
     description:
-      "We think beyond traditional limits. Geography, industry, and process boundaries don't restrict us. We build a global platform with limitless potential to change the way business travel operates everywhere.",
+      "I think beyond traditional limits. Geography, industry, and process boundaries don't restrict me. I build a global platform with limitless potential to change the way business travel operates everywhere.",
   },
   {
     id: 15,
     title: "Customer Obsession.",
     description:
-      "We are obsessed with our customers' success. Every decision we make is driven by how it will impact our users. We listen, we adapt, and we evolve based on their feedback. Their success is our success, and we won't rest until we've exceeded their expectations.",
+      "I'm obsessed with my customers' success. Every decision I make is driven by how it will impact users. I listen, I adapt, and I evolve based on their feedback. Their success is my success, and I won't rest until I've exceeded their expectations.",
   },
   {
     id: 16,
     title: "Transparency Above All.",
     description:
-      "We believe in radical transparency with our team, our customers, and our partners. No hidden agendas, no secret plans. We communicate openly about our successes, our failures, and our roadmap. Trust is built on transparency, and we're committed to earning that trust every day.",
+      "I believe in radical transparency with my customers and partners. No hidden agendas, no secret plans. I communicate openly about successes, failures, and the roadmap. Trust is built on transparency, and I'm committed to earning that trust every day.",
   },
   {
     id: 17,
     title: "Embrace the Future.",
     description:
-      "We don't just adapt to change – we anticipate it. The future of travel is evolving rapidly, and we're at the forefront of that evolution. We embrace new technologies, new methodologies, and new ideas with open arms, always looking ahead to what's next.",
+      "I don't just adapt to change – I anticipate it. The future of travel is evolving rapidly, and I'm working to be at the forefront of that evolution. I embrace new technologies, methodologies, and ideas with open arms, always looking ahead to what's next.",
   },
   {
     id: 18,
     title: "Sustainable by Design.",
     description:
-      "We build with sustainability in mind. Our platform is designed to reduce the environmental impact of business travel through smart routing, carbon offsetting, and digital-first solutions. We believe that efficiency and sustainability go hand in hand.",
+      "I build with sustainability in mind. The platform is designed to reduce the environmental impact of business travel through smart routing, carbon offsetting, and digital-first solutions. I believe that efficiency and sustainability go hand in hand.",
   },
   {
     id: 19,
     title: "Global Mindset.",
     description:
-      "We think and operate globally from day one. Our platform is built for international scale, supporting multiple languages, currencies, and regional requirements. We understand that business travel crosses borders, and our solutions do too.",
+      "I think and operate globally from day one. The platform is built for international scale, supporting multiple languages, currencies, and regional requirements. I understand that business travel crosses borders, and my solutions do too.",
   },
   {
     id: 20,
     title: "Measure What Matters.",
     description:
-      "We focus on metrics that drive real value. Vanity metrics don't impress us – we care about the numbers that reflect actual impact for our users. Every feature, every update, every decision is measured against its ability to deliver meaningful results.",
+      "I focus on metrics that drive real value. Vanity metrics don't impress me – I care about the numbers that reflect actual impact for users. Every feature, every update, every decision is measured against its ability to deliver meaningful results.",
   },
 ]
 
