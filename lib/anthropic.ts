@@ -13,17 +13,22 @@ export interface ConversationMessage {
 // Configuración según tu pricing y criterio de modelos
 const PLAN_CONFIGS = {
   free: {
-    model: "claude-3-7-sonnet-latest",
+    model: "claude-3-7-sonnet-20250219",
     maxTokens: 1024,
     monthlyTokens: 5_000,
   },
+  basic: {
+    model: "claude-3-7-sonnet-20250219",
+    maxTokens: 2048,
+    monthlyTokens: 15_000,
+  },
   pro: {
-    model: "claude-3-7-sonnet-latest",
+    model: "claude-3-7-sonnet-20250219",
     maxTokens: 4096,
     monthlyTokens: 25_000,
   },
   enterprise: {
-    model: "claude-3-7-sonnet-latest",
+    model: "claude-3-7-sonnet-20250219",
     maxTokens: 8192,
     monthlyTokens: undefined,
   }

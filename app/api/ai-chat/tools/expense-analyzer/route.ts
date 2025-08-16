@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const input = `\n${EXPENSE_ANALYSIS_PROMPT}\n\n## Task\n- User: ${userId || "anonymous"}\n- Request: ${query}\n\nProvide a concise analysis with 3-5 key insights and a short action plan.`
 
     const res = await anthropic.messages.create({
-      model: "claude-3-7-sonnet-latest",
+      model: "claude-3-7-sonnet-20250219",
       max_tokens: 1200,
       system: EXPENSE_ANALYSIS_PROMPT,
       messages: [{ role: "user", content: input }],

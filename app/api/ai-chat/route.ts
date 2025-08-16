@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
     }
 
     const initial = await anthropic.messages.create({
-      model: "claude-3-7-sonnet-latest",
+      model: "claude-3-7-sonnet-20250219",
       max_tokens: maxTokensForResponse,
       system: systemPrompt,
       messages: [...conversationHistory, { role: "user", content: enhancedMessage }],
@@ -277,7 +277,7 @@ export async function POST(request: NextRequest) {
         : `Mensaje del usuario: ${message}\n\nRespuesta: ${text}\n\nExplica en 3–5 puntos el razonamiento de alto nivel.`
 
       const r = await anthropic.messages.create({
-        model: "claude-3-7-sonnet-latest",
+        model: "claude-3-7-sonnet-20250219",
         max_tokens: 300,
         system: buildReasoningInstruction("es"),
         messages: [{ role: "user", content: reasoningPrompt }],
@@ -294,13 +294,13 @@ export async function POST(request: NextRequest) {
     try {
       await supabase.from("ai_usage").insert({
         user_id: user.id,
-        model: "claude-3-7-sonnet-latest",
+        model: "claude-3-7-sonnet-20250219",
         input_tokens: actualInputTokens,
         output_tokens: actualOutputTokens,
         total_tokens: totalTokensUsed,
         context_type: toolType,
         provider: "anthropic",
-        cost_usd: calculateTokenCost(totalTokensUsed, "claude-3-7-sonnet-latest"),
+        cost_usd: calculateTokenCost(totalTokensUsed, "claude-3-7-sonnet-20250219"),
       })
 
       // Also log to ai_chat_logs for backward compatibility

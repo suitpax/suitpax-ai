@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const input = `\n${DOCUMENT_AI_PROMPT}\n\n## Task\n- User query: ${query || "Analyze document"}\n- Document type: ${documentType}\n${documentText ? `- Document content (truncated):\n${String(documentText).slice(0, 4000)}` : ""}\n\nProvide a brief analysis and, if applicable, extract structured data in JSON.`
 
     const res = await anthropic.messages.create({
-      model: "claude-3-7-sonnet-latest",
+      model: "claude-3-7-sonnet-20250219",
       max_tokens: 1500,
       system: DOCUMENT_AI_PROMPT,
       messages: [{ role: "user", content: input }],

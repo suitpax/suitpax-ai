@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookieStore } from "@/lib/supabase/cookies"
 import Anthropic from "@anthropic-ai/sdk"
+import { SUITPAX_VOICE_SYSTEM_PROMPT } from "@/lib/prompts/voice"
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -36,16 +37,9 @@ export async function POST(request: NextRequest) {
       model: "claude-3-7-sonnet-latest",
       max_tokens: 500,
       temperature: 0.7,
-      system: `You are Suitpax Voice AI, a conversational travel assistant. You're designed for voice interactions, so:
-      - Keep responses concise and natural for speech
-      - Use a friendly, professional tone
-      - Ask clarifying questions when needed
-      - Focus on actionable travel assistance
-      - Avoid long lists or complex formatting
-      
-      You help with flight bookings, hotel recommendations, travel policies, and general business travel assistance.
-      
-      Context: ${context || "No additional context provided"}`,
+      system: `${SUITPAX_VOICE_SYSTEM_PROMPT}
+
+Context: ${context || "No additional context provided"}`,
       messages: [
         {
           role: "user",
