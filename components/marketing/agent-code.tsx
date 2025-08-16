@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { PromptInput, PromptInputAction, PromptInputActions, PromptInputTextarea } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
 import { ArrowUp, Square } from "lucide-react"
-import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 
 export default function AgentCode() {
   const [input, setInput] = useState("")
@@ -42,21 +41,30 @@ export default function AgentCode() {
   }
 
   return (
-    <section className="relative py-16">
-      <VantaHaloBackground className="rounded-[24px] overflow-hidden">
-        <div className="relative px-4 md:px-6 py-14">
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white/70 border border-gray-200 rounded-full px-3 py-1">
-              <span className="text-[10px] font-medium text-gray-700">Suitpax Code</span>
-              <span className="text-[10px] text-gray-500">Agent Interface</span>
-            </div>
-            <h2 className="mt-4 text-3xl sm:text-4xl font-medium tracking-tighter text-gray-900">Ask. Build. Ship.</h2>
-            <p className="mt-2 text-sm sm:text-base text-gray-600 font-medium">Demonstrating the power of Suitpax AI to turn prompts into production-grade components and tools.</p>
+    <section className="relative py-16 bg-black overflow-hidden">
+      <div className="absolute inset-0 opacity-[0.03] bg-repeat bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px]"></div>
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        <div className="text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-md rounded-full px-3 py-1">
+            <span className="text-[10px] font-medium text-white">Suitpax Code</span>
+            <span className="text-[10px] text-gray-300">Agent Interface</span>
           </div>
+          <h2 className="mt-4 text-3xl sm:text-4xl font-medium tracking-tighter text-white">Ask. Build. Ship.</h2>
+          <p className="mt-2 text-sm sm:text-base text-gray-400 font-medium">
+            Demonstrating the power of Suitpax AI to turn prompts into production-grade components and tools.
+          </p>
+        </div>
 
-          <div className="mt-8 max-w-3xl mx-auto">
-            <PromptInput value={input} onValueChange={setInput} isLoading={isLoading} onSubmit={submit}>
-              <PromptInputTextarea placeholder={typed || "Anything to Suitpax AI…"} />
+        <div className="mt-8 max-w-3xl mx-auto">
+          <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur-md p-3 sm:p-4 shadow-lg">
+            <PromptInput
+              value={input}
+              onValueChange={setInput}
+              isLoading={isLoading}
+              onSubmit={submit}
+              className="bg-white border border-gray-200 p-2 sm:p-3"
+            >
+              <PromptInputTextarea placeholder={typed || "Anything to Suitpax AI…"} className="bg-white text-gray-900 placeholder:text-gray-500" />
               <PromptInputActions className="justify-end pt-2">
                 <PromptInputAction tooltip={isLoading ? "Stop generation" : "Send message"}>
                   <Button
@@ -72,7 +80,7 @@ export default function AgentCode() {
             </PromptInput>
           </div>
         </div>
-      </VantaHaloBackground>
+      </div>
     </section>
   )
 }
