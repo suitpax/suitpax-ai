@@ -46,9 +46,10 @@ export default function SuitpaxCodePage() {
         if (ratio >= 0.8) setShowLimitModal(true)
       }
       setLoading(false)
-      if (p === "free") {
-        router.push("/dashboard/billing?upgrade=code")
-      }
+      // Access allowed for preview/testing; gating disabled for now
+      // if (p === "free") {
+      //   router.push("/dashboard/billing?upgrade=code")
+      // }
     }
     load()
   }, [router, supabase])
@@ -124,42 +125,42 @@ export default function SuitpaxCodePage() {
   if (loading) return null
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="px-6 pt-6 pb-3 border-b border-gray-200 bg-white">
-        <h1 className="text-xl font-semibold tracking-tight text-gray-900">Suitpax Code X</h1>
-        <p className="text-sm text-gray-600">Advanced coding assistant powered by Claude 3.7 Sonnet</p>
-      </div>
+          <div className="flex flex-col h-full">
+        <div className="px-4 pt-4 pb-2 border-b border-gray-200 bg-white">
+          <h1 className="text-base font-medium tracking-tighter text-black">Suitpax Code</h1>
+          <p className="text-[12px] text-gray-600">Custom pricing planned Q1 2026</p>
+        </div>
 
-      <div className="flex-1 grid grid-rows-[auto_1fr_auto] bg-white">
-        <div className="p-4 border-b border-gray-200 bg-white">
-          <MCPRemoteServerList />
-          <div className="mt-3">
-            <MCPToolRunner />
-          </div>
-        </div>
-        <div className="overflow-hidden grid grid-cols-1 lg:grid-cols-2">
-          <ChatContainer messages={messages} className="h-[calc(100vh-360px)]" />
-          <div className="border-l border-gray-200 hidden lg:block">
-            <div className="flex items-center justify-between p-3">
-              <div className="text-sm font-medium">Preview</div>
-              <div className="flex gap-2">
-                <button onClick={copyCode} className="px-2 py-1 text-xs border rounded">Copy code</button>
-                <button onClick={saveSnippet} className="px-2 py-1 text-xs border rounded">Save</button>
-              </div>
+                <div className="flex-1 grid grid-rows-[auto_1fr_auto] bg-white">
+          <div className="p-3 border-b border-gray-200 bg-white">
+            <MCPRemoteServerList />
+            <div className="mt-2">
+              <MCPToolRunner />
             </div>
-            <iframe sandbox="allow-scripts allow-same-origin" className="w-full h-[calc(100vh-420px)]" srcDoc={previewHtml || "<div style='padding:12px;font-family:sans-serif;color:#555'>No preview</div>"} />
+          </div>
+          <div className="overflow-hidden grid grid-cols-1 lg:grid-cols-2">
+            <ChatContainer messages={messages} className="h-[calc(100vh-300px)]" />
+            <div className="border-l border-gray-200 hidden lg:block">
+              <div className="flex items-center justify-between p-2">
+                <div className="text-xs font-medium">Preview</div>
+                <div className="flex gap-2">
+                  <button onClick={copyCode} className="px-2 py-1 text-[10px] border rounded">Copy</button>
+                  <button onClick={saveSnippet} className="px-2 py-1 text-[10px] border rounded">Save</button>
+                </div>
+              </div>
+              <iframe sandbox="allow-scripts allow-same-origin" className="w-full h-[calc(100vh-360px)]" srcDoc={previewHtml || "<div style='padding:12px;font-family:sans-serif;color:#555'>No preview</div>"} />
+            </div>
+          </div>
+          <div className="p-3 border-t border-gray-200 bg-white">
+            <EnhancedPromptInput
+              value={input}
+              onChange={setInput}
+              onSubmit={send}
+              isLoading={isSending}
+              placeholder="/mcp <tool> {json} or ask Suitpax Code to build a UI..."
+            />
           </div>
         </div>
-        <div className="p-4 border-t border-gray-200 bg-white">
-          <EnhancedPromptInput
-            value={input}
-            onChange={setInput}
-            onSubmit={send}
-            isLoading={isSending}
-            placeholder="/mcp <tool> {json} or ask Suitpax Code X to build a UI..."
-          />
-        </div>
-      </div>
 
       {showLimitModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">

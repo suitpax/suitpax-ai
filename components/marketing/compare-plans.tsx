@@ -13,7 +13,7 @@ const featureCategories = [
     features: [
       {
         name: "Monthly AI Tokens",
-        description: "Number of AI tokens available for use each month (Claude 3.7 Sonnet across all plans)",
+        description: "Number of AI tokens available for use each month (same runtime across all plans)",
         free: "5,000",
         basic: "15,000",
         pro: "25,000",
@@ -21,7 +21,7 @@ const featureCategories = [
       },
       {
         name: "AI Travel Searches",
-        description: "Number of AI-powered travel searches per month (same model, different limits)",
+                 description: "Number of AI-powered travel searches per month (plan-based limits)",
         free: "10/month",
         basic: "30/month",
         pro: "50/month",
@@ -188,8 +188,8 @@ export function ComparePlans() {
             </div>
           </motion.div>
 
-          <motion.div
-            className="overflow-x-auto rounded-2xl border border-gray-200 shadow bg-white"
+                    <motion.div
+            className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm bg-white"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -229,7 +229,7 @@ export function ComparePlans() {
                     <th className="py-6 px-6 text-center w-1/5">
                       <div className="flex flex-col items-center">
                         <span className="text-lg font-medium text-black mb-1">Enterprise</span>
-                        <span className="text-sm text-gray-500 mb-2">Custom pricing</span>
+                                                 <span className="text-sm text-gray-500 mb-2">Custom pricing (Suitpax Code add-on Q1 2026)</span>
                         <span className="inline-flex items-center rounded-full bg-transparent border border-black px-4 py-1 text-xs font-medium text-black">
                           Enterprise
                         </span>
@@ -248,7 +248,7 @@ export function ComparePlans() {
                       >
                         <td colSpan={6} className="py-4 px-6">
                           <div className="flex items-center justify-between">
-                            <span className="font-medium text-base text-white">{category.name}</span>
+                            <span className="font-medium text-base text-black">{category.name}</span>
                             <svg
                               className={`w-5 h-5 transition-transform text-gray-400 ${expandedCategory === category.name ? "rotate-180" : ""}`}
                               fill="none"

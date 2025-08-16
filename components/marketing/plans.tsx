@@ -84,7 +84,7 @@ const pricingPlans = [
     period: "forever",
     annualPeriod: "forever",
     features: [
-      "5,000 AI tokens/month (Claude 3.7 Sonnet)",
+      "5,000 AI tokens/month",
       "10 AI travel searches per month",
       "Up to 5 team members",
       "Basic AI travel planning",
@@ -109,7 +109,7 @@ const pricingPlans = [
     period: "per month",
     annualPeriod: "per month, billed annually",
     features: [
-      "15,000 AI tokens/month (Claude 3.7 Sonnet)",
+      "15,000 AI tokens/month",
       "30 AI travel searches per month",
       "Up to 15 team members",
       "Standard AI travel planning",
@@ -135,7 +135,7 @@ const pricingPlans = [
     period: "per month",
     annualPeriod: "per month, billed annually",
     features: [
-      "25,000 AI tokens/month (Claude 3.7 Sonnet)",
+      "25,000 AI tokens/month",
       "50 AI travel searches per month",
       "Up to 25 team members",
       "AI-powered expense management",
@@ -167,7 +167,7 @@ const pricingPlans = [
     period: "tailored for enterprise",
     annualPeriod: "tailored for enterprise",
     features: [
-      "Unlimited AI tokens (Claude 3.7 Sonnet)",
+      "Unlimited AI tokens",
       "Unlimited AI travel searches",
       "Unlimited team members",
       "Full AI travel intelligence suite",
@@ -176,6 +176,7 @@ const pricingPlans = [
       "24/7 VIP support",
       "Custom AI workflows",
       "Executive travel program",
+      "Suitpax Code add-on (coming Q1 2026)",
       "Full bank API integration",
       "Multi-currency management",
     ],
@@ -393,148 +394,170 @@ export const Plans = () => {
   }
 
   return (
-    <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-gray-50">
-      <div className="container mx-auto px-4 md:px-6">
-        <motion.div
-          className="flex flex-col items-center justify-center text-center mb-12 sm:mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="inline-flex flex-wrap items-center justify-center gap-3 mb-4 sm:mb-6 bg-gray-50 px-3 py-2 rounded-full">
-            <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
-              Suitpax Pricing
-            </span>
-            <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
-              Updated Q2 2025
-            </span>
-          </div>
-
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
-            {randomTitle}
-          </h2>
-          <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6 sm:mb-8">{randomSubtitle}</p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
-            <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
-              <span className="font-medium">Flexible Solutions</span>
-            </div>
-            <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
-              <span className="font-medium">Artificial Intelligence</span>
-            </div>
-            <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
-              <span className="font-medium">Scalability</span>
-            </div>
-          </div>
-        </motion.div>
-
-        <div className="flex justify-center mb-8">
-          <div className="flex items-center bg-gray-100 p-1 rounded-full">
-            <button
-              onClick={() => setIsAnnual(false)}
-              className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
-                !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setIsAnnual(true)}
-              className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
-                isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
-              }`}
-            >
-              Annual
-              <span className="ml-1 inline-flex items-center rounded-full bg-black px-2 py-0.5 text-[9px] font-medium text-white">
-                Save 20%
+    <>
+      <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-gray-50">
+        <div className="container mx-auto px-4 md:px-6">
+          <motion.div
+            className="flex flex-col items-center justify-center text-center mb-12 sm:mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="inline-flex flex-wrap items-center justify-center gap-3 mb-4 sm:mb-6 bg-gray-50 border border-gray-200 px-3 py-2 rounded-full">
+              <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
+                Suitpax Pricing
               </span>
-            </button>
+              <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
+                Updated Q2 2025
+              </span>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
+              {randomTitle}
+            </h2>
+            <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mb-6 sm:mb-8">{randomSubtitle}</p>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
+              <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
+                <span className="font-medium">Flexible Solutions</span>
+              </div>
+              <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
+                <span className="font-medium">Artificial Intelligence</span>
+              </div>
+              <div className="inline-flex items-center rounded-md bg-transparent border border-gray-200 px-2 py-1 text-[8px] sm:text-[9px] text-gray-600">
+                <span className="font-medium">Scalability</span>
+              </div>
+            </div>
+          </motion.div>
+
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center bg-gray-100 p-1 rounded-full">
+              <button
+                onClick={() => setIsAnnual(false)}
+                className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
+                  !isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setIsAnnual(true)}
+                className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
+                  isAnnual ? "bg-white shadow-sm text-black" : "text-gray-600"
+                }`}
+              >
+                Annual
+                <span className="ml-1 inline-flex items-center rounded-full bg-black px-2 py-0.5 text-[9px] font-medium text-white">
+                  Save 20%
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Grid modificado para 2x2 en pantallas grandes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
+            {pricingPlans.map((plan, index) => (
+              <motion.div
+                key={plan.id}
+                className={`relative overflow-hidden bg-gradient-to-br ${plan.bgGradient} border border-black rounded-xl p-3 sm:p-4 flex flex-col h-full ${
+                  plan.popular ? "border-2 shadow-lg" : "border shadow-sm"
+                }`}
+                whileHover={{
+                  y: -4,
+                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                  transition: { duration: 0.2 },
+                }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                {/* Diseño más compacto */}
+                <div className="mb-2 sm:mb-3 flex items-start justify-between">
+                  <div>
+                    <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">{plan.name}</h3>
+                    <p className="text-[9px] sm:text-[10px] text-gray-600 mt-0.5 line-clamp-2">{plan.description}</p>
+                  </div>
+                  {plan.badge && (
+                    <span className="inline-flex items-center rounded-xl bg-transparent border border-black px-2 py-0.5 text-[8px] sm:text-[9px] font-medium text-black">
+                      {plan.badge}
+                    </span>
+                  )}
+                </div>
+
+                <div className="mb-2 sm:mb-3">
+                  <div className="flex items-baseline">
+                    <span className="text-2xl sm:text-3xl font-medium tracking-tighter text-black">
+                      {isAnnual ? plan.annualPrice : plan.price}
+                    </span>
+                    <span className="text-[9px] sm:text-[10px] text-gray-500 ml-1">
+                      /{isAnnual ? plan.annualPeriod : plan.period}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Features más compactas */}
+                <ul className="space-y-1 mb-3 sm:mb-4 flex-grow">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <svg
+                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-950 mt-0.5 mr-1.5 flex-shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      <span className="text-[9px] sm:text-[10px] font-medium text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Mini Chat UI con agente específico */}
+                <MiniChat planId={plan.id} />
+
+                {/* Suitpax Code label for enterprise */}
+                {plan.id === "enterprise" && (
+                  <div className="mt-2 text-[10px] text-gray-600">
+                    Suitpax Code add-on planned for Q1 2026.
+                  </div>
+                )}
+
+                {/* Community Carousel - solo para planes no beta */}
+                {plan.id !== "beta" && plan.communityImages && <CommunityCarousel images={plan.communityImages} />}
+
+                <div className="mt-3">
+                  <button
+                    onClick={() => handlePlanSelect(plan.id)}
+                    className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors ${
+                      plan.popular
+                        ? "bg-black text-white hover:bg-gray-800"
+                        : "bg-white text-black border border-black hover:bg-gray-100"
+                    } block mx-auto max-w-[220px]`}
+                  >
+                    {plan.cta}
+                  </button>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
-
-        {/* Grid modificado para 2x2 en pantallas grandes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
-          {pricingPlans.map((plan, index) => (
-            <motion.div
-              key={plan.id}
-              className={`relative overflow-hidden bg-gradient-to-br ${plan.bgGradient} border border-black rounded-xl p-3 sm:p-4 flex flex-col h-full ${
-                plan.popular ? "border-2 shadow-lg" : "border shadow-sm"
-              }`}
-              whileHover={{
-                y: -4,
-                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
-                transition: { duration: 0.2 },
-              }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              {/* Diseño más compacto */}
-              <div className="mb-2 sm:mb-3 flex items-start justify-between">
-                <div>
-                  <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">{plan.name}</h3>
-                  <p className="text-[9px] sm:text-[10px] text-gray-600 mt-0.5 line-clamp-2">{plan.description}</p>
-                </div>
-                {plan.badge && (
-                  <span className="inline-flex items-center rounded-xl bg-transparent border border-black px-2 py-0.5 text-[8px] sm:text-[9px] font-medium text-black">
-                    {plan.badge}
-                  </span>
-                )}
+      </section>
+      <section id="code" className="py-10">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="max-w-3xl mx-auto border border-gray-200 rounded-2xl p-4 bg-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">Suitpax Code</h3>
+                <p className="text-xs text-gray-600">Custom pricing planned for Q1 2026. Available on mobile navigation when opened.</p>
               </div>
-
-              <div className="mb-2 sm:mb-3">
-                <div className="flex items-baseline">
-                  <span className="text-2xl sm:text-3xl font-medium tracking-tighter text-black">
-                    {isAnnual ? plan.annualPrice : plan.price}
-                  </span>
-                  <span className="text-[9px] sm:text-[10px] text-gray-500 ml-1">
-                    /{isAnnual ? plan.annualPeriod : plan.period}
-                  </span>
-                </div>
-              </div>
-
-              {/* Features más compactas */}
-              <ul className="space-y-1 mb-3 sm:mb-4 flex-grow">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start">
-                    <svg
-                      className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-950 mt-0.5 mr-1.5 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span className="text-[9px] sm:text-[10px] font-medium text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Mini Chat UI con agente específico */}
-              <MiniChat planId={plan.id} />
-
-              {/* Community Carousel - solo para planes no beta */}
-              {plan.id !== "beta" && plan.communityImages && <CommunityCarousel images={plan.communityImages} />}
-
-              <div className="mt-3">
-                <button
-                  onClick={() => handlePlanSelect(plan.id)}
-                  className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors ${
-                    plan.popular
-                      ? "bg-black text-white hover:bg-gray-800"
-                      : "bg-white text-black border border-black hover:bg-gray-100"
-                  } block mx-auto max-w-[220px]`}
-                >
-                  {plan.cta}
-                </button>
-              </div>
-            </motion.div>
-          ))}
+              <span className="inline-flex items-center rounded-full border border-black px-2.5 py-0.5 text-[10px] font-medium text-black">Coming soon</span>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   )
 }
 
