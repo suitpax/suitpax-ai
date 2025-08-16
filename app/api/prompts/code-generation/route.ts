@@ -22,6 +22,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
 
+    // Check Code add-on token limits
+    const estInput = Math.ceil((prompt + (language || "") + (framework || "")).length / 4)
+    const estOutput = 2000
+    const { data: canUseCode } = await supabase.rpc("can_use_code_tokens", { user_uuid: user.id, tokens_needed: estInput + estOutput })
+    if (!canUseCode) {
+      const { data: limits } = await supabase.rpc("get_user_subscription_limits", { user_uuid: user.id })
+      return NextResponse.json({ error: "Code add-on limit exceeded", limits: limits?.[0] || null, upgradeRequired: true }, { status: 429 })
+    }
+
     const enhancedPrompt = `
 ${SUITPAX_CODE_SYSTEM_PROMPT}
 
@@ -60,6 +69,9 @@ ${SUITPAX_CODE_SYSTEM_PROMPT}
       provider: "anthropic",
       cost_usd: (tokensUsed / 1000) * 0.003,
     })
+
+    // Increment Code tokens usage
+    await supabase.rpc("increment_code_tokens", { p_user: user.id, p_tokens: tokensUsed })
 
     return NextResponse.json({
       code: generatedCode,

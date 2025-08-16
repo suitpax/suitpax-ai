@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const estimatedOutputTokens = 1000 // Conservative estimate for response
 
     // Check if user can use AI tokens
-    const { data: canUseTokens, error: tokenCheckError } = await supabase.rpc("can_use_ai_tokens", {
+    const { data: canUseTokens, error: tokenCheckError } = await supabase.rpc("can_use_ai_tokens_v2", {
       user_uuid: user.id,
       tokens_needed: estimatedInputTokens + estimatedOutputTokens,
     })
@@ -161,6 +161,17 @@ export async function POST(request: NextRequest) {
         }
       } catch (error) {
         console.error("Expense analysis tool error:", error)
+      }
+    }
+
+    // If Code generation, check code add-on
+    if (isCodeIntent) {
+      const estInput = Math.ceil((message + JSON.stringify(conversationHistory)).length / 4)
+      const estOutput = 2000
+      const { data: canUseCode } = await supabase.rpc("can_use_code_tokens", { user_uuid: user.id, tokens_needed: estInput + estOutput })
+      if (!canUseCode) {
+        const { data: limits } = await supabase.rpc("get_user_subscription_limits", { user_uuid: user.id })
+        return NextResponse.json({ error: "Code add-on limit exceeded", limits: limits?.[0] || null, upgradeRequired: true }, { status: 429 })
       }
     }
 
@@ -302,6 +313,12 @@ export async function POST(request: NextRequest) {
         provider: "anthropic",
         cost_usd: calculateTokenCost(totalTokensUsed, "claude-3-7-sonnet-20250219"),
       })
+
+      // Increment token usage (AI and optionally Code)
+      await supabase.rpc("increment_ai_tokens_v2", { user_uuid: user.id, tokens_needed: totalTokensUsed })
+      if (isCodeIntent) {
+        await supabase.rpc("increment_code_tokens", { p_user: user.id, p_tokens: totalTokensUsed })
+      }
 
       // Also log to ai_chat_logs for backward compatibility
       await supabase.from("ai_chat_logs").insert({
