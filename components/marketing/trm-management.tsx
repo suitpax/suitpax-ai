@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { PiHandshakeBold, PiChartLineUpBold, PiUsersBold } from "react-icons/pi"
 
-export const TRMManagement = () => {
+const TRMManagement = () => {
   return (
     <section className="pt-12 pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -80,3 +80,5 @@ export const TRMManagement = () => {
     </section>
   )
 }
+
+export default TRMManagement

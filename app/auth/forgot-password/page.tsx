@@ -7,7 +7,7 @@ import { motion } from "framer-motion"
 import { Mail, ArrowLeft, Loader2, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { createBrowserClient } from "@supabase/ssr"
+import { createClient } from "@/lib/supabase/client"
 import toast from "react-hot-toast"
 
 export default function ForgotPasswordPage() {
@@ -15,10 +15,7 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const supabase = createClient()
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,10 +24,10 @@ export default function ForgotPasswordPage() {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
-      })
+      } as any)
 
       if (error) {
-        toast.error(error.message)
+        toast.error((error as any).message || "Reset failed")
       } else {
         setEmailSent(true)
         toast.success("Password reset email sent!")
