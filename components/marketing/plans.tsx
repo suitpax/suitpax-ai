@@ -330,7 +330,7 @@ const MissionValues = () => {
   return (
     <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm mt-12 mb-16">
       <h3 className="text-xl sm:text-2xl font-medium tracking-tighter text-black mb-4 text-center">
-        Our Mission and Values
+        My mission and values
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-gray-200 shadow-sm">

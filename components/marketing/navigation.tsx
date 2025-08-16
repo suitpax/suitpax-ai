@@ -137,10 +137,10 @@ export default function Navigation() {
           {isMobile && (
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-1.5 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
+              className="p-1 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
             >
               <div className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
-                {isOpen ? <PiDotsSixBold size={20} /> : <PiDotsNineBold size={20} />}
+                {isOpen ? <PiDotsSixBold size={16} /> : <PiDotsNineBold size={16} />}
               </div>
             </button>
           )}
@@ -209,6 +209,23 @@ export default function Navigation() {
                 </div>
               </div>
 
+              {!loading && user && (
+                <div className="pt-4 border-t border-gray-200 space-y-3">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full text-center px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-xl transition-colors tracking-tight"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={async () => { await supabase.auth.signOut(); setUser(null); setIsOpen(false) }}
+                    className="block w-full text-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors tracking-tight"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
               {!loading && !user && (
                 <div className="pt-4 border-t border-gray-200 space-y-3">
                   <Link

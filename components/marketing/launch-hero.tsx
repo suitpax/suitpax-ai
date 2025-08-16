@@ -51,6 +51,7 @@ const Countdown = () => {
 
 const AgentMiniBlock = () => {
 	const [agentSrc, setAgentSrc] = useState("/agents/agent-emma.jpeg")
+	const [videoSrc, setVideoSrc] = useState<string | null>(null)
 	useEffect(() => {
 		const pool = [
 			"/agents/agent-emma.jpeg",
@@ -59,12 +60,20 @@ const AgentMiniBlock = () => {
 			"/agents/agent-alex.jpeg",
 		]
 		setAgentSrc(pool[Math.floor(Math.random() * pool.length)])
+		// sample agent video from existing assets
+		setVideoSrc("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372671794094522374%20%281%29-mXhXqJuzE8yRQG72P48PBvFH1FNb7X.mp4")
 	}, [])
 	return (
 		<div className="w-full max-w-xl mx-auto bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-2 shadow-sm">
 			<div className="flex items-center gap-3">
 				<div className="relative w-12 h-12 rounded-xl overflow-hidden border border-gray-200">
-					<Image src={agentSrc} alt="AI Agent" width={48} height={48} className="w-full h-full object-cover" />
+					{videoSrc ? (
+						<video className="w-full h-full object-cover" autoPlay muted loop playsInline>
+							<source src={videoSrc} type="video/mp4" />
+						</video>
+					) : (
+						<Image src={agentSrc} alt="AI Agent" width={48} height={48} className="w-full h-full object-cover" />
+					)}
 					<div className="absolute -top-1 -right-1 flex items-center gap-1">
 						<span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
 						<span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse [animation-delay:150ms]"></span>
