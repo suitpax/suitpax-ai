@@ -23,6 +23,7 @@ export default function SuitpaxCodePage() {
   const [input, setInput] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
+  const [previewHtml, setPreviewHtml] = useState<string>("")
 
   useEffect(() => {
     const load = async () => {
@@ -42,8 +43,34 @@ export default function SuitpaxCodePage() {
     load()
   }, [router, supabase])
 
+  const tryMcpCommand = async (text: string) => {
+    const match = text.match(/^\/(mcp)\s+(\S+)\s+(\{[\s\S]*\})$/i)
+    if (!match) return false
+    const toolName = match[2]
+    let args: any = {}
+    try { args = JSON.parse(match[3]) } catch {}
+    const serverUrl = typeof window !== "undefined" ? localStorage.getItem("suitpax.mcp.serverUrl") : null
+    if (!serverUrl) {
+      setMessages((m) => [...m, { id: crypto.randomUUID(), content: "No MCP server active. Set one above.", role: "assistant", timestamp: new Date() }])
+      return true
+    }
+    const res = await fetch("/api/mcp/remote/tools", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ serverUrl, toolName, args }) })
+    const data = await res.json()
+    setMessages((m) => [...m, { id: crypto.randomUUID(), content: "```json\n" + JSON.stringify(data.result || data, null, 2) + "\n```", role: "assistant", timestamp: new Date() }])
+    return true
+  }
+
+  const extractHtmlFromResponse = (text: string) => {
+    const codeBlock = text.match(/```(html|jsx|tsx)?\n([\s\S]*?)```/i)
+    if (codeBlock) return codeBlock[2]
+    return ""
+  }
+
   const send = async () => {
     if (!input.trim()) return
+    // slash /mcp
+    if (await tryMcpCommand(input.trim())) { setInput(""); return }
+
     setIsSending(true)
     const userMsg: Message = { id: crypto.randomUUID(), content: input, role: "user", timestamp: new Date() }
     setMessages((m) => [...m, userMsg])
@@ -62,10 +89,26 @@ export default function SuitpaxCodePage() {
         timestamp: new Date(),
       }
       setMessages((m) => [...m, aiMsg])
+      const html = extractHtmlFromResponse(aiMsg.content)
+      if (html) setPreviewHtml(html)
       setInput("")
     } finally {
       setIsSending(false)
     }
+  }
+
+  const copyCode = async () => {
+    const last = [...messages].reverse().find((m) => m.role === "assistant")
+    if (!last) return
+    const codeMatch = last.content.match(/```[\s\S]*?\n([\s\S]*?)```/)
+    const code = codeMatch ? codeMatch[1] : last.content
+    await navigator.clipboard.writeText(code)
+  }
+
+  const saveSnippet = async () => {
+    const last = [...messages].reverse().find((m) => m.role === "assistant")
+    if (!last) return
+    await fetch("/api/snippets/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: last.content }) })
   }
 
   if (loading) return null
@@ -81,8 +124,18 @@ export default function SuitpaxCodePage() {
         <div className="p-4 border-b border-gray-200 bg-white">
           <MCPRemoteServerList />
         </div>
-        <div className="overflow-hidden">
-          <ChatContainer messages={messages} className="h-[calc(100vh-320px)]" />
+        <div className="overflow-hidden grid grid-cols-1 lg:grid-cols-2">
+          <ChatContainer messages={messages} className="h-[calc(100vh-360px)]" />
+          <div className="border-l border-gray-200 hidden lg:block">
+            <div className="flex items-center justify-between p-3">
+              <div className="text-sm font-medium">Preview</div>
+              <div className="flex gap-2">
+                <button onClick={copyCode} className="px-2 py-1 text-xs border rounded">Copy code</button>
+                <button onClick={saveSnippet} className="px-2 py-1 text-xs border rounded">Save</button>
+              </div>
+            </div>
+            <iframe sandbox="allow-scripts allow-same-origin" className="w-full h-[calc(100vh-420px)]" srcDoc={previewHtml || "<div style='padding:12px;font-family:sans-serif;color:#555'>No preview</div>"} />
+          </div>
         </div>
         <div className="p-4 border-t border-gray-200 bg-white">
           <EnhancedPromptInput
@@ -90,7 +143,7 @@ export default function SuitpaxCodePage() {
             onChange={setInput}
             onSubmit={send}
             isLoading={isSending}
-            placeholder="Ask Suitpax Code X to build or refactor your feature..."
+            placeholder="/mcp <tool> {json} or ask Suitpax Code X to build a UI..."
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export function MCPRemoteServerList() {
   const [url, setUrl] = useState("")
@@ -8,12 +8,26 @@ export function MCPRemoteServerList() {
   const [resources, setResources] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    const saved = typeof window !== "undefined" ? localStorage.getItem("suitpax.mcp.serverUrl") : null
+    if (saved) setUrl(saved)
+  }, [])
+
+  const setActive = () => {
+    if (!url) return
+    if (typeof window !== "undefined") {
+      localStorage.setItem("suitpax.mcp.serverUrl", url)
+      window.dispatchEvent(new CustomEvent("mcp:serverChanged", { detail: { url } }))
+    }
+  }
+
   const fetchTools = async () => {
     setLoading(true)
     try {
       const res = await fetch("/api/mcp/remote/tools", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ serverUrl: url }) })
       const data = await res.json()
       setTools(data.tools || [])
+      setActive()
     } finally {
       setLoading(false)
     }
@@ -25,6 +39,7 @@ export function MCPRemoteServerList() {
       const res = await fetch("/api/mcp/remote/resources", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ serverUrl: url }) })
       const data = await res.json()
       setResources(data.resources || [])
+      setActive()
     } finally {
       setLoading(false)
     }
@@ -34,6 +49,7 @@ export function MCPRemoteServerList() {
     <div className="p-4 border rounded-xl bg-white">
       <div className="flex gap-2 items-center">
         <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="wss://your-remote-mcp" className="border rounded px-2 py-1 text-sm flex-1" />
+        <button onClick={setActive} disabled={!url} className="px-2 py-1 text-sm border rounded">Set Active</button>
         <button onClick={fetchTools} disabled={!url || loading} className="px-2 py-1 text-sm border rounded">Tools</button>
         <button onClick={fetchResources} disabled={!url || loading} className="px-2 py-1 text-sm border rounded">Resources</button>
       </div>
