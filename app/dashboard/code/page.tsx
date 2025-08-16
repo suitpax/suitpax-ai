@@ -6,6 +6,7 @@ import { EnhancedPromptInput } from "@/components/prompt-kit/enhanced-prompt-inp
 import { ChatContainer } from "@/components/prompt-kit/chat-container"
 import { createClient } from "@/lib/supabase/client"
 import { MCPRemoteServerList } from "@/components/dashboard/code/server-list"
+import { MCPToolRunner } from "@/components/dashboard/code/tool-runner"
 
 interface Message {
   id: string
@@ -123,6 +124,9 @@ export default function SuitpaxCodePage() {
       <div className="flex-1 grid grid-rows-[auto_1fr_auto] bg-white">
         <div className="p-4 border-b border-gray-200 bg-white">
           <MCPRemoteServerList />
+          <div className="mt-3">
+            <MCPToolRunner />
+          </div>
         </div>
         <div className="overflow-hidden grid grid-cols-1 lg:grid-cols-2">
           <ChatContainer messages={messages} className="h-[calc(100vh-360px)]" />
