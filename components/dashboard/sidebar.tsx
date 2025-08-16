@@ -49,25 +49,18 @@ import type { User as SupabaseUser } from "@supabase/supabase-js"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Flights", href: "/dashboard/flights", icon: Plane },
-  { name: "Hotels", href: "/dashboard/hotels", icon: Hotel },
-  { name: "Finance", href: "/dashboard/finance", icon: CreditCard },
+  { name: "Trips", href: "/dashboard/trips", icon: Plane },
+  { name: "Approvals", href: "/dashboard/approvals", icon: CheckSquare },
+  { name: "Requests", href: "/dashboard/requests", icon: Send },
+  { name: "Finance Hub", href: "/dashboard/finance-hub", icon: CreditCard },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-  { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
-  { name: "Mail", href: "/dashboard/mail", icon: Mail },
-  { name: "Meetings", href: "/dashboard/meetings", icon: Meeting },
-  { name: "Locations", href: "/dashboard/locations", icon: MapPin },
-  { name: "Team", href: "/dashboard/team", icon: Users },
-  { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
-  { name: "Tasks", href: "/dashboard/tasks", icon: CheckSquare },
-  { name: "Policies", href: "/dashboard/policies", icon: Shield },
   { name: "Integrations", href: "/dashboard/integrations", icon: Settings },
+  { name: "Admin", href: "/dashboard/settings", icon: User },
 ]
 
 const aiNavigation = [
-  { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: MessageSquare, badge: "AI" },
-  { name: "Voice AI", href: "/dashboard/voice-ai", icon: Mic, badge: "NEW" },
-  { name: "Suitpax Code X", href: "/dashboard/code", icon: MessageSquare, badge: "Development" },
+  { name: "AI Center", href: "/dashboard/ai-center", icon: MessageSquare, badge: "AI" },
+  { name: "Suitpax Code", href: "/dashboard/code", icon: MessageSquare, badge: "Dev" },
 ]
 
 interface SidebarProps {

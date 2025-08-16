@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { SuitpaxIntelligenceService } from "@/lib/intelligence"
 
+export const dynamic = "force-dynamic"
+
 export async function POST(request: NextRequest) {
   try {
     const { message, userId, context, documents } = await request.json()

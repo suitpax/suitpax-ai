@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { PiDotsNineBold, PiDotsSixBold } from "react-icons/pi"
+import { PiDotsSixBold, PiDotsNineBold } from "react-icons/pi"
 import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail } from "react-icons/si"
 import { FaDiscord } from "react-icons/fa"
 import { useMediaQuery } from "@/hooks/use-media-query"
@@ -25,7 +25,28 @@ export default function Navigation() {
   const [loading, setLoading] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
-  const supabase = createClient()
+
+  // Lazy init supabase after first paint
+  useEffect(() => {
+    const supabase = createClient()
+    let unsub: { unsubscribe: () => void } | null = null
+
+    const init = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        setUser(user)
+      } finally {
+        setLoading(false)
+      }
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+        setUser(session?.user ?? null)
+      })
+      unsub = subscription
+    }
+
+    init()
+    return () => { unsub?.unsubscribe?.() }
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10)
@@ -33,21 +54,8 @@ export default function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      setLoading(false)
-    }
-    getUser()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
-
   const handleSignOut = async () => {
+    const supabase = createClient()
     await supabase.auth.signOut()
     setUser(null)
   }
@@ -58,13 +66,13 @@ export default function Navigation() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-                     "fixed top-0 left-0 right-0 z-50 flex justify-center px-3 pt-1.5 pb-1.5",
+          "fixed top-0 left-0 right-0 z-50 flex justify-center px-3 pt-2 pb-2", // slightly taller
           "transition-all duration-300"
         )}
       >
         <div
           className={cn(
-            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-white/90 border border-black/5 px-3 py-1",
+            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-white/90 border border-black/5 px-4 py-2", // slightly taller container
             isScrolled ? "shadow-lg border-black/10" : ""
           )}
         >
@@ -72,10 +80,10 @@ export default function Navigation() {
             <Image
               src="/logo/suitpax-bl-logo.webp"
               alt="Suitpax"
-              width={110}
-              height={22}
+              width={118}
+              height={24}
               priority
-              className="h-5 w-auto"
+              className="h-6 w-auto" // a bit taller logo
             />
           </Link>
 
@@ -137,10 +145,10 @@ export default function Navigation() {
           {isMobile && (
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-1 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
+              className="p-1.5 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
             >
               <div className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
-                {isOpen ? <PiDotsSixBold size={16} /> : <PiDotsNineBold size={16} />}
+                {isOpen ? <PiDotsSixBold size={18} /> : <PiDotsNineBold size={18} />}
               </div>
             </button>
           )}
@@ -219,7 +227,7 @@ export default function Navigation() {
                     Dashboard
                   </Link>
                   <button
-                    onClick={async () => { await supabase.auth.signOut(); setUser(null); setIsOpen(false) }}
+                    onClick={async () => { const s = createClient(); await s.auth.signOut(); setUser(null); setIsOpen(false) }}
                     className="block w-full text-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors tracking-tight"
                   >
                     Sign Out

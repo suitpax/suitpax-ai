@@ -29,13 +29,13 @@ export default function VantaCloudsBackground({ children, className = "" }: Vant
         minHeight: 200.0,
         minWidth: 200.0,
         // Colores personalizados para un fondo más neutro y gris
-        backgroundColor: 0xf5f5f5, // Gris muy claro para el fondo
-        skyColor: 0xd1d5db, // Gray-300, un gris más neutro para el cielo
-        cloudColor: 0xe5e7eb, // Gray-200 para las nubes
-        cloudShadowColor: 0x9ca3af, // Gray-400 para las sombras de las nubes
-        sunColor: 0x000000, // Eliminando el sol (negro sin opacidad)
-        sunGlareColor: 0x000000, // Eliminando el resplandor del sol
-        sunlightColor: 0x000000, // Eliminando la luz del sol
+        backgroundColor: 0xf7f7f7, // aún más claro
+        skyColor: 0xf3f4f6, // gray-100 para cielo muy claro
+        cloudColor: 0xffffff, // nubes blancas
+        cloudShadowColor: 0xcbd5e1, // gray-300 sutil
+        sunColor: 0x000000,
+        sunGlareColor: 0x000000,
+        sunlightColor: 0x000000,
         speed: 1,
         sunPosition: [0, -100, 0], // Posicionando el sol muy abajo para que no sea visible
         sunIntensity: 0, // Intensidad del sol a 0

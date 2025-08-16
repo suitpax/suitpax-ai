@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
     }
 
     const initial = await anthropic.messages.create({
-      model: "claude-3-7-sonnet-20250219",
+      model: "claude-4.1", // Upgraded to Claude 4
       max_tokens: maxTokensForResponse,
       system: systemPrompt,
       messages: [...conversationHistory, { role: "user", content: enhancedMessage }],
@@ -259,25 +259,10 @@ export async function POST(request: NextRequest) {
         if (toolData.explanation) {
           text += `### Explanation\n${toolData.explanation}\n\n`
         }
-        if (toolData.usage) {
-          text += `### Usage\n${toolData.usage}\n\n`
-        }
-      } else if (toolType === "document_processing" && toolData.analysis) {
-        text += `\n\n## 📄 Document Analysis\n\n`
-        text += `${toolData.analysis}\n\n`
-        if (toolData.extractedData) {
-          text += `### Extracted Data\n\`\`\`json\n${JSON.stringify(toolData.extractedData, null, 2)}\n\`\`\`\n\n`
-        }
-      } else if (toolType === "expense_analysis" && toolData.analysis) {
-        text += `\n\n## 💰 Expense Analysis\n\n`
-        text += `${toolData.analysis}\n\n`
-        if (toolData.insights) {
-          text += `### Key Insights\n`
-          toolData.insights.forEach((insight: string, index: number) => {
-            text += `${index + 1}. ${insight}\n`
-          })
-          text += `\n`
-        }
+      } else if (toolType === "document_processing" && toolData.summary) {
+        text += `\n\n## 📄 Document Summary\n\n${toolData.summary}\n\n`
+      } else if (toolType === "expense_analysis" && toolData.summary) {
+        text += `\n\n## 💰 Expense Insights\n\n${toolData.summary}\n\n`
       }
     }
 
@@ -357,41 +342,13 @@ function calculateTokenCost(totalTokens: number, model: string): number {
   return (totalTokens / 1000) * costPer1kTokens
 }
 
-function getDestinationName(iataCode: string): string {
-  const cityMap: Record<string, string> = {
-    MAD: "Madrid",
-    BCN: "Barcelona",
-    LHR: "London",
-    CDG: "Paris",
-    JFK: "New York",
-    LAX: "Los Angeles",
-    DXB: "Dubai",
-    NRT: "Tokyo",
-    SIN: "Singapore",
-    SYD: "Sydney",
-    FRA: "Frankfurt",
-    AMS: "Amsterdam",
-    ZUR: "Zurich",
-    MUC: "Munich",
-    FCO: "Rome",
-    MXP: "Milan",
-  }
-  return cityMap[iataCode] || iataCode
+function getDestinationName(code: string) {
+  const map: Record<string, string> = { MAD: "Madrid", BCN: "Barcelona", LHR: "London", CDG: "Paris", JFK: "New York", NRT: "Tokyo", DXB: "Dubai" }
+  return map[code] || code
 }
 
-function formatDuration(duration: string): string {
-  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/)
-  if (!match) return duration
-
-  const hours = match[1] ? Number.parseInt(match[1]) : 0
-  const minutes = match[2] ? Number.parseInt(match[2]) : 0
-
-  if (hours && minutes) {
-    return `${hours}h ${minutes}m`
-  } else if (hours) {
-    return `${hours}h`
-  } else if (minutes) {
-    return `${minutes}m`
-  }
-  return duration
+function formatDuration(minutes: number) {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  return `${h}h ${m}m`
 }

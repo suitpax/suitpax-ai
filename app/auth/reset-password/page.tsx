@@ -7,7 +7,7 @@ import { motion } from "framer-motion"
 import { Eye, EyeOff, Lock, ArrowRight, Loader2, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { createBrowserClient } from "@supabase/ssr"
+import { createClient } from "@/lib/supabase/client"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
 
@@ -19,10 +19,7 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [passwordReset, setPasswordReset] = useState(false)
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const supabase = createClient()
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -53,7 +50,7 @@ export default function ResetPasswordPage() {
     setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.updateUser({
+      const { error } = await (supabase as any).auth.updateUser({
         password: password,
       })
 
