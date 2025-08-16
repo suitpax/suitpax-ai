@@ -299,3 +299,36 @@ body {
     opacity: 0;
   }
 }
+
+/* Shimmer animation for Suitpax AI text effects */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Additional shimmer variant for slower effect */
+@keyframes shimmer-slow {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-shimmer-slow {
+  animation: shimmer-slow 4s ease-in-out infinite;
+}

@@ -2,17 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Loader2, User, CreditCard, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react'
+import { Loader2, User, CreditCard, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import PassengerForm from "@/components/flights/passenger-form"
 import FlightItinerary from "@/components/flights/flight-itinerary"
 import BookingSummary from "@/components/flights/booking-summary"
-import { StripePaymentForm } from "@/components/flights/stripe-payment-form"
 import { toast } from "sonner"
-import dynamic from "next/dynamic"
-
-const DuffelAncillaries = dynamic(() => import("@duffel/components").then(m => (m as any).Ancillaries), { ssr: false, loading: () => null })
 
 interface DuffelOffer {
   id: string
@@ -30,16 +26,7 @@ interface PassengerData {
   born_on: string
   email: string
   phone_number: string
-  type: 'adult' | 'child' | 'infant_without_seat'
-}
-
-async function savePendingServices(offerId: string, services: any[]) {
-  await fetch('/api/flights/duffel/pending-services', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ offerId, services }) })
-}
-
-async function applyPendingServices(orderId: string) {
-  // In this MVP we assume pending services were for the original offer; retrieving is optional
-  // Here we could fetch specific service IDs; for simplicity, no-op. Extend as needed.
+  type: "adult" | "child" | "infant_without_seat"
 }
 
 export default function BookFlightPage() {
@@ -51,7 +38,7 @@ export default function BookFlightPage() {
   const [passengers, setPassengers] = useState<PassengerData[]>([])
   const [loading, setLoading] = useState(true)
   const [booking, setBooking] = useState(false)
-  const [currentStep, setCurrentStep] = useState<'details' | 'payment' | 'confirmation'>('details')
+  const [currentStep, setCurrentStep] = useState<"details" | "payment" | "confirmation">("details")
   const [paymentIntent, setPaymentIntent] = useState<string | null>(null)
 
   useEffect(() => {
@@ -66,15 +53,17 @@ export default function BookFlightPage() {
           throw new Error(data.error || "Failed to fetch flight details.")
         }
         setOffer(data.offer)
-        setPassengers(data.offer.passengers.map((p: any) => ({
-          title: 'mr',
-          given_name: '',
-          family_name: '',
-          born_on: '',
-          email: '',
-          phone_number: '',
-          type: p.type,
-        })))
+        setPassengers(
+          data.offer.passengers.map((p: any) => ({
+            title: "mr",
+            given_name: "",
+            family_name: "",
+            born_on: "",
+            email: "",
+            phone_number: "",
+            type: p.type,
+          })),
+        )
       } catch (error: any) {
         toast.error(error.message)
         router.push("/dashboard/flights")
@@ -107,25 +96,24 @@ export default function BookFlightPage() {
 
     setBooking(true)
     try {
-      const res = await fetch("/api/flights/create-payment-intent", {
+      const res = await fetch("/api/flights/duffel/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          offerId, 
+        body: JSON.stringify({
+          offerId,
           passengers,
-          amount: Math.round(parseFloat(offer.total_amount) * 100),
-          currency: offer.total_currency.toLowerCase()
+          hold_order: true,
         }),
       })
 
       const data = await res.json()
 
       if (!data.success) {
-        throw new Error(data.error || "Failed to create payment intent.")
+        throw new Error(data.error || "Failed to create booking.")
       }
 
-      setPaymentIntent(data.clientSecret)
-      setCurrentStep('payment')
+      toast.success("Hold order created successfully! Redirecting to confirmation...")
+      router.push(`/dashboard/flights/book/confirmation/${data.order.id}`)
     } catch (error: any) {
       toast.error(error.message)
     } finally {
@@ -134,34 +122,7 @@ export default function BookFlightPage() {
   }
 
   const handlePaymentSuccess = async (paymentIntentId: string) => {
-    setBooking(true)
-    try {
-      const res = await fetch("/api/flights/duffel/booking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          offerId, 
-          passengers,
-          paymentIntentId 
-        }),
-      })
-
-      const data = await res.json()
-
-      if (!data.success) {
-        throw new Error(data.error || "Booking failed.")
-      }
-
-      try { await applyPendingServices(data.order.id) } catch {}
-
-      toast.success("Booking successful! Redirecting to confirmation...")
-      router.push(`/dashboard/flights/book/confirmation/${data.order.id}`)
-    } catch (error: any) {
-      toast.error(error.message)
-      setCurrentStep('details')
-    } finally {
-      setBooking(false)
-    }
+    toast.error("Payment processing is temporarily unavailable. Please contact hello@suitpax.com")
   }
 
   if (loading) {
@@ -197,43 +158,59 @@ export default function BookFlightPage() {
           <Button variant="ghost" onClick={() => router.back()} className="mb-4 text-gray-600 hover:text-gray-900">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to results
           </Button>
-          
+
           <div>
             <h1 className="text-3xl md:text-4xl font-medium tracking-tighter leading-none">
               <em className="font-serif italic">Complete</em>
               <br />
               <span className="text-gray-900">Your Booking</span>
             </h1>
-            <p className="text-sm md:text-base font-light text-gray-600 mt-2">
-              Secure checkout powered by Stripe
-            </p>
+            <p className="text-sm md:text-base font-light text-gray-600 mt-2">Secure checkout powered by Stripe</p>
           </div>
         </div>
 
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-8">
-            <div className={`flex items-center space-x-2 ${currentStep === 'details' ? 'text-gray-900' : currentStep === 'payment' || currentStep === 'confirmation' ? 'text-green-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'details' ? 'bg-gray-900 text-white' : currentStep === 'payment' || currentStep === 'confirmation' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
-                {currentStep === 'payment' || currentStep === 'confirmation' ? <CheckCircle className="h-4 w-4" /> : '1'}
+            <div
+              className={`flex items-center space-x-2 ${currentStep === "details" ? "text-gray-900" : currentStep === "payment" || currentStep === "confirmation" ? "text-green-600" : "text-gray-400"}`}
+            >
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === "details" ? "bg-gray-900 text-white" : currentStep === "payment" || currentStep === "confirmation" ? "bg-green-600 text-white" : "bg-gray-200"}`}
+              >
+                {currentStep === "payment" || currentStep === "confirmation" ? (
+                  <CheckCircle className="h-4 w-4" />
+                ) : (
+                  "1"
+                )}
               </div>
               <span className="text-sm font-medium">Passenger Details</span>
             </div>
-            
-            <div className={`w-16 h-px ${currentStep === 'payment' || currentStep === 'confirmation' ? 'bg-green-600' : 'bg-gray-200'}`} />
-            
-            <div className={`flex items-center space-x-2 ${currentStep === 'payment' ? 'text-gray-900' : currentStep === 'confirmation' ? 'text-green-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'payment' ? 'bg-gray-900 text-white' : currentStep === 'confirmation' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
-                {currentStep === 'confirmation' ? <CheckCircle className="h-4 w-4" /> : '2'}
+
+            <div
+              className={`w-16 h-px ${currentStep === "payment" || currentStep === "confirmation" ? "bg-green-600" : "bg-gray-200"}`}
+            />
+
+            <div
+              className={`flex items-center space-x-2 ${currentStep === "payment" ? "text-gray-900" : currentStep === "confirmation" ? "text-green-600" : "text-gray-400"}`}
+            >
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === "payment" ? "bg-gray-900 text-white" : currentStep === "confirmation" ? "bg-green-600 text-white" : "bg-gray-200"}`}
+              >
+                {currentStep === "confirmation" ? <CheckCircle className="h-4 w-4" /> : "2"}
               </div>
               <span className="text-sm font-medium">Payment</span>
             </div>
-            
-            <div className={`w-16 h-px ${currentStep === 'confirmation' ? 'bg-green-600' : 'bg-gray-200'}`} />
-            
-            <div className={`flex items-center space-x-2 ${currentStep === 'confirmation' ? 'text-green-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'confirmation' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
-                {currentStep === 'confirmation' ? <CheckCircle className="h-4 w-4" /> : '3'}
+
+            <div className={`w-16 h-px ${currentStep === "confirmation" ? "bg-green-600" : "bg-gray-200"}`} />
+
+            <div
+              className={`flex items-center space-x-2 ${currentStep === "confirmation" ? "text-green-600" : "text-gray-400"}`}
+            >
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === "confirmation" ? "bg-green-600 text-white" : "bg-gray-200"}`}
+              >
+                {currentStep === "confirmation" ? <CheckCircle className="h-4 w-4" /> : "3"}
               </div>
               <span className="text-sm font-medium">Confirmation</span>
             </div>
@@ -244,34 +221,7 @@ export default function BookFlightPage() {
           <div className="lg:col-span-2 space-y-8">
             <FlightItinerary slices={offer.slices} />
 
-            {/* Ancillaries (bags, seats, etc.) */}
-            <Card className="rounded-2xl border border-gray-200 shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 font-medium tracking-tighter">
-                  Extras & Ancillaries
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {process.env.NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN ? (
-                  <DuffelAncillaries
-                    offerId={offer.id}
-                    duffelToken={process.env.NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN as string}
-                    onAdd={async (items: any) => {
-                      try {
-                        await savePendingServices(offer!.id, items)
-                        toast.success('Extras saved. They will be applied after booking.')
-                      } catch {
-                        toast.error('Failed to save extras')
-                      }
-                    }}
-                  />
-                ) : (
-                  <div className="text-sm text-gray-600">Ancillaries unavailable. Configure NEXT_PUBLIC_DUFFEL_ANCILLARIES_TOKEN.</div>
-                )}
-              </CardContent>
-            </Card>
-
-            {currentStep === 'details' && (
+            {currentStep === "details" && (
               <Card className="rounded-2xl border border-gray-200 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 font-medium tracking-tighter">
@@ -292,7 +242,7 @@ export default function BookFlightPage() {
               </Card>
             )}
 
-            {currentStep === 'payment' && paymentIntent && (
+            {currentStep === "payment" && paymentIntent && (
               <Card className="rounded-2xl border border-gray-200 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 font-medium tracking-tighter">
@@ -301,16 +251,16 @@ export default function BookFlightPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <StripePaymentForm
-                    clientSecret={paymentIntent}
-                    amount={parseFloat(offer.total_amount)}
-                    currency={offer.total_currency}
-                    onSuccess={handlePaymentSuccess}
-                    onError={(error) => {
-                      toast.error(error)
-                      setCurrentStep('details')
-                    }}
-                  />
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 mb-4">Payment processing is temporarily unavailable.</p>
+                    <p className="text-sm text-gray-500 mb-6">Please contact us to complete your booking.</p>
+                    <Button
+                      onClick={() => (window.location.href = "mailto:hello@suitpax.com")}
+                      className="bg-black text-white hover:bg-gray-800"
+                    >
+                      Contact Support
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -322,22 +272,18 @@ export default function BookFlightPage() {
               currency={offer.total_currency}
               passengersCount={offer.passengers.length}
             />
-            
-            {currentStep === 'details' && (
+
+            {currentStep === "details" && (
               <Button
                 onClick={handleContinueToPayment}
                 disabled={booking}
                 className="w-full bg-black text-white hover:bg-gray-800 rounded-xl py-6 text-lg font-medium tracking-tight"
               >
-                {booking ? (
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                ) : (
-                  <>Continue to Payment</>
-                )}
+                {booking ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <>Create Hold Order</>}
               </Button>
             )}
-            
-            {currentStep === 'payment' && (
+
+            {currentStep === "payment" && (
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <div className="flex items-start space-x-3">
                   <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />

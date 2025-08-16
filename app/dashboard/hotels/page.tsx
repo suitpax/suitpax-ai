@@ -50,31 +50,41 @@ export default function HotelsPage() {
   }
 
   return (
-    <div className="p-4 lg:p-6 space-y-6">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 lg:p-6">
-          <div className="mb-4">
-            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Stays</h1>
-            <p className="text-sm text-gray-600">Search hotels and corporate rates</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-6">
+            <div className="mb-4">
+              <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Stays</h1>
+              <p className="text-gray-600 font-light">
+                <em className="font-serif italic">Search hotels and corporate rates</em>
+              </p>
+            </div>
+            <StaysSearchForm onSearch={onSearch} loading={loading} />
           </div>
-          <StaysSearchForm onSearch={onSearch} loading={loading} />
-        </div>
-      </motion.div>
+        </motion.div>
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
-        {error && (
-          <div className="text-sm text-red-600">{error}</div>
-        )}
-        {!error && !loading && results.length === 0 && (
-          <div className="text-sm text-gray-600">Start a search to see available stays.</div>
-        )}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
+          {error && (
+            <div className="bg-red-50/80 backdrop-blur-sm border border-red-200 rounded-xl p-4 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+          {!error && !loading && results.length === 0 && (
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-8 text-center">
+              <p className="text-gray-600 font-light">
+                <em className="font-serif italic">Start a search to see available stays</em>
+              </p>
+            </div>
+          )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {results.map((stay, idx) => (
-            <StayCard key={stay?.id || idx} stay={stay} />
-          ))}
-        </div>
-      </motion.div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {results.map((stay, idx) => (
+              <StayCard key={stay?.id || idx} stay={stay} />
+            ))}
+          </div>
+        </motion.div>
+      </div>
     </div>
   )
 }

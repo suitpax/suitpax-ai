@@ -1,93 +1,22 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import {
-  Plane,
-  Hotel,
-  CreditCard,
-  BarChart3,
-  Clock,
-  DollarSign,
-  TrendingUp,
-  Calendar,
-  Zap,
-  CheckCircle,
-  ArrowRight,
-  Plus,
-  Users,
-  Building,
-  MapPin,
-} from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts"
-import DashboardOverviewV2 from "@/components/dashboard/v2/overview"
-
-// Interfaces
-interface DashboardStats {
-  totalTrips: number
-  totalSavings: number
-  upcomingTrips: number
-  activeBookings: number
-}
-
-interface RecentActivity {
-  id: string
-  type: "welcome" | "profile" | "setup"
-  title: string
-  description: string
-  timestamp: Date
-  status: "completed" | "pending"
-}
-
-interface User {
-  id: string
-  email?: string
-  created_at: string
-  user_metadata?: {
-    full_name?: string
-  }
-}
+import { createClient } from "@/lib/supabase/client"
+import type { User } from "@supabase/supabase-js"
+import { ArrowRight, Bot, Sparkles, MessageSquare, Brain } from "lucide-react"
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [stats, setStats] = useState<DashboardStats>({
-    totalTrips: 0,
-    totalSavings: 0,
-    upcomingTrips: 0,
-    activeBookings: 0,
-  })
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
-
-  // Configuración inicial para nuevos usuarios
-  const initializeNewUser = useCallback(() => {
-    const welcomeActivity: RecentActivity = {
-      id: "welcome",
-      type: "welcome",
-      title: "Welcome to Suitpax!",
-      description: "Your business travel account has been created successfully",
-      timestamp: new Date(),
-      status: "completed",
-    }
-    
-    setRecentActivity([welcomeActivity])
-    setStats({
-      totalTrips: 0,
-      totalSavings: 0,
-      upcomingTrips: 0,
-      activeBookings: 0,
-    })
-  }, [])
 
   useEffect(() => {
     let isMounted = true
-    
+
     const getUser = async () => {
       try {
         const supabase = createClient()
-        
         const {
           data: { user },
           error,
@@ -100,8 +29,6 @@ export default function DashboardPage() {
 
         if (user && isMounted) {
           setUser(user)
-          // Todos los usuarios empiezan con estado cero
-          initializeNewUser()
         }
       } catch (error) {
         if (isMounted) {
@@ -115,453 +42,117 @@ export default function DashboardPage() {
     }
 
     getUser()
-    
+
     return () => {
       isMounted = false
     }
-  }, [initializeNewUser])
-
-  // Acciones principales para empezar
-  const quickActions = [
-    {
-      icon: Plane,
-      title: "Book Your First Flight",
-      description: "Start by booking your first business trip",
-      href: "/dashboard/flights",
-      color: "bg-gray-100 text-gray-800",
-      priority: true,
-    },
-    {
-      icon: Hotel,
-      title: "Find Hotels",
-      description: "Discover and book accommodations",
-      href: "/dashboard/hotels",
-      color: "bg-gray-100 text-gray-800",
-      priority: true,
-    },
-    {
-      icon: Users,
-      title: "Invite Team",
-      description: "Add team members to your account",
-      href: "/dashboard/team",
-      color: "bg-gray-100 text-gray-800",
-      priority: false,
-    },
-    {
-      icon: Building,
-      title: "Company Setup",
-      description: "Configure your company travel policies",
-      href: "/dashboard/settings",
-      color: "bg-gray-100 text-gray-800",
-      priority: false,
-    },
-  ]
-
-  // Pasos de onboarding
-  const onboardingSteps = [
-    {
-      icon: CheckCircle,
-      title: "Complete Your Profile",
-      description: "Add your travel preferences and contact details",
-      href: "/dashboard/profile",
-      completed: false,
-    },
-    {
-      icon: MapPin,
-      title: "Set Travel Preferences",
-      description: "Configure your preferred airlines, hotels, and travel class",
-      href: "/dashboard/preferences",
-      completed: false,
-    },
-    {
-      icon: CreditCard,
-      title: "Add Payment Method",
-      description: "Secure payment setup for seamless bookings",
-      href: "/dashboard/billing",
-      completed: false,
-    },
-  ]
+  }, [])
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-light">Loading your dashboard...</p>
-        </div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* New Overview (v2) */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-8">
-          <DashboardOverviewV2 />
-        </motion.div>
-        {/* Welcome Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none">Dashboard</h1>
-              <p className="text-lg font-light text-gray-600 mt-2">
-                Let's get your business travel management set up
-              </p>
-            </div>
-            <div className="hidden md:block">
-              <div className="inline-flex items-center rounded-xl bg-gray-200 px-3 py-1 text-xs font-medium text-gray-800">
-                <em className="font-serif italic">New Account</em>
-              </div>
-            </div>
+    <div className="space-y-6 p-4 lg:p-0">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">
+              Welcome back, {user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}
+            </h1>
+            <p className="text-gray-600 font-light">Ready to transform your business travel experience</p>
           </div>
-        </motion.div>
-
-        {/* Getting Started Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-8"
-        >
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-2xl p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Zap className="h-6 w-6 text-gray-700" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-medium tracking-tighter mb-2">Empieza en 3 pasos</h3>
-<p className="text-sm font-light text-gray-600 mb-6">
-  Completa tu configuración para desbloquear la gestión de viajes de negocio con IA
-</p>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {onboardingSteps.map((step, index) => (
-                    <Link
-                      key={index}
-                      href={step.href}
-                      className="group flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 transition-all"
-                    >
-                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <step.icon className="h-4 w-4 text-gray-700" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 group-hover:text-black transition-colors">
-                          {step.title}
-                        </p>
-                        <p className="text-xs font-light text-gray-600 mt-0.5">
-                          {step.description}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium text-gray-700">Online</span>
           </div>
-        </motion.div>
-
-        {/* Stats Grid - Estado Cero */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-        >
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Trips</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">{stats.totalTrips}</p>
-                <p className="text-xs text-gray-700 font-medium mt-1">Book your first trip →</p>
-              </div>
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <Plane className="h-5 w-5 text-gray-700" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Savings</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">${stats.totalSavings.toLocaleString()}</p>
-                <p className="text-xs text-gray-700 font-medium mt-1">Start saving with AI →</p>
-              </div>
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-gray-700" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Upcoming Trips</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">{stats.upcomingTrips}</p>
-                <p className="text-xs text-gray-700 font-medium mt-1">Plan your trips →</p>
-              </div>
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-gray-700" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Active Bookings</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">{stats.activeBookings}</p>
-                <p className="text-xs text-gray-700 font-medium mt-1">Make first booking →</p>
-              </div>
-              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-gray-700" />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Spending Trend (Black/Grey) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.35 }}
-          className="mb-8"
-        >
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-medium tracking-tighter">Monthly Spending</h2>
-              <span className="text-xs text-gray-500">Simulated</span>
-            </div>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={[
-                    { month: "Jan", amount: 0 },
-                    { month: "Feb", amount: 0 },
-                    { month: "Mar", amount: 0 },
-                    { month: "Apr", amount: 0 },
-                    { month: "May", amount: 0 },
-                    { month: "Jun", amount: 0 },
-                  ]}
-                  margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
-                  <Tooltip cursor={{ stroke: '#111827', strokeWidth: 1 }} formatter={(v: any) => `$${Number(v).toLocaleString()}`} />
-                  <Line type="monotone" dataKey="amount" stroke="#111827" strokeWidth={2} dot={{ r: 3, fill: '#111827' }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </motion.div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="lg:col-span-2"
-          >
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-medium tracking-tighter mb-6">
-                <em className="font-serif italic">Quick Actions</em>
-              </h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                {quickActions.map((action, index) => (
-                  <Link
-                    key={index}
-                    href={action.href}
-                    className={`group p-4 rounded-xl border transition-all duration-200 hover:shadow-sm ${
-                      action.priority 
-                        ? 'border-gray-300 bg-gray-50 hover:border-gray-400' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${action.color}`}>
-                        <action.icon className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-medium tracking-tighter group-hover:text-black transition-colors">
-                            {action.title}
-                          </h3>
-                          {action.priority && (
-                            <div className="inline-flex items-center rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-medium text-gray-800">
-                              Start Here
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-sm font-light text-gray-600 mt-1">{action.description}</p>
-                      </div>
-                      <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Recent Activity - Estado Inicial */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-medium tracking-tighter mb-6">
-                <em className="font-serif italic">Activity</em>
-              </h2>
-              <div className="space-y-4">
-                {recentActivity.length > 0 ? (
-                  recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle className="h-4 w-4 text-gray-700" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm tracking-tighter">{activity.title}</p>
-                        <p className="text-xs font-light text-gray-600 mt-1">{activity.description}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {activity.timestamp.toLocaleDateString()} at{" "}
-                          {activity.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <Clock className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                    <p className="text-sm font-light text-gray-600">No activity yet</p>
-                    <p className="text-xs text-gray-500 mt-1">Your travel activity will appear here</p>
-                  </div>
-                )}
-                
-                {/* Placeholder for future activities */}
-                <div className="border-t border-gray-100 pt-4 mt-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 opacity-40">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        <Plane className="h-4 w-4 text-gray-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-xs font-light text-gray-500">First flight booking</p>
-                        <p className="text-xs text-gray-400">Coming soon...</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 opacity-40">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        <Hotel className="h-4 w-4 text-gray-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-xs font-light text-gray-500">Hotel reservation</p>
-                        <p className="text-xs text-gray-400">Coming soon...</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </div>
+      </motion.div>
 
-        {/* Additional Intelligent Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6"
-        >
-          <div className="lg:col-span-2 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-medium tracking-tighter">Proposal Progress</h3>
-              <span className="text-xs text-gray-500">April 2024</span>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <p className="text-xs text-gray-500">Proposals sent</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">64</p>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <p className="text-xs text-gray-500">Interviews</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">12</p>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <p className="text-xs text-gray-500">Hires</p>
-                <p className="text-2xl font-medium tracking-tighter mt-1">10</p>
-              </div>
-            </div>
-            <div className="mt-6 h-20 flex items-end gap-1">
-              {Array.from({ length: 36 }).map((_, i) => (
-                <div key={i} className={"w-2 rounded-t-sm " + (i % 5 === 0 ? "h-16 bg-gray-900" : "h-10 bg-gray-300")} />
-              ))}
-            </div>
+      {/* KPIs */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.08 }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
+            <p className="text-sm font-medium text-gray-600">Total Trips</p>
+            <p className="text-2xl font-medium tracking-tighter">0</p>
           </div>
-          <div className="bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md">
-            <h3 className="text-xl font-medium tracking-tighter mb-4">Recent Projects</h3>
-            <div className="space-y-3">
-              {["Web Development Project","Copyright Project","Web Design Project"].map((title, idx) => (
-                <div key={idx} className="group flex items-start justify-between p-3 rounded-xl border border-gray-200 bg-white hover:shadow-sm transition-all">
-                  <div>
-                    <p className="text-sm font-medium tracking-tight text-gray-900">{title}</p>
-                    <p className="text-xs text-gray-600">$10/hour • Remote</p>
-                  </div>
-                  <span className="text-[10px] rounded-full px-2 py-0.5 bg-gray-200 text-gray-800">Paid</span>
+          <div className="bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
+            <p className="text-sm font-medium text-gray-600">Savings</p>
+            <p className="text-2xl font-medium tracking-tighter">$0</p>
+          </div>
+          <div className="bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
+            <p className="text-sm font-medium text-gray-600">Expenses</p>
+            <p className="text-2xl font-medium tracking-tighter">$0</p>
+          </div>
+          <div className="bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
+            <p className="text-sm font-medium text-gray-600">Team Size</p>
+            <p className="text-2xl font-medium tracking-tighter">1</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Suitpax AI Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.16 }}
+      >
+        <Link href="/dashboard/suitpax-ai">
+          <div className="bg-white border border-gray-200 shadow-sm rounded-2xl p-8 hover:shadow-md transition-all duration-300 group cursor-pointer">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1.5 mb-4">
+                <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[9px] font-medium text-gray-700">
+                  <Bot className="h-3 w-3 mr-1" />
+                  AI Technology
+                </span>
+                <span className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[8px] font-medium text-gray-700">
+                  <span className="w-1 h-1 rounded-full bg-gray-600 animate-pulse mr-1"></span>
+                  Available Now
+                </span>
+              </div>
+
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter text-gray-900 leading-none max-w-4xl mx-auto mb-4">
+                Your AI travel assistant is ready
+              </h3>
+
+              <p className="text-sm font-medium text-gray-500 max-w-2xl mx-auto mb-6">
+                Get instant help with flight bookings, expense management, travel policies, and more
+              </p>
+
+              <div className="flex items-center justify-center gap-6 mb-8">
+                <div className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-gray-600" />
+                  <span className="text-sm text-gray-600 font-medium">Smart Memory</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Footer CTA: Meet Suitpax AI at the very bottom */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.75 }}
-          className="mt-10"
-        >
-          <div className="rounded-2xl border border-gray-200 bg-white p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex-1">
-                <h3 className="text-xl font-medium tracking-tighter mb-2 text-gray-900">
-                  <em className="font-serif italic">Meet Suitpax AI</em>
-                </h3>
-                <p className="text-sm font-light text-gray-600">Your monochrome, modern travel copilot. Ask for flights, hotels, expenses, policies and more.</p>
-                {/* Mini typing example */}
-                <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-3">
-                  <div className="text-[11px] uppercase tracking-wider text-gray-500 mb-2">Live demo</div>
-                  <div className="rounded-lg border border-gray-200 bg-white p-3">
-                    <div className="text-xs text-gray-500 mb-1">You</div>
-                    <div className="text-sm text-gray-900">Find direct flights MAD → SFO next month</div>
-                  </div>
-                  <div className="mt-2 rounded-lg border border-gray-200 bg-white p-3">
-                    <div className="text-xs text-gray-500 mb-1">Suitpax AI</div>
-                    <div className="text-sm text-gray-900">
-                      <span className="inline-block w-2 h-3 bg-gray-900 animate-pulse align-baseline mr-1" />
-                      Searching best options… non-stop, sorted by price.
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-gray-600" />
+                  <span className="text-sm text-gray-600 font-medium">24/7 Available</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-gray-600" />
+                  <span className="text-sm text-gray-600 font-medium">AI Powered</span>
                 </div>
               </div>
-              <Link href="/dashboard/ai-chat" className="md:self-start inline-flex items-center gap-2 rounded-xl border border-gray-900 bg-gray-900 px-6 py-3 text-white hover:bg-gray-800 transition-colors">
-                <em className="font-serif italic">Start Chatting</em>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+
+              <div className="flex justify-center">
+                <div className="inline-flex items-center justify-center bg-gray-900 text-white hover:bg-black px-8 py-3 rounded-xl text-sm font-medium tracking-tighter transition-colors group-hover:shadow-md">
+                  <span className="relative z-10">Start Conversation</span>
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-center text-xs text-gray-500">
-            <span className="mr-2">Technology by</span>
-            <img src="/logo/suitpax-bl-logo.webp" alt="Suitpax" className="h-4 w-auto" />
-          </div>
-        </motion.div>
-      </div>
+        </Link>
+      </motion.div>
     </div>
   )
 }

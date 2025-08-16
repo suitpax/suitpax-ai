@@ -30,7 +30,7 @@ export default function ProfilePage() {
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   )
 
   useEffect(() => {
@@ -105,170 +105,186 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-        <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Profile</h1>
-        <p className="mt-1 text-sm text-gray-600">Manage your account information and preferences.</p>
-      </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-blue-50/20">
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">Profile</h1>
+          <p className="mt-1 text-sm text-gray-600">Manage your account information and preferences.</p>
+        </motion.div>
 
-      {/* Profile Form */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
-      >
-        <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-6">
-          <em className="font-serif italic">Personal Information</em>
-        </h3>
+        {/* Profile Form */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-8"
+        >
+          <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-8">
+            <em className="font-serif italic">Personal Information</em>
+          </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Full Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                value={profile.full_name || ""}
-                onChange={(e) => handleInputChange("full_name", e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
-                placeholder="Enter your full name"
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Full Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Full Name</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={profile.full_name || ""}
+                  onChange={(e) => handleInputChange("full_name", e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your full name"
+                />
+              </div>
+            </div>
+
+            {/* Email (read-only) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="email"
+                  value={user?.email || ""}
+                  disabled
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-500"
+                />
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Phone</label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="tel"
+                  value={profile.phone || ""}
+                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your phone number"
+                />
+              </div>
+            </div>
+
+            {/* Company */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Company</label>
+              <div className="relative">
+                <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={profile.company || ""}
+                  onChange={(e) => handleInputChange("company", e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your company name"
+                />
+              </div>
+            </div>
+
+            {/* Timezone */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-3">Timezone</label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <select
+                  value={profile.timezone || ""}
+                  onChange={(e) => handleInputChange("timezone", e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200"
+                >
+                  <option value="">Select timezone</option>
+                  <option value="America/New_York">Eastern Time (ET)</option>
+                  <option value="America/Chicago">Central Time (CT)</option>
+                  <option value="America/Denver">Mountain Time (MT)</option>
+                  <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                  <option value="Europe/London">London (GMT)</option>
+                  <option value="Europe/Paris">Paris (CET)</option>
+                  <option value="Asia/Tokyo">Tokyo (JST)</option>
+                </select>
+              </div>
             </div>
           </div>
+        </motion.div>
 
-          {/* Email (read-only) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="email"
-                value={user?.email || ""}
-                disabled
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-gray-50 text-gray-500"
-              />
-            </div>
-          </div>
+        {/* Travel Preferences */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-8"
+        >
+          <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-8">
+            <em className="font-serif italic">Travel Preferences</em>
+          </h3>
 
-          {/* Phone */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="tel"
-                value={profile.phone || ""}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
-                placeholder="Enter your phone number"
-              />
-            </div>
-          </div>
-
-          {/* Company */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
-            <div className="relative">
-              <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                value={profile.company || ""}
-                onChange={(e) => handleInputChange("company", e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
-                placeholder="Enter your company name"
-              />
-            </div>
-          </div>
-
-          {/* Timezone */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
-            <div className="relative">
-              <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Seat Preference */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Seat Preference</label>
               <select
-                value={profile.timezone || ""}
-                onChange={(e) => handleInputChange("timezone", e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
+                value={profile.preferences?.seat_preference || ""}
+                onChange={(e) => handlePreferenceChange("seat_preference", e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200"
               >
-                <option value="">Select timezone</option>
-                <option value="America/New_York">Eastern Time (ET)</option>
-                <option value="America/Chicago">Central Time (CT)</option>
-                <option value="America/Denver">Mountain Time (MT)</option>
-                <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                <option value="Europe/London">London (GMT)</option>
-                <option value="Europe/Paris">Paris (CET)</option>
-                <option value="Asia/Tokyo">Tokyo (JST)</option>
+                <option value="">No preference</option>
+                <option value="window">Window</option>
+                <option value="aisle">Aisle</option>
+                <option value="middle">Middle</option>
+              </select>
+            </div>
+
+            {/* Meal Preference */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Meal Preference</label>
+              <select
+                value={profile.preferences?.meal_preference || ""}
+                onChange={(e) => handlePreferenceChange("meal_preference", e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all duration-200"
+              >
+                <option value="">Standard</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="kosher">Kosher</option>
+                <option value="halal">Halal</option>
+                <option value="gluten-free">Gluten Free</option>
               </select>
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
 
-      {/* Travel Preferences */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
-      >
-        <h3 className="text-lg font-medium tracking-tighter text-gray-900 mb-6">
-          <em className="font-serif italic">Travel Preferences</em>
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Seat Preference */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Seat Preference</label>
-            <select
-              value={profile.preferences?.seat_preference || ""}
-              onChange={(e) => handlePreferenceChange("seat_preference", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
-            >
-              <option value="">No preference</option>
-              <option value="window">Window</option>
-              <option value="aisle">Aisle</option>
-              <option value="middle">Middle</option>
-            </select>
-          </div>
-
-          {/* Meal Preference */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Meal Preference</label>
-            <select
-              value={profile.preferences?.meal_preference || ""}
-              onChange={(e) => handlePreferenceChange("meal_preference", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
-            >
-              <option value="">Standard</option>
-              <option value="vegetarian">Vegetarian</option>
-              <option value="vegan">Vegan</option>
-              <option value="kosher">Kosher</option>
-              <option value="halal">Halal</option>
-              <option value="gluten-free">Gluten Free</option>
-            </select>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Save Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="flex justify-end"
-      >
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-xl text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        {/* Save Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="flex justify-end pt-4"
         >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-          {saving ? "Saving..." : "Save Changes"}
-        </button>
-      </motion.div>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="inline-flex items-center px-8 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
+          >
+            {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+            {saving ? "Saving..." : "Save Changes"}
+          </button>
+        </motion.div>
+
+        {/* Success/Error Messages */}
+        {saving && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="fixed bottom-4 right-4 bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-lg"
+          >
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+              <span className="text-sm text-blue-800">Saving your changes...</span>
+            </div>
+          </motion.div>
+        )}
+      </div>
     </div>
   )
 }
