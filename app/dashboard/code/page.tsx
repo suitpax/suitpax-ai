@@ -182,7 +182,7 @@ export default function SuitpaxCodePage() {
 
         {/* Chat + Preview */}
         <div className="overflow-hidden grid grid-cols-1 xl:grid-cols-2">
-          <ChatContainer messages={messages} className="h-[calc(100vh-330px)] p-6" />
+          <ChatContainer messages={messages} className="h-[calc(100vh-390px)] p-6" />
           <div className="border-t xl:border-t-0 xl:border-l border-gray-200/60 bg-white/80 backdrop-blur-md">
             <div className="flex items-center justify-between p-3">
               <div className="text-xs font-medium">Preview</div>
@@ -190,14 +190,36 @@ export default function SuitpaxCodePage() {
                 <button onClick={copyCode} className="px-2 py-1 text-[10px] border rounded">Copy</button>
                 <button onClick={saveSnippet} className="px-2 py-1 text-[10px] border rounded">Save</button>
                 <button onClick={downloadCode} className="px-2 py-1 text-[10px] border rounded">Download</button>
+                <button onClick={() => { const w = window.open(); if (w) { w.document.write(previewHtml || '<div style=\'padding:12px;font-family:sans-serif;color:#555\'>No preview</div>'); w.document.close(); } }} className="px-2 py-1 text-[10px] border rounded">Open</button>
               </div>
             </div>
-            <iframe sandbox="allow-scripts allow-same-origin" className="w-full h-[calc(100vh-390px)]" srcDoc={previewHtml || "<div style='padding:12px;font-family:sans-serif;color:#555'>No preview</div>"} />
+            <iframe sandbox="allow-scripts allow-same-origin" className="w-full h-[calc(100vh-450px)]" srcDoc={previewHtml || "<div style='padding:12px;font-family:sans-serif;color:#555'>No preview</div>"} />
           </div>
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t border-gray-200/60 bg-white/80 backdrop-blur-md">
+        <div className="p-4 border-t border-gray-200/60 bg-white/80 backdrop-blur-md space-y-3">
+          {/* Role presets */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: 'traveler', title: 'Traveler preset', prompt: 'Create a mobile-first trip timeline widget with flights & hotels (Tailwind).' },
+              { id: 'manager', title: 'Manager preset', prompt: 'Design a policy violations table with filters and export buttons (TSX).' },
+              { id: 'finance', title: 'Finance preset', prompt: 'Build a monthly expense breakdown chart + table (TSX, Tailwind).' },
+            ].map((p) => (
+              <button key={p.id} onClick={() => setInput(p.prompt)} className="px-3 py-1.5 text-xs border rounded-full bg-white hover:bg-gray-50">{p.title}</button>
+            ))}
+          </div>
+          {/* Template chips */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: 'expense-widget', title: 'Travel expense widget', prompt: 'Create a travel expense widget with totals, categories and last 5 items (TSX).' },
+              { id: 'flight-grid', title: 'Flight deals grid', prompt: 'Generate a responsive flight deals grid card layout (HTML).' },
+              { id: 'policy-table', title: 'Policy table', prompt: 'Create a compact policy rules table with status tags (TSX).' },
+              { id: 'trip-timeline', title: 'Trip timeline', prompt: 'Build a timeline of trip segments (flight, hotel, car) (TSX).' },
+            ].map((t) => (
+              <button key={t.id} onClick={() => setInput(t.prompt)} className="px-3 py-1.5 text-xs border rounded-full bg-white hover:bg-gray-50">{t.title}</button>
+            ))}
+          </div>
           <EnhancedPromptInput
             value={input}
             onChange={setInput}

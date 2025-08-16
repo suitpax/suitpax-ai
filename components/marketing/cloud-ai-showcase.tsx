@@ -121,7 +121,7 @@ export default function CloudAIShowcase() {
           viewport={{ once: true }}
           className="w-full"
         >
-          <VantaCloudsBackground className="w-full min-h-[500px] md:min-h-[600px] rounded-xl flex items-center justify-center p-4 md:p-6 overflow-hidden bg-blue-100">
+          <VantaCloudsBackground className="w-full min-h-[500px] md:min-h-[600px] rounded-xl flex items-center justify-center p-4 md:p-6 overflow-hidden bg-gray-100">
             <div className="w-full max-w-3xl">
               <div className="text-center mb-6 md:mb-8">
                 <h3 className="inline-flex items-center rounded-xl bg-gray-800/60 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-medium text-white mb-4 shadow-sm">

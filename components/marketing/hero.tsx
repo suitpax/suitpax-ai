@@ -300,7 +300,7 @@ export const Hero = () => {
 
           <div className="mt-10 text-center max-w-3xl mx-auto">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
-              <FadeSpan>{randomTitle}</FadeSpan>
+              <em className="font-serif italic"><FadeSpan>{randomTitle}</FadeSpan></em>
             </h1>
 
             {/* Animated AI Assistant Text */}
