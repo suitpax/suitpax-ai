@@ -11,6 +11,7 @@ import { motion } from "framer-motion"
 import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 import AISearchInput from "@/components/ui/ai-search-input"
+import MobileBottomNav from "@/components/dashboard/mobile-bottom-nav"
 
 export default function DashboardLayout({
   children,
@@ -202,7 +203,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Main content area */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto pb-24 lg:pb-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -244,6 +245,9 @@ export default function DashboardLayout({
           },
         }}
       />
+
+      {/* Mobile bottom navigation */}
+      <MobileBottomNav />
     </div>
   )
 }
