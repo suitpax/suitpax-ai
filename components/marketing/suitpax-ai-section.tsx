@@ -5,7 +5,6 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { ShiningText } from "../ui/shining-text"
 import Link from "next/link"
 
 // Mini Chat para IA
@@ -228,10 +227,9 @@ export const SuitpaxAISection = () => {
             </div>
 
             {/* Título con efecto brillante */}
-            <ShiningText
-              text="Inteligencia artificial para cada aspecto de tu negocio"
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-tight mb-4 py-2 text-white"
-            />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter leading-tight mb-4 py-2 text-white">
+              Inteligencia artificial para cada aspecto de tu negocio
+            </h1>
 
             <p className="mt-4 text-xs sm:text-sm font-medium text-gray-400 max-w-2xl mx-auto mb-2">
               Nuestras soluciones de IA transforman la gestión de viajes, gastos y finanzas con inteligencia predictiva

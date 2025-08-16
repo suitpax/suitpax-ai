@@ -26,6 +26,8 @@ import TRMManagement from "@/components/marketing/trm-management"
 import TeamExpenseGuide from "@/components/marketing/team-expense-guide"
 import TravelRewards from "@/components/marketing/travel-rewards"
 import PolicyCTA from "@/components/marketing/policy-cta"
+import OpsCopilot from "@/components/marketing/ops-copilot"
+import Hiring from "@/components/marketing/hiring"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -86,6 +88,7 @@ export default function Home() {
       <main id="main-content" className="w-full">
         <Hero />
         <LaunchHero />
+        <OpsCopilot />
         {/* Newly added blocks */}
         <Product />
         <TeamCollaborationShowcase />
@@ -113,6 +116,7 @@ export default function Home() {
         <AgenticDisruption />
         <AIVoiceAssistant />
         <AIMeetingsAttachment />
+        <Hiring />
         <ContactForm />
         <FoundersOpenLetter />
       </main>

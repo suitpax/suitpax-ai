@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { Check, Shield } from "lucide-react"
-import { ZiaChatInput } from "../ui/zia-chat-input"
+import ModernChatInput from "../ui/chat-input"
 
 export default function IntelligentPolicyShowcase() {
   const [activeTab, setActiveTab] = useState("compliance")
@@ -91,32 +91,9 @@ export default function IntelligentPolicyShowcase() {
               ))}
             </ul>
           </div>
-
-          <div className="bg-gray-50 rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-6">
-            <div className="mb-4">
-              <h4 className="font-medium text-gray-900 mb-2">Ask Zia to create your policy</h4>
-              <p className="text-sm text-gray-500">
-                Describe your needs and our AI will generate a custom travel policy for you
-              </p>
-            </div>
-
-            {/* Componente de chat input */}
-            <ZiaChatInput />
-
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <p className="text-xs text-gray-500 mb-3">Example policies you can generate:</p>
-              <div className="flex flex-wrap gap-2">
-                {["Startup policy", "Enterprise policy", "Budget-focused", "Sustainability-focused"].map(
-                  (policy, i) => (
-                    <span
-                      key={i}
-                      className="inline-flex items-center rounded-xl bg-white px-2.5 py-1 text-xs font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors"
-                    >
-                      {policy}
-                    </span>
-                  ),
-                )}
-              </div>
+          <div className="flex items-center justify-center">
+            <div className="w-full max-w-md">
+              <ModernChatInput />
             </div>
           </div>
         </div>
