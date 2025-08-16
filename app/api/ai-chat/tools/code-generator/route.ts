@@ -13,17 +13,17 @@ export async function POST(request: NextRequest) {
     const { query, language, framework } = await request.json()
     if (!query) return NextResponse.json({ success: false, error: "Query is required" }, { status: 400 })
 
-    const enhanced = `\n${SUITPAX_CODE_SYSTEM_PROMPT}\n\n## Request\n- User request: ${query}\n- Language: ${language || "best-fit"}\n- Framework: ${framework || "best-fit"}\n\nProvide concise, production-ready code with minimal explanation. Include imports.`
+    const enhanced = `${SUITPAX_CODE_SYSTEM_PROMPT}\n\nRequest:\n- Task: ${query}\n- Language: ${language || "best-fit"}\n- Framework: ${framework || "best-fit"}\n\nRemember: output EXACTLY ONE fenced code block with a proper language tag. If a webpage, return full HTML document; if Next.js, return a complete TSX component/page.`
 
     const client = getAnthropic()
     if (!client) return NextResponse.json({ success: false, error: "AI not configured" }, { status: 500 })
 
     const res = await client.messages.create({
       model: "claude-3-7-sonnet-20250219",
-      max_tokens: 2000,
+      max_tokens: 3500,
       system: SUITPAX_CODE_SYSTEM_PROMPT,
       messages: [{ role: "user", content: enhanced }],
-      temperature: 0.4,
+      temperature: 0.2,
     })
 
     const text = (res as any).content?.find?.((c: any) => c.type === "text")?.text || ""

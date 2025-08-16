@@ -40,16 +40,11 @@ export default function SuitpaxCodePage() {
       setLimits(l)
       const p = (l?.plan_id || "free").toLowerCase?.() || "free"
       setPlan(p)
-      // Near limit modal
       if (l?.code_tokens_limit && l?.code_tokens_limit > 0) {
         const ratio = (l.code_tokens_used || 0) / l.code_tokens_limit
         if (ratio >= 0.8) setShowLimitModal(true)
       }
       setLoading(false)
-      // Access allowed for preview/testing; gating disabled for now
-      // if (p === "free") {
-      //   router.push("/dashboard/billing?upgrade=code")
-      // }
     }
     load()
   }, [router, supabase])
@@ -79,7 +74,6 @@ export default function SuitpaxCodePage() {
 
   const send = async () => {
     if (!input.trim()) return
-    // slash /mcp
     if (await tryMcpCommand(input.trim())) { setInput(""); return }
 
     setIsSending(true)
@@ -108,12 +102,28 @@ export default function SuitpaxCodePage() {
     }
   }
 
-  const copyCode = async () => {
+  const getLastAssistantCode = () => {
     const last = [...messages].reverse().find((m) => m.role === "assistant")
-    if (!last) return
+    if (!last) return ""
     const codeMatch = last.content.match(/```[\s\S]*?\n([\s\S]*?)```/)
-    const code = codeMatch ? codeMatch[1] : last.content
+    return codeMatch ? codeMatch[1] : last.content
+  }
+
+  const copyCode = async () => {
+    const code = getLastAssistantCode()
+    if (!code) return
     await navigator.clipboard.writeText(code)
+  }
+
+  const downloadCode = () => {
+    const code = getLastAssistantCode()
+    if (!code) return
+    const blob = new Blob([code], { type: "text/plain;charset=utf-8" })
+    const a = document.createElement("a")
+    a.href = URL.createObjectURL(blob)
+    a.download = /<html/i.test(code) ? "suitpax-code.html" : "suitpax-code.tsx"
+    a.click()
+    URL.revokeObjectURL(a.href)
   }
 
   const saveSnippet = async () => {
@@ -125,42 +135,52 @@ export default function SuitpaxCodePage() {
   if (loading) return null
 
   return (
-          <div className="flex flex-col h-full">
-        <div className="px-4 pt-4 pb-2 border-b border-gray-200 bg-white">
-          <h1 className="text-base font-medium tracking-tighter text-black">Suitpax Code</h1>
-          <p className="text-[12px] text-gray-600">Custom pricing planned Q1 2026</p>
+    <div className="flex flex-col h-full bg-white">
+      {/* Header */}
+      <div className="px-5 pt-5 pb-3 border-b border-gray-200 bg-white">
+        <h1 className="text-lg font-medium tracking-tighter text-black">Suitpax Code</h1>
+        <p className="text-[12px] text-gray-600">An AI coding agent to design and ship real UIs. Copy, download or preview your code.</p>
+      </div>
+
+      {/* Tools */}
+      <div className="grid grid-rows-[auto_1fr_auto]">
+        <div className="p-4 border-b border-gray-200 bg-white">
+          <div className="grid gap-3 md:grid-cols-2">
+            <MCPRemoteServerList />
+            <div className="hidden md:block" />
+          </div>
+          <div className="mt-3">
+            <MCPToolRunner />
+          </div>
         </div>
 
-                <div className="flex-1 grid grid-rows-[auto_1fr_auto] bg-white">
-          <div className="p-3 border-b border-gray-200 bg-white">
-            <MCPRemoteServerList />
-            <div className="mt-2">
-              <MCPToolRunner />
-            </div>
-          </div>
-          <div className="overflow-hidden grid grid-cols-1 lg:grid-cols-2">
-            <ChatContainer messages={messages} className="h-[calc(100vh-300px)]" />
-            <div className="border-l border-gray-200 hidden lg:block">
-              <div className="flex items-center justify-between p-2">
-                <div className="text-xs font-medium">Preview</div>
-                <div className="flex gap-2">
-                  <button onClick={copyCode} className="px-2 py-1 text-[10px] border rounded">Copy</button>
-                  <button onClick={saveSnippet} className="px-2 py-1 text-[10px] border rounded">Save</button>
-                </div>
+        {/* Chat + Preview */}
+        <div className="overflow-hidden grid grid-cols-1 xl:grid-cols-2">
+          <ChatContainer messages={messages} className="h-[calc(100vh-330px)] p-6" />
+          <div className="border-t xl:border-t-0 xl:border-l border-gray-200 bg-white">
+            <div className="flex items-center justify-between p-3">
+              <div className="text-xs font-medium">Preview</div>
+              <div className="flex gap-2">
+                <button onClick={copyCode} className="px-2 py-1 text-[10px] border rounded">Copy</button>
+                <button onClick={saveSnippet} className="px-2 py-1 text-[10px] border rounded">Save</button>
+                <button onClick={downloadCode} className="px-2 py-1 text-[10px] border rounded">Download</button>
               </div>
-              <iframe sandbox="allow-scripts allow-same-origin" className="w-full h-[calc(100vh-360px)]" srcDoc={previewHtml || "<div style='padding:12px;font-family:sans-serif;color:#555'>No preview</div>"} />
             </div>
-          </div>
-          <div className="p-3 border-t border-gray-200 bg-white">
-            <EnhancedPromptInput
-              value={input}
-              onChange={setInput}
-              onSubmit={send}
-              isLoading={isSending}
-              placeholder="/mcp <tool> {json} or ask Suitpax Code to build a UI..."
-            />
+            <iframe sandbox="allow-scripts allow-same-origin" className="w-full h-[calc(100vh-390px)]" srcDoc={previewHtml || "<div style='padding:12px;font-family:sans-serif;color:#555'>No preview</div>"} />
           </div>
         </div>
+
+        {/* Input */}
+        <div className="p-4 border-t border-gray-200 bg-white">
+          <EnhancedPromptInput
+            value={input}
+            onChange={setInput}
+            onSubmit={send}
+            isLoading={isSending}
+            placeholder={"Design a responsive landing hero for a B2B SaaS in Tailwind (with CTA). Return ONLY a full HTML page or a full TSX component."}
+          />
+        </div>
+      </div>
 
       {showLimitModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
