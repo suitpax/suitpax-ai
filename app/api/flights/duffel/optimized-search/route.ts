@@ -3,6 +3,8 @@ import { getDuffelClient } from '@/lib/duffel';
 import { enrichOffersWithAirlineInfo } from '@/lib/duffel-enrichment';
 import { enrichOffersWithAircraftInfo } from '@/lib/duffel-aircraft';
 
+export const runtime = 'nodejs'
+
 function buildPassengerArray(passengers: any): Array<{ type: string }> {
   const result: Array<{ type: string }> = [];
   if (!passengers) return [{ type: 'adult' }];
@@ -61,10 +63,21 @@ export async function POST(request: Request) {
 
     const listParams: any = { offer_request_id };
     if (typeof max_results === 'number') listParams.limit = max_results;
-    const list = await (duffel as any).offers.list(listParams);
 
-    const offers = list?.data || list?.offers || [];
-    const meta = list?.meta || {};
+    // Polling loop to wait for offers to be ready
+    let list = await (duffel as any).offers.list(listParams);
+    let offers = list?.data || list?.offers || [];
+    let meta = list?.meta || {};
+    let attempts = 0;
+
+    while (offers.length === 0 && attempts < 8) {
+      await new Promise((r) => setTimeout(r, 800));
+      list = await (duffel as any).offers.list(listParams);
+      offers = list?.data || list?.offers || [];
+      meta = list?.meta || {};
+      attempts += 1;
+    }
+
     const withAirlines = await enrichOffersWithAirlineInfo(offers)
     const withAircraft = await enrichOffersWithAircraftInfo(withAirlines)
 
