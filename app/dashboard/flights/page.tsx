@@ -212,6 +212,20 @@ export default function FlightsPage() {
     }
   }
 
+  const sortPlaces = (list: any[]) => {
+    try {
+      const norm = (s: string) => (s || '').toString().trim().toLowerCase()
+      return [...list].sort((a, b) => {
+        const ac = norm(a.city_name || a.city?.name); const bc = norm(b.city_name || b.city?.name)
+        if (ac && bc && ac !== bc) return ac.localeCompare(bc)
+        const ai = (a.iata_code || a.airport?.iata_code || '').toUpperCase(); const bi = (b.iata_code || b.airport?.iata_code || '').toUpperCase()
+        if (ai && bi && ai !== bi) return ai.localeCompare(bi)
+        const an = norm(a.name); const bn = norm(b.name)
+        return an.localeCompare(bn)
+      })
+    } catch { return list }
+  }
+
   const handleOriginKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showOriginResults && originResults.length === 0) return
     if (e.key === 'ArrowDown') {
@@ -406,7 +420,7 @@ export default function FlightsPage() {
       </div>
 
       {/* Search Card */}
-      <Card className="border-gray-200 bg-white rounded-2xl">
+      <Card className="border-gray-200 glass-card">
         <CardHeader>
           <CardTitle className="text-gray-900 text-base">Search parameters</CardTitle>
         </CardHeader>
@@ -420,6 +434,27 @@ export default function FlightsPage() {
                 onSelect={(item: any) => selectAirport(item, 'origin')}
                 placeholder="JFK"
               />
+              {showOriginResults && sortPlaces(originResults).length > 0 && (
+                <div className="absolute z-10 mt-1 w-full rounded-2xl border border-gray-200 bg-white shadow-soft max-h-60 overflow-auto">
+                  {sortPlaces(originResults).slice(0, 8).map((p: any, idx: number) => {
+                    const city = (p.city_name || p.city?.name || '').toString()
+                    const name = p.name || city
+                    const iata = (p.iata_code || p.airport?.iata_code || '').toUpperCase()
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onMouseDown={() => selectAirport({ id: p.id, iata_code: iata, name, city_name: city } as any, 'origin')}
+                        onMouseEnter={() => setOriginHighlight(idx)}
+                        className={`w-full text-left px-3 py-2 ${idx === originHighlight ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+                      >
+                        <div className="text-sm text-gray-900">{city || name} ({iata})</div>
+                        <div className="text-xs text-gray-600">{name}</div>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Swap */}
@@ -437,6 +472,27 @@ export default function FlightsPage() {
                 onSelect={(item: any) => selectAirport(item, 'destination')}
                 placeholder="LHR"
               />
+              {showDestinationResults && sortPlaces(destinationResults).length > 0 && (
+                <div className="absolute z-10 mt-1 w-full rounded-2xl border border-gray-200 bg-white shadow-soft max-h-60 overflow-auto">
+                  {sortPlaces(destinationResults).slice(0, 8).map((p: any, idx: number) => {
+                    const city = (p.city_name || p.city?.name || '').toString()
+                    const name = p.name || city
+                    const iata = (p.iata_code || p.airport?.iata_code || '').toUpperCase()
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onMouseDown={() => selectAirport({ id: p.id, iata_code: iata, name, city_name: city } as any, 'destination')}
+                        onMouseEnter={() => setDestinationHighlight(idx)}
+                        className={`w-full text-left px-3 py-2 ${idx === destinationHighlight ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+                      >
+                        <div className="text-sm text-gray-900">{city || name} ({iata})</div>
+                        <div className="text-xs text-gray-600">{name}</div>
+                      </button>
+                    )}
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Trip type */}
