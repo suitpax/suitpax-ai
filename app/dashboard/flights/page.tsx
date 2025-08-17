@@ -67,6 +67,8 @@ export default function FlightsPage() {
   const [destinationResults, setDestinationResults] = useState<DuffelAirport[]>([])
   const [showOriginResults, setShowOriginResults] = useState(false)
   const [showDestinationResults, setShowDestinationResults] = useState(false)
+  const [originHighlight, setOriginHighlight] = useState<number>(-1)
+  const [destinationHighlight, setDestinationHighlight] = useState<number>(-1)
 
   const [savedSearches, setSavedSearches] = useState<SavedSearchItem[]>([])
 
@@ -189,6 +191,9 @@ export default function FlightsPage() {
     return () => clearTimeout(t)
   }, [destinationQuery, fetchPlaces])
 
+  useEffect(() => { setOriginHighlight(-1) }, [originQuery, showOriginResults, originResults.length])
+  useEffect(() => { setDestinationHighlight(-1) }, [destinationQuery, showDestinationResults, destinationResults.length])
+
   const selectAirport = (airport: any, type: "origin" | "destination") => {
     const code = (airport?.iata_code || '').toUpperCase()
     const cityCode = (airport?.iata_city_code || airport?.city?.iata_code || '').toUpperCase()
@@ -202,6 +207,46 @@ export default function FlightsPage() {
       setShowOriginResults(false)
     } else {
       setDestinationQuery(label)
+      setShowDestinationResults(false)
+    }
+  }
+
+  const handleOriginKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showOriginResults && originResults.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setShowOriginResults(true)
+      setOriginHighlight(h => Math.min(h + 1, originResults.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setOriginHighlight(h => Math.max(h - 1, 0))
+    } else if (e.key === 'Enter') {
+      if (originHighlight >= 0 && originResults[originHighlight]) {
+        e.preventDefault()
+        selectAirport(originResults[originHighlight] as any, 'origin')
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      setShowOriginResults(false)
+    }
+  }
+
+  const handleDestinationKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showDestinationResults && destinationResults.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setShowDestinationResults(true)
+      setDestinationHighlight(h => Math.min(h + 1, destinationResults.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setDestinationHighlight(h => Math.max(h - 1, 0))
+    } else if (e.key === 'Enter') {
+      if (destinationHighlight >= 0 && destinationResults[destinationHighlight]) {
+        e.preventDefault()
+        selectAirport(destinationResults[destinationHighlight] as any, 'destination')
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
       setShowDestinationResults(false)
     }
   }
@@ -374,6 +419,7 @@ export default function FlightsPage() {
                   value={originQuery}
                   onChange={e => setOriginQuery(e.target.value.toUpperCase())}
                   onFocus={() => setShowOriginResults(true)}
+                  onKeyDown={handleOriginKeyDown}
                   placeholder="JFK"
                   className="bg-white text-gray-900 pr-10 rounded-2xl"
                 />
@@ -381,7 +427,7 @@ export default function FlightsPage() {
               </div>
               {showOriginResults && originResults.length > 0 && (
                 <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-sm max-h-60 overflow-auto">
-                  {originResults.slice(0, 8).map((p: any) => {
+                  {originResults.slice(0, 8).map((p: any, idx: number) => {
                     const city = (p.city_name || p.city?.name || '').toString()
                     const name = p.name || city
                     const iata = p.iata_code || p.airport?.iata_code || ''
@@ -389,8 +435,9 @@ export default function FlightsPage() {
                       <button
                         key={p.id}
                         type="button"
-                        onClick={() => selectAirport({ id: p.id, iata_code: iata, name, city_name: city } as any, 'origin')}
-                        className="w-full text-left px-3 py-2 hover:bg-gray-50"
+                        onMouseDown={() => selectAirport({ id: p.id, iata_code: iata, name, city_name: city } as any, 'origin')}
+                        onMouseEnter={() => setOriginHighlight(idx)}
+                        className={`w-full text-left px-3 py-2 ${idx === originHighlight ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
                       >
                         <div className="text-sm text-gray-900">{city ? city.charAt(0).toUpperCase() + city.slice(1).toLowerCase() : name} ({iata})</div>
                         <div className="text-xs text-gray-600">{name}</div>
@@ -416,6 +463,7 @@ export default function FlightsPage() {
                   value={destinationQuery}
                   onChange={e => setDestinationQuery(e.target.value.toUpperCase())}
                   onFocus={() => setShowDestinationResults(true)}
+                  onKeyDown={handleDestinationKeyDown}
                   placeholder="LHR"
                   className="bg-white text-gray-900 pr-10 rounded-2xl"
                 />
@@ -423,7 +471,7 @@ export default function FlightsPage() {
               </div>
               {showDestinationResults && destinationResults.length > 0 && (
                 <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-sm max-h-60 overflow-auto">
-                  {destinationResults.slice(0, 8).map((p: any) => {
+                  {destinationResults.slice(0, 8).map((p: any, idx: number) => {
                     const city = (p.city_name || p.city?.name || '').toString()
                     const name = p.name || city
                     const iata = p.iata_code || p.airport?.iata_code || ''
@@ -431,8 +479,9 @@ export default function FlightsPage() {
                       <button
                         key={p.id}
                         type="button"
-                        onClick={() => selectAirport({ id: p.id, iata_code: iata, name, city_name: city } as any, 'destination')}
-                        className="w-full text-left px-3 py-2 hover:bg-gray-50"
+                        onMouseDown={() => selectAirport({ id: p.id, iata_code: iata, name, city_name: city } as any, 'destination')}
+                        onMouseEnter={() => setDestinationHighlight(idx)}
+                        className={`w-full text-left px-3 py-2 ${idx === destinationHighlight ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
                       >
                         <div className="text-sm text-gray-900">{city ? city.charAt(0).toUpperCase() + city.slice(1).toLowerCase() : name} ({iata})</div>
                         <div className="text-xs text-gray-600">{name}</div>
