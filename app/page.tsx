@@ -8,22 +8,9 @@ import AIMeetingsAttachment from "@/components/marketing/ai-meetings-attachment"
 import AgenticDisruption from "@/components/marketing/agentic-disruption"
 import AIVoiceAssistant from "@/components/marketing/ai-voice-assistant"
 import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
+import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
 import ContactForm from "@/components/marketing/contact-form"
-import { default as LaunchHero } from "@/components/marketing/launch-hero"
-import TeamCollaborationShowcase from "@/components/marketing/team-collaboration-showcase"
-import BusinessTravelSlider from "@/components/marketing/business-travel-slider"
-import AirlinesSlider from "@/components/marketing/airlines-slider"
-import BusinessIntelligence from "@/components/marketing/business-intelligence"
-import ExpenseManagement from "@/components/marketing/expense-management"
-import TRMManagement from "@/components/marketing/trm-management"
-import TravelRewards from "@/components/marketing/travel-rewards"
-import PolicyCTA from "@/components/marketing/policy-cta"
-import OpsCopilot from "@/components/marketing/ops-copilot"
-import AgentCode from "@/components/marketing/agent-code"
-import AIFlightSection from "@/components/marketing/ai-flight-section"
-import Plans from "@/components/marketing/plans"
 import type { Metadata } from "next"
-import HyperspeedBooking from "@/components/marketing/hyperspeed-booking"
 
 export const metadata: Metadata = {
   title: "Suitpax | AI-Powered Business Travel Platform",
@@ -35,6 +22,68 @@ export const metadata: Metadata = {
       "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
     url: "https://suitpax.com",
     siteName: "Suitpax",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Suitpax | AI-Powered Business Travel Platform",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Suitpax | AI-Powered Business Travel Platform",
+    description:
+      "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
+    images: ["/twitter-image.png"],
+    creator: "@suitpax",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "verification_token",
+  },
+  alternates: {
+    canonical: "https://suitpax.com",
+    languages: {
+      "en-US": "https://suitpax.com/en-US",
+      "es-ES": "https://suitpax.com/es-ES",
+    },
+  },
+}
+
+export default function Home() {
+  return (
+    <>
+      <main id="main-content" className="w-full">
+        <Hero />
+        <PartnersShowcase />
+        <AITravelAgents />
+        <BusinessTravelRevolution />
+        <AIVoiceCallingHub />
+        <MCPFlightsAIAgents />
+        <CloudAIShowcase />
+        <AgenticDisruption />
+        <AIVoiceAssistant />
+        <AIMeetingsAttachment />
+        <ContactForm />
+        <FoundersOpenLetter />
+      </main>
+    </>
+  )
+}    siteName: "Suitpax",
     images: [
       {
         url: "/og-image.png",
