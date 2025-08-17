@@ -14,7 +14,7 @@ interface FlightOfferSegment {
   operating_carrier: any
   flight_number: string
   aircraft: any
-  airline?: { name?: string; logo_symbol_url?: string }
+  airline?: { name?: string; logo_symbol_url?: string; logo_lockup_url?: string; iata_code?: string }
 }
 
 interface FlightOfferSlice {
@@ -50,42 +50,51 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
       {offers.map((offer) => (
         <Card key={offer.id} className="border-gray-200 bg-white">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold text-gray-900">
-              {offer.total_amount} {offer.total_currency}
-            </CardTitle>
-            <div className="text-xs text-gray-500">Expira {new Date(offer.expires_at).toLocaleString()}</div>
+            <div className="flex items-center gap-3">
+              {(() => {
+                const seg = offer.slices?.[0]?.segments?.[0]
+                const airlineName = seg?.airline?.name || seg?.marketing_carrier?.name
+                const airlineIata = seg?.airline?.iata_code || seg?.marketing_carrier?.iata_code
+                const logo = seg?.airline?.logo_lockup_url || seg?.airline?.logo_symbol_url
+                if (!airlineName) return null
+                return (
+                  <div className="flex items-center gap-2">
+                    {logo && <img src={logo} alt={airlineName} className="h-5" />}
+                    <span className="text-sm text-gray-700">{airlineName} ({airlineIata})</span>
+                  </div>
+                )
+              })()}
+            </div>
+            <div className="text-right">
+              <CardTitle className="text-lg font-semibold text-gray-900">
+                {offer.total_amount} {offer.total_currency}
+              </CardTitle>
+              <div className="text-xs text-gray-500">Expira {new Date(offer.expires_at).toLocaleString()}</div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            {offer.slices.map((slice, idx) => {
-              const seg = slice.segments?.[0]
-              const airlineName = seg?.airline?.name || seg?.marketing_carrier?.name
-              const airlineLogo = seg?.airline?.logo_symbol_url
-              return (
-                <div key={slice.id} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
-                  <div className="flex items-center justify-between text-sm text-gray-800">
-                    <div className="font-medium">Tramo {idx + 1}: {slice.origin?.iata_code} → {slice.destination?.iata_code}</div>
-                    <div className="flex items-center gap-2">
-                      {airlineLogo && <img src={airlineLogo} alt={airlineName || ''} className="h-5 w-5 rounded-full" />}
-                      <div className="text-gray-600">{airlineName}</div>
-                    </div>
-                  </div>
-                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                    {slice.segments.map(seg => (
-                      <div key={seg.id} className="rounded-md bg-white border border-gray-200 p-2 text-xs text-gray-800">
-                        <div className="flex items-center justify-between">
-                          <div>{seg.origin?.iata_code} → {seg.destination?.iata_code}</div>
-                          <div>{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
-                        </div>
-                        <div className="mt-1 flex items-center justify-between text-gray-600">
-                          <div>Sale: {new Date(seg.departing_at).toLocaleString()}</div>
-                          <div>Llega: {new Date(seg.arriving_at).toLocaleString()}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+            {offer.slices.map((slice, idx) => (
+              <div key={slice.id} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                <div className="flex items-center justify-between text-sm text-gray-800">
+                  <div className="font-medium">Tramo {idx + 1}: {slice.origin?.iata_code} → {slice.destination?.iata_code}</div>
+                  <div className="text-gray-600">Duración: {slice.duration?.replace('PT', '').toLowerCase()}</div>
                 </div>
-              )
-            })}
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {slice.segments.map(seg => (
+                    <div key={seg.id} className="rounded-md bg-white border border-gray-200 p-2 text-xs text-gray-800">
+                      <div className="flex items-center justify-between">
+                        <div>{seg.origin?.iata_code} → {seg.destination?.iata_code}</div>
+                        <div>{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
+                      </div>
+                      <div className="mt-1 flex items-center justify-between text-gray-600">
+                        <div>Sale: {new Date(seg.departing_at).toLocaleString()}</div>
+                        <div>Llega: {new Date(seg.arriving_at).toLocaleString()}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
 
             <div className="flex items-center justify-end gap-3">
               <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={() => onTrackPrice?.(offer.id)}>

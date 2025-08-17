@@ -330,17 +330,22 @@ export default function FlightsPage() {
               </div>
               {showOriginResults && originResults.length > 0 && (
                 <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-sm max-h-60 overflow-auto">
-                  {originResults.slice(0, 8).map(a => (
-                    <button
-                      key={a.id}
-                      type="button"
-                      onClick={() => selectAirport(a, 'origin')}
-                      className="w-full text-left px-3 py-2 hover:bg-gray-50"
-                    >
-                      <div className="text-sm text-gray-900">{a.city?.name || a.city_name} ({a.iata_code})</div>
-                      <div className="text-xs text-gray-600">{a.name}</div>
-                    </button>
-                  ))}
+                  {originResults.slice(0, 8).map((p: any) => {
+                    const city = (p.city_name || p.city?.name || '').toString()
+                    const name = p.name || city
+                    const iata = p.iata_code || p.airport?.iata_code || ''
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => selectAirport({ id: p.id, iata_code: iata, name, city_name: city } as any, 'origin')}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-50"
+                      >
+                        <div className="text-sm text-gray-900">{city ? city.charAt(0).toUpperCase() + city.slice(1).toLowerCase() : name} ({iata})</div>
+                        <div className="text-xs text-gray-600">{name}</div>
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -367,17 +372,22 @@ export default function FlightsPage() {
               </div>
               {showDestinationResults && destinationResults.length > 0 && (
                 <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-sm max-h-60 overflow-auto">
-                  {destinationResults.slice(0, 8).map(a => (
-                    <button
-                      key={a.id}
-                      type="button"
-                      onClick={() => selectAirport(a, 'destination')}
-                      className="w-full text-left px-3 py-2 hover:bg-gray-50"
-                    >
-                      <div className="text-sm text-gray-900">{a.city?.name || a.city_name} ({a.iata_code})</div>
-                      <div className="text-xs text-gray-600">{a.name}</div>
-                    </button>
-                  ))}
+                  {destinationResults.slice(0, 8).map((p: any) => {
+                    const city = (p.city_name || p.city?.name || '').toString()
+                    const name = p.name || city
+                    const iata = p.iata_code || p.airport?.iata_code || ''
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => selectAirport({ id: p.id, iata_code: iata, name, city_name: city } as any, 'destination')}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-50"
+                      >
+                        <div className="text-sm text-gray-900">{city ? city.charAt(0).toUpperCase() + city.slice(1).toLowerCase() : name} ({iata})</div>
+                        <div className="text-xs text-gray-600">{name}</div>
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </div>

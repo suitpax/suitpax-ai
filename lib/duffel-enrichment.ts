@@ -8,7 +8,7 @@ export async function enrichOffersWithAirlineInfo(offers: any[]) {
   for (const offer of offers) {
     for (const slice of offer?.slices || []) {
       for (const segment of slice?.segments || []) {
-        const hasAirlineLogo = Boolean(segment?.airline?.logo_symbol_url)
+        const hasAirlineLogo = Boolean(segment?.airline?.logo_symbol_url || segment?.airline?.logo_lockup_url)
         const code = segment?.marketing_carrier?.iata_code
         if (!hasAirlineLogo && code) codes.add(code.toUpperCase())
       }
@@ -54,6 +54,8 @@ export async function enrichOffersWithAirlineInfo(offers: any[]) {
         segment.airline = segment.airline || {}
         if (!segment.airline.name) segment.airline.name = air.name
         if (!segment.airline.logo_symbol_url) segment.airline.logo_symbol_url = air.logo_symbol_url
+        if (!segment.airline.logo_lockup_url) segment.airline.logo_lockup_url = air.logo_lockup_url
+        if (!segment.airline.iata_code) segment.airline.iata_code = code
       }
     }
   }
