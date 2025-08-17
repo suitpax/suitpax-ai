@@ -70,6 +70,16 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                 {offer.total_amount} {offer.total_currency}
               </CardTitle>
               <div className="text-xs text-gray-500">Expira {new Date(offer.expires_at).toLocaleString()}</div>
+              {(() => {
+                const seg = offer.slices?.[0]?.segments?.[0]
+                const url = seg?.airline?.conditions_of_carriage_url
+                if (!url) return null
+                return (
+                  <a href={url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline">
+                    Conditions of carriage
+                  </a>
+                )
+              })()}
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
