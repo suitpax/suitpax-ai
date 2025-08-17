@@ -10,6 +10,8 @@ export default function FlightsLayout({ children }: { children: React.ReactNode 
     { href: '/dashboard/flights', label: 'Search' },
     { href: '/dashboard/flights/airlines', label: 'Airlines' },
     { href: '/dashboard/flights/airports', label: 'Airports' },
+    { href: '/dashboard/flights/ancillaries', label: 'Ancillaries' },
+    { href: '/dashboard/flights/loyalty', label: 'Loyalty' },
   ]
 
   return (
