@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDuffelClient } from '@/lib/duffel';
+import { enrichOffersWithAirlineInfo } from '@/lib/duffel-enrichment';
 
 function buildPassengerArray(passengers: any): Array<{ type: string }> {
   const result: Array<{ type: string }> = [];
@@ -57,8 +58,9 @@ export async function POST(request: Request) {
 
     const offerRequest = await (duffel as any).offerRequests.create(requestPayload);
     const offers = offerRequest?.data?.offers || [];
+    const enriched = await enrichOffersWithAirlineInfo(offers)
 
-    return NextResponse.json({ data: offers, offer_request_id: offerRequest?.data?.id });
+    return NextResponse.json({ data: enriched, offer_request_id: offerRequest?.data?.id });
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || 'Unexpected error' },
