@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plane, Clock, ArrowRight } from 'lucide-react'
+import Image from 'next/image'
 
 interface Segment {
   origin: { iata_code: string; city_name: string; name: string }
@@ -50,8 +51,18 @@ export default function FlightItinerary({ slices }: FlightItineraryProps) {
                 <div key={segIndex} className="flex items-center gap-4">
                   {(() => {
                     const name = segment.airline?.name || segment.marketing_carrier?.name || 'Airline'
-                    const logo = segment.airline?.logo_symbol_url
-                    const src = logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`
+                    const iata = segment.airline?.iata_code || segment.marketing_carrier?.iata_code
+                    if (iata) {
+                      return (
+                        <Image
+                          src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${iata}.svg`}
+                          width={48}
+                          height={18}
+                          alt={name}
+                        />
+                      )
+                    }
+                    const src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`
                     return <img src={src} alt={name} className="h-8 w-8 rounded-full border border-gray-200" />
                   })()}
                   <div className="flex-grow">

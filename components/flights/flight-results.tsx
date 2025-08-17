@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Image from 'next/image'
 
 interface FlightOfferSegment {
   id: string
@@ -55,11 +56,17 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                 const seg = offer.slices?.[0]?.segments?.[0]
                 const airlineName = seg?.airline?.name || seg?.marketing_carrier?.name
                 const airlineIata = seg?.airline?.iata_code || seg?.marketing_carrier?.iata_code
-                const logo = seg?.airline?.logo_lockup_url || seg?.airline?.logo_symbol_url
                 if (!airlineName) return null
                 return (
                   <div className="flex items-center gap-2">
-                    {logo && <img src={logo} alt={airlineName} className="h-5" />}
+                    {airlineIata ? (
+                      <Image
+                        src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${airlineIata}.svg`}
+                        width={64}
+                        height={24}
+                        alt={airlineName}
+                      />
+                    ) : null}
                     <span className="text-sm text-gray-700 tracking-tighter">{airlineName} ({airlineIata})</span>
                   </div>
                 )
@@ -93,7 +100,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                   {slice.segments.map(seg => {
                     const destCity = seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name
                     const cityThumb = destCity ? `https://source.unsplash.com/96x64/?${encodeURIComponent(destCity + ' skyline')}` : ''
-                    const logo = seg.airline?.logo_symbol_url || seg.airline?.logo_lockup_url
+                    const iata = seg.airline?.iata_code || seg.marketing_carrier?.iata_code
                     return (
                       <div key={seg.id} className="segment">
                         <div className="flex items-center justify-between">
@@ -112,11 +119,14 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://images.pexels.com/photos/373912/pexels-photo-373912.jpeg?auto=compress&cs=tinysrgb&h=64&w=96' }}
                               />
                             )}
-                            {logo ? (
-                              <img src={logo} alt={seg.airline?.name || ''} className="h-4" />
-                            ) : (
-                              <span className="text-xs text-gray-600">{seg.marketing_carrier?.iata_code}</span>
-                            )}
+                            {iata ? (
+                              <Image
+                                src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${iata}.svg`}
+                                width={48}
+                                height={18}
+                                alt={seg.airline?.name || seg.marketing_carrier?.name || 'Airline'}
+                              />
+                            ) : <span className="text-xs text-gray-600">{seg.marketing_carrier?.iata_code}</span>}
                           </div>
                         </div>
                         <div className="mt-1 flex items-center justify-between text-gray-600 text-xs">
