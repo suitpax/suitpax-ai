@@ -47,20 +47,27 @@ export async function POST(request: Request) {
     const requestPayload: any = {
       slices,
       passengers: buildPassengerArray(passengers),
-      return_offers: true,
+      return_offers: false,
     };
 
     if (cabin_class) requestPayload.cabin_class = cabin_class;
     if (typeof max_connections === 'number') requestPayload.max_connections = max_connections;
-    if (typeof max_results === 'number') requestPayload.max_results = max_results;
     if (sort) requestPayload.sort = sort;
     if (currency) requestPayload.currency = currency;
 
     const offerRequest = await (duffel as any).offerRequests.create(requestPayload);
-    const offers = offerRequest?.data?.offers || [];
+    const offer_request_id = offerRequest?.data?.id;
+
+    // Fetch first page of offers using offers.list for consistent pagination
+    const listParams: any = { offer_request_id };
+    if (typeof max_results === 'number') listParams.limit = max_results;
+    const list = await (duffel as any).offers.list(listParams);
+
+    const offers = list?.data || list?.offers || [];
+    const meta = list?.meta || {};
     const enriched = await enrichOffersWithAirlineInfo(offers)
 
-    return NextResponse.json({ data: enriched, offer_request_id: offerRequest?.data?.id });
+    return NextResponse.json({ data: enriched, offer_request_id, meta });
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || 'Unexpected error' },

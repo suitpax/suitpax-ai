@@ -79,6 +79,10 @@ export default function FlightsPage() {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
 
+  const [offerRequestId, setOfferRequestId] = useState<string | null>(null)
+  const [pageMeta, setPageMeta] = useState<any>({})
+  const [loadingMore, setLoadingMore] = useState(false)
+
   // Load saved searches from localStorage
   useEffect(() => {
     try {
@@ -205,6 +209,8 @@ export default function FlightsPage() {
 
     setSearching(true)
     setOffers([])
+    setOfferRequestId(null)
+    setPageMeta({})
 
     try {
       const payload: any = {
@@ -225,11 +231,34 @@ export default function FlightsPage() {
       if (!res.ok) throw new Error(json?.error || 'Search failed')
       const results = Array.isArray(json?.data) ? json.data : json?.offers || []
       setOffers(results)
+      setOfferRequestId(json?.offer_request_id || null)
+      setPageMeta(json?.meta || {})
       toast.success(`Found ${results.length} flights`)
     } catch (e: any) {
       toast.error(e?.message || 'Error searching flights')
     } finally {
       setSearching(false)
+    }
+  }
+
+  const loadMore = async () => {
+    if (!offerRequestId || !pageMeta?.after) return
+    setLoadingMore(true)
+    try {
+      const url = new URL('/api/flights/duffel/offers', window.location.origin)
+      url.searchParams.set('offer_request_id', offerRequestId)
+      url.searchParams.set('after', pageMeta.after)
+      url.searchParams.set('limit', '20')
+      const res = await fetch(url.toString())
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error || 'Failed to load more')
+      const more = Array.isArray(json?.data) ? json.data : []
+      setOffers(prev => [...prev, ...more])
+      setPageMeta(json?.meta || {})
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to load more')
+    } finally {
+      setLoadingMore(false)
     }
   }
 
@@ -519,6 +548,14 @@ export default function FlightsPage() {
         onSelectOffer={(offer) => toast.success(`Select flight ${offer.id}`)}
         className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''}
       />
+
+      {pageMeta?.after && (
+        <div className="flex justify-center py-4">
+          <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={loadMore} disabled={loadingMore}>
+            {loadingMore ? 'Loading more…' : 'Load more'}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
