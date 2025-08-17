@@ -30,16 +30,18 @@ export async function GET(request: Request) {
       cache: 'no-store',
     })
 
+    const requestId = resp.headers.get('x-request-id') || undefined
+
     if (!resp.ok) {
       const text = await resp.text()
-      return NextResponse.json({ error: text || 'Duffel error' }, { status: resp.status })
+      return NextResponse.json({ error: text || 'Duffel error', request_id: requestId }, { status: resp.status })
     }
 
     const json = await resp.json()
     const data = Array.isArray(json?.data) ? json.data : []
     const meta = json?.meta || {}
 
-    return NextResponse.json({ data, meta })
+    return NextResponse.json({ data, meta, request_id: requestId })
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Unexpected error' }, { status: 500 })
   }
