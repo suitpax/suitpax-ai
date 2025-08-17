@@ -5,6 +5,8 @@ import Counter from "./Counter"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import IncludedBaggageBanner from "./bags/IncludedBaggageBanner"
+import BaggageSelectionController from "./bags/BaggageSelectionController"
 
 interface DuffelAncillaryRaw {
 	id?: string
@@ -102,10 +104,17 @@ export default function DuffelAncillaries({ offerId, onChange, className = "" }:
 				<CardTitle className="text-gray-900 text-base tracking-tighter">Extras</CardTitle>
 			</CardHeader>
 			<CardContent className="space-y-4">
+				{/* Included baggage summary (placeholder; wire real data if present on offer) */}
+				<IncludedBaggageBanner cabin={null} checked={null} />
 				{loading && <div className="text-sm text-gray-600">Loading…</div>}
 				{error && <div className="text-sm text-red-600">{error}</div>}
 				{!loading && !error && ancillaries.length === 0 && (
 					<div className="text-sm text-gray-600">No extras available for this offer</div>
+				)}
+
+				{/* Baggage controller */}
+				{ancillaries.some(a => (a.category || '').includes('baggage') || a.code.includes('BAG')) && (
+					<BaggageSelectionController ancillaries={ancillaries} onChange={() => {}} />
 				)}
 
 				{Object.keys(byCategory).map((cat) => (
