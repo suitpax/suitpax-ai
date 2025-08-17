@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import IncludedBaggageBanner from "./bags/IncludedBaggageBanner"
 import BaggageSelectionController from "./bags/BaggageSelectionController"
+import CfarSelectionCard from "./cfar/CfarSelectionCard"
+import CfarSelectionModal from "./cfar/CfarSelectionModal"
 
 interface DuffelAncillaryRaw {
 	id?: string
@@ -55,6 +57,8 @@ export default function DuffelAncillaries({ offerId, onChange, className = "" }:
 	const [error, setError] = useState<string | null>(null)
 	const [ancillaries, setAncillaries] = useState<SimplifiedAncillary[]>([])
 	const [selection, setSelection] = useState<Record<string, number>>({})
+	const [cfarOpen, setCfarOpen] = useState(false)
+	const [cfarSelected, setCfarSelected] = useState(false)
 
 	useEffect(() => {
 		const run = async () => {
@@ -89,6 +93,8 @@ export default function DuffelAncillaries({ offerId, onChange, className = "" }:
 		}, {})
 	}, [ancillaries])
 
+	const cfarOption = useMemo(() => ancillaries.find(a => (a.category || '').includes('cancel') || a.code.toLowerCase().includes('cfar')), [ancillaries])
+
 	const setQty = (code: string, qty: number) => {
 		setSelection((prev) => {
 			const next = { ...prev }
@@ -115,6 +121,25 @@ export default function DuffelAncillaries({ offerId, onChange, className = "" }:
 				{/* Baggage controller */}
 				{ancillaries.some(a => (a.category || '').includes('baggage') || a.code.includes('BAG')) && (
 					<BaggageSelectionController ancillaries={ancillaries} onChange={() => {}} />
+				)}
+
+				{/* CFAR */}
+				{cfarOption && (
+					<div className="space-y-2">
+						<div className="text-sm font-medium text-gray-900">Trip protection</div>
+						<CfarSelectionCard
+							option={{ code: cfarOption.code, title: cfarOption.title, description: cfarOption.description, amount: cfarOption.amount, currency: cfarOption.currency }}
+							selected={cfarSelected}
+							onToggle={(sel) => { setCfarSelected(sel); if (sel) setCfarOpen(true) }}
+						/>
+						<CfarSelectionModal
+							open={cfarOpen}
+							onClose={() => setCfarOpen(false)}
+							option={{ code: cfarOption.code, title: cfarOption.title, description: cfarOption.description, amount: cfarOption.amount, currency: cfarOption.currency }}
+							selected={cfarSelected}
+							onToggle={(sel) => setCfarSelected(sel)}
+						/>
+					</div>
 				)}
 
 				{Object.keys(byCategory).map((cat) => (

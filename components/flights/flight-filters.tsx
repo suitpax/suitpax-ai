@@ -387,7 +387,7 @@ export default function FlightFilters({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto"
+            className="fixed right-0 top-0 h-full w-full sm:w-[90%] md:w-[420px] max-w-full bg-white shadow-2xl z-50 overflow-y-auto"
           >
             <div className="h-full border-0 rounded-none flex flex-col">
               {/* Header */}
@@ -412,7 +412,7 @@ export default function FlightFilters({
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-8">
+              <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-white">
                 {/* Price Range */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -478,7 +478,7 @@ export default function FlightFilters({
                     <PaperAirplaneIcon className="h-4 w-4 mr-2" />
                     Airlines
                   </Label>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                  <div className="space-y-2 max-h-48 overflow-y-auto bg-white rounded-xl border border-gray-200 p-2">
                     {airlines.map((airline) => (
                       <div key={airline.code} className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">

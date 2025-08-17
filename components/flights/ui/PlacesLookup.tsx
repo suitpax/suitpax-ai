@@ -11,11 +11,14 @@ interface Props {
   placeholder?: string
 }
 
+const cityThumbCache: Map<string, string> = new Map()
+
 export default function PlacesLookup({ value, onSelect, placeholder }: Props) {
   const [query, setQuery] = useState(value)
   const [items, setItems] = useState<Item[]>([])
   const [open, setOpen] = useState(false)
   const [highlight, setHighlight] = useState(-1)
+  const [loading, setLoading] = useState(false)
 
   const fetchPlaces = useCallback(async (q: string) => {
     const res = await fetch(`/api/flights/duffel/places/suggestions?query=${encodeURIComponent(q)}`)
@@ -36,12 +39,14 @@ export default function PlacesLookup({ value, onSelect, placeholder }: Props) {
 
   useEffect(() => {
     const q = query.trim()
-    if (!q) { setItems([]); return }
+    if (!q) { setItems([]); setLoading(false); return }
+    setLoading(true)
     const t = setTimeout(async () => {
       const data = await fetchPlaces(q)
       setItems(data)
-    }, 200)
-    return () => clearTimeout(t)
+      setLoading(false)
+    }, 250)
+    return () => { clearTimeout(t); }
   }, [query, fetchPlaces])
 
   const select = (p: any) => {
@@ -55,17 +60,43 @@ export default function PlacesLookup({ value, onSelect, placeholder }: Props) {
 
   const cityThumb = (city?: string) => {
     if (!city) return ''
+    const key = city.toLowerCase()
+    if (cityThumbCache.has(key)) return cityThumbCache.get(key) as string
     const q = encodeURIComponent(`${city} skyline`)
-    // Primary Unsplash on-the-fly; fallback to a generic Pexels city image
-    return `https://source.unsplash.com/96x64/?${q}`
+    const url = `https://source.unsplash.com/96x64/?${q}`
+    cityThumbCache.set(key, url)
+    return url
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!open && items.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setOpen(true)
+      setHighlight(h => Math.min(h + 1, items.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlight(h => Math.max(h - 1, 0))
+    } else if (e.key === 'Enter') {
+      if (highlight >= 0 && items[highlight]) {
+        e.preventDefault()
+        select(items[highlight] as any)
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      setOpen(false)
+    }
   }
 
   return (
     <div className="places">
-      <Input value={query} onChange={e => { setQuery(e.target.value.toUpperCase()); setOpen(true) }} placeholder={placeholder} className="bg-white text-gray-900 rounded-2xl" />
+      <Input value={query} onChange={e => { setQuery(e.target.value.toUpperCase()); setOpen(true) }} onFocus={() => setOpen(true)} onKeyDown={handleKeyDown} placeholder={placeholder} className="bg-white text-gray-900 rounded-2xl" />
       {open && items.length > 0 && (
         <div className="places-panel">
           <div className="p-2">
+            {loading && (
+              <div className="px-3 py-2 text-xs text-gray-600">Searching…</div>
+            )}
             {items.slice(0, 8).map((p: any, idx: number) => {
               const city = (p.city_name || p.city?.name || '').toString()
               const name = p.name || city
@@ -80,7 +111,7 @@ export default function PlacesLookup({ value, onSelect, placeholder }: Props) {
                           src={thumb}
                           alt={city || name}
                           className="h-10 w-16 rounded-lg object-cover border border-gray-200"
-                          onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://images.pexels.com/photos/373912/pexels-photo-373912.jpeg?auto=compress&cs=tinysrgb&h=64&w=96' }}
+                          onError={(e) => { const el = e.currentTarget as HTMLImageElement; const fallback = 'https://images.pexels.com/photos/373912/pexels-photo-373912.jpeg?auto=compress&cs=tinysrgb&h=64&w=96'; el.src = fallback; if (city) cityThumbCache.set(city.toLowerCase(), fallback) }}
                         />
                       ) : (
                         <div className="h-10 w-16 rounded-lg border border-gray-200 bg-gray-50" />
