@@ -238,10 +238,10 @@ export default function FlightsPage() {
       if (searchParams.tripType === 'multi_city') {
         const legs = multiCityLegs.filter(l => l.origin && l.destination && l.date)
         if (legs.length < 2) throw new Error('Please add at least 2 valid legs')
-        payload.slices = legs.map(l => ({ origin: l.origin, destination: l.destination, departure_date: l.date }))
+        payload.slices = legs.map(l => ({ origin: l.origin.toUpperCase(), destination: l.destination.toUpperCase(), departure_date: l.date }))
       } else {
-        payload.origin = searchParams.origin
-        payload.destination = searchParams.destination
+        payload.origin = searchParams.origin.toUpperCase()
+        payload.destination = searchParams.destination.toUpperCase()
         payload.departure_date = searchParams.departureDate
         if (searchParams.tripType === 'round_trip' && searchParams.returnDate) payload.return_date = searchParams.returnDate
       }
@@ -348,9 +348,9 @@ export default function FlightsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tighter">Flights</h1>
+          <h1 className="text-3xl md:text-5xl font-semibold tracking-tighter">Flights</h1>
           <p className="text-sm text-gray-600">Find and compare flights in real-time (Suitpax)</p>
         </div>
         <div className="flex items-center gap-2">

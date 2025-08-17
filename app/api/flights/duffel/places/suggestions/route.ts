@@ -46,9 +46,31 @@ export async function GET(request: Request) {
     }
 
     const json = await resp.json()
-    const data = Array.isArray(json?.data) ? json.data : []
+    const raw = Array.isArray(json?.data) ? json.data : []
+    const data = raw.filter((p: any) => {
+      const city = (p?.city_name || p?.city?.name || '').toString()
+      const name = (p?.name || city || '').toString()
+      if (!name || name.length < 3) return false
+      if (/^\d+\s/.test(name)) return false
+      return true
+    }).map((p: any) => ({
+      ...p,
+      iata_code: (p?.iata_code || p?.airport?.iata_code || '').toUpperCase(),
+      city_name: p?.city_name ? capitalize(p.city_name) : (p?.city?.name ? capitalize(p.city.name) : undefined),
+      name: p?.name ? titleCase(p.name) : p?.name,
+    }))
     return NextResponse.json({ data, warnings: json?.warnings || [], request_id: requestId })
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Unexpected error' }, { status: 500 })
   }
+}
+
+function capitalize(s: string) {
+  try { return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() } catch { return s }
+}
+
+function titleCase(s: string) {
+  try {
+    return s.split(' ').map(w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w).join(' ')
+  } catch { return s }
 }
