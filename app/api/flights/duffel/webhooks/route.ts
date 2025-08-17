@@ -22,7 +22,10 @@ function verifySignature(rawBody: string, signature: string | null): boolean {
 
 export async function POST(request: Request) {
   try {
-    const signature = request.headers.get('x-duffel-signature')
+    const signature =
+      request.headers.get('x-duffel-signature') ||
+      request.headers.get('duffel-signature') ||
+      request.headers.get('x-signature')
     const rawBody = await request.text()
 
     if (!verifySignature(rawBody, signature)) {
@@ -31,7 +34,36 @@ export async function POST(request: Request) {
 
     const event = JSON.parse(rawBody)
 
-    // TODO: persist event and update related entities (orders/payments/services)
+    // Persist event (best-effort). Use service role to bypass RLS.
+    try {
+      const { getAdminClient } = await import('@/lib/supabase/admin')
+      const admin = getAdminClient()
+
+      // Extract common fields defensively
+      const eventType = event?.type || event?.event_type || event?.event || null
+      const eventId = event?.id || event?.event_id || null
+      const resourceType = event?.data?.type || event?.resource_type || null
+      const resourceId = event?.data?.id || event?.resource_id || null
+      const orderId = event?.data?.order_id || (resourceType === 'order' ? resourceId : null)
+
+      const headers: Record<string, string> = {}
+      request.headers.forEach((v, k) => (headers[k] = v))
+
+      await admin.from('webhook_events').insert({
+        provider: 'duffel',
+        event_id: eventId,
+        event_type: eventType,
+        resource_type: resourceType,
+        resource_id: resourceId,
+        order_id: orderId,
+        signature: signature || null,
+        headers: headers as any,
+        payload: event as any,
+        status: 'received',
+      })
+    } catch (persistError) {
+      console.error('Failed to persist Duffel webhook event:', persistError)
+    }
 
     return NextResponse.json({ received: true })
   } catch (error: any) {
