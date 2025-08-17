@@ -4,20 +4,68 @@ import crypto from 'crypto'
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
-function verifySignature(rawBody: string, signature: string | null): boolean {
-  const secret = process.env.DUFFEL_WEBHOOK_SECRET || ''
-  if (!secret || !signature) return false
+function isProbablyBase64(input: string): boolean {
+  // Rough heuristic; avoids throwing on non-base64
+  if (!input || input.length % 4 !== 0) return false
+  return /^[A-Za-z0-9+/]+={0,2}$/.test(input)
+}
 
-  // Duffel uses HMAC SHA-256 signatures
-  const hmac = crypto.createHmac('sha256', secret)
-  hmac.update(rawBody, 'utf8')
-  const expected = hmac.digest('hex')
+function parseSignatureHeader(header: string | null): { timestamp?: string; signature?: string } {
+  if (!header) return {}
+  // Support either raw signature or key=value pairs (e.g., t=..., v1=...)
+  if (header.includes('=')) {
+    const parts = header.split(',').map((p) => p.trim())
+    const map: Record<string, string> = {}
+    for (const part of parts) {
+      const [k, v] = part.split('=')
+      if (k && v) map[k] = v
+    }
+    return { timestamp: map['t'], signature: map['v1'] || map['signature'] }
+  }
+  return { signature: header }
+}
 
+function timingSafeEqualString(a: string, b: string): boolean {
   try {
-    return crypto.timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expected, 'hex'))
+    const bufA = Buffer.from(a)
+    const bufB = Buffer.from(b)
+    return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB)
   } catch {
     return false
   }
+}
+
+function verifySignature(rawBody: string, signatureHeader: string | null): boolean {
+  const secretEnv = process.env.DUFFEL_WEBHOOK_SECRET || ''
+  if (!secretEnv || !signatureHeader) return false
+
+  const { timestamp, signature } = parseSignatureHeader(signatureHeader)
+  if (!signature) return false
+
+  // Use base64-decoded key when appropriate
+  const key: crypto.BinaryLike = isProbablyBase64(secretEnv) ? Buffer.from(secretEnv, 'base64') : secretEnv
+
+  const payloadCandidates: string[] = [rawBody]
+  if (timestamp) payloadCandidates.push(`${timestamp}.${rawBody}`)
+
+  for (const payload of payloadCandidates) {
+    const hmac = crypto.createHmac('sha256', key)
+    hmac.update(payload, 'utf8')
+    const digest = hmac.digest()
+
+    const expectedHex = digest.toString('hex')
+    const expectedBase64 = digest.toString('base64')
+
+    // Compare against provided signature as-is, case-insensitive for hex
+    if (timingSafeEqualString(signature, expectedHex) || timingSafeEqualString(signature.toLowerCase(), expectedHex.toLowerCase())) {
+      return true
+    }
+    if (timingSafeEqualString(signature, expectedBase64)) {
+      return true
+    }
+  }
+
+  return false
 }
 
 export async function POST(request: Request) {
