@@ -1,56 +1,37 @@
 "use client"
 
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { RiArrowRightUpLine } from "react-icons/ri"
-import type { ReactNode } from "react"
 
-// Primitive badge variants for app-wide use (flights, dashboards, etc.)
-export type PrimitiveBadgeVariant = "default" | "outline" | "success" | "warning" | "danger"
+const badgeVariants = cva(
+	"inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors",
+	{
+		variants: {
+			variant: {
+				default: "bg-black text-white border-black",
+				secondary: "bg-gray-100 text-gray-800 border-gray-200",
+				outline: "bg-white text-gray-800 border-gray-200",
+				muted: "bg-gray-50 text-gray-700 border-gray-200",
+				compact: "bg-gray-50 text-gray-700 border-gray-200 px-2 py-0 text-[11px]",
+			},
+			size: {
+				md: "px-2.5 py-0.5 text-xs",
+				sm: "px-2 py-0.5 text-[11px]",
+				xs: "px-1.5 py-0 text-[10px]",
+			},
+		},
+		defaultVariants: {
+			variant: "outline",
+			size: "sm",
+		},
+	}
+)
 
-type PrimitiveBadgeProps = {
-  children: ReactNode
-  className?: string
-  variant?: PrimitiveBadgeVariant
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {
+	asChild?: boolean
 }
 
-export function Badge({ children, className, variant = "outline" }: PrimitiveBadgeProps) {
-  const base = "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
-  const styles = {
-    default: "bg-gray-900 text-white",
-    outline: "border border-gray-200 bg-gray-50 text-gray-700",
-    success: "bg-green-50 text-green-700 border border-green-200",
-    warning: "bg-yellow-50 text-yellow-700 border border-yellow-200",
-    danger: "bg-red-50 text-red-700 border border-red-200",
-  } as const
-  return <span className={cn(base, styles[variant], className)}>{children}</span>
+export default function Badge({ className, variant, size, ...props }: BadgeProps) {
+	return <span className={cn(badgeVariants({ variant, size }), className)} {...props} />
 }
-
-// Fancy marketing badge fallback (preserves previous API if text prop is used)
-interface FancyBadgeProps {
-  text: string
-  href?: string
-  label?: string
-  isNew?: boolean
-}
-
-export function FancyBadge({ text, href = "#", label = "Update", isNew = true }: FancyBadgeProps) {
-  return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="mx-auto">
-      <Link aria-label={`View ${text}`} href={text === "Join our waitlist in the meantime." ? "https://accounts.suitpax.com/waitlist" : href} className="mx-auto inline-block">
-        <div className="inline-flex max-w-full items-center gap-2 rounded-xl bg-white/5 px-2 py-0.5 pr-2.5 pl-0.5 text-xs font-medium text-white ring-1 shadow-md shadow-emerald-400/10 ring-white/10 filter backdrop-blur-[1px] transition-colors hover:bg-emerald-500/[2.5%] focus:outline-hidden sm:text-xs">
-          {isNew && (
-            <span className="shrink-0 truncate rounded-xl border bg-white/20 px-1.5 py-0.5 text-xs font-medium text-gray-700">{label}</span>
-          )}
-          <span className="flex items-center gap-1 truncate">
-            <span className="w-full truncate text-gray-800">{text}</span>
-            <RiArrowRightUpLine className="size-3 shrink-0 text-gray-700" />
-          </span>
-        </div>
-      </Link>
-    </motion.div>
-  )
-}
-
-export default Badge

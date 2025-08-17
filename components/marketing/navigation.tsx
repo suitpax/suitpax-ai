@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 const navigationItems = [
   { name: "Manifesto", href: "/manifesto" },
   { name: "Pricing", href: "/pricing" },
-  { name: "Suitpax Code X", href: "/pricing#code", badge: "Mobile Only" },
+  // Removed public Code page entry
   { name: "Talk to founder", href: "/contact" },
 ]
 
@@ -72,8 +72,8 @@ export default function Navigation() {
       >
         <div
           className={cn(
-            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-black/70 border border-white/10 px-4 py-2",
-            isScrolled ? "shadow-lg border-white/20" : ""
+            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-white/90 border border-black/5 px-4 py-2",
+            isScrolled ? "shadow-lg border-black/10" : ""
           )}
         >
           <Link href="/" className="flex items-center">
@@ -89,9 +89,7 @@ export default function Navigation() {
 
           {!isMobile && (
             <div className="hidden md:flex items-center space-x-5">
-              {navigationItems
-                .filter((i) => i.name !== "Suitpax Code X")
-                .map((item) => (
+              {navigationItems.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
@@ -172,9 +170,7 @@ export default function Navigation() {
                   className="block text-sm font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
                 >
                   {item.name}
-                  {item.name === "Suitpax Code X" && (
-                    <span className="ml-1 inline-flex items-center rounded-full border border-black px-2 py-0.5 text-[10px] font-medium text-black">Mobile Only</span>
-                  )}
+
                 </Link>
               ))}
 

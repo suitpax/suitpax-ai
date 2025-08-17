@@ -143,13 +143,17 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                                 <div className="font-medium truncate">
                                   {(seg.origin?.city?.name || seg.origin?.city_name || seg.origin?.name)} ({seg.origin?.iata_code}) → {(seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name)} ({seg.destination?.iata_code})
                                 </div>
-                                <div className="segment-meta text-xs text-gray-600">{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
+                                <div className="segment-meta text-[11px] text-gray-600">{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
                               </div>
                               {/* Eliminamos logos duplicados y thumbnails por segmento para evitar duplicados */}
                             </div>
-                            <div className="mt-1 flex items-center justify-between text-gray-600 text-xs">
-                              <div>Sale: {new Date(seg.departing_at).toLocaleString()}</div>
-                              <div>Llega: {new Date(seg.arriving_at).toLocaleString()}</div>
+                            <div className="mt-1 flex items-center justify-between text-gray-600 text-[11px]">
+                              <span className="inline-flex items-center gap-1">
+                                <span className="inline-flex items-center rounded-full bg-gray-50 text-gray-700 border border-gray-200 px-2 py-0 text-[10px]">Sale: {new Date(seg.departing_at).toLocaleString()}</span>
+                              </span>
+                              <span className="inline-flex items-center gap-1">
+                                <span className="inline-flex items-center rounded-full bg-gray-50 text-gray-700 border border-gray-200 px-2 py-0 text-[10px]">Llega: {new Date(seg.arriving_at).toLocaleString()}</span>
+                              </span>
                             </div>
                           </div>
                         ))}

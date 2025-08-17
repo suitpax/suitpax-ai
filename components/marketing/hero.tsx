@@ -281,7 +281,7 @@ export const Hero = () => {
     <VantaHaloBackground className="w-full min-h-[100vh] md:min-h-[90vh] lg:min-h-[100vh]">
       <section
         aria-label="hero"
-        className="relative w-full overflow-hidden py-20 md:py-32 lg:py-40 pt-24 flex items-center justify-center min-h-[100vh] md:min-h-[90vh] lg:min-h-[100vh] text-white"
+        className="relative w-full overflow-hidden py-20 md:py-32 lg:py-40 pt-24 flex items-center justify-center min-h-[100vh] md:min-h-[90vh] lg:min-h-[100vh]"
       >
         <FadeContainer className="relative flex flex-col items-center justify-center container px-4 md:px-6 mx-auto">
           <Badge
@@ -293,7 +293,7 @@ export const Hero = () => {
           <CounterBadge className="mt-4" variant="light" />
 
           <div className="mt-10 text-center max-w-3xl mx-auto">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-white leading-none max-w-4xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
               <FadeSpan>{randomTitle}</FadeSpan>
             </h1>
 
@@ -302,26 +302,26 @@ export const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-8 bg-black/40 backdrop-blur-md p-6 rounded-xl border border-white/10 relative"
+              className="mt-8 bg-white/70 backdrop-blur-sm p-6 rounded-xl border border-gray-200 relative"
             >
               <CityAnimateText cities={cities} />
             </motion.div>
 
-            <p className="mt-4 text-xs sm:text-sm font-medium text-gray-300 max-w-2xl mx-auto">
+            <p className="mt-4 text-xs sm:text-sm font-medium text-gray-500 max-w-2xl mx-auto">
               <FadeSpan>{randomSubtitle}</FadeSpan>
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
               <Button
                 asChild
-                className="rounded-xl bg-white text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
+                className="rounded-xl bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
                 <Link href="/manifesto">Read the manifesto</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="rounded-xl bg-black/40 backdrop-blur-md border-white/20 text-white hover:bg-black/60 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
+                className="rounded-xl bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
                 <Link href="https://cal.com/team/founders/partnership">Talk to founder</Link>
               </Button>

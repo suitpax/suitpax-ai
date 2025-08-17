@@ -552,7 +552,7 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">Suitpax Code</h3>
-                <p className="text-xs text-gray-600">Custom pricing planned for Q1 2026. Available on mobile navigation when opened.</p>
+                <p className="text-xs text-gray-600">Private preview for enterprise customers only.</p>
               </div>
               <span className="inline-flex items-center rounded-full border border-black px-2.5 py-0.5 text-[10px] font-medium text-black">Coming soon</span>
             </div>
