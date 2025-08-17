@@ -10,7 +10,6 @@ import { FadeContainer, FadeSpan } from "@/components/ui/animations"
 import CounterBadge from "@/components/ui/counter-badge"
 import MiniChat from "@/components/ui/mini-chat"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-import { ArcadeEmbed } from "@/components/ui/arcade-embed"
 
 // Modificar las variaciones de título para hacerlas más inclusivas
 
@@ -114,7 +113,7 @@ const getBadgeMessage = () => {
 
   // Random selection for other times
   const messages = [
-    "Launching at the end of Q2 2025.",
+    "Launching at the end of Q4 2025.",
     "Our AI Agents are at the gym...",
     "Join our waitlist in the meantime.",
     "The next-gen of traveltech.",
@@ -317,27 +316,24 @@ export const Hero = () => {
                 asChild
                 className="rounded-xl bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
-                <Link href="/manifesto">Read our manifesto</Link>
+                <Link href="/manifesto">Read the manifesto</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 className="rounded-xl bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
-                <Link href="https://cal.com/team/founders/partnership">Talk to founders</Link>
+                <Link href="https://cal.com/team/founders/partnership">Talk to founder</Link>
               </Button>
             </div>
           </div>
 
-          {/* Dashboard Image - Sin mini badges */}
-          <div className="mt-12 sm:mt-16 md:mt-20 w-full max-w-[95vw] mx-auto flex justify-center relative px-4 sm:px-6">
-            <ArcadeEmbed />
-          </div>
 
           {/* Caption text */}
           <div className="mt-6 text-center">
             <p className="text-black/90 text-xs font-medium tracking-wider uppercase">
-              CONNECTED TO 400+ GLOBAL AIRLINES & PREMIUM HOTELS WORLDWIDE
+              ASK ANYTHING TO SUITPAX AI.
+              
             </p>
           </div>
 
@@ -352,7 +348,7 @@ export const Hero = () => {
               transition: { duration: 0.2 },
             }}
           >
-            <div className="bg-white/80 backdrop-blur-md rounded-xl border border-gray-200 overflow-hidden">
+            <div className="bg-white/80 backdrop-blur-lg rounded-xl border border-gray-200 overflow-hidden">
               <MiniChat />
             </div>
           </motion.div>
