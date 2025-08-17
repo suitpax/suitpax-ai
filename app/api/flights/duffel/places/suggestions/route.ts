@@ -5,16 +5,22 @@ export const runtime = 'nodejs'
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const q = searchParams.get('q') || searchParams.get('query') || ''
+    const query = searchParams.get('query') || searchParams.get('q') || ''
     const limit = searchParams.get('limit') || '8'
-    if (!q) return NextResponse.json({ data: [] })
+    const lat = searchParams.get('lat') || undefined
+    const lng = searchParams.get('lng') || undefined
+    const rad = searchParams.get('rad') || undefined
+    if (!query) return NextResponse.json({ data: [] })
 
     const token = process.env.DUFFEL_API_KEY || ''
     if (!token) return NextResponse.json({ error: 'Missing DUFFEL_API_KEY' }, { status: 500 })
 
     const url = new URL('https://api.duffel.com/places/suggestions')
-    url.searchParams.set('name_or_iata', q)
+    url.searchParams.set('query', query)
     url.searchParams.set('limit', limit)
+    if (lat) url.searchParams.set('lat', lat)
+    if (lng) url.searchParams.set('lng', lng)
+    if (rad) url.searchParams.set('rad', rad)
 
     const resp = await fetch(url.toString(), {
       headers: {
@@ -30,9 +36,8 @@ export async function GET(request: Request) {
     }
 
     const json = await resp.json()
-    // Normalize to { data: [...] }
-    const data = Array.isArray(json?.data) ? json.data : (json?.places || [])
-    return NextResponse.json({ data })
+    const data = Array.isArray(json?.data) ? json.data : []
+    return NextResponse.json({ data, warnings: json?.warnings || [] })
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Unexpected error' }, { status: 500 })
   }

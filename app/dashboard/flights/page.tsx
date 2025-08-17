@@ -180,13 +180,16 @@ export default function FlightsPage() {
     return () => clearTimeout(t)
   }, [destinationQuery, fetchPlaces])
 
-  const selectAirport = (airport: DuffelAirport, type: "origin" | "destination") => {
-    setSearchParams(prev => ({ ...prev, [type]: airport.iata_code }))
+  const selectAirport = (airport: any, type: "origin" | "destination") => {
+    const code = (airport?.iata_code || '').toUpperCase()
+    const cityCode = (airport?.iata_city_code || airport?.city?.iata_code || '').toUpperCase()
+    const useCode = cityCode || code
+    setSearchParams(prev => ({ ...prev, [type]: useCode }))
     if (type === "origin") {
-      setOriginQuery(airport.iata_code)
+      setOriginQuery(useCode)
       setShowOriginResults(false)
     } else {
-      setDestinationQuery(airport.iata_code)
+      setDestinationQuery(useCode)
       setShowDestinationResults(false)
     }
   }
