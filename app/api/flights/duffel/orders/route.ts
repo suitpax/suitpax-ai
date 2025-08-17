@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient as createSupabase } from '@/lib/supabase/server'
 import { getDuffelClient } from '@/lib/duffel'
+import crypto from 'crypto'
 
 export const runtime = 'nodejs'
 

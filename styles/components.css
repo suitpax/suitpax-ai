@@ -1,0 +1,121 @@
+@layer components {
+	/* Tabs */
+	.tabs { @apply flex gap-2 p-1 bg-gray-100 rounded-2xl; }
+	.tab { @apply px-3 py-1.5 text-sm text-gray-700 rounded-xl transition-soft; }
+	.tab-active { @apply bg-white text-gray-900 shadow-soft border border-gray-200; }
+
+	/* TimelineItem */
+	.timeline-item { @apply relative pl-6; }
+	.timeline-item:before { content: ""; @apply absolute left-2 top-0 bottom-0 w-px bg-gray-200; }
+	.timeline-dot { @apply absolute left-0 top-1.5 h-2.5 w-2.5 rounded-full bg-gray-900; }
+	.timeline-content { @apply bg-white border border-gray-200 rounded-2xl p-3 shadow-soft; }
+
+	/* Summary */
+	.summary-card { @apply bg-white border border-gray-200 rounded-2xl p-4; }
+	.summary-row { @apply flex items-center justify-between text-sm text-gray-800; }
+	.summary-muted { @apply text-xs text-gray-600; }
+
+	/* TimeRangeSelector */
+	.time-range { @apply flex items-center gap-2; }
+	.time-pill { @apply px-3 py-1 text-xs rounded-2xl border border-gray-200 bg-white text-gray-900; }
+	.time-pill-active { @apply bg-black text-white border-black; }
+
+	/* Slice & Segment */
+	.slice-summary { @apply bg-white border border-gray-200 rounded-2xl p-3 shadow-soft; }
+	.slice-carriers { @apply flex items-center gap-2 text-sm text-gray-700; }
+	.segment { @apply grid gap-2 md:grid-cols-3 text-sm text-gray-800 bg-gray-50 rounded-xl p-3 border border-gray-200; }
+	.segment-meta { @apply text-xs text-gray-600; }
+
+	/* Row */
+	.row { @apply flex items-center gap-2; }
+
+	/* Seat map */
+	.seat-map { @apply bg-gray-50 rounded-2xl border border-gray-200 p-3; }
+	.seat { @apply inline-flex items-center justify-center h-8 w-8 rounded-lg text-xs transition-soft; }
+
+	/* Radio button */
+	.radio { @apply inline-flex items-center gap-2 cursor-pointer select-none; }
+	.radio-input { @apply relative h-4 w-4 rounded-full border border-gray-300 bg-white; }
+	.radio-input[data-checked="true"] { @apply border-black; }
+	.radio-input[data-checked="true"]::after { content: ""; @apply absolute inset-1 rounded-full bg-black; }
+
+	/* Places lookup */
+	.places { @apply relative; }
+	.places-panel { @apply absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-soft max-h-60 overflow-auto; }
+	.places-item { @apply w-full text-left px-3 py-2 text-sm text-gray-900 hover:bg-gray-50; }
+	.places-item-active { @apply bg-gray-100; }
+
+	/* Passengers */
+	.passengers { @apply grid grid-cols-3 gap-2; }
+	.passenger-pill { @apply flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-3 py-2; }
+
+	/* Card */
+	.dc-card { @apply bg-white border border-gray-200 rounded-2xl shadow-soft; }
+
+	/* Buttons */
+	.dc-button-primary { @apply rounded-2xl bg-black text-white hover:bg-gray-900 transition-soft; }
+	.dc-button-secondary { @apply rounded-2xl bg-white text-gray-900 border border-gray-300 hover:bg-gray-100 transition-soft; }
+
+	/* Baggage Display */
+	.dc-baggage { @apply flex flex-wrap gap-2; }
+	.dc-baggage-item { @apply inline-flex items-center gap-2 px-2.5 py-1 rounded-2xl border border-gray-200 bg-white text-xs text-gray-700; }
+	.dc-baggage-icon { @apply h-3 w-3; }
+
+	/* Amenity */
+	.dc-amenity { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-2xl border border-gray-200 bg-gray-50 text-xs text-gray-700; }
+
+	/* Airline Selector */
+	.dc-airline-selector { @apply grid grid-cols-1 gap-2; }
+	.dc-airline-chip { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl border border-gray-200 bg-white text-sm text-gray-800 cursor-pointer select-none; }
+	.dc-airline-chip[data-selected="true"] { @apply border-black bg-black text-white; }
+
+	/* NGS Table */
+	.ngs-table { @apply w-full border border-gray-200 rounded-2xl overflow-hidden; }
+	.ngs-head { @apply bg-gray-100 text-xs text-gray-600; }
+	.ngs-row { @apply grid grid-cols-12 items-center; }
+	.ngs-cell { @apply px-3 py-2 text-sm text-gray-800; }
+
+	/* NGS Fare Card */
+	.ngs-fare-card { @apply dc-card p-4; }
+	.ngs-fare-header { @apply flex items-center justify-between mb-2; }
+	.ngs-fare-body { @apply space-y-2; }
+	.ngs-fare-footer { @apply flex items-center justify-end mt-2; }
+
+	/* Shelf Info Card */
+	.ngs-shelf { @apply grid gap-2; }
+	.ngs-shelf-item { @apply dc-card p-3; }
+
+	/* Modal */
+	.dc-modal-backdrop { @apply fixed inset-0 bg-black/40; }
+	.dc-modal { @apply fixed inset-0 flex items-center justify-center p-4; }
+	.dc-modal > .dc-modal-panel { @apply bg-white rounded-2xl shadow-soft border border-gray-200 p-4 w-full max-w-lg; }
+	.dc-modal-header { @apply flex items-center justify-between mb-2; }
+	.dc-modal-actions { @apply flex items-center justify-end gap-2 mt-3; }
+
+	/* Loading */
+	.dc-loading-state { @apply dc-card p-4 text-sm text-gray-600; }
+	.dc-loading-text { @apply mt-2 text-xs text-gray-500; }
+	.dc-loader { @apply h-5 w-5 rounded-full border-2 border-gray-300 border-t-black animate-spin; }
+
+	/* Legend */
+	.dc-legend { @apply flex items-center gap-3 text-xs text-gray-600; }
+	.dc-legend-item { @apply inline-flex items-center gap-1; }
+	.dc-legend-dot { @apply inline-block h-2.5 w-2.5 rounded-full; }
+
+	/* Icon Button */
+	.dc-icon-btn { @apply inline-flex items-center justify-center h-9 w-9 rounded-full bg-black text-white hover:bg-gray-900 transition-soft; }
+	.dc-icon-btn-ghost { @apply inline-flex items-center justify-center h-9 w-9 rounded-full bg-white text-gray-900 border border-gray-300 hover:bg-gray-100 transition-soft; }
+
+	/* Filter Control */
+	.dc-filter { @apply flex items-center gap-2; }
+	.dc-filter-chip { @apply inline-flex items-center gap-1 px-2 py-1 rounded-2xl bg-gray-100 text-xs text-gray-700; }
+	.dc-filter-clear { @apply text-xs text-gray-500 hover:text-gray-700; }
+
+	/* Duffel Payments */
+	.dc-pay-card { @apply dc-card p-3; }
+	.dc-pay-row { @apply flex items-center justify-between text-sm text-gray-800; }
+
+	/* NGS View */
+	.ngs-view { @apply space-y-3; }
+	.ngs-header { @apply flex items-center justify-between; }
+}

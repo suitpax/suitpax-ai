@@ -47,7 +47,7 @@ export default function AnalyticsPage() {
         <div className="animate-pulse h-8 w-48 bg-gray-200 rounded" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm h-28" />
+            <Card key={i} className="glass-card h-28" />
           ))}
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function AnalyticsPage() {
 
       {/* Key Metrics */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
+        <Card className="glass-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -89,7 +89,7 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
+        <Card className="glass-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -101,7 +101,7 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
+        <Card className="glass-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -113,7 +113,7 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
+        <Card className="glass-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -128,7 +128,7 @@ export default function AnalyticsPage() {
 
       {/* Top Destinations and Expense Categories */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm xl:col-span-2">
+        <Card className="glass-card xl:col-span-2">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-medium tracking-tighter">Monthly Spending Trend</h2>
@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
+        <Card className="glass-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-medium tracking-tighter">Top Destinations</h2>
@@ -178,7 +178,7 @@ export default function AnalyticsPage() {
 
       {/* Recent Activity + Upcoming Trips */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm xl:col-span-2">
+        <Card className="glass-card xl:col-span-2">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-medium tracking-tighter">Recent Activity</h2>
@@ -202,7 +202,7 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
+        <Card className="glass-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-medium tracking-tighter">Upcoming Trips</h2>

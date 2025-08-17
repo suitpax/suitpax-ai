@@ -12,6 +12,7 @@ import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 import AISearchInput from "@/components/ui/ai-search-input"
 import MobileBottomNav from "@/components/dashboard/mobile-bottom-nav"
+import { DashboardLoadingScreen } from "@/components/ui/loaders"
 
 export default function DashboardLayout({
   children,
@@ -107,19 +108,7 @@ export default function DashboardLayout({
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-blue-700 font-medium tracking-tight">Loading your workspace...</p>
-        </motion.div>
-      </div>
-    )
+    return <DashboardLoadingScreen />
   }
 
   if (!user) {

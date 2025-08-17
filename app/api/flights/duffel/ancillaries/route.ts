@@ -13,8 +13,9 @@ export async function GET(request: Request) {
     if (!offer_id) return NextResponse.json({ error: 'offer_id is required' }, { status: 400 })
 
     const duffel = getDuffelClient() as any
-    const res = await duffel.seatMaps.list({ offer_id })
+    const res = await duffel.ancillaries.list({ offer_id })
     const data = res?.data || res
+
     return NextResponse.json({ data })
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Unexpected error' }, { status: 500 })

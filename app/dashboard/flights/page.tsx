@@ -13,6 +13,7 @@ import FlightResults from "@/components/flights/flight-results"
 import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
+import PlacesLookup from "@/components/flights/ui/PlacesLookup"
 
 interface DuffelAirport {
   id: string
@@ -211,6 +212,20 @@ export default function FlightsPage() {
     }
   }
 
+  const sortPlaces = (list: any[]) => {
+    try {
+      const norm = (s: string) => (s || '').toString().trim().toLowerCase()
+      return [...list].sort((a, b) => {
+        const ac = norm(a.city_name || a.city?.name); const bc = norm(b.city_name || b.city?.name)
+        if (ac && bc && ac !== bc) return ac.localeCompare(bc)
+        const ai = (a.iata_code || a.airport?.iata_code || '').toUpperCase(); const bi = (b.iata_code || b.airport?.iata_code || '').toUpperCase()
+        if (ai && bi && ai !== bi) return ai.localeCompare(bi)
+        const an = norm(a.name); const bn = norm(b.name)
+        return an.localeCompare(bn)
+      })
+    } catch { return list }
+  }
+
   const handleOriginKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showOriginResults && originResults.length === 0) return
     if (e.key === 'ArrowDown') {
@@ -405,7 +420,7 @@ export default function FlightsPage() {
       </div>
 
       {/* Search Card */}
-      <Card className="border-gray-200 bg-white rounded-2xl">
+      <Card className="border-gray-200 glass-card">
         <CardHeader>
           <CardTitle className="text-gray-900 text-base">Search parameters</CardTitle>
         </CardHeader>
@@ -414,23 +429,17 @@ export default function FlightsPage() {
             {/* Origin */}
             <div className="relative">
               <Label className="text-sm text-gray-700">Origin</Label>
-              <div className="relative">
-                <Input
-                  value={originQuery}
-                  onChange={e => setOriginQuery(e.target.value.toUpperCase())}
-                  onFocus={() => setShowOriginResults(true)}
-                  onKeyDown={handleOriginKeyDown}
-                  placeholder="JFK"
-                  className="bg-white text-gray-900 pr-10 rounded-2xl"
-                />
-                <MapPinIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
-              </div>
-              {showOriginResults && originResults.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-sm max-h-60 overflow-auto">
-                  {originResults.slice(0, 8).map((p: any, idx: number) => {
+              <PlacesLookup
+                value={originQuery}
+                onSelect={(item: any) => selectAirport(item, 'origin')}
+                placeholder="JFK"
+              />
+              {showOriginResults && sortPlaces(originResults).length > 0 && (
+                <div className="absolute z-10 mt-1 w-full rounded-2xl border border-gray-200 bg-white shadow-soft max-h-60 overflow-auto">
+                  {sortPlaces(originResults).slice(0, 8).map((p: any, idx: number) => {
                     const city = (p.city_name || p.city?.name || '').toString()
                     const name = p.name || city
-                    const iata = p.iata_code || p.airport?.iata_code || ''
+                    const iata = (p.iata_code || p.airport?.iata_code || '').toUpperCase()
                     return (
                       <button
                         key={p.id}
@@ -439,7 +448,7 @@ export default function FlightsPage() {
                         onMouseEnter={() => setOriginHighlight(idx)}
                         className={`w-full text-left px-3 py-2 ${idx === originHighlight ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
                       >
-                        <div className="text-sm text-gray-900">{city ? city.charAt(0).toUpperCase() + city.slice(1).toLowerCase() : name} ({iata})</div>
+                        <div className="text-sm text-gray-900">{city || name} ({iata})</div>
                         <div className="text-xs text-gray-600">{name}</div>
                       </button>
                     )
@@ -458,23 +467,17 @@ export default function FlightsPage() {
             {/* Destination */}
             <div className="relative">
               <Label className="text-sm text-gray-700">Destination</Label>
-              <div className="relative">
-                <Input
-                  value={destinationQuery}
-                  onChange={e => setDestinationQuery(e.target.value.toUpperCase())}
-                  onFocus={() => setShowDestinationResults(true)}
-                  onKeyDown={handleDestinationKeyDown}
-                  placeholder="LHR"
-                  className="bg-white text-gray-900 pr-10 rounded-2xl"
-                />
-                <MapPinIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
-              </div>
-              {showDestinationResults && destinationResults.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-sm max-h-60 overflow-auto">
-                  {destinationResults.slice(0, 8).map((p: any, idx: number) => {
+              <PlacesLookup
+                value={destinationQuery}
+                onSelect={(item: any) => selectAirport(item, 'destination')}
+                placeholder="LHR"
+              />
+              {showDestinationResults && sortPlaces(destinationResults).length > 0 && (
+                <div className="absolute z-10 mt-1 w-full rounded-2xl border border-gray-200 bg-white shadow-soft max-h-60 overflow-auto">
+                  {sortPlaces(destinationResults).slice(0, 8).map((p: any, idx: number) => {
                     const city = (p.city_name || p.city?.name || '').toString()
                     const name = p.name || city
-                    const iata = p.iata_code || p.airport?.iata_code || ''
+                    const iata = (p.iata_code || p.airport?.iata_code || '').toUpperCase()
                     return (
                       <button
                         key={p.id}
@@ -483,11 +486,11 @@ export default function FlightsPage() {
                         onMouseEnter={() => setDestinationHighlight(idx)}
                         className={`w-full text-left px-3 py-2 ${idx === destinationHighlight ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
                       >
-                        <div className="text-sm text-gray-900">{city ? city.charAt(0).toUpperCase() + city.slice(1).toLowerCase() : name} ({iata})</div>
+                        <div className="text-sm text-gray-900">{city || name} ({iata})</div>
                         <div className="text-xs text-gray-600">{name}</div>
                       </button>
-                    )
-                  })}
+                    )}
+                  )}
                 </div>
               )}
             </div>
@@ -657,7 +660,7 @@ export default function FlightsPage() {
       <FlightResults
         offers={filteredOffers}
         onTrackPrice={(id) => toast.success(`Tracking price for ${id}`)}
-        onSelectOffer={(offer) => toast.success(`Select flight ${offer.id}`)}
+        onSelectOffer={(offer) => router.push(`/dashboard/flights/book/${offer.id}`)}
         className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''}
       />
 
