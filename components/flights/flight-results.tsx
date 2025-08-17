@@ -30,6 +30,7 @@ interface FlightOffer {
   total_currency: string
   expires_at: string
   slices: FlightOfferSlice[]
+  conditions?: any
 }
 
 interface Props {
@@ -47,7 +48,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
   return (
     <div className={`space-y-4 ${className}`}>
       {offers.map((offer) => (
-        <Card key={offer.id} className="glass-card">
+        <Card key={offer.id} className="glass-card hover-raise">
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-center gap-3">
               {(() => {
@@ -69,6 +70,16 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                 {new Intl.NumberFormat('en-US', { style: 'currency', currency: offer.total_currency, maximumFractionDigits: 0 }).format(parseFloat(offer.total_amount))}
               </CardTitle>
               <div className="text-xs text-gray-500">Expira {new Date(offer.expires_at).toLocaleString()}</div>
+              {offer?.conditions && (
+                <div className="mt-1 flex items-center justify-end gap-2">
+                  {offer.conditions.refund_before_departure && (
+                    <span className={`dc-baggage-item ${offer.conditions.refund_before_departure.allowed ? '' : 'opacity-60'}`}>Refundable</span>
+                  )}
+                  {offer.conditions.change_before_departure && (
+                    <span className={`dc-baggage-item ${offer.conditions.change_before_departure.allowed ? '' : 'opacity-60'}`}>Changeable</span>
+                  )}
+                </div>
+              )}
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
