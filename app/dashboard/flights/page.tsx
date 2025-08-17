@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowsRightLeftIcon, FunnelIcon, MapPinIcon, CalendarIcon, UserIcon } from "@heroicons/react/24/outline"
 import FlightResults from "@/components/flights/flight-results"
+import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
 
 interface DuffelAirport {
   id: string
@@ -61,6 +62,20 @@ export default function FlightsPage() {
   const [showDestinationResults, setShowDestinationResults] = useState(false)
 
   const [savedSearches, setSavedSearches] = useState<SavedSearchItem[]>([])
+
+  const [filters, setFilters] = useState({
+    priceRange: [0, 5000],
+    maxStops: 3,
+    airlines: [] as string[],
+    departureTime: [] as string[],
+    arrivalTime: [] as string[],
+    duration: [0, 1440] as [number, number],
+    cabinClass: [] as string[],
+    refundable: false,
+    changeable: false,
+    directOnly: false,
+  })
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
   // Load saved searches from localStorage
   useEffect(() => {
@@ -185,6 +200,62 @@ export default function FlightsPage() {
     setOriginQuery(searchParams.origin)
     setDestinationQuery(searchParams.destination)
   }, [])
+
+  const applyFilters = useCallback((offersToFilter: any[]) => {
+    let filtered = [...offersToFilter]
+
+    // Price
+    filtered = filtered.filter(offer => {
+      const price = parseFloat(offer.total_amount)
+      return price >= filters.priceRange[0] && price <= filters.priceRange[1]
+    })
+
+    // Airlines
+    if (filters.airlines.length > 0) {
+      filtered = filtered.filter(offer => {
+        const seg = offer.slices?.[0]?.segments?.[0]
+        const code = seg?.airline?.iata_code || seg?.marketing_carrier?.iata_code
+        return code && filters.airlines.includes(code)
+      })
+    }
+
+    // Stops
+    if (filters.directOnly) {
+      filtered = filtered.filter(offer => (offer.slices?.[0]?.segments?.length || 1) - 1 === 0)
+    } else if (filters.maxStops < 3) {
+      filtered = filtered.filter(offer => (offer.slices?.[0]?.segments?.length || 1) - 1 <= filters.maxStops)
+    }
+
+    // Departure time
+    if (filters.departureTime.length > 0) {
+      filtered = filtered.filter(offer => {
+        const dt = new Date(offer.slices?.[0]?.segments?.[0]?.departing_at)
+        const hour = dt.getHours()
+        return filters.departureTime.some(slot => {
+          switch (slot) {
+            case 'early-morning': return hour >= 5 && hour < 8
+            case 'morning': return hour >= 8 && hour < 12
+            case 'afternoon': return hour >= 12 && hour < 18
+            case 'evening': return hour >= 18 && hour < 22
+            case 'night': return hour >= 22 || hour < 5
+            default: return true
+          }
+        })
+      })
+    }
+
+    // Refundable / Changeable flags (if available)
+    if (filters.refundable) {
+      filtered = filtered.filter((o: any) => o.conditions?.refund_before_departure?.allowed === true)
+    }
+    if (filters.changeable) {
+      filtered = filtered.filter((o: any) => o.conditions?.change_before_departure?.allowed === true)
+    }
+
+    return filtered
+  }, [filters])
+
+  const filteredOffers = useMemo(() => applyFilters(offers), [offers, applyFilters])
 
   return (
     <div className="p-6 space-y-6">
@@ -361,9 +432,33 @@ export default function FlightsPage() {
         </div>
       )}
 
+      {/* Filters bar and panel */}
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-gray-600">{offers.length} results</div>
+        <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={() => setFiltersOpen(true)}>
+          <FunnelIcon className="h-4 w-4 mr-2" /> Filters
+        </Button>
+      </div>
+
+      <FlightFiltersDisplay
+        filters={[]}
+        onRemoveFilter={() => {}}
+        onClearAll={() => setFilters({
+          priceRange: [0, 5000], maxStops: 3, airlines: [], departureTime: [], arrivalTime: [], duration: [0, 1440], cabinClass: [], refundable: false, changeable: false, directOnly: false
+        })}
+      />
+
+      <FlightFilters
+        offers={offers}
+        filters={filters}
+        onFiltersChange={(f) => setFilters(f)}
+        isOpen={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+      />
+
       {/* Results */}
       <FlightResults
-        offers={offers}
+        offers={filteredOffers}
         onTrackPrice={(id) => toast.success(`Tracking price for ${id}`)}
         onSelectOffer={(offer) => toast.success(`Select flight ${offer.id}`)}
       />
