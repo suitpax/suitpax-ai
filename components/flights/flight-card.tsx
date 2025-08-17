@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -80,13 +81,10 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
   }
 
   const formatFlightDuration = (duration: string) => {
-    // Duration viene en formato ISO 8601: PT2H30M
     const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/)
     if (!match) return duration
-    
     const hours = match[1] ? parseInt(match[1]) : 0
     const minutes = match[2] ? parseInt(match[2]) : 0
-    
     if (hours === 0) return `${minutes}m`
     if (minutes === 0) return `${hours}h`
     return `${hours}h ${minutes}m`
@@ -95,16 +93,15 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
   const formatDateTime = (dateTime: string) => {
     const date = new Date(dateTime)
     return {
-      time: date.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: false 
-      }),
-      date: date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric' 
-      })
+      time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     }
+  }
+
+  const cityImageUrl = (city?: string) => {
+    const q = encodeURIComponent(city || 'city skyline')
+    // Unsplash source, already whitelisted
+    return `https://images.unsplash.com/photo-1494783367193-149034c05e8f?auto=format&fit=crop&w=300&q=60&city=${q}`
   }
 
   return (
@@ -113,7 +110,6 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
         <div className="space-y-6">
           {offer.slices.map((slice, sliceIndex) => (
             <div key={slice.id} className="space-y-4">
-              {/* Slice Header */}
               {offer.slices.length > 1 && (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   {sliceIndex === 0 ? (
@@ -127,7 +123,6 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
                 </div>
               )}
 
-              {/* Flight Route Overview */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-8">
                   {/* Origin */}
@@ -177,6 +172,7 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
                     </div>
                   </div>
                 </div>
+
                 {/* Airline logo for first segment */}
                 {(() => {
                   const seg = slice.segments[0]
@@ -185,15 +181,17 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
                   if (!name) return null
                   const src = logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`
                   return (
-                    <div className="ml-4 hidden md:block">
-                      <img src={src} alt={name} className="h-8 w-8 rounded-full" />
+                    <div className="ml-4 hidden md:flex items-center gap-3">
+                      <Image src={src} alt={name} width={32} height={32} className="rounded-full" />
+                      <div className="relative h-8 w-12 overflow-hidden rounded-md border border-gray-200">
+                        <Image src={cityImageUrl(slice.destination.city_name)} alt={slice.destination.city_name || ''} fill sizes="48px" className="object-cover" />
+                      </div>
                     </div>
                   )
                 })()}
               </div>
 
-              {/* Flight Details */}
-                            <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2">
                 {slice.segments.map((segment) => (
                   <Badge key={segment.id} variant="outline" className="rounded-xl">
                     <span className="text-[11px]">
@@ -204,7 +202,6 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
                 ))}
               </div>
 
-              {/* Stops Details (if any) */}
               {slice.segments.length > 1 && (
                 <div className="text-xs text-gray-500">
                   <span className="font-medium">Stops: </span>
@@ -219,7 +216,6 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
             </div>
           ))}
 
-          {/* Bottom Section - Price and Action */}
           <div className="flex items-center justify-between pt-4 border-t border-gray-100">
             <div className="space-y-1">
               <div className="text-xs text-gray-500">
@@ -240,10 +236,7 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
                 </div>
               </div>
 
-              <Button
-                onClick={() => onSelect(offer.id)}
-                className="bg-black text-white hover:bg-gray-800"
-              >
+              <Button onClick={() => onSelect(offer.id)} className="bg-black text-white hover:bg-gray-800">
                 Select Flight
               </Button>
             </div>
