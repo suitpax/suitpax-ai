@@ -1,0 +1,6 @@
+@layer utilities {
+	.space-section { padding: 1.25rem; }
+	.space-section-lg { padding: 1.5rem; }
+	.gap-section { gap: 1rem; }
+	.gap-section-lg { gap: 1.25rem; }
+}

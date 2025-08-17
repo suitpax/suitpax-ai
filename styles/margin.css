@@ -1,0 +1,5 @@
+@layer utilities {
+	.mt-section { margin-top: 1.25rem; }
+	.mb-section { margin-bottom: 1.25rem; }
+	.my-section { margin-top: 1.25rem; margin-bottom: 1.25rem; }
+}
