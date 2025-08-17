@@ -12,6 +12,7 @@ import { ArrowsRightLeftIcon, FunnelIcon, MapPinIcon, CalendarIcon, UserIcon } f
 import FlightResults from "@/components/flights/flight-results"
 import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
 import { Switch } from "@/components/ui/switch"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface DuffelAirport {
   id: string
@@ -29,7 +30,7 @@ interface SearchParams {
   returnDate?: string
   passengers: number
   cabinClass: string
-  tripType: "one_way" | "round_trip"
+  tripType: "one_way" | "round_trip" | "multi_city"
 }
 
 interface SavedSearchItem {
@@ -51,6 +52,11 @@ export default function FlightsPage() {
     cabinClass: "economy",
     tripType: "one_way",
   })
+  const [directOnly, setDirectOnly] = useState(false)
+  const [multiCityLegs, setMultiCityLegs] = useState<Array<{ origin: string; destination: string; date: string }>>([
+    { origin: "", destination: "", date: "" },
+    { origin: "", destination: "", date: "" },
+  ])
 
   const [offers, setOffers] = useState<any[]>([])
   const [searching, setSearching] = useState(false)
@@ -205,8 +211,10 @@ export default function FlightsPage() {
 
   const searchFlights = async () => {
     if (!searchParams.origin || !searchParams.destination || !searchParams.departureDate) {
-      toast.error("Please fill in origin, destination and date")
-      return
+      if (searchParams.tripType !== 'multi_city') {
+        toast.error("Please fill in origin, destination and date")
+        return
+      }
     }
     if (searchParams.tripType === "round_trip" && !searchParams.returnDate) {
       toast.error("Please add a return date")
@@ -217,17 +225,22 @@ export default function FlightsPage() {
     setOffers([])
     setOfferRequestId(null)
     setPageMeta({})
-
     try {
       const payload: any = {
-        origin: searchParams.origin,
-        destination: searchParams.destination,
-        departure_date: searchParams.departureDate,
         passengers: { adults: searchParams.passengers },
         cabin_class: searchParams.cabinClass,
       }
-      if (searchParams.tripType === "round_trip" && searchParams.returnDate) {
-        payload.return_date = searchParams.returnDate
+      if (directOnly) payload.max_connections = 0
+
+      if (searchParams.tripType === 'multi_city') {
+        const legs = multiCityLegs.filter(l => l.origin && l.destination && l.date)
+        if (legs.length < 2) throw new Error('Please add at least 2 valid legs')
+        payload.slices = legs.map(l => ({ origin: l.origin, destination: l.destination, departure_date: l.date }))
+      } else {
+        payload.origin = searchParams.origin
+        payload.destination = searchParams.destination
+        payload.departure_date = searchParams.departureDate
+        if (searchParams.tripType === 'round_trip' && searchParams.returnDate) payload.return_date = searchParams.returnDate
       }
 
       const res = await fetch('/api/flights/duffel/optimized-search', {
@@ -344,7 +357,7 @@ export default function FlightsPage() {
       </div>
 
       {/* Search Card */}
-      <Card className="border-gray-200 bg-white">
+      <Card className="border-gray-200 bg-white rounded-2xl">
         <CardHeader>
           <CardTitle className="text-gray-900 text-base">Search parameters</CardTitle>
         </CardHeader>
@@ -359,7 +372,7 @@ export default function FlightsPage() {
                   onChange={e => setOriginQuery(e.target.value.toUpperCase())}
                   onFocus={() => setShowOriginResults(true)}
                   placeholder="JFK"
-                  className="bg-white text-gray-900 pr-10"
+                  className="bg-white text-gray-900 pr-10 rounded-2xl"
                 />
                 <MapPinIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
               </div>
@@ -401,7 +414,7 @@ export default function FlightsPage() {
                   onChange={e => setDestinationQuery(e.target.value.toUpperCase())}
                   onFocus={() => setShowDestinationResults(true)}
                   placeholder="LHR"
-                  className="bg-white text-gray-900 pr-10"
+                  className="bg-white text-gray-900 pr-10 rounded-2xl"
                 />
                 <MapPinIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
               </div>
@@ -431,12 +444,13 @@ export default function FlightsPage() {
             <div>
               <Label className="text-sm text-gray-700">Trip</Label>
               <Select value={searchParams.tripType} onValueChange={v => setSearchParams(prev => ({ ...prev, tripType: v as any }))}>
-                <SelectTrigger className="bg-white text-gray-900">
+                <SelectTrigger className="bg-white text-gray-900 rounded-2xl">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-white text-gray-900">
                   <SelectItem value="one_way">One way</SelectItem>
                   <SelectItem value="round_trip">Round trip</SelectItem>
+                  <SelectItem value="multi_city">Multi-city</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -445,7 +459,7 @@ export default function FlightsPage() {
             <div>
               <Label className="text-sm text-gray-700">Cabin</Label>
               <Select value={searchParams.cabinClass} onValueChange={v => setSearchParams(prev => ({ ...prev, cabinClass: v }))}>
-                <SelectTrigger className="bg-white text-gray-900">
+                <SelectTrigger className="bg-white text-gray-900 rounded-2xl">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-white text-gray-900">
@@ -458,12 +472,37 @@ export default function FlightsPage() {
             </div>
           </div>
 
+          {searchParams.tripType === 'multi_city' && (
+            <div className="space-y-3">
+              <div className="text-sm text-gray-700">Multi-city legs</div>
+              {multiCityLegs.map((leg, idx) => (
+                <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Input placeholder="Origin IATA or City" value={leg.origin} onChange={e => {
+                    const v = e.target.value.toUpperCase(); setMultiCityLegs(prev => prev.map((l, i) => i === idx ? { ...l, origin: v } : l))
+                  }} className="bg-white text-gray-900 rounded-2xl" />
+                  <Input placeholder="Destination IATA or City" value={leg.destination} onChange={e => {
+                    const v = e.target.value.toUpperCase(); setMultiCityLegs(prev => prev.map((l, i) => i === idx ? { ...l, destination: v } : l))
+                  }} className="bg-white text-gray-900 rounded-2xl" />
+                  <Input type="date" value={leg.date} onChange={e => {
+                    const v = e.target.value; setMultiCityLegs(prev => prev.map((l, i) => i === idx ? { ...l, date: v } : l))
+                  }} className="bg-white text-gray-900 rounded-2xl" />
+                </div>
+              ))}
+              <div className="flex gap-2">
+                <Button type="button" variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-2xl" onClick={() => setMultiCityLegs(prev => [...prev, { origin: "", destination: "", date: "" }])}>Add leg</Button>
+                {multiCityLegs.length > 2 && (
+                  <Button type="button" variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-2xl" onClick={() => setMultiCityLegs(prev => prev.slice(0, -1))}>Remove last</Button>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             {/* Departure */}
             <div>
               <Label className="text-sm text-gray-700">Departure</Label>
               <div className="relative">
-                <Input type="date" value={searchParams.departureDate} onChange={e => setSearchParams(prev => ({ ...prev, departureDate: e.target.value }))} className="bg-white text-gray-900 pr-10" />
+                <Input type="date" value={searchParams.departureDate} onChange={e => setSearchParams(prev => ({ ...prev, departureDate: e.target.value }))} className="bg-white text-gray-900 pr-10 rounded-2xl" />
                 <CalendarIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
               </div>
             </div>
@@ -477,7 +516,7 @@ export default function FlightsPage() {
                   value={searchParams.returnDate || ""}
                   onChange={e => setSearchParams(prev => ({ ...prev, returnDate: e.target.value }))}
                   disabled={searchParams.tripType !== 'round_trip'}
-                  className="bg-white text-gray-900 pr-10 disabled:opacity-50"
+                  className="bg-white text-gray-900 pr-10 disabled:opacity-50 rounded-2xl"
                 />
                 <CalendarIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
               </div>
@@ -487,15 +526,19 @@ export default function FlightsPage() {
             <div>
               <Label className="text-sm text-gray-700">Passengers</Label>
               <div className="relative">
-                <Input type="number" min={1} max={9} value={searchParams.passengers} onChange={e => setSearchParams(prev => ({ ...prev, passengers: parseInt(e.target.value || '1') }))} className="bg-white text-gray-900 pr-10" />
+                <Input type="number" min={1} max={9} value={searchParams.passengers} onChange={e => setSearchParams(prev => ({ ...prev, passengers: parseInt(e.target.value || '1') }))} className="bg-white text-gray-900 pr-10 rounded-2xl" />
                 <UserIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-end gap-2">
-              <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={saveSearch}>Save</Button>
-              <Button className="bg-black text-white hover:bg-gray-800" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
+            <div className="flex items-end gap-3">
+              <div className="flex items-center gap-2">
+                <Checkbox id="directOnly" checked={directOnly} onCheckedChange={v => setDirectOnly(Boolean(v))} />
+                <Label htmlFor="directOnly" className="text-sm text-gray-700">Direct only</Label>
+              </div>
+              <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-2xl" onClick={saveSearch}>Save</Button>
+              <Button className="bg-black text-white hover:bg-gray-800 rounded-2xl" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
             </div>
           </div>
         </CardContent>
