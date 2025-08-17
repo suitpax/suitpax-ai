@@ -42,25 +42,28 @@ export async function POST(request: Request) {
 
     const duffel = getDuffelClient();
 
-    const searchPayload: any = {
+    const requestPayload: any = {
       slices,
       passengers: buildPassengerArray(passengers),
-      private_fares: {}
+      private_fares: {},
+      return_offers: true,
     };
 
-    if (cabin_class) searchPayload.cabin_class = cabin_class;
-    if (currency) searchPayload.currency = currency;
+    if (cabin_class) requestPayload.cabin_class = cabin_class;
+    if (currency) requestPayload.currency = currency;
 
     if (Array.isArray(loyalty_accounts) && loyalty_accounts.length > 0) {
-      searchPayload.private_fares.loyalty_programme_accounts = loyalty_accounts;
+      requestPayload.private_fares.loyalty_programme_accounts = loyalty_accounts;
     }
 
     if (Array.isArray(corporate_codes) && corporate_codes.length > 0) {
-      searchPayload.private_fares.corporate = { codes: corporate_codes };
+      requestPayload.private_fares.corporate = { codes: corporate_codes };
     }
 
-    const result = await (duffel as any).offers.search(searchPayload);
-    return NextResponse.json(result);
+    const offerRequest = await (duffel as any).offerRequests.create(requestPayload);
+    const offers = offerRequest?.data?.offers || [];
+
+    return NextResponse.json({ data: offers, offer_request_id: offerRequest?.data?.id });
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || 'Unexpected error' },

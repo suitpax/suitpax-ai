@@ -7,10 +7,11 @@ export async function GET(request: Request) {
     const limitParam = searchParams.get('limit');
     const after = searchParams.get('after') || undefined;
     const before = searchParams.get('before') || undefined;
+    const query = searchParams.get('query') || undefined;
 
     const limit = limitParam ? parseInt(limitParam, 10) : undefined;
 
-    const result = await getAirportsHandler({ limit, after, before });
+    const result = await getAirportsHandler({ limit, after, before, query });
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json(

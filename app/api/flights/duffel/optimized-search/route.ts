@@ -43,19 +43,22 @@ export async function POST(request: Request) {
 
     const duffel = getDuffelClient();
 
-    const searchPayload: any = {
+    const requestPayload: any = {
       slices,
       passengers: buildPassengerArray(passengers),
+      return_offers: true,
     };
 
-    if (cabin_class) searchPayload.cabin_class = cabin_class;
-    if (typeof max_connections === 'number') searchPayload.max_connections = max_connections;
-    if (typeof max_results === 'number') searchPayload.max_results = max_results;
-    if (sort) searchPayload.sort = sort;
-    if (currency) searchPayload.currency = currency;
+    if (cabin_class) requestPayload.cabin_class = cabin_class;
+    if (typeof max_connections === 'number') requestPayload.max_connections = max_connections;
+    if (typeof max_results === 'number') requestPayload.max_results = max_results;
+    if (sort) requestPayload.sort = sort;
+    if (currency) requestPayload.currency = currency;
 
-    const result = await (duffel as any).offers.search(searchPayload);
-    return NextResponse.json(result);
+    const offerRequest = await (duffel as any).offerRequests.create(requestPayload);
+    const offers = offerRequest?.data?.offers || [];
+
+    return NextResponse.json({ data: offers, offer_request_id: offerRequest?.data?.id });
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || 'Unexpected error' },
