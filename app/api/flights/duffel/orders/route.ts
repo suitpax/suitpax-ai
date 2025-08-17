@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient as createSupabase } from '@/lib/supabase/server'
+import { getDuffelClient } from '@/lib/duffel'
 
 export const runtime = 'nodejs'
 
@@ -9,27 +10,10 @@ export async function POST(request: Request) {
     if (!token) return NextResponse.json({ error: 'Missing DUFFEL_API_KEY' }, { status: 500 })
 
     const body = await request.json()
-    const url = new URL('https://api.duffel.com/air/orders')
+    const duffel = getDuffelClient() as any
 
-    const resp = await fetch(url.toString(), {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-        'Duffel-Version': 'v2',
-        'Accept-Encoding': 'gzip',
-        'Content-Type': 'application/json',
-        'Idempotency-Key': crypto.randomUUID(),
-      },
-      body: JSON.stringify(body),
-      cache: 'no-store',
-    })
-
-    const requestId = resp.headers.get('x-request-id') || undefined
-    const text = await resp.text()
-    let json: any = {}
-    try { json = text ? JSON.parse(text) : {} } catch {}
-    if (!resp.ok) return NextResponse.json({ error: json?.error || text || 'Duffel error', request_id: requestId }, { status: resp.status })
+    const created = await duffel.orders.create(body, { idempotencyKey: crypto.randomUUID?.() || undefined })
+    const order = created?.data || created
 
     // Persist order minimally
     try {
@@ -37,19 +21,18 @@ export async function POST(request: Request) {
       const userRes = await supabase.auth.getUser()
       const userId = userRes.data.user?.id
       if (userId) {
-        const order = json?.data || json
         await supabase.from('flight_orders').insert({
           user_id: userId,
           duffel_order_id: order?.id,
           total_amount: order?.total_amount ? Number(order.total_amount) : null,
           total_currency: order?.total_currency || null,
           status: order?.status || null,
-          raw: order || json,
+          raw: order,
         })
       }
     } catch {}
 
-    return NextResponse.json({ ...json, request_id: requestId })
+    return NextResponse.json({ data: order })
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Unexpected error' }, { status: 500 })
   }
