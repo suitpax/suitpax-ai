@@ -36,6 +36,8 @@ export default function FlightSearchForm({ onResults, className = '' }: Props) {
       cabinClass,
       loyaltyProgrammes: [],
       corporateDiscounts: false,
+      directOnly,
+      airlines,
     })
     onResults?.(res)
   }

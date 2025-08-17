@@ -1,37 +1,17 @@
 "use client"
 
-import Link from "next/link"
-import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
+import Link from 'next/link'
 
 export default function IntegrationsPage() {
-  const supabase = createClient()
-  const [userId, setUserId] = useState<string | null>(null)
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id || null))
-  }, [supabase])
-
-  if (!userId) return null
-
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-semibold mb-4">Integrations</h1>
-      <div className="space-y-3">
-        <div className="flex items-center justify-between border rounded-xl p-3">
-          <div>
-            <div className="font-medium">Google Drive</div>
-            <div className="text-sm text-gray-600">Read your documents to enrich Suitpax AI</div>
-          </div>
-          <Link href="/api/integrations/google/drive/auth" className="px-3 py-1.5 border rounded-lg text-sm">Connect</Link>
-        </div>
-        <div className="flex items-center justify-between border rounded-xl p-3">
-          <div>
-            <div className="font-medium">Gmail</div>
-            <div className="text-sm text-gray-600">Read emails metadata/content (readonly)</div>
-          </div>
-          <Link href="/api/integrations/google/gmail/auth" className="px-3 py-1.5 border rounded-lg text-sm">Connect</Link>
-        </div>
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-semibold tracking-tight">Integrations</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Link href="/dashboard/flights" className="rounded-xl border p-4 hover:shadow-sm transition">
+          <div className="text-sm text-neutral-500">Flights</div>
+          <div className="font-medium">Duffel Flights</div>
+          <div className="text-xs text-neutral-500 mt-1">Real-time flight search and booking</div>
+        </Link>
       </div>
     </div>
   )
