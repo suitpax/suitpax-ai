@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -9,10 +10,11 @@ interface FlightOfferSegment {
   destination: any
   departing_at: string
   arriving_at: string
-  marketing_carrier: any
+  marketing_carrier: { iata_code?: string; name?: string }
   operating_carrier: any
   flight_number: string
   aircraft: any
+  airline?: { name?: string; logo_symbol_url?: string; logo_lockup_url?: string; iata_code?: string }
 }
 
 interface FlightOfferSlice {
@@ -40,34 +42,63 @@ interface Props {
 
 export default function FlightResults({ offers, onSelectOffer, onTrackPrice, className = '' }: Props) {
   if (!offers || offers.length === 0) {
-    return <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-6 text-neutral-300">No hay vuelos disponibles para estos criterios.</div>
+    return <div className="rounded-xl border border-gray-200 bg-white p-6 text-gray-600">No hay vuelos disponibles para estos criterios.</div>
   }
 
   return (
     <div className={`space-y-4 ${className}`}>
       {offers.map((offer) => (
-        <Card key={offer.id} className="border-neutral-800 bg-neutral-950 text-white">
+        <Card key={offer.id} className="border-gray-200 bg-white">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold">
-              {offer.total_amount} {offer.total_currency}
-            </CardTitle>
-            <div className="text-xs text-neutral-400">Expira {new Date(offer.expires_at).toLocaleString()}</div>
+            <div className="flex items-center gap-3">
+              {(() => {
+                const seg = offer.slices?.[0]?.segments?.[0]
+                const airlineName = seg?.airline?.name || seg?.marketing_carrier?.name
+                const airlineIata = seg?.airline?.iata_code || seg?.marketing_carrier?.iata_code
+                const logo = seg?.airline?.logo_lockup_url || seg?.airline?.logo_symbol_url
+                if (!airlineName) return null
+                return (
+                  <div className="flex items-center gap-2">
+                    {logo && <img src={logo} alt={airlineName} className="h-5" />}
+                    <span className="text-sm text-gray-700">{airlineName} ({airlineIata})</span>
+                  </div>
+                )
+              })()}
+            </div>
+            <div className="text-right">
+              <CardTitle className="text-lg font-semibold text-gray-900">
+                {offer.total_amount} {offer.total_currency}
+              </CardTitle>
+              <div className="text-xs text-gray-500">Expira {new Date(offer.expires_at).toLocaleString()}</div>
+              {(() => {
+                const seg = offer.slices?.[0]?.segments?.[0]
+                const url = seg?.airline?.conditions_of_carriage_url
+                if (!url) return null
+                return (
+                  <a href={url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline">
+                    Conditions of carriage
+                  </a>
+                )
+              })()}
+            </div>
           </CardHeader>
           <CardContent className="space-y-3">
             {offer.slices.map((slice, idx) => (
-              <div key={slice.id} className="rounded-lg border border-neutral-800 bg-neutral-900 p-3">
-                <div className="flex items-center justify-between text-sm text-neutral-300">
+              <div key={slice.id} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                <div className="flex items-center justify-between text-sm text-gray-800">
                   <div className="font-medium">Tramo {idx + 1}: {slice.origin?.iata_code} → {slice.destination?.iata_code}</div>
-                  <div className="text-neutral-400">Duración: {slice.duration?.replace('PT', '').toLowerCase()}</div>
+                  <div className="text-gray-600">Duración: {slice.duration?.replace('PT', '').toLowerCase()}</div>
                 </div>
                 <div className="mt-2 grid gap-2 sm:grid-cols-2">
                   {slice.segments.map(seg => (
-                    <div key={seg.id} className="rounded-md bg-neutral-800 p-2 text-xs text-neutral-300">
+                    <div key={seg.id} className="rounded-md bg-white border border-gray-200 p-2 text-xs text-gray-800">
                       <div className="flex items-center justify-between">
-                        <div>{seg.origin?.iata_code} → {seg.destination?.iata_code}</div>
+                        <div>
+                          <div className="font-medium">{seg.origin?.city_name || seg.origin?.name} ({seg.origin?.iata_code}) → {seg.destination?.city_name || seg.destination?.name} ({seg.destination?.iata_code})</div>
+                        </div>
                         <div>{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
                       </div>
-                      <div className="mt-1 flex items-center justify-between text-neutral-400">
+                      <div className="mt-1 flex items-center justify-between text-gray-600">
                         <div>Sale: {new Date(seg.departing_at).toLocaleString()}</div>
                         <div>Llega: {new Date(seg.arriving_at).toLocaleString()}</div>
                       </div>
@@ -78,10 +109,10 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
             ))}
 
             <div className="flex items-center justify-end gap-3">
-              <Button variant="secondary" className="border-neutral-700 bg-neutral-900 text-white hover:bg-neutral-800" onClick={() => onTrackPrice?.(offer.id)}>
+              <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={() => onTrackPrice?.(offer.id)}>
                 Seguir precio
               </Button>
-              <Button className="bg-white text-black hover:bg-neutral-200" onClick={() => onSelectOffer?.(offer)}>
+              <Button className="bg-black text-white hover:bg-gray-800" onClick={() => onSelectOffer?.(offer)}>
                 Reservar
               </Button>
             </div>

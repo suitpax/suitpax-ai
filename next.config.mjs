@@ -8,7 +8,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['images.unsplash.com', 'ui-avatars.com', 'cdn.brandfetch.io'],
+    domains: ['images.unsplash.com', 'source.unsplash.com', 'images.pexels.com', 'ui-avatars.com', 'cdn.brandfetch.io', 'assets.duffel.com', 'static.duffel.com', 'images.duffel.com', 'duffel.com'],
   }
 };
 

@@ -50,6 +50,7 @@ import type { User as SupabaseUser } from "@supabase/supabase-js"
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Trips", href: "/dashboard/trips", icon: Plane },
+  { name: "Flights", href: "/dashboard/flights", icon: Plane },
   { name: "Approvals", href: "/dashboard/approvals", icon: CheckSquare },
   { name: "Requests", href: "/dashboard/requests", icon: Send },
   { name: "Finance Hub", href: "/dashboard/finance-hub", icon: CreditCard },
