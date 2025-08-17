@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from "react-hot-toast"
 import PaymentForm from "@/components/flights/booking-flow/payment-form"
 import BookingSummary from "@/components/flights/booking-summary"
+import Ancillaries from "@/components/flights/booking-flow/ancillaries"
 
 export default function BookOfferPage() {
 	const params = useParams() as { offerId: string }
@@ -124,6 +125,7 @@ export default function BookOfferPage() {
 					</Card>
 
 					<PaymentForm offer={offer} onReady={setPaymentIntentId} />
+					<Ancillaries offerId={offer.id} />
 				</div>
 
 				<div className="space-y-4">
