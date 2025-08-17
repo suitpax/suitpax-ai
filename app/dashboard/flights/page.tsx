@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowsRightLeftIcon, FunnelIcon, MapPinIcon, CalendarIcon, UserIcon } from "@heroicons/react/24/outline"
+import { ArrowsRightLeftIcon, FunnelIcon, MapPinIcon, CalendarIcon, UserIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline"
 import FlightResults from "@/components/flights/flight-results"
 import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
 import { Switch } from "@/components/ui/switch"
@@ -350,12 +350,12 @@ export default function FlightsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Flights</h1>
-          <p className="text-sm text-gray-600">Find and compare flights in real-time (Duffel)</p>
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tighter">Flights</h1>
+          <p className="text-sm text-gray-600">Find and compare flights in real-time (Suitpax)</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={saveSearch}>Save search</Button>
-          <Button className="bg-black text-white hover:bg-gray-800" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
+          <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-2xl" onClick={saveSearch}>Save search</Button>
+          <Button className="bg-gradient-to-r from-gray-900 to-gray-700 text-white hover:from-black hover:to-gray-800 rounded-2xl" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
         </div>
       </div>
 
@@ -365,7 +365,7 @@ export default function FlightsPage() {
           <CardTitle className="text-gray-900 text-base">Search parameters</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-5 relative">
             {/* Origin */}
             <div className="relative">
               <Label className="text-sm text-gray-700">Origin</Label>
@@ -402,8 +402,8 @@ export default function FlightsPage() {
             </div>
 
             {/* Swap */}
-            <div className="flex items-end md:justify-center">
-              <Button type="button" variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={swapLocations}>
+            <div className="hidden md:flex items-end justify-center">
+              <Button type="button" variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-full shadow-sm" onClick={swapLocations} title="Swap">
                 <ArrowsRightLeftIcon className="h-4 w-4" />
               </Button>
             </div>
@@ -528,9 +528,14 @@ export default function FlightsPage() {
             {/* Passengers */}
             <div>
               <Label className="text-sm text-gray-700">Passengers</Label>
-              <div className="relative">
-                <Input type="number" min={1} max={9} value={searchParams.passengers} onChange={e => setSearchParams(prev => ({ ...prev, passengers: parseInt(e.target.value || '1') }))} className="bg-white text-gray-900 pr-10 rounded-2xl" />
-                <UserIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
+              <div className="flex items-center gap-2">
+                <Button type="button" variant="secondary" className="h-9 w-9 border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-full" onClick={() => setSearchParams(prev => ({ ...prev, passengers: Math.max(1, (prev.passengers || 1) - 1) }))}>
+                  <MinusIcon className="h-4 w-4" />
+                </Button>
+                <div className="w-10 text-center text-gray-900">{searchParams.passengers}</div>
+                <Button type="button" variant="secondary" className="h-9 w-9 border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-full" onClick={() => setSearchParams(prev => ({ ...prev, passengers: Math.min(9, (prev.passengers || 1) + 1) }))}>
+                  <PlusIcon className="h-4 w-4" />
+                </Button>
               </div>
             </div>
 
@@ -541,7 +546,7 @@ export default function FlightsPage() {
                 <Label htmlFor="directOnly" className="text-sm text-gray-700">Direct only</Label>
               </div>
               <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-2xl" onClick={saveSearch}>Save</Button>
-              <Button className="bg-black text-white hover:bg-gray-800 rounded-2xl" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
+              <Button className="bg-gradient-to-r from-gray-900 to-gray-700 text-white hover:from-black hover:to-gray-800 rounded-2xl" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
             </div>
           </div>
         </CardContent>
@@ -589,8 +594,8 @@ export default function FlightsPage() {
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">View</div>
         <div className="flex items-center gap-2">
-          <Button variant={viewMode === 'list' ? 'default' : 'secondary'} className={viewMode === 'list' ? 'bg-black text-white' : 'border-gray-300 bg-white text-gray-900'} onClick={() => setViewMode('list')}>List</Button>
-          <Button variant={viewMode === 'grid' ? 'default' : 'secondary'} className={viewMode === 'grid' ? 'bg-black text-white' : 'border-gray-300 bg-white text-gray-900'} onClick={() => setViewMode('grid')}>Grid</Button>
+          <Button variant={viewMode === 'list' ? 'default' : 'secondary'} className={viewMode === 'list' ? 'bg-black text-white rounded-2xl' : 'border-gray-300 bg-white text-gray-900 rounded-2xl'} onClick={() => setViewMode('list')}>List</Button>
+          <Button variant={viewMode === 'grid' ? 'default' : 'secondary'} className={viewMode === 'grid' ? 'bg-black text-white rounded-2xl' : 'border-gray-300 bg-white text-gray-900 rounded-2xl'} onClick={() => setViewMode('grid')}>Grid</Button>
         </div>
       </div>
 

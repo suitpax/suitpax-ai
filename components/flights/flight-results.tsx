@@ -42,13 +42,13 @@ interface Props {
 
 export default function FlightResults({ offers, onSelectOffer, onTrackPrice, className = '' }: Props) {
   if (!offers || offers.length === 0) {
-    return <div className="rounded-xl border border-gray-200 bg-white p-6 text-gray-600">No hay vuelos disponibles para estos criterios.</div>
+    return <div className="rounded-2xl border border-gray-200 bg-white p-6 text-gray-600">No hay vuelos disponibles para estos criterios.</div>
   }
 
   return (
     <div className={`space-y-4 ${className}`}>
       {offers.map((offer) => (
-        <Card key={offer.id} className="border-gray-200 bg-white">
+        <Card key={offer.id} className="border-gray-200 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-center gap-3">
               {(() => {
@@ -66,8 +66,8 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
               })()}
             </div>
             <div className="text-right">
-              <CardTitle className="text-lg font-semibold text-gray-900">
-                {offer.total_amount} {offer.total_currency}
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                {new Intl.NumberFormat('en-US', { style: 'currency', currency: offer.total_currency, maximumFractionDigits: 0 }).format(parseFloat(offer.total_amount))}
               </CardTitle>
               <div className="text-xs text-gray-500">Expira {new Date(offer.expires_at).toLocaleString()}</div>
               {(() => {
@@ -84,17 +84,19 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
           </CardHeader>
           <CardContent className="space-y-3">
             {offer.slices.map((slice, idx) => (
-              <div key={slice.id} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+              <div key={slice.id} className="rounded-xl border border-gray-200 bg-gray-50 p-3">
                 <div className="flex items-center justify-between text-sm text-gray-800">
                   <div className="font-medium">Tramo {idx + 1}: {slice.origin?.iata_code} → {slice.destination?.iata_code}</div>
                   <div className="text-gray-600">Duración: {slice.duration?.replace('PT', '').toLowerCase()}</div>
                 </div>
                 <div className="mt-2 grid gap-2 sm:grid-cols-2">
                   {slice.segments.map(seg => (
-                    <div key={seg.id} className="rounded-md bg-white border border-gray-200 p-2 text-xs text-gray-800">
+                    <div key={seg.id} className="rounded-lg bg-white border border-gray-200 p-2 text-xs text-gray-800">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium">{seg.origin?.city_name || seg.origin?.name} ({seg.origin?.iata_code}) → {seg.destination?.city_name || seg.destination?.name} ({seg.destination?.iata_code})</div>
+                          <div className="font-medium">
+                            {(seg.origin?.city?.name || seg.origin?.city_name || seg.origin?.name)} ({seg.origin?.iata_code}) → {(seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name)} ({seg.destination?.iata_code})
+                          </div>
                         </div>
                         <div>{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
                       </div>

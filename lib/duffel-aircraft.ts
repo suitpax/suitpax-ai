@@ -1,4 +1,4 @@
-import { getDuffelClient } from '@/lib/duffel'
+import { aircraft as AircraftResource } from '@/lib/duffel/supportingResources'
 
 interface AircraftDetails {
   id: string
@@ -22,14 +22,11 @@ export async function enrichOffersWithAircraftInfo(offers: any[]) {
   }
   if (aircraftIds.size === 0) return offers
 
-  const duffel = getDuffelClient()
   const idToDetails: Record<string, AircraftDetails> = {}
 
   await Promise.all(Array.from(aircraftIds).map(async (id) => {
     try {
-      const details = await (duffel as any).aircraft.get(id)
-      // normalize depending on SDK response shape
-      const data = (details?.data || details) as any
+      const data = await AircraftResource.get(id) as any
       idToDetails[id] = {
         id: data.id,
         name: data.name,
