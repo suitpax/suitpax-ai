@@ -93,7 +93,9 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                   {slice.segments.map(seg => (
                     <div key={seg.id} className="rounded-md bg-white border border-gray-200 p-2 text-xs text-gray-800">
                       <div className="flex items-center justify-between">
-                        <div>{seg.origin?.iata_code} → {seg.destination?.iata_code}</div>
+                        <div>
+                          <div className="font-medium">{seg.origin?.city_name || seg.origin?.name} ({seg.origin?.iata_code}) → {seg.destination?.city_name || seg.destination?.name} ({seg.destination?.iata_code})</div>
+                        </div>
                         <div>{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
                       </div>
                       <div className="mt-1 flex items-center justify-between text-gray-600">

@@ -193,12 +193,15 @@ export default function FlightsPage() {
     const code = (airport?.iata_code || '').toUpperCase()
     const cityCode = (airport?.iata_city_code || airport?.city?.iata_code || '').toUpperCase()
     const useCode = cityCode || code
+    const city = (airport?.city_name || airport?.city?.name || '').toString()
+    const name = airport?.name || city
+    const label = `${city ? city.charAt(0).toUpperCase() + city.slice(1).toLowerCase() : name} (${code || cityCode}) – ${name}`
     setSearchParams(prev => ({ ...prev, [type]: useCode }))
     if (type === "origin") {
-      setOriginQuery(useCode)
+      setOriginQuery(label)
       setShowOriginResults(false)
     } else {
-      setDestinationQuery(useCode)
+      setDestinationQuery(label)
       setShowDestinationResults(false)
     }
   }
