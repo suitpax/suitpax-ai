@@ -10,6 +10,6 @@ export function getDuffelClient(): Duffel {
     throw new Error('Missing DUFFEL_API_KEY environment variable');
   }
 
-  cachedDuffelClient = new Duffel({ token });
+  cachedDuffelClient = new Duffel({ token, apiVersion: 'v2' } as any);
   return cachedDuffelClient;
 }
