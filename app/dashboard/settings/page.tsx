@@ -172,7 +172,7 @@ export default function SettingsPage() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="lg:col-span-1"
         >
-          <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-2">
+          <div className="glass-card p-2">
             {settingsSections.map((section) => (
               <button
                 key={section.id}
@@ -200,7 +200,7 @@ export default function SettingsPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="lg:col-span-3"
         >
-          <div className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm p-6 lg:p-8">
+          <div className="glass-card p-6 lg:p-8">
             {activeSection === "profile" && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-medium tracking-tighter">Profile Information</h2>
