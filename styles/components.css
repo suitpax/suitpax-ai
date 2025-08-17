@@ -68,4 +68,54 @@
 	.dc-airline-selector { @apply grid grid-cols-1 gap-2; }
 	.dc-airline-chip { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl border border-gray-200 bg-white text-sm text-gray-800 cursor-pointer select-none; }
 	.dc-airline-chip[data-selected="true"] { @apply border-black bg-black text-white; }
+
+	/* NGS Table */
+	.ngs-table { @apply w-full border border-gray-200 rounded-2xl overflow-hidden; }
+	.ngs-head { @apply bg-gray-100 text-xs text-gray-600; }
+	.ngs-row { @apply grid grid-cols-12 items-center; }
+	.ngs-cell { @apply px-3 py-2 text-sm text-gray-800; }
+
+	/* NGS Fare Card */
+	.ngs-fare-card { @apply dc-card p-4; }
+	.ngs-fare-header { @apply flex items-center justify-between mb-2; }
+	.ngs-fare-body { @apply space-y-2; }
+	.ngs-fare-footer { @apply flex items-center justify-end mt-2; }
+
+	/* Shelf Info Card */
+	.ngs-shelf { @apply grid gap-2; }
+	.ngs-shelf-item { @apply dc-card p-3; }
+
+	/* Modal */
+	.dc-modal-backdrop { @apply fixed inset-0 bg-black/40; }
+	.dc-modal { @apply fixed inset-0 flex items-center justify-center p-4; }
+	.dc-modal > .dc-modal-panel { @apply bg-white rounded-2xl shadow-soft border border-gray-200 p-4 w-full max-w-lg; }
+	.dc-modal-header { @apply flex items-center justify-between mb-2; }
+	.dc-modal-actions { @apply flex items-center justify-end gap-2 mt-3; }
+
+	/* Loading */
+	.dc-loading-state { @apply dc-card p-4 text-sm text-gray-600; }
+	.dc-loading-text { @apply mt-2 text-xs text-gray-500; }
+	.dc-loader { @apply h-5 w-5 rounded-full border-2 border-gray-300 border-t-black animate-spin; }
+
+	/* Legend */
+	.dc-legend { @apply flex items-center gap-3 text-xs text-gray-600; }
+	.dc-legend-item { @apply inline-flex items-center gap-1; }
+	.dc-legend-dot { @apply inline-block h-2.5 w-2.5 rounded-full; }
+
+	/* Icon Button */
+	.dc-icon-btn { @apply inline-flex items-center justify-center h-9 w-9 rounded-full bg-black text-white hover:bg-gray-900 transition-soft; }
+	.dc-icon-btn-ghost { @apply inline-flex items-center justify-center h-9 w-9 rounded-full bg-white text-gray-900 border border-gray-300 hover:bg-gray-100 transition-soft; }
+
+	/* Filter Control */
+	.dc-filter { @apply flex items-center gap-2; }
+	.dc-filter-chip { @apply inline-flex items-center gap-1 px-2 py-1 rounded-2xl bg-gray-100 text-xs text-gray-700; }
+	.dc-filter-clear { @apply text-xs text-gray-500 hover:text-gray-700; }
+
+	/* Duffel Payments */
+	.dc-pay-card { @apply dc-card p-3; }
+	.dc-pay-row { @apply flex items-center justify-between text-sm text-gray-800; }
+
+	/* NGS View */
+	.ngs-view { @apply space-y-3; }
+	.ngs-header { @apply flex items-center justify-between; }
 }
