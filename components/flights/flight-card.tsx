@@ -28,7 +28,7 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
   }
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200 border border-gray-200">
+    <Card className="hover:shadow-md transition-shadow duration-200 border border-gray-200 rounded-2xl">
       <CardContent className="p-6">
         <div className="space-y-6">
           {offer.slices.map((slice: any, sliceIndex: number) => (
@@ -54,7 +54,7 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
                       {slice.origin.iata_code}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {slice.origin.city_name || slice.origin.name}
+                      {slice.origin.city?.name || slice.origin.city_name || slice.origin.name}
                     </div>
                   </div>
 
@@ -64,7 +64,7 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
                       {slice.destination.iata_code}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {slice.destination.city_name || slice.destination.name}
+                      {slice.destination.city?.name || slice.destination.city_name || slice.destination.name}
                     </div>
                   </div>
                 </div>
