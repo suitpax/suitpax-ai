@@ -34,9 +34,9 @@ const formatDuration = (duration: string) => {
 
 export default function FlightItinerary({ slices }: FlightItineraryProps) {
   return (
-    <Card>
+    <Card className="rounded-2xl border border-gray-200">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 tracking-tighter text-gray-900">
           <Plane className="h-5 w-5" />
           Flight Itinerary
         </CardTitle>
@@ -44,31 +44,31 @@ export default function FlightItinerary({ slices }: FlightItineraryProps) {
       <CardContent className="space-y-6">
         {slices.map((slice, index) => (
           <div key={index}>
-            <h3 className="font-medium mb-2 text-lg">{index === 0 ? 'Outbound' : 'Return'}</h3>
-            <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+            <h3 className="font-medium mb-2 text-lg text-gray-900 tracking-tighter">{index === 0 ? 'Outbound' : 'Return'}</h3>
+            <div className="border border-gray-200 rounded-2xl p-4 space-y-4 bg-white">
               {slice.segments.map((segment, segIndex) => (
                 <div key={segIndex} className="flex items-center gap-4">
                   {(() => {
                     const name = segment.airline?.name || segment.marketing_carrier?.name || 'Airline'
                     const logo = segment.airline?.logo_symbol_url
                     const src = logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`
-                    return <img src={src} alt={name} className="h-8 w-8 rounded-full" />
+                    return <img src={src} alt={name} className="h-8 w-8 rounded-full border border-gray-200" />
                   })()}
                   <div className="flex-grow">
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="font-medium">{segment.origin.iata_code} <ArrowRight className="inline h-4 w-4" /> {segment.destination.iata_code}</p>
-                        <p className="text-sm text-gray-500">{segment.airline?.name || segment.marketing_carrier?.name} • {segment.flight_number}</p>
+                        <p className="font-medium text-gray-900">{segment.origin.iata_code} <ArrowRight className="inline h-4 w-4" /> {segment.destination.iata_code}</p>
+                        <p className="text-sm text-gray-600">{segment.airline?.name || segment.marketing_carrier?.name} • {segment.flight_number}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{formatDateTime(segment.departing_at)}</p>
-                        <p className="text-sm text-gray-500">to {formatDateTime(segment.arriving_at)}</p>
+                        <p className="font-medium text-gray-900">{formatDateTime(segment.departing_at)}</p>
+                        <p className="text-sm text-gray-600">to {formatDateTime(segment.arriving_at)}</p>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
-              <div className="text-right text-sm text-gray-600 flex items-center justify-end gap-2">
+              <div className="text-right text-sm text-gray-700 flex items-center justify-end gap-2">
                 <Clock className="h-4 w-4" />
                 Total duration: {formatDuration(slice.duration)}
               </div>

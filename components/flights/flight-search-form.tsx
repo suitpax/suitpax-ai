@@ -74,40 +74,40 @@ export default function FlightSearchForm({ onResults, className = '' }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={`space-y-4 rounded-xl border border-gray-200 bg-white p-4 ${className}`}>
+    <form onSubmit={handleSubmit} className={`space-y-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-soft ${className}`}>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div>
-          <Label className="text-sm text-gray-700">Origen</Label>
-          <Input value={origin} onChange={e => setOrigin(e.target.value.toUpperCase())} placeholder="JFK" className="bg-white text-gray-900" />
+          <Label className="text-sm text-gray-800">Origin</Label>
+          <Input value={origin} onChange={e => setOrigin(e.target.value.toUpperCase())} placeholder="From (IATA) e.g. JFK" className="bg-white text-gray-900 border border-gray-300 rounded-2xl" />
           {originPreview && <div className="mt-1 text-xs text-gray-500">{originPreview}</div>}
         </div>
         <div>
-          <Label className="text-sm text-gray-700">Destino</Label>
-          <Input value={destination} onChange={e => setDestination(e.target.value.toUpperCase())} placeholder="LAX" className="bg-white text-gray-900" />
+          <Label className="text-sm text-gray-800">Destination</Label>
+          <Input value={destination} onChange={e => setDestination(e.target.value.toUpperCase())} placeholder="To (IATA) e.g. LAX" className="bg-white text-gray-900 border border-gray-300 rounded-2xl" />
           {destinationPreview && <div className="mt-1 text-xs text-gray-500">{destinationPreview}</div>}
         </div>
         <div>
-          <Label className="text-sm text-gray-700">Salida</Label>
-          <Input type="date" value={departureDate} onChange={e => setDepartureDate(e.target.value)} className="bg-white text-gray-900" />
+          <Label className="text-sm text-gray-800">Departure</Label>
+          <Input type="date" value={departureDate} onChange={e => setDepartureDate(e.target.value)} className="bg-white text-gray-900 border border-gray-300 rounded-2xl" />
         </div>
         <div>
-          <Label className="text-sm text-gray-700">Regreso (opcional)</Label>
-          <Input type="date" value={returnDate} onChange={e => setReturnDate(e.target.value)} className="bg-white text-gray-900" />
+          <Label className="text-sm text-gray-800">Return (optional)</Label>
+          <Input type="date" value={returnDate} onChange={e => setReturnDate(e.target.value)} className="bg-white text-gray-900 border border-gray-300 rounded-2xl" />
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div>
-          <Label className="text-sm text-gray-700">Pasajeros</Label>
-          <Input type="number" min={1} max={9} value={passengers} onChange={e => setPassengers(parseInt(e.target.value || '1'))} className="bg-white text-gray-900" />
+          <Label className="text-sm text-gray-800">Passengers</Label>
+          <Input type="number" min={1} max={9} value={passengers} onChange={e => setPassengers(parseInt(e.target.value || '1'))} className="bg-white text-gray-900 border border-gray-300 rounded-2xl" />
         </div>
         <div>
-          <Label className="text-sm text-gray-700">Cabina</Label>
+          <Label className="text-sm text-gray-800">Cabin</Label>
           <Select value={cabinClass} onValueChange={setCabinClass}>
-            <SelectTrigger className="bg-white text-gray-900">
+            <SelectTrigger className="bg-white text-gray-900 border border-gray-300 rounded-2xl">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-white text-gray-900">
+            <SelectContent className="bg-white text-gray-900 border border-gray-200 rounded-2xl">
               <SelectItem value="economy">Economy</SelectItem>
               <SelectItem value="premium_economy">Premium Economy</SelectItem>
               <SelectItem value="business">Business</SelectItem>
@@ -117,20 +117,20 @@ export default function FlightSearchForm({ onResults, className = '' }: Props) {
         </div>
         <div className="flex items-end gap-3">
           <Checkbox id="direct" checked={directOnly} onCheckedChange={v => setDirectOnly(Boolean(v))} />
-          <Label htmlFor="direct" className="text-sm text-gray-700">Solo vuelos directos</Label>
+          <Label htmlFor="direct" className="text-sm text-gray-800">Direct flights only</Label>
         </div>
       </div>
 
       <div>
-        <Label className="text-sm text-gray-700">Filtrar por aerolíneas (IATA, separadas por coma)</Label>
-        <Input value={airlines} onChange={e => setAirlines(e.target.value)} placeholder="AA,UA,DL" className="bg-white text-gray-900" />
+        <Label className="text-sm text-gray-800">Filter by airlines (IATA, comma separated)</Label>
+        <Input value={airlines} onChange={e => setAirlines(e.target.value)} placeholder="AA, UA, DL" className="bg-white text-gray-900 border border-gray-300 rounded-2xl" />
       </div>
 
       {error && <div className="text-sm text-red-600">{error}</div>}
 
       <div className="flex justify-end">
-        <Button type="submit" disabled={isLoading} className="bg-black text-white hover:bg-gray-800">
-          {isLoading ? 'Buscando…' : 'Buscar vuelos'}
+        <Button type="submit" disabled={isLoading} className="bg-black text-white hover:bg-gray-800 rounded-2xl">
+          {isLoading ? 'Searching…' : 'Search flights'}
         </Button>
       </div>
     </form>

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from "react-hot-toast"
 import PaymentForm from "@/components/flights/booking-flow/payment-form"
 import BookingSummary from "@/components/flights/booking-summary"
-import Ancillaries from "@/components/flights/booking-flow/ancillaries"
+import DuffelAncillaries from "@/components/flights/ancillaries/DuffelAncillaries"
 import SeatSelection from "@/components/flights/booking-flow/seat-selection"
 
 export default function BookOfferPage() {
@@ -126,7 +126,7 @@ export default function BookOfferPage() {
 					</Card>
 
 					<PaymentForm offer={offer} onReady={setPaymentIntentId} />
-					<Ancillaries offerId={offer.id} />
+					<DuffelAncillaries offerId={offer.id} />
 					<SeatSelection offerId={offer.id} />
 				</div>
 

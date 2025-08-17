@@ -44,7 +44,7 @@ interface LoyaltyProgramsProps {
   className?: string
 }
 
-// Aerolíneas principales con programas de lealtad
+// Major airlines with loyalty programmes
 const MAJOR_AIRLINES = [
   { code: "AA", name: "American Airlines", program: "AAdvantage" },
   { code: "UA", name: "United Airlines", program: "MileagePlus" },
@@ -204,19 +204,19 @@ export function LoyaltyProgramsManager({
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {/* Header con resumen */}
+      {/* Collapsible header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-sm text-gray-600 hover:text-gray-800 p-0 h-auto font-normal"
+            className="text-sm text-gray-700 hover:text-gray-900 p-0 h-auto font-normal"
           >
             <StarIcon className="h-4 w-4 mr-2" />
             Loyalty Programs
             {totalPrograms > 0 && (
-              <Badge variant="outline" className="ml-2 text-xs">
+              <Badge variant="outline" className="ml-2 text-xs bg-white text-gray-800 border-gray-300 rounded-2xl">
                 {totalPrograms}
               </Badge>
             )}
@@ -318,20 +318,20 @@ export function LoyaltyProgramsManager({
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-6 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="text-center py-6 bg-gray-50 rounded-2xl border border-gray-200">
                       <StarIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600">No personal programs added yet</p>
+                      <p className="text-sm text-gray-600">No personal programmes added yet</p>
                     </div>
                   )}
 
-                  {/* Formulario para agregar programa personal */}
+                  {/* Add personal programme */}
                   <AnimatePresence>
                     {showAddProgram && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="p-4 bg-blue-50 border border-blue-200 rounded-lg"
+                        className="p-4 bg-blue-50 border border-blue-200 rounded-2xl"
                       >
                         <div className="space-y-3">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -341,10 +341,10 @@ export function LoyaltyProgramsManager({
                                 value={newProgram.airline_iata_code}
                                 onValueChange={(value) => setNewProgram((prev) => ({ ...prev, airline_iata_code: value }))}
                               >
-                                <SelectTrigger className="text-sm">
+                                <SelectTrigger className="text-sm bg-white text-gray-900 border border-gray-300 rounded-2xl">
                                   <SelectValue placeholder="Select airline" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white text-gray-900 border border-gray-200 rounded-2xl">
                                   {MAJOR_AIRLINES.map((airline) => (
                                     <SelectItem key={airline.code} value={airline.code}>
                                       {airline.code} - {airline.name}
@@ -361,17 +361,17 @@ export function LoyaltyProgramsManager({
                                 value={newProgram.account_number}
                                 onChange={(e) => setNewProgram((prev) => ({ ...prev, account_number: e.target.value }))}
                                 placeholder="Enter account number"
-                                className="text-sm"
+                                className="text-sm bg-white text-gray-900 border border-gray-300 rounded-2xl"
                               />
                             </div>
 
                             <div>
                               <Label className="text-xs font-medium text-gray-700">Tier Level</Label>
                               <Select value={newProgram.tier} onValueChange={(value) => setNewProgram((prev) => ({ ...prev, tier: value }))}>
-                                <SelectTrigger className="text-sm">
+                                <SelectTrigger className="text-sm bg-white text-gray-900 border border-gray-300 rounded-2xl">
                                   <SelectValue placeholder="Select tier" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white text-gray-900 border border-gray-200 rounded-2xl">
                                   {TIER_LEVELS.map((tier) => (
                                     <SelectItem key={tier} value={tier}>
                                       {tier}
@@ -383,10 +383,10 @@ export function LoyaltyProgramsManager({
                           </div>
 
                           <div className="flex items-center justify-end space-x-2">
-                            <Button variant="ghost" size="sm" onClick={() => setShowAddProgram(false)} className="text-xs">
+                            <Button variant="ghost" size="sm" onClick={() => setShowAddProgram(false)} className="text-xs text-gray-700">
                               Cancel
                             </Button>
-                            <Button size="sm" onClick={addLoyaltyProgram} disabled={!newProgram.airline_iata_code || !newProgram.account_number} className="text-xs">
+                            <Button size="sm" onClick={addLoyaltyProgram} disabled={!newProgram.airline_iata_code || !newProgram.account_number} className="text-xs rounded-2xl">
                               <CheckCircleIcon className="h-3 w-3 mr-1" />
                               Add Program
                             </Button>
@@ -404,7 +404,7 @@ export function LoyaltyProgramsManager({
                       <BuildingOfficeIcon className="h-4 w-4 mr-2" />
                       Corporate Contracts
                     </h4>
-                    <Button variant="outline" size="sm" onClick={() => setShowAddCorporate(true)} className="text-xs">
+                    <Button variant="outline" size="sm" onClick={() => setShowAddCorporate(true)} className="text-xs rounded-2xl">
                       <PlusIcon className="h-3 w-3 mr-1" />
                       Add Contract
                     </Button>
@@ -415,10 +415,10 @@ export function LoyaltyProgramsManager({
                       {corporateContracts.map((contract) => (
                         <div
                           key={contract.id}
-                          className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200"
+                          className="flex items-center justify-between p-3 bg-green-50 rounded-2xl border border-green-200"
                         >
                           <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-white rounded-lg border border-green-200 flex items-center justify-center">
+                            <div className="w-8 h-8 bg-white rounded-2xl border border-green-200 flex items-center justify-center">
                               <span className="text-xs font-medium text-green-700">{contract.airline_iata_code}</span>
                             </div>
                             <div>
@@ -443,7 +443,7 @@ export function LoyaltyProgramsManager({
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-6 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-center py-6 bg-green-50 rounded-2xl border border-green-200">
                       <BuildingOfficeIcon className="h-8 w-8 text-green-400 mx-auto mb-2" />
                       <p className="text-sm text-gray-600">No corporate contracts added yet</p>
                     </div>
@@ -456,7 +456,7 @@ export function LoyaltyProgramsManager({
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="p-4 bg-green-50 border border-green-200 rounded-lg"
+                        className="p-4 bg-green-50 border border-green-200 rounded-2xl"
                       >
                         <div className="space-y-3">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -466,10 +466,10 @@ export function LoyaltyProgramsManager({
                                 value={newCorporate.airline_iata_code}
                                 onValueChange={(value) => setNewCorporate((prev) => ({ ...prev, airline_iata_code: value }))}
                               >
-                                <SelectTrigger className="text-sm">
+                                <SelectTrigger className="text-sm bg-white text-gray-900 border border-gray-300 rounded-2xl">
                                   <SelectValue placeholder="Select airline" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white text-gray-900 border border-gray-200 rounded-2xl">
                                   {MAJOR_AIRLINES.map((airline) => (
                                     <SelectItem key={airline.code} value={airline.code}>
                                       {airline.code} - {airline.name}
@@ -486,7 +486,7 @@ export function LoyaltyProgramsManager({
                                 value={newCorporate.contract_name}
                                 onChange={(e) => setNewCorporate((prev) => ({ ...prev, contract_name: e.target.value }))}
                                 placeholder="Enter contract name"
-                                className="text-sm"
+                                className="text-sm bg-white text-gray-900 border border-gray-300 rounded-2xl"
                               />
                             </div>
 
@@ -499,16 +499,16 @@ export function LoyaltyProgramsManager({
                                   setNewCorporate((prev) => ({ ...prev, discount_percentage: Number(e.target.value) || 0 }))
                                 }
                                 placeholder="0"
-                                className="text-sm"
+                                className="text-sm bg-white text-gray-900 border border-gray-300 rounded-2xl"
                               />
                             </div>
                           </div>
 
                           <div className="flex items-center justify-end space-x-2">
-                            <Button variant="ghost" size="sm" onClick={() => setShowAddCorporate(false)} className="text-xs">
+                            <Button variant="ghost" size="sm" onClick={() => setShowAddCorporate(false)} className="text-xs text-gray-700">
                               Cancel
                             </Button>
-                            <Button size="sm" onClick={addCorporateContract} disabled={!newCorporate.airline_iata_code || !newCorporate.contract_name} className="text-xs">
+                            <Button size="sm" onClick={addCorporateContract} disabled={!newCorporate.airline_iata_code || !newCorporate.contract_name} className="text-xs rounded-2xl">
                               <CheckCircleIcon className="h-3 w-3 mr-1" />
                               Add Contract
                             </Button>
