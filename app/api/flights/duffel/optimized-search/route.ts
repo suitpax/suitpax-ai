@@ -28,21 +28,33 @@ export async function POST(request: Request) {
       max_connections,
       sort,
       max_results,
-      currency
+      currency,
+      slices: inputSlices
     } = body || {};
 
-    if (!origin || !destination || !departure_date) {
-      return NextResponse.json(
-        { error: 'origin, destination y departure_date son obligatorios' },
-        { status: 400 }
-      );
-    }
-
-    const slices: Array<{ origin: string; destination: string; departure_date: string }> = [
-      { origin, destination, departure_date }
-    ];
-    if (return_date) {
-      slices.push({ origin: destination, destination: origin, departure_date: return_date });
+    // Build slices: accept multi-city via body.slices, else fallback to origin/destination
+    let slices: Array<{ origin: string; destination: string; departure_date: string }> = []
+    if (Array.isArray(inputSlices) && inputSlices.length > 0) {
+      slices = inputSlices
+        .filter((s: any) => s?.origin && s?.destination && s?.departure_date)
+        .map((s: any) => ({
+          origin: String(s.origin).toUpperCase(),
+          destination: String(s.destination).toUpperCase(),
+          departure_date: String(s.departure_date),
+        }))
+    } else {
+      if (!origin || !destination || !departure_date) {
+        return NextResponse.json(
+          { error: 'origin, destination y departure_date son obligatorios' },
+          { status: 400 }
+        );
+      }
+      slices = [
+        { origin, destination, departure_date }
+      ];
+      if (return_date) {
+        slices.push({ origin: destination, destination: origin, departure_date: return_date });
+      }
     }
 
     const duffel = getDuffelClient();

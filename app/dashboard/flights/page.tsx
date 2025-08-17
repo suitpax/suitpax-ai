@@ -657,7 +657,7 @@ export default function FlightsPage() {
       <FlightResults
         offers={filteredOffers}
         onTrackPrice={(id) => toast.success(`Tracking price for ${id}`)}
-        onSelectOffer={(offer) => toast.success(`Select flight ${offer.id}`)}
+        onSelectOffer={(offer) => router.push(`/dashboard/flights/book/${offer.id}`)}
         className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''}
       />
 
