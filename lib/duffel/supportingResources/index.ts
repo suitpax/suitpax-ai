@@ -1,5 +1,6 @@
 import { getDuffelClient } from '@/lib/duffel'
 import { AircraftResource } from './Aircraft'
+import { AirlinesResource } from './Airlines'
 
 export const airports = {
   async list(params: { limit?: number; after?: string; before?: string; query?: string } = {}) {
@@ -13,24 +14,18 @@ export const airports = {
       if (q.length === 3) p.iata_code = q.toUpperCase()
       else p.name = q
     }
-    return duffel.airports.list(p)
+    const res = await duffel.airports.list(p)
+    const data = (res?.data || res?.airports || []) as any[]
+    return { data, meta: res?.meta }
   },
   async get(id: string) {
     const duffel = getDuffelClient() as any
-    return duffel.airports.get(id)
+    const res = await duffel.airports.get(id)
+    return res?.data || res
   },
 }
 
-export const airlines = {
-  async list(params: Record<string, any> = {}) {
-    const duffel = getDuffelClient() as any
-    return duffel.airlines.list(params)
-  },
-  async get(id: string) {
-    const duffel = getDuffelClient() as any
-    return duffel.airlines.get(id)
-  },
-}
+export const airlines = AirlinesResource
 
 export const aircraft = AircraftResource
 
