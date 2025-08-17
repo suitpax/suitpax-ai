@@ -92,7 +92,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                 <div className="mt-2 grid gap-2 md:grid-cols-2">
                   {slice.segments.map(seg => {
                     const destCity = seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name
-                    const cityThumb = destCity ? `https://source.unsplash.com/featured/96x64/?${encodeURIComponent(destCity)}` : ''
+                    const cityThumb = destCity ? `https://source.unsplash.com/96x64/?${encodeURIComponent(destCity + ' skyline')}` : ''
                     const logo = seg.airline?.logo_symbol_url || seg.airline?.logo_lockup_url
                     return (
                       <div key={seg.id} className="segment">
@@ -104,7 +104,14 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                             <div className="segment-meta">{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
                           </div>
                           <div className="flex items-center gap-2">
-                            {cityThumb && <img src={cityThumb} alt={destCity || ''} className="h-10 w-16 rounded-md object-cover border border-gray-200" />}
+                            {cityThumb && (
+                              <img
+                                src={cityThumb}
+                                alt={destCity || ''}
+                                className="h-10 w-16 rounded-md object-cover border border-gray-200"
+                                onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://images.pexels.com/photos/373912/pexels-photo-373912.jpeg?auto=compress&cs=tinysrgb&h=64&w=96' }}
+                              />
+                            )}
                             {logo ? (
                               <img src={logo} alt={seg.airline?.name || ''} className="h-4" />
                             ) : (
