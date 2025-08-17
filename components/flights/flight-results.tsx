@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
+import { resolveCityImage } from '@/lib/utils'
 
 // Mapeo de ciudades -> landmarks para imágenes más representativas
 const CITY_KEYWORDS: Record<string, string> = {
@@ -35,8 +36,8 @@ const CITY_KEYWORDS: Record<string, string> = {
 
 function getCityImageUrl(cityName?: string, width = 640, height = 400) {
   const key = (cityName || '').toLowerCase().trim()
-  const query = CITY_KEYWORDS[key] || `${cityName || 'city'} skyline`
-  return `https://source.unsplash.com/featured/${width}x${height}/?${encodeURIComponent(query)}`
+  const query = CITY_KEYWORDS[key] || cityName
+  return resolveCityImage(query || 'city', { width, height })
 }
 
 interface FlightOfferSegment {
