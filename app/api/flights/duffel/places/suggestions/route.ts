@@ -10,6 +10,9 @@ export async function GET(request: Request) {
     const lat = searchParams.get('lat') || undefined
     const lng = searchParams.get('lng') || undefined
     const rad = searchParams.get('rad') || undefined
+    const types = searchParams.get('types') || undefined
+    const subtypes = searchParams.get('subtypes') || undefined
+    const locale = searchParams.get('locale') || undefined
     if (!query) return NextResponse.json({ data: [] })
 
     const token = process.env.DUFFEL_API_KEY || ''
@@ -21,6 +24,9 @@ export async function GET(request: Request) {
     if (lat) url.searchParams.set('lat', lat)
     if (lng) url.searchParams.set('lng', lng)
     if (rad) url.searchParams.set('rad', rad)
+    if (types) url.searchParams.set('types', types)
+    if (subtypes) url.searchParams.set('subtypes', subtypes)
+    if (locale) url.searchParams.set('locale', locale)
 
     const resp = await fetch(url.toString(), {
       headers: {
