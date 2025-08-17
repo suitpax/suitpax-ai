@@ -109,8 +109,33 @@ export async function POST(request: Request) {
         payload: event as any,
         status: 'received',
       })
+
+      // Update orders/payments best-effort
+      if (eventType && orderId) {
+        const status = event?.data?.status || event?.data?.order?.status || null
+        if (eventType.startsWith('order.')) {
+          if (status) {
+            await admin.from('flight_orders').update({ status }).eq('duffel_order_id', orderId)
+          }
+        }
+      }
+      if (eventType && (eventType.startsWith('payment.'))) {
+        const paymentId = event?.data?.id || null
+        const status = event?.data?.status || null
+        const amount = event?.data?.amount || null
+        const currency = event?.data?.currency || null
+        const order_id = event?.data?.order_id || null
+        if (paymentId) {
+          const patch: any = {}
+          if (status) patch.status = status
+          if (amount) patch.amount = Number(amount)
+          if (currency) patch.currency = currency
+          if (order_id) patch.duffel_order_id = order_id
+          await admin.from('flight_payments').update(patch).eq('duffel_payment_id', paymentId)
+        }
+      }
     } catch (persistError) {
-      console.error('Failed to persist Duffel webhook event:', persistError)
+      console.error('Failed to persist/sync Duffel webhook event:', persistError)
     }
 
     return NextResponse.json({ received: true })

@@ -9,6 +9,7 @@
 @import './spacing.css';
 @import './margin.css';
 @import './flex.css';
+@import './components.css';
 
 :root {
 	--color-bg: #ffffff;

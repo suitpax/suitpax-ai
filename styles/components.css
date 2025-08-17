@@ -1,0 +1,28 @@
+@layer components {
+	/* Tabs */
+	.tabs {
+		@apply flex gap-2 p-1 bg-gray-100 rounded-2xl;
+	}
+	.tab {
+		@apply px-3 py-1.5 text-sm text-gray-700 rounded-xl transition-soft;
+	}
+	.tab-active {
+		@apply bg-white text-gray-900 shadow-soft border border-gray-200;
+	}
+
+	/* TimelineItem */
+	.timeline-item { @apply relative pl-6; }
+	.timeline-item:before { content: ""; @apply absolute left-2 top-0 bottom-0 w-px bg-gray-200; }
+	.timeline-dot { @apply absolute left-0 top-1.5 h-2.5 w-2.5 rounded-full bg-gray-900; }
+	.timeline-content { @apply bg-white border border-gray-200 rounded-2xl p-3 shadow-soft; }
+
+	/* Summary panel */
+	.summary-card { @apply bg-white border border-gray-200 rounded-2xl p-4; }
+	.summary-row { @apply flex items-center justify-between text-sm text-gray-800; }
+	.summary-muted { @apply text-xs text-gray-600; }
+
+	/* TimeRangeSelector */
+	.time-range { @apply flex items-center gap-2; }
+	.time-pill { @apply px-3 py-1 text-xs rounded-2xl border border-gray-200 bg-white text-gray-900; }
+	.time-pill-active { @apply bg-black text-white border-black; }
+}
