@@ -48,4 +48,24 @@
 	/* Passengers */
 	.passengers { @apply grid grid-cols-3 gap-2; }
 	.passenger-pill { @apply flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-3 py-2; }
+
+	/* Card */
+	.dc-card { @apply bg-white border border-gray-200 rounded-2xl shadow-soft; }
+
+	/* Buttons */
+	.dc-button-primary { @apply rounded-2xl bg-black text-white hover:bg-gray-900 transition-soft; }
+	.dc-button-secondary { @apply rounded-2xl bg-white text-gray-900 border border-gray-300 hover:bg-gray-100 transition-soft; }
+
+	/* Baggage Display */
+	.dc-baggage { @apply flex flex-wrap gap-2; }
+	.dc-baggage-item { @apply inline-flex items-center gap-2 px-2.5 py-1 rounded-2xl border border-gray-200 bg-white text-xs text-gray-700; }
+	.dc-baggage-icon { @apply h-3 w-3; }
+
+	/* Amenity */
+	.dc-amenity { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-2xl border border-gray-200 bg-gray-50 text-xs text-gray-700; }
+
+	/* Airline Selector */
+	.dc-airline-selector { @apply grid grid-cols-1 gap-2; }
+	.dc-airline-chip { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl border border-gray-200 bg-white text-sm text-gray-800 cursor-pointer select-none; }
+	.dc-airline-chip[data-selected="true"] { @apply border-black bg-black text-white; }
 }
