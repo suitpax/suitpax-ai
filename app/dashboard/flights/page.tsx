@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowsRightLeftIcon, FunnelIcon, MapPinIcon, CalendarIcon, UserIcon } from "@heroicons/react/24/outline"
 import FlightResults from "@/components/flights/flight-results"
 import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
+import { Switch } from "@/components/ui/switch"
 
 interface DuffelAirport {
   id: string
@@ -76,6 +77,7 @@ export default function FlightsPage() {
     directOnly: false,
   })
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
 
   // Load saved searches from localStorage
   useEffect(() => {
@@ -109,34 +111,70 @@ export default function FlightsPage() {
     toast("Loaded saved search")
   }
 
-  // Airport search helpers
-  const fetchAirports = useCallback(async (query: string) => {
-    const res = await fetch(`/api/flights/duffel/airports?query=${encodeURIComponent(query)}`)
+  // Persist filters
+  useEffect(() => {
+    try { localStorage.setItem('suitpax_flight_filters', JSON.stringify(filters)) } catch {}
+  }, [filters])
+  useEffect(() => {
+    try { const raw = localStorage.getItem('suitpax_flight_filters'); if (raw) setFilters(JSON.parse(raw)) } catch {}
+  }, [])
+
+  // Build active chips for display
+  const activeChips = useMemo(() => {
+    const chips: { id: string; label: string; value: string }[] = []
+    if (filters.directOnly) chips.push({ id: 'directOnly', label: 'Stops', value: 'Direct only' })
+    if (filters.maxStops < 3 && !filters.directOnly) chips.push({ id: 'maxStops', label: 'Stops', value: `${filters.maxStops} max` })
+    if (filters.airlines.length > 0) chips.push({ id: 'airlines', label: 'Airlines', value: filters.airlines.join(', ') })
+    if (filters.priceRange[0] > 0 || filters.priceRange[1] < 5000) chips.push({ id: 'price', label: 'Price', value: `${filters.priceRange[0]}-${filters.priceRange[1]}` })
+    if (filters.departureTime.length > 0) chips.push({ id: 'dep', label: 'Departure', value: `${filters.departureTime.length} selected` })
+    if (filters.refundable) chips.push({ id: 'ref', label: 'Refundable', value: 'Yes' })
+    if (filters.changeable) chips.push({ id: 'chg', label: 'Changeable', value: 'Yes' })
+    return chips
+  }, [filters])
+
+  const removeChip = (id: string) => {
+    setFilters(prev => {
+      const next = { ...prev }
+      switch (id) {
+        case 'directOnly': next.directOnly = false; break
+        case 'maxStops': next.maxStops = 3; break
+        case 'airlines': next.airlines = []; break
+        case 'price': next.priceRange = [0, 5000]; break
+        case 'dep': next.departureTime = []; break
+        case 'ref': next.refundable = false; break
+        case 'chg': next.changeable = false; break
+      }
+      return next
+    })
+  }
+
+  // Airport suggestions via Duffel Places
+  const fetchPlaces = useCallback(async (query: string) => {
+    const res = await fetch(`/api/flights/duffel/places/suggestions?q=${encodeURIComponent(query)}`)
     if (!res.ok) return []
     const json = await res.json()
-    const items = Array.isArray(json?.data) ? json.data : json?.airports || []
-    return items as DuffelAirport[]
+    return Array.isArray(json?.data) ? json.data : []
   }, [])
 
   useEffect(() => {
     const q = originQuery.trim()
     if (!q) return setOriginResults([])
     const t = setTimeout(async () => {
-      const items = await fetchAirports(q)
+      const items = await fetchPlaces(q)
       setOriginResults(items)
     }, 200)
     return () => clearTimeout(t)
-  }, [originQuery, fetchAirports])
+  }, [originQuery, fetchPlaces])
 
   useEffect(() => {
     const q = destinationQuery.trim()
     if (!q) return setDestinationResults([])
     const t = setTimeout(async () => {
-      const items = await fetchAirports(q)
+      const items = await fetchPlaces(q)
       setDestinationResults(items)
     }, 200)
     return () => clearTimeout(t)
-  }, [destinationQuery, fetchAirports])
+  }, [destinationQuery, fetchPlaces])
 
   const selectAirport = (airport: DuffelAirport, type: "origin" | "destination") => {
     setSearchParams(prev => ({ ...prev, [type]: airport.iata_code }))
@@ -441,8 +479,8 @@ export default function FlightsPage() {
       </div>
 
       <FlightFiltersDisplay
-        filters={[]}
-        onRemoveFilter={() => {}}
+        filters={activeChips}
+        onRemoveFilter={removeChip}
         onClearAll={() => setFilters({
           priceRange: [0, 5000], maxStops: 3, airlines: [], departureTime: [], arrivalTime: [], duration: [0, 1440], cabinClass: [], refundable: false, changeable: false, directOnly: false
         })}
@@ -457,10 +495,19 @@ export default function FlightsPage() {
       />
 
       {/* Results */}
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-gray-600">View</div>
+        <div className="flex items-center gap-2">
+          <Button variant={viewMode === 'list' ? 'default' : 'secondary'} className={viewMode === 'list' ? 'bg-black text-white' : 'border-gray-300 bg-white text-gray-900'} onClick={() => setViewMode('list')}>List</Button>
+          <Button variant={viewMode === 'grid' ? 'default' : 'secondary'} className={viewMode === 'grid' ? 'bg-black text-white' : 'border-gray-300 bg-white text-gray-900'} onClick={() => setViewMode('grid')}>Grid</Button>
+        </div>
+      </div>
+
       <FlightResults
         offers={filteredOffers}
         onTrackPrice={(id) => toast.success(`Tracking price for ${id}`)}
         onSelectOffer={(offer) => toast.success(`Select flight ${offer.id}`)}
+        className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''}
       />
     </div>
   )
