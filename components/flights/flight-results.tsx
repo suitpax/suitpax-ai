@@ -1,6 +1,5 @@
 "use client"
 
-import { useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -42,13 +41,13 @@ interface Props {
 
 export default function FlightResults({ offers, onSelectOffer, onTrackPrice, className = '' }: Props) {
   if (!offers || offers.length === 0) {
-    return <div className="rounded-2xl border border-gray-200 bg-white p-6 text-gray-600">No hay vuelos disponibles para estos criterios.</div>
+    return <div className="rounded-3xl border border-gray-200 glass-card p-6 text-gray-600">No hay vuelos disponibles para estos criterios.</div>
   }
 
   return (
     <div className={`space-y-4 ${className}`}>
       {offers.map((offer) => (
-        <Card key={offer.id} className="border-gray-200 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+        <Card key={offer.id} className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-center gap-3">
               {(() => {
@@ -60,7 +59,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                 return (
                   <div className="flex items-center gap-2">
                     {logo && <img src={logo} alt={airlineName} className="h-5" />}
-                    <span className="text-sm text-gray-700">{airlineName} ({airlineIata})</span>
+                    <span className="text-sm text-gray-700 tracking-tighter">{airlineName} ({airlineIata})</span>
                   </div>
                 )
               })()}
@@ -70,37 +69,28 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                 {new Intl.NumberFormat('en-US', { style: 'currency', currency: offer.total_currency, maximumFractionDigits: 0 }).format(parseFloat(offer.total_amount))}
               </CardTitle>
               <div className="text-xs text-gray-500">Expira {new Date(offer.expires_at).toLocaleString()}</div>
-              {(() => {
-                const seg = offer.slices?.[0]?.segments?.[0]
-                const url = seg?.airline?.conditions_of_carriage_url
-                if (!url) return null
-                return (
-                  <a href={url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline">
-                    Conditions of carriage
-                  </a>
-                )
-              })()}
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             {offer.slices.map((slice, idx) => (
-              <div key={slice.id} className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+              <div key={slice.id} className="slice-summary">
                 <div className="flex items-center justify-between text-sm text-gray-800">
-                  <div className="font-medium">Tramo {idx + 1}: {slice.origin?.iata_code} → {slice.destination?.iata_code}</div>
+                  <div className="font-medium tracking-tighter">Tramo {idx + 1}: {slice.origin?.iata_code} → {slice.destination?.iata_code}</div>
                   <div className="text-gray-600">Duración: {slice.duration?.replace('PT', '').toLowerCase()}</div>
                 </div>
-                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                <div className="mt-2 grid gap-2 md:grid-cols-2">
                   {slice.segments.map(seg => (
-                    <div key={seg.id} className="rounded-lg bg-white border border-gray-200 p-2 text-xs text-gray-800">
+                    <div key={seg.id} className="segment">
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="font-medium">
                             {(seg.origin?.city?.name || seg.origin?.city_name || seg.origin?.name)} ({seg.origin?.iata_code}) → {(seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name)} ({seg.destination?.iata_code})
                           </div>
+                          <div className="segment-meta">{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
                         </div>
-                        <div>{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
+                        {seg.airline?.logo_symbol_url && <img src={seg.airline.logo_symbol_url} alt={seg.airline?.name || ''} className="h-4" />}
                       </div>
-                      <div className="mt-1 flex items-center justify-between text-gray-600">
+                      <div className="mt-1 flex items-center justify-between text-gray-600 text-xs">
                         <div>Sale: {new Date(seg.departing_at).toLocaleString()}</div>
                         <div>Llega: {new Date(seg.arriving_at).toLocaleString()}</div>
                       </div>
@@ -111,10 +101,10 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
             ))}
 
             <div className="flex items-center justify-end gap-3">
-              <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={() => onTrackPrice?.(offer.id)}>
+              <Button variant="secondary" className="dc-button-secondary" onClick={() => onTrackPrice?.(offer.id)}>
                 Seguir precio
               </Button>
-              <Button className="bg-black text-white hover:bg-gray-800" onClick={() => onSelectOffer?.(offer)}>
+              <Button className="dc-button-primary" onClick={() => onSelectOffer?.(offer)}>
                 Reservar
               </Button>
             </div>
