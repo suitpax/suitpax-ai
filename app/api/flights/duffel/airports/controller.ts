@@ -33,5 +33,18 @@ function titleCase(s: string) {
 }
 
 export async function getAirportByIdHandler(params: { id: string }) {
-  return await fetchAirportById(params.id);
+  const res = await fetchAirportById(params.id);
+  const a: any = (res as any)?.data || res
+  if (!a) return res
+  const iata = (a?.iata_code || '').toString()
+  const name = (a?.name || '').toString()
+  const valid = name && name.length >= 3 && !/^\d+\s/.test(name) && (!iata || /^[A-Z]{3}$/i.test(iata))
+  if (!valid) return { data: null }
+  const cleaned = {
+    ...a,
+    iata_code: (a?.iata_code || '').toString().toUpperCase() || undefined,
+    city_name: a?.city_name ? capitalize(a.city_name) : (a?.city?.name ? capitalize(a.city.name) : undefined),
+    name: a?.name ? titleCase(a.name) : a?.name,
+  }
+  return { data: cleaned }
 }
