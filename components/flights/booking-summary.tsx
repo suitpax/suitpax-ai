@@ -35,7 +35,7 @@ export default function BookingSummary({ offer, details }: Props) {
   const converted = rate ? amount * rate : null
 
   return (
-    <Card className="border-gray-200 bg-white rounded-2xl">
+    <Card className="glass-card">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-gray-900 text-base tracking-tighter">Summary</CardTitle>

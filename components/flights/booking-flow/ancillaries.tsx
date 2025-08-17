@@ -49,7 +49,7 @@ export default function Ancillaries({ offerId }: Props) {
   }
 
   return (
-    <Card className="border-gray-200 bg-white rounded-2xl">
+    <Card className="glass-card">
       <CardHeader>
         <CardTitle className="text-gray-900 text-base tracking-tighter">Extras</CardTitle>
       </CardHeader>

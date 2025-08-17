@@ -76,9 +76,9 @@ export default function PaymentForm({ offer, onReady }: PaymentFormProps) {
   }
 
   return (
-    <Card className="border-gray-200">
+    <Card className="glass-card">
       <CardHeader>
-        <CardTitle>Payment</CardTitle>
+        <CardTitle className="text-gray-900 text-base tracking-tighter">Payment</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

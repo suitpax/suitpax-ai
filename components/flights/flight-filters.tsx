@@ -387,7 +387,7 @@ export default function FlightFilters({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto"
+            className="fixed right-0 top-0 h-full w-full max-w-md z-50 overflow-y-auto glass-card"
           >
             <div className="h-full border-0 rounded-none flex flex-col">
               {/* Header */}

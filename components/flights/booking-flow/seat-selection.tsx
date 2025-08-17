@@ -67,7 +67,7 @@ export default function SeatSelection({ offerId, onSelect }: Props) {
   }
 
   return (
-    <Card className="border-gray-200 bg-white rounded-2xl">
+    <Card className="glass-card">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-gray-900 text-base tracking-tighter">Seat selection</CardTitle>
