@@ -66,14 +66,14 @@ export default function Navigation() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 flex justify-center px-3 pt-2 pb-2", // slightly taller
+          "fixed top-0 left-0 right-0 z-50 flex justify-center px-3 pt-2 pb-2",
           "transition-all duration-300"
         )}
       >
         <div
           className={cn(
-            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-white/90 border border-black/5 px-4 py-2", // slightly taller container
-            isScrolled ? "shadow-lg border-black/10" : ""
+            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-black/70 border border-white/10 px-4 py-2",
+            isScrolled ? "shadow-lg border-white/20" : ""
           )}
         >
           <Link href="/" className="flex items-center">

@@ -150,16 +150,16 @@ export default function SuitpaxCodePage() {
   return (
     <VantaHaloBackground className="relative min-h-screen">
       {/* Header */}
-      <div className="px-5 pt-6 pb-3 border-b border-gray-200/60 bg-white/80 backdrop-blur-md">
+      <div className="px-5 pt-6 pb-3 border-b border-white/10 bg-black/60 backdrop-blur-md">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-medium tracking-tighter text-black">Suitpax Code</h1>
-            <p className="text-[12px] text-gray-600">AI coding agent for business travelers — design real UIs and ship.</p>
+            <h1 className="text-lg font-medium tracking-tighter text-white">Suitpax Code</h1>
+            <p className="text-[12px] text-white/70">AI coding agent for business travelers — design real UIs and ship.</p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => { sessionStorage.setItem("suitpax.theme.manual", "1"); setTheme(resolvedTheme === "dark" ? "light" : "dark") }}
-              className="px-3 py-1.5 text-xs border rounded-lg bg-white/70 hover:bg-white"
+              className="px-3 py-1.5 text-xs border rounded-lg bg-white/10 text-white hover:bg-white/20 border-white/20"
               aria-label="Toggle theme"
             >
               {resolvedTheme === "dark" ? "Light" : "Dark"}
@@ -170,7 +170,7 @@ export default function SuitpaxCodePage() {
 
       {/* Tools */}
       <div className="grid grid-rows-[auto_1fr_auto]">
-        <div className="p-4 border-b border-gray-200/60 bg-white/80 backdrop-blur-md">
+        <div className="p-4 border-b border-white/10 bg-black/60 backdrop-blur-md">
           <div className="grid gap-3 md:grid-cols-2">
             <MCPRemoteServerList />
             <div className="hidden md:block" />
@@ -183,17 +183,17 @@ export default function SuitpaxCodePage() {
         {/* Chat + Preview */}
         <div className="overflow-hidden grid grid-cols-1 xl:grid-cols-2">
           <ChatContainer messages={messages} className="h-[calc(100vh-390px)] p-6" />
-          <div className="border-t xl:border-t-0 xl:border-l border-gray-200/60 bg-white/80 backdrop-blur-md">
+          <div className="border-t xl;border-t-0 xl:border-l border-white/10 bg-black/60 backdrop-blur-md">
             <div className="flex items-center justify-between p-3">
-              <div className="text-xs font-medium">Preview</div>
+              <div className="text-xs font-medium text-white/80">Preview</div>
               <div className="flex gap-2">
-                <button onClick={copyCode} className="px-2 py-1 text-[10px] border rounded">Copy</button>
-                <button onClick={saveSnippet} className="px-2 py-1 text-[10px] border rounded">Save</button>
-                <button onClick={downloadCode} className="px-2 py-1 text-[10px] border rounded">Download</button>
-                <button onClick={() => { const w = window.open(); if (w) { w.document.write(previewHtml || '<div style=\'padding:12px;font-family:sans-serif;color:#555\'>No preview</div>'); w.document.close(); } }} className="px-2 py-1 text-[10px] border rounded">Open</button>
+                <button onClick={copyCode} className="px-2 py-1 text-[10px] border rounded border-white/20 text-white/80">Copy</button>
+                <button onClick={saveSnippet} className="px-2 py-1 text-[10px] border rounded border-white/20 text-white/80">Save</button>
+                <button onClick={downloadCode} className="px-2 py-1 text-[10px] border rounded border-white/20 text-white/80">Download</button>
+                <button onClick={() => { const w = window.open(); if (w) { w.document.write(previewHtml || '<div style=\'padding:12px;font-family:sans-serif;color:#bbb;background:#111\'>No preview</div>'); w.document.close(); } }} className="px-2 py-1 text-[10px] border rounded border-white/20 text-white/80">Open</button>
               </div>
             </div>
-            <iframe sandbox="allow-scripts allow-same-origin" className="w-full h-[calc(100vh-450px)]" srcDoc={previewHtml || "<div style='padding:12px;font-family:sans-serif;color:#555'>No preview</div>"} />
+            <iframe sandbox="allow-scripts allow-same-origin" className="w-full h-[calc(100vh-450px)]" srcDoc={previewHtml || "<div style='padding:12px;font-family:sans-serif;color:#bbb;background:#111'>No preview</div>"} />
           </div>
         </div>
 

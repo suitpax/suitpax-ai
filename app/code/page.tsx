@@ -10,28 +10,28 @@ export const metadata: Metadata = {
 
 export default function CodePage() {
   return (
-    <main className="min-h-screen bg-white">
-      <section className="relative overflow-hidden bg-white">
+    <main className="min-h-screen bg-black text-white">
+      <section className="relative overflow-hidden bg-black">
         <div className="relative mx-auto max-w-7xl px-6 pt-10 pb-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
-              <span className="text-[10px] font-medium text-gray-700">Suitpax</span>
-              <span className="text-[10px] text-gray-500">Code</span>
+            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1">
+              <span className="text-[10px] font-medium text-white">Suitpax</span>
+              <span className="text-[10px] text-white/70">Code</span>
             </div>
-            <h1 className="mt-4 text-3xl md:text-5xl font-medium tracking-tighter text-black">Build with AI, ship faster</h1>
-            <p className="mt-3 text-gray-600 font-medium">Production-grade components, SDKs and agent workflows to build enterprise UIs and tools in hours.</p>
+            <h1 className="mt-4 text-3xl md:text-5xl font-medium tracking-tighter text-white">Build with AI, ship faster</h1>
+            <p className="mt-3 text-white/70 font-medium">Production-grade components, SDKs and agent workflows to build enterprise UIs and tools in hours.</p>
           </div>
 
           {/* Overview */}
           <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {[
+            [
               { title: "UI Kits", desc: "Composable React components for dashboards, workflows and data-heavy UIs" },
               { title: "Agents SDK", desc: "Task-oriented agents with tools, memory and safety rails" },
               { title: "Templates", desc: "Starter kits for finance ops, travel ops and internal tools" },
             ].map((b, i) => (
-              <div key={i} className="rounded-2xl border border-gray-200 p-4 bg-white/60">
-                <p className="text-sm font-medium text-black">{b.title}</p>
-                <p className="text-sm text-gray-600 mt-1">{b.desc}</p>
+              <div key={i} className="rounded-2xl border border-white/15 p-4 bg-white/5">
+                <p className="text-sm font-medium text-white">{b.title}</p>
+                <p className="text-sm text-white/70 mt-1">{b.desc}</p>
               </div>
             ))}
           </div>
@@ -46,11 +46,11 @@ export default function CodePage() {
       </div>
 
       {/* Capabilities */}
-      <section className="py-10 md:py-12">
+      <section className="py-10 md:py-12 bg-black">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-2xl md:text-3xl font-medium tracking-tighter text-black mb-4">What you can build</h2>
+          <h2 className="text-2xl md:text-3xl font-medium tracking-tighter text-white mb-4">What you can build</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
+            [
               {
                 t: "AI Workflows",
                 d: "Form builders, approvals and automations with agent tools (mail, calendar, flights, expenses).",
@@ -59,9 +59,9 @@ export default function CodePage() {
               { t: "Copilots", d: "Context-aware assistants with memory, RAG and safe tool execution." },
               { t: "Dashboards", d: "Plug-and-play layouts with auth, theming and responsive navigation." },
             ].map((c, i) => (
-              <div key={i} className="rounded-xl border border-gray-200 p-4 bg-white">
-                <p className="text-sm font-medium text-black">{c.t}</p>
-                <p className="text-sm text-gray-600 mt-1">{c.d}</p>
+              <div key={i} className="rounded-xl border border-white/15 p-4 bg-white/5">
+                <p className="text-sm font-medium text-white">{c.t}</p>
+                <p className="text-sm text-white/70 mt-1">{c.d}</p>
               </div>
             ))}
           </div>

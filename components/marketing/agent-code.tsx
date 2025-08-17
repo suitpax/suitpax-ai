@@ -42,7 +42,7 @@ export default function AgentCode() {
 
   return (
     <section className="relative py-16 bg-black overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.03] bg-repeat bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px]"></div>
+      <div className="absolute inset-0 opacity-[0.06] bg-repeat bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px]"></div>
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-md rounded-full px-3 py-1">
@@ -50,7 +50,7 @@ export default function AgentCode() {
             <span className="text-[10px] text-gray-300">Agent Interface</span>
           </div>
           <h2 className="mt-4 text-3xl sm:text-4xl font-medium tracking-tighter text-white">Ask. Build. Ship.</h2>
-          <p className="mt-2 text-sm sm:text-base text-gray-400 font-medium">
+          <p className="mt-2 text-sm sm:text-base text-gray-300 font-medium">
             Demonstrating the power of Suitpax AI to turn prompts into production-grade components and tools.
           </p>
         </div>
