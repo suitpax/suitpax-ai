@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import Image from "next/image"
+import { SmallSessionLoader } from "@/components/ui/loaders"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -157,7 +158,7 @@ export default function LoginPage() {
                   disabled={loading}
                   className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all tracking-tight"
                 >
-                  {loading ? "Signing in..." : "Sign in"}
+                  {loading ? <SmallSessionLoader label="Signing you in…" /> : "Sign in"}
                 </button>
               </div>
 
