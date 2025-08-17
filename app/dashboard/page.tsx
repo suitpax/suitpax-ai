@@ -1,15 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import dynamic from "next/dynamic"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { ArrowRight, Bot, Sparkles, MessageSquare, Brain } from "lucide-react"
 
+const MotionDiv: any = dynamic(() => import("framer-motion").then(m => m.motion.div), { ssr: false })
+
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [stats, setStats] = useState<{ trips: number; savings: number; expenses: number; teamSize: number }>({ trips: 0, savings: 0, expenses: 0, teamSize: 1 })
 
   useEffect(() => {
     let isMounted = true
@@ -19,33 +22,18 @@ export default function DashboardPage() {
         const supabase = createClient()
         const {
           data: { user },
-          error,
         } = await supabase.auth.getUser()
+        if (user && isMounted) setUser(user)
 
-        if (error) {
-          console.error("Error getting user:", error)
-          return
-        }
-
-        if (user && isMounted) {
-          setUser(user)
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.error("Error in getUser:", error)
-        }
+        // TODO: fetch real KPIs from your tables
+        if (isMounted) setStats({ trips: 0, savings: 0, expenses: 0, teamSize: 1 })
       } finally {
-        if (isMounted) {
-          setIsLoading(false)
-        }
+        if (isMounted) setIsLoading(false)
       }
     }
 
     getUser()
-
-    return () => {
-      isMounted = false
-    }
+    return () => { isMounted = false }
   }, [])
 
   if (isLoading) {
@@ -59,7 +47,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 p-4 lg:p-0">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+      <MotionDiv initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
             <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">
@@ -72,40 +60,34 @@ export default function DashboardPage() {
             <span className="text-sm font-medium text-gray-700">Online</span>
           </div>
         </div>
-      </motion.div>
+      </MotionDiv>
 
       {/* KPIs */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.08 }}
-      >
+      <MotionDiv initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.08 }}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
-            <p className="text-sm font-medium text-gray-600">Total Trips</p>
-            <p className="text-2xl font-medium tracking-tighter">0</p>
-          </div>
-          <div className="bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
-            <p className="text-sm font-medium text-gray-600">Savings</p>
-            <p className="text-2xl font-medium tracking-tighter">$0</p>
-          </div>
-          <div className="bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
-            <p className="text-sm font-medium text-gray-600">Expenses</p>
-            <p className="text-2xl font-medium tracking-tighter">$0</p>
-          </div>
-          <div className="bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
-            <p className="text-sm font-medium text-gray-600">Team Size</p>
-            <p className="text-2xl font-medium tracking-tighter">1</p>
-          </div>
+          {[
+            { label: "Total Trips", value: stats.trips, empty: "No trips yet", action: "/dashboard/trips" },
+            { label: "Savings", value: stats.savings, prefix: "$", empty: "Start saving", action: "/dashboard/analytics" },
+            { label: "Expenses", value: stats.expenses, prefix: "$", empty: "Track expenses", action: "/dashboard/finance-hub" },
+            { label: "Team Size", value: stats.teamSize, empty: "Invite teammates", action: "/dashboard/settings" },
+          ].map((kpi) => (
+            <div key={kpi.label} className="bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm rounded-2xl p-6">
+              <p className="text-sm font-medium text-gray-600">{kpi.label}</p>
+              {kpi.value ? (
+                <p className="text-2xl font-medium tracking-tighter">{kpi.prefix || ''}{kpi.value}</p>
+              ) : (
+                <Link href={kpi.action} className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900">
+                  <span>{kpi.empty}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
+          ))}
         </div>
-      </motion.div>
+      </MotionDiv>
 
       {/* Suitpax AI Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.16 }}
-      >
+      <MotionDiv initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.16 }}>
         <Link href="/dashboard/suitpax-ai">
           <div className="bg-white border border-gray-200 shadow-sm rounded-2xl p-8 hover:shadow-md transition-all duration-300 group cursor-pointer">
             <div className="text-center">
@@ -152,7 +134,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </Link>
-      </motion.div>
+      </MotionDiv>
     </div>
   )
 }
