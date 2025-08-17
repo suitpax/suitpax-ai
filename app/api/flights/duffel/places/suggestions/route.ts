@@ -26,6 +26,8 @@ export async function GET(request: Request) {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json',
+        'Duffel-Version': 'v2',
+        'Accept-Encoding': 'gzip',
       },
       cache: 'no-store',
     })

@@ -19,7 +19,12 @@ export async function GET(request: Request) {
     if (typeof limit === 'number') url.searchParams.set('limit', String(limit))
 
     const resp = await fetch(url.toString(), {
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+      headers: { 
+        Authorization: `Bearer ${token}`, 
+        Accept: 'application/json',
+        'Duffel-Version': 'v2',
+        'Accept-Encoding': 'gzip',
+      },
       cache: 'no-store',
     })
 
