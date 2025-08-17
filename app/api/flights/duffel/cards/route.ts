@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getDuffelClient } from '@/lib/duffel'
+import crypto from 'crypto'
 
 export const runtime = 'nodejs'
 
