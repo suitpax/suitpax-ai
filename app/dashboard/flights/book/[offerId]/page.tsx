@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "react-hot-toast"
+import PaymentForm from "@/components/flights/booking-flow/payment-form"
+import BookingSummary from "@/components/flights/booking-summary"
 
 export default function BookOfferPage() {
 	const params = useParams() as { offerId: string }
@@ -16,6 +18,7 @@ export default function BookOfferPage() {
 	const [loading, setLoading] = useState(true)
 	const [offer, setOffer] = useState<any>(null)
 	const [submitting, setSubmitting] = useState(false)
+	const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
 
 	// Simple passenger form (1 adulto)
 	const [givenName, setGivenName] = useState("")
@@ -49,7 +52,9 @@ export default function BookOfferPage() {
 		}
 		setSubmitting(true)
 		try {
-			// Create order with Duffel (simplified: 1 passenger, using selected offer)
+			const payments = paymentIntentId
+				? [{ type: 'card', payment_intent_id: paymentIntentId }]
+				: [{ type: 'balance' }]
 			const body = {
 				selected_offers: [offer.id],
 				passengers: [
@@ -61,11 +66,7 @@ export default function BookOfferPage() {
 						email,
 					},
 				],
-				payments: [
-					{
-						type: "balance",
-					}
-				],
+				payments,
 			}
 			const res = await fetch('/api/flights/duffel/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
 			const json = await res.json()
@@ -94,37 +95,44 @@ export default function BookOfferPage() {
 				</div>
 			</div>
 
-			<Card className="border-gray-200">
-				<CardHeader>
-					<CardTitle>Passenger</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-3">
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-						<div>
-							<Label>Given name</Label>
-							<Input value={givenName} onChange={e => setGivenName(e.target.value)} className="bg-white text-gray-900" />
-						</div>
-						<div>
-							<Label>Family name</Label>
-							<Input value={familyName} onChange={e => setFamilyName(e.target.value)} className="bg-white text-gray-900" />
-						</div>
-						<div>
-							<Label>Email</Label>
-							<Input type="email" value={email} onChange={e => setEmail(e.target.value)} className="bg-white text-gray-900" />
-						</div>
-						<div>
-							<Label>Date of birth</Label>
-							<Input type="date" value={bornOn} onChange={e => setBornOn(e.target.value)} className="bg-white text-gray-900" />
-						</div>
-					</div>
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+				<div className="md:col-span-2 space-y-4">
+					<Card className="border-gray-200">
+						<CardHeader>
+							<CardTitle>Passenger</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-3">
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+								<div>
+									<Label>Given name</Label>
+									<Input value={givenName} onChange={e => setGivenName(e.target.value)} className="bg-white text-gray-900" />
+								</div>
+								<div>
+									<Label>Family name</Label>
+									<Input value={familyName} onChange={e => setFamilyName(e.target.value)} className="bg-white text-gray-900" />
+								</div>
+								<div>
+									<Label>Email</Label>
+									<Input type="email" value={email} onChange={e => setEmail(e.target.value)} className="bg-white text-gray-900" />
+								</div>
+								<div>
+									<Label>Date of birth</Label>
+									<Input type="date" value={bornOn} onChange={e => setBornOn(e.target.value)} className="bg-white text-gray-900" />
+								</div>
+							</div>
+						</CardContent>
+					</Card>
 
-					<div className="flex justify-end">
-						<Button onClick={submitOrder} disabled={submitting} className="bg-black text-white hover:bg-gray-800 rounded-2xl">
-							{submitting ? 'Processing…' : 'Confirm booking'}
-						</Button>
-					</div>
-				</CardContent>
-			</Card>
+					<PaymentForm offer={offer} onReady={setPaymentIntentId} />
+				</div>
+
+				<div className="space-y-4">
+					<BookingSummary offer={offer} />
+					<Button onClick={submitOrder} disabled={submitting} className="w-full bg-black text-white hover:bg-gray-800 rounded-2xl">
+						{submitting ? 'Processing…' : 'Confirm booking'}
+					</Button>
+				</div>
+			</div>
 
 			<Card className="border-gray-200">
 				<CardHeader>

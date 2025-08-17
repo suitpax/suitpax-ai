@@ -1,45 +1,50 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Ticket, Users, DollarSign } from 'lucide-react'
+import type { TravelDetails, CurrencyConversion } from "@/types/duffel-ui"
 
-interface BookingSummaryProps {
-  totalAmount: string
-  currency: string
-  passengersCount: number
+interface Props {
+  offer: any
+  details?: TravelDetails
+  conversion?: CurrencyConversion
 }
 
-export default function BookingSummary({ totalAmount, currency, passengersCount }: BookingSummaryProps) {
-  const price = parseFloat(totalAmount)
-  const taxes = price * 0.15 // Example tax calculation
-  const basePrice = price - taxes
+export default function BookingSummary({ offer, details, conversion }: Props) {
+  const amount = parseFloat(offer?.total_amount || '0')
+  const curr = offer?.total_currency || 'USD'
+  const converted = conversion ? amount * conversion.rate : null
 
   return (
-    <Card>
+    <Card className="border-gray-200">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Ticket className="h-5 w-5" />
-          Booking Summary
-        </CardTitle>
+        <CardTitle>Summary</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex justify-between items-center">
-          <p className="text-gray-600 flex items-center gap-2"><Users className="h-4 w-4" /> Passengers</p>
-          <p className="font-medium">{passengersCount}</p>
+      <CardContent className="space-y-2 text-sm text-gray-800">
+        {details && (
+          <div className="rounded-lg border border-gray-200 p-3">
+            <div className="font-medium">{details.origin} → {details.destination}</div>
+            <div className="text-gray-600">
+              {details.departureDate}{details.returnDate ? ` • return ${details.returnDate}` : ''}
+            </div>
+            <div className="text-gray-600">
+              {details.cabinClass} • {details.passengers.adults} adult{(details.passengers.adults || 1) > 1 ? 's' : ''}
+              {details.passengers.children ? ` • ${details.passengers.children} child` : ''}
+              {details.passengers.infants ? ` • ${details.passengers.infants} infant` : ''}
+            </div>
+          </div>
+        )}
+        <div className="flex items-center justify-between">
+          <div>Total</div>
+          <div className="font-semibold">
+            {new Intl.NumberFormat('en-US', { style: 'currency', currency: curr, maximumFractionDigits: 0 }).format(amount)}
+          </div>
         </div>
-        <div className="flex justify-between items-center">
-          <p className="text-gray-600 flex items-center gap-2"><DollarSign className="h-4 w-4" /> Base Fare</p>
-          <p className="font-medium">{new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(basePrice)}</p>
-        </div>
-        <div className="flex justify-between items-center">
-          <p className="text-gray-600">Taxes and Fees</p>
-          <p className="font-medium">{new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(taxes)}</p>
-        </div>
-        <div className="border-t border-gray-200 my-2" />
-        <div className="flex justify-between items-center text-lg font-semibold">
-          <p>Total</p>
-          <p>{new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(price)}</p>
-        </div>
+        {converted && conversion && (
+          <div className="flex items-center justify-between text-gray-600">
+            <div>≈ {conversion.target_currency}</div>
+            <div>{new Intl.NumberFormat('en-US', { style: 'currency', currency: conversion.target_currency, maximumFractionDigits: 0 }).format(converted)}</div>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
