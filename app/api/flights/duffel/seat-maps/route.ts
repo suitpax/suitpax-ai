@@ -6,6 +6,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const offer_id = searchParams.get('offer_id')
+    const cabin_class = searchParams.get('cabin_class') || undefined
     if (!offer_id) return NextResponse.json({ error: 'offer_id is required' }, { status: 400 })
 
     const token = process.env.DUFFEL_API_KEY || ''
@@ -13,6 +14,7 @@ export async function GET(request: Request) {
 
     const url = new URL('https://api.duffel.com/air/seat_maps')
     url.searchParams.set('offer_id', offer_id)
+    if (cabin_class) url.searchParams.set('cabin_class', cabin_class)
 
     const resp = await fetch(url.toString(), {
       headers: {

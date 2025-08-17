@@ -1,21 +1,17 @@
 import { NextResponse } from 'next/server'
 import { getDuffelClient } from '@/lib/duffel'
-import crypto from 'crypto'
 
 export const runtime = 'nodejs'
 
-export async function POST(request: Request) {
+export async function GET(_request: Request, { params }: { params: { id: string } }) {
   try {
     const token = process.env.DUFFEL_API_KEY || ''
     if (!token) return NextResponse.json({ error: 'Missing DUFFEL_API_KEY' }, { status: 500 })
 
-    const body = await request.json()
     const duffel = getDuffelClient() as any
-
-    const created = await duffel.threeDSecureSessions.create(body, { idempotencyKey: crypto.randomUUID?.() || undefined })
-    const session = created?.data || created
-
-    return NextResponse.json({ data: session })
+    const res = await duffel.refunds.get(params.id)
+    const data = res?.data || res
+    return NextResponse.json({ data })
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Unexpected error' }, { status: 500 })
   }
