@@ -10,6 +10,7 @@ import { FadeContainer, FadeSpan } from "@/components/ui/animations"
 import CounterBadge from "@/components/ui/counter-badge"
 import MiniChat from "@/components/ui/mini-chat"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import { ArcadeEmbed } from "@/components/ui/arcade-embed"
 
 // Modificar las variaciones de título para hacerlas más inclusivas
 
@@ -111,18 +112,12 @@ const getBadgeMessage = () => {
     return "Our AI Agents are sleeping..."
   }
 
-  // Random selection for other times with more variety
+  // Random selection for other times
   const messages = [
-    "Update: MCP Integration Live",
-    "New: AI Context Protocol",
-    "Update: Enhanced AI Agents",
-    "New: Model Context Protocol",
-    "Launching October 2025.",
+    "Launching at the end of Q2 2025.",
     "Our AI Agents are at the gym...",
-    "Building the AI context...",
+    "Join our waitlist in the meantime.",
     "The next-gen of traveltech.",
-    "Update: Smarter AI Responses",
-    "New: Context-Aware Agents",
   ]
 
   return messages[Math.floor(Math.random() * messages.length)]
@@ -214,7 +209,7 @@ const cities = [
   "Gothenburg",
   "Malmö",
   "Tampere",
-  "Manchester",
+  "Aarhus",
   "Odense",
   "Bergen",
   "Stavanger",
@@ -292,7 +287,7 @@ export const Hero = () => {
         <FadeContainer className="relative flex flex-col items-center justify-center container px-4 md:px-6 mx-auto">
           <Badge
             text={badgeMessage}
-            href={badgeMessage === "Pre-register." ? "https://app.suitpax.com/sign-up" : "#"}
+            href={badgeMessage === "Join our waitlist in the meantime." ? "https://app.suitpax.com/sign-up" : "#"}
             className="bg-white text-black hover:bg-gray-100 transition-colors"
           />
 
@@ -322,16 +317,21 @@ export const Hero = () => {
                 asChild
                 className="rounded-xl bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
-                <Link href="/manifesto">Read the manifesto</Link>
+                <Link href="/manifesto">Read our manifesto</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 className="rounded-xl bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
               >
-                <Link href="https://cal.com/team/founders/partnership">Invest in Suitpax- Let's talk</Link>
+                <Link href="https://cal.com/team/founders/partnership">Talk to founders</Link>
               </Button>
             </div>
+          </div>
+
+          {/* Dashboard Image - Sin mini badges */}
+          <div className="mt-12 sm:mt-16 md:mt-20 w-full max-w-[95vw] mx-auto flex justify-center relative px-4 sm:px-6">
+            <ArcadeEmbed />
           </div>
 
           {/* Caption text */}
