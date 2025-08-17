@@ -229,25 +229,25 @@ export function Sidebar({
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-600">{getDisplayName().split(" ")[0]}</span>
                   <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse"></div>
-                    <div
-                      className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-pulse"
-                      style={{ animationDelay: "0.5s" }}
-                    ></div>
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                    <div className="w-1.5 h-1.5 bg-emerald-400/80 rounded-full animate-pulse" style={{ animationDelay: "0.5s" }}></div>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500">Suitpax AI v2.1.0</div>
+                <div className="text-xs text-gray-500">Suitpax AI</div>
               </div>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsCollapsed?.(!isCollapsed)}
-            className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl"
-          >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </Button>
+          {/* Collapse button: visible only on mobile */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsCollapsed?.(!isCollapsed)}
+              className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl"
+            >
+              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -328,7 +328,7 @@ export function Sidebar({
                       <item.icon className="flex-shrink-0 h-5 w-5 mr-3" aria-hidden="true" />
                       <span>{item.name}</span>
                     </div>
-                    <Badge className="bg-gray-200 text-gray-700 text-[10px] px-2 py-0.5 rounded-lg">{item.badge}</Badge>
+                    <Badge className="bg-gray-200 text-gray-700 text-[10px] px-2 py-0 rounded-lg">{item.badge}</Badge>
                   </Link>
                 )
               })}
