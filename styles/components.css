@@ -1,14 +1,8 @@
 @layer components {
 	/* Tabs */
-	.tabs {
-		@apply flex gap-2 p-1 bg-gray-100 rounded-2xl;
-	}
-	.tab {
-		@apply px-3 py-1.5 text-sm text-gray-700 rounded-xl transition-soft;
-	}
-	.tab-active {
-		@apply bg-white text-gray-900 shadow-soft border border-gray-200;
-	}
+	.tabs { @apply flex gap-2 p-1 bg-gray-100 rounded-2xl; }
+	.tab { @apply px-3 py-1.5 text-sm text-gray-700 rounded-xl transition-soft; }
+	.tab-active { @apply bg-white text-gray-900 shadow-soft border border-gray-200; }
 
 	/* TimelineItem */
 	.timeline-item { @apply relative pl-6; }
@@ -16,7 +10,7 @@
 	.timeline-dot { @apply absolute left-0 top-1.5 h-2.5 w-2.5 rounded-full bg-gray-900; }
 	.timeline-content { @apply bg-white border border-gray-200 rounded-2xl p-3 shadow-soft; }
 
-	/* Summary panel */
+	/* Summary */
 	.summary-card { @apply bg-white border border-gray-200 rounded-2xl p-4; }
 	.summary-row { @apply flex items-center justify-between text-sm text-gray-800; }
 	.summary-muted { @apply text-xs text-gray-600; }
@@ -25,4 +19,33 @@
 	.time-range { @apply flex items-center gap-2; }
 	.time-pill { @apply px-3 py-1 text-xs rounded-2xl border border-gray-200 bg-white text-gray-900; }
 	.time-pill-active { @apply bg-black text-white border-black; }
+
+	/* Slice & Segment */
+	.slice-summary { @apply bg-white border border-gray-200 rounded-2xl p-3 shadow-soft; }
+	.slice-carriers { @apply flex items-center gap-2 text-sm text-gray-700; }
+	.segment { @apply grid gap-2 md:grid-cols-3 text-sm text-gray-800 bg-gray-50 rounded-xl p-3 border border-gray-200; }
+	.segment-meta { @apply text-xs text-gray-600; }
+
+	/* Row */
+	.row { @apply flex items-center gap-2; }
+
+	/* Seat map */
+	.seat-map { @apply bg-gray-50 rounded-2xl border border-gray-200 p-3; }
+	.seat { @apply inline-flex items-center justify-center h-8 w-8 rounded-lg text-xs transition-soft; }
+
+	/* Radio button */
+	.radio { @apply inline-flex items-center gap-2 cursor-pointer select-none; }
+	.radio-input { @apply relative h-4 w-4 rounded-full border border-gray-300 bg-white; }
+	.radio-input[data-checked="true"] { @apply border-black; }
+	.radio-input[data-checked="true"]::after { content: ""; @apply absolute inset-1 rounded-full bg-black; }
+
+	/* Places lookup */
+	.places { @apply relative; }
+	.places-panel { @apply absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-soft max-h-60 overflow-auto; }
+	.places-item { @apply w-full text-left px-3 py-2 text-sm text-gray-900 hover:bg-gray-50; }
+	.places-item-active { @apply bg-gray-100; }
+
+	/* Passengers */
+	.passengers { @apply grid grid-cols-3 gap-2; }
+	.passenger-pill { @apply flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-3 py-2; }
 }
