@@ -83,6 +83,8 @@ export default function FlightsPage() {
   const [pageMeta, setPageMeta] = useState<any>({})
   const [loadingMore, setLoadingMore] = useState(false)
 
+  const [placesWarnings, setPlacesWarnings] = useState<any[]>([])
+
   // Load saved searches from localStorage
   useEffect(() => {
     try {
@@ -154,9 +156,10 @@ export default function FlightsPage() {
 
   // Airport suggestions via Duffel Places
   const fetchPlaces = useCallback(async (query: string) => {
-    const res = await fetch(`/api/flights/duffel/places/suggestions?q=${encodeURIComponent(query)}`)
+    const res = await fetch(`/api/flights/duffel/places/suggestions?query=${encodeURIComponent(query)}`)
     if (!res.ok) return []
     const json = await res.json()
+    setPlacesWarnings(json?.warnings || [])
     return Array.isArray(json?.data) ? json.data : []
   }, [])
 
@@ -544,6 +547,12 @@ export default function FlightsPage() {
           <Button variant={viewMode === 'grid' ? 'default' : 'secondary'} className={viewMode === 'grid' ? 'bg-black text-white' : 'border-gray-300 bg-white text-gray-900'} onClick={() => setViewMode('grid')}>Grid</Button>
         </div>
       </div>
+
+      {placesWarnings.length > 0 && (
+        <div className="rounded-xl border border-yellow-200 bg-yellow-50 text-yellow-800 p-3 text-sm">
+          Some parameters are deprecated or will change soon. Using updated query field for suggestions.
+        </div>
+      )}
 
       <FlightResults
         offers={filteredOffers}
