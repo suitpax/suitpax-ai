@@ -90,23 +90,35 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                   <div className="text-gray-600">Duración: {slice.duration?.replace('PT', '').toLowerCase()}</div>
                 </div>
                 <div className="mt-2 grid gap-2 md:grid-cols-2">
-                  {slice.segments.map(seg => (
-                    <div key={seg.id} className="segment">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium">
-                            {(seg.origin?.city?.name || seg.origin?.city_name || seg.origin?.name)} ({seg.origin?.iata_code}) → {(seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name)} ({seg.destination?.iata_code})
+                  {slice.segments.map(seg => {
+                    const destCity = seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name
+                    const cityThumb = destCity ? `https://source.unsplash.com/featured/96x64/?${encodeURIComponent(destCity)}` : ''
+                    const logo = seg.airline?.logo_symbol_url || seg.airline?.logo_lockup_url
+                    return (
+                      <div key={seg.id} className="segment">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">
+                              {(seg.origin?.city?.name || seg.origin?.city_name || seg.origin?.name)} ({seg.origin?.iata_code}) → {(seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name)} ({seg.destination?.iata_code})
+                            </div>
+                            <div className="segment-meta">{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
                           </div>
-                          <div className="segment-meta">{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
+                          <div className="flex items-center gap-2">
+                            {cityThumb && <img src={cityThumb} alt={destCity || ''} className="h-10 w-16 rounded-md object-cover border border-gray-200" />}
+                            {logo ? (
+                              <img src={logo} alt={seg.airline?.name || ''} className="h-4" />
+                            ) : (
+                              <span className="text-xs text-gray-600">{seg.marketing_carrier?.iata_code}</span>
+                            )}
+                          </div>
                         </div>
-                        {seg.airline?.logo_symbol_url && <img src={seg.airline.logo_symbol_url} alt={seg.airline?.name || ''} className="h-4" />}
+                        <div className="mt-1 flex items-center justify-between text-gray-600 text-xs">
+                          <div>Sale: {new Date(seg.departing_at).toLocaleString()}</div>
+                          <div>Llega: {new Date(seg.arriving_at).toLocaleString()}</div>
+                        </div>
                       </div>
-                      <div className="mt-1 flex items-center justify-between text-gray-600 text-xs">
-                        <div>Sale: {new Date(seg.departing_at).toLocaleString()}</div>
-                        <div>Llega: {new Date(seg.arriving_at).toLocaleString()}</div>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             ))}
