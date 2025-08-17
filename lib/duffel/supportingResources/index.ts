@@ -1,4 +1,5 @@
 import { getDuffelClient } from '@/lib/duffel'
+import { AircraftResource } from './Aircraft'
 
 export const airports = {
   async list(params: { limit?: number; after?: string; before?: string; query?: string } = {}) {
@@ -31,16 +32,6 @@ export const airlines = {
   },
 }
 
-export const aircraft = {
-  async get(id: string) {
-    const duffel = getDuffelClient() as any
-    return duffel.aircraft.get(id)
-  },
-  async list(params: Record<string, any> = {}) {
-    const duffel = getDuffelClient() as any
-    if (!duffel.aircraft?.list) throw new Error('Listing aircraft is not supported by current SDK version')
-    return duffel.aircraft.list(params)
-  },
-}
+export const aircraft = AircraftResource
 
 export const supportingResources = { airports, airlines, aircraft }
