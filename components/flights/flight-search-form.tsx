@@ -128,8 +128,8 @@ export default function FlightSearchForm({ onResults, className = '' }: Props) {
 
       {error && <div className="text-sm text-red-600">{error}</div>}
 
-      <div className="flex justify-end">
-        <Button type="submit" disabled={isLoading} className="bg-black text-white hover:bg-gray-800 rounded-2xl">
+      <div className="flex flex-col md:flex-row md:justify-end">
+        <Button type="submit" disabled={isLoading} className="w-full md:w-auto bg-black text-white hover:bg-gray-800 rounded-2xl">
           {isLoading ? 'Searching…' : 'Search flights'}
         </Button>
       </div>

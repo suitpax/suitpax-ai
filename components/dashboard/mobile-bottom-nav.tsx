@@ -19,10 +19,10 @@ export default function MobileBottomNav() {
 	return (
 		<div className="lg:hidden">
 			<nav
-				className="fixed bottom-4 left-4 right-4 z-50 rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-md shadow-lg"
+				className="fixed bottom-3 left-3 right-3 z-50 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-md shadow"
 				style={{ WebkitBackdropFilter: "blur(12px)" }}
 			>
-				<ul className="flex items-center justify-between gap-1 px-2 py-1.5">
+				<ul className="flex items-center justify-between gap-0.5 px-1.5 py-1">
 					{items.map((item) => {
 						const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
 						return (
@@ -30,12 +30,12 @@ export default function MobileBottomNav() {
 								<Link
 									href={item.href}
 									className={cn(
-										"flex flex-col items-center justify-center rounded-xl px-3 py-2 transition-colors",
+										"flex flex-col items-center justify-center rounded-lg px-2 py-1.5 transition-colors",
 										isActive ? "bg-gray-900 text-white" : "text-gray-900 hover:bg-gray-100",
 									)}
 								>
-									<item.icon className="h-5 w-5" />
-									<span className="mt-0.5 text-[10px] font-medium">{item.name}</span>
+									<item.icon className="h-4 w-4" />
+									<span className="mt-0.5 text-[10px] leading-none font-medium">{item.name}</span>
 								</Link>
 							</li>
 						)
