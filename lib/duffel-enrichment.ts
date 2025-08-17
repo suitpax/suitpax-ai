@@ -19,29 +19,28 @@ export async function enrichOffersWithAirlineInfo(offers: any[]) {
 
   const duffel = getDuffelClient()
 
-  const entries = await Promise.all(
-    Array.from(codes).map(async (code) => {
-      try {
-        const res: any = await (duffel as any).airlines.list({ iata_code: code })
-        const air = Array.isArray(res?.data) ? res.data[0] : (res?.airlines?.[0] || null)
-        if (!air) return [code, null] as const
-        return [code, {
+  // Build map by iterating airlines generator; stop early if all found
+  const needed = new Set(codes)
+  const map: Record<string, any> = {}
+  // @ts-ignore - use internal generator helper
+  const gen = (duffel as any).airlines.listWithGenerator ? (duffel as any).airlines.listWithGenerator() : null
+  if (gen && gen[Symbol.asyncIterator]) {
+    for await (const air of gen as AsyncGenerator<any, any, any>) {
+      const code = air?.iata_code?.toUpperCase?.()
+      if (code && needed.has(code)) {
+        map[code] = {
           id: air.id,
           name: air.name,
           iata_code: air.iata_code,
           icao_code: air.icao_code,
           logo_symbol_url: air.logo_symbol_url,
           logo_lockup_url: air.logo_lockup_url,
-        }] as const
-      } catch {
-        return [code, null] as const
+          conditions_of_carriage_url: air.conditions_of_carriage_url,
+        }
+        needed.delete(code)
+        if (needed.size === 0) break
       }
-    })
-  )
-
-  const map: Record<string, any> = {}
-  for (const [code, air] of entries) {
-    if (air) map[code] = air
+    }
   }
 
   for (const offer of offers) {
@@ -56,6 +55,7 @@ export async function enrichOffersWithAirlineInfo(offers: any[]) {
         if (!segment.airline.logo_symbol_url) segment.airline.logo_symbol_url = air.logo_symbol_url
         if (!segment.airline.logo_lockup_url) segment.airline.logo_lockup_url = air.logo_lockup_url
         if (!segment.airline.iata_code) segment.airline.iata_code = code
+        if (!segment.airline.conditions_of_carriage_url && air.conditions_of_carriage_url) segment.airline.conditions_of_carriage_url = air.conditions_of_carriage_url
       }
     }
   }
