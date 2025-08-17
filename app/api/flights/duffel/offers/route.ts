@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getDuffelClient } from '@/lib/duffel'
 import { enrichOffersWithAirlineInfo } from '@/lib/duffel-enrichment'
+import { enrichOffersWithAircraftInfo } from '@/lib/duffel-aircraft'
 
 export async function GET(request: Request) {
   try {
@@ -22,9 +23,10 @@ export async function GET(request: Request) {
     const list = await (duffel as any).offers.list(params)
     const offers = list?.data || list?.offers || []
     const meta = list?.meta || {}
-    const enriched = await enrichOffersWithAirlineInfo(offers)
+    const withAirlines = await enrichOffersWithAirlineInfo(offers)
+    const withAircraft = await enrichOffersWithAircraftInfo(withAirlines)
 
-    return NextResponse.json({ data: enriched, meta })
+    return NextResponse.json({ data: withAircraft, meta })
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Unexpected error' }, { status: 500 })
   }

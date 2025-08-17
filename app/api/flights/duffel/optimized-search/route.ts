@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDuffelClient } from '@/lib/duffel';
 import { enrichOffersWithAirlineInfo } from '@/lib/duffel-enrichment';
+import { enrichOffersWithAircraftInfo } from '@/lib/duffel-aircraft';
 
 function buildPassengerArray(passengers: any): Array<{ type: string }> {
   const result: Array<{ type: string }> = [];
@@ -58,16 +59,16 @@ export async function POST(request: Request) {
     const offerRequest = await (duffel as any).offerRequests.create(requestPayload);
     const offer_request_id = offerRequest?.data?.id;
 
-    // Fetch first page of offers using offers.list for consistent pagination
     const listParams: any = { offer_request_id };
     if (typeof max_results === 'number') listParams.limit = max_results;
     const list = await (duffel as any).offers.list(listParams);
 
     const offers = list?.data || list?.offers || [];
     const meta = list?.meta || {};
-    const enriched = await enrichOffersWithAirlineInfo(offers)
+    const withAirlines = await enrichOffersWithAirlineInfo(offers)
+    const withAircraft = await enrichOffersWithAircraftInfo(withAirlines)
 
-    return NextResponse.json({ data: enriched, offer_request_id, meta });
+    return NextResponse.json({ data: withAircraft, offer_request_id, meta });
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || 'Unexpected error' },
