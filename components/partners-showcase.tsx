@@ -126,7 +126,7 @@ export const PartnersShowcase = ({
                 <motion.img
                   src={logo.url}
                   alt={`${logo.name} logo`}
-                  className="max-h-full max-w-full object-contain transition-all duration-300 opacity-80 group-hover:opacity-100"
+                  className="max-h-full max-w-full object-contain transition-all duration-300 brightness-0 invert opacity-40 group-hover:opacity-80"
                   style={{ WebkitFontSmoothing: "antialiased" }}
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
