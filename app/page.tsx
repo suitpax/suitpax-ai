@@ -13,6 +13,7 @@ import HyperspeedBooking from "@/components/marketing/hyperspeed-booking"
 import ContactForm from "@/components/marketing/contact-form"
 import AIAirlinesHero from "@/components/flights/ai-airlines-hero"
 import APITravel from "@/components/marketing/api-travel"
+import CodeTimeline from "@/components/marketing/code-timeline"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -81,6 +82,7 @@ export default function Home() {
         <AgenticDisruption />
         <AIVoiceAssistant />
         <APITravel />
+        <CodeTimeline />
         <HyperspeedBooking />
         <AIAirlinesHero />
         <AIMeetingsAttachment />
