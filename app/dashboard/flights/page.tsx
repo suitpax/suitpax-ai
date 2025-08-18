@@ -327,8 +327,14 @@ export default function FlightsPage() {
 
       {/* Shimmer headline variation */}
       <div className="flex justify-center">
-        <div className="mt-2 text-center text-sm font-medium bg-gradient-to-r from-gray-300 via-gray-100 to-gray-300 bg-clip-text text-transparent animate-hero-shimmer">
-          {['Search flights with Suitpax AI', 'Plan the next business trip in seconds', 'Ask for the best fares today'].sort(() => 0.5 - Math.random())[0]}
+        <div className="mt-2 text-center text-sm font-medium bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 bg-clip-text text-transparent animate-hero-shimmer">
+          {[
+            'Search flights with Suitpax AI',
+            'Plan your next business trip in seconds',
+            'Ask for the best fares today',
+            'Track prices and rebook instantly',
+            'Save time with one-click booking',
+          ].sort(() => 0.5 - Math.random())[0]}
         </div>
       </div>
       <style jsx>{`

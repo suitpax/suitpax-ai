@@ -8,7 +8,8 @@ export async function GET(req: Request) {
     const city = url.searchParams.get('city') || 'city'
     const w = url.searchParams.get('w') || '640'
     const h = url.searchParams.get('h') || '400'
-    const q = `${city} skyline landmark`
+    const lang = url.searchParams.get('lang') || ''
+    const q = `${city} skyline landmark${lang ? ` language:${lang}` : ''}`
 
     const key = process.env.PEXELS_API_KEY
     if (key) {
@@ -35,4 +36,3 @@ export async function GET(req: Request) {
     return NextResponse.redirect(fallback, 302)
   }
 }
-
