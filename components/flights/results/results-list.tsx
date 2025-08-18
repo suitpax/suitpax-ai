@@ -133,10 +133,10 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
               )}
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-end gap-2 sm:gap-3 pt-1">
-                <Button variant="secondary" className="w-full sm:w-auto" onClick={() => onTrackPrice?.(offer.id)}>
+                <Button variant="secondary" className="w-full sm:w-auto h-10 rounded-2xl px-5 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => onTrackPrice?.(offer.id)}>
                   Track price
                 </Button>
-                <Button className="w-full sm:w-auto" onClick={() => onSelectOffer?.(offer)}>
+                <Button className="w-full sm:w-auto h-10 rounded-2xl px-5 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={() => onSelectOffer?.(offer)}>
                   Book now
                 </Button>
               </div>

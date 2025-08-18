@@ -8,22 +8,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowsRightLeftIcon, FunnelIcon, MapPinIcon, CalendarIcon, UserIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline"
+import { ArrowsRightLeftIcon, FunnelIcon, CalendarIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline"
 import FlightResults from "@/components/flights/results/results-list"
 import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
-import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
 import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
-
-interface DuffelAirport {
-  id: string
-  name: string
-  iata_code: string
-  city?: { name?: string }
-  city_name?: string
-  country_name?: string
-}
 
 interface SearchParams {
   origin: string
@@ -54,6 +44,7 @@ export default function FlightsPage() {
     cabinClass: "economy",
     tripType: "one_way",
   })
+
   const [directOnly, setDirectOnly] = useState(false)
   const [multiCityLegs, setMultiCityLegs] = useState<Array<{ origin: string; destination: string; date: string }>>([
     { origin: "", destination: "", date: "" },
@@ -62,20 +53,9 @@ export default function FlightsPage() {
 
   const [offers, setOffers] = useState<any[]>([])
   const [searching, setSearching] = useState(false)
-
-  const [originQuery, setOriginQuery] = useState("")
-  const [destinationQuery, setDestinationQuery] = useState("")
-  const [originResults, setOriginResults] = useState<DuffelAirport[]>([])
-  const [destinationResults, setDestinationResults] = useState<DuffelAirport[]>([])
-  const [showOriginResults, setShowOriginResults] = useState(false)
-  const [showDestinationResults, setShowDestinationResults] = useState(false)
-  const [originHighlight, setOriginHighlight] = useState<number>(-1)
-  const [destinationHighlight, setDestinationHighlight] = useState<number>(-1)
-
   const [savedSearches, setSavedSearches] = useState<SavedSearchItem[]>([])
-
   const [filters, setFilters] = useState({
-    priceRange: [0, 5000],
+    priceRange: [0, 5000] as [number, number],
     maxStops: 3,
     airlines: [] as string[],
     departureTime: [] as string[],
@@ -88,28 +68,18 @@ export default function FlightsPage() {
   })
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
-
   const [offerRequestId, setOfferRequestId] = useState<string | null>(null)
   const [pageMeta, setPageMeta] = useState<any>({})
   const [loadingMore, setLoadingMore] = useState(false)
 
-  const [placesWarnings, setPlacesWarnings] = useState<any[]>([])
-
-  // Load saved searches from localStorage
+  // Load saved searches
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("suitpax_saved_searches")
-      if (raw) setSavedSearches(JSON.parse(raw))
-    } catch {}
+    try { const raw = localStorage.getItem("suitpax_saved_searches"); if (raw) setSavedSearches(JSON.parse(raw)) } catch {}
   }, [])
-
   const persistSavedSearches = (next: SavedSearchItem[]) => {
     setSavedSearches(next)
-    try {
-      localStorage.setItem("suitpax_saved_searches", JSON.stringify(next))
-    } catch {}
+    try { localStorage.setItem("suitpax_saved_searches", JSON.stringify(next)) } catch {}
   }
-
   const saveSearch = () => {
     const item: SavedSearchItem = {
       id: `${Date.now()}`,
@@ -121,21 +91,15 @@ export default function FlightsPage() {
     persistSavedSearches(next)
     toast.success("Search saved")
   }
-
   const loadSavedSearch = (item: SavedSearchItem) => {
     setSearchParams(item.search_params)
     toast("Loaded saved search")
   }
 
   // Persist filters
-  useEffect(() => {
-    try { localStorage.setItem('suitpax_flight_filters', JSON.stringify(filters)) } catch {}
-  }, [filters])
-  useEffect(() => {
-    try { const raw = localStorage.getItem('suitpax_flight_filters'); if (raw) setFilters(JSON.parse(raw)) } catch {}
-  }, [])
+  useEffect(() => { try { localStorage.setItem('suitpax_flight_filters', JSON.stringify(filters)) } catch {} }, [filters])
+  useEffect(() => { try { const raw = localStorage.getItem('suitpax_flight_filters'); if (raw) setFilters(JSON.parse(raw)) } catch {} }, [])
 
-  // Build active chips for display
   const activeChips = useMemo(() => {
     const chips: { id: string; label: string; value: string }[] = []
     if (filters.directOnly) chips.push({ id: 'directOnly', label: 'Stops', value: 'Direct only' })
@@ -164,113 +128,8 @@ export default function FlightsPage() {
     })
   }
 
-  // Airport suggestions via Duffel Places
-  const fetchPlaces = useCallback(async (query: string) => {
-    const res = await fetch(`/api/flights/duffel/places/suggestions?query=${encodeURIComponent(query)}`)
-    if (!res.ok) return []
-    const json = await res.json()
-    setPlacesWarnings(json?.warnings || [])
-    return Array.isArray(json?.data) ? json.data : []
-  }, [])
-
-  useEffect(() => {
-    const q = originQuery.trim()
-    if (!q) return setOriginResults([])
-    const t = setTimeout(async () => {
-      const items = await fetchPlaces(q)
-      setOriginResults(items)
-    }, 200)
-    return () => clearTimeout(t)
-  }, [originQuery, fetchPlaces])
-
-  useEffect(() => {
-    const q = destinationQuery.trim()
-    if (!q) return setDestinationResults([])
-    const t = setTimeout(async () => {
-      const items = await fetchPlaces(q)
-      setDestinationResults(items)
-    }, 200)
-    return () => clearTimeout(t)
-  }, [destinationQuery, fetchPlaces])
-
-  useEffect(() => { setOriginHighlight(-1) }, [originQuery, showOriginResults, originResults.length])
-  useEffect(() => { setDestinationHighlight(-1) }, [destinationQuery, showDestinationResults, destinationResults.length])
-
-  const selectAirport = (airport: any, type: "origin" | "destination") => {
-    const code = (airport?.iata_code || '').toUpperCase()
-    const cityCode = (airport?.iata_city_code || airport?.city?.iata_code || '').toUpperCase()
-    const useCode = cityCode || code
-    const city = (airport?.city_name || airport?.city?.name || '').toString()
-    const name = airport?.name || city
-    const label = `${city ? city.charAt(0).toUpperCase() + city.slice(1).toLowerCase() : name} (${code || cityCode}) – ${name}`
-    setSearchParams(prev => ({ ...prev, [type]: useCode }))
-    if (type === "origin") {
-      setOriginQuery(label)
-      setShowOriginResults(false)
-    } else {
-      setDestinationQuery(label)
-      setShowDestinationResults(false)
-    }
-  }
-
-  const sortPlaces = (list: any[]) => {
-    try {
-      const norm = (s: string) => (s || '').toString().trim().toLowerCase()
-      return [...list].sort((a, b) => {
-        const ac = norm(a.city_name || a.city?.name); const bc = norm(b.city_name || b.city?.name)
-        if (ac && bc && ac !== bc) return ac.localeCompare(bc)
-        const ai = (a.iata_code || a.airport?.iata_code || '').toUpperCase(); const bi = (b.iata_code || b.airport?.iata_code || '').toUpperCase()
-        if (ai && bi && ai !== bi) return ai.localeCompare(bi)
-        const an = norm(a.name); const bn = norm(b.name)
-        return an.localeCompare(bn)
-      })
-    } catch { return list }
-  }
-
-  const handleOriginKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!showOriginResults && originResults.length === 0) return
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setShowOriginResults(true)
-      setOriginHighlight(h => Math.min(h + 1, originResults.length - 1))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setOriginHighlight(h => Math.max(h - 1, 0))
-    } else if (e.key === 'Enter') {
-      if (originHighlight >= 0 && originResults[originHighlight]) {
-        e.preventDefault()
-        selectAirport(originResults[originHighlight] as any, 'origin')
-      }
-    } else if (e.key === 'Escape') {
-      e.preventDefault()
-      setShowOriginResults(false)
-    }
-  }
-
-  const handleDestinationKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!showDestinationResults && destinationResults.length === 0) return
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setShowDestinationResults(true)
-      setDestinationHighlight(h => Math.min(h + 1, destinationResults.length - 1))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setDestinationHighlight(h => Math.max(h - 1, 0))
-    } else if (e.key === 'Enter') {
-      if (destinationHighlight >= 0 && destinationResults[destinationHighlight]) {
-        e.preventDefault()
-        selectAirport(destinationResults[destinationHighlight] as any, 'destination')
-      }
-    } else if (e.key === 'Escape') {
-      e.preventDefault()
-      setShowDestinationResults(false)
-    }
-  }
-
   const swapLocations = () => {
     setSearchParams(prev => ({ ...prev, origin: prev.destination, destination: prev.origin }))
-    setOriginQuery(searchParams.destination)
-    setDestinationQuery(searchParams.origin)
   }
 
   const searchFlights = async () => {
@@ -290,12 +149,8 @@ export default function FlightsPage() {
     setOfferRequestId(null)
     setPageMeta({})
     try {
-      const payload: any = {
-        passengers: { adults: searchParams.passengers },
-        cabin_class: searchParams.cabinClass,
-      }
+      const payload: any = { passengers: { adults: searchParams.passengers }, cabin_class: searchParams.cabinClass }
       if (directOnly) payload.max_connections = 0
-
       if (searchParams.tripType === 'multi_city') {
         const legs = multiCityLegs.filter(l => l.origin && l.destination && l.date)
         if (legs.length < 2) throw new Error('Please add at least 2 valid legs')
@@ -307,9 +162,7 @@ export default function FlightsPage() {
         if (searchParams.tripType === 'round_trip' && searchParams.returnDate) payload.return_date = searchParams.returnDate
       }
 
-      const res = await fetch('/api/flights/duffel/optimized-search', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-      })
+      const res = await fetch('/api/flights/duffel/optimized-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error || 'Search failed')
       const results = Array.isArray(json?.data) ? json.data : json?.offers || []
@@ -345,12 +198,6 @@ export default function FlightsPage() {
     }
   }
 
-  useEffect(() => {
-    // Sync visible queries with current params on mount
-    setOriginQuery(searchParams.origin)
-    setDestinationQuery(searchParams.destination)
-  }, [])
-
   const applyFilters = useCallback((offersToFilter: any[]) => {
     let filtered = [...offersToFilter]
 
@@ -376,7 +223,7 @@ export default function FlightsPage() {
       })
     }
 
-    // Stops (from inline controls or legacy flags)
+    // Stops (inline)
     const selectedStops: number[] = Array.isArray((filters as any).stops) ? (filters as any).stops : []
     if (selectedStops.length > 0) {
       filtered = filtered.filter(offer => {
@@ -389,7 +236,7 @@ export default function FlightsPage() {
       filtered = filtered.filter(offer => (offer.slices?.[0]?.segments?.length || 1) - 1 <= filters.maxStops)
     }
 
-    // Departure time (inline range overrides legacy buckets)
+    // Departure time (inline)
     const departs = (filters as any).departs as { from?: string; to?: string } | undefined
     if (departs?.from && departs?.to) {
       const fromMin = timeStringToMinutes(departs.from)
@@ -398,31 +245,13 @@ export default function FlightsPage() {
         filtered = filtered.filter(offer => {
           const dt = new Date(offer.slices?.[0]?.segments?.[0]?.departing_at)
           const mins = dt.getHours() * 60 + dt.getMinutes()
-          if (fromMin <= toMin) {
-            return mins >= fromMin && mins <= toMin
-          }
-          // overnight range (e.g., 22:00 -> 06:00)
+          if (fromMin <= toMin) return mins >= fromMin && mins <= toMin
           return mins >= fromMin || mins <= toMin
         })
       }
-    } else if (filters.departureTime.length > 0) {
-      filtered = filtered.filter(offer => {
-        const dt = new Date(offer.slices?.[0]?.segments?.[0]?.departing_at)
-        const hour = dt.getHours()
-        return filters.departureTime.some(slot => {
-          switch (slot) {
-            case 'early-morning': return hour >= 5 && hour < 8
-            case 'morning': return hour >= 8 && hour < 12
-            case 'afternoon': return hour >= 12 && hour < 18
-            case 'evening': return hour >= 18 && hour < 22
-            case 'night': return hour >= 22 || hour < 5
-            default: return true
-          }
-        })
-      })
     }
 
-    // Refundable / Changeable flags (if available)
+    // Refundable / Changeable flags
     if (filters.refundable) {
       filtered = filtered.filter((o: any) => o.conditions?.refund_before_departure?.allowed === true)
     }
@@ -458,6 +287,16 @@ export default function FlightsPage() {
     return copy
   }, [offers, applyFilters, filters])
 
+  // Airline options for inline selector
+  const airlineOptions = useMemo(() => {
+    return Array.from(new Set(offers.map(o => {
+      const seg = o?.slices?.[0]?.segments?.[0]
+      const code = seg?.airline?.iata_code || seg?.marketing_carrier?.iata_code
+      const name = seg?.airline?.name || seg?.marketing_carrier?.name
+      return code ? `${code}|${name || code}` : ''
+    }).filter(Boolean))).map(s => ({ code: s.split('|')[0], name: s.split('|')[1] }))
+  }, [offers])
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -466,8 +305,8 @@ export default function FlightsPage() {
           <p className="text-sm text-gray-600">Find and compare flights in real-time (Suitpax)</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-2xl" onClick={saveSearch}>Save search</Button>
-          <Button className="bg-gradient-to-r from-gray-900 to-gray-700 text-white hover:from-black hover:to-gray-800 rounded-2xl" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
+          <Button variant="secondary" className="rounded-2xl px-5 h-11 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
+          <Button className="rounded-2xl px-6 h-11 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
         </div>
       </div>
 
@@ -481,37 +320,12 @@ export default function FlightsPage() {
             {/* Origin */}
             <div className="relative">
               <Label className="text-sm text-gray-700">Origin</Label>
-              <PlacesLookup
-                value={originQuery}
-                onSelect={(item: any) => selectAirport(item, 'origin')}
-                placeholder="JFK"
-              />
-              {showOriginResults && sortPlaces(originResults).length > 0 && (
-                <div className="absolute z-10 mt-1 w-full rounded-2xl border border-gray-200 bg-white shadow-soft max-h-60 overflow-auto">
-                  {sortPlaces(originResults).slice(0, 8).map((p: any, idx: number) => {
-                    const city = (p.city_name || p.city?.name || '').toString()
-                    const name = p.name || city
-                    const iata = (p.iata_code || p.airport?.iata_code || '').toUpperCase()
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onMouseDown={() => selectAirport({ id: p.id, iata_code: iata, name, city_name: city } as any, 'origin')}
-                        onMouseEnter={() => setOriginHighlight(idx)}
-                        className={`w-full text-left px-3 py-2 ${idx === originHighlight ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
-                      >
-                        <div className="text-sm text-gray-900">{city || name} ({iata})</div>
-                        <div className="text-xs text-gray-600">{name}</div>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
+              <PlacesLookup value={searchParams.origin} onSelect={(item: any) => setSearchParams(prev => ({ ...prev, origin: (item?.iata_code || '').toUpperCase() }))} placeholder="JFK" />
             </div>
 
             {/* Swap */}
             <div className="hidden md:flex items-end justify-center">
-              <Button type="button" variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-full shadow-sm" onClick={swapLocations} title="Swap">
+              <Button type="button" variant="secondary" className="h-11 w-11 p-0 rounded-full border-gray-300 bg-white/80 text-gray-900 hover:bg-white backdrop-blur-sm shadow-sm" onClick={swapLocations} title="Swap">
                 <ArrowsRightLeftIcon className="h-4 w-4" />
               </Button>
             </div>
@@ -519,32 +333,7 @@ export default function FlightsPage() {
             {/* Destination */}
             <div className="relative">
               <Label className="text-sm text-gray-700">Destination</Label>
-              <PlacesLookup
-                value={destinationQuery}
-                onSelect={(item: any) => selectAirport(item, 'destination')}
-                placeholder="LHR"
-              />
-              {showDestinationResults && sortPlaces(destinationResults).length > 0 && (
-                <div className="absolute z-10 mt-1 w-full rounded-2xl border border-gray-200 bg-white shadow-soft max-h-60 overflow-auto">
-                  {sortPlaces(destinationResults).slice(0, 8).map((p: any, idx: number) => {
-                    const city = (p.city_name || p.city?.name || '').toString()
-                    const name = p.name || city
-                    const iata = (p.iata_code || p.airport?.iata_code || '').toUpperCase()
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onMouseDown={() => selectAirport({ id: p.id, iata_code: iata, name, city_name: city } as any, 'destination')}
-                        onMouseEnter={() => setDestinationHighlight(idx)}
-                        className={`w-full text-left px-3 py-2 ${idx === destinationHighlight ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
-                      >
-                        <div className="text-sm text-gray-900">{city || name} ({iata})</div>
-                        <div className="text-xs text-gray-600">{name}</div>
-                      </button>
-                    )}
-                  )}
-                </div>
-              )}
+              <PlacesLookup value={searchParams.destination} onSelect={(item: any) => setSearchParams(prev => ({ ...prev, destination: (item?.iata_code || '').toUpperCase() }))} placeholder="LHR" />
             </div>
 
             {/* Trip type */}
@@ -596,9 +385,9 @@ export default function FlightsPage() {
                 </div>
               ))}
               <div className="flex gap-2">
-                <Button type="button" variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-2xl" onClick={() => setMultiCityLegs(prev => [...prev, { origin: "", destination: "", date: "" }])}>Add leg</Button>
+                <Button type="button" variant="secondary" className="rounded-2xl px-5 h-10 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => setMultiCityLegs(prev => [...prev, { origin: "", destination: "", date: "" }])}>Add leg</Button>
                 {multiCityLegs.length > 2 && (
-                  <Button type="button" variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-2xl" onClick={() => setMultiCityLegs(prev => prev.slice(0, -1))}>Remove last</Button>
+                  <Button type="button" variant="secondary" className="rounded-2xl px-5 h-10 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => setMultiCityLegs(prev => prev.slice(0, -1))}>Remove last</Button>
                 )}
               </div>
             </div>
@@ -618,13 +407,7 @@ export default function FlightsPage() {
             <div>
               <Label className="text-sm text-gray-700">Return (optional)</Label>
               <div className="relative">
-                <Input
-                  type="date"
-                  value={searchParams.returnDate || ""}
-                  onChange={e => setSearchParams(prev => ({ ...prev, returnDate: e.target.value }))}
-                  disabled={searchParams.tripType !== 'round_trip'}
-                  className="bg-white text-gray-900 pr-10 disabled:opacity-50 rounded-2xl"
-                />
+                <Input type="date" value={searchParams.returnDate || ""} onChange={e => setSearchParams(prev => ({ ...prev, returnDate: e.target.value }))} disabled={searchParams.tripType !== 'round_trip'} className="bg-white text-gray-900 pr-10 disabled:opacity-50 rounded-2xl" />
                 <CalendarIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
               </div>
             </div>
@@ -649,8 +432,8 @@ export default function FlightsPage() {
                 <Checkbox id="directOnly" checked={directOnly} onCheckedChange={v => setDirectOnly(Boolean(v))} />
                 <Label htmlFor="directOnly" className="text-sm text-gray-700">Direct only</Label>
               </div>
-              <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-2xl" onClick={saveSearch}>Save</Button>
-              <Button className="bg-gradient-to-r from-gray-900 to-gray-700 text-white hover:from-black hover:to-gray-800 rounded-2xl" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
+              <Button variant="secondary" className="rounded-2xl px-5 h-11 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save</Button>
+              <Button className="rounded-2xl px-6 h-11 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
             </div>
           </div>
         </CardContent>
@@ -679,14 +462,12 @@ export default function FlightsPage() {
       </div>
 
       {/* Lightweight inline controls (time range, stops, sorting) */}
-      <FilterControls onChange={(partial) => setFilters(prev => ({ ...prev, ...partial }))} />
+      <FilterControls onChange={(partial) => setFilters(prev => ({ ...prev, ...partial }))} airlines={airlineOptions} />
 
       <FlightFiltersDisplay
         filters={activeChips}
         onRemoveFilter={removeChip}
-        onClearAll={() => setFilters({
-          priceRange: [0, 5000], maxStops: 3, airlines: [], departureTime: [], arrivalTime: [], duration: [0, 1440], cabinClass: [], refundable: false, changeable: false, directOnly: false
-        })}
+        onClearAll={() => setFilters({ priceRange: [0, 5000], maxStops: 3, airlines: [], departureTime: [], arrivalTime: [], duration: [0, 1440], cabinClass: [], refundable: false, changeable: false, directOnly: false })}
       />
 
       <FlightFilters
@@ -706,12 +487,6 @@ export default function FlightsPage() {
         </div>
       </div>
 
-      {placesWarnings.length > 0 && (
-        <div className="rounded-xl border border-yellow-200 bg-yellow-50 text-yellow-800 p-3 text-sm">
-          Some parameters are deprecated or will change soon. Using updated query field for suggestions.
-        </div>
-      )}
-
       <FlightResults
         offers={filteredOffers}
         onTrackPrice={(id) => toast.success(`Tracking price for ${id}`)}
@@ -721,7 +496,7 @@ export default function FlightsPage() {
 
       {pageMeta?.after && (
         <div className="flex justify-center py-4">
-          <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={loadMore} disabled={loadingMore}>
+          <Button variant="secondary" className="rounded-2xl px-6 h-11 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={loadMore} disabled={loadingMore}>
             {loadingMore ? 'Loading more…' : 'Load more'}
           </Button>
         </div>
@@ -729,3 +504,4 @@ export default function FlightsPage() {
     </div>
   )
 }
+

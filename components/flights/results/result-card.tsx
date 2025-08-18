@@ -107,7 +107,7 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
             ))}
 
             <div className="flex items-center justify-end">
-              <Button onClick={() => onSelect(offer.id)} className="bg-black text-white hover:bg-gray-800">
+              <Button onClick={() => onSelect(offer.id)} className="h-10 rounded-2xl px-5 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm">
                 Select Flight
               </Button>
             </div>
