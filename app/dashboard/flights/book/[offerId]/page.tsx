@@ -9,6 +9,9 @@ import { Label } from "@/components/ui/label"
 import { toast } from "react-hot-toast"
 import PaymentForm from "@/components/flights/booking-flow/payment-form"
 import BookingSummary from "@/components/flights/booking-summary"
+import OfferSlice from "@/components/flights/offer-slice/offer-slice"
+import OfferSliceConditions from "@/components/flights/offer-slice/offer-slice-conditions"
+import OfferSliceModal from "@/components/flights/offer-slice-modal/offer-slice-modal"
 import DuffelAncillaries from "@/components/flights/ancillaries/DuffelAncillaries"
 import SeatSelection from "@/components/flights/booking-flow/seat-selection"
 
@@ -16,11 +19,15 @@ export default function BookOfferPage() {
 	const params = useParams() as { offerId: string }
 	const router = useRouter()
 	const offerId = params?.offerId
-
+    
 	const [loading, setLoading] = useState(true)
 	const [offer, setOffer] = useState<any>(null)
 	const [submitting, setSubmitting] = useState(false)
 	const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
+
+    // Slice modal
+    const [sliceOpen, setSliceOpen] = useState(false)
+    const [activeSliceIndex, setActiveSliceIndex] = useState<number | null>(null)
 
 	// Simple passenger form (1 adulto)
 	const [givenName, setGivenName] = useState("")
@@ -142,22 +149,25 @@ export default function BookOfferPage() {
 				<CardHeader>
 					<CardTitle>Itinerary</CardTitle>
 				</CardHeader>
-				<CardContent className="space-y-2 text-sm text-gray-800">
+				<CardContent className="space-y-3 text-sm text-gray-800">
 					{offer.slices?.map((s: any, i: number) => (
 						<div key={s.id} className="rounded-lg border border-gray-200 p-3">
-							<div className="font-medium">Leg {i + 1}: {s.origin?.iata_code} → {s.destination?.iata_code}</div>
-							<div className="mt-1 grid gap-2">
-								{s.segments?.map((seg: any) => (
-									<div key={seg.id} className="flex items-center justify-between text-xs">
-										<div>{seg.origin?.iata_code} → {seg.destination?.iata_code}</div>
-										<div>{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
-									</div>
-								))}
+							<OfferSlice slice={s} index={i + 1} />
+							<OfferSliceConditions conditions={offer.conditions} />
+							<div className="flex justify-end pt-2">
+								<Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-2xl" onClick={() => { setActiveSliceIndex(i); setSliceOpen(true) }}>View details</Button>
 							</div>
 						</div>
 					))}
 				</CardContent>
 			</Card>
+
+			{activeSliceIndex !== null && (
+				<OfferSliceModal open={sliceOpen} onOpenChange={setSliceOpen} title={`Leg ${activeSliceIndex + 1} details`}>
+					<OfferSlice slice={offer.slices[activeSliceIndex]} index={activeSliceIndex + 1} />
+					<OfferSliceConditions conditions={offer.conditions} />
+				</OfferSliceModal>
+			)}
 		</div>
 	)
 }
