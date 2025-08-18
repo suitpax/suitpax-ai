@@ -47,7 +47,7 @@ const chatPlaceholders = {
   ],
   enterprise: [
     "Coordinate global travel for our executive team...",
-    "Analyze our Q2 travel spend and suggest optimizations...",
+    "Analyze our Q4 travel spend and suggest optimizations...",
     "Set up custom approval workflows for our regional offices...",
   ],
 }
@@ -84,14 +84,17 @@ const pricingPlans = [
     period: "forever",
     annualPeriod: "forever",
     features: [
-      "5,000 AI tokens/month",
-      "10 AI travel searches per month",
+      "Suitpax AI assistant access",
+      "Voice AI Agent (limited)",
+      "7,500 AI tokens/month",
+      "15 AI travel searches per month",
       "Up to 5 team members",
       "Basic AI travel planning",
       "Email support",
       "Basic expense tracking",
       "Simple itinerary management",
       "Basic travel policy templates",
+      "Suitpax Connect (trial)",
     ],
     cta: "Get Started",
     badge: "Free",
@@ -109,15 +112,19 @@ const pricingPlans = [
     period: "per month",
     annualPeriod: "per month, billed annually",
     features: [
-      "15,000 AI tokens/month",
-      "30 AI travel searches per month",
-      "Up to 15 team members",
+      "Suitpax AI assistant access",
+      "Voice AI Agent",
+      "20,000 AI tokens/month",
+      "40 AI travel searches per month",
+      "Up to 20 team members",
       "Standard AI travel planning",
       "Priority email support",
       "Advanced expense tracking",
       "Enhanced itinerary management",
       "Standard travel policy templates",
       "Basic CRM integration",
+      "Suitpax Connect (limited)",
+      "Additional users: €8/user",
     ],
     cta: "Start 14-day trial",
     badge: "Starter",
@@ -135,16 +142,19 @@ const pricingPlans = [
     period: "per month",
     annualPeriod: "per month, billed annually",
     features: [
-      "25,000 AI tokens/month",
-      "50 AI travel searches per month",
-      "Up to 25 team members",
+      "Suitpax AI assistant access",
+      "Voice AI Agent",
+      "35,000 AI tokens/month",
+      "80 AI travel searches per month",
+      "Up to 50 team members",
       "AI-powered expense management",
       "Advanced itinerary planning",
-      "Custom travel policies",
+      "Automatic travel policies (Auto-Policy)",
       "24/5 priority support",
       "Team travel coordination",
-      "Basic bank API integration",
+      "Suitpax Connect (bank connections)",
       "Advanced CRM intelligence",
+      "Additional users: €10/user",
     ],
     cta: "Contact us",
     badge: "Advanced",
@@ -170,13 +180,16 @@ const pricingPlans = [
       "Unlimited AI tokens",
       "Unlimited AI travel searches",
       "Unlimited team members",
+      "Suitpax AI assistant access",
+      "Voice AI Agent",
       "Full AI travel intelligence suite",
       "Enterprise CRM integration",
       "Global travel compliance",
       "24/7 VIP support",
+      "Automatic travel policies (Auto-Policy)",
       "Custom AI workflows",
       "Executive travel program",
-      "Suitpax Code add-on (coming Q1 2026)",
+      "Suitpax Code (included)",
       "Full bank API integration",
       "Multi-currency management",
     ],
@@ -409,8 +422,8 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
                   Suitpax Pricing
                 </span>
                 <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-[9px] sm:text-xs font-medium text-gray-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
-                  Updated Q2 2025
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-500 animate-pulse mr-1"></span>
+                  Updated Q4 2025
                 </span>
               </div>
 
@@ -503,7 +516,7 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start">
                       <svg
-                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-950 mt-0.5 mr-1.5 flex-shrink-0"
+                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-600 mt-0.5 mr-1.5 flex-shrink-0"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -543,6 +556,36 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+      {/* Add-ons section */}
+      <section className="py-8">
+        <div className="container mx-auto px-4 md:px-6 max-w-4xl">
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-medium tracking-tighter text-black mb-3">Powerful add-ons</h3>
+            <p className="text-sm text-gray-600 mb-4">Enhance any plan with AI-first capabilities</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="rounded-xl border border-gray-200 p-3 bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">AI OCR System</div>
+                    <div className="text-[11px] text-gray-600">Receipts, invoices and travel docs extraction</div>
+                  </div>
+                  <div className="text-sm font-medium text-black">€10/mo</div>
+                </div>
+              </div>
+              <div className="rounded-xl border border-gray-200 p-3 bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">Predictive Spend</div>
+                    <div className="text-[11px] text-gray-600">Forecasts, alerts and proactive savings</div>
+                  </div>
+                  <div className="text-sm font-medium text-black">€10/mo</div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 text-[11px] text-gray-600">Coming soon: Smart Budget AI, AI Savings Advisor, Smart Wallet, Visa & Docs, AI Rebooking Express, Sustainability, Benefits Marketplace, Ultra-privacy, Open API.</div>
           </div>
         </div>
       </section>
