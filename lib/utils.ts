@@ -11,7 +11,7 @@ export function toLowerSlug(input?: string) {
 
 export function resolveCityImage(
 	cityName?: string,
-	options?: { width?: number; height?: number; preferCdn?: boolean; preferUnsplash?: boolean }
+	options?: { width?: number; height?: number; preferCdn?: boolean; preferUnsplash?: boolean; preferPexels?: boolean }
 ) {
 	const w = options?.width || 640
 	const h = options?.height || 400
@@ -26,11 +26,13 @@ export function resolveCityImage(
 	if ((options?.preferCdn ?? true) && slug) {
 		return `https://cdn.suitpax.com/cities/${slug}.webp`
 	}
-	// Preferred global fallback: Pexels (kept as default)
-	if (!(options?.preferUnsplash)) {
+	// Optional explicit Pexels sample (static)
+	if (options?.preferPexels) {
 		return `https://images.pexels.com/photos/3408353/pexels-photo-3408353.jpeg?auto=compress&cs=tinysrgb&h=${h}&w=${w}&q=80`
 	}
-	// Optional Unsplash fallback kept available for other contexts
-	const q = encodeURIComponent(`${cityName || 'city'} skyline`)
-	return `https://source.unsplash.com/featured/${w}x${h}/?${q}`
+	// Default: dynamic Unsplash per city for varied, city-accurate images; keep flag to override
+	if (options?.preferUnsplash || true) {
+		const q = encodeURIComponent(`${cityName || 'city'} skyline landmark`)
+		return `https://source.unsplash.com/featured/${w}x${h}/?${q}`
+	}
 }
