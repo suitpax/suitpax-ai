@@ -10,16 +10,16 @@ interface AirlinesSliderProps {
 }
 
 const AIRLINE_LOGOS = [
-  { name: "Cathay Pacific", url: "https://cdn.brandfetch.io/cathaypacific.com/w/512/h/72/logo?c=1idU-l8vdm7C5__3dci" },
-  { name: "Transavia", url: "https://cdn.brandfetch.io/transavia.com/w/512/h/92/logo?c=1idU-l8vdm7C5__3dci" },
-  { name: "Air France", url: "https://cdn.brandfetch.io/airfrance.com/w/512/h/49/logo?c=1idU-l8vdm7C5__3dci" },
-  { name: "Jet2", url: "https://cdn.brandfetch.io/jet2.com/w/512/h/175/logo?c=1idU-l8vdm7C5__3dci" },
-  { name: "Vueling", url: "https://cdn.brandfetch.io/vueling.com/w/512/h/169/theme/light/logo?c=1idU-l8vdm7C5__3dci" },
-  { name: "KLM", url: "https://cdn.brandfetch.io/klm.com/w/512/h/140/logo?c=suitpax" },
-  { name: "Iberia", url: "https://cdn.brandfetch.io/iberia.com/w/512/h/180/logo?c=suitpax" },
-  { name: "Lufthansa", url: "https://cdn.brandfetch.io/lufthansa.com/w/512/h/110/logo?c=suitpax" },
-  { name: "British Airways", url: "https://cdn.brandfetch.io/britishairways.com/w/512/h/120/logo?c=suitpax" },
-  { name: "Emirates", url: "https://cdn.brandfetch.io/emirates.com/w/512/h/120/logo?c=suitpax" },
+  { name: "Cathay Pacific", url: "https://cdn.brandfetch.io/cathaypacific.com/w/512/h/72/logo" },
+  { name: "Transavia", url: "https://cdn.brandfetch.io/transavia.com/w/512/h/92/logo" },
+  { name: "Air France", url: "https://cdn.brandfetch.io/airfrance.com/w/512/h/49/logo" },
+  { name: "Jet2", url: "https://cdn.brandfetch.io/jet2.com/w/512/h/175/logo" },
+  { name: "Vueling", url: "https://cdn.brandfetch.io/vueling.com/w/512/h/169/logo" },
+  { name: "KLM", url: "https://cdn.brandfetch.io/klm.com/w/512/h/140/logo" },
+  { name: "Iberia", url: "https://cdn.brandfetch.io/iberia.com/w/512/h/180/logo" },
+  { name: "Lufthansa", url: "https://cdn.brandfetch.io/lufthansa.com/w/512/h/110/logo" },
+  { name: "British Airways", url: "https://cdn.brandfetch.io/britishairways.com/w/512/h/120/logo" },
+  { name: "Emirates", url: "https://cdn.brandfetch.io/emirates.com/w/512/h/120/logo" },
 ]
 
 export default function AirlinesSlider({ title = "", className = "" }: AirlinesSliderProps) {
@@ -31,7 +31,7 @@ export default function AirlinesSlider({ title = "", className = "" }: AirlinesS
           <HyperspeedBadge />
         </p>
       </div>
-      <div className="relative w-full overflow-hidden rounded-2xl border border-gray-200 bg-white/70 backdrop-blur-sm">
+      <div className="relative w-full overflow-hidden rounded-2xl border border-gray-900 bg-black/90 backdrop-blur-sm">
         <div className="flex overflow-hidden">
           <motion.div
             className="flex items-center space-x-14 px-8"
@@ -43,7 +43,7 @@ export default function AirlinesSlider({ title = "", className = "" }: AirlinesS
                 <motion.img
                   src={logo.url}
                   alt={`${logo.name} logo`}
-                  className="max-h-full max-w-full object-contain transition-all duration-300 opacity-80 group-hover:opacity-100"
+                  className="max-h-full max-w-full object-contain transition-all duration-300 opacity-80 group-hover:opacity-100 invert"
                   whileHover={{ scale: 1.04 }}
                   transition={{ type: "spring", stiffness: 400, damping: 12 }}
                 />

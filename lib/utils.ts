@@ -9,23 +9,28 @@ export function toLowerSlug(input?: string) {
 	return (input || '').toLowerCase().trim().replace(/\s+/g, '-')
 }
 
-export function resolveCityImage(cityName?: string, options?: { width?: number; height?: number }) {
+export function resolveCityImage(
+	cityName?: string,
+	options?: { width?: number; height?: number; preferCdn?: boolean; preferUnsplash?: boolean }
+) {
 	const w = options?.width || 640
 	const h = options?.height || 400
 	const slug = toLowerSlug(cityName)
 	try {
 		// Attempt local mapping
-		// Using dynamic import so it doesn't bloat client bundles unnecessarily
-		// Note: this will be tree-shaken on server where possible
 		// eslint-disable-next-line @typescript-eslint/no-var-requires
 		const map = require('@/data/cities.json') as Record<string, string>
 		if (slug && map[slug]) return map[slug]
 	} catch {}
-	// CDN suggestion (adjust domain if used)
-	if (slug) {
+	// Optional CDN (kept available)
+	if ((options?.preferCdn ?? true) && slug) {
 		return `https://cdn.suitpax.com/cities/${slug}.webp`
 	}
-	// Fallback to Pexels CDN sample (replace with API-based search later)
+	// Preferred global fallback: Pexels (kept as default)
+	if (!(options?.preferUnsplash)) {
+		return `https://images.pexels.com/photos/3408353/pexels-photo-3408353.jpeg?auto=compress&cs=tinysrgb&h=${h}&w=${w}&q=80`
+	}
+	// Optional Unsplash fallback kept available for other contexts
 	const q = encodeURIComponent(`${cityName || 'city'} skyline`)
-	return `https://images.pexels.com/photos/3408353/pexels-photo-3408353.jpeg?auto=compress&cs=tinysrgb&h=${h}&w=${w}&q=80` 
+	return `https://source.unsplash.com/featured/${w}x${h}/?${q}`
 }
