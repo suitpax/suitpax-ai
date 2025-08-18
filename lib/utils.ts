@@ -26,13 +26,11 @@ export function resolveCityImage(
 	if ((options?.preferCdn ?? true) && slug) {
 		return `https://cdn.suitpax.com/cities/${slug}.webp`
 	}
-	// Optional explicit Pexels sample (static)
-	if (options?.preferPexels) {
-		return `https://images.pexels.com/photos/3408353/pexels-photo-3408353.jpeg?auto=compress&cs=tinysrgb&h=${h}&w=${w}&q=80`
+	// Prefer our Edge proxy backed by Pexels if we have a city
+	if (slug) {
+		return `/api/images/city?city=${encodeURIComponent(cityName || 'city')}&w=${w}&h=${h}`
 	}
-	// Default: dynamic Unsplash per city for varied, city-accurate images; keep flag to override
-	if (options?.preferUnsplash || true) {
-		const q = encodeURIComponent(`${cityName || 'city'} skyline landmark`)
-		return `https://source.unsplash.com/featured/${w}x${h}/?${q}`
-	}
+	// Last resort: Unsplash featured per topic
+	const q = encodeURIComponent(`${cityName || 'city'} skyline landmark`)
+	return `https://source.unsplash.com/featured/${w}x${h}/?${q}`
 }
