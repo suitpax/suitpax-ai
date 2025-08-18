@@ -28,11 +28,11 @@ export default function VantaCloudsBackground({ children, className = "" }: Vant
         gyroControls: false,
         minHeight: 200.0,
         minWidth: 200.0,
-        // Colores personalizados para un fondo más neutro y gris
-        backgroundColor: 0xf7f7f7, // aún más claro
-        skyColor: 0xf3f4f6, // gray-100 para cielo muy claro
-        cloudColor: 0xffffff, // nubes blancas
-        cloudShadowColor: 0xcbd5e1, // gray-300 sutil
+        // Cielo más azul claro para mejor contraste
+        backgroundColor: 0xe6f0ff, // azul muy claro
+        skyColor: 0xdbeafe, // tailwind blue-100
+        cloudColor: 0xffffff,
+        cloudShadowColor: 0xbfd7ff, // azul pálido para sombra
         sunColor: 0x000000,
         sunGlareColor: 0x000000,
         sunlightColor: 0x000000,

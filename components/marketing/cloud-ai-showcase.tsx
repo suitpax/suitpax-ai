@@ -121,7 +121,7 @@ export default function CloudAIShowcase() {
           viewport={{ once: true }}
           className="w-full"
         >
-          <VantaCloudsBackground className="w-full min-h-[500px] md:min-h-[600px] rounded-xl flex items-center justify-center p-4 md:p-6 overflow-hidden bg-gray-100">
+          <VantaCloudsBackground className="w-full min-h-[500px] md:min-h-[600px] rounded-xl flex items-center justify-center p-4 md:p-6 overflow-hidden bg-blue-50/60">
             <div className="w-full max-w-3xl">
               <div className="text-center mb-6 md:mb-8">
                 <h3 className="inline-flex items-center rounded-xl bg-gray-800/60 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-medium text-white mb-4 shadow-sm">
@@ -134,7 +134,7 @@ export default function CloudAIShowcase() {
                   />
                   <em className="font-serif italic">AI Assistant</em>
                 </h3>
-                <h2 className="text-2xl sm:text-3xl md:text-3xl font-medium tracking-tighter text-white leading-none mb-3">
+                <h2 className="text-2xl sm:text-3xl md:text-3xl font-medium tracking-tighter text-black leading-none mb-3">
                   <em className="font-serif italic">Speak your journey</em> into existence
                 </h2>
               </div>
