@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import AirlinesSlider from "@/components/flights/results/airlines-slider"
-import { EnhancedPromptInput } from "@/components/prompt-kit/enhanced-prompt-input"
+import { EnhancedPromptInput } from "@/components/prompt-kit/prompt-input"
 
 export default function AIAirlinesHero() {
   const [query, setQuery] = useState("")
