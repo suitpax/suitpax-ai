@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import AIAirlinesHero from "@/components/flights/ai-airlines-hero"
-import HyperspeedBooking from "@/components/marketing/hyperspeed-booking"
+import BusinessOpsSuite from "@/components/marketing/business-ops-suite"
+import CorporateTravelStack from "@/components/marketing/corporate-travel-stack"
 
 export const metadata: Metadata = {
   title: "Business Travel | Suitpax",
@@ -11,7 +12,8 @@ export default function BusinessTravelPage() {
   return (
     <main className="w-full">
       <AIAirlinesHero />
-      <HyperspeedBooking />
+      <BusinessOpsSuite />
+      <CorporateTravelStack />
     </main>
   )
 }

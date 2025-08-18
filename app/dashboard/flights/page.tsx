@@ -316,15 +316,15 @@ export default function FlightsPage() {
       {/* AI prompt with video placeholder */}
       <div className="flex justify-center">
         <div className="w-full max-w-2xl">
-          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-3 shadow-sm">
+          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-2 shadow-sm">
             <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-gray-200">
               <video autoPlay loop muted playsInline className="h-full w-full object-cover">
-                <source src="/videos/ai-agent-1.mp4" type="video/mp4" />
+                <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20(online-video-cutter.com)%20(1)-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
               </video>
             </div>
             <input
-              placeholder="Ask: MAD → LHR next Friday morning, return Sunday (try in English)"
-              className="flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none"
+              placeholder="Ask Suitpax AI to plan your next flight (e.g., MAD → LHR Friday)"
+              className="flex-1 bg-transparent text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-8"
             />
             <button className="h-9 w-9 rounded-xl bg-black text-white hover:bg-black/90 flex items-center justify-center">
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>

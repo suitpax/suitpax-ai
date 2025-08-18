@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { useMemo } from "react"
-import HyperspeedBadge from "@/components/ui/hyperspeed-badge"
+import PartnersShowcase from "@/components/partners-showcase"
 
 interface AirlinesSliderProps {
   title?: string
@@ -27,9 +27,7 @@ export default function AirlinesSlider({ title = "", className = "" }: AirlinesS
   return (
     <div className={`w-full overflow-hidden py-10 ${className}`}>
       <div className="text-center mb-6">
-        <p className="inline-flex items-center gap-2">
-          <HyperspeedBadge />
-        </p>
+        <PartnersShowcase />
       </div>
       <div className="relative w-full overflow-hidden rounded-2xl border border-gray-200 bg-gray-200">
         <div className="flex overflow-hidden">
