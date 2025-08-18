@@ -1,9 +1,14 @@
 "use client"
 
+import { useState } from "react"
 import AirlinesSlider from "@/components/flights/results/airlines-slider"
-import PromptInput from "@/components/prompt-kit/enhanced-prompt-input"
+import { EnhancedPromptInput } from "@/components/prompt-kit/enhanced-prompt-input"
 
 export default function AIAirlinesHero() {
+  const [query, setQuery] = useState("")
+  const handleSubmit = () => {
+    // no-op on public hero; could navigate to flights with prefilled params
+  }
   return (
     <section className="w-full py-16 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-5xl mx-auto px-4">
@@ -13,7 +18,13 @@ export default function AIAirlinesHero() {
         </div>
         <div className="flex justify-center mb-8">
           <div className="w-full max-w-2xl">
-            <PromptInput placeholder="Ask: Find a return flight Madrid → Paris for next weekend, morning outbound" />
+            <EnhancedPromptInput
+              value={query}
+              onChange={setQuery}
+              onSubmit={handleSubmit}
+              isLoading={false}
+              placeholder="Ask: Find a return flight Madrid → Paris for next weekend, morning outbound"
+            />
           </div>
         </div>
         <div className="rounded-3xl overflow-hidden">

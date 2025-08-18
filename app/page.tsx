@@ -1,5 +1,6 @@
 import Hero from "@/components/marketing/hero"
 import PartnersShowcase from "@/components/partners-showcase"
+import AIAirlinesHero from "@/components/flights/ai-airlines-hero"
 import AITravelAgents from "@/components/marketing/ai-travel-agents"
 import BusinessTravelRevolution from "@/components/marketing/business-travel-revolution"
 import FoundersOpenLetter from "@/components/marketing/founders-open-letter"
@@ -70,6 +71,7 @@ export default function Home() {
       <main id="main-content" className="w-full">
         <Hero />
         <PartnersShowcase />
+        <AIAirlinesHero />
         <AITravelAgents />
         <BusinessTravelRevolution />
         <AIVoiceCallingHub />
