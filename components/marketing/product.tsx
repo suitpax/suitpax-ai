@@ -68,6 +68,18 @@ export default function Product() {
           <p className="text-sm text-gray-400 max-w-2xl">
             Discover how our solutions transform corporate travel and expense management for businesses of all sizes.
           </p>
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-4xl">
+            {[
+              { t: 'API-first travel platform', d: 'Embed search, booking, policies and payments with modern APIs.' },
+              { t: 'AI copilots', d: 'Agents for booking, policy approvals and real-time rebooking.' },
+              { t: 'Secure & compliant', d: 'SSO, audit logs and governance for enterprises.' },
+            ].map((f) => (
+              <div key={f.t} className="rounded-xl border border-white/10 bg-white/5 text-left p-4">
+                <div className="text-white text-sm font-medium">{f.t}</div>
+                <div className="text-xs text-gray-400 mt-1">{f.d}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="max-w-5xl mx-auto mb-8">

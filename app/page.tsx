@@ -12,6 +12,7 @@ import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
 import HyperspeedBooking from "@/components/marketing/hyperspeed-booking"
 import ContactForm from "@/components/marketing/contact-form"
 import AIAirlinesHero from "@/components/flights/ai-airlines-hero"
+import APITravel from "@/components/marketing/api-travel"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -79,6 +80,7 @@ export default function Home() {
         <CloudAIShowcase />
         <AgenticDisruption />
         <AIVoiceAssistant />
+        <APITravel />
         <HyperspeedBooking />
         <AIAirlinesHero />
         <AIMeetingsAttachment />

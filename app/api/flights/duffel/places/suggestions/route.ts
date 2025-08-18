@@ -56,7 +56,7 @@ export async function GET(request: Request) {
     }).map((p: any) => ({
       ...p,
       iata_code: (p?.iata_code || p?.airport?.iata_code || '').toUpperCase(),
-      city_name: p?.city_name ? capitalize(p.city_name) : (p?.city?.name ? capitalize(p.city.name) : undefined),
+      city_name: p?.city_name ? titleCase(p.city_name) : (p?.city?.name ? titleCase(p.city.name) : undefined),
       name: p?.name ? titleCase(p.name) : p?.name,
     }))
     return NextResponse.json({ data, warnings: json?.warnings || [], request_id: requestId })
