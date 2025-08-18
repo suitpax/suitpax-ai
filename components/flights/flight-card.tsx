@@ -129,7 +129,7 @@ export function FlightCard({ offer, onSelect }: FlightCardProps) {
                       <Badge key={segment.id} variant="compact" className="rounded-xl flex items-center gap-2">
                         {manuLogo && <img src={manuLogo} alt="manufacturer" className="h-3 w-3" />}
                         <span className="text-[11px]">
-                          {(segment.marketing_carrier?.iata_code || '')} {segment.flight_number}
+                          {(segment.airline?.name || segment.marketing_carrier?.name || '')} {segment.flight_number}
                           {segment.aircraft?.name && ` • ${segment.aircraft.name}`}
                         </span>
                       </Badge>

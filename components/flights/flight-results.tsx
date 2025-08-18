@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
 import { resolveCityImage } from '@/lib/utils'
 
-// Mapeo de ciudades -> landmarks para imágenes más representativas
+// City -> landmark mapping (kept for Unsplash/CDN fallback)
 const CITY_KEYWORDS: Record<string, string> = {
   london: 'London Big Ben skyline',
   roma: 'Rome Colosseum skyline',
@@ -79,18 +79,18 @@ interface Props {
 
 export default function FlightResults({ offers, onSelectOffer, onTrackPrice, className = '' }: Props) {
   if (!offers || offers.length === 0) {
-    return <div className="rounded-3xl border border-gray-200 glass-card p-6 text-gray-600">No hay vuelos disponibles para estos criterios.</div>
+    return <div className="rounded-3xl border border-gray-200 glass-card p-6 text-gray-600">No flights available for these criteria.</div>
   }
 
   return (
     <div className={`space-y-4 ${className}`}>
       {offers.map((offer) => {
-        // Aerolínea principal del primer segmento del primer tramo
+        // Main airline (first segment of first slice)
         const firstSlice = offer.slices?.[0]
         const firstSeg = firstSlice?.segments?.[0]
         const airlineName = firstSeg?.airline?.name || firstSeg?.marketing_carrier?.name || ''
         const airlineIata = firstSeg?.airline?.iata_code || firstSeg?.marketing_carrier?.iata_code || ''
-        // Origen y destino globales de la oferta
+        // Global route
         const overallOrigin = offer.slices?.[0]?.origin?.iata_code
         const overallDestination = offer.slices?.[offer.slices.length - 1]?.destination
         const destCityName = overallDestination?.city?.name || overallDestination?.city_name || overallDestination?.name
@@ -98,7 +98,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
 
         return (
           <Card key={offer.id} className="glass-card hover-raise overflow-hidden">
-            <CardHeader className="flex items-center justify-between gap-3">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
               <div className="flex items-center gap-2 min-w-0">
                 {airlineIata ? (
                   <Image
@@ -121,19 +121,19 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                   {new Intl.NumberFormat('en-US', { style: 'currency', currency: offer.total_currency, maximumFractionDigits: 0 }).format(parseFloat(offer.total_amount))}
                 </CardTitle>
                 <div className="text-[11px] text-gray-500">Total</div>
-                <div className="text-[10px] text-gray-400 mt-0.5">Expira {new Date(offer.expires_at).toLocaleString()}</div>
+                <div className="text-[10px] text-gray-400 mt-0.5">Expires {new Date(offer.expires_at).toLocaleString()}</div>
               </div>
             </CardHeader>
 
             <CardContent className="space-y-3">
               <div className="grid gap-3 md:grid-cols-[1fr_220px] items-stretch">
-                {/* Columna izquierda: detalle de tramos/segmentos */}
+                {/* Left column: slices and segments */}
                 <div>
                   {offer.slices.map((slice, idx) => (
                     <div key={slice.id} className="slice-summary py-2 first:pt-0 last:pb-0">
-                      <div className="flex items-center justify-between text-sm text-gray-800">
-                        <div className="font-medium tracking-tighter">Tramo {idx + 1}: {slice.origin?.iata_code} → {slice.destination?.iata_code}</div>
-                        <div className="text-gray-600">Duración: {slice.duration?.replace('PT', '').toLowerCase()}</div>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-800">
+                        <div className="font-medium tracking-tighter">Leg {idx + 1}: {slice.origin?.iata_code} → {slice.destination?.iata_code}</div>
+                        <div className="text-gray-600">Duration: {slice.duration?.replace('PT', '').toLowerCase()}</div>
                       </div>
 
                       <div className="mt-2 space-y-2">
@@ -144,17 +144,15 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                                 <div className="font-medium truncate">
                                   {(seg.origin?.city?.name || seg.origin?.city_name || seg.origin?.name)} ({seg.origin?.iata_code}) → {(seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name)} ({seg.destination?.iata_code})
                                 </div>
-                                <div className="segment-meta text-[11px] text-gray-600">{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
+                                <div className="segment-meta text-[11px] text-gray-600">
+                                  {/* Carrier: full name and flight number */}
+                                  {(seg.airline?.name || seg.marketing_carrier?.name || '')} {seg.flight_number}
+                                </div>
                               </div>
-                              {/* Eliminamos logos duplicados y thumbnails por segmento para evitar duplicados */}
                             </div>
                             <div className="mt-1 flex items-center justify-between text-gray-600 text-[11px]">
-                              <span className="inline-flex items-center gap-1">
-                                <span className="inline-flex items-center rounded-full bg-gray-50 text-gray-700 border border-gray-200 px-2 py-0 text-[10px]">Sale: {new Date(seg.departing_at).toLocaleString()}</span>
-                              </span>
-                              <span className="inline-flex items-center gap-1">
-                                <span className="inline-flex items-center rounded-full bg-gray-50 text-gray-700 border border-gray-200 px-2 py-0 text-[10px]">Llega: {new Date(seg.arriving_at).toLocaleString()}</span>
-                              </span>
+                              <span className="inline-flex items-center rounded-full bg-gray-50 text-gray-700 border border-gray-200 px-2 py-0 text-[10px]">Departs: {new Date(seg.departing_at).toLocaleString()}</span>
+                              <span className="inline-flex items-center rounded-full bg-gray-50 text-gray-700 border border-gray-200 px-2 py-0 text-[10px]">Arrives: {new Date(seg.arriving_at).toLocaleString()}</span>
                             </div>
                           </div>
                         ))}
@@ -163,7 +161,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                   ))}
                 </div>
 
-                {/* Columna derecha: imagen única de la ciudad de destino */}
+                {/* Right column: destination image */}
                 <div className="md:pl-2">
                   <div className="relative w-full h-[160px] md:h-full min-h-[160px] rounded-xl overflow-hidden border border-gray-200">
                     <Image
@@ -178,7 +176,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                 </div>
               </div>
 
-              {/* Condiciones */}
+              {/* Conditions */}
               {offer?.conditions && (
                 <div className="flex items-center justify-end gap-2 pt-1">
                   {offer.conditions.refund_before_departure && (
@@ -192,11 +190,11 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-end gap-2 sm:gap-3 pt-1">
-                <Button variant="secondary" className="dc-button-secondary w-full sm:w-auto" onClick={() => onTrackPrice?.(offer.id)}>
-                  Seguir precio
+                <Button variant="secondary" className="w-full sm:w-auto" onClick={() => onTrackPrice?.(offer.id)}>
+                  Track price
                 </Button>
-                <Button className="dc-button-primary w-full sm:w-auto" onClick={() => onSelectOffer?.(offer)}>
-                  Reservar
+                <Button className="w-full sm:w-auto" onClick={() => onSelectOffer?.(offer)}>
+                  Book now
                 </Button>
               </div>
             </CardContent>
