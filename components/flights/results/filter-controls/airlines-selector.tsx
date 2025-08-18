@@ -3,6 +3,7 @@
 import { Checkbox } from "@/components/ui/checkbox"
 import Popover from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 interface AirlineOption { code: string; name: string }
 
@@ -42,6 +43,13 @@ export default function AirlinesSelector({ options, value = [], onChange }: Airl
         {options.map((a) => (
           <label key={a.code} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50">
             <Checkbox checked={value.includes(a.code)} onCheckedChange={() => toggle(a.code)} />
+            <Image
+              src={`https://assets.duffel.com/img/airlines/for-dark-background/full-color-logo/${a.code}.svg`}
+              alt={a.name}
+              width={22}
+              height={10}
+              className="h-3.5 w-auto object-contain"
+            />
             <span className="text-sm text-gray-800">{a.name} ({a.code})</span>
           </label>
         ))}

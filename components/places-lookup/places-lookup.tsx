@@ -61,8 +61,7 @@ export default function PlacesLookup({ value, onSelect, placeholder }: Props) {
     if (!city) return ''
     const key = city.toLowerCase()
     if (cityThumbCache.has(key)) return cityThumbCache.get(key) as string
-    const q = encodeURIComponent(`${city} skyline`)
-    const url = `https://source.unsplash.com/96x64/?${q}`
+    const url = `https://images.pexels.com/photos/373912/pexels-photo-373912.jpeg?auto=compress&cs=tinysrgb&h=64&w=96&q=80`
     cityThumbCache.set(key, url)
     return url
   }
@@ -89,7 +88,7 @@ export default function PlacesLookup({ value, onSelect, placeholder }: Props) {
 
   return (
     <div className="places">
-      <Input value={query} onChange={e => { setQuery(e.target.value.toUpperCase()); setOpen(true) }} onFocus={() => setOpen(true)} onKeyDown={handleKeyDown} placeholder={placeholder} className="bg-white text-gray-900 rounded-2xl" />
+      <Input value={query} onChange={e => { setQuery(e.target.value); setOpen(true) }} onFocus={() => setOpen(true)} onKeyDown={handleKeyDown} placeholder={placeholder} className="bg-white text-gray-900 rounded-2xl" />
       {open && items.length > 0 && (
         <div className="places-panel">
           <div className="p-2">
