@@ -13,7 +13,7 @@ import FlightResults from "@/components/flights/results/results-list"
 import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
-import PlacesLookup from "@/components/flights/ui/PlacesLookup"
+import PlacesLookup from "@/components/places-lookup/places-lookup"
 import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
 
 interface DuffelAirport {
@@ -354,6 +354,13 @@ export default function FlightsPage() {
   const applyFilters = useCallback((offersToFilter: any[]) => {
     let filtered = [...offersToFilter]
 
+    const timeStringToMinutes = (t?: string) => {
+      if (!t) return null
+      const [h, m] = t.split(":").map(Number)
+      if (Number.isNaN(h) || Number.isNaN(m)) return null
+      return h * 60 + m
+    }
+
     // Price
     filtered = filtered.filter(offer => {
       const price = parseFloat(offer.total_amount)
@@ -369,15 +376,36 @@ export default function FlightsPage() {
       })
     }
 
-    // Stops
-    if (filters.directOnly) {
+    // Stops (from inline controls or legacy flags)
+    const selectedStops: number[] = Array.isArray((filters as any).stops) ? (filters as any).stops : []
+    if (selectedStops.length > 0) {
+      filtered = filtered.filter(offer => {
+        const numStops = ((offer.slices?.[0]?.segments?.length || 1) - 1)
+        return selectedStops.includes(numStops)
+      })
+    } else if (filters.directOnly) {
       filtered = filtered.filter(offer => (offer.slices?.[0]?.segments?.length || 1) - 1 === 0)
     } else if (filters.maxStops < 3) {
       filtered = filtered.filter(offer => (offer.slices?.[0]?.segments?.length || 1) - 1 <= filters.maxStops)
     }
 
-    // Departure time
-    if (filters.departureTime.length > 0) {
+    // Departure time (inline range overrides legacy buckets)
+    const departs = (filters as any).departs as { from?: string; to?: string } | undefined
+    if (departs?.from && departs?.to) {
+      const fromMin = timeStringToMinutes(departs.from)
+      const toMin = timeStringToMinutes(departs.to)
+      if (fromMin !== null && toMin !== null) {
+        filtered = filtered.filter(offer => {
+          const dt = new Date(offer.slices?.[0]?.segments?.[0]?.departing_at)
+          const mins = dt.getHours() * 60 + dt.getMinutes()
+          if (fromMin <= toMin) {
+            return mins >= fromMin && mins <= toMin
+          }
+          // overnight range (e.g., 22:00 -> 06:00)
+          return mins >= fromMin || mins <= toMin
+        })
+      }
+    } else if (filters.departureTime.length > 0) {
       filtered = filtered.filter(offer => {
         const dt = new Date(offer.slices?.[0]?.segments?.[0]?.departing_at)
         const hour = dt.getHours()
@@ -405,7 +433,30 @@ export default function FlightsPage() {
     return filtered
   }, [filters])
 
-  const filteredOffers = useMemo(() => applyFilters(offers), [offers, applyFilters])
+  const filteredOffers = useMemo(() => {
+    const list = applyFilters(offers)
+    const sortKey = (filters as any).sort as 'recommended' | 'price' | 'duration' | undefined
+    if (!sortKey) return list
+    const toMinutes = (iso?: string) => {
+      if (!iso) return Number.POSITIVE_INFINITY
+      const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?/)
+      if (!m) return Number.POSITIVE_INFINITY
+      const h = m[1] ? parseInt(m[1], 10) : 0
+      const mins = m[2] ? parseInt(m[2], 10) : 0
+      return h * 60 + mins
+    }
+    const copy = [...list]
+    if (sortKey === 'price' || sortKey === 'recommended') {
+      copy.sort((a: any, b: any) => parseFloat(a.total_amount) - parseFloat(b.total_amount))
+    } else if (sortKey === 'duration') {
+      copy.sort((a: any, b: any) => {
+        const ad = (a.slices || []).reduce((sum: number, s: any) => sum + toMinutes(s.duration), 0)
+        const bd = (b.slices || []).reduce((sum: number, s: any) => sum + toMinutes(s.duration), 0)
+        return ad - bd
+      })
+    }
+    return copy
+  }, [offers, applyFilters, filters])
 
   return (
     <div className="p-6 space-y-6">
