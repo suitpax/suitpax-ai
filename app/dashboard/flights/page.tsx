@@ -14,6 +14,7 @@ import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight
 import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
 import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
+import AirlinesSlider from "@/components/flights/results/airlines-slider"
 
 interface SearchParams {
   origin: string
@@ -68,6 +69,7 @@ export default function FlightsPage() {
   })
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
+  const [density, setDensity] = useState<'compact' | 'cozy'>('cozy')
   const [offerRequestId, setOfferRequestId] = useState<string | null>(null)
   const [pageMeta, setPageMeta] = useState<any>({})
   const [loadingMore, setLoadingMore] = useState(false)
@@ -472,11 +474,13 @@ export default function FlightsPage() {
 
       <FlightFilters
         offers={offers}
-        filters={filters}
-        onFiltersChange={(f) => setFilters(f)}
+        filters={{ ...filters, density }}
+        onFiltersChange={(f) => { setFilters(f); if ((f as any).density) setDensity((f as any).density) }}
         isOpen={filtersOpen}
         onClose={() => setFiltersOpen(false)}
       />
+
+      <AirlinesSlider className="mt-2" />
 
       {/* Results */}
       <div className="flex items-center justify-between">
@@ -491,7 +495,7 @@ export default function FlightsPage() {
         offers={filteredOffers}
         onTrackPrice={(id) => toast.success(`Tracking price for ${id}`)}
         onSelectOffer={(offer) => router.push(`/dashboard/flights/book/${offer.id}`)}
-        className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''}
+        className={`${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2' : 'space-y-4'} ${density === 'compact' ? 'gap-3' : 'gap-6'}`}
       />
 
       {pageMeta?.after && (

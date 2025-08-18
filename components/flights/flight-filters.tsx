@@ -25,6 +25,7 @@ interface FlightFilters {
   refundable: boolean
   changeable: boolean
   directOnly: boolean
+  density?: 'compact' | 'cozy'
 }
 
 interface Airline {
@@ -413,6 +414,20 @@ export default function FlightFilters({
 
               {/* Content */}
               <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-white">
+                {/* Density Toggle */}
+                <div className="space-y-3">
+                  <Label className="flex items-center">
+                    <AdjustmentsHorizontalIcon className="h-4 w-4 mr-2" />
+                    Density
+                  </Label>
+                  <div className="inline-flex rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm p-1">
+                    {(['compact','cozy'] as const).map(opt => (
+                      <button key={opt} onClick={() => updateFilter('density', opt)} className={`px-3 py-1.5 rounded-lg text-sm ${tempFilters.density === opt ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-100'}`}>
+                        {opt === 'compact' ? 'Compact' : 'Cozy'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 {/* Price Range */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">

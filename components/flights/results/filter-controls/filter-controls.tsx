@@ -10,7 +10,7 @@ interface FilterControlsProps { onChange?: (filters: any) => void; airlines?: Ar
 
 export default function FilterControls({ onChange, airlines = [] }: FilterControlsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 bg-white/60 backdrop-blur-sm border border-gray-200 rounded-2xl p-3">
       <div>
         <div className="text-xs text-gray-600 mb-1">Departure time</div>
         <TimeRangeSelector onChange={(v) => onChange?.({ departs: v })} />
