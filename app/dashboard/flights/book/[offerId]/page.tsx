@@ -125,13 +125,23 @@ export default function BookOfferPage({ params }: { params: { offerId: string } 
                           phone_number: p.phone_number,
                           email: p.email,
                         })),
+                        services: [] as any[],
                       }
-                      // Services can be added here if mapped correctly for Duffel (seats/ancillaries)
+                      // Seat service (Duffel expects service with type 'seat' and metadata.designator or seat_id if known)
+                      if (selectedSeat) {
+                        orderBody.services.push({ type: 'seat', metadata: { designator: selectedSeat } })
+                      }
+                      // Ancillaries: map by id if present in our selection
+                      Object.values(selectedExtras || {}).forEach((a: any) => {
+                        if (a?.code) {
+                          orderBody.services.push({ type: 'ancillary', id: a.code })
+                        }
+                      })
                       const res = await fetch('/api/flights/duffel/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(orderBody) })
                       const json = await res.json()
                       if (!res.ok) throw new Error(json?.error || 'Failed to create order')
                       toast.success('Booking confirmed')
-                      router.push('/dashboard/trips')
+                      router.push('/dashboard/billing')
                     } catch (e: any) {
                       console.error(e)
                       toast.error(e?.message || 'Booking failed')
