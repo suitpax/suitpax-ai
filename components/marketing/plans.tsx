@@ -18,6 +18,9 @@ const titleVariations = [
   "Transparent pricing, exceptional value.",
   "Plans designed for modern business travel.",
   "Pricing that scales with your success.",
+  "Flight booking with superpowers.",
+  "Travel management with superpowers.",
+  "AI travel agents with superpowers.",
 ]
 
 // Subtítulos

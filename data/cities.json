@@ -23,5 +23,17 @@
   "mumbai": "https://images.pexels.com/photos/1051751/pexels-photo-1051751.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
   "zurich": "https://images.pexels.com/photos/356830/pexels-photo-356830.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
   "frankfurt": "https://images.pexels.com/photos/1796724/pexels-photo-1796724.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
-  "seoul": "https://images.pexels.com/photos/3732904/pexels-photo-3732904.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80"
+  "seoul": "https://images.pexels.com/photos/3732904/pexels-photo-3732904.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "oslo": "https://images.pexels.com/photos/3385150/pexels-photo-3385150.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "helsinki": "https://images.pexels.com/photos/2901209/pexels-photo-2901209.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "stockholm": "https://images.pexels.com/photos/462331/pexels-photo-462331.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "copenhagen": "https://images.pexels.com/photos/2362000/pexels-photo-2362000.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "athens": "https://images.pexels.com/photos/3385151/pexels-photo-3385151.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "istanbul": "https://images.pexels.com/photos/804954/pexels-photo-804954.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "warsaw": "https://images.pexels.com/photos/3568302/pexels-photo-3568302.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "krakow": "https://images.pexels.com/photos/3563244/pexels-photo-3563244.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "budapest": "https://images.pexels.com/photos/681335/pexels-photo-681335.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "dublin": "https://images.pexels.com/photos/2089698/pexels-photo-2089698.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "manchester": "https://images.pexels.com/photos/1739757/pexels-photo-1739757.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80",
+  "birmingham": "https://images.pexels.com/photos/3569681/pexels-photo-3569681.jpeg?auto=compress&cs=tinysrgb&w=1280&h=800&q=80"
 }

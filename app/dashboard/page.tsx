@@ -51,9 +51,14 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
             <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none mb-2">
-              Welcome back, {user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}
+              {(() => {
+                const hours = new Date().getHours()
+                const greet = hours < 12 ? 'Good morning' : hours < 18 ? 'Good afternoon' : 'Good evening'
+                const name = (user?.user_metadata?.full_name || user?.email?.split("@")[0] || "there")
+                return `${greet}, ${name}`
+              })()}
             </h1>
-            <p className="text-gray-600 font-light">Ready to transform your business travel experience</p>
+            <p className="text-gray-600 font-light">Your AI travel workspace is ready — let’s plan smarter</p>
           </div>
           <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>

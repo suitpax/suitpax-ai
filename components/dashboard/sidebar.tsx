@@ -51,6 +51,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Trips", href: "/dashboard/trips", icon: Plane },
   { name: "Flights", href: "/dashboard/flights", icon: Plane },
+  { name: "Events", href: "/dashboard/events", icon: Calendar },
   { name: "Approvals", href: "/dashboard/approvals", icon: CheckSquare },
   { name: "Requests", href: "/dashboard/requests", icon: Send },
   { name: "Finance Hub", href: "/dashboard/finance-hub", icon: CreditCard },
@@ -254,26 +255,28 @@ export function Sidebar({
       {(!isCollapsed || isMobile) && (
         <div className="px-3 pt-3 border-b border-gray-200">
           <form onSubmit={handleAiSubmit} className="relative">
-            <Input
-              value={aiQuery}
-              onChange={(e) => setAiQuery(e.target.value)}
-              placeholder="Ask AI anything..."
-              className="pr-10 rounded-xl border-gray-200 text-sm h-9 bg-gray-50 focus:bg-white transition-colors"
-              disabled={isAiLoading}
-            />
-            <Button
-              type="submit"
-              size="sm"
-              variant="ghost"
-              disabled={!aiQuery.trim() || isAiLoading}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100 rounded-lg"
-            >
-              {isAiLoading ? (
-                <div className="animate-spin rounded-full h-3 w-3 border-2 border-gray-400 border-t-transparent" />
-              ) : (
-                <Send className="h-3 w-3" />
-              )}
-            </Button>
+            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl p-2.5 shadow-sm focus-within:ring-1 focus-within:ring-gray-300">
+              <Input
+                value={aiQuery}
+                onChange={(e) => setAiQuery(e.target.value)}
+                placeholder="Search flights with AI — try: MAD → LHR next Friday"
+                className="flex-1 bg-transparent border-0 focus-visible:ring-0 text-sm"
+                disabled={isAiLoading}
+              />
+              <Button
+                type="submit"
+                size="sm"
+                variant="ghost"
+                disabled={!aiQuery.trim() || isAiLoading}
+                className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl"
+              >
+                {isAiLoading ? (
+                  <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent" />
+                ) : (
+                  <Send className="h-3.5 w-3.5" />
+                )}
+              </Button>
+            </div>
           </form>
         </div>
       )}

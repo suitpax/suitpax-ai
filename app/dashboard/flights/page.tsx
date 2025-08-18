@@ -304,7 +304,7 @@ export default function FlightsPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tighter">Flights</h1>
-          <p className="text-sm text-gray-600">Find and compare flights in real-time (Suitpax)</p>
+          <p className="text-sm text-gray-600">Find the best routes, fares and schedules — compare in seconds.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" className="rounded-2xl px-5 h-11 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
