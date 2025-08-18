@@ -9,11 +9,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowsRightLeftIcon, FunnelIcon, MapPinIcon, CalendarIcon, UserIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline"
-import FlightResults from "@/components/flights/flight-results"
+import FlightResults from "@/components/flights/results/results-list"
 import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/flights/ui/PlacesLookup"
+import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
 
 interface DuffelAirport {
   id: string
@@ -625,6 +626,9 @@ export default function FlightsPage() {
           <FunnelIcon className="h-4 w-4 mr-2" /> Filters
         </Button>
       </div>
+
+      {/* Lightweight inline controls (time range, stops, sorting) */}
+      <FilterControls onChange={(partial) => setFilters(prev => ({ ...prev, ...partial }))} />
 
       <FlightFiltersDisplay
         filters={activeChips}
