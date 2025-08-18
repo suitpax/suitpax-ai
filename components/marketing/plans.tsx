@@ -505,7 +505,7 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
                     <span className="text-2xl sm:text-3xl font-medium tracking-tighter text-black">
                       {isAnnual ? plan.annualPrice : plan.price}
                     </span>
-                    <span className="text-[9px] sm:text-[10px] text-gray-500 ml-1">
+                    <span className="text-[9px] sm:text-[10px] text-gray-700 font-semibold ml-1">
                       /{isAnnual ? plan.annualPeriod : plan.period}
                     </span>
                   </div>

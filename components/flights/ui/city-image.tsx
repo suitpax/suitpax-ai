@@ -12,7 +12,7 @@ interface CityImageProps {
 }
 
 export default function CityImage({ city, className = "", sizes = "100vw", width = 640, height = 400 }: CityImageProps) {
-  const src = resolveCityImage(city || "city", { width, height })
+  const src = resolveCityImage(city || "city", { width, height, preferCdn: false, preferUnsplash: true })
   return <Image src={src} alt={city || "city"} fill sizes={sizes} className={className || "object-cover"} />
 }
 

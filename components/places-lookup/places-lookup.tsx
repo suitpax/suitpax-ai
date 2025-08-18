@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Input } from '@/components/ui/input'
 import { getPlacesFromClient } from './lib/get-places-from-client'
+import { resolveCityImage } from '@/lib/utils'
 
 interface Item { id: string; iata_code?: string; city_name?: string; name?: string }
 
@@ -61,7 +62,7 @@ export default function PlacesLookup({ value, onSelect, placeholder }: Props) {
     if (!city) return ''
     const key = city.toLowerCase()
     if (cityThumbCache.has(key)) return cityThumbCache.get(key) as string
-    const url = `https://images.pexels.com/photos/373912/pexels-photo-373912.jpeg?auto=compress&cs=tinysrgb&h=64&w=96&q=80`
+    const url = resolveCityImage(city, { width: 96, height: 64, preferCdn: false, preferUnsplash: true })
     cityThumbCache.set(key, url)
     return url
   }

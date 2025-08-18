@@ -5,13 +5,14 @@ import { useEffect, useState } from "react"
 import PassengerForm from "@/components/flights/booking/passenger-form"
 import PaymentForm from "@/components/flights/booking/payment-form"
 import Ancillaries from "@/components/flights/booking/ancillaries"
+import { Input } from "@/components/ui/input"
 import ResultCard from "@/components/flights/results/result-card"
 
 export default function BookOfferPage({ params }: { params: { offerId: string } }) {
   const router = useRouter()
   const { offerId } = params
   const [offer, setOffer] = useState<any | null>(null)
-  const [step, setStep] = useState<"review" | "passengers" | "extras" | "payment">("review")
+  const [step, setStep] = useState<"review" | "passengers" | "documents" | "extras" | "payment">("review")
 
   useEffect(() => {
     const load = async () => {
@@ -45,6 +46,18 @@ export default function BookOfferPage({ params }: { params: { offerId: string } 
           {step === "passengers" && (
             <div className="space-y-4">
               <PassengerForm />
+              <div className="flex justify-end">
+                <button onClick={() => setStep("documents")} className="h-11 rounded-2xl bg-black text-white px-5">Next: Documents</button>
+              </div>
+            </div>
+          )}
+          {step === "documents" && (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-gray-200 p-4 bg-white/70">
+                <div className="text-sm font-medium mb-2">Travel documents</div>
+                <p className="text-xs text-gray-600 mb-3">Upload passport/ID if required for destination.</p>
+                <Input type="file" accept="image/*,application/pdf" />
+              </div>
               <div className="flex justify-end">
                 <button onClick={() => setStep("extras")} className="h-11 rounded-2xl bg-black text-white px-5">Next: Extras</button>
               </div>
