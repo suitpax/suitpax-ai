@@ -38,4 +38,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 export const metadata = {
   generator: "v0.dev",
+  metadataBase: new URL("https://suitpax.com"),
 }
