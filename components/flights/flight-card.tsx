@@ -8,6 +8,7 @@ import {
   PlaneTakeoffIcon, 
   PlaneIcon, 
 } from '@heroicons/react/24/outline'
+import { resolveCityImage } from '@/lib/utils'
 
 interface FlightCardProps {
   offer: any
@@ -26,9 +27,7 @@ const CITY_KEYWORDS: Record<string, string> = {
 }
 
 const cityImageUrl = (city?: string, w = 640, h = 360) => {
-  const key = (city || '').toLowerCase().trim()
-  const q = CITY_KEYWORDS[key] || `${city || 'city'} skyline`
-  return `https://source.unsplash.com/featured/${w}x${h}/?${encodeURIComponent(q)}`
+  return resolveCityImage(city || 'city', { width: w, height: h })
 }
 
 export function FlightCard({ offer, onSelect }: FlightCardProps) {
