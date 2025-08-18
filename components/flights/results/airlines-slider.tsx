@@ -22,14 +22,13 @@ const AIRLINE_LOGOS = [
   { name: "Emirates", url: "https://cdn.brandfetch.io/emirates.com/w/512/h/120/logo?c=suitpax" },
 ]
 
-export default function AirlinesSlider({ title = "OUR AIRLINES", className = "" }: AirlinesSliderProps) {
+export default function AirlinesSlider({ title = "", className = "" }: AirlinesSliderProps) {
   const items = useMemo(() => [...AIRLINE_LOGOS, ...AIRLINE_LOGOS], [])
   return (
     <div className={`w-full overflow-hidden py-10 ${className}`}>
       <div className="text-center mb-6">
-        <p className="text-xs font-medium tracking-wider text-gray-600 uppercase inline-flex items-center gap-2 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-full px-3 py-1">
+        <p className="inline-flex items-center gap-2">
           <HyperspeedBadge />
-          {title}
         </p>
       </div>
       <div className="relative w-full overflow-hidden rounded-2xl border border-gray-200 bg-white/70 backdrop-blur-sm">

@@ -25,7 +25,7 @@ export function resolveCityImage(cityName?: string, options?: { width?: number; 
 	if (slug) {
 		return `https://cdn.suitpax.com/cities/${slug}.webp`
 	}
-	// Fallback to Unsplash keyword
+	// Fallback to Pexels CDN sample (replace with API-based search later)
 	const q = encodeURIComponent(`${cityName || 'city'} skyline`)
-	return `https://source.unsplash.com/featured/${w}x${h}/?${q}`
+	return `https://images.pexels.com/photos/3408353/pexels-photo-3408353.jpeg?auto=compress&cs=tinysrgb&h=${h}&w=${w}&q=80` 
 }

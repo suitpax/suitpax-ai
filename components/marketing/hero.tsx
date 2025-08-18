@@ -287,13 +287,13 @@ export const Hero = () => {
           <Badge
             text={badgeMessage}
             href={badgeMessage === "Join our waitlist in the meantime." ? "https://app.suitpax.com/sign-up" : "#"}
-            className="bg-white text-black hover:bg-gray-100 transition-colors"
+            className="bg-transparent hover:bg-transparent"
           />
 
           <CounterBadge className="mt-4" variant="light" />
 
           <div className="mt-10 text-center max-w-3xl mx-auto">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-tighter text-black leading-none max-w-4xl">
               <FadeSpan>{randomTitle}</FadeSpan>
             </h1>
 

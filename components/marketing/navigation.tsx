@@ -13,9 +13,9 @@ import type { User } from "@supabase/supabase-js"
 import { cn } from "@/lib/utils"
 
 const navigationItems = [
+  { name: "Business travel", href: "/business-travel" },
   { name: "Manifesto", href: "/manifesto" },
   { name: "Pricing", href: "/pricing" },
-  // Removed public Code page entry
   { name: "Talk to founder", href: "/contact" },
 ]
 
