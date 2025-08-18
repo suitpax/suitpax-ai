@@ -301,16 +301,40 @@ export default function FlightsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div className="flex flex-col items-center text-center gap-3">
         <div>
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tighter">Flights</h1>
-          <p className="text-sm text-gray-600">Find the best routes, fares and schedules — compare in seconds.</p>
+          <p className="text-sm text-gray-600 mt-1">Find the best routes, fares and schedules — compare in seconds.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" className="rounded-2xl px-5 h-11 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
           <Button className="rounded-2xl px-6 h-11 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
         </div>
       </div>
+
+      {/* Badges row under subtitle */}
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        {[
+          'AI-optimized results',
+          'Policy-aware',
+          'Loyalty-smart',
+          'Price tracking',
+          'Real seat maps',
+        ].map((b) => (
+          <span key={b} className="inline-flex items-center rounded-full px-3 py-1 text-xs border border-gray-300 bg-white/70 text-gray-800">{b}</span>
+        ))}
+      </div>
+
+      {/* Shimmer headline variation */}
+      <div className="flex justify-center">
+        <div className="mt-2 text-center text-sm font-medium bg-gradient-to-r from-gray-300 via-gray-100 to-gray-300 bg-clip-text text-transparent animate-hero-shimmer">
+          {['Search flights with Suitpax AI', 'Plan the next business trip in seconds', 'Ask for the best fares today'].sort(() => 0.5 - Math.random())[0]}
+        </div>
+      </div>
+      <style jsx>{`
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        :global(.animate-hero-shimmer) { animation: shimmer 2.5s linear infinite; background-size: 200% 100%; }
+      `}</style>
 
       {/* Search Card */}
       <Card className="border-gray-200 glass-card">
@@ -508,4 +532,3 @@ export default function FlightsPage() {
     </div>
   )
 }
-

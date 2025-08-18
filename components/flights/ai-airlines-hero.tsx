@@ -12,6 +12,8 @@ export default function AIAirlinesHero() {
     "Find: BCN → CDG under €150 with cabin bags",
     "Search: LIS → AMS direct, depart 7-9am",
     "Book: LHR → JFK business, flexible dates",
+    "Search flights with Suitpax AI in seconds",
+    "Ask Suitpax AI to plan your next business trip",
   ]
   const [phIndex, setPhIndex] = useState(0)
   useEffect(() => {
@@ -53,4 +55,3 @@ export default function AIAirlinesHero() {
     </section>
   )
 }
-

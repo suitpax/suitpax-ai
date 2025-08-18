@@ -24,6 +24,10 @@ export default function DashboardPage() {
           data: { user },
         } = await supabase.auth.getUser()
         if (user && isMounted) setUser(user)
+        try {
+          const name = (user?.user_metadata?.full_name || user?.email?.split("@")[0] || '').trim()
+          if (name) localStorage.setItem('suitpax_user_name', name)
+        } catch {}
 
         // TODO: fetch real KPIs from your tables
         if (isMounted) setStats({ trips: 0, savings: 0, expenses: 0, teamSize: 1 })
@@ -39,7 +43,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <div className="h-8 w-8 rounded-full border-2 border-gray-300 border-t-transparent animate-spin"></div>
       </div>
     )
   }

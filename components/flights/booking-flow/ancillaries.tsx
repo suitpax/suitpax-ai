@@ -8,9 +8,10 @@ import type { AncillaryItem } from "@/types/duffel-ui"
 
 interface Props {
   offerId: string
+  onChange?: (selected: Record<string, AncillaryItem>) => void
 }
 
-export default function Ancillaries({ offerId }: Props) {
+export default function Ancillaries({ offerId, onChange }: Props) {
   const [items, setItems] = useState<AncillaryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<Record<string, AncillaryItem>>({})
@@ -44,6 +45,7 @@ export default function Ancillaries({ offerId }: Props) {
       const next = { ...prev }
       if (next[item.code]) delete next[item.code]
       else next[item.code] = item
+      onChange?.(next)
       return next
     })
   }

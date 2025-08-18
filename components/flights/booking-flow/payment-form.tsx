@@ -46,12 +46,14 @@ export default function PaymentForm({ offer, onReady }: PaymentFormProps) {
       const intent = json?.data || json
       if (!intent?.id) throw new Error('Invalid payment intent')
 
-      // Expose intent id immediately
+      // Expose intent id immediately and persist for 3DS return
       onReady(intent.id)
+      try { localStorage.setItem('suitpax_payment_intent', intent.id) } catch {}
 
       // Try to create a 3DS session (if required)
       try {
-        const returnUrl = `${window.location.origin}/dashboard/flights/book/3ds/return?intent=${encodeURIComponent(intent.id)}&offer=${encodeURIComponent(offer?.id || '')}`
+        const returnUrl = `${window.location.origin}/dashboard/flights/book/${encodeURIComponent(offer?.id || '')}`
+        try { localStorage.setItem('suitpax_payment_offer', offer?.id || '') } catch {}
         const sres = await fetch('/api/flights/duffel/three_d_secure_sessions', {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ payment_intent_id: intent.id, return_url: returnUrl })
         })
