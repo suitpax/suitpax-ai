@@ -174,14 +174,11 @@ export const AIMeetingsAttachment = () => {
           {/* Header con título mejorado */}
           <div className="text-center mb-12">
             <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-3">
-              <Image
-                src="/logo/suitpax-bl-logo.webp"
-                alt="Suitpax"
-                width={16}
-                height={16}
-                className="mr-1.5 h-3.5 w-auto"
-              />
-              Smart Meeting Management
+              <span className="inline-flex items-center gap-1">
+                <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={50} height={14} className="h-3.5 w-auto" />
+                <span className="sr-only">Suitpax</span>
+              </span>
+              <span className="ml-1.5">Smart Meeting Management</span>
             </div>
 
             {/* Título aumentado un nivel */}
