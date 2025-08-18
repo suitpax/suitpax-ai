@@ -31,7 +31,7 @@ export default function AirlinesSlider({ title = "", className = "" }: AirlinesS
           <HyperspeedBadge />
         </p>
       </div>
-      <div className="relative w-full overflow-hidden rounded-2xl border border-gray-900 bg-black/90 backdrop-blur-sm">
+      <div className="relative w-full overflow-hidden rounded-2xl border border-gray-200 bg-gray-200">
         <div className="flex overflow-hidden">
           <motion.div
             className="flex items-center space-x-14 px-8"

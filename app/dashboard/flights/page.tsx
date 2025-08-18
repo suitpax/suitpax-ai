@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
 import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
 import AirlinesSlider from "@/components/flights/results/airlines-slider"
+import { EnhancedPromptInput } from "@/components/prompt-kit/prompt-input"
 
 interface SearchParams {
   origin: string
@@ -312,13 +313,30 @@ export default function FlightsPage() {
         </div>
       </div>
 
-      {/* Badges row under subtitle */}
+      {/* AI prompt with video placeholder */}
+      <div className="flex justify-center">
+        <div className="w-full max-w-2xl">
+          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-3 shadow-sm">
+            <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-gray-200">
+              <video autoPlay loop muted playsInline className="h-full w-full object-cover">
+                <source src="/videos/ai-agent-1.mp4" type="video/mp4" />
+              </video>
+            </div>
+            <input
+              placeholder="Ask: MAD → LHR next Friday morning, return Sunday (try in English)"
+              className="flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none"
+            />
+            <button className="h-9 w-9 rounded-xl bg-black text-white hover:bg-black/90 flex items-center justify-center">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Badges row under subtitle (show two) */}
       <div className="flex flex-wrap items-center justify-center gap-2">
         {[
           'AI-optimized results',
-          'Policy-aware',
-          'Loyalty-smart',
-          'Price tracking',
           'Real seat maps',
         ].map((b) => (
           <span key={b} className="inline-flex items-center rounded-full px-3 py-1 text-xs border border-gray-300 bg-white/70 text-gray-800">{b}</span>
@@ -510,7 +528,16 @@ export default function FlightsPage() {
         onClose={() => setFiltersOpen(false)}
       />
 
+      {/* Inline controls */}
       <AirlinesSlider className="mt-2" />
+      <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
+        {[
+          'Policy-aware',
+          'Price tracking',
+        ].map((b) => (
+          <span key={b} className="inline-flex items-center rounded-full px-3 py-1 text-xs border border-gray-300 bg-white/70 text-gray-800">{b}</span>
+        ))}
+      </div>
 
       {/* Results */}
       <div className="flex items-center justify-between">
