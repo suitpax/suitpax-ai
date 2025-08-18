@@ -15,6 +15,7 @@ import AIAirlinesHero from "@/components/flights/ai-airlines-hero"
 import APITravel from "@/components/marketing/api-travel"
 import CodeTimeline from "@/components/marketing/code-timeline"
 import BusinessTravelSlider from "@/components/marketing/business-travel-slider"
+import FlightBookingShowcase from "@/components/marketing/flight-booking-showcase"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -85,6 +86,7 @@ export default function Home() {
         <APITravel />
         <CodeTimeline />
         <BusinessTravelSlider />
+        <FlightBookingShowcase />
         <HyperspeedBooking />
         <AIAirlinesHero />
         <AIMeetingsAttachment />

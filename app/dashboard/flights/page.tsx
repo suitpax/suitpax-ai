@@ -95,8 +95,8 @@ export default function FlightsPage() {
         <div className="w-full max-w-2xl">
           <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-2 shadow-sm">
             <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-gray-200">
-              <video autoPlay loop muted playsInline className="h-full w-full object-cover">
-                <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20(online-video-cutter.com)%20(1)-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
+              <video autoPlay muted loop playsInline className="h-full w-full object-cover object-center">
+                <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20%28online-video-cutter.com%29%20%281%29-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
               </video>
             </div>
             <input

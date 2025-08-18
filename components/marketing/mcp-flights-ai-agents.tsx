@@ -51,7 +51,7 @@ export default function MCPFlightsAIAgents() {
                 viewport={{ once: true }}
                 className="flex items-center justify-center py-3 px-4 rounded-xl border border-gray-800 bg-black/80"
               >
-                <img src={logo.url} alt={`${logo.name} logo`} className="h-5 w-auto invert opacity-90" />
+                <img src={logo.url} alt={`${logo.name} logo`} className="h-5 w-auto opacity-95" />
               </motion.div>
             ))}
           </div>

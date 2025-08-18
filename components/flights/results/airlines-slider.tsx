@@ -37,7 +37,7 @@ export default function AirlinesSlider({ title = "", className = "" }: AirlinesS
                 <motion.img
                   src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${logo.code}.svg`}
                   alt={`${logo.name} logo`}
-                  className="max-h-full max-w-full object-contain transition-all duration-300 opacity-80 group-hover:opacity-100"
+                  className="max-h-full max-w-full object-contain transition-all duration-300 opacity-90 group-hover:opacity-100"
                   whileHover={{ scale: 1.04 }}
                   transition={{ type: "spring", stiffness: 400, damping: 12 }}
                 />
