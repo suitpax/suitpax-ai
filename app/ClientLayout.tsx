@@ -23,6 +23,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     "/auth/forgot-password",
     "/auth/reset-password",
     "/auth",
+    "/password",
   ].some((path) => pathname.startsWith(path))
 
   const isAppSubdomain =
