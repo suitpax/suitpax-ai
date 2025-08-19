@@ -35,8 +35,13 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
           <div className="flex items-center gap-3 min-w-0">
             <CarrierLogo iata={airlineIata} name={airlineName} className="h-5 w-5" width={18} height={18} />
             <div className="truncate text-sm text-gray-800">
-              <div className="font-medium leading-tight">{firstSeg?.flight_number || ''}</div>
-              <div className="text-[11px] text-gray-600 truncate">{airlineName} {airlineIata ? `(${airlineIata})` : ''}</div>
+              <div className="font-medium leading-tight flex items-center gap-2">
+                <span>{firstSeg?.flight_number || ''}</span>
+                {firstSeg?.airline?.conditions_of_carriage_url && (
+                  <a href={firstSeg.airline.conditions_of_carriage_url} target="_blank" rel="noreferrer" className="text-[10px] text-gray-500 underline hover:text-gray-700">conditions</a>
+                )}
+              </div>
+              <div className="text-[11px] text-gray-600 truncate sm:hidden">{airlineName} {airlineIata ? `(${airlineIata})` : ''}</div>
             </div>
           </div>
           <div className="hidden sm:block text-gray-700 text-sm font-medium">

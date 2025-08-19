@@ -230,11 +230,10 @@ export default function PasswordGatePage() {
           <div className="flex items-center justify-between text-gray-500">
             <span className="text-xs">© {new Date().getFullYear()} Suitpax. All rights reserved.</span>
             <div className="flex items-center gap-3">
-              {/* Social icons from navigation styles */}
-              <a href="https://x.com/suitpax" target="_blank" rel="noreferrer" className="hover:text-black" aria-label="X / Twitter">
+              <a href="https://twitter.com/suitpax" target="_blank" rel="noreferrer" className="hover:text-black" aria-label="X">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M18.146 2.146a.5.5 0 0 1 .708.708L13.207 8.5l5.647 5.646a.5.5 0 0 1-.708.708L12.5 9.207l-5.646 5.647a.5.5 0 1 1-.708-.708L11.793 8.5 6.146 2.854a.5.5 0 1 1 .708-.708L12.5 7.793l5.646-5.647Z"/></svg>
               </a>
-              <a href="https://www.linkedin.com/company/suitpax" target="_blank" rel="noreferrer" className="hover:text-black" aria-label="LinkedIn">
+              <a href="https://linkedin.com/company/suitpax" target="_blank" rel="noreferrer" className="hover:text-black" aria-label="LinkedIn">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M4.98 3.5C4.98 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM0 8h5v16H0V8zm7.5 0h4.8v2.2h.1c.7-1.3 2.5-2.7 5.1-2.7 5.4 0 6.4 3.6 6.4 8.2V24h-5V16.4c0-1.8 0-4.1-2.5-4.1s-2.9 2-2.9 4V24h-5V8z"/></svg>
               </a>
               <a href="https://github.com/suitpax" target="_blank" rel="noreferrer" className="hover:text-black" aria-label="GitHub">

@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowsRightLeftIcon, FunnelIcon, CalendarIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline"
 import FlightResults from "@/components/flights/results/results-list"
-import SampleDemoRoutes from "@/components/flights/sample-demo-routes"
 import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
 import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
@@ -105,7 +104,6 @@ export default function FlightsPage() {
       }
       if (directOnly) body.max_connections = 0
 
-      // Support multi-city if user filled legs
       const legs = multiCityLegs.filter((l) => l.origin && l.destination && l.date)
       if (searchParams.tripType === 'multi_city' && legs.length > 0) {
         body.slices = legs.map((l) => ({ origin: l.origin.toUpperCase(), destination: l.destination.toUpperCase(), departure_date: l.date }))
@@ -142,10 +140,32 @@ export default function FlightsPage() {
         </div>
       </div>
 
-      
-
-      {/* Sample demo routes (static randomized) */}
-      <SampleDemoRoutes />
+      {/* Compact AI-like single input with code example */}
+      <Card className="border-gray-200">
+        <CardContent className="p-3">
+          <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+            <div className="p-3">
+              <input
+                placeholder="e.g. MAD → LHR on 2025-03-12, 1 adult, economy"
+                className="w-full bg-transparent text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none"
+              />
+            </div>
+            <div className="border-t border-gray-200 bg-gray-50 p-3">
+              <pre className="text-[12px] text-gray-800 whitespace-pre-wrap">{
+`// Suitpax AI request (simulated)
+POST /api/flights/duffel/search
+{
+  "origin": "MAD",
+  "destination": "LHR",
+  "departure_date": "2025-03-12",
+  "passengers": { "adults": 1 },
+  "cabin_class": "economy",
+  "max_connections": 0
+}`}</pre>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Controls row: sorting, filters, etc. */}
       <div className="flex items-center justify-between">
