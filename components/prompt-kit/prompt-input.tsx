@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-export const PromptInput = React.forwardRef<
+export const PromptSurface = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
     value?: string
@@ -41,7 +41,7 @@ export const PromptInput = React.forwardRef<
     })}
   </div>
 ))
-PromptInput.displayName = "PromptInput"
+PromptSurface.displayName = "PromptSurface"
 
 export const PromptInputTextarea = React.forwardRef<
   HTMLTextAreaElement,
@@ -93,4 +93,4 @@ export const PromptInputAction = React.forwardRef<
 ))
 PromptInputAction.displayName = "PromptInputAction"
 
-export { EnhancedPromptInput } from "./enhanced-prompt-input"
+export { EnhancedPromptInput as PromptInput } from "./enhanced-prompt-input"

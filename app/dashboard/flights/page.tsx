@@ -16,7 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
 import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
 import AirlinesSlider from "@/components/flights/results/airlines-slider"
-import { EnhancedPromptInput } from "@/components/prompt-kit/prompt-input"
+import { PromptInput } from "@/components/prompt-kit/prompt-input"
 
 interface SearchParams {
   origin: string
