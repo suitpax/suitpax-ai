@@ -367,10 +367,10 @@ importers:
         version: 0.12.6
       llama-cloud-services:
         specifier: 0.3.3
-        version: 0.3.3(@llamaindex/core@0.6.19)(@llamaindex/env@0.1.30)(@llamaindex/workflow-core@1.2.0(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64))
+        version: 0.3.3(@llamaindex/core@0.6.20)(@llamaindex/env@0.1.30)(@llamaindex/workflow-core@1.2.0(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64))
       llamaindex:
-        specifier: ^0.11.26
-        version: 0.11.26(@llama-flow/core@0.4.4(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64))(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod-to-json-schema@3.24.6(zod@3.25.64))(zod@3.25.64)
+        specifier: ^0.11.27
+        version: 0.11.27(@llama-flow/core@0.4.4(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64))(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod-to-json-schema@3.24.6(zod@3.25.64))(zod@3.25.64)
       lucide-react:
         specifier: ^0.454.0
         version: 0.454.0(react@19.1.0)
@@ -1516,15 +1516,15 @@ packages:
       zod:
         optional: true
 
-  '@llamaindex/cloud@4.1.1':
-    resolution: {integrity: sha512-SvvNXAXwGUo7WOr1ajbcKlrK3nhzufb8p3noIAImviPHmeezhIygzlBDPAOM0Gkn4zl/fejJ0a/aK5RhwgMIFg==}
+  '@llamaindex/cloud@4.1.2':
+    resolution: {integrity: sha512-UgCMsf7W4t5lqO8wMQZNA4mHYk8i1QbYr3RnLOCmHhfcJPGnoAupyVF2IBL0L0p++LThDyKHSxCdCM+OQZV3jQ==}
     peerDependencies:
       '@llama-flow/core': ^0.4.1
-      '@llamaindex/core': 0.6.19
+      '@llamaindex/core': 0.6.20
       '@llamaindex/env': 0.1.30
 
-  '@llamaindex/core@0.6.19':
-    resolution: {integrity: sha512-TkVnhYRah95bRySo2kSgZIRhqO54fbmppHZI7BBU7RFptKquLe9lASHamjM5cPwlmL1XHZ2cTEof+eRDuGahbQ==}
+  '@llamaindex/core@0.6.20':
+    resolution: {integrity: sha512-3Sq8eoNyHjF9yFdzHJKjHxVioQPKcp7YLp6PiwkWryev30H3EFIloAr5CvgppRHGmwlhbTwHsGp+SSfpWIdg/g==}
 
   '@llamaindex/env@0.1.30':
     resolution: {integrity: sha512-y6kutMcCevzbmexUgz+HXf7KiZemzAoFEYSjAILfR+cG6FmYSF8XvLbGOB34Kx8mlRi7EI8rZXpezJ5qCqOyZg==}
@@ -1537,10 +1537,10 @@ packages:
       gpt-tokenizer:
         optional: true
 
-  '@llamaindex/node-parser@2.0.19':
-    resolution: {integrity: sha512-9jYj1KBMEcLnKU6miZT47NQjulm2xEYfOuSG8puKii3VX0n3HOftfaazjVuKkjC3KyyKR4/EqAcJsWWZagcvPQ==}
+  '@llamaindex/node-parser@2.0.20':
+    resolution: {integrity: sha512-9x/VqqrybWqFERui9H62AQqfJw0J0Hnzxcb501Ttt46nGnJXYIJ6DgcxA14EKlgEuiPRuYFMcXtO399ewnhteQ==}
     peerDependencies:
-      '@llamaindex/core': 0.6.19
+      '@llamaindex/core': 0.6.20
       '@llamaindex/env': 0.1.30
       tree-sitter: ^0.22.0
       web-tree-sitter: ^0.24.3
@@ -1568,10 +1568,10 @@ packages:
       zod:
         optional: true
 
-  '@llamaindex/workflow@1.1.20':
-    resolution: {integrity: sha512-hULpEZDwE24RQA+6L31ffHTRnwIg+Po81jmx2Crdz60lf5nCu4aReJ/yJP6JdaEQcUpuMkezhojh5FeT6g0Pkg==}
+  '@llamaindex/workflow@1.1.21':
+    resolution: {integrity: sha512-niNbmxUG+Czo3E7MJtu5GU4oTf2utzceA7xFUDFW0IMBcaap4FJItSr8UZbFj9uHa69SZrPmaZInXvOML6Onqw==}
     peerDependencies:
-      '@llamaindex/core': 0.6.19
+      '@llamaindex/core': 0.6.20
       '@llamaindex/env': 0.1.30
       zod: ^3.25.67
       zod-to-json-schema: ^3.24.6
@@ -6815,8 +6815,8 @@ packages:
       '@llamaindex/env': ^0.1.30
       '@llamaindex/workflow-core': ^0.4.1
 
-  llamaindex@0.11.26:
-    resolution: {integrity: sha512-jKKr/ekZ5Sjw2KWUdN3knSpUzLUmgJLEstWdyihqVH+mol7tIwhK3rMDz2528PCo6vPRB0RpuCQnVUcBAU/aRQ==}
+  llamaindex@0.11.27:
+    resolution: {integrity: sha512-UpVqxa+JSW6AvL0PgTZfuuhs9ujpXdnoUUQQBnV5CccEX1j/2GGQmKSS5xEsT/92ZjqIYfM5PyXViKGLE3XHYw==}
     engines: {node: '>=18.0.0'}
 
   load-json-file@1.1.0:
@@ -11303,15 +11303,15 @@ snapshots:
       rxjs: 7.8.2
       zod: 3.25.64
 
-  '@llamaindex/cloud@4.1.1(@llama-flow/core@0.4.4(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64))(@llamaindex/core@0.6.19)(@llamaindex/env@0.1.30)':
+  '@llamaindex/cloud@4.1.2(@llama-flow/core@0.4.4(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64))(@llamaindex/core@0.6.20)(@llamaindex/env@0.1.30)':
     dependencies:
       '@llama-flow/core': 0.4.4(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64)
-      '@llamaindex/core': 0.6.19
+      '@llamaindex/core': 0.6.20
       '@llamaindex/env': 0.1.30
       p-retry: 6.2.1
       zod: 3.25.76
 
-  '@llamaindex/core@0.6.19':
+  '@llamaindex/core@0.6.20':
     dependencies:
       '@llamaindex/env': 0.1.30
       '@types/node': 24.3.0
@@ -11328,9 +11328,9 @@ snapshots:
       js-tiktoken: 1.0.21
       pathe: 1.1.2
 
-  '@llamaindex/node-parser@2.0.19(@llamaindex/core@0.6.19)(@llamaindex/env@0.1.30)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)':
+  '@llamaindex/node-parser@2.0.20(@llamaindex/core@0.6.20)(@llamaindex/env@0.1.30)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)':
     dependencies:
-      '@llamaindex/core': 0.6.19
+      '@llamaindex/core': 0.6.20
       '@llamaindex/env': 0.1.30
       html-to-text: 9.0.5
       tree-sitter: 0.22.4
@@ -11344,9 +11344,9 @@ snapshots:
       rxjs: 7.8.2
       zod: 3.25.64
 
-  '@llamaindex/workflow@1.1.20(@llamaindex/core@0.6.19)(@llamaindex/env@0.1.30)(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod-to-json-schema@3.24.6(zod@3.25.64))(zod@3.25.64)':
+  '@llamaindex/workflow@1.1.21(@llamaindex/core@0.6.20)(@llamaindex/env@0.1.30)(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod-to-json-schema@3.24.6(zod@3.25.64))(zod@3.25.64)':
     dependencies:
-      '@llamaindex/core': 0.6.19
+      '@llamaindex/core': 0.6.20
       '@llamaindex/env': 0.1.30
       '@llamaindex/workflow-core': 1.2.0(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64)
       zod: 3.25.64
@@ -17583,9 +17583,9 @@ snapshots:
       cheerio: 0.22.0
       pick-util: 1.1.5
 
-  llama-cloud-services@0.3.3(@llamaindex/core@0.6.19)(@llamaindex/env@0.1.30)(@llamaindex/workflow-core@1.2.0(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64)):
+  llama-cloud-services@0.3.3(@llamaindex/core@0.6.20)(@llamaindex/env@0.1.30)(@llamaindex/workflow-core@1.2.0(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64)):
     dependencies:
-      '@llamaindex/core': 0.6.19
+      '@llamaindex/core': 0.6.20
       '@llamaindex/env': 0.1.30
       '@llamaindex/workflow-core': 1.2.0(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64)
       ajv: 8.17.1
@@ -17595,13 +17595,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  llamaindex@0.11.26(@llama-flow/core@0.4.4(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64))(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod-to-json-schema@3.24.6(zod@3.25.64))(zod@3.25.64):
+  llamaindex@0.11.27(@llama-flow/core@0.4.4(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64))(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod-to-json-schema@3.24.6(zod@3.25.64))(zod@3.25.64):
     dependencies:
-      '@llamaindex/cloud': 4.1.1(@llama-flow/core@0.4.4(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64))(@llamaindex/core@0.6.19)(@llamaindex/env@0.1.30)
-      '@llamaindex/core': 0.6.19
+      '@llamaindex/cloud': 4.1.2(@llama-flow/core@0.4.4(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod@3.25.64))(@llamaindex/core@0.6.20)(@llamaindex/env@0.1.30)
+      '@llamaindex/core': 0.6.20
       '@llamaindex/env': 0.1.30
-      '@llamaindex/node-parser': 2.0.19(@llamaindex/core@0.6.19)(@llamaindex/env@0.1.30)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)
-      '@llamaindex/workflow': 1.1.20(@llamaindex/core@0.6.19)(@llamaindex/env@0.1.30)(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod-to-json-schema@3.24.6(zod@3.25.64))(zod@3.25.64)
+      '@llamaindex/node-parser': 2.0.20(@llamaindex/core@0.6.20)(@llamaindex/env@0.1.30)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)
+      '@llamaindex/workflow': 1.1.21(@llamaindex/core@0.6.20)(@llamaindex/env@0.1.30)(@modelcontextprotocol/sdk@1.17.3)(next@15.2.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(p-retry@6.2.1)(rxjs@7.8.2)(zod-to-json-schema@3.24.6(zod@3.25.64))(zod@3.25.64)
       '@types/lodash': 4.17.20
       '@types/node': 24.3.0
       lodash: 4.17.21
