@@ -1,3 +1,63 @@
+import { NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
+
+export async function POST(request: Request) {
+  try {
+    const token = process.env.DUFFEL_API_KEY || ''
+    if (!token) return NextResponse.json({ error: 'Missing DUFFEL_API_KEY' }, { status: 500 })
+
+    const body = await request.json()
+    const slices: any[] = []
+    const origin = (body?.origin || '').toUpperCase()
+    const destination = (body?.destination || '').toUpperCase()
+    const departure_date = body?.departure_date
+    const return_date = body?.return_date
+    const adults = Number(body?.passengers?.adults || 1)
+    const cabin_class = body?.cabin_class || 'economy'
+    const max_connections = body?.max_connections
+
+    if (!origin || !destination || !departure_date) {
+      return NextResponse.json({ error: 'Missing required fields: origin, destination, departure_date' }, { status: 400 })
+    }
+
+    slices.push({ origin, destination, departure_date })
+    if (return_date) slices.push({ origin: destination, destination: origin, departure_date: return_date })
+
+    const reqBody = {
+      data: {
+        slices,
+        passengers: Array.from({ length: adults }).map(() => ({ type: 'adult' })),
+        cabin_class,
+        ...(typeof max_connections === 'number' ? { max_connections } : {}),
+      },
+    }
+
+    const resp = await fetch('https://api.duffel.com/air/offer_requests', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'Duffel-Version': 'v2',
+      },
+      body: JSON.stringify(reqBody),
+      cache: 'no-store',
+    })
+
+    if (!resp.ok) {
+      const text = await resp.text()
+      return NextResponse.json({ error: text || 'Duffel error' }, { status: resp.status })
+    }
+
+    const json = await resp.json()
+    const data = json?.data || json
+    return NextResponse.json({ data })
+  } catch (error: any) {
+    return NextResponse.json({ error: error?.message || 'Unexpected error' }, { status: 500 })
+  }
+}
+
 import { NextResponse } from 'next/server';
 import { getDuffelClient } from '@/lib/duffel';
 import { enrichOffersWithAirlineInfo } from '@/lib/duffel-enrichment';

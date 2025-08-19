@@ -70,6 +70,7 @@ export default function FlightsPage() {
     directOnly: false,
   })
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [promptValue, setPromptValue] = useState("")
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [density, setDensity] = useState<'compact' | 'cozy'>('cozy')
   const [offerRequestId, setOfferRequestId] = useState<string | null>(null)
@@ -101,15 +102,15 @@ export default function FlightsPage() {
               </video>
             </div>
             <input
+              value={promptValue}
+              onChange={(e) => setPromptValue(e.target.value)}
               placeholder="Ask Suitpax AI to plan your next flight (e.g., MAD → LHR Friday)"
               className="flex-1 bg-transparent text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-8"
             />
             <button
               className="h-9 w-9 rounded-xl bg-black text-white hover:bg-black/90 flex items-center justify-center"
-              onClick={(e) => {
-                const wrap = (e.currentTarget.closest('div') as HTMLDivElement) || document.body
-                const input = wrap.querySelector('input') as HTMLInputElement | null
-                const q = (input?.value || '').trim() || 'MAD to LHR Friday morning, return Sunday'
+              onClick={() => {
+                const q = (promptValue || '').trim() || 'MAD to LHR Friday morning, return Sunday'
                 window.location.href = `/dashboard/suitpax-ai?query=${encodeURIComponent(q)}`
               }}
             >
@@ -120,7 +121,7 @@ export default function FlightsPage() {
       </div>
 
       {/* Sample demo routes (always 3, randomized per load) */}
-      <SampleDemoRoutes />
+      <SampleDemoRoutes seedQuery={promptValue} />
 
       {/* Badges row under subtitle (show two) */}
       {/* ... existing code continues ... */}
