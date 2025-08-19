@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { resolveTravelIntent } from '@/lib/predictive-resolver'
+import { Translate } from '@google-cloud/translate/build/src/v2'
 
 export const runtime = 'nodejs'
 
@@ -24,8 +25,20 @@ export async function POST(request: Request) {
     const upper = query.toUpperCase()
     const iataInQuery = extractIataCodes(upper)
 
-    // Predict destination from natural language
-    const predicted = resolveTravelIntent(query)
+    // Optional: auto-detect language and translate to English to improve matching across any language
+    let queryForPrediction = query
+    try {
+      const translate = new Translate()
+      const [translated] = await translate.translate(query, 'en')
+      if (translated && typeof translated === 'string') {
+        queryForPrediction = translated
+      }
+    } catch {
+      // If translation is not configured, we silently skip
+    }
+
+    // Predict destination from natural language (translated when possible)
+    const predicted = resolveTravelIntent(queryForPrediction)
     const best = predicted[0]
 
     // Very simple heuristics for origin/destination

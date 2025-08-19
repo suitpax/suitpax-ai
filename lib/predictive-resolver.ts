@@ -39,6 +39,22 @@ export function resolveTravelIntent(query: string): ResolvedDestination[] {
     })
     .filter(Boolean) as ResolvedDestination[]
 
+  // Secondary fuzzy: partial includes for multiword queries (e.g., "ciudad amor" → Rome/Paris)
+  if (matches.length === 0) {
+    for (const intent of PREDICTIVE_INTENTS) {
+      const needle = intent.keywords.join(' ')
+      if (needle && q.includes(normalize(needle.split(' ')[0] || ''))) {
+        matches.push({
+          city: intent.destination.city,
+          iataCity: intent.destination.iataCity,
+          airport: intent.destination.airports?.[0],
+          confidence: (intent.weight ?? 0.7) * 0.9,
+          intentId: intent.id,
+        })
+      }
+    }
+  }
+
   // If user mentions an IATA code inside text, boost that city deterministically
   const iataMatch = /\b([A-Za-z]{3})\b/.exec(query)
   if (iataMatch) {
