@@ -32,11 +32,16 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
     <Card className="hover:shadow-md transition-shadow duration-200 border border-gray-200 rounded-2xl overflow-hidden">
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <div className="flex items-center gap-2 min-w-0">
-            <CarrierLogo iata={airlineIata} name={airlineName} />
+          <div className="flex items-center gap-3 min-w-0">
+            <CarrierLogo iata={airlineIata} name={airlineName} className="h-5 w-5" width={18} height={18} />
             <div className="truncate text-sm text-gray-800">
-              <span className="font-medium">{airlineName}</span>
-              {airlineIata && <span className="text-gray-500"> ({airlineIata})</span>}
+              <div className="font-medium leading-tight flex items-center gap-2">
+                <span>{firstSeg?.flight_number || ''}</span>
+                {firstSeg?.airline?.conditions_of_carriage_url && (
+                  <a href={firstSeg.airline.conditions_of_carriage_url} target="_blank" rel="noreferrer" className="text-[10px] text-gray-500 underline hover:text-gray-700">conditions</a>
+                )}
+              </div>
+              <div className="text-[11px] text-gray-600 truncate sm:hidden">{airlineName} {airlineIata ? `(${airlineIata})` : ''}</div>
             </div>
           </div>
           <div className="hidden sm:block text-gray-700 text-sm font-medium">

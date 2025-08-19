@@ -27,7 +27,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { EnhancedPromptInput } from "@/components/prompt-kit/prompt-input"
+import { PromptInput } from "@/components/prompt-kit/prompt-input"
 import { ChatMessage } from "@/components/prompt-kit/chat-message"
 
 interface Message {
@@ -311,7 +311,7 @@ export default function SuitpaxAIPage() {
                 <div className="hidden sm:block">
                   <div className="max-w-3xl mx-auto">
                     <div className="mb-2 text-xs text-gray-500 font-medium">Ask Suitpax AI</div>
-                    <EnhancedPromptInput
+                    <PromptInput
                       value={input}
                       onChange={setInput}
                       onSubmit={handleSend}

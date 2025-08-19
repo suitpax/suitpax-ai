@@ -37,7 +37,7 @@ export function useFlightSearch() {
         body.max_connections = 0
       }
 
-      const res = await fetch('/api/flights/duffel/optimized-search', {
+      const res = await fetch('/api/flights/duffel/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

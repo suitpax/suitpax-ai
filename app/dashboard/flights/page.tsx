@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
 import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
 import AirlinesSlider from "@/components/flights/results/airlines-slider"
-import { EnhancedPromptInput } from "@/components/prompt-kit/prompt-input"
+ 
 
 interface SearchParams {
   origin: string
@@ -69,13 +69,63 @@ export default function FlightsPage() {
     directOnly: false,
   })
   const [filtersOpen, setFiltersOpen] = useState(false)
+  
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [density, setDensity] = useState<'compact' | 'cozy'>('cozy')
   const [offerRequestId, setOfferRequestId] = useState<string | null>(null)
   const [pageMeta, setPageMeta] = useState<any>({})
   const [loadingMore, setLoadingMore] = useState(false)
+  const [sortBy, setSortBy] = useState<'recommended' | 'price' | 'duration'>('recommended')
 
-  // ... existing code ...
+  // Handlers
+  const saveSearch = useCallback(() => {
+    const item: SavedSearchItem = {
+      id: `${Date.now()}`,
+      name: `${searchParams.origin} → ${searchParams.destination} ${searchParams.departureDate}`,
+      created_at: new Date().toISOString(),
+      search_params: searchParams,
+    }
+    setSavedSearches((prev) => [item, ...prev].slice(0, 25))
+    toast.success('Search saved')
+  }, [searchParams])
+
+  const searchFlights = useCallback(async () => {
+    setSearching(true)
+    try {
+      const body: any = {
+        origin: (searchParams.origin || '').toUpperCase(),
+        destination: (searchParams.destination || '').toUpperCase(),
+        departure_date: searchParams.departureDate,
+        passengers: { adults: Math.max(1, Number(searchParams.passengers || 1)) },
+        cabin_class: searchParams.cabinClass || 'economy',
+      }
+      if (searchParams.tripType === 'round_trip' && searchParams.returnDate) {
+        body.return_date = searchParams.returnDate
+      }
+      if (directOnly) body.max_connections = 0
+
+      const legs = multiCityLegs.filter((l) => l.origin && l.destination && l.date)
+      if (searchParams.tripType === 'multi_city' && legs.length > 0) {
+        body.slices = legs.map((l) => ({ origin: l.origin.toUpperCase(), destination: l.destination.toUpperCase(), departure_date: l.date }))
+      }
+
+      const res = await fetch('/api/flights/duffel/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (!res.ok) throw new Error(await res.text())
+      const json = await res.json()
+      const items = Array.isArray(json?.data) ? json.data : (json?.offers || json?.data?.offers || [])
+      setOffers(items || [])
+      setOfferRequestId(json?.offer_request_id || null)
+      setPageMeta(json?.meta || {})
+    } catch (err: any) {
+      toast.error(err?.message || 'Error searching flights')
+    } finally {
+      setSearching(false)
+    }
+  }, [searchParams, directOnly, multiCityLegs])
 
   return (
     <div className="p-6 space-y-6">
@@ -90,33 +140,53 @@ export default function FlightsPage() {
         </div>
       </div>
 
-      {/* AI prompt with video placeholder */}
-      <div className="flex justify-center">
-        <div className="w-full max-w-2xl">
-          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-2 shadow-sm">
-            <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-gray-200">
-              <video autoPlay muted loop playsInline className="h-full w-full object-cover object-center">
-                <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20%28online-video-cutter.com%29%20%281%29-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
-              </video>
+      {/* Compact AI-like single input with code example */}
+      <Card className="border-gray-200">
+        <CardContent className="p-3">
+          <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+            <div className="p-3">
+              <input
+                placeholder="e.g. MAD → LHR on 2025-03-12, 1 adult, economy"
+                className="w-full bg-transparent text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none"
+              />
             </div>
-            <input
-              placeholder="Ask Suitpax AI to plan your next flight (e.g., MAD → LHR Friday)"
-              className="flex-1 bg-transparent text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-8"
-            />
-            <button
-              className="h-9 w-9 rounded-xl bg-black text-white hover:bg-black/90 flex items-center justify-center"
-              onClick={(e) => {
-                const wrap = (e.currentTarget.closest('div') as HTMLDivElement) || document.body
-                const input = wrap.querySelector('input') as HTMLInputElement | null
-                const q = (input?.value || '').trim() || 'MAD to LHR Friday morning, return Sunday'
-                window.location.href = `/dashboard/suitpax-ai?query=${encodeURIComponent(q)}`
-              }}
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-            </button>
+            <div className="border-t border-gray-200 bg-gray-50 p-3">
+              <pre className="text-[12px] text-gray-800 whitespace-pre-wrap">{
+`// Suitpax AI request (simulated)
+POST /api/flights/duffel/search
+{
+  "origin": "MAD",
+  "destination": "LHR",
+  "departure_date": "2025-03-12",
+  "passengers": { "adults": 1 },
+  "cabin_class": "economy",
+  "max_connections": 0
+}`}</pre>
+            </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Controls row: sorting, filters, etc. */}
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-gray-600">Sorted by: {sortBy}</div>
+        <div>
+          <FilterControls onChange={(v) => {
+            if (v?.sort) setSortBy(v.sort)
+          }} />
         </div>
       </div>
+
+      {/* Results list */}
+      {offers.length > 0 && (
+        <div className="mt-4">
+          <FlightResults
+            offers={offers as any}
+            sort={sortBy}
+            onSelectOffer={(offer) => router.push(`/dashboard/flights/book/${offer.id}`)}
+          />
+        </div>
+      )}
 
       {/* Badges row under subtitle (show two) */}
       {/* ... existing code continues ... */}

@@ -50,7 +50,7 @@ DUFFEL_WEBHOOK_SECRET=whsec_...       # Secreto para verificar webhooks
 
 | Endpoint                                      | MÃ©todo | DescripciÃ³n                                             |
 |-----------------------------------------------|--------|---------------------------------------------------------|
-| `/api/flights/duffel/optimized-search`        | POST   | BÃºsqueda optimizada de vuelos con todas las mejores prÃ¡cticas |
+| `/api/flights/duffel/search`                  | POST   | BÃºsqueda optimizada de vuelos con todas las mejores prÃ¡cticas |
 | `/api/flights/duffel/private-fares`           | POST   | BÃºsqueda de vuelos con tarifas privadas                |
 | `/api/flights/duffel/conditions`              | GET    | Obtener condiciones detalladas de ofertas y Ã³rdenes    |
 | `/api/flights/duffel/stops`                   | GET    | Obtener informaciÃ³n detallada de escalas               |
@@ -95,7 +95,7 @@ const searchRequest = {
   max_connections: 1
 };
 
-// POST /api/flights/duffel/optimized-search
+// POST /api/flights/duffel/search
 \`\`\`
 
 ## Tarifas Privadas

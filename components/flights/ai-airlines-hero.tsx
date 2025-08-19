@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import AirlinesSlider from "@/components/ui/airlines-slider"
 import TripsBooking from "@/components/flights/trips-booking"
-import { EnhancedPromptInput } from "@/components/prompt-kit/prompt-input"
+import { PromptInput, PromptInputTextarea } from "@/components/prompt-kit/prompt-input"
 
 export default function AIAirlinesHero() {
   const [query, setQuery] = useState("")
@@ -35,17 +35,9 @@ export default function AIAirlinesHero() {
         </div>
         <div className="flex justify-center mb-8">
           <div className="w-full max-w-2xl">
-            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl p-2.5 shadow-sm focus-within:ring-1 focus-within:ring-gray-300">
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={placeholders[phIndex]}
-                className="flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
-              />
-              <button onClick={handleSubmit} className="h-9 w-9 rounded-xl bg-black text-white hover:bg-gray-900 flex items-center justify-center">
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-              </button>
-            </div>
+            <PromptInput value={query} onValueChange={setQuery} onSubmit={handleSubmit}>
+              <PromptInputTextarea placeholder={placeholders[phIndex]} />
+            </PromptInput>
           </div>
         </div>
         <div className="rounded-3xl overflow-hidden">
