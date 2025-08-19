@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
     const origin = iatas[0]
     const destination = iatas[1]
-    const departure_date = new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toISOString().split('T')[0]
+    const departure_date = new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0]
 
     const body = {
       origin,

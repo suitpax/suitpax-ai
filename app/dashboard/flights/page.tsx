@@ -16,7 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
 import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
 import AirlinesSlider from "@/components/flights/results/airlines-slider"
-import { PromptInput } from "@/components/prompt-kit/prompt-input"
+ 
 
 interface SearchParams {
   origin: string
@@ -70,7 +70,7 @@ export default function FlightsPage() {
     directOnly: false,
   })
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [promptValue, setPromptValue] = useState("")
+  
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [density, setDensity] = useState<'compact' | 'cozy'>('cozy')
   const [offerRequestId, setOfferRequestId] = useState<string | null>(null)
@@ -142,36 +142,10 @@ export default function FlightsPage() {
         </div>
       </div>
 
-      {/* AI prompt with video placeholder */}
-      <div className="flex justify-center">
-        <div className="w-full max-w-2xl">
-          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-2 shadow-sm">
-            <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-gray-200">
-              <video autoPlay muted loop playsInline className="h-full w-full object-cover object-center">
-                <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20%28online-video-cutter.com%29%20%281%29-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
-              </video>
-            </div>
-            <input
-              value={promptValue}
-              onChange={(e) => setPromptValue(e.target.value)}
-              placeholder="Ask Suitpax AI to plan your next flight (e.g., MAD → LHR Friday)"
-              className="flex-1 bg-transparent text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-8"
-            />
-            <button
-              className="h-9 w-9 rounded-xl bg-black text-white hover:bg-black/90 flex items-center justify-center"
-              onClick={() => {
-                const q = (promptValue || '').trim() || 'MAD to LHR Friday morning, return Sunday'
-                window.location.href = `/dashboard/suitpax-ai?query=${encodeURIComponent(q)}`
-              }}
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-            </button>
-          </div>
-        </div>
-      </div>
+      
 
-      {/* Sample demo routes (real Duffel when available; always 3) */}
-      <SampleDemoRoutes seedQuery={promptValue} />
+      {/* Sample demo routes (static randomized) */}
+      <SampleDemoRoutes />
 
       {/* Controls row: sorting, filters, etc. */}
       <div className="flex items-center justify-between">

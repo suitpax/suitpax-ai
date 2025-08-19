@@ -10,11 +10,11 @@ interface CarrierLogoProps {
   height?: number
 }
 
-export default function CarrierLogo({ iata, name, className = "", width = 56, height = 22 }: CarrierLogoProps) {
+export default function CarrierLogo({ iata, name, className = "", width = 32, height = 32 }: CarrierLogoProps) {
   if (!iata) return null
   return (
     <Image
-      src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${iata}.svg`}
+      src={`https://assets.duffel.com/img/airlines/for-light-background/symbol/${iata}.svg`}
       width={width}
       height={height}
       alt={name || iata}
