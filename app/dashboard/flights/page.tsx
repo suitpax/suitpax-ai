@@ -78,7 +78,56 @@ export default function FlightsPage() {
   const [loadingMore, setLoadingMore] = useState(false)
   const [sortBy, setSortBy] = useState<'recommended' | 'price' | 'duration'>('recommended')
 
-  // ... existing code ...
+  // Handlers
+  const saveSearch = useCallback(() => {
+    const item: SavedSearchItem = {
+      id: `${Date.now()}`,
+      name: `${searchParams.origin} → ${searchParams.destination} ${searchParams.departureDate}`,
+      created_at: new Date().toISOString(),
+      search_params: searchParams,
+    }
+    setSavedSearches((prev) => [item, ...prev].slice(0, 25))
+    toast.success('Search saved')
+  }, [searchParams])
+
+  const searchFlights = useCallback(async () => {
+    setSearching(true)
+    try {
+      const body: any = {
+        origin: (searchParams.origin || '').toUpperCase(),
+        destination: (searchParams.destination || '').toUpperCase(),
+        departure_date: searchParams.departureDate,
+        passengers: { adults: Math.max(1, Number(searchParams.passengers || 1)) },
+        cabin_class: searchParams.cabinClass || 'economy',
+      }
+      if (searchParams.tripType === 'round_trip' && searchParams.returnDate) {
+        body.return_date = searchParams.returnDate
+      }
+      if (directOnly) body.max_connections = 0
+
+      // Support multi-city if user filled legs
+      const legs = multiCityLegs.filter((l) => l.origin && l.destination && l.date)
+      if (searchParams.tripType === 'multi_city' && legs.length > 0) {
+        body.slices = legs.map((l) => ({ origin: l.origin.toUpperCase(), destination: l.destination.toUpperCase(), departure_date: l.date }))
+      }
+
+      const res = await fetch('/api/flights/duffel/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (!res.ok) throw new Error(await res.text())
+      const json = await res.json()
+      const items = Array.isArray(json?.data) ? json.data : (json?.offers || json?.data?.offers || [])
+      setOffers(items || [])
+      setOfferRequestId(json?.offer_request_id || null)
+      setPageMeta(json?.meta || {})
+    } catch (err: any) {
+      toast.error(err?.message || 'Error searching flights')
+    } finally {
+      setSearching(false)
+    }
+  }, [searchParams, directOnly, multiCityLegs])
 
   return (
     <div className="p-6 space-y-6">
@@ -134,8 +183,16 @@ export default function FlightsPage() {
         </div>
       </div>
 
-      {/* Results list sample — pass sortBy if offers are present in your state */}
-      {/* Example usage: <FlightResults offers={offers} sort={sortBy} onSelectOffer={...} /> */}
+      {/* Results list */}
+      {offers.length > 0 && (
+        <div className="mt-4">
+          <FlightResults
+            offers={offers as any}
+            sort={sortBy}
+            onSelectOffer={(offer) => router.push(`/dashboard/flights/book/${offer.id}`)}
+          />
+        </div>
+      )}
 
       {/* Badges row under subtitle (show two) */}
       {/* ... existing code continues ... */}
