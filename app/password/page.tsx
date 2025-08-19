@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 
 export default function PasswordGatePage() {
   const router = useRouter()
@@ -37,7 +38,17 @@ export default function PasswordGatePage() {
   }
 
   return (
-    <div className="relative w-full min-h-[100vh] bg-gradient-to-b from-gray-50 via-gray-100 to-gray-50 overflow-hidden">
+    <VantaHaloBackground
+      className="relative w-full min-h-[100vh] overflow-hidden"
+      options={{
+        backgroundColor: 0x000000,
+        baseColor: 0x111111,
+        color: 0xffffff,
+        color2: 0xCFE8FF,
+        size: 0.9,
+        amplitudeFactor: 1.2,
+      }}
+    >
       <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-25" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10 py-20 md:py-28">
@@ -129,7 +140,7 @@ export default function PasswordGatePage() {
           100% { background-position: -200% 0; }
         }
       `}</style>
-    </div>
+    </VantaHaloBackground>
   )
 }
 

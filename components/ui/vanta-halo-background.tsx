@@ -8,9 +8,19 @@ import Script from "next/script"
 interface VantaHaloBackgroundProps {
   children: React.ReactNode
   className?: string
+  options?: Partial<{
+    backgroundColor: number
+    baseColor: number
+    color: number
+    color2: number
+    size: number
+    amplitudeFactor: number
+    xOffset: number
+    yOffset: number
+  }>
 }
 
-export default function VantaHaloBackground({ children, className = "" }: VantaHaloBackgroundProps) {
+export default function VantaHaloBackground({ children, className = "", options = {} }: VantaHaloBackgroundProps) {
   const vantaRef = useRef<HTMLDivElement>(null)
   const [vantaEffect, setVantaEffect] = useState<any>(null)
   const [scriptsLoaded, setScriptsLoaded] = useState(false)
@@ -28,16 +38,14 @@ export default function VantaHaloBackground({ children, className = "" }: VantaH
         gyroControls: false,
         minHeight: 200.0,
         minWidth: 200.0,
-        backgroundColor: 0xe4e5ed, // gris claro
-        baseColor: 0xdfe3ea, // un poco más blanco/azulado
-        size: 0.8,
-        amplitudeFactor: 1.0,
-        xOffset: 0,
-        yOffset: 0,
-        // tonos blancos y azules suaves
-        // algunos temas de Vanta aceptan color1/color2; si no, se ignora sin romper
-        color: 0xffffff,
-        color2: 0xCFE8FF,
+        backgroundColor: options.backgroundColor ?? 0xe4e5ed,
+        baseColor: options.baseColor ?? 0xdfe3ea,
+        size: options.size ?? 0.8,
+        amplitudeFactor: options.amplitudeFactor ?? 1.0,
+        xOffset: options.xOffset ?? 0,
+        yOffset: options.yOffset ?? 0,
+        color: options.color ?? 0xffffff,
+        color2: options.color2 ?? 0xCFE8FF,
       })
 
       setVantaEffect(effect)
