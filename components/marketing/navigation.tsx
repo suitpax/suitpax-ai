@@ -13,9 +13,9 @@ import type { User } from "@supabase/supabase-js"
 import { cn } from "@/lib/utils"
 
 const navigationItems = [
+  { name: "Business travel", href: "/business-travel" },
   { name: "Manifesto", href: "/manifesto" },
   { name: "Pricing", href: "/pricing" },
-  { name: "Suitpax Code X", href: "/pricing#code", badge: "Mobile Only" },
   { name: "Talk to founder", href: "/contact" },
 ]
 
@@ -66,13 +66,13 @@ export default function Navigation() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 flex justify-center px-3 pt-2 pb-2", // slightly taller
+          "fixed top-0 left-0 right-0 z-50 flex justify-center px-3 pt-2 pb-2",
           "transition-all duration-300"
         )}
       >
         <div
           className={cn(
-            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-white/90 border border-black/5 px-4 py-2", // slightly taller container
+            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-white/90 border border-black/5 px-4 py-2",
             isScrolled ? "shadow-lg border-black/10" : ""
           )}
         >
@@ -89,9 +89,7 @@ export default function Navigation() {
 
           {!isMobile && (
             <div className="hidden md:flex items-center space-x-5">
-              {navigationItems
-                .filter((i) => i.name !== "Suitpax Code X")
-                .map((item) => (
+              {navigationItems.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
@@ -172,9 +170,7 @@ export default function Navigation() {
                   className="block text-sm font-medium text-gray-700 hover:text-black transition-colors tracking-tight"
                 >
                   {item.name}
-                  {item.name === "Suitpax Code X" && (
-                    <span className="ml-1 inline-flex items-center rounded-full border border-black px-2 py-0.5 text-[10px] font-medium text-black">Mobile Only</span>
-                  )}
+
                 </Link>
               ))}
 

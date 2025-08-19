@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import {
@@ -174,14 +174,11 @@ export const AIMeetingsAttachment = () => {
           {/* Header con título mejorado */}
           <div className="text-center mb-12">
             <div className="inline-flex items-center rounded-xl bg-gray-200 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 mb-3">
-              <Image
-                src="/logo/suitpax-bl-logo.webp"
-                alt="Suitpax"
-                width={16}
-                height={16}
-                className="mr-1.5 h-3.5 w-auto"
-              />
-              Smart Meeting Management
+              <span className="inline-flex items-center gap-1">
+                <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={50} height={14} className="h-3.5 w-auto" />
+                <span className="sr-only">Suitpax</span>
+              </span>
+              <span className="ml-1.5">Smart Meeting Management</span>
             </div>
 
             {/* Título aumentado un nivel */}
@@ -210,22 +207,28 @@ export const AIMeetingsAttachment = () => {
           <div className="mb-12 max-w-lg mx-auto">
             <div className="rounded-xl border border-gray-500/20 p-2.5 bg-black/20 backdrop-blur-sm">
               <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-gray-200/10">
-                <Image
-                  src="https://tailark.com/_next/image?url=%2Forigin-cal-dark.png&w=3840&q=75"
-                  alt="Calendar Integration"
-                  width={1207}
-                  height={929}
-                  className="w-full h-full object-cover"
-                />
+                {/* Futuristic dots grid calendar */}
+                <div className="absolute inset-0 grid grid-cols-14 grid-rows-7 gap-2 p-4">
+                  {Array.from({ length: 14 * 7 }).map((_, idx) => (
+                    <div key={idx} className="flex items-center justify-center">
+                      <div className="h-1.5 w-1.5 rounded-full bg-gray-400/30" />
+                    </div>
+                  ))}
+                </div>
 
-                {/* Overlay elements */}
+                {/* Highlighted time blocks */}
+                <div className="absolute inset-0 p-4">
+                  <div className="absolute left-[20%] top-[30%] h-8 w-16 rounded-lg bg-sky-300/30 border border-sky-200/40" />
+                  <div className="absolute left-[55%] top-[55%] h-8 w-24 rounded-lg bg-emerald-300/20 border border-emerald-200/40" />
+                </div>
+
+                {/* Overlay badges */}
                 <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-gray-200/20">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-gray-300" />
                     <span className="text-[10px] text-gray-300">Smart scheduling</span>
                   </div>
                 </div>
-
                 <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-gray-200/20">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-emerald-400" />

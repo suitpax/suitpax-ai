@@ -61,15 +61,27 @@ export function middleware(request: NextRequest) {
     "/contact",
     "/solutions",
     "/public",
-    "/api/public"
+    "/password",
+    "/api/public",
+    "/api/password/verify",
   ]
 
   const isPublicPath = publicPaths.some(path =>
     pathname === path || pathname.startsWith(path + "/")
   )
 
+  const launchMode = process.env.LAUNCH_MODE === 'on'
   if (isPublicPath) {
     return response
+  }
+
+  if (launchMode) {
+    const cookie = request.cookies.get('site_access_ok')?.value
+    if (!cookie) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/password'
+      return NextResponse.redirect(url)
+    }
   }
 
   return response

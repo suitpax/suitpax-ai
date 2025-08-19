@@ -92,3 +92,5 @@ export const PromptInputAction = React.forwardRef<
   </div>
 ))
 PromptInputAction.displayName = "PromptInputAction"
+
+export { EnhancedPromptInput } from "./enhanced-prompt-input"

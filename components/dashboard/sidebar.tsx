@@ -51,6 +51,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Trips", href: "/dashboard/trips", icon: Plane },
   { name: "Flights", href: "/dashboard/flights", icon: Plane },
+  { name: "Events", href: "/dashboard/events", icon: Calendar },
   { name: "Approvals", href: "/dashboard/approvals", icon: CheckSquare },
   { name: "Requests", href: "/dashboard/requests", icon: Send },
   { name: "Finance Hub", href: "/dashboard/finance-hub", icon: CreditCard },
@@ -61,7 +62,7 @@ const navigation = [
 
 const aiNavigation = [
   { name: "AI Center", href: "/dashboard/ai-center", icon: MessageSquare, badge: "AI" },
-  { name: "Suitpax Code", href: "/dashboard/code", icon: MessageSquare, badge: "Dev" },
+  // { name: "Suitpax Code", href: "/dashboard/code", icon: MessageSquare, badge: "Dev" },
 ]
 
 interface SidebarProps {
@@ -229,51 +230,53 @@ export function Sidebar({
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-600">{getDisplayName().split(" ")[0]}</span>
                   <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse"></div>
-                    <div
-                      className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-pulse"
-                      style={{ animationDelay: "0.5s" }}
-                    ></div>
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                    <div className="w-1.5 h-1.5 bg-emerald-400/80 rounded-full animate-pulse" style={{ animationDelay: "0.5s" }}></div>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500">Suitpax AI v2.1.0</div>
+                <div className="text-xs text-gray-500">Suitpax AI</div>
               </div>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsCollapsed?.(!isCollapsed)}
-            className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl"
-          >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </Button>
+          {/* Collapse button: visible only on mobile */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsCollapsed?.(!isCollapsed)}
+              className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl"
+            >
+              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </Button>
+          )}
         </div>
       </div>
 
       {(!isCollapsed || isMobile) && (
         <div className="px-3 pt-3 border-b border-gray-200">
           <form onSubmit={handleAiSubmit} className="relative">
-            <Input
-              value={aiQuery}
-              onChange={(e) => setAiQuery(e.target.value)}
-              placeholder="Ask AI anything..."
-              className="pr-10 rounded-xl border-gray-200 text-sm h-9 bg-gray-50 focus:bg-white transition-colors"
-              disabled={isAiLoading}
-            />
-            <Button
-              type="submit"
-              size="sm"
-              variant="ghost"
-              disabled={!aiQuery.trim() || isAiLoading}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100 rounded-lg"
-            >
-              {isAiLoading ? (
-                <div className="animate-spin rounded-full h-3 w-3 border-2 border-gray-400 border-t-transparent" />
-              ) : (
-                <Send className="h-3 w-3" />
-              )}
-            </Button>
+            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl p-2.5 shadow-sm focus-within:ring-1 focus-within:ring-gray-300">
+              <Input
+                value={aiQuery}
+                onChange={(e) => setAiQuery(e.target.value)}
+                placeholder="Search flights with AI — try: MAD → LHR next Friday"
+                className="flex-1 bg-transparent border-0 focus-visible:ring-0 text-sm"
+                disabled={isAiLoading}
+              />
+              <Button
+                type="submit"
+                size="sm"
+                variant="ghost"
+                disabled={!aiQuery.trim() || isAiLoading}
+                className="h-8 w-8 p-0 hover:bg-gray-100 rounded-xl"
+              >
+                {isAiLoading ? (
+                  <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent" />
+                ) : (
+                  <Send className="h-3.5 w-3.5" />
+                )}
+              </Button>
+            </div>
           </form>
         </div>
       )}
@@ -328,7 +331,7 @@ export function Sidebar({
                       <item.icon className="flex-shrink-0 h-5 w-5 mr-3" aria-hidden="true" />
                       <span>{item.name}</span>
                     </div>
-                    <Badge className="bg-gray-200 text-gray-700 text-[10px] px-2 py-0.5 rounded-lg">{item.badge}</Badge>
+                    <Badge className="bg-gray-200 text-gray-700 text-[10px] px-2 py-0 rounded-lg">{item.badge}</Badge>
                   </Link>
                 )
               })}

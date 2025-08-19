@@ -229,7 +229,7 @@ export function ComparePlans() {
                     <th className="py-6 px-6 text-center w-1/5">
                       <div className="flex flex-col items-center">
                         <span className="text-lg font-medium text-black mb-1">Enterprise</span>
-                                                 <span className="text-sm text-gray-500 mb-2">Custom pricing (Suitpax Code add-on Q1 2026)</span>
+                                                 <span className="text-sm text-gray-500 mb-2">Custom pricing (Suitpax Code private preview)</span>
                         <span className="inline-flex items-center rounded-full bg-transparent border border-black px-4 py-1 text-xs font-medium text-black">
                           Enterprise
                         </span>

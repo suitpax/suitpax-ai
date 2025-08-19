@@ -36,47 +36,47 @@ export default function PassengerDetails({ onSubmit, initial = [] }: Props) {
   const removePassenger = (idx: number) => setPassengers(prev => prev.filter((_, i) => i !== idx))
 
   return (
-    <div className="space-y-4 rounded-xl border border-neutral-800 bg-neutral-950 p-4">
+    <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4">
       {passengers.map((p, idx) => (
-        <div key={idx} className="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
-          <div className="mb-3 text-sm font-medium text-neutral-200">Pasajero {idx + 1}</div>
+        <div key={idx} className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="mb-3 text-sm font-medium text-gray-900">Passenger {idx + 1}</div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
-              <Label className="text-sm text-neutral-300">Nombre</Label>
-              <Input value={p.given_name} onChange={e => update(idx, { given_name: e.target.value })} className="bg-neutral-800 text-white" />
+              <Label className="text-sm text-gray-700">First name</Label>
+              <Input value={p.given_name} onChange={e => update(idx, { given_name: e.target.value })} className="bg-white text-gray-900" />
             </div>
             <div>
-              <Label className="text-sm text-neutral-300">Apellido</Label>
-              <Input value={p.family_name} onChange={e => update(idx, { family_name: e.target.value })} className="bg-neutral-800 text-white" />
+              <Label className="text-sm text-gray-700">Last name</Label>
+              <Input value={p.family_name} onChange={e => update(idx, { family_name: e.target.value })} className="bg-white text-gray-900" />
             </div>
             <div>
-              <Label className="text-sm text-neutral-300">Fecha de nacimiento</Label>
-              <Input type="date" value={p.born_on} onChange={e => update(idx, { born_on: e.target.value })} className="bg-neutral-800 text-white" />
-            </div>
-          </div>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div>
-              <Label className="text-sm text-neutral-300">Teléfono</Label>
-              <Input value={p.phone_number} onChange={e => update(idx, { phone_number: e.target.value })} className="bg-neutral-800 text-white" />
-            </div>
-            <div>
-              <Label className="text-sm text-neutral-300">Email</Label>
-              <Input type="email" value={p.email} onChange={e => update(idx, { email: e.target.value })} className="bg-neutral-800 text-white" />
-            </div>
-            <div>
-              <Label className="text-sm text-neutral-300">Preferencia de asiento</Label>
-              <Input placeholder="aisle/window/middle" value={p.seat_preference || ''} onChange={e => update(idx, { seat_preference: e.target.value })} className="bg-neutral-800 text-white" />
+              <Label className="text-sm text-gray-700">Date of birth</Label>
+              <Input type="date" value={p.born_on} onChange={e => update(idx, { born_on: e.target.value })} className="bg-white text-gray-900" />
             </div>
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
-              <Label className="text-sm text-neutral-300">Preferencia de comida</Label>
-              <Input placeholder="vegetarian/vegan/halal/..." value={p.meal_preference || ''} onChange={e => update(idx, { meal_preference: e.target.value })} className="bg-neutral-800 text-white" />
+              <Label className="text-sm text-gray-700">Phone</Label>
+              <Input value={p.phone_number} onChange={e => update(idx, { phone_number: e.target.value })} className="bg-white text-gray-900" />
+            </div>
+            <div>
+              <Label className="text-sm text-gray-700">Email</Label>
+              <Input type="email" value={p.email} onChange={e => update(idx, { email: e.target.value })} className="bg-white text-gray-900" />
+            </div>
+            <div>
+              <Label className="text-sm text-gray-700">Seat preference</Label>
+              <Input placeholder="aisle/window/middle" value={p.seat_preference || ''} onChange={e => update(idx, { seat_preference: e.target.value })} className="bg-white text-gray-900" />
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div>
+              <Label className="text-sm text-gray-700">Meal preference</Label>
+              <Input placeholder="vegetarian/vegan/halal/..." value={p.meal_preference || ''} onChange={e => update(idx, { meal_preference: e.target.value })} className="bg-white text-gray-900" />
             </div>
             <div className="md:col-span-2">
-              <Label className="text-sm text-neutral-300">Programa de fidelidad (IATA - Número)</Label>
+              <Label className="text-sm text-gray-700">Loyalty programs (IATA - Number)</Label>
               <Input placeholder="AA-123456, BA-987654" onBlur={e => {
                 const val = e.target.value.trim()
                 if (!val) return update(idx, { loyalty_programme_accounts: [] })
@@ -85,21 +85,21 @@ export default function PassengerDetails({ onSubmit, initial = [] }: Props) {
                   return { airline_iata_code: (air || '').toUpperCase(), account_number: acc || '' }
                 }).filter(a => a.airline_iata_code && a.account_number)
                 update(idx, { loyalty_programme_accounts: accounts })
-              }} className="bg-neutral-800 text-white" />
+              }} className="bg-white text-gray-900" />
             </div>
           </div>
 
           {passengers.length > 1 && (
             <div className="mt-4 flex justify-end">
-              <Button variant="secondary" onClick={() => removePassenger(idx)} className="border-neutral-700 bg-neutral-800 text-white hover:bg-neutral-700">Quitar</Button>
+              <Button variant="secondary" onClick={() => removePassenger(idx)} className="border-gray-300 bg-white text-gray-800 hover:bg-gray-50">Remove</Button>
             </div>
           )}
         </div>
       ))}
 
       <div className="flex items-center justify-between">
-        <Button variant="secondary" onClick={addPassenger} className="border-neutral-700 bg-neutral-900 text-white hover:bg-neutral-800">Añadir pasajero</Button>
-        <Button onClick={() => onSubmit(passengers)} className="bg-white text-black hover:bg-neutral-200">Continuar</Button>
+        <Button variant="secondary" onClick={addPassenger} className="border-gray-300 bg-white text-gray-800 hover:bg-gray-50">Add passenger</Button>
+        <Button onClick={() => onSubmit(passengers)} className="bg-black text-white hover:bg-gray-800">Continue</Button>
       </div>
     </div>
   )

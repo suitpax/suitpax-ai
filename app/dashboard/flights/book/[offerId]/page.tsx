@@ -1,163 +1,170 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { toast } from "react-hot-toast"
-import PaymentForm from "@/components/flights/booking-flow/payment-form"
-import BookingSummary from "@/components/flights/booking-summary"
-import DuffelAncillaries from "@/components/flights/ancillaries/DuffelAncillaries"
+import PassengerForm from "@/components/flights/booking/passenger-form"
+import PaymentForm from "@/components/flights/booking/payment-form"
+import Ancillaries from "@/components/flights/booking/ancillaries"
 import SeatSelection from "@/components/flights/booking-flow/seat-selection"
+import { Input } from "@/components/ui/input"
+import ResultCard from "@/components/flights/results/result-card"
 
-export default function BookOfferPage() {
-	const params = useParams() as { offerId: string }
-	const router = useRouter()
-	const offerId = params?.offerId
+type Step = "review" | "passengers" | "documents" | "seats" | "extras" | "payment"
 
-	const [loading, setLoading] = useState(true)
-	const [offer, setOffer] = useState<any>(null)
-	const [submitting, setSubmitting] = useState(false)
-	const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
+export default function BookOfferPage({ params }: { params: { offerId: string } }) {
+  const router = useRouter()
+  const { offerId } = params
+  const [offer, setOffer] = useState<any | null>(null)
+  const [step, setStep] = useState<Step>("review")
+  const [passengers, setPassengers] = useState<any[]>([])
+  const [selectedSeat, setSelectedSeat] = useState<string | null>(null)
+  const [selectedExtras, setSelectedExtras] = useState<Record<string, any>>({})
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
-	// Simple passenger form (1 adulto)
-	const [givenName, setGivenName] = useState("")
-	const [familyName, setFamilyName] = useState("")
-	const [email, setEmail] = useState("")
-	const [bornOn, setBornOn] = useState("")
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch(`/api/flights/duffel/offers/${offerId}`)
+        const data = await res.json()
+        setOffer(data?.data || data?.offer || null)
+      } catch {}
+    }
+    load()
+    // Restore payment intent after 3DS return
+    try {
+      const storedOffer = localStorage.getItem('suitpax_payment_offer')
+      const storedIntent = localStorage.getItem('suitpax_payment_intent')
+      if (storedOffer === offerId && storedIntent) {
+        setPaymentIntentId(storedIntent)
+        localStorage.removeItem('suitpax_payment_offer')
+        localStorage.removeItem('suitpax_payment_intent')
+      }
+    } catch {}
+  }, [offerId])
 
-	useEffect(() => {
-		const run = async () => {
-			try {
-				if (!offerId) return
-				const res = await fetch(`/api/flights/duffel/offers/${offerId}`)
-				const json = await res.json()
-				if (!res.ok) throw new Error(json?.error || "Failed to load offer")
-				const data = json?.data || json
-				setOffer(data)
-			} catch (e: any) {
-				toast.error(e?.message || "Error loading offer")
-			} finally {
-				setLoading(false)
-			}
-		}
-		run()
-	}, [offerId])
+  if (!offer) return <div className="p-6 text-sm text-gray-600">Loading offer…</div>
 
-	const submitOrder = async () => {
-		if (!offer) return
-		if (!givenName || !familyName || !email || !bornOn) {
-			toast.error("Please complete passenger info")
-			return
-		}
-		setSubmitting(true)
-		try {
-			const payments = paymentIntentId
-				? [{ type: 'card', payment_intent_id: paymentIntentId }]
-				: [{ type: 'balance' }]
-			const body = {
-				selected_offers: [offer.id],
-				passengers: [
-					{
-						type: "adult",
-						given_name: givenName,
-						family_name: familyName,
-						born_on: bornOn,
-						email,
-					},
-				],
-				payments,
-			}
-			const res = await fetch('/api/flights/duffel/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-			const json = await res.json()
-			if (!res.ok) throw new Error(json?.error || 'Order failed')
-			toast.success('Booking confirmed')
-			router.push('/dashboard/trips')
-		} catch (e: any) {
-			toast.error(e?.message || 'Failed to place order')
-		} finally {
-			setSubmitting(false)
-		}
-	}
+  return (
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      <div className="flex flex-col items-center text-center gap-2">
+        <h1 className="text-2xl md:text-3xl font-medium tracking-tighter">Complete your booking</h1>
+        <p className="text-sm text-gray-600">Secure checkout, seat selection, and extras — all in one place.</p>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {['3D Secure', 'PCI-safe', 'Seat maps', 'Extras'].map(x => (
+            <span key={x} className="inline-flex items-center rounded-full px-3 py-1 text-xs border border-gray-300 bg-white/70 text-gray-800">{x}</span>
+          ))}
+        </div>
+        <button className="text-xs text-gray-500 hover:text-gray-800" onClick={() => router.back()}>Back</button>
+      </div>
 
-	if (loading) return <div className="p-6">Loading…</div>
-	if (!offer) return <div className="p-6">Offer not found</div>
+      <ResultCard offer={offer} onSelect={() => {}} />
 
-	return (
-		<div className="p-6 space-y-6">
-			<div className="flex items-center justify-between">
-				<h1 className="text-2xl font-semibold">Checkout</h1>
-				<div className="text-right">
-					<div className="text-xl font-semibold">
-						{new Intl.NumberFormat('en-US', { style: 'currency', currency: offer.total_currency, maximumFractionDigits: 0 }).format(parseFloat(offer.total_amount))}
-					</div>
-					<div className="text-xs text-gray-500">Offer ID: {offer.id}</div>
-				</div>
-			</div>
-
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-				<div className="md:col-span-2 space-y-4">
-					<Card className="border-gray-200">
-						<CardHeader>
-							<CardTitle>Passenger</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-3">
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-								<div>
-									<Label>Given name</Label>
-									<Input value={givenName} onChange={e => setGivenName(e.target.value)} className="bg-white text-gray-900" />
-								</div>
-								<div>
-									<Label>Family name</Label>
-									<Input value={familyName} onChange={e => setFamilyName(e.target.value)} className="bg-white text-gray-900" />
-								</div>
-								<div>
-									<Label>Email</Label>
-									<Input type="email" value={email} onChange={e => setEmail(e.target.value)} className="bg-white text-gray-900" />
-								</div>
-								<div>
-									<Label>Date of birth</Label>
-									<Input type="date" value={bornOn} onChange={e => setBornOn(e.target.value)} className="bg-white text-gray-900" />
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					<PaymentForm offer={offer} onReady={setPaymentIntentId} />
-					<DuffelAncillaries offerId={offer.id} />
-					<SeatSelection offerId={offer.id} />
-				</div>
-
-				<div className="space-y-4">
-					<BookingSummary offer={offer} />
-					<Button onClick={submitOrder} disabled={submitting} className="w-full bg-black text-white hover:bg-gray-800 rounded-2xl">
-						{submitting ? 'Processing…' : 'Confirm booking'}
-					</Button>
-				</div>
-			</div>
-
-			<Card className="border-gray-200">
-				<CardHeader>
-					<CardTitle>Itinerary</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-2 text-sm text-gray-800">
-					{offer.slices?.map((s: any, i: number) => (
-						<div key={s.id} className="rounded-lg border border-gray-200 p-3">
-							<div className="font-medium">Leg {i + 1}: {s.origin?.iata_code} → {s.destination?.iata_code}</div>
-							<div className="mt-1 grid gap-2">
-								{s.segments?.map((seg: any) => (
-									<div key={seg.id} className="flex items-center justify-between text-xs">
-										<div>{seg.origin?.iata_code} → {seg.destination?.iata_code}</div>
-										<div>{seg.marketing_carrier?.iata_code}{seg.flight_number}</div>
-									</div>
-								))}
-							</div>
-						</div>
-					))}
-				</CardContent>
-			</Card>
-		</div>
-	)
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 space-y-4">
+          {step === "review" && (
+            <div className="space-y-4">
+              <button onClick={() => setStep("passengers")} className="w-full h-11 rounded-2xl bg-black text-white hover:bg-gray-900">Continue</button>
+            </div>
+          )}
+          {step === "passengers" && (
+            <div className="space-y-4">
+              <PassengerForm onSubmit={(p) => { setPassengers(p); setStep("documents") }} />
+              <div className="flex justify-end">
+                <button onClick={() => setStep("documents")} className="h-11 rounded-2xl bg-black text-white px-5">Next: Documents</button>
+              </div>
+            </div>
+          )}
+          {step === "documents" && (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-gray-200 p-4 bg-white/70">
+                <div className="text-sm font-medium mb-2">Travel documents</div>
+                <p className="text-xs text-gray-600 mb-3">Upload passport/ID if required for destination.</p>
+                <Input type="file" accept="image/*,application/pdf" />
+              </div>
+              <div className="flex justify-end">
+                <button onClick={() => setStep("seats")} className="h-11 rounded-2xl bg-black text-white px-5">Next: Seats</button>
+              </div>
+            </div>
+          )}
+          {step === "seats" && (
+            <div className="space-y-4">
+              <SeatSelection offerId={offerId} onSelect={(s) => setSelectedSeat(s.designator)} />
+              <div className="flex justify-between">
+                <button onClick={() => setStep("documents")} className="h-11 rounded-2xl bg-white border border-gray-300 text-gray-900 px-5">Back</button>
+                <button onClick={() => setStep("extras")} className="h-11 rounded-2xl bg-black text-white px-5" disabled={!selectedSeat}>Next: Extras</button>
+              </div>
+            </div>
+          )}
+          {step === "extras" && (
+            <div className="space-y-4">
+              <Ancillaries offerId={offerId} onChange={setSelectedExtras} />
+              <div className="flex justify-end">
+                <button onClick={() => setStep("payment")} className="h-11 rounded-2xl bg-black text-white px-5">Next: Payment</button>
+              </div>
+            </div>
+          )}
+          {step === "payment" && (
+            <div className="space-y-4">
+              <PaymentForm offer={offer} onReady={setPaymentIntentId} />
+              <div className="flex justify-end">
+                <button
+                  disabled={!paymentIntentId || submitting}
+                  onClick={async () => {
+                    setSubmitting(true)
+                    try {
+                      const orderBody: any = {
+                        selected_offers: [offer.id],
+                        payments: [{ type: 'balance', payment_intent_id: paymentIntentId }],
+                        passengers: (passengers.length ? passengers : [{ given_name: 'John', family_name: 'Doe', born_on: '1990-01-01', phone_number: '000', email: 'john@example.com' }]).map((p: any) => ({
+                          type: 'adult',
+                          given_name: p.given_name,
+                          family_name: p.family_name,
+                          born_on: p.born_on,
+                          phone_number: p.phone_number,
+                          email: p.email,
+                        })),
+                        services: [] as any[],
+                      }
+                      // Seat service (Duffel expects service with type 'seat' and metadata.designator or seat_id if known)
+                      if (selectedSeat) {
+                        orderBody.services.push({ type: 'seat', metadata: { designator: selectedSeat } })
+                      }
+                      // Ancillaries: map by id if present in our selection
+                      Object.values(selectedExtras || {}).forEach((a: any) => {
+                        if (a?.code) {
+                          orderBody.services.push({ type: 'ancillary', id: a.code })
+                        }
+                      })
+                      const res = await fetch('/api/flights/duffel/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(orderBody) })
+                      const json = await res.json()
+                      if (!res.ok) throw new Error(json?.error || 'Failed to create order')
+                      toast.success('Booking confirmed')
+                      router.push('/dashboard/billing')
+                    } catch (e: any) {
+                      console.error(e)
+                      toast.error(e?.message || 'Booking failed')
+                    } finally {
+                      setSubmitting(false)
+                    }
+                  }}
+                  className="h-11 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white px-5"
+                >
+                  {submitting ? 'Processing…' : 'Pay and book'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="space-y-3">
+          <div className="rounded-2xl border border-gray-200 p-4 bg-white/70">
+            <div className="text-sm font-medium">Order summary</div>
+            <div className="mt-2 text-sm text-gray-700">Total: {new Intl.NumberFormat("en-US", { style: "currency", currency: offer.total_currency }).format(parseFloat(offer.total_amount))}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
+

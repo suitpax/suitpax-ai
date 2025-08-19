@@ -63,8 +63,8 @@ export function EnhancedPromptInput({
   return (
     <motion.div
       className={cn(
-        "relative w-full border border-gray-200 rounded-2xl bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-200",
-        isFocused && "ring-2 ring-blue-500/20 border-blue-300 shadow-md",
+        "relative w-full border rounded-2xl bg-black/60 border-white/10 backdrop-blur-md shadow-sm transition-all duration-200",
+        isFocused && "ring-2 ring-white/20 border-white/30 shadow-md",
         isLoading && "opacity-75",
         className,
       )}
@@ -84,82 +84,82 @@ export function EnhancedPromptInput({
           disabled={isLoading}
           maxLength={maxLength}
           rows={1}
-          className="w-full resize-none bg-transparent text-gray-900 placeholder:text-gray-500 focus:outline-none disabled:cursor-not-allowed text-sm leading-relaxed min-h-[24px] max-h-[200px] overflow-y-auto"
+          className="w-full resize-none bg-transparent text-white placeholder:text-white/50 focus:outline-none disabled:cursor-not-allowed text-sm leading-relaxed min-h-[24px] max-h-[200px] overflow-y-auto"
         />
 
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-2">
-            {enableAttachments && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-                disabled={isLoading}
-              >
-                <Paperclip className="h-4 w-4" />
-              </Button>
-            )}
-
-            {enableVoice && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleVoiceToggle}
-                className={cn(
-                  "h-8 w-8 p-0 rounded-lg transition-colors",
-                  isRecording
-                    ? "text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100",
-                )}
-                disabled={isLoading}
-              >
-                {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </Button>
-            )}
-
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-              disabled={isLoading}
-            >
-              <Sparkles className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {showWordCount && (
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span>{wordCount} words</span>
-                <span className={cn("transition-colors", isNearLimit && "text-orange-500")}>
-                  {charCount}/{maxLength}
-                </span>
-              </div>
-            )}
-
-            <Button
-              type="button"
-              onClick={onSubmit}
-              disabled={!value.trim() || isLoading || charCount > maxLength}
-              size="sm"
-              className="h-8 px-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+            <div className="flex items-center gap-2">
+              {enableAttachments && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-white/60 hover:text-white hover:bg-white/10 rounded-lg"
+                  disabled={isLoading}
                 >
-                  <Sparkles className="h-4 w-4" />
-                </motion.div>
-              ) : (
-                <Send className="h-4 w-4" />
+                  <Paperclip className="h-4 w-4" />
+                </Button>
               )}
-            </Button>
+
+              {enableVoice && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleVoiceToggle}
+                  className={cn(
+                    "h-8 w-8 p-0 rounded-lg transition-colors",
+                    isRecording
+                      ? "text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20"
+                      : "text-white/60 hover:text-white hover:bg-white/10",
+                  )}
+                  disabled={isLoading}
+                >
+                  {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </Button>
+              )}
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-white/60 hover:text-white hover:bg-white/10 rounded-lg"
+                disabled={isLoading}
+              >
+                <Sparkles className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {showWordCount && (
+                <div className="flex items-center gap-2 text-xs text-white/60">
+                  <span>{wordCount} words</span>
+                  <span className={cn("transition-colors", isNearLimit && "text-orange-400")}>
+                    {charCount}/{maxLength}
+                  </span>
+                </div>
+              )}
+
+              <Button
+                type="button"
+                onClick={onSubmit}
+                disabled={!value.trim() || isLoading || charCount > maxLength}
+                size="sm"
+                className="h-8 px-3 bg-white/90 hover:bg-white text-black rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                  </motion.div>
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
       </div>
 
       <AnimatePresence>

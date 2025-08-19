@@ -68,10 +68,7 @@ export const Footer = () => {
           <div className="flex flex-col items-start">
             <h3 className="text-white font-medium mb-4 text-sm">Products</h3>
             <div className="flex flex-col space-y-2 mb-6">
-              <Link
-                href="/auth/sign-up"
-                className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
-              >
+              <Link href="/business-travel" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Business Travel
               </Link>
               <Link href="/pricing" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">

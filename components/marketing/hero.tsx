@@ -5,7 +5,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import Badge from "@/components/ui/badge"
 import CityAnimateText from "@/components/ui/city-animate-text"
-import { useEffect, useState } from "@/components/ui/animations"
+import { useEffect, useState } from "react"
 import { FadeContainer, FadeSpan } from "@/components/ui/animations"
 import CounterBadge from "@/components/ui/counter-badge"
 import MiniChat from "@/components/ui/mini-chat"
@@ -99,6 +99,9 @@ const titleVariations = [
   "Beyond traditional TMS: AI-driven travel intelligence for smart businesses.",
   "The future of TMS is here: AI agents managing your entire travel ecosystem.",
   "TMS redefined: Intelligent automation meets human-centered travel design.",
+  "Flight booking with superpowers.",
+  "Travel management with superpowers.",
+  "Hey there — your AI travel copilot is ready.",
 ]
 
 // Badge update messages with time-based logic
@@ -263,8 +266,19 @@ export const Hero = () => {
   const [randomTitle, setRandomTitle] = useState("")
   const [badgeMessage, setBadgeMessage] = useState("")
   const [randomSubtitle, setRandomSubtitle] = useState("")
+  const [greeting, setGreeting] = useState("")
 
   useEffect(() => {
+    // Personalized greeting
+    try {
+      const hours = new Date().getHours()
+      const greet = hours < 12 ? 'Good morning' : hours < 18 ? 'Good afternoon' : 'Good evening'
+      // If user info is stored locally by app subdomain, read minimal name
+      const raw = localStorage.getItem('suitpax_user_name')
+      const name = raw && raw.trim() ? raw : 'traveler'
+      setGreeting(`${greet}, ${name}`)
+    } catch {}
+
     // Select a random title on component mount
     const titleIndex = Math.floor(Math.random() * titleVariations.length)
     setRandomTitle(titleVariations[titleIndex])
@@ -287,12 +301,15 @@ export const Hero = () => {
           <Badge
             text={badgeMessage}
             href={badgeMessage === "Join our waitlist in the meantime." ? "https://app.suitpax.com/sign-up" : "#"}
-            className="bg-white text-black hover:bg-gray-100 transition-colors"
+            className="bg-transparent hover:bg-transparent"
           />
 
           <CounterBadge className="mt-4" variant="light" />
 
           <div className="mt-10 text-center max-w-3xl mx-auto">
+            <div className="mb-2 text-xs sm:text-sm text-gray-600">
+              <FadeSpan>{greeting}</FadeSpan>
+            </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
               <FadeSpan>{randomTitle}</FadeSpan>
             </h1>

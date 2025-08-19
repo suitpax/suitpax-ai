@@ -25,9 +25,9 @@ export default function AIVoiceAssistant() {
   const [detectedLanguage, setDetectedLanguage] = useState<string>("en-US")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [currentAgent] = useState({
-    name: "Emma",
+    name: "Maya",
     role: "AI Travel Assistant",
-    image: "/agents/agent-emma.jpeg",
+    image: "/agents/agent-6.png",
   })
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -370,7 +370,7 @@ export default function AIVoiceAssistant() {
   }
 
   return (
-    <section className="w-full py-12 md:py-24 bg-gray-50">
+    <section className="w-full py-12 md:py-24 bg-gradient-to-b from-white to-blue-50/40">
       <div className="container px-4 md:px-6 mx-auto">
         <div className="flex flex-col items-center text-center space-y-4 mb-12">
           <motion.div
@@ -416,7 +416,7 @@ export default function AIVoiceAssistant() {
           viewport={{ once: true }}
           className="w-full max-w-4xl mx-auto"
         >
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+          <div className="bg-white/75 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white/80">
               <div className="flex items-center space-x-3">
@@ -452,7 +452,7 @@ export default function AIVoiceAssistant() {
             </div>
 
             {/* Conversation Area */}
-            <div className="h-80 overflow-y-auto p-6 bg-gradient-to-b from-white/90 to-white/70">
+            <div className="h-80 overflow-y-auto p-6 bg-white/60 backdrop-blur-sm">
               <AnimatePresence>
                 {messages.length === 0 ? (
                   <motion.div
@@ -627,7 +627,7 @@ export default function AIVoiceAssistant() {
                   disabled={!inputText.trim() || isProcessing}
                   className="flex items-center justify-center w-12 h-12 rounded-xl bg-black text-white hover:bg-black/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <MdSend className="h-4 w-4" />
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                 </button>
 
                 {messages.length > 0 && (
