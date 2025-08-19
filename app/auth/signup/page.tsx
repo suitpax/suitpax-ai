@@ -19,6 +19,17 @@ export default function SignupPage() {
     setError("")
 
     try {
+      const lower = email.toLowerCase().trim()
+      const banned = [
+        '@gmail.com', '@googlemail.com', '@outlook.com', '@hotmail.com', '@live.com', '@yahoo.com', '@icloud.com', '@me.com', '@aol.com', '@proton.me', '@protonmail.com', '@gmx.com', '@qq.com'
+      ]
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lower)) {
+        throw new Error('Please enter a valid email')
+      }
+      if (banned.some(domain => lower.endsWith(domain))) {
+        throw new Error('Please use your corporate email (personal mailboxes are not allowed)')
+      }
+
       const supabase = (await import("@/lib/supabase/client")).createClient()
       const { error } = await supabase.auth.signUp({ email, password })
       if (error) setError(error.message)
