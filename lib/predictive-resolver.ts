@@ -39,6 +39,14 @@ export function resolveTravelIntent(query: string): ResolvedDestination[] {
     })
     .filter(Boolean) as ResolvedDestination[]
 
+  // If user mentions an IATA code inside text, boost that city deterministically
+  const iataMatch = /\b([A-Za-z]{3})\b/.exec(query)
+  if (iataMatch) {
+    const code = iataMatch[1].toUpperCase()
+    const direct: ResolvedDestination = { city: code, iataCity: code, airport: code, confidence: 0.99, intentId: 'explicit-iata' }
+    matches.unshift(direct)
+  }
+
   // Deduplicate by city keeping highest confidence
   const byCity = new Map<string, ResolvedDestination>()
   for (const m of matches) {
