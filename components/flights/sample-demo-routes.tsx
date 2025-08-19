@@ -55,8 +55,7 @@ export default function SampleDemoRoutes() {
 
 	return (
 		<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{picks.map((r: any) => {
-				return (
+			{picks.map((r: any) => (
 				<div key={r.id} className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow">
 					<div className="p-3 pb-0 flex items-center justify-between gap-3">
 						<div className="flex items-center gap-2 min-w-0">
@@ -98,8 +97,7 @@ export default function SampleDemoRoutes() {
 						</div>
 					</div>
 				</div>
-				)
-			})}
+			))}
 		</div>
 	)
 }
