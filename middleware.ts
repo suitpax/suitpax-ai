@@ -54,15 +54,7 @@ export function middleware(request: NextRequest) {
   }
 
   const publicPaths = [
-    "/",
-    "/manifesto",
-    "/pricing",
-    "/travel-expense-management",
-    "/contact",
-    "/solutions",
-    "/public",
     "/password",
-    "/api/public",
     "/api/password/verify",
   ]
 
