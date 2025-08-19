@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowsRightLeftIcon, FunnelIcon, CalendarIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline"
 import FlightResults from "@/components/flights/results/results-list"
+import SampleDemoRoutes from "@/components/flights/sample-demo-routes"
 import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
 import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
@@ -117,6 +118,9 @@ export default function FlightsPage() {
           </div>
         </div>
       </div>
+
+      {/* Sample demo routes (always 3, randomized per load) */}
+      <SampleDemoRoutes />
 
       {/* Badges row under subtitle (show two) */}
       {/* ... existing code continues ... */}
