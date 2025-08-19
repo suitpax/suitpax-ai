@@ -43,16 +43,44 @@ interface Props {
   onSelectOffer?: (offer: FlightOffer) => void
   onTrackPrice?: (offerId: string) => void
   className?: string
+  sort?: 'recommended' | 'price' | 'duration'
 }
 
-export default function FlightResults({ offers, onSelectOffer, onTrackPrice, className = "" }: Props) {
+function toMinutes(isoDuration?: string): number {
+  if (!isoDuration) return Number.MAX_SAFE_INTEGER
+  // Minimal ISO8601 PT#H#M parser
+  const match = /PT(?:(\d+)H)?(?:(\d+)M)?/i.exec(isoDuration)
+  const hours = match?.[1] ? parseInt(match[1], 10) : 0
+  const mins = match?.[2] ? parseInt(match[2], 10) : 0
+  return hours * 60 + mins
+}
+
+function sortOffers(offers: FlightOffer[], sort?: 'recommended' | 'price' | 'duration'): FlightOffer[] {
+  const list = [...offers]
+  if (sort === 'price') {
+    return list.sort((a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount))
+  }
+  if (sort === 'duration') {
+    const totalDur = (o: FlightOffer) => (o.slices || []).reduce((sum, s) => sum + toMinutes(s.duration), 0)
+    return list.sort((a, b) => totalDur(a) - totalDur(b))
+  }
+  // recommended: simple composite (price + penalty per stop)
+  const score = (o: FlightOffer) => {
+    const price = parseFloat(o.total_amount)
+    const stops = (o.slices?.[0]?.segments?.length || 1) - 1
+    return price + stops * 50
+  }
+  return list.sort((a, b) => score(a) - score(b))
+}
+
+export default function FlightResults({ offers, onSelectOffer, onTrackPrice, className = "", sort = 'recommended' }: Props) {
   if (!offers || offers.length === 0) {
     return <div className="rounded-3xl border border-gray-200 glass-card p-6 text-gray-600">No flights available for these criteria.</div>
   }
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {offers.map((offer) => {
+      {sortOffers(offers, sort).map((offer) => {
         const firstSlice = offer.slices?.[0]
         const firstSeg = firstSlice?.segments?.[0]
         const airlineName = firstSeg?.airline?.name || firstSeg?.marketing_carrier?.name || ""

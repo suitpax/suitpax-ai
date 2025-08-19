@@ -76,6 +76,7 @@ export default function FlightsPage() {
   const [offerRequestId, setOfferRequestId] = useState<string | null>(null)
   const [pageMeta, setPageMeta] = useState<any>({})
   const [loadingMore, setLoadingMore] = useState(false)
+  const [sortBy, setSortBy] = useState<'recommended' | 'price' | 'duration'>('recommended')
 
   // ... existing code ...
 
@@ -120,8 +121,21 @@ export default function FlightsPage() {
         </div>
       </div>
 
-      {/* Sample demo routes (always 3, randomized per load) */}
+      {/* Sample demo routes (real Duffel when available; always 3) */}
       <SampleDemoRoutes seedQuery={promptValue} />
+
+      {/* Controls row: sorting, filters, etc. */}
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-gray-600">Sorted by: {sortBy}</div>
+        <div>
+          <FilterControls onChange={(v) => {
+            if (v?.sort) setSortBy(v.sort)
+          }} />
+        </div>
+      </div>
+
+      {/* Results list sample — pass sortBy if offers are present in your state */}
+      {/* Example usage: <FlightResults offers={offers} sort={sortBy} onSelectOffer={...} /> */}
 
       {/* Badges row under subtitle (show two) */}
       {/* ... existing code continues ... */}
