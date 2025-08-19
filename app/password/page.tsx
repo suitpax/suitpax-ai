@@ -5,6 +5,7 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import { Sparkles, Plane, Mic } from "lucide-react"
 
 export default function PasswordGatePage() {
   const router = useRouter()
@@ -53,8 +54,8 @@ export default function PasswordGatePage() {
 
       <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24">
         <div className="flex flex-col items-center text-center">
-          <div className="inline-flex items-center rounded-xl bg-white/10 backdrop-blur px-2.5 py-0.5 text-[10px] font-medium text-white/90 mb-4 border border-white/15">
-            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={60} height={15} className="h-3 w-auto mr-1 invert" />
+          <div className="inline-flex items-center rounded-xl bg-white px-2.5 py-0.5 text-[10px] font-medium text-gray-900 mb-4 border border-gray-200">
+            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={60} height={15} className="h-3 w-auto mr-1" />
             Private preview access
           </div>
 
@@ -87,12 +88,14 @@ export default function PasswordGatePage() {
             <span className="inline-flex items-center rounded-xl bg-black/5 px-2.5 py-1 border border-black/10">Design. Ship. Scale.</span>
             <span className="inline-flex items-center rounded-xl bg-black/5 px-2.5 py-1 border border-black/10">Predict. Plan. Automate.</span>
             <span className="inline-flex items-center rounded-xl bg-black/5 px-2.5 py-1 border border-black/10">Flights. Hotels. Finance.</span>
+            <span className="inline-flex items-center rounded-xl bg-black/5 px-2.5 py-1 border border-black/10">Build. Travel. Code.</span>
+            <span className="inline-flex items-center rounded-xl bg-black/5 px-2.5 py-1 border border-black/10">Chat. Voice. Agents.</span>
           </div>
 
           {/* Prompt-like password input */}
           <form onSubmit={handleSubmit} className="mt-8 w-full max-w-3xl mx-auto px-2">
             <div className="flex items-center gap-4 bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-3 md:p-4 shadow-sm">
-              <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-2xl overflow-hidden bg-gray-200">
+              <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-lg overflow-hidden bg-gray-200">
                 <video autoPlay muted loop playsInline className="h-full w-full object-cover object-center md:object-center object-[50%_35%]">
                   <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20%28online-video-cutter.com%29%20%281%29-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
                 </video>
@@ -108,13 +111,46 @@ export default function PasswordGatePage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="h-12 md:h-14 w-12 md:w-14 rounded-2xl bg-black text-white hover:bg-gray-900 flex items-center justify-center border border-black/10"
+                className="h-10 w-10 md:h-12 md:w-12 rounded-xl text-black hover:text-gray-700 flex items-center justify-center"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                <svg className="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </button>
             </div>
             {error && <div className="mt-2 text-xs text-red-600">{error}</div>}
           </form>
+
+          {/* Feature strip under input */}
+          <div className="mt-6 w-full max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white/90 p-3">
+                <div className="h-8 w-8 rounded-xl bg-black text-white flex items-center justify-center">
+                  <Sparkles className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[13px] font-medium text-gray-900">Predictive prompts</div>
+                  <div className="text-[11px] text-gray-600">Understand intent in any language</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white/90 p-3">
+                <div className="h-8 w-8 rounded-xl bg-black text-white flex items-center justify-center">
+                  <Plane className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[13px] font-medium text-gray-900">Real flight data</div>
+                  <div className="text-[11px] text-gray-600">Duffel offers with smart re‑ranking</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white/90 p-3">
+                <div className="h-8 w-8 rounded-xl bg-black text-white flex items-center justify-center">
+                  <Mic className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[13px] font-medium text-gray-900">Voice‑first</div>
+                  <div className="text-[11px] text-gray-600">Call Nova, your Suitpax AI agent</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Secondary hype badges */}
           <div className="flex items-center gap-2 mt-6">
@@ -152,4 +188,3 @@ export default function PasswordGatePage() {
     </VantaHaloBackground>
   )
 }
-
