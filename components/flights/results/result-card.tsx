@@ -33,7 +33,7 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-3 min-w-0">
-            <CarrierLogo iata={airlineIata} name={airlineName} className="h-6 w-6" width={24} height={24} />
+            <CarrierLogo iata={airlineIata} name={airlineName} className="h-5 w-5" width={18} height={18} />
             <div className="truncate text-sm text-gray-800">
               <div className="font-medium leading-tight">{firstSeg?.flight_number || ''}</div>
               <div className="text-[11px] text-gray-600 truncate">{airlineName} {airlineIata ? `(${airlineIata})` : ''}</div>

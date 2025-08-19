@@ -11,7 +11,7 @@ interface CarrierLogoProps {
   lockup?: boolean
 }
 
-export default function CarrierLogo({ iata, name, className = "", width = 32, height = 32, lockup = false }: CarrierLogoProps) {
+export default function CarrierLogo({ iata, name, className = "", width = 20, height = 20, lockup = false }: CarrierLogoProps) {
   if (!iata) return null
   const base = 'https://assets.duffel.com/img/airlines/for-light-background'
   const path = lockup ? 'full-color-lockup' : 'symbol'

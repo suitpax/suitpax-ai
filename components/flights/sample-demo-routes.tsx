@@ -59,7 +59,7 @@ export default function SampleDemoRoutes() {
 				<div key={r.id} className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow">
 					<div className="p-3 pb-0 flex items-center justify-between gap-3">
 						<div className="flex items-center gap-2 min-w-0">
-							<CarrierLogo iata={r.airline.iata} name={r.airline.name} />
+							<CarrierLogo iata={r.airline.iata} name={r.airline.name} className="h-5 w-5" width={18} height={18} />
 							<div className="truncate">
 								<div className="text-sm font-medium text-gray-900 truncate">{r.airline.name}</div>
 								<div className="text-[11px] text-gray-500">{r.origin.code} → {r.destination.code}</div>
