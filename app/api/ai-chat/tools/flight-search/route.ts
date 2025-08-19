@@ -63,7 +63,8 @@ export async function POST(request: Request) {
       max_connections: 1,
     }
 
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/flights/duffel/optimized-search`, {
+    const endpoint = new URL('/api/flights/duffel/search', (request as any).url || 'http://localhost:3000')
+    const resp = await fetch(endpoint.toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

@@ -56,7 +56,7 @@ export default function SampleDemoRoutes({ seedQuery }: { seedQuery?: string }) 
 				const origin = "MAD"
 				const destination = dest || ["LON", "PAR", "NYC", "ROM", "BCN"][Math.floor(Math.random() * 5)]
 				const departureDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toISOString().split("T")[0]
-				const res = await fetch('/api/flights/duffel/optimized-search', {
+				const res = await fetch('/api/flights/duffel/search', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ origin, destination, departure_date: departureDate, passengers: { adults: 1 }, cabin_class: 'economy', max_connections: 1 }),
