@@ -1,9 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import CityImage from "@/components/flights/ui/city-image"
 import CarrierLogo from "@/components/flights/ui/carrier-logo"
-import { pickBestDestination } from "@/lib/predictive-resolver"
 
 type SampleRoute = {
 	id: string
@@ -44,38 +43,7 @@ function formatPrice(amount?: number, currency?: string) {
 	}
 }
 
-export default function SampleDemoRoutes({ seedQuery }: { seedQuery?: string }) {
-	const [realOffers, setRealOffers] = useState<any[] | null>(null)
-
-	useEffect(() => {
-		const controller = new AbortController()
-		;(async () => {
-			try {
-				const seed = seedQuery ? pickBestDestination(seedQuery) : null
-				const dest = seed?.iataCity || seed?.airport || undefined
-				const origin = "MAD"
-				const destination = dest || ["LON", "PAR", "NYC", "ROM", "BCN"][Math.floor(Math.random() * 5)]
-				const departureDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toISOString().split("T")[0]
-				const res = await fetch('/api/flights/duffel/search', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ origin, destination, departure_date: departureDate, passengers: { adults: 1 }, cabin_class: 'economy', max_connections: 1 }),
-					signal: controller.signal,
-				})
-				if (!res.ok) throw new Error(await res.text())
-				const json = await res.json()
-				const offers = (json?.data?.offers || json?.data || []) as any[]
-				if (Array.isArray(offers) && offers.length > 0) {
-					const shuffled = [...offers].sort(() => Math.random() - 0.5)
-					setRealOffers(shuffled.slice(0, 3))
-				}
-			} catch {
-				setRealOffers(null)
-			}
-		})()
-		return () => controller.abort()
-	}, [seedQuery])
-
+export default function SampleDemoRoutes() {
 	const picks = useMemo(() => {
 		const items = [...SAMPLES]
 		for (let i = items.length - 1; i > 0; i--) {
@@ -87,21 +55,7 @@ export default function SampleDemoRoutes({ seedQuery }: { seedQuery?: string }) 
 
 	return (
 		<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{(realOffers || picks).map((item: any) => {
-				const demo = !realOffers
-				const r = demo
-					? item
-					: {
-						id: item.id,
-						origin: { code: item?.slices?.[0]?.origin?.iata_code, city: item?.slices?.[0]?.origin?.city?.name },
-						destination: { code: item?.slices?.[item.slices.length - 1]?.destination?.iata_code, city: item?.slices?.[item.slices.length - 1]?.destination?.city?.name },
-						airline: { name: item?.slices?.[0]?.segments?.[0]?.airline?.name || item?.slices?.[0]?.segments?.[0]?.marketing_carrier?.name, iata: item?.slices?.[0]?.segments?.[0]?.airline?.iata_code || item?.slices?.[0]?.segments?.[0]?.marketing_carrier?.iata_code },
-						cabin: (item?.owner?.name && /business/i.test(item?.owner?.name)) ? 'Business' : 'Economy',
-						stops: Math.max(0, (item?.slices?.[0]?.segments?.length || 1) - 1),
-						duration: item?.slices?.[0]?.duration,
-						flightNumber: item?.slices?.[0]?.segments?.[0]?.flight_number,
-						price: item?.total_amount && item?.total_currency ? { amount: parseFloat(item.total_amount), currency: item.total_currency } : undefined,
-					}
+			{picks.map((r: any) => {
 				return (
 				<div key={r.id} className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow">
 					<div className="p-3 pb-0 flex items-center justify-between gap-3">
