@@ -41,12 +41,12 @@ export default function PasswordGatePage() {
     <VantaHaloBackground
       className="relative w-full min-h-[100vh] overflow-hidden"
       options={{
-        backgroundColor: 0x000000,
-        baseColor: 0x111111,
+        backgroundColor: 0xe8eaee,
+        baseColor: 0xdfe3ea,
         color: 0xffffff,
-        color2: 0x222222,
-        size: 0.9,
-        amplitudeFactor: 1.2,
+        color2: 0xeeeeee,
+        size: 0.85,
+        amplitudeFactor: 1.0,
       }}
     >
       <div className="absolute inset-0 bg-[radial-gradient(#6b7280_1px,transparent_1px)] [background-size:20px_20px] opacity-20" />
@@ -62,30 +62,37 @@ export default function PasswordGatePage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tighter text-white leading-tight max-w-3xl"
+            className="text-3xl md:text-5xl lg:text-6xl font-serif tracking-tighter text-white leading-tight max-w-4xl"
           >
-            Welcome to Suitpax private preview
+            The Suitpax AI: Build. Travel. Code.
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="mt-3 text-sm font-medium text-gray-200/90 max-w-xl"
+            className="mt-4 text-base md:text-lg font-light text-gray-200/90 max-w-2xl"
           >
-            Enter the access key to explore what we are building. Launch hype is real. Limited early access only.
+            Enter the access key to explore our next‑gen business travel platform. Precision. Speed. Intelligence.
           </motion.p>
 
           {/* Shimmer text */}
-          <div className="mt-8 text-gray-200/80 text-base font-medium relative inline-block">
-            <span className="relative z-10">Shaping the next-gen of business travel</span>
+          <div className="mt-6 text-gray-200/80 text-base font-medium relative inline-block">
+            <span className="relative z-10">Shaping the next‑gen of business travel</span>
             <span className="absolute inset-0 animate-hero-shimmer bg-[linear-gradient(110deg,#ffffff,45%,#9ca3af,55%,#ffffff)] bg-[length:200%_100%] bg-clip-text text-transparent" />
           </div>
 
+          {/* Variant lines */}
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-[11px] text-white/80">
+            <span className="inline-flex items-center rounded-xl bg-white/10 px-2.5 py-1 border border-white/15">Design. Ship. Scale.</span>
+            <span className="inline-flex items-center rounded-xl bg-white/10 px-2.5 py-1 border border-white/15">Predict. Plan. Automate.</span>
+            <span className="inline-flex items-center rounded-xl bg-white/10 px-2.5 py-1 border border-white/15">Flights. Hotels. Finance.</span>
+          </div>
+
           {/* Prompt-like password input */}
-          <form onSubmit={handleSubmit} className="mt-10 w-full max-w-2xl">
-            <div className="flex items-center gap-3 bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
-              <div className="relative h-12 w-12 rounded-xl overflow-hidden bg-gray-700">
+          <form onSubmit={handleSubmit} className="mt-10 w-full max-w-3xl mx-auto">
+            <div className="flex items-center gap-4 bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
+              <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-2xl overflow-hidden bg-gray-700">
                 <video autoPlay muted loop playsInline className="h-full w-full object-cover object-center">
                   <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20%28online-video-cutter.com%29%20%281%29-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
                 </video>
@@ -95,13 +102,13 @@ export default function PasswordGatePage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter access key to continue"
-                className="flex-1 bg-transparent text-[15px] text-white placeholder:text-gray-400 focus:outline-none h-12"
+                className="flex-1 bg-transparent text-base md:text-lg text-white placeholder:text-gray-300 focus:outline-none h-16 md:h-[72px]"
                 required
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="h-11 px-5 rounded-xl bg-white text-black hover:bg-gray-100 flex items-center justify-center text-sm font-medium border border-white/20"
+                className="h-14 md:h-16 px-6 rounded-2xl bg-white text-black hover:bg-gray-100 flex items-center justify-center text-sm md:text-base font-medium border border-white/20"
               >
                 {loading ? (
                   <span className="inline-flex items-center gap-1">
@@ -125,6 +132,16 @@ export default function PasswordGatePage() {
             <span className="inline-flex items-center rounded-xl bg-white/10 px-2.5 py-0.5 text-[9px] font-medium text-white/90 border border-white/15">
               Private beta
             </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="absolute inset-x-0 bottom-0 z-10">
+        <div className="container mx-auto px-4 md:px-6 py-6">
+          <div className="flex items-center justify-center gap-3 text-white/90">
+            <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={90} height={22} className="h-5 w-auto invert" />
+            <span className="text-xs uppercase tracking-wider">Technology by Suitpax</span>
           </div>
         </div>
       </div>
