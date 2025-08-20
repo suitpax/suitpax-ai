@@ -166,7 +166,7 @@ export default function FlightsPage() {
         if (searchParams.tripType === 'round_trip' && searchParams.returnDate) payload.return_date = searchParams.returnDate
       }
 
-      const res = await fetch('/api/flights/duffel/optimized-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      const res = await fetch('/api/flights/duffel/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error || 'Search failed')
       const results = Array.isArray(json?.data) ? json.data : json?.offers || []
