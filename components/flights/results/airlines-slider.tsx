@@ -25,7 +25,7 @@ export default function AirlinesSlider({ title = "", className = "" }: AirlinesS
   const items = useMemo(() => [...AIRLINE_LOGOS, ...AIRLINE_LOGOS], [])
   return (
     <div className={`w-full overflow-hidden py-10 ${className}`}>
-      <div className="relative w-full overflow-hidden rounded-2xl">
+      <div className="relative w-full overflow-hidden rounded-2xl bg-white/40 border border-gray-200/60 supports-[backdrop-filter]:backdrop-blur-xl shadow-sm">
         <div className="flex overflow-hidden">
           <motion.div
             className="flex items-center space-x-14 px-8"
@@ -33,14 +33,16 @@ export default function AirlinesSlider({ title = "", className = "" }: AirlinesS
             transition={{ x: { repeat: Number.POSITIVE_INFINITY, repeatType: "loop", duration: 36, ease: "linear" } }}
           >
             {items.map((logo, index) => (
-              <div key={`${logo.name}-${index}`} className="flex items-center justify-center h-12 w-28 relative group">
-                <motion.img
-                  src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${logo.code}.svg`}
-                  alt={`${logo.name} logo`}
-                  className="max-h-full max-w-full object-contain transition-all duration-300 group-hover:opacity-100"
-                  whileHover={{ scale: 1.04 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 12 }}
-                />
+              <div key={`${logo.name}-${index}`} className="flex items-center justify-center h-12 w-36 relative group">
+                <div className="flex h-12 w-36 items-center justify-center rounded-xl bg-white/70 border border-white/60 supports-[backdrop-filter]:backdrop-blur-md shadow-sm">
+                  <motion.img
+                    src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${logo.code}.svg`}
+                    alt={`${logo.name} logo`}
+                    className="max-h-[22px] max-w-[128px] object-contain transition-all duration-300 group-hover:opacity-100"
+                    whileHover={{ scale: 1.04 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 12 }}
+                  />
+                </div>
                 <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-gray-500">
                   {logo.name}
                 </div>
