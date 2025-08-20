@@ -59,7 +59,9 @@ export default function BookOfferPage({ params }: { params: { offerId: string } 
         <button className="text-xs text-gray-500 hover:text-gray-800" onClick={() => router.back()}>Back</button>
       </div>
 
-      <ResultCard offer={offer} onSelect={() => {}} />
+      <div className="glass-card rounded-2xl border border-gray-200">
+        <ResultCard offer={offer} onSelect={() => {}} />
+      </div>
 
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-4">

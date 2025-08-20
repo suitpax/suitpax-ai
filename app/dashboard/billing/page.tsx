@@ -22,17 +22,17 @@ export default function BillingPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-5xl mx-auto space-y-6">
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
-            <CardTitle>Flight orders & payments</CardTitle>
+            <CardTitle className="text-gray-900 text-base">Flight orders & payments</CardTitle>
             <CardDescription>Recent activity from your bookings</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
               <div className="text-sm font-medium text-gray-900 mb-2">Recent Orders</div>
-              <div className="divide-y divide-gray-100 rounded-xl border border-gray-200 overflow-hidden">
+              <div className="divide-y divide-gray-100 rounded-2xl border border-gray-200 overflow-hidden bg-white/70">
                 {(orders || []).slice(0, 5).map((o) => (
-                  <div key={o.id} className="grid grid-cols-3 md:grid-cols-4 gap-3 px-4 py-3 text-sm bg-white items-center">
+                  <div key={o.id} className="grid grid-cols-3 md:grid-cols-4 gap-3 px-4 py-3 text-sm items-center">
                     <div className="truncate">{o.duffel_order_id}</div>
                     <div className="text-gray-600">{o.status || '—'}</div>
                     <div className="text-right font-medium">{o.total_amount ? `${o.total_amount} ${o.total_currency || ''}` : '—'}</div>
@@ -58,7 +58,7 @@ export default function BillingPage() {
                             if (pjson?.success && pjson?.url) window.open(pjson.url, '_blank')
                           } catch {}
                         }}
-                        className="inline-flex items-center rounded-xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100"
+                        className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100"
                       >
                         View receipt
                       </button>
@@ -66,22 +66,22 @@ export default function BillingPage() {
                   </div>
                 ))}
                 {(!orders || orders.length === 0) && (
-                  <div className="px-4 py-3 text-sm text-gray-600 bg-white">No orders yet</div>
+                  <div className="px-4 py-3 text-sm text-gray-600">No orders yet</div>
                 )}
               </div>
             </div>
             <div>
               <div className="text-sm font-medium text-gray-900 mb-2">Recent Payments</div>
-              <div className="divide-y divide-gray-100 rounded-xl border border-gray-200 overflow-hidden">
+              <div className="divide-y divide-gray-100 rounded-2xl border border-gray-200 overflow-hidden bg-white/70">
                 {(payments || []).slice(0, 5).map((p) => (
-                  <div key={p.id} className="grid grid-cols-3 gap-3 px-4 py-3 text-sm bg-white">
+                  <div key={p.id} className="grid grid-cols-3 gap-3 px-4 py-3 text-sm">
                     <div className="truncate">{p.duffel_payment_id}</div>
                     <div className="text-gray-600">{p.status || '—'}</div>
                     <div className="text-right font-medium">{p.amount ? `${p.amount} ${p.currency || ''}` : '—'}</div>
                   </div>
                 ))}
                 {(!payments || payments.length === 0) && (
-                  <div className="px-4 py-3 text-sm text-gray-600 bg-white">No payments yet</div>
+                  <div className="px-4 py-3 text-sm text-gray-600">No payments yet</div>
                 )}
               </div>
             </div>
