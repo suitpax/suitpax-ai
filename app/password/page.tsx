@@ -48,6 +48,24 @@ export default function PasswordGatePage() {
     setHeadline(titles[Math.floor(Math.random() * titles.length)])
   }, [])
 
+  const launchPhrases = [
+    "Preparing the gears…",
+    "Updating Suitpax AI…",
+    "Integrating systems…",
+    "Collecting data…",
+    "Calibrating policies…",
+    "Optimizing itineraries…",
+    "Syncing travel wallets…",
+    "Securing payments (3DS)…",
+    "Fetching NDC content…",
+    "Mapping seats in real‑time…",
+    "Tuning price tracking…",
+    "Booting voice agents…",
+    "Orchestrating workflows…",
+    "Connecting to airlines…",
+    "Verifying compliance…",
+  ]
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -109,6 +127,27 @@ export default function PasswordGatePage() {
     >
       <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24">
         <div className="flex flex-col items-center text-center">
+          {/* Top launch banner */}
+          <div className="mb-4 w-full max-w-4xl rounded-xl overflow-hidden">
+            <div className="flex items-center gap-3 px-3 py-1.5 bg-black/95 text-gray-300 rounded-xl border border-white/10">
+              <div className="flex -space-x-2">
+                {["/agents/agent-5.png","/agents/agent-15.png","/agents/agent-3.png","/agents/agent-8.png"].slice(0,4).map((src, i) => (
+                  <img key={i} src={src} alt="AI Agent" className="h-6 w-6 rounded-full ring-1 ring-white/20 object-cover" />
+                ))}
+              </div>
+              <div className="relative flex-1 overflow-hidden h-5">
+                <div className="absolute inset-0 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+                  <div className="whitespace-nowrap text-[11px] text-gray-300 animate-[marquee_16s_linear_infinite]">
+                    {launchPhrases.concat(launchPhrases).map((p, idx) => (
+                      <span key={idx} className="mx-4">
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="inline-flex items-center rounded-xl bg-white px-2.5 py-0.5 text-[10px] font-medium text-gray-900 mb-4 border border-gray-200">
             <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={60} height={15} className="h-3 w-auto mr-1" />
             Private preview access
@@ -132,17 +171,24 @@ export default function PasswordGatePage() {
           </div>
 
           {/* Animated city text (cleaner spacing) */}
-          <div className="mt-7">
+          <div className="mt-8">
             <CityAnimateText />
           </div>
 
-          {/* Variant lines */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2.5 text-[11px] text-gray-700">
-            <span className="inline-flex items-center rounded-lg bg-black/5 px-2.5 py-1 border border-black/10">Design. Ship. Scale.</span>
-            <span className="inline-flex items-center rounded-lg bg-black/5 px-2.5 py-1 border border-black/10">Predict. Plan. Automate.</span>
-            <span className="inline-flex items-center rounded-lg bg-black/5 px-2.5 py-1 border border-black/10">Flights. Hotels. Finance.</span>
-            <span className="inline-flex items-center rounded-lg bg-black/5 px-2.5 py-1 border border-black/10">Build. Travel. Code.</span>
-            <span className="inline-flex items-center rounded-lg bg-black/5 px-2.5 py-1 border border-black/10">Chat. Voice. Agents.</span>
+          {/* Mini badges under animated text */}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[10px] text-gray-700">
+            <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Design. Ship. Scale.</span>
+            <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Predict. Plan. Automate.</span>
+            <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Flights. Hotels. Finance.</span>
+            <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Chat. Voice. Agents.</span>
+          </div>
+          {/* Small city strip using Pexels API proxy */}
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            {["Amsterdam","Paris","New York","London","Barcelona","Tokyo"].map((city) => (
+              <div key={city} className="h-8 w-14 rounded-md overflow-hidden border border-gray-200">
+                <img src={`/api/images/city?city=${encodeURIComponent(city)}&w=200&h=120`} alt={city} className="h-full w-full object-cover" />
+              </div>
+            ))}
           </div>
 
           {/* Access input */}
@@ -191,43 +237,43 @@ export default function PasswordGatePage() {
           </div>
 
           {/* Contact form (Brevo-ready): message, email, company */}
-          <div className="mt-9 w-full max-w-2xl">
+          <div className="mt-10 w-full max-w-2xl">
             <div className="text-center mb-3">
               <div className="text-xs font-semibold tracking-widest text-gray-700 uppercase">Get early access</div>
               <div className="text-[12px] text-gray-600 font-light">Tell us about your team and we’ll reach out with access.</div>
             </div>
-            <form onSubmit={submitContact} className="space-y-2">
+            <form onSubmit={submitContact} className="space-y-3">
               <textarea
                 value={contactMessage}
                 onChange={(e) => setContactMessage(e.target.value)}
                 placeholder="What do you want to achieve with Suitpax?"
-                className="w-full bg-white/90 border border-gray-200 rounded-2xl p-3 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
-                rows={3}
+                className="w-full bg-white/90 border border-gray-200 rounded-2xl p-3 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur min-h-[120px]"
+                rows={4}
               />
-              <div className="flex gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <input
                   type="email"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   placeholder="Work email"
-                  className="flex-1 bg-white/90 border border-gray-200 rounded-2xl p-2 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
+                  className="bg-white/90 border border-gray-200 rounded-2xl p-2.5 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
                   required
                 />
                 <input
                   value={contactCompany}
                   onChange={(e) => setContactCompany(e.target.value)}
                   placeholder="Company"
-                  className="flex-1 bg-white/90 border border-gray-200 rounded-2xl p-2 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
+                  className="bg-white/90 border border-gray-200 rounded-2xl p-2.5 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
                   required
                 />
-                <button
-                  type="submit"
-                  disabled={contactLoading}
-                  className="px-4 rounded-2xl bg-black text-white hover:bg-gray-900 text-[13px]"
-                >
-                  {contactLoading ? 'Sending…' : 'Request access'}
-                </button>
               </div>
+              <button
+                type="submit"
+                disabled={contactLoading}
+                className="w-full md:w-auto md:self-end px-6 h-10 rounded-2xl bg-black text-white hover:bg-gray-900 text-[13px]"
+              >
+                {contactLoading ? 'Sending…' : 'Request access'}
+              </button>
             </form>
             {contactMsg && <div className="mt-2 text-center text-xs text-gray-700">{contactMsg}</div>}
           </div>
@@ -256,6 +302,7 @@ export default function PasswordGatePage() {
       </div>
 
       <style jsx global>{`
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         .animate-hero-shimmer {
           -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,0) 0%, #000 20%, #000 80%, rgba(0,0,0,0) 100%);
           mask-image: linear-gradient(90deg, rgba(0,0,0,0) 0%, #000 20%, #000 80%, rgba(0,0,0,0) 100%);
