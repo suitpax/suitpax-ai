@@ -176,7 +176,7 @@ export function Sidebar({
       })
 
       const data = await response.json()
-      if (data.success) {
+      if (response.ok) {
         // Navigate to Suitpax AI page with the response
         router.push(`/dashboard/suitpax-ai?query=${encodeURIComponent(aiQuery)}`)
         setAiQuery("")

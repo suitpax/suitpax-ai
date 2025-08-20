@@ -107,7 +107,8 @@ export default function SuitpaxAIPage() {
           message: input,
           userId: user?.id,
           sessionId: currentSessionId,
-          conversationHistory: messages.slice(-10),
+          history: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+          includeReasoning: showReasoning,
         }),
       })
 

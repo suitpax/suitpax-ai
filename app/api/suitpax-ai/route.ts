@@ -1,3 +1,5 @@
+export { POST } from "../ai-chat/route"
+
 import { type NextRequest, NextResponse } from "next/server"
 import { SuitpaxIntelligenceService } from "@/lib/intelligence"
 
