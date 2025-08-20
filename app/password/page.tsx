@@ -5,6 +5,8 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import CityAnimateText from "@/components/ui/city-animate-text"
+import CityAnimateWithImages from "@/components/ui/city-animate-with-images"
 import { Sparkles, Plane, Mic } from "lucide-react"
 
 export default function PasswordGatePage() {
@@ -114,6 +116,12 @@ export default function PasswordGatePage() {
           <div className="mt-4 text-gray-700 text-sm font-medium relative inline-block">
             <span className="relative z-10">Shaping the next‑gen of business travel</span>
             <span className="absolute inset-0 animate-hero-shimmer bg-[linear-gradient(110deg,#ffffff,45%,#9ca3af,55%,#ffffff)] bg-[length:200%_100%] bg-clip-text text-transparent" />
+          </div>
+
+          {/* Animated cities */}
+          <div className="mt-4 flex items-center gap-4">
+            <CityAnimateText />
+            <CityAnimateWithImages />
           </div>
 
           {/* Variant lines */}
