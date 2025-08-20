@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import AirlinesSlider from "./airlines-slider"
+// Removed AirlinesSlider to avoid partners showcase with airline logos in this section
 import { PlusCircle } from "lucide-react"
 import { PiCheckCircle } from "react-icons/pi"
 
@@ -614,11 +614,7 @@ export const HyperspeedBooking = () => {
             </div>
           </div>
 
-          {/* Airlines Slider sin borde */}
-          <div className="mt-10 sm:mt-12">
-
-            <AirlinesSlider variant="dark" showHeader={false} />
-          </div>
+          {/* Airlines slider removed from marketing section per request */}
         </div>
       </div>
     </section>

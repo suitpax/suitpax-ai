@@ -126,7 +126,7 @@ const AirlinesSlider = ({ variant = "light", showHeader = true }: AirlinesSlider
               <div className={
                 variant === "dark"
                   ? "relative h-7 flex items-center justify-center rounded-lg bg-white/10 border border-white/15 shadow-sm group-hover:shadow-md transition-shadow"
-                  : "relative h-7 flex items-center justify-center rounded-lg bg-gray-100 border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow"
+                  : "relative h-7 flex items-center justify-center rounded-lg bg-white border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow"
               }>
                 <Image
                   src={airline.logo || "/placeholder.svg"}
@@ -135,8 +135,8 @@ const AirlinesSlider = ({ variant = "light", showHeader = true }: AirlinesSlider
                   height={28}
                   className={
                     variant === "dark"
-                      ? "h-3.5 w-auto object-contain invert"
-                      : "h-3.5 w-auto object-contain grayscale brightness-0 opacity-70"
+                      ? "h-3.5 w-auto object-contain"
+                      : "h-3.5 w-auto object-contain"
                   }
                   priority={index < airlines.length}
                   onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg" }}

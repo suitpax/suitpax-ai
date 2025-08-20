@@ -11,7 +11,7 @@ import AIVoiceCallingHub from "@/components/marketing/ai-voice-calling-hub"
 import MCPFlightsAIAgents from "@/components/marketing/mcp-flights-ai-agents"
 import HyperspeedBooking from "@/components/marketing/hyperspeed-booking"
 import ContactForm from "@/components/marketing/contact-form"
-import AIAirlinesHero from "@/components/flights/ai-airlines-hero"
+// Removed AIAirlinesHero to avoid airline logos in homepage partners context
 import APITravel from "@/components/marketing/api-travel"
 import BusinessTravelSlider from "@/components/marketing/business-travel-slider"
 import FlightBookingShowcase from "@/components/marketing/flight-booking-showcase"
@@ -86,7 +86,7 @@ export default function Home() {
         <BusinessTravelSlider />
         <FlightBookingShowcase />
         <HyperspeedBooking />
-        <AIAirlinesHero />
+        {/* AIAirlinesHero removed per request */}
         <AIMeetingsAttachment />
         <ContactForm />
         <FoundersOpenLetter />

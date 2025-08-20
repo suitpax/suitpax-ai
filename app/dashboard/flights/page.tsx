@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
 import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
 import AirlinesSlider from "@/components/flights/results/airlines-slider"
-import { EnhancedPromptInput } from "@/components/prompt-kit/prompt-input"
+import { PromptInput, PromptInputTextarea } from "@/components/prompt-kit/prompt-input"
 
 interface SearchParams {
   origin: string
@@ -36,6 +36,7 @@ interface SavedSearchItem {
 
 export default function FlightsPage() {
   const router = useRouter()
+  const [aiQuery, setAiQuery] = useState("")
 
   const [searchParams, setSearchParams] = useState<SearchParams>({
     origin: "JFK",
@@ -313,23 +314,12 @@ export default function FlightsPage() {
         </div>
       </div>
 
-      {/* AI prompt with video placeholder */}
+      {/* AI prompt */}
       <div className="flex justify-center">
         <div className="w-full max-w-2xl">
-          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-2 shadow-sm">
-            <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-gray-200">
-              <video autoPlay loop muted playsInline className="h-full w-full object-cover">
-                <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20(online-video-cutter.com)%20(1)-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
-              </video>
-            </div>
-            <input
-              placeholder="Ask Suitpax AI to plan your next flight (e.g., MAD → LHR Friday)"
-              className="flex-1 bg-transparent text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-8"
-            />
-            <button className="h-9 w-9 rounded-xl bg-black text-white hover:bg-black/90 flex items-center justify-center">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-            </button>
-          </div>
+          <PromptInput value={aiQuery} onValueChange={setAiQuery} onSubmit={searchFlights}>
+            <PromptInputTextarea placeholder="Ask Suitpax AI to plan your next flight (e.g., MAD → LHR Friday)" />
+          </PromptInput>
         </div>
       </div>
 
