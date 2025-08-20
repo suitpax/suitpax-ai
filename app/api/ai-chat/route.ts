@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
     includeReasoning = false,
     webSearch = false,
     deepSearch = false,
+    sessionId,
   } = await request.json()
   if (!message) return NextResponse.json({ error: "Message is required" }, { status: 400 })
 
@@ -287,7 +288,21 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    let newSessionId: string | undefined
     try {
+      // Create session if not provided
+      if (!sessionId) {
+        const { data: created } = await supabase
+          .from("chat_sessions")
+          .insert({ user_id: user.id, title: message.slice(0, 60) || "New chat" })
+          .select("id")
+          .single()
+        newSessionId = created?.id
+      } else {
+        newSessionId = sessionId
+        await supabase.from("chat_sessions").update({ last_message_at: new Date().toISOString() }).eq("id", sessionId).eq("user_id", user.id)
+      }
+
       await supabase.from("ai_usage").insert({
         user_id: user.id,
         model: "claude-3-7-sonnet-20250219",
@@ -313,6 +328,9 @@ export async function POST(request: NextRequest) {
         tokens_used: totalTokensUsed,
         model_used: "claude-3-7-sonnet-latest",
         context_type: toolType,
+        session_id: newSessionId || null,
+        reasoning_included: includeReasoning || false,
+        reasoning_content: reasoning || null,
       })
     } catch (e) {
       console.error("Failed to log AI usage:", e)
@@ -328,6 +346,7 @@ export async function POST(request: NextRequest) {
         outputTokens: actualOutputTokens,
       },
       toolUsed: toolType !== "general" ? toolType : undefined,
+      sessionId: newSessionId || sessionId,
     })
   } catch (e: any) {
     const errorId = Math.random().toString(36).slice(2)
