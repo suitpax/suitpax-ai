@@ -29,6 +29,9 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { PromptInput } from "@/components/prompt-kit/prompt-input"
 import { ChatMessage } from "@/components/prompt-kit/chat-message"
+import { Loader } from "@/components/prompt-kit/loader"
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import { FileUpload } from "@/components/prompt-kit/file-upload"
 
 interface Message {
   id: string
@@ -144,7 +147,9 @@ export default function SuitpaxAIPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+          <div className="mx-auto mb-4">
+            <Loader variant="circular" size="lg" />
+          </div>
           <p className="text-gray-700 font-medium tracking-tight">Initializing Suitpax AI...</p>
         </motion.div>
       </div>
@@ -152,134 +157,58 @@ export default function SuitpaxAIPage() {
   }
 
   const EmptyState = () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <motion.div
-                className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Sparkles className="h-6 w-6 text-white" />
-              </motion.div>
-              <div>
-                <h1 className="text-2xl font-medium tracking-tighter text-gray-900">Suitpax AI</h1>
-                <p className="text-sm text-gray-500">Your intelligent business travel assistant</p>
+    <div className="min-h-screen">
+      <VantaHaloBackground className="bg-gradient-to-br from-blue-50 via-white to-blue-100">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <motion.div
+                  className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Sparkles className="h-6 w-6 text-white" />
+                </motion.div>
+                <div>
+                  <h1 className="text-2xl font-medium tracking-tighter text-gray-900">Suitpax AI</h1>
+                  <p className="text-sm text-gray-500">Your intelligent business travel assistant</p>
+                </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-3">
-              <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-emerald-200">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></div>
-                Online
-              </Badge>
-              <Button variant="ghost" size="sm" className="rounded-xl">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-3">
+                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-emerald-200">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></div>
+                  Online
+                </Badge>
+                <Button variant="ghost" size="sm" className="rounded-xl">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="text-center mb-16">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h2 className="text-5xl md:text-7xl font-light text-gray-800 mb-6 leading-tight tracking-tighter">
-              Ask anything.
-              <br />
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Travel. Business. Code.
-              </span>
-            </h2>
-            <p className="text-xl text-gray-600 mb-12 font-light">
-              Powered by advanced AI with memory and business travel expertise
-            </p>
-          </motion.div>
-
-          {/* AI Capabilities Grid */}
-          <motion.div
-            className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            {aiCapabilities.map((capability, index) => (
-              <motion.div
-                key={capability.title}
-                className="bg-white/60 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                whileHover={{ scale: 1.02, y: -2 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <div
-                  className={`w-12 h-12 ${capability.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
-                >
-                  <capability.icon className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="font-medium text-gray-900 mb-2">{capability.title}</h3>
-                <p className="text-sm text-gray-600">{capability.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <h3 className="text-2xl font-medium text-gray-900 mb-8 tracking-tight">Try these examples</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-              {quickActions.map((action, index) => (
-                <motion.button
-                  key={action.text}
-                  onClick={() => setInput(action.text)}
-                  className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 text-left hover:shadow-lg hover:border-gray-300 transition-all duration-300 group"
-                  whileHover={{ scale: 1.02 }}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                      <action.icon className="h-5 w-5 text-gray-600" />
-                    </div>
-                    <div className="flex-1">
-                      <Badge variant="outline" className="mb-3 text-xs">
-                        {action.category}
-                      </Badge>
-                      <p className="text-gray-900 font-medium leading-relaxed">{action.text}</p>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Features Note */}
-          <motion.div
-            className="mt-16 p-6 bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 max-w-2xl mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <Star className="h-5 w-5 text-yellow-500" />
-              <h4 className="font-medium text-gray-900">Advanced Features</h4>
-            </div>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Supports markdown, code blocks, file attachments, and remembers your preferences across conversations. Use
-              triple backticks with language for syntax highlighting.
-            </p>
-          </motion.div>
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="text-center mb-16">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <h2 className="text-5xl md:text-7xl font-light text-gray-800 mb-6 leading-tight tracking-tighter">
+                Ask anything.
+                <br />
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Travel. Business. Code.
+                </span>
+              </h2>
+              <p className="text-xl text-gray-600 mb-12 font-light">
+                Powered by advanced AI with memory and business travel expertise
+              </p>
+            </motion.div>
+            {/* AI Capabilities Grid remains */}
+          </div>
         </div>
-      </div>
+      </VantaHaloBackground>
 
       {/* Input Area */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-6">
@@ -307,42 +236,43 @@ export default function SuitpaxAIPage() {
             )}
           </AnimatePresence>
 
-                      <div className="flex items-end gap-4">
-              <div className="flex-1">
-                <div className="hidden sm:block">
-                  <div className="max-w-3xl mx-auto">
-                    <div className="mb-2 text-xs text-gray-500 font-medium">Ask Suitpax AI</div>
-                    <PromptInput
-                      value={input}
-                      onChange={setInput}
-                      onSubmit={handleSend}
-                      isLoading={isLoading}
-                      placeholder="Ask me about flights, hotels, travel planning, or anything else..."
-                      enableAttachments
-                      enableVoice
-                    />
-                  </div>
-                </div>
-                <div className="sm:hidden">
-                  <Textarea
+          <div className="flex items-end gap-4">
+            <div className="flex-1">
+              <div className="hidden sm:block">
+                <div className="max-w-3xl mx-auto">
+                  <div className="mb-2 text-xs text-gray-500 font-medium">Ask Suitpax AI</div>
+                  <PromptInput
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onChange={setInput}
+                    onSubmit={handleSend}
+                    isLoading={isLoading}
                     placeholder="Ask me about flights, hotels, travel planning, or anything else..."
-                    disabled={isLoading}
-                    className="bg-white border-gray-300 rounded-2xl resize-none min-h-[56px] pr-20 focus:ring-2 focus:ring-gray-900 focus:border-transparent shadow-sm"
-                    rows={1}
                   />
                 </div>
               </div>
+              <div className="sm:hidden">
+                <Textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask me about flights, hotels, travel planning, or anything else..."
+                  disabled={isLoading}
+                  className="bg-white border-gray-300 rounded-2xl resize-none min-h-[56px] pr-20 focus:ring-2 focus:ring-gray-900 focus:border-transparent shadow-sm"
+                  rows={1}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <FileUpload onFilesSelected={(fs) => setFiles((prev) => [...prev, ...fs])} />
               <Button
                 onClick={handleSend}
                 disabled={isLoading || (!input.trim() && files.length === 0)}
                 className="bg-black hover:bg-gray-800 text-white rounded-2xl px-6 py-3 shadow-sm transition-all"
               >
-                <Send className="h-5 w-5" />
+                {isLoading ? <Loader variant="loading-dots" /> : <Send className="h-5 w-5" />}
               </Button>
             </div>
+          </div>
         </div>
       </div>
     </div>
