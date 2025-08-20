@@ -191,17 +191,34 @@ export default function VoiceAIPage() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+        >
           <div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-gray-900 mb-2">Voice AI Assistant</h1>
-            <p className="text-lg font-light text-gray-600">{getGreeting()}, {getDisplayName().split(" ")[0]}! Ready to help with your business needs.</p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-gray-900 mb-2">
+              Voice AI Assistant
+            </h1>
+            <p className="text-lg font-light text-gray-600">
+              {getGreeting()}, {getDisplayName().split(" ")[0]}! Ready to help with your business needs.
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input placeholder="Search conversations..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 w-64 rounded-2xl border-gray-200 bg-white/80 backdrop-blur-sm" />
+              <Input
+                placeholder="Search conversations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-64 rounded-2xl border-gray-200 bg-white/80 backdrop-blur-sm"
+              />
             </div>
-            <Button variant="outline" className="rounded-2xl bg-white/80 backdrop-blur-sm border-gray-200" onClick={() => updateSettings({ autoSpeak: !voiceSettings.autoSpeak })}>
+            <Button
+              variant="outline"
+              className="rounded-2xl bg-white/80 backdrop-blur-sm border-gray-200"
+              onClick={() => updateSettings({ autoSpeak: !voiceSettings.autoSpeak })}
+            >
               {voiceSettings.autoSpeak ? "Auto-speak: On" : "Auto-speak: Off"}
             </Button>
           </div>

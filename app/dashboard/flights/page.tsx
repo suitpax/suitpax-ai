@@ -16,6 +16,8 @@ import PlacesLookup from "@/components/places-lookup/places-lookup"
 import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
 import AirlinesSlider from "@/components/flights/results/airlines-slider"
 import { PromptInput, PromptInputTextarea } from "@/components/prompt-kit/prompt-input"
+import { Loader } from "@/components/prompt-kit/loader"
+import { useSpeechToText } from "@/hooks/use-speech-recognition"
 
 interface SearchParams {
   origin: string
@@ -37,6 +39,17 @@ interface SavedSearchItem {
 export default function FlightsPage() {
   const router = useRouter()
   const [aiQuery, setAiQuery] = useState("")
+  const { isListening, startListening, stopListening, transcript, resetTranscript } = useSpeechToText({
+    continuous: false,
+    interimResults: true,
+    language: "en-US",
+    onResult: (t, isFinal) => {
+      if (isFinal) setAiQuery(t)
+    },
+    onEnd: async (final) => {
+      if (final.trim()) await searchFlights()
+    },
+  })
 
   const [searchParams, setSearchParams] = useState<SearchParams>({
     origin: "JFK",
@@ -317,9 +330,23 @@ export default function FlightsPage() {
       {/* AI prompt */}
       <div className="flex justify-center">
         <div className="w-full max-w-2xl">
-          <PromptInput value={aiQuery} onValueChange={setAiQuery} onSubmit={searchFlights}>
-            <PromptInputTextarea placeholder="Ask Suitpax AI to plan your next flight (e.g., MAD → LHR Friday)" />
-          </PromptInput>
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <PromptInput value={aiQuery} onValueChange={setAiQuery} onSubmit={searchFlights}>
+                <PromptInputTextarea placeholder="Ask Suitpax AI to plan your next flight (e.g., MAD → LHR Friday)" />
+              </PromptInput>
+            </div>
+            <Button
+              type="button"
+              className={`rounded-full h-10 w-10 ${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-black hover:bg-gray-800'} text-white`}
+              onClick={() => {
+                if (isListening) stopListening(); else { resetTranscript(); startListening() }
+              }}
+              title="Voice search"
+            >
+              {isListening ? <Loader variant="wave" size="sm" /> : <Loader variant="dots" size="sm" />}
+            </Button>
+          </div>
         </div>
       </div>
 
