@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { buildSystemPrompt, buildReasoningInstruction, buildToolContext } from "@/lib/prompts/system"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
-import { SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/enhanced-system"
+import { System as SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/system"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 

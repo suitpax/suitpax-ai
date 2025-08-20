@@ -61,8 +61,9 @@ const navigation = [
 ]
 
 const aiNavigation = [
-  { name: "AI Center", href: "/dashboard/ai-center", icon: MessageSquare, badge: "AI" },
-  // { name: "Suitpax Code", href: "/dashboard/code", icon: MessageSquare, badge: "Dev" },
+  { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: MessageSquare, badge: "AI" },
+  { name: "Voice AI", href: "/dashboard/voice-ai", icon: Mic, badge: "Voice" },
+  { name: "AI Center", href: "/dashboard/ai-center", icon: MessageSquare },
 ]
 
 interface SidebarProps {

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { TRAVEL_OPTIMIZATION_PROMPT } from "@/lib/prompts/enhanced-system"
+import { TRAVEL_OPTIMIZATION_PROMPT } from "@/lib/prompts/specialized-prompts"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })

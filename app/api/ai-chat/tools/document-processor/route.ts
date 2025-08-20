@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { DOCUMENT_AI_PROMPT } from "@/lib/prompts/enhanced-system"
+import { DOCUMENT_AI_PROMPT } from "@/lib/prompts/specialized-prompts"
 
 function getAnthropic() {
   const key = process.env.ANTHROPIC_API_KEY

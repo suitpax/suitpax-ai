@@ -1,4 +1,4 @@
-import { SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/enhanced-system"
+import { System as SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/system"
 import { buildSystemPrompt, buildReasoningInstruction, buildToolContext } from "@/lib/prompts/system"
 import { generateAgentResponseByPlan, toAnthropicMessages, type ConversationMessage, type UserPlan } from "@/lib/anthropic"
 import { SUITPAX_CODE_SYSTEM_PROMPT } from "@/lib/prompts/code"
