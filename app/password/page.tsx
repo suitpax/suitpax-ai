@@ -14,17 +14,36 @@ export default function PasswordGatePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [headline, setHeadline] = useState("Suitpax AI: Build. Travel. Code.")
-  const [newsletterEmail, setNewsletterEmail] = useState("")
-  const [newsletterMsg, setNewsletterMsg] = useState<string | null>(null)
-  const [newsletterLoading, setNewsletterLoading] = useState(false)
+  const [contactEmail, setContactEmail] = useState("")
+  const [contactCompany, setContactCompany] = useState("")
+  const [contactMessage, setContactMessage] = useState("")
+  const [contactMsg, setContactMsg] = useState<string | null>(null)
+  const [contactLoading, setContactLoading] = useState(false)
 
   useEffect(() => {
     const titles = [
-      "Suitpax AI: Build. Travel. Code.",
-      "Suitpax AI: Predict. Plan. Automate.",
-      "Suitpax AI: Flights. Hotels. Finance.",
-      "Suitpax AI: Chat. Voice. Agents.",
-      "Suitpax AI: Design. Ship. Scale.",
+      "Run your business travel like a product.",
+      "From intent to itinerary, instantly.",
+      "Policy‑aware bookings. Real‑time savings.",
+      "Conversations that turn into trips.",
+      "Smarter flights. Faster finance.",
+      "One platform. Travel, spend, compliance.",
+      "Predict. Plan. Automate.",
+      "Design. Ship. Scale.",
+      "Build. Travel. Code.",
+      "Context. Voice. Agents.",
+      "Flights. Stays. Finance.",
+      "Seat maps. Price tracking. Rebooking.",
+      "Made for teams that move fast.",
+      "Your travel copilot, 24/7.",
+      "Reduce costs, not ambition.",
+      "NDC direct. 3DS secure. PCI‑safe.",
+      "Travel that fits your policy.",
+      "Talk to book. Track to save.",
+      "From Slack to seat in minutes.",
+      "All your trips. One beautiful flow.",
+      "Suitpax AI for modern companies.",
+      "Suitpax AI: Manage. Travel. Code.",
     ]
     setHeadline(titles[Math.floor(Math.random() * titles.length)])
   }, [])
@@ -53,24 +72,26 @@ export default function PasswordGatePage() {
     }
   }
 
-  const subscribeNewsletter = async (e: React.FormEvent) => {
+  const submitContact = async (e: React.FormEvent) => {
     e.preventDefault()
-    setNewsletterMsg(null)
-    setNewsletterLoading(true)
+    setContactMsg(null)
+    setContactLoading(true)
     try {
-      const resp = await fetch('/api/newsletter/subscribe', {
+      const resp = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newsletterEmail }),
+        body: JSON.stringify({ email: contactEmail, company: contactCompany, message: contactMessage }),
       })
       const json = await resp.json()
-      if (!resp.ok || !json?.ok) throw new Error(json?.error || 'Subscribe failed')
-      setNewsletterMsg('You are in. Check your inbox!')
-      setNewsletterEmail("")
+      if (!resp.ok) throw new Error(json?.error || 'Message failed')
+      setContactMsg('Thanks! We will reach out shortly.')
+      setContactEmail("")
+      setContactCompany("")
+      setContactMessage("")
     } catch (err: any) {
-      setNewsletterMsg(err?.message || 'Something went wrong')
+      setContactMsg(err?.message || 'Something went wrong')
     } finally {
-      setNewsletterLoading(false)
+      setContactLoading(false)
     }
   }
 
@@ -78,12 +99,12 @@ export default function PasswordGatePage() {
     <VantaHaloBackground
       className="relative w-full min-h-[100vh] overflow-hidden bg-white"
       options={{
-        backgroundColor: 0xf6f7fb,
-        baseColor: 0xeff2f7,
-        color: 0xffffff,
-        color2: 0xdde3ee,
-        size: 0.85,
-        amplitudeFactor: 0.9,
+        backgroundColor: 0xf3f4f6,
+        baseColor: 0xe5e7eb,
+        color: 0x93c5fd,
+        color2: 0xdbeafe,
+        size: 0.8,
+        amplitudeFactor: 0.7,
       }}
     >
       <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24">
@@ -102,14 +123,7 @@ export default function PasswordGatePage() {
             {headline}
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="mt-3 text-sm md:text-base font-light text-gray-700 max-w-2xl"
-          >
-            Enter the access key to explore our next‑gen business travel platform.
-          </motion.p>
+          {/* Intro copy moved closer to the input */}
 
           {/* Shimmer text */}
           <div className="mt-4 text-gray-700 text-sm font-medium relative inline-block">
@@ -118,7 +132,7 @@ export default function PasswordGatePage() {
           </div>
 
           {/* Animated city text (cleaner spacing) */}
-          <div className="mt-6">
+          <div className="mt-7">
             <CityAnimateText />
           </div>
 
@@ -131,11 +145,12 @@ export default function PasswordGatePage() {
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2.5 py-1 border border-black/10">Chat. Voice. Agents.</span>
           </div>
 
-          {/* Prompt-like password input (smaller & squarer) */}
-          <form onSubmit={handleSubmit} className="mt-8 w-full max-w-3xl mx-auto px-2">
+          {/* Access input */}
+          <div className="mt-6 text-[11px] text-gray-600">Enter the access key to explore our next‑gen business travel platform.</div>
+          <form onSubmit={handleSubmit} className="mt-2 w-full max-w-3xl mx-auto px-2">
             <div className="flex items-center gap-2.5 bg-white/90 backdrop-blur border border-gray-200 rounded-full p-2 shadow-sm">
               <div className="relative h-12 w-12 md:h-12 md:w-12 rounded-full overflow-hidden bg-gray-200 ring-1 ring-gray-300/50">
-                <video autoPlay muted loop playsInline className="h-full w-full object-cover object-center object-[50%_25%]">
+                <video autoPlay muted loop playsInline className="h-full w-full object-cover object-center object-[50%_30%] scale-125">
                   <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20(online-video-cutter.com)%20(1)-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
                 </video>
               </div>
@@ -144,7 +159,7 @@ export default function PasswordGatePage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter access key to continue"
-                className="flex-1 bg-transparent text-[14px] md:text-[15px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-10"
+                className="flex-1 bg-transparent text-[13px] md:text-[14px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-10"
                 required
               />
               <button
@@ -175,30 +190,46 @@ export default function PasswordGatePage() {
             ))}
           </div>
 
-          {/* Suitpax Nation Newsletter */}
-          <div className="mt-10 w-full max-w-2xl">
+          {/* Contact form (Brevo-ready): message, email, company */}
+          <div className="mt-9 w-full max-w-2xl">
             <div className="text-center mb-3">
-              <div className="text-xs font-semibold tracking-widest text-gray-700 uppercase">Suitpax Nation</div>
-              <div className="text-[12px] text-gray-600 font-light">Join our newsletter for product drops, travel intel, and deep dives.</div>
+              <div className="text-xs font-semibold tracking-widest text-gray-700 uppercase">Get early access</div>
+              <div className="text-[12px] text-gray-600 font-light">Tell us about your team and we’ll reach out with access.</div>
             </div>
-            <form onSubmit={subscribeNewsletter} className="flex items-center gap-2 bg-white/90 border border-gray-200 rounded-full p-2 shadow-sm">
-              <input
-                type="email"
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="flex-1 bg-transparent text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-9 px-2"
-                required
+            <form onSubmit={submitContact} className="space-y-2">
+              <textarea
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+                placeholder="What do you want to achieve with Suitpax?"
+                className="w-full bg-white/90 border border-gray-200 rounded-2xl p-3 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
+                rows={3}
               />
-              <button
-                type="submit"
-                disabled={newsletterLoading}
-                className="h-9 px-4 rounded-full bg-black text-white hover:bg-gray-900"
-              >
-                {newsletterLoading ? 'Sending…' : 'Subscribe'}
-              </button>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  placeholder="Work email"
+                  className="flex-1 bg-white/90 border border-gray-200 rounded-2xl p-2 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
+                  required
+                />
+                <input
+                  value={contactCompany}
+                  onChange={(e) => setContactCompany(e.target.value)}
+                  placeholder="Company"
+                  className="flex-1 bg-white/90 border border-gray-200 rounded-2xl p-2 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={contactLoading}
+                  className="px-4 rounded-2xl bg-black text-white hover:bg-gray-900 text-[13px]"
+                >
+                  {contactLoading ? 'Sending…' : 'Request access'}
+                </button>
+              </div>
             </form>
-            {newsletterMsg && <div className="mt-2 text-center text-xs text-gray-700">{newsletterMsg}</div>}
+            {contactMsg && <div className="mt-2 text-center text-xs text-gray-700">{contactMsg}</div>}
           </div>
 
           {/* Reduced badges spacing */}
@@ -218,6 +249,9 @@ export default function PasswordGatePage() {
       <div className="absolute inset-x-0 bottom-0 z-10">
         <div className="px-4 py-2 bg-black/95 text-gray-300 text-center text-[11px] font-medium tracking-tight">
           Private preview • Building the future of business travel
+        </div>
+        <div className="px-4 py-1 bg-black/95 text-center text-[10px] text-gray-400">
+          Suitpax™ is a trademark of Suitpax. All product names, logos, and brands are property of their respective owners.
         </div>
       </div>
 
