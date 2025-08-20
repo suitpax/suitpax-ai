@@ -182,20 +182,13 @@ export default function PasswordGatePage() {
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Flights. Hotels. Finance.</span>
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Chat. Voice. Agents.</span>
           </div>
-          {/* Small city strip using Pexels API proxy */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-            {["Amsterdam","Paris","New York","London","Barcelona","Tokyo"].map((city) => (
-              <div key={city} className="h-8 w-14 rounded-md overflow-hidden border border-gray-200">
-                <img src={`/api/images/city?city=${encodeURIComponent(city)}&w=200&h=120`} alt={city} className="h-full w-full object-cover" />
-              </div>
-            ))}
-          </div>
+          {/* Removed small city strip */}
 
           {/* Access input */}
           <div className="mt-6 text-[11px] text-gray-600">Enter the access key to explore our next‑gen business travel platform.</div>
-          <form onSubmit={handleSubmit} className="mt-2 w-full max-w-3xl mx-auto px-2">
-            <div className="flex items-center gap-2.5 bg-white/90 backdrop-blur border border-gray-200 rounded-full p-2 shadow-sm">
-              <div className="relative h-12 w-12 md:h-12 md:w-12 rounded-full overflow-hidden bg-gray-200 ring-1 ring-gray-300/50">
+          <form onSubmit={handleSubmit} className="mt-2 w-full max-w-xl mx-auto px-2">
+            <div className="flex items-center gap-2 bg-white/90 backdrop-blur border border-gray-200 rounded-full p-1.5 shadow-sm">
+              <div className="relative h-9 w-9 md:h-9 md:w-9 rounded-full overflow-hidden bg-gray-200 ring-1 ring-gray-300/50">
                 <video autoPlay muted loop playsInline className="h-full w-full object-cover object-center object-[50%_30%] scale-125">
                   <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20(online-video-cutter.com)%20(1)-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
                 </video>
@@ -205,13 +198,13 @@ export default function PasswordGatePage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter access key to continue"
-                className="flex-1 bg-transparent text-[13px] md:text-[14px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-10"
+                className="flex-1 bg-transparent text-[12px] md:text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-8"
                 required
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="h-8 w-8 md:h-9 md:w-9 rounded-full text-black hover:text-gray-700 flex items-center justify-center"
+                className="h-7 w-7 md:h-8 md:w-8 rounded-full text-black hover:text-gray-700 flex items-center justify-center"
                 aria-label="Continue"
                 title="Continue"
               >
@@ -288,6 +281,16 @@ export default function PasswordGatePage() {
               Private beta
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* Top sticky banner (full width) */}
+      <div className="absolute inset-x-0 top-0 z-20">
+        <div className="flex items-center justify-between px-4 py-2 bg-black/95 text-gray-300 text-[11px] font-medium tracking-tight">
+          <div className="truncate">Private preview • Building the future of business travel</div>
+          <a href="mailto:ai@suitpax.com" className="rounded-xl border border-white/10 bg-white/20 px-2.5 py-1 text-[10px] text-black hover:bg-white/30 backdrop-blur">
+            Contact us
+          </a>
         </div>
       </div>
 
