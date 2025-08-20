@@ -128,12 +128,10 @@ export default function PasswordGatePage() {
           {/* Prompt-like password input (smaller & squarer) */}
           <form onSubmit={handleSubmit} className="mt-8 w-full max-w-3xl mx-auto px-2">
             <div className="flex items-center gap-2.5 bg-white/90 backdrop-blur border border-gray-200 rounded-full p-2 shadow-sm">
-              <div className="relative h-12 w-12 md:h-12 md:w-12 rounded-full overflow-hidden bg-white ring-1 ring-gray-300/50 flex items-center justify-center">
-                <img
-                  src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/${['BA','AF','KL','IB','LH','EK','AA','UA','QR','CX'][Math.floor(Math.random()*10)]}.svg`}
-                  alt="Airline"
-                  className="max-h-6 max-w-10 object-contain"
-                />
+              <div className="relative h-12 w-12 md:h-12 md:w-12 rounded-full overflow-hidden bg-gray-200 ring-1 ring-gray-300/50">
+                <video autoPlay muted loop playsInline className="h-full w-full object-cover object-center object-[50%_25%]">
+                  <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/372667474502451203%20(online-video-cutter.com)%20(1)-cMldY8CRYlKeR2Ppc8vnuyqiUzfGWe.mp4" type="video/mp4" />
+                </video>
               </div>
               <input
                 type="password"
