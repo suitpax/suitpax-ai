@@ -36,7 +36,7 @@ export default function AirlinesSlider({ title = "", className = "" }: AirlinesS
               <div key={`${logo.name}-${index}`} className="flex items-center justify-center h-12 w-36 relative group">
                 <div className="flex h-12 w-36 items-center justify-center rounded-xl bg-white/70 border border-white/60 supports-[backdrop-filter]:backdrop-blur-md shadow-sm">
                   <motion.img
-                    src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${logo.code}.svg`}
+                    src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/${logo.code}.svg`}
                     alt={`${logo.name} logo`}
                     className="max-h-[22px] max-w-[128px] object-contain transition-all duration-300 group-hover:opacity-100"
                     whileHover={{ scale: 1.04 }}
