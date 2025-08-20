@@ -101,7 +101,7 @@ export default function VoiceAIPage() {
     const loadUserPreferences = async () => {
       if (user) {
         try {
-          const response = await fetch(`/api/suitpax-ai?userId=${user.id}`)
+          const response = await fetch(`/api/preferences?userId=${user.id}`)
           const data = await response.json()
           setUserPreferences(data.preferences || [])
         } catch (error) {

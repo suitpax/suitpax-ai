@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
     }
 
     const initial = await anthropic.messages.create({
-      model: "claude-4.1", // Upgraded to Claude 4
+      model: "claude-3-7-sonnet-20250219",
       max_tokens: maxTokensForResponse,
       system: systemPrompt,
       messages: [...conversationHistory, { role: "user", content: enhancedMessage }],
