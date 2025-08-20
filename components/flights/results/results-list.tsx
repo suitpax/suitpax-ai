@@ -93,10 +93,15 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
           <Card key={offer.id} className="glass-card hover-raise overflow-hidden">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
               <div className="flex items-center gap-2 min-w-0">
-                <CarrierLogo iata={airlineIata} name={airlineName} />
-                <div className="truncate text-sm text-gray-800 tracking-tight">
+                <CarrierLogo iata={airlineIata} name={airlineName} lockup width={72} height={20} className="h-5 w-auto" />
+                <div className="truncate text-sm text-gray-800 tracking-tight flex items-center gap-1">
                   <span className="font-medium">{airlineName}</span>
-                  {airlineIata && <span className="text-gray-500"> ({airlineIata})</span>}
+                  {airlineIata && (
+                    <>
+                      <span className="text-gray-500">({airlineIata})</span>
+                      <CarrierLogo iata={airlineIata} name={airlineName} width={14} height={14} className="inline-block align-middle" />
+                    </>
+                  )}
                 </div>
               </div>
               <div className="text-center text-gray-700 font-medium hidden sm:block">
@@ -142,8 +147,8 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                 </div>
 
                 <div className="md:pl-2">
-                  <div className="relative w-full h-[160px] md:h-full min-h-[160px] rounded-xl overflow-hidden border border-gray-200">
-                    <CityImage city={destCityName} sizes="(min-width: 768px) 220px, 100vw" />
+                  <div className="relative w-full h-[160px] md:h-full min-h-[160px] rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+                    <CityImage city={destCityName || (overallDestination?.name as any)} sizes="(min-width: 768px) 220px, 100vw" />
                   </div>
                   <div className="mt-1 text-center text-xs text-gray-600">{destCityName}</div>
                 </div>

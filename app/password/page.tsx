@@ -127,9 +127,9 @@ export default function PasswordGatePage() {
     >
       <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24">
         <div className="flex flex-col items-center text-center">
-          {/* Top launch banner */}
-          <div className="mb-4 w-full max-w-4xl rounded-xl overflow-hidden">
-            <div className="flex items-center gap-3 px-3 py-1.5 bg-black/95 text-gray-300 rounded-xl border border-white/10">
+          {/* Top launch banner (flat, no rounded, flush to top) */}
+          <div className="mb-4 w-full max-w-4xl">
+            <div className="flex items-center gap-3 px-3 py-1 bg-black/95 text-gray-300 border-b border-white/10">
               <div className="flex -space-x-2">
                 {["/agents/agent-5.png","/agents/agent-15.png","/agents/agent-3.png","/agents/agent-8.png"].slice(0,4).map((src, i) => (
                   <img key={i} src={src} alt="AI Agent" className="h-6 w-6 rounded-full ring-1 ring-white/20 object-cover" />
