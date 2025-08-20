@@ -1,5 +1,53 @@
 "use client"
 
+import Link from "next/link"
+import { useState } from "react"
+
+const templates = [
+  { id: "expense-policy-seed", name: "Expense Policy (Seed/Small Team)", size: "1-20", focus: "Frugal, fast approvals" },
+  { id: "expense-policy-series-a", name: "Expense Policy (Series A/B)", size: "20-150", focus: "Controls, budgets" },
+  { id: "travel-policy-midmarket", name: "Business Travel Policy (Mid-Market)", size: "150-1000", focus: "Duty of care, compliance" },
+  { id: "per-diem-remote-first", name: "Per Diem Policy (Remote-First)", size: "Any", focus: "Remote fairness, FX" },
+  { id: "anti-fraud-approval-matrix", name: "Anti-Fraud & Approval Matrix", size: "Any", focus: "Segregation of duties" },
+]
+
+export default function PoliciesPage() {
+  const [search, setSearch] = useState("")
+  const filtered = templates.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
+  return (
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Policies</h1>
+        <p className="text-sm text-gray-600">Curated templates and a guided builder to generate enterprise-ready policies.</p>
+        <div className="mt-3">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search templates…"
+            className="w-full max-w-md rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filtered.map((t) => (
+          <Link key={t.id} href={`/dashboard/policies/templates/${t.id}`} className="rounded-2xl border border-gray-200 bg-white p-4 hover:shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-medium text-gray-900">{t.name}</div>
+                <div className="text-xs text-gray-600">Size: {t.size} • Focus: {t.focus}</div>
+              </div>
+              <div className="text-xs text-gray-500">Open →</div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+"use client"
+
 import { useState, useCallback, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
