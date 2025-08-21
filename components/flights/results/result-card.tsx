@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PlaneTakeoffIcon, PlaneIcon } from "@heroicons/react/24/outline"
 import AircraftBadge from "@/components/flights/ui/aircraft-badge"
+import LoyaltyBadge from "@/components/flights/ui/loyalty-badge"
 
 interface FlightCardProps {
   offer: any
@@ -43,6 +44,7 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
                 {airlineIata && (
                   <span className="inline-flex items-center rounded-md border border-gray-300 px-1.5 py-[2px] text-[10px] font-medium text-gray-700 bg-white">{airlineIata}</span>
                 )}
+                <LoyaltyBadge airlineIata={airlineIata} airlineId={(firstSeg?.airline as any)?.id} />
                 {firstSeg?.flight_number && <span className="text-gray-500 text-[11px]">{firstSeg.flight_number}</span>}
                 {firstSeg?.airline?.conditions_of_carriage_url && (
                   <a href={firstSeg.airline.conditions_of_carriage_url} target="_blank" rel="noreferrer" className="text-[10px] text-gray-500 underline hover:text-gray-700">conditions</a>

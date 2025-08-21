@@ -7,6 +7,7 @@ import CityImage from "@/components/flights/ui/city-image"
 import LegSummary from "@/components/flights/ui/leg-summary"
 import SegmentMeta from "@/components/flights/ui/segment-meta"
 import { formatDurationISO } from "./lib"
+import LoyaltyBadge from "@/components/flights/ui/loyalty-badge"
 
 interface FlightOfferSegment {
   id: string
@@ -18,7 +19,7 @@ interface FlightOfferSegment {
   operating_carrier: any
   flight_number: string
   aircraft: any
-  airline?: { name?: string; logo_symbol_url?: string; logo_lockup_url?: string; iata_code?: string }
+  airline?: { name?: string; logo_symbol_url?: string; logo_lockup_url?: string; iata_code?: string; id?: string }
 }
 
 interface FlightOfferSlice {
@@ -81,6 +82,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
         const firstSeg = firstSlice?.segments?.[0]
         const airlineName = firstSeg?.airline?.name || firstSeg?.marketing_carrier?.name || ""
         const airlineIata = firstSeg?.airline?.iata_code || firstSeg?.marketing_carrier?.iata_code || ""
+        const airlineId = (firstSeg?.airline as any)?.id
         const airlineSymbolUrl = firstSeg?.airline?.logo_symbol_url || firstSeg?.airline?.logo_lockup_url || ""
         const overallOrigin = offer.slices?.[0]?.origin?.iata_code
         const overallDestination = offer.slices?.[offer.slices.length - 1]?.destination
@@ -91,9 +93,10 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 rounded-2xl">
               <div className="flex items-center gap-3 min-w-0">
                 <CarrierLogo src={airlineSymbolUrl} iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" noFallback />
-                <div className="truncate text-sm text-gray-800 tracking-tight flex items-center gap-1">
-                  <span className="font-medium">{airlineName}</span>
+                <div className="truncate text-sm text-gray-800 tracking-tight flex items-center gap-2">
+                  <span className="font-medium truncate max-w-[140px]">{airlineName}</span>
                   {airlineIata && (<span className="text-gray-500">({airlineIata})</span>)}
+                  <LoyaltyBadge airlineIata={airlineIata} airlineId={airlineId} />
                 </div>
               </div>
               <div className="text-center text-gray-700 font-medium hidden sm:block">

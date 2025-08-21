@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { getPlacesFromClient } from './lib/get-places-from-client'
 import { resolveCityImage } from '@/lib/utils'
 
-interface Item { id: string; iata_code?: string; city_name?: string; name?: string }
+interface Item { id: string; iata_code?: string; city_name?: string; name?: string; icao_code?: string; iata_country_code?: string; iata_city_code?: string }
 
 interface Props {
   value: string
@@ -55,7 +55,7 @@ export default function PlacesLookup({ value, onSelect, placeholder }: Props) {
     const iata = (p.iata_code || p.airport?.iata_code || '').toUpperCase()
     setQuery(`${city || name} (${iata})`)
     setOpen(false)
-    onSelect({ id: p.id, iata_code: iata, city_name: city, name })
+    onSelect({ id: p.id, iata_code: iata, city_name: city, name, icao_code: p.icao_code, iata_country_code: p.iata_country_code, iata_city_code: p.iata_city_code })
   }
 
   const cityThumb = (city?: string) => {
@@ -87,46 +87,83 @@ export default function PlacesLookup({ value, onSelect, placeholder }: Props) {
     }
   }
 
+  const cityItems = items.filter((p: any) => (p.iata_city_code || p.city?.iata_code) && !p.iata_code)
+  const airportItems = items.filter((p: any) => p.iata_code)
+
   return (
     <div className="places">
       <Input value={query} onChange={e => { setQuery(e.target.value); setOpen(true) }} onFocus={() => setOpen(true)} onKeyDown={handleKeyDown} placeholder={placeholder} className="bg-white text-gray-900 rounded-2xl" />
       {open && items.length > 0 && (
         <div className="places-panel">
-          <div className="p-2">
+          <div className="p-2 space-y-2">
             {loading && (
               <div className="px-3 py-2 text-xs text-gray-600">Searching…</div>
             )}
-            {items.slice(0, 8).map((p: any, idx: number) => {
-              const city = (p.city_name || p.city?.name || '').toString()
-              const name = p.name || city
-              const iata = (p.iata_code || p.airport?.iata_code || '').toUpperCase()
-              const thumb = cityThumb(city)
-              return (
-                <button key={p.id} type="button" onMouseDown={() => select(p)} onMouseEnter={() => setHighlight(idx)} className={`w-full text-left px-3 py-2 rounded-xl transition-soft ${idx === highlight ? 'bg-gray-100' : 'hover:bg-gray-50'}`}>
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      {thumb ? (
-                        <img
-                          src={thumb}
-                          alt={city || name}
-                          className="h-10 w-16 rounded-lg object-cover border border-gray-200"
-                          onError={(e) => { const el = e.currentTarget as HTMLImageElement; const fallback = 'https://images.pexels.com/photos/373912/pexels-photo-373912.jpeg?auto=compress&cs=tinysrgb&h=64&w=96'; el.src = fallback; if (city) cityThumbCache.set(city.toLowerCase(), fallback) }}
-                        />
-                      ) : (
-                        <div className="h-10 w-16 rounded-lg border border-gray-200 bg-gray-50" />
-                      )}
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-900 tracking-tighter truncate">{city || name}</div>
-                        <div className="text-xs text-gray-600 truncate">{name}</div>
+            {cityItems.length > 0 && (
+              <div>
+                <div className="px-3 py-1 text-[10px] uppercase tracking-wide text-gray-500">City</div>
+                {cityItems.slice(0, 4).map((p: any, idx: number) => {
+                  const city = (p.city_name || p.city?.name || '').toString()
+                  const name = p.name || city
+                  const iata = (p.iata_city_code || p.city?.iata_code || '').toUpperCase()
+                  const thumb = cityThumb(city)
+                  return (
+                    <button key={`city-${p.id}`} type="button" onMouseDown={() => select({ ...p, iata_code: iata })} className={`w-full text-left px-3 py-2 rounded-xl transition-soft hover:bg-gray-50`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          {thumb ? (
+                            <img src={thumb} alt={city || name} className="h-10 w-16 rounded-lg object-cover border border-gray-200" />
+                          ) : (
+                            <div className="h-10 w-16 rounded-lg border border-gray-200 bg-gray-50" />
+                          )}
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-gray-900 tracking-tighter truncate">{city || name}</div>
+                            <div className="text-xs text-gray-600 truncate">{name}</div>
+                          </div>
+                        </div>
+                        <div className="shrink-0">
+                          <span className="inline-flex items-center px-2 py-1 rounded-2xl border border-gray-200 bg-white text-xs text-gray-800">{iata || '—'}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="shrink-0">
-                      <span className="inline-flex items-center px-2 py-1 rounded-2xl border border-gray-200 bg-white text-xs text-gray-800">{iata || '—'}</span>
-                    </div>
-                  </div>
-                </button>
-              )
-            })}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            {airportItems.length > 0 && (
+              <div>
+                <div className="px-3 py-1 text-[10px] uppercase tracking-wide text-gray-500">Airports in city</div>
+                {airportItems.slice(0, 8).map((p: any, idx: number) => {
+                  const city = (p.city_name || p.city?.name || '').toString()
+                  const name = p.name || city
+                  const iata = (p.iata_code || '').toUpperCase()
+                  const icao = p.icao_code || ''
+                  const country = p.iata_country_code || ''
+                  const thumb = cityThumb(city)
+                  return (
+                    <button key={`airport-${p.id}`} type="button" onMouseDown={() => select(p)} className={`w-full text-left px-3 py-2 rounded-xl transition-soft hover:bg-gray-50`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          {thumb ? (
+                            <img src={thumb} alt={city || name} className="h-10 w-16 rounded-lg object-cover border border-gray-200" />
+                          ) : (
+                            <div className="h-10 w-16 rounded-lg border border-gray-200 bg-gray-50" />
+                          )}
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-gray-900 tracking-tighter truncate">{name} ({iata})</div>
+                            <div className="text-[11px] text-gray-600 truncate">{city} {icao ? `· ${icao}` : ''} {country ? `· ${country}` : ''}</div>
+                          </div>
+                        </div>
+                        <div className="shrink-0">
+                          <span className="inline-flex items-center px-2 py-1 rounded-2xl border border-gray-200 bg-white text-xs text-gray-800">{iata || '—'}</span>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
