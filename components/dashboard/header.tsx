@@ -92,11 +92,7 @@ export default function Header({
 }: HeaderProps) {
   const pathname = usePathname()
   const [userProfile, setUserProfile] = useState<any>(null)
-  const [notifications, setNotifications] = useState([
-    { id: 1, title: "Flight confirmed to NYC", time: "2 min ago", type: "booking" },
-    { id: 2, title: "Expense report approved", time: "1 hour ago", type: "expense" },
-    { id: 3, title: "Team meeting reminder", time: "3 hours ago", type: "meeting" },
-  ])
+  const [notifications, setNotifications] = useState<any[]>([])
   const [commandOpen, setCommandOpen] = useState(false)
   const supabase = createClient()
 
@@ -105,12 +101,8 @@ export default function Header({
   useEffect(() => {
     const getUserProfile = async () => {
       const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-
-      if (profile) {
-        setUserProfile(profile)
-      }
+      if (profile) setUserProfile(profile)
     }
-
     getUserProfile()
   }, [user.id, supabase])
 
@@ -209,27 +201,15 @@ export default function Header({
                   className="relative p-2.5 rounded-xl hover:bg-gray-100/80 transition-colors"
                 >
                   <Bell className="h-5 w-5 text-gray-600" />
-                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-80 bg-white/95 backdrop-blur-sm border-gray-200/50">
                 <DropdownMenuLabel className="flex items-center justify-between">
                   Notifications
-                  <Badge variant="secondary" className="text-xs">
-                    3
-                  </Badge>
+                  <Badge variant="secondary" className="text-xs">0</Badge>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <div className="p-2 space-y-2">
-                  <div className="p-3 rounded-xl bg-blue-50/50 border border-blue-100/50">
-                    <p className="text-sm font-medium text-gray-900">Flight confirmed to NYC</p>
-                    <p className="text-xs text-gray-500 mt-1">2 minutes ago</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-green-50/50 border border-green-100/50">
-                    <p className="text-sm font-medium text-gray-900">Expense report approved</p>
-                    <p className="text-xs text-gray-500 mt-1">1 hour ago</p>
-                  </div>
-                </div>
+                <div className="p-2 text-xs text-gray-500">No notifications</div>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -240,28 +220,20 @@ export default function Header({
                   variant="ghost"
                   className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100/80 transition-colors"
                 >
-                  <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500 ring-2 ring-blue-200/50">
+                  <div className="w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500 ring-2 ring-blue-200/50">
                     {userProfile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={userProfile.avatar_url || "/placeholder.svg"}
-                        alt="avatar"
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={userProfile.avatar_url || "/placeholder.svg"} alt="avatar" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">
-                          {user.email?.charAt(0).toUpperCase() || "U"}
-                        </span>
+                        <span className="text-white text-sm font-medium">{user.email?.charAt(0).toUpperCase() || "U"}</span>
                       </div>
                     )}
                   </div>
                   {!isMobile && (
                     <div className="hidden lg:flex items-center space-x-2">
                       <div className="text-left">
-                        <p className="text-sm font-medium text-gray-900">
-                          {userProfile?.full_name || user.email?.split("@")[0] || "User"}
-                        </p>
+                        <p className="text-sm font-medium text-gray-900">{userProfile?.full_name || user.email?.split("@")[0] || "User"}</p>
                         <p className="text-xs text-gray-500 capitalize">{userPlan} Plan</p>
                       </div>
                       <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -272,15 +244,11 @@ export default function Header({
 
               <DropdownMenuContent align="end" className="w-64 bg-white/95 backdrop-blur-sm border-gray-200/50">
                 <div className="px-3 py-2">
-                  <p className="text-sm font-medium text-gray-900">
-                    {userProfile?.full_name || user.email?.split("@")[0] || "User"}
-                  </p>
+                  <p className="text-sm font-medium text-gray-900">{userProfile?.full_name || user.email?.split("@")[0] || "User"}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                   <div className="mt-2 flex items-center space-x-2">
                     {getPlanBadge()}
-                    <Badge variant="outline" className="text-xs">
-                      {subscriptionStatus}
-                    </Badge>
+                    <Badge variant="outline" className="text-xs">{subscriptionStatus}</Badge>
                   </div>
                 </div>
 
