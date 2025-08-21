@@ -10,7 +10,8 @@ interface AirlinesSliderProps {
 
 const AIRLINE_LOGOS = [
   { name: "Cathay Pacific", code: "CX" },
-  { name: "Transavia", code: "HV" },
+  // Removed Transavia (asset flaky); replace with Swiss
+  { name: "SWISS", code: "LX" },
   { name: "Air France", code: "AF" },
   { name: "Jet2", code: "LS" },
   { name: "Vueling", code: "VY" },
