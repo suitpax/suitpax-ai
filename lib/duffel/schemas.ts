@@ -51,3 +51,11 @@ export interface DuffelCity {
   }>
 }
 
+export interface DuffelLoyaltyProgramme {
+  id: string
+  name: string | null
+  alliance?: string | null
+  owner_airline_id?: string | null
+  logo_url?: string | null
+}
+
