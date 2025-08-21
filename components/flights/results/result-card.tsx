@@ -21,7 +21,12 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
   const overallDestination = offer.slices?.[offer.slices.length - 1]?.destination
   const destCityName = overallDestination?.city?.name || overallDestination?.city_name || overallDestination?.name
 
-  // Removed manufacturer badge to avoid broken images
+  const manufacturerLogo = (aircraftName?: string) => {
+    const name = (aircraftName || '').toLowerCase()
+    if (name.includes('airbus')) return 'https://cdn.brandfetch.io/airbus.com/w/128/h/128/theme/dark/icon.png?c=1q2'
+    if (name.includes('boeing')) return 'https://cdn.brandfetch.io/boeing.com/w/128/h/128/theme/dark/icon.png?c=1q2'
+    return ''
+  }
 
   return (
     <Card className="hover:shadow-md transition-shadow duration-200 border border-gray-200 rounded-2xl overflow-hidden">
@@ -94,8 +99,10 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
 
                 <div className="flex flex-wrap gap-2 mt-2">
                   {slice.segments.map((segment: any) => {
+                    const manuLogo = manufacturerLogo(segment.aircraft?.name)
                     return (
                       <Badge key={segment.id} variant="outline" className="rounded-xl flex items-center gap-2 border-gray-300">
+                        {manuLogo && <img src={manuLogo} alt="manufacturer" className="h-3 w-3" />}
                         <span className="text-[11px]">
                           {(segment.airline?.name || segment.marketing_carrier?.name || '')} {segment.flight_number}
                           {segment.aircraft?.name && ` • ${segment.aircraft.name}`}
