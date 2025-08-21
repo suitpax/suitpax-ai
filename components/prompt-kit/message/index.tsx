@@ -46,5 +46,27 @@ export function MessageContent({ className, markdown, children, ...rest }: Messa
   )
 }
 
+export type MessageActionsProps = React.HTMLAttributes<HTMLDivElement>
+
+export function MessageActions({ className, children, ...rest }: MessageActionsProps) {
+  return (
+    <div className={cn("flex items-center gap-1", className)} {...rest}>
+      {children}
+    </div>
+  )
+}
+
+export type MessageActionProps = React.HTMLAttributes<HTMLDivElement> & {
+  tooltip?: string
+}
+
+export function MessageAction({ className, tooltip, children, ...rest }: MessageActionProps) {
+  return (
+    <div title={tooltip} className={cn("inline-flex items-center justify-center", className)} {...rest}>
+      {children}
+    </div>
+  )
+}
+
 export default Message
 
