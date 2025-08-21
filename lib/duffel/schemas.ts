@@ -20,3 +20,34 @@ export interface DuffelListResponse<T> {
   meta?: { before?: string | null; after?: string | null }
 }
 
+export interface DuffelAirport {
+  id: string
+  name: string | null
+  iata_code: string | null
+  icao_code?: string | null
+  iata_country_code?: string | null
+  iata_city_code?: string | null
+  city_name?: string | null
+  time_zone?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  city?: DuffelCity | null
+}
+
+export interface DuffelCity {
+  id: string
+  name: string | null
+  iata_code: string | null
+  iata_country_code?: string | null
+  airports?: Array<{
+    id: string
+    name: string | null
+    iata_code: string | null
+    icao_code?: string | null
+    iata_country_code?: string | null
+    time_zone?: string | null
+    latitude?: number | null
+    longitude?: number | null
+  }>
+}
+
