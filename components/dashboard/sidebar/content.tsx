@@ -2,11 +2,10 @@
 
 import Link from "next/link"
 import { SidebarMenu, SidebarMenuItem } from "@/components/ui/primitives/sidebar"
-import { LayoutDashboard, Plane, BarChart3, MessageSquare, Mic, Settings, Send } from "lucide-react"
+import { LayoutDashboard, Plane, BarChart3, MessageSquare, Mic, Settings } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
 
 export default function DashboardSidebarContent({ isCollapsed, isMobile, onCloseMobile }: { isCollapsed?: boolean; isMobile?: boolean; onCloseMobile?: () => void }) {
 	const pathname = usePathname()
@@ -22,12 +21,7 @@ export default function DashboardSidebarContent({ isCollapsed, isMobile, onClose
 		<SidebarMenu>
 			{!isCollapsed && (
 				<div className="px-3 pb-2">
-					<div className="flex items-center gap-2 bg-white/80 border border-gray-200 rounded-2xl p-2">
-						<Input placeholder="Ask Suitpax AI…" className="bg-transparent border-0 h-7 text-sm" />
-						<Button size="sm" variant="ghost" className="h-7 w-7 p-0 rounded-xl">
-							<Send className="h-3.5 w-3.5" />
-						</Button>
-					</div>
+					<GlobalPromptInput className="bg-white/80 border border-gray-200" placeholder="Ask the AI to plan a trip…" />
 				</div>
 			)}
 			{nav.map((item) => (
