@@ -24,7 +24,10 @@ export default function Ancillaries({ offerId, onChange }: Props) {
         const res = await fetch(url.toString())
         const json = await res.json()
         const data: any[] = json?.data || []
-        const mapped: AncillaryItem[] = data.map((a: any) => ({
+        const mapped: AncillaryItem[] = data
+          // Remove meal-type ancillaries to simplify UX
+          .filter((a: any) => String(a?.type || '').toLowerCase() !== 'meal')
+          .map((a: any) => ({
           code: a?.id || a?.type || 'anc',
           title: a?.name || a?.type || 'Service',
           description: a?.description || '',

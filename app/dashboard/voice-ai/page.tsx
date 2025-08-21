@@ -92,6 +92,16 @@ function VoiceAIContent() {
     return () => clearInterval(timer)
   }, [supabase])
 
+  // Autostart listening when ?autostart=1 and route from intent to Flights
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const auto = url.searchParams.get('autostart') === '1'
+    if (auto) {
+      handleStartRecording()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     const loadUserPreferences = async () => {
       if (user) {
@@ -145,6 +155,20 @@ function VoiceAIContent() {
         knowledgeUsed: data.knowledgeUsed || [],
       }
       setConversations((prev) => [newConversation, ...prev])
+
+      // Simple intent: if user mentions flight booking/search, try to extract route and date and navigate to Flights
+      const intent = /\b(flight|flights|book|search)\b/i.test(message)
+      if (intent) {
+        // naive extract IATA like ABC or patterns "MAD" "LHR" and an ISO date
+        const iatas = (message.match(/\b([A-Z]{3})\b/g) || []).slice(0, 2)
+        const dateMatch = message.match(/\b(\d{4}-\d{2}-\d{2})\b/)
+        const params = new URLSearchParams()
+        if (iatas[0]) params.set('origin', iatas[0])
+        if (iatas[1]) params.set('destination', iatas[1])
+        if (dateMatch) params.set('date', dateMatch[1])
+        params.set('autosearch', '1')
+        window.location.href = `/dashboard/flights?${params.toString()}`
+      }
     } catch (error) {
       console.error("Error processing voice message:", error)
       setAiResponse("Sorry, I encountered an error processing your request.")

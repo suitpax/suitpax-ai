@@ -88,6 +88,36 @@ export default function FlightsPage() {
     setSavedSearches(next)
     try { localStorage.setItem("suitpax_saved_searches", JSON.stringify(next)) } catch {}
   }
+
+  // Read URL params to prefill and optionally autosearch
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href)
+      const qp = url.searchParams
+      const origin = qp.get('origin') || ''
+      const destination = qp.get('destination') || ''
+      const date = qp.get('date') || ''
+      const ret = qp.get('return') || ''
+      const cabin = qp.get('cabin') || ''
+      const directOnlyParam = qp.get('directOnly')
+      const autosearch = qp.get('autosearch') === '1'
+      if (origin || destination || date || ret || cabin || directOnlyParam) {
+        setSearchParams(prev => ({
+          ...prev,
+          origin: origin || prev.origin,
+          destination: destination || prev.destination,
+          departureDate: date || prev.departureDate,
+          returnDate: ret || prev.returnDate,
+          cabinClass: (cabin || prev.cabinClass) as any,
+        }))
+        setDirectOnly(directOnlyParam === '1')
+        if (autosearch) {
+          setTimeout(() => { searchFlights() }, 50)
+        }
+      }
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const saveSearch = () => {
     const item: SavedSearchItem = {
       id: `${Date.now()}`,
@@ -320,7 +350,7 @@ export default function FlightsPage() {
         </div>
         <div className="flex flex-col w-full max-w-sm md:max-w-none md:flex-row items-stretch md:items-center gap-2">
           <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-gradient-to-r from-gray-900 to-gray-700 text-white hover:from-gray-800 hover:to-gray-700 backdrop-blur-sm shadow-sm" onClick={() => router.push('/dashboard/suitpax-ai?tab=chat')}>Try Suitpax AI</Button>
-          <Button id="primary-search-btn" className="w-full md:w-auto rounded-full md:rounded-2xl px-8 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Start a call'}</Button>
+          <Button id="primary-search-btn" className="w-full md:w-auto rounded-full md:rounded-2xl px-8 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={() => router.push('/dashboard/voice-ai?autostart=1')} disabled={searching}>{searching ? 'Searching…' : 'Start a call'}</Button>
         </div>
       </div>
 
