@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import dynamic from "next/dynamic"
 import { createClient } from "@/lib/supabase/client"
 import {
   Sparkles,
@@ -25,11 +26,11 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { PromptInput } from "@/components/prompt-kit/prompt-input"
-import { ChatMessage } from "@/components/prompt-kit/chat-message"
-import { Loader } from "@/components/prompt-kit/loader"
-import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-import { FileUpload } from "@/components/prompt-kit/file-upload"
+const PromptInput = dynamic(() => import("@/components/prompt-kit/prompt-input").then(m => m.PromptInput), { ssr: false })
+const ChatMessage = dynamic(() => import("@/components/prompt-kit/chat-message").then(m => m.ChatMessage), { ssr: false })
+const Loader = dynamic(() => import("@/components/prompt-kit/loader").then(m => m.Loader), { ssr: false })
+const VantaHaloBackground = dynamic(() => import("@/components/ui/vanta-halo-background"), { ssr: false })
+const FileUpload = dynamic(() => import("@/components/prompt-kit/file-upload").then(m => m.FileUpload), { ssr: false })
 
 interface Message {
   id: string
@@ -196,11 +197,11 @@ export default function SuitpaxAIPage() {
                 Ask anything.
                 <br />
                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Travel. Business. Code.
+                  Business travel. Expenses. Voice AI. Agents. Analytics.
                 </span>
               </h2>
               <p className="text-xl text-gray-600 mb-12 font-light">
-                Powered by advanced AI with memory and business travel expertise
+                Powered by advanced AI with memory for travel, expense and analytics — with room for code when you need it
               </p>
             </motion.div>
             {/* AI Capabilities Grid remains */}
@@ -244,7 +245,7 @@ export default function SuitpaxAIPage() {
                     onChange={setInput}
                     onSubmit={handleSend}
                     isLoading={isLoading}
-                    placeholder="Ask me about flights, hotels, travel planning, or anything else..."
+                    placeholder="Ask about business travel, expenses, voice AI/agents, analytics, or code snippets"
                   />
                 </div>
               </div>
@@ -253,7 +254,7 @@ export default function SuitpaxAIPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask me about flights, hotels, travel planning, or anything else..."
+                  placeholder="Ask about business travel, expenses, voice AI/agents, analytics, or code"
                   disabled={isLoading}
                   className="bg-white border-gray-300 rounded-2xl resize-none min-h-[56px] pr-20 focus:ring-2 focus:ring-gray-900 focus:border-transparent shadow-sm"
                   rows={1}

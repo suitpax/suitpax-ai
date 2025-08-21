@@ -9,12 +9,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowsRightLeftIcon, FunnelIcon, CalendarIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline"
-import FlightResults from "@/components/flights/results/results-list"
-import FlightFilters, { FlightFiltersDisplay } from "@/components/flights/flight-filters"
+import dynamic from "next/dynamic"
+const FlightResults = dynamic(() => import("@/components/flights/results/results-list"), { ssr: false })
+const FlightFilters = dynamic(() => import("@/components/flights/flight-filters"), { ssr: false })
+import type { FlightFiltersDisplay } from "@/components/flights/flight-filters"
 import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
-import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
-import AirlinesSlider from "@/components/flights/results/airlines-slider"
+const FilterControls = dynamic(() => import("@/components/flights/results/filter-controls/filter-controls"), { ssr: false })
+const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlines-slider"), { ssr: false })
 import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import Loader from "@/components/prompt-kit/loader"
@@ -310,9 +312,9 @@ export default function FlightsPage() {
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tighter">Flights</h1>
           <p className="text-sm text-gray-600 mt-1">Find the best routes, fares and schedules — compare in seconds.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="secondary" className="rounded-2xl px-5 h-11 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
-          <Button className="rounded-2xl px-6 h-11 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
+        <div className="flex flex-col w-full max-w-sm md:max-w-none md:flex-row items-stretch md:items-center gap-2">
+          <Button variant="secondary" className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
+          <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-8 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
         </div>
       </div>
 

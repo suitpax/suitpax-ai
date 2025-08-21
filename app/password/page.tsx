@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import CityAnimateText from "@/components/ui/city-animate-text"
-import { Sparkles, Plane, Mic } from "lucide-react"
+// Icons removed (unused)
 
 export default function PasswordGatePage() {
   const router = useRouter()
@@ -22,28 +22,16 @@ export default function PasswordGatePage() {
 
   useEffect(() => {
     const titles = [
-      "Run your business travel like a product.",
-      "From intent to itinerary, instantly.",
+      "Suitpax AI: Business travel. Expenses. Voice.",
+      "Run business travel with AI Agents and Analytics.",
+      "From itinerary to expense — one intelligent flow.",
       "Policy‑aware bookings. Real‑time savings.",
-      "Conversations that turn into trips.",
+      "Travel. Expense. Voice AI. Agents.",
+      "Business travel copilots with live Analytics.",
+      "Talk to book. Track to save. Automate compliance.",
+      "Suitpax AI: Travel. Expense. Code — for teams.",
+      "Context. Voice. Agents. Analytics.",
       "Smarter flights. Faster finance.",
-      "One platform. Travel, spend, compliance.",
-      "Predict. Plan. Automate.",
-      "Design. Ship. Scale.",
-      "Build. Travel. Code.",
-      "Context. Voice. Agents.",
-      "Flights. Stays. Finance.",
-      "Seat maps. Price tracking. Rebooking.",
-      "Made for teams that move fast.",
-      "Your travel copilot, 24/7.",
-      "Reduce costs, not ambition.",
-      "NDC direct. 3DS secure. PCI‑safe.",
-      "Travel that fits your policy.",
-      "Talk to book. Track to save.",
-      "From Slack to seat in minutes.",
-      "All your trips. One beautiful flow.",
-      "Suitpax AI for modern companies.",
-      "Suitpax AI: Manage. Travel. Code.",
     ]
     setHeadline(titles[Math.floor(Math.random() * titles.length)])
   }, [])
@@ -127,27 +115,7 @@ export default function PasswordGatePage() {
     >
       <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24">
         <div className="flex flex-col items-center text-center">
-          {/* Top launch banner (flat, no rounded, flush to top) */}
-          <div className="mb-4 w-full max-w-4xl">
-            <div className="flex items-center gap-3 px-3 py-1 bg-black/95 text-gray-300 border-b border-white/10">
-              <div className="flex -space-x-2">
-                {["/agents/agent-5.png","/agents/agent-15.png","/agents/agent-3.png","/agents/agent-8.png"].slice(0,4).map((src, i) => (
-                  <img key={i} src={src} alt="AI Agent" className="h-6 w-6 rounded-full ring-1 ring-white/20 object-cover" />
-                ))}
-              </div>
-              <div className="relative flex-1 overflow-hidden h-5">
-                <div className="absolute inset-0 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-                  <div className="whitespace-nowrap text-[11px] text-gray-300 animate-[marquee_16s_linear_infinite]">
-                    {launchPhrases.concat(launchPhrases).map((p, idx) => (
-                      <span key={idx} className="mx-4">
-                        {p}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Removed separate agents banner to avoid duplication with the sticky top bar */}
           <div className="inline-flex items-center rounded-xl bg-white px-2.5 py-0.5 text-[10px] font-medium text-gray-900 mb-4 border border-gray-200">
             <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={60} height={15} className="h-3 w-auto mr-1" />
             Private preview access
@@ -284,10 +252,23 @@ export default function PasswordGatePage() {
         </div>
       </div>
 
-      {/* Top sticky banner (full width) */}
+      {/* Top sticky banner (full width) — merged with AI Agents marquee */}
       <div className="absolute inset-x-0 top-0 z-20">
-        <div className="flex items-center justify-between px-4 py-2 bg-black/95 text-gray-300 text-[11px] font-medium tracking-tight">
-          <div className="truncate">Private preview • Building the future of business travel</div>
+        <div className="flex items-center gap-3 px-4 py-2 bg-black/95 text-gray-300 text-[11px] font-medium tracking-tight border-b border-white/10">
+          <div className="flex -space-x-2">
+            {["/agents/agent-5.png","/agents/agent-15.png","/agents/agent-3.png","/agents/agent-8.png"].slice(0,4).map((src, i) => (
+              <img key={i} src={src} alt="AI Agent" className="h-6 w-6 rounded-full ring-1 ring-white/20 object-cover" />
+            ))}
+          </div>
+          <div className="relative flex-1 overflow-hidden h-5">
+            <div className="absolute inset-0 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+              <div className="whitespace-nowrap text-[11px] text-gray-300 animate-[marquee_16s_linear_infinite]">
+                {launchPhrases.concat(launchPhrases).map((p, idx) => (
+                  <span key={idx} className="mx-4">{p}</span>
+                ))}
+              </div>
+            </div>
+          </div>
           <a href="mailto:ai@suitpax.com" className="rounded-xl border border-white/10 bg-white/20 px-2.5 py-1 text-[10px] text-black hover:bg-white/30 backdrop-blur">
             Contact us
           </a>
