@@ -47,7 +47,7 @@ export function DashboardLoadingScreen({ className = "" }: { className?: string 
 	)
 }
 
-// Orb loader (blue/black/gray conic gradient)
+// Orb loader (light-blue/white)
 export const loader = ({ size = "sm", className = "" }: { size?: "sm" | "md" | "lg"; className?: string }) => {
 	const dims = size === "lg" ? "h-6 w-6" : size === "md" ? "h-5 w-5" : "h-4 w-4"
 	return (
@@ -55,7 +55,7 @@ export const loader = ({ size = "sm", className = "" }: { size?: "sm" | "md" | "
 			aria-hidden
 			className={`inline-block ${dims} rounded-full animate-spin ${className}`}
 			style={{
-				background: "conic-gradient(from 0deg, #93c5fd 0%, #111827 40%, #e5e7eb 70%, #93c5fd 100%)",
+				background: "conic-gradient(from 0deg, #D6E9FF 0%, #FFFFFF 50%, #D6E9FF 100%)",
 				WebkitMask: "radial-gradient(circle, transparent 55%, black 56%)",
 				mask: "radial-gradient(circle, transparent 55%, black 56%)",
 			}}

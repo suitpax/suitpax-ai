@@ -15,7 +15,7 @@ import {
   BarChart3,
   HelpCircle,
 } from "lucide-react"
-import { PiDotsSixBold, PiCrownBold } from "react-icons/pi"
+import { PiDotsNineBold, PiCrownBold } from "react-icons/pi"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { loader } from "@/components/ui/loaders"
@@ -153,14 +153,10 @@ export default function Header({
               className="h-8 w-8 p-0 rounded-xl hover:bg-gray-100/80 transition-colors"
               aria-label={isMobile ? "Open menu" : "Toggle sidebar"}
             >
-              <PiDotsSixBold className="h-4 w-4" />
+              <PiDotsNineBold className="h-4 w-4" />
             </Button>
-
-            {/* Page Info */}
-            <div className="hidden sm:block">
-              <h1 className="text-[15px] font-medium text-gray-900 tracking-tight leading-tight">{pageInfo.title}</h1>
-              {pageInfo.description && <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">{pageInfo.description}</p>}
-            </div>
+            <span className="text-[14px] font-medium text-black leading-none">Home</span>
+            {/* Optional small logo can be added here if approved */}
           </div>
 
           {/* Center Section - AI Search */}
@@ -222,7 +218,7 @@ export default function Header({
                   variant="ghost"
                   className="flex items-center gap-2 h-8 px-2 rounded-xl hover:bg-gray-100/80 transition-colors"
                 >
-                  <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500 ring-2 ring-blue-200/50">
+                  <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500">
                     {userProfile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
