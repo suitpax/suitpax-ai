@@ -353,7 +353,7 @@ export default function FlightsPage() {
       {/* Search Card */}
       <Card className="border-gray-200 glass-card">
         <CardHeader>
-          <CardTitle className="text-gray-900 text-base">Search parameters</CardTitle>
+          <CardTitle className="text-gray-900 text-base">Trip details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-5 relative">
