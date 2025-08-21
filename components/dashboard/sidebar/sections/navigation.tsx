@@ -2,14 +2,14 @@
 
 import Link from "next/link"
 import { SidebarMenuItem } from "@/components/ui/primitives/sidebar"
-import { PiLayoutGridBold, PiAirplaneTiltBold, PiChartBarBold, PiChatsBold, PiMicrophoneBold, PiGearBold } from "react-icons/pi"
+import { PiSquaresFourBold, PiAirplaneTiltBold, PiChartBarBold, PiChatsBold, PiMicrophoneBold, PiGearBold } from "react-icons/pi"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile }: { isCollapsed?: boolean; isMobile?: boolean; onCloseMobile?: () => void }) {
   const pathname = usePathname()
   const nav = [
-    { name: "Dashboard", href: "/dashboard", icon: PiLayoutGridBold },
+    { name: "Dashboard", href: "/dashboard", icon: PiSquaresFourBold },
     { name: "Flights", href: "/dashboard/flights", icon: PiAirplaneTiltBold },
     { name: "Analytics", href: "/dashboard/analytics", icon: PiChartBarBold },
     { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatsBold },

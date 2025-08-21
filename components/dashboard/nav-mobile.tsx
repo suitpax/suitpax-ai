@@ -2,11 +2,11 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { PiLayoutGridBold, PiAirplaneTiltBold, PiChatsBold, PiMicrophoneBold, PiChartBarBold } from "react-icons/pi"
+import { PiSquaresFourBold, PiAirplaneTiltBold, PiChatsBold, PiMicrophoneBold, PiChartBarBold } from "react-icons/pi"
 import { cn } from "@/lib/utils"
 
 const items = [
-  { name: "Home", href: "/dashboard", icon: PiLayoutGridBold },
+  { name: "Home", href: "/dashboard", icon: PiSquaresFourBold },
   { name: "Flights", href: "/dashboard/flights", icon: PiAirplaneTiltBold },
   { name: "Analytics", href: "/dashboard/analytics", icon: PiChartBarBold },
   { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatsBold },
