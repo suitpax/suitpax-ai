@@ -31,6 +31,7 @@ import { Progress } from "@/components/ui/progress"
 import { VoiceAIProvider, useVoiceAI } from "@/contexts/voice-ai-context"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
 import MiniCountdownBadge from "@/components/ui/mini-countdown"
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 
 function VoiceAIContent() {
   const [user, setUser] = useState(null)
@@ -214,7 +215,7 @@ function VoiceAIContent() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <motion.div
@@ -229,6 +230,14 @@ function VoiceAIContent() {
             <p className="text-lg font-light text-gray-600">
               {getGreeting()}, {getDisplayName().split(" ")[0]}! Ready to help with your business needs.
             </p>
+            <div className="mt-2 flex flex-col sm:flex-row items-center gap-2">
+              <span className="inline-block text-xs font-medium bg-gradient-to-r from-gray-200 via-gray-300 to-gray-400 bg-clip-text text-transparent animate-hero-shimmer">Crystal-clear voice understanding</span>
+              <span className="inline-block text-xs font-medium bg-gradient-to-r from-gray-200 via-gray-300 to-gray-400 bg-clip-text text-transparent animate-hero-shimmer">Instant actions for travel and ops</span>
+            </div>
+            <style jsx>{`
+              @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+              :global(.animate-hero-shimmer) { animation: shimmer 2.8s linear infinite; background-size: 200% 100%; }
+            `}</style>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
