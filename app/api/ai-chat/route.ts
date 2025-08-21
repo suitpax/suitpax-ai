@@ -185,12 +185,17 @@ export async function POST(request: NextRequest) {
       enhancedMessage += buildToolContext(toolType, toolData)
     }
 
-    const initial = await anthropic.messages.create({
+    const initial = await anthropic.beta.messages.create({
       model: "claude-3-7-sonnet-20250219",
-      max_tokens: maxTokensForResponse,
+      max_tokens: Math.min(20000, maxTokensForResponse),
+      temperature: 1,
       system: systemPrompt,
       messages: [...conversationHistory, { role: "user", content: enhancedMessage }],
-    })
+      tools: [
+        { name: "web_search", type: "web_search_20250305" as any },
+      ],
+      betas: ["web-search-2025-03-05"],
+    } as any)
 
     text = initial.content.find((c: any) => c.type === "text")?.text || ""
 
