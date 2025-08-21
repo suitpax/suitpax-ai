@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PlaneTakeoffIcon, PlaneIcon } from "@heroicons/react/24/outline"
+import AircraftBadge from "@/components/flights/ui/aircraft-badge"
 
 interface FlightCardProps {
   offer: any
@@ -107,8 +108,10 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
                         {manuLogo && <img src={manuLogo} alt="manufacturer" className="h-3 w-3" />}
                         <span className="text-[11px]">
                           {(segment.airline?.name || segment.marketing_carrier?.name || '')} {segment.flight_number}
-                          {segment.aircraft?.name && ` • ${segment.aircraft.name}`}
                         </span>
+                        {segment?.aircraft?.iata_code || segment?.aircraft?.id ? (
+                          <AircraftBadge iata={segment?.aircraft?.iata_code} id={segment?.aircraft?.id} />
+                        ) : null}
                       </Badge>
                     )
                   })}
