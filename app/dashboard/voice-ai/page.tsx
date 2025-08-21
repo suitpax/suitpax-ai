@@ -323,8 +323,11 @@ function VoiceAIContent() {
 
 export default function VoiceAIPage() {
   return (
-    <VoiceAIProvider>
-      <VoiceAIContent />
-    </VoiceAIProvider>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-3xl mx-auto text-center">
+        <h1 className="text-3xl md:text-5xl font-medium tracking-tighter">Voice AI</h1>
+        <p className="text-sm text-gray-600 mt-2">Rebuilding from scratch — coming soon.</p>
+      </div>
+    </div>
   )
 }

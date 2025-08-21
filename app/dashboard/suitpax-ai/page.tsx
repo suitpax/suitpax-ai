@@ -61,16 +61,15 @@ const quickActions = [
 ]
 
 export default function SuitpaxAIPage() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [isUserLoading, setIsUserLoading] = useState(true)
-  const [files, setFiles] = useState<File[]>([])
-  const [showReasoning, setShowReasoning] = useState(true)
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const uploadInputRef = useRef<HTMLInputElement>(null)
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-3xl mx-auto text-center">
+        <h1 className="text-3xl md:text-5xl font-medium tracking-tighter">Suitpax AI</h1>
+        <p className="text-sm text-gray-600 mt-2">Rebuilding Prompt Kit from scratch — coming soon.</p>
+      </div>
+    </div>
+  )
+}
 
   useEffect(() => {
     const getUser = async () => {
