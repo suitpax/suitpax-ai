@@ -5,7 +5,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { PiDotsNineBold } from "react-icons/pi"
 
-export default function DashboardSidebarHeader({ onToggle }: { onToggle?: () => void }) {
+export default function TopSidebar({ onToggle }: { onToggle?: () => void }) {
 	const { toggleSidebar } = useSidebar()
 	return (
 		<SidebarHeader className="flex items-center justify-between bg-gray-100 px-4 border-b border-gray-200">

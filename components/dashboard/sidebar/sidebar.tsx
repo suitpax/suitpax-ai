@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import { MessageSquare, Mic, Plane, LayoutDashboard, BarChart3, Settings, CreditCard } from "lucide-react"
-import DashboardSidebarHeader from "./header"
+import TopSidebar from "./top-sidebar"
 import DashboardSidebarContent from "./content"
 import FooterSidebar from "./footer"
 
@@ -30,7 +30,7 @@ export default function DashboardSidebar({ isCollapsed, isMobile, onCloseMobile,
         isMobile ? "pb-14" : ""
       )}
     >
-      <DashboardSidebarHeader onToggle={onToggleCollapse} isCollapsed={isCollapsed} isMobile={isMobile} />
+      <TopSidebar onToggle={onToggleCollapse} />
       <div className="flex-1 overflow-y-auto">
         <DashboardSidebarContent isCollapsed={isCollapsed} isMobile={isMobile} onCloseMobile={onCloseMobile} />
       </div>
