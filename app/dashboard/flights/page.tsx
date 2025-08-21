@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import FlightSearchForm from "@/components/flights/flight-search-form"
+import { FullscreenOverlay } from "@/components/prompt-kit/loader"
 
 const FlightResults = dynamic(() => import("@/components/flights/results/results-list"), { ssr: false })
 const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlines-slider"), { ssr: false })
@@ -12,6 +13,7 @@ const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlin
 export default function FlightsPage() {
   const router = useRouter()
   const [offers, setOffers] = useState<any[]>([])
+  const [searching, setSearching] = useState(false)
   const searchAnchorRef = useRef<HTMLDivElement>(null)
 
   // Autosearch from query params (origin, destination, date, return, cabin)
@@ -25,6 +27,7 @@ export default function FlightsPage() {
     const autosearch = url.searchParams.get("autosearch") === "1"
     if (autosearch && origin && destination && departure_date) {
       ;(async () => {
+        setSearching(true)
         try {
           const res = await fetch("/api/flights/duffel/search", {
             method: "POST",
@@ -35,6 +38,7 @@ export default function FlightsPage() {
           const data = Array.isArray(json?.data) ? json.data : json?.offers || []
           setOffers(data)
         } catch {}
+        finally { setSearching(false) }
       })()
     }
   }, [])
@@ -69,12 +73,16 @@ export default function FlightsPage() {
       <FlightSearchForm
         className="max-w-4xl mx-auto"
         onResults={(res: any) => {
+          setSearching(true)
           const data = Array.isArray(res?.data) ? res.data : res?.offers || []
           setOffers(data)
+          setSearching(false)
         }}
       />
 
       <FlightResults offers={offers} />
+
+      {searching && <FullscreenOverlay label="Searching flights…" />}
     </div>
   )
 }

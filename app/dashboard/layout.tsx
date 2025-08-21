@@ -4,7 +4,8 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { Sidebar } from "@/components/dashboard/sidebar"
+import { SidebarProvider } from "@/components/ui/primitives/sidebar"
+import DashboardSidebar from "@/components/dashboard/sidebar/sidebar"
 import Header from "@/components/dashboard/header"
 import { Toaster } from "react-hot-toast"
 import { motion } from "framer-motion"
@@ -118,6 +119,7 @@ export default function DashboardLayout({
   const isActuallyCollapsed = !isMobile && sidebarCollapsed && !sidebarHovered
 
   return (
+    <SidebarProvider>
     <div className="flex h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden">
       {/* Mobile backdrop */}
       {isMobile && mobileMenuOpen && (
@@ -148,7 +150,7 @@ export default function DashboardLayout({
           if (!isMobile) setSidebarHovered(false)
         }}
       >
-        <Sidebar
+        <DashboardSidebar
           onUserUpdate={handleUserUpdate}
           isCollapsed={isActuallyCollapsed && !isMobile}
           isMobile={isMobile}
@@ -238,5 +240,6 @@ export default function DashboardLayout({
       {/* Mobile bottom navigation */}
       <MobileBottomNav />
     </div>
+    </SidebarProvider>
   )
 }
