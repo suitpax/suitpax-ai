@@ -9,7 +9,6 @@ import Ancillaries from "@/components/flights/booking/ancillaries"
 import SeatSelection from "@/components/flights/booking-flow/seat-selection"
 import { Input } from "@/components/ui/input"
 import ResultCard from "@/components/flights/results/result-card"
-import CarrierLogo from "@/components/flights/ui/carrier-logo"
 
 type Step = "review" | "passengers" | "documents" | "seats" | "extras" | "payment"
 
@@ -61,18 +60,6 @@ export default function BookOfferPage({ params }: { params: { offerId: string } 
       </div>
 
       <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm shadow-sm">
-        {/* Header with airline symbol and lockup */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <CarrierLogo iata={offer?.slices?.[0]?.segments?.[0]?.airline?.iata_code || offer?.slices?.[0]?.segments?.[0]?.marketing_carrier?.iata_code} name={offer?.slices?.[0]?.segments?.[0]?.airline?.name} width={20} height={20} className="h-6 w-6" />
-            <CarrierLogo iata={offer?.slices?.[0]?.segments?.[0]?.airline?.iata_code || offer?.slices?.[0]?.segments?.[0]?.marketing_carrier?.iata_code} name={offer?.slices?.[0]?.segments?.[0]?.airline?.name} lockup width={96} height={24} className="h-6 w-auto" />
-          </div>
-          <div className="text-right">
-            <div className="text-xl font-semibold text-gray-900">
-              {new Intl.NumberFormat('en-US', { style: 'currency', currency: offer.total_currency, maximumFractionDigits: 0 }).format(parseFloat(offer.total_amount))}
-            </div>
-          </div>
-        </div>
         <ResultCard offer={offer} onSelect={() => {}} />
       </div>
 

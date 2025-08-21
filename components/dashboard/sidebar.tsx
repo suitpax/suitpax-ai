@@ -215,12 +215,12 @@ export function Sidebar({
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-white/70 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-r border-gray-200 transition-all duration-300",
+        "flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300",
         isCollapsed ? "w-16" : "w-64",
       )}
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white/60 backdrop-blur">
+      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm border border-gray-200 bg-white">
@@ -256,11 +256,11 @@ export function Sidebar({
       {(!isCollapsed || isMobile) && (
         <div className="px-3 pt-3 border-b border-gray-200">
           <form onSubmit={handleAiSubmit} className="relative">
-            <div className="flex items-center gap-2 bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-2.5 shadow-sm focus-within:ring-1 focus-within:ring-gray-300">
+            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl p-2.5 shadow-sm focus-within:ring-1 focus-within:ring-gray-300">
               <Input
                 value={aiQuery}
                 onChange={(e) => setAiQuery(e.target.value)}
-                placeholder="Search business travel with AI — try: MAD → LHR next Friday"
+                placeholder="Search flights with AI — try: MAD → LHR next Friday"
                 className="flex-1 bg-transparent border-0 focus-visible:ring-0 text-sm"
                 disabled={isAiLoading}
               />
@@ -295,7 +295,7 @@ export function Sidebar({
                 onClick={isMobile ? onCloseMobile : undefined}
                 className={cn(
                   "group flex items-center px-3 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200 relative",
-                  isActive ? "bg-gray-900/90 text-white shadow-sm" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                  isActive ? "bg-gray-900 text-white shadow-md" : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
                   isCollapsed && !isMobile && "justify-center px-2",
                 )}
                 title={isCollapsed && !isMobile ? item.name : ""}
@@ -353,10 +353,7 @@ export function Sidebar({
                     "group flex items-center justify-center px-2 py-2.5 text-sm font-medium rounded-2xl transition-all duration-200 relative",
                     isActive
                       ? "bg-gray-200 text-gray-900 shadow-sm"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
-                    isActive
-                      ? "bg-gray-200 text-gray-900 shadow-sm"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                      : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
                   )}
                   title={item.name}
                 >
