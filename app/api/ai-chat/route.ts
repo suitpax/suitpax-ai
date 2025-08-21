@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { buildSystemPrompt, buildReasoningInstruction, buildToolContext, System as SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/system"
+import { buildReasoningInstruction, buildToolContext, System as SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/system"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     const planToMaxTokens: Record<string, number> = { free: 1024, basic: 2048, premium: 4096, pro: 4096, enterprise: 8192 }
     const maxTokensForResponse = planToMaxTokens[planName] ?? 2048
 
-    // Intent detection
+    // Intent detection (tools)
     const isFlightIntent =
       /\b([A-Z]{3})\b.*\b(to|→|-|from)\b.*\b([A-Z]{3})\b/i.test(message) ||
       /\b(flight|flights|vuelo|vuelos|fly|flying|book|search)\b/i.test(message) ||
@@ -131,15 +131,11 @@ export async function POST(request: NextRequest) {
       } catch (error) { console.error("Expense analysis tool error:", error) }
     }
 
-    const baseSystem = isFlightIntent
-      ? TRAVEL_AGENT_SYSTEM_PROMPT
-      : buildSystemPrompt({ domain: ["general", "travel", "coding", "business"] })
-
+    // Always use central System prompt; add inline-thinking instruction if requested
     const thinkingInlineInstruction = includeReasoningInline
       ? "\n\nWhen requested, include your high-level thinking wrapped in <thinking>...</thinking> (3–5 bullets), then the main answer. Do not include private chain-of-thought; keep it brief."
       : ""
-
-    const systemPrompt = `${baseSystem}${thinkingInlineInstruction}`.trim()
+    const systemPrompt = `${SUITPAX_AI_SYSTEM_PROMPT}${thinkingInlineInstruction}`.trim()
 
     let enhancedMessage = message
     if (toolData?.success) {
@@ -158,16 +154,14 @@ export async function POST(request: NextRequest) {
 
     const raw = initial.content.find((c: any) => c.type === "text")?.text || ""
 
+    let text = raw.trim()
+    let reasoningInline: string | undefined
     if (includeReasoningInline) {
       const match = raw.match(/<thinking>[\s\S]*?<\/thinking>/)
       if (match) {
         reasoningInline = match[0].replace(/<\/?thinking>/g, "").trim()
         text = raw.replace(/<thinking>[\s\S]*?<\/thinking>/, "").trim()
-      } else {
-        text = raw.trim()
       }
-    } else {
-      text = raw.trim()
     }
 
     const actualInputTokens = (initial.usage as any)?.input_tokens || estimatedInputTokens
