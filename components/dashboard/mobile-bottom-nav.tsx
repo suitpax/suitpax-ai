@@ -2,15 +2,15 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Plane, CheckSquare, Sparkles, CreditCard } from "lucide-react"
+import { PiLayoutGridBold, PiAirplaneTiltBold, PiChatsBold, PiMicrophoneBold, PiChartBarBold } from "react-icons/pi"
 import { cn } from "@/lib/utils"
 
 const items = [
-  { name: "Home", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Trips", href: "/dashboard/trips", icon: Plane },
-  { name: "Approvals", href: "/dashboard/approvals", icon: CheckSquare },
-  { name: "AI", href: "/dashboard/suitpax-ai", icon: Sparkles },
-  { name: "Finance", href: "/dashboard/finance-hub", icon: CreditCard },
+  { name: "Home", href: "/dashboard", icon: PiLayoutGridBold },
+  { name: "Flights", href: "/dashboard/flights", icon: PiAirplaneTiltBold },
+  { name: "Analytics", href: "/dashboard/analytics", icon: PiChartBarBold },
+  { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatsBold },
+  { name: "Voice", href: "/dashboard/voice-ai", icon: PiMicrophoneBold },
 ]
 
 export default function MobileBottomNav() {
@@ -19,10 +19,10 @@ export default function MobileBottomNav() {
   return (
     <div className="lg:hidden">
       <nav
-        className="fixed bottom-3 left-3 right-3 z-50 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-md shadow"
+        className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95"
         style={{ WebkitBackdropFilter: "blur(12px)" }}
       >
-        <ul className="flex items-center justify-between gap-0.5 px-1.5 py-1">
+        <ul className="flex items-center justify-between gap-0.5 px-2 py-2">
           {items.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
             return (
@@ -30,8 +30,8 @@ export default function MobileBottomNav() {
                 <Link
                   href={item.href}
                   className={cn(
-                    "flex flex-col items-center justify-center rounded-lg px-2 py-1.5 transition-colors",
-                    isActive ? "bg-gray-900 text-white" : "text-gray-900 hover:bg-gray-100",
+                    "flex flex-col items-center justify-center px-2 py-1 transition-colors",
+                    isActive ? "text-gray-900" : "text-gray-500 hover:text-gray-900",
                   )}
                 >
                   <item.icon className="h-4 w-4" />
