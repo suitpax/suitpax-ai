@@ -13,7 +13,7 @@ const items = [
   { name: "Voice", href: "/dashboard/voice-ai", icon: PiMicrophoneBold },
 ]
 
-export default function MobileBottomNav() {
+export default function NavMobile() {
   const pathname = usePathname()
 
   return (
@@ -38,8 +38,8 @@ export default function MobileBottomNav() {
                   <span className="mt-0.5 text-[10px] leading-none font-medium">{item.name}</span>
                 </Link>
               </li>
-            )
-          })}
+            )}
+          )}
         </ul>
       </nav>
     </div>

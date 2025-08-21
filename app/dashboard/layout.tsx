@@ -12,7 +12,7 @@ import { motion } from "framer-motion"
 import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 import AISearchInput from "@/components/ui/ai-search-input"
-import MobileBottomNav from "@/components/dashboard/mobile-bottom-nav"
+import NavMobile from "@/components/dashboard/nav-mobile"
 import { DashboardLoadingScreen } from "@/components/ui/loaders"
 
 export default function DashboardLayout({
@@ -238,7 +238,7 @@ export default function DashboardLayout({
       />
 
       {/* Mobile bottom navigation */}
-      <MobileBottomNav />
+      <NavMobile />
     </div>
     </SidebarProvider>
   )
