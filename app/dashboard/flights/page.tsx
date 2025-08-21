@@ -19,7 +19,7 @@ const FilterControls = dynamic(() => import("@/components/flights/results/filter
 const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlines-slider"), { ssr: false })
 import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-import Loader from "@/components/prompt-kit/loader"
+import FlightsSearchOverlay from "@/components/ui/flights-search-overlay"
 
 interface SearchParams {
   origin: string
@@ -563,25 +563,7 @@ export default function FlightsPage() {
         </div>
       )}
 
-      {searching && (
-        <div className="fixed inset-0 z-50">
-          <VantaHaloBackground className="absolute inset-0">
-            <div className="absolute inset-0 bg-white/60 backdrop-blur-sm" />
-            <div className="relative h-full w-full flex items-center justify-center p-6">
-              <div className="text-center space-y-4">
-                <div className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white/80 px-4 py-2 text-xs text-gray-700 shadow-sm">
-                  Real-time Duffel search
-                </div>
-                <h2 className="text-3xl md:text-5xl font-serif tracking-tighter text-gray-900">Searching flights</h2>
-                <div className="text-sm text-gray-600">Please wait while we fetch the best offers for your trip.</div>
-                <div className="flex items-center justify-center gap-3 pt-2">
-                  <Loader variant="text-shimmer" className="text-base md:text-lg" />
-                </div>
-              </div>
-            </div>
-          </VantaHaloBackground>
-        </div>
-      )}
+      <FlightsSearchOverlay open={searching} />
     </div>
   )
 }
