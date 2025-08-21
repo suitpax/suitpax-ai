@@ -1,7 +1,7 @@
 "use client"
 
 import MiniCountdownBadge from "@/components/ui/mini-countdown"
-import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
+import PromptInputWithActions from "@/components/prompt-kit/prompt-input-with-actions"
 
 export default function SuitpaxAIPage() {
   return (
@@ -14,7 +14,7 @@ export default function SuitpaxAIPage() {
         </div>
         <div className="mt-6">
           <div className="max-w-2xl mx-auto">
-            <GlobalPromptInput placeholder="Ask Suitpax AI..." className="bg-white border border-gray-200" />
+            <PromptInputWithActions />
           </div>
         </div>
       </div>
