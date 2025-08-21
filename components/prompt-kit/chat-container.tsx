@@ -34,3 +34,7 @@ export function ChatContainerContent({ className, children }: { className?: stri
 
 export default ChatContainerRoot
 
+export function ChatContainerScrollAnchor() {
+  return <div aria-hidden className="h-0 w-0" />
+}
+
