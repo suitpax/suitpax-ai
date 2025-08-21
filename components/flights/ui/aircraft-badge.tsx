@@ -10,7 +10,7 @@ export default function AircraftBadge({ iata, id }: { iata?: string; id?: string
   const aircraft = data?.data
   if (!aircraft) return null
   return (
-    <span className="inline-flex items-center gap-1 rounded-xl border border-gray-300 bg-white/70 px-2 py-0.5 text-[10px] text-gray-800">
+    <span title={`${aircraft.iata_code || ""} ${aircraft.name || ""}`.trim()} className="inline-flex items-center gap-1 rounded-xl border border-gray-300 bg-white/70 px-2 py-0.5 text-[10px] text-gray-800">
       <span className="font-medium">{aircraft.iata_code || "AC"}</span>
       <span className="opacity-70">{aircraft.name || "Aircraft"}</span>
     </span>
