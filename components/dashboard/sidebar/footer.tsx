@@ -3,7 +3,7 @@
 import { SidebarFooter } from "@/components/ui/primitives/sidebar"
 import { Badge } from "@/components/ui/badge"
 
-export default function DashboardSidebarFooter({ userPlan, subscriptionStatus }: { userPlan: string; subscriptionStatus: string }) {
+export default function FooterSidebar({ userPlan, subscriptionStatus }: { userPlan: string; subscriptionStatus: string }) {
   return (
     <SidebarFooter>
       <div className="rounded-2xl border border-gray-200 bg-white/80 p-3">

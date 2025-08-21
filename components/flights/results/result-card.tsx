@@ -33,7 +33,8 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-3 min-w-0">
-            <CarrierLogo iata={airlineIata} name={airlineName} className="h-6 w-6" width={20} height={20} />
+            <CarrierLogo iata={airlineIata} name={airlineName} lockup width={84} height={22} className="h-5 w-auto" />
+            <CarrierLogo iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" />
             <div className="truncate">
               <div className="leading-tight flex items-center gap-2">
                 <span className="font-semibold text-gray-900 text-sm md:text-base tracking-tight">{airlineName}</span>
@@ -114,9 +115,12 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
               </div>
             ))}
 
-            <div className="flex items-center justify-end">
-              <Button onClick={() => onSelect(offer.id)} className="h-10 rounded-2xl px-5 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm">
-                Select Flight
+            <div className="flex flex-col items-stretch gap-2">
+              <Button onClick={() => onSelect(offer.id)} className="w-full h-10 rounded-full px-5 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm">
+                Continue to booking
+              </Button>
+              <Button variant="secondary" className="w-full h-10 rounded-full px-5 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm">
+                Track price
               </Button>
             </div>
           </div>

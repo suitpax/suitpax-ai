@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation"
 import { MessageSquare, Mic, Plane, LayoutDashboard, BarChart3, Settings, CreditCard } from "lucide-react"
 import DashboardSidebarHeader from "./header"
 import DashboardSidebarContent from "./content"
-import DashboardSidebarFooter from "./footer"
+import FooterSidebar from "./footer"
 
 export interface DashboardSidebarProps {
   onUserUpdate?: (user: SupabaseUser) => void
@@ -33,7 +33,7 @@ export default function DashboardSidebar({ isCollapsed, isMobile, onCloseMobile,
       <div className="flex-1 overflow-y-auto">
         <DashboardSidebarContent isCollapsed={isCollapsed} isMobile={isMobile} onCloseMobile={onCloseMobile} />
       </div>
-      <DashboardSidebarFooter userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
+      <FooterSidebar userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
     </div>
   )
 }

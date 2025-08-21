@@ -2,7 +2,7 @@
 
 import { SidebarMenu } from "@/components/ui/primitives/sidebar"
 import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
-import NavigationSection from "./sections/navigation"
+import { NavigationSection } from "./sections"
 
 export default function DashboardSidebarContent({ isCollapsed, isMobile, onCloseMobile }: { isCollapsed?: boolean; isMobile?: boolean; onCloseMobile?: () => void }) {
 	return (
