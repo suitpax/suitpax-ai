@@ -15,6 +15,9 @@ const FlightFilters = dynamic(() => import("@/components/flights/flight-filters"
 const FlightFiltersDisplay = dynamic(() => import("@/components/flights/flight-filters").then(m => m.FlightFiltersDisplay), { ssr: false })
 import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
+import PlacesCommand from "@/components/ui/places-command"
+import { DateRangePicker } from "@/components/ui/date-range-picker"
+import SheetFilters from "@/components/ui/sheet-filters"
 const FilterControls = dynamic(() => import("@/components/flights/results/filter-controls/filter-controls"), { ssr: false })
 const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlines-slider"), { ssr: false })
 import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
@@ -449,7 +452,12 @@ export default function FlightsPage() {
             {/* Origin */}
             <div className="relative">
               <Label className="text-sm text-gray-700">Origin</Label>
-              <PlacesLookup value={searchParams.origin} onSelect={(item: any) => setSearchParams(prev => ({ ...prev, origin: (item?.iata_code || '').toUpperCase() }))} placeholder="JFK" />
+              <div className="hidden md:block">
+                <PlacesCommand value={searchParams.origin} onSelect={(item: any) => setSearchParams(prev => ({ ...prev, origin: (item?.iata_code || '').toUpperCase() }))} placeholder="Origin (city or airport)" />
+              </div>
+              <div className="md:hidden">
+                <PlacesLookup value={searchParams.origin} onSelect={(item: any) => setSearchParams(prev => ({ ...prev, origin: (item?.iata_code || '').toUpperCase() }))} placeholder="Origin" />
+              </div>
             </div>
 
             {/* Swap */}
@@ -462,7 +470,12 @@ export default function FlightsPage() {
             {/* Destination */}
             <div className="relative">
               <Label className="text-sm text-gray-700">Destination</Label>
-              <PlacesLookup value={searchParams.destination} onSelect={(item: any) => setSearchParams(prev => ({ ...prev, destination: (item?.iata_code || '').toUpperCase() }))} placeholder="LHR" />
+              <div className="hidden md:block">
+                <PlacesCommand value={searchParams.destination} onSelect={(item: any) => setSearchParams(prev => ({ ...prev, destination: (item?.iata_code || '').toUpperCase() }))} placeholder="Destination (city or airport)" />
+              </div>
+              <div className="md:hidden">
+                <PlacesLookup value={searchParams.destination} onSelect={(item: any) => setSearchParams(prev => ({ ...prev, destination: (item?.iata_code || '').toUpperCase() }))} placeholder="Destination" />
+              </div>
             </div>
 
             {/* Trip type */}
@@ -526,10 +539,17 @@ export default function FlightsPage() {
             {/* Departure */}
             <div>
               <Label className="text-sm text-gray-700">Departure</Label>
-              <div className="relative">
-                <Input type="date" value={searchParams.departureDate} onChange={e => setSearchParams(prev => ({ ...prev, departureDate: e.target.value }))} className="bg-white text-gray-900 pr-10 rounded-2xl" />
-                <CalendarIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
-              </div>
+              <DateRangePicker
+                mode={searchParams.tripType === 'round_trip' ? 'range' : 'single'}
+                value={searchParams.tripType === 'round_trip' ? { from: searchParams.departureDate ? new Date(searchParams.departureDate) : undefined, to: searchParams.returnDate ? new Date(searchParams.returnDate) : undefined } : (searchParams.departureDate ? new Date(searchParams.departureDate) : undefined)}
+                onChange={(val: any) => {
+                  if (searchParams.tripType === 'round_trip') {
+                    setSearchParams(prev => ({ ...prev, departureDate: val?.from ? val.from.toISOString().split('T')[0] : prev.departureDate, returnDate: val?.to ? val.to.toISOString().split('T')[0] : '' }))
+                  } else {
+                    setSearchParams(prev => ({ ...prev, departureDate: val ? (val as Date).toISOString().split('T')[0] : prev.departureDate }))
+                  }
+                }}
+              />
             </div>
 
             {/* Return (conditional) */}
@@ -599,13 +619,21 @@ export default function FlightsPage() {
         onClearAll={() => setFilters({ priceRange: [0, 5000], maxStops: 3, airlines: [], departureTime: [], arrivalTime: [], duration: [0, 1440], cabinClass: [], refundable: false, changeable: false, directOnly: false })}
       />
 
-      <FlightFilters
-        offers={offers}
-        filters={{ ...filters, density }}
-        onFiltersChange={(f) => { setFilters(f); if ((f as any).density) setDensity((f as any).density) }}
-        isOpen={filtersOpen}
-        onClose={() => setFiltersOpen(false)}
-      />
+      {/* Mobile drawer filters (Sheet) */}
+      <div className="md:hidden">
+        <SheetFilters trigger={<Button className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900"><FunnelIcon className="h-4 w-4 mr-2" /> Filters</Button>}>
+          {/* Mount existing filter panel inside accordion body as children */}
+          <div className="p-2">
+            <FlightFilters
+              offers={offers}
+              filters={{ ...filters, density }}
+              onFiltersChange={(f) => { setFilters(f); if ((f as any).density) setDensity((f as any).density) }}
+              isOpen={true}
+              onClose={() => {}}
+            />
+          </div>
+        </SheetFilters>
+      </div>
 
       {/* Mini pulse badge CTA */}
       <div className="flex justify-center mt-3">
