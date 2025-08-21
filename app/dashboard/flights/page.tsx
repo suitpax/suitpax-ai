@@ -336,7 +336,7 @@ export default function FlightsPage() {
           <p className="text-sm text-gray-600 mt-1">Find the best routes, fares and schedules — compare in seconds.</p>
         </div>
         <div className="flex flex-col w-full max-w-sm md:max-w-none md:flex-row items-stretch md:items-center gap-2">
-          <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-gradient-to-r from-gray-900 to-gray-700 text-white hover:from-gray-800 hover:to-gray-700 backdrop-blur-sm shadow-sm" onClick={() => router.push('/dashboard/suitpax-ai?tab=chat')}>Ask Suitpax AI</Button>
+          <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-gray-200 text-black hover:bg-gray-300 backdrop-blur-sm shadow-sm" onClick={() => router.push('/dashboard/suitpax-ai?tab=chat')}>Ask Suitpax AI</Button>
           <Button id="primary-search-btn" className="w-full md:w-auto rounded-full md:rounded-2xl px-8 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search flights'}</Button>
         </div>
       </div>
@@ -462,7 +462,7 @@ export default function FlightsPage() {
 
             {/* Swap */}
             <div className="hidden md:flex items-end justify-center">
-              <Button type="button" variant="secondary" className="h-11 w-11 p-0 rounded-full border-gray-300 bg-white/80 text-gray-900 hover:bg-white backdrop-blur-sm shadow-sm" onClick={swapLocations} title="Swap">
+              <Button type="button" variant="secondary" className="h-11 w-11 p-0 rounded-full border-gray-300 bg-gray-200 text-black hover:bg-gray-300 backdrop-blur-sm shadow-sm" onClick={swapLocations} title="Swap">
                 <ArrowsRightLeftIcon className="h-4 w-4" />
               </Button>
             </div>
@@ -527,9 +527,9 @@ export default function FlightsPage() {
                 </div>
               ))}
               <div className="flex gap-2">
-                <Button type="button" variant="secondary" className="rounded-2xl px-5 h-10 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => setMultiCityLegs(prev => [...prev, { origin: "", destination: "", date: "" }])}>Add leg</Button>
+                <Button type="button" variant="secondary" className="rounded-2xl px-5 h-10 bg-gray-200 text-black border border-gray-300 hover:bg-gray-300 backdrop-blur-sm shadow-sm" onClick={() => setMultiCityLegs(prev => [...prev, { origin: "", destination: "", date: "" }])}>Add leg</Button>
                 {multiCityLegs.length > 2 && (
-                  <Button type="button" variant="secondary" className="rounded-2xl px-5 h-10 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => setMultiCityLegs(prev => prev.slice(0, -1))}>Remove last</Button>
+                  <Button type="button" variant="secondary" className="rounded-2xl px-5 h-10 bg-gray-200 text-black border border-gray-300 hover:bg-gray-300 backdrop-blur-sm shadow-sm" onClick={() => setMultiCityLegs(prev => prev.slice(0, -1))}>Remove last</Button>
                 )}
               </div>
             </div>
@@ -565,11 +565,11 @@ export default function FlightsPage() {
             <div>
               <Label className="text-sm text-gray-700">Passengers</Label>
               <div className="flex items-center gap-2">
-                <Button type="button" variant="secondary" className="h-9 w-9 border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-full" onClick={() => setSearchParams(prev => ({ ...prev, passengers: Math.max(1, (prev.passengers || 1) - 1) }))}>
+                <Button type="button" variant="secondary" className="h-9 w-9 border-gray-300 bg-gray-200 text-black hover:bg-gray-300 rounded-full" onClick={() => setSearchParams(prev => ({ ...prev, passengers: Math.max(1, (prev.passengers || 1) - 1) }))}>
                   <MinusIcon className="h-4 w-4" />
                 </Button>
                 <div className="w-10 text-center text-gray-900">{searchParams.passengers}</div>
-                <Button type="button" variant="secondary" className="h-9 w-9 border-gray-300 bg-white text-gray-900 hover:bg-gray-100 rounded-full" onClick={() => setSearchParams(prev => ({ ...prev, passengers: Math.min(9, (prev.passengers || 1) + 1) }))}>
+                <Button type="button" variant="secondary" className="h-9 w-9 border-gray-300 bg-gray-200 text-black hover:bg-gray-300 rounded-full" onClick={() => setSearchParams(prev => ({ ...prev, passengers: Math.min(9, (prev.passengers || 1) + 1) }))}>
                   <PlusIcon className="h-4 w-4" />
                 </Button>
               </div>
@@ -581,7 +581,7 @@ export default function FlightsPage() {
                 <Checkbox id="directOnly" checked={directOnly} onCheckedChange={v => setDirectOnly(Boolean(v))} />
                 <Label htmlFor="directOnly" className="text-sm text-gray-700">Direct only</Label>
               </div>
-              <Button variant="secondary" className="w-full rounded-full px-5 h-10 bg-gray-100 text-gray-900 border border-gray-900/50 hover:bg-white backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
+              <Button variant="secondary" className="w-full rounded-full px-5 h-10 bg-gray-200 text-black border border-gray-300 hover:bg-gray-300 backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
               <Button className="w-full rounded-full px-6 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search flights'}</Button>
             </div>
           </div>
@@ -594,7 +594,7 @@ export default function FlightsPage() {
           <div className="text-sm text-gray-600">Recent searches</div>
           <div className="flex flex-wrap gap-2">
             {savedSearches.map(item => (
-              <Button key={item.id} variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={() => loadSavedSearch(item)}>
+              <Button key={item.id} variant="secondary" className="border-gray-300 bg-gray-200 text-black hover:bg-gray-300" onClick={() => loadSavedSearch(item)}>
                 {item.name}
               </Button>
             ))}
@@ -650,8 +650,8 @@ export default function FlightsPage() {
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">View</div>
         <div className="flex items-center gap-2">
-          <Button variant={viewMode === 'list' ? 'default' : 'secondary'} className={viewMode === 'list' ? 'bg-black text-white rounded-2xl' : 'border-gray-300 bg-white text-gray-900 rounded-2xl'} onClick={() => setViewMode('list')}>List</Button>
-          <Button variant={viewMode === 'grid' ? 'default' : 'secondary'} className={viewMode === 'grid' ? 'bg-black text-white rounded-2xl' : 'border-gray-300 bg-white text-gray-900 rounded-2xl'} onClick={() => setViewMode('grid')}>Grid</Button>
+          <Button variant={viewMode === 'list' ? 'default' : 'secondary'} className={viewMode === 'list' ? 'bg-black text-white rounded-2xl' : 'border-gray-300 bg-gray-200 text-black rounded-2xl'} onClick={() => setViewMode('list')}>List</Button>
+          <Button variant={viewMode === 'grid' ? 'default' : 'secondary'} className={viewMode === 'grid' ? 'bg-black text-white rounded-2xl' : 'border-gray-300 bg-gray-200 text-black rounded-2xl'} onClick={() => setViewMode('grid')}>Grid</Button>
         </div>
       </div>
 
@@ -664,7 +664,7 @@ export default function FlightsPage() {
 
       {pageMeta?.after && (
         <div className="flex justify-center py-4">
-          <Button variant="secondary" className="rounded-2xl px-6 h-11 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={loadMore} disabled={loadingMore}>
+          <Button variant="secondary" className="rounded-2xl px-6 h-11 bg-gray-200 text-black border border-gray-300 hover:bg-gray-300 backdrop-blur-sm shadow-sm" onClick={loadMore} disabled={loadingMore}>
             {loadingMore ? 'Loading more…' : 'Load more'}
           </Button>
         </div>

@@ -26,8 +26,8 @@ export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile
               href={item.href}
               onClick={isMobile ? onCloseMobile : undefined}
               className={cn(
-                "flex items-center gap-2 px-3 py-1.5 rounded-xl text-gray-900",
-                active ? "bg-gray-200 text-gray-900 border border-gray-200" : "hover:bg-gray-100"
+                "flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-900",
+                active ? "bg-gray-100 text-gray-900 border border-gray-200" : "hover:bg-gray-100"
               )}
             >
               <item.icon className="h-3.5 w-3.5" />

@@ -31,6 +31,16 @@ export default function DashboardLayout({
   const supabase = createClient()
   const router = useRouter()
 
+  // Prevent global scroll when mobile sidebar open
+  useEffect(() => {
+    if (isMobile) {
+      document.body.style.overflow = mobileMenuOpen ? "hidden" : ""
+    }
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [isMobile, mobileMenuOpen])
+
   // Check if mobile on mount and window resize
   useEffect(() => {
     const checkMobile = () => {

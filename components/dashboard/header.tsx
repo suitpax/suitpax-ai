@@ -16,7 +16,7 @@ import {
   HelpCircle,
   Sparkles,
 } from "lucide-react"
-import { PiDotsNineBold } from "react-icons/pi"
+import { PiDotsNineBold, PiCrownBold } from "react-icons/pi"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -292,8 +292,8 @@ export default function Header({
                 {userPlan === "free" && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-purple-600 focus:text-purple-700 focus:bg-purple-50">
-                      <Crown className="h-4 w-4 mr-2" />
+                    <DropdownMenuItem className="text-gray-900 focus:text-gray-900 focus:bg-gray-100">
+                      <PiCrownBold className="h-4 w-4 mr-2" />
                       Upgrade to Pro
                       <CommandShortcut>⇧</CommandShortcut>
                     </DropdownMenuItem>
