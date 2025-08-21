@@ -48,7 +48,6 @@ interface Props {
 
 function toMinutes(isoDuration?: string): number {
   if (!isoDuration) return Number.MAX_SAFE_INTEGER
-  // Minimal ISO8601 PT#H#M parser
   const match = /PT(?:(\d+)H)?(?:(\d+)M)?/i.exec(isoDuration)
   const hours = match?.[1] ? parseInt(match[1], 10) : 0
   const mins = match?.[2] ? parseInt(match[2], 10) : 0
@@ -57,14 +56,11 @@ function toMinutes(isoDuration?: string): number {
 
 function sortOffers(offers: FlightOffer[], sort?: 'recommended' | 'price' | 'duration'): FlightOffer[] {
   const list = [...offers]
-  if (sort === 'price') {
-    return list.sort((a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount))
-  }
+  if (sort === 'price') return list.sort((a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount))
   if (sort === 'duration') {
     const totalDur = (o: FlightOffer) => (o.slices || []).reduce((sum, s) => sum + toMinutes(s.duration), 0)
     return list.sort((a, b) => totalDur(a) - totalDur(b))
   }
-  // recommended: simple composite (price + penalty per stop)
   const score = (o: FlightOffer) => {
     const price = parseFloat(o.total_amount)
     const stops = (o.slices?.[0]?.segments?.length || 1) - 1
@@ -92,16 +88,12 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
         return (
           <Card key={offer.id} className="glass-card hover-raise overflow-hidden">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
-              <div className="flex items-center gap-2 min-w-0">
-                <CarrierLogo iata={airlineIata} name={airlineName} lockup width={72} height={20} className="h-5 w-auto" />
+              <div className="flex items-center gap-3 min-w-0">
+                <CarrierLogo iata={airlineIata} name={airlineName} lockup width={84} height={22} className="h-5 w-auto" />
+                <CarrierLogo iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" />
                 <div className="truncate text-sm text-gray-800 tracking-tight flex items-center gap-1">
                   <span className="font-medium">{airlineName}</span>
-                  {airlineIata && (
-                    <>
-                      <span className="text-gray-500">({airlineIata})</span>
-                      <CarrierLogo iata={airlineIata} name={airlineName} width={14} height={14} className="inline-block align-middle" />
-                    </>
-                  )}
+                  {airlineIata && (<span className="text-gray-500">({airlineIata})</span>)}
                 </div>
               </div>
               <div className="text-center text-gray-700 font-medium hidden sm:block">
@@ -122,7 +114,6 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                   {offer.slices.map((slice, idx) => (
                     <div key={slice.id} className="slice-summary py-2 first:pt-0 last:pb-0">
                       <LegSummary index={idx + 1} origin={slice.origin?.iata_code} destination={slice.destination?.iata_code} duration={formatDurationISO(slice.duration)} />
-
                       <div className="mt-2 space-y-2">
                         {slice.segments.map((seg) => (
                           <div key={seg.id} className="segment">
@@ -131,12 +122,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                                 <div className="font-medium truncate">
                                   {(seg.origin?.city?.name || seg.origin?.city_name || seg.origin?.name)} ({seg.origin?.iata_code}) → {(seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name)} ({seg.destination?.iata_code})
                                 </div>
-                                <SegmentMeta
-                                  airlineName={(seg.airline?.name || seg.marketing_carrier?.name || "")}
-                                  flightNumber={seg.flight_number}
-                                  departAt={new Date(seg.departing_at).toLocaleString()}
-                                  arriveAt={new Date(seg.arriving_at).toLocaleString()}
-                                />
+                                <SegmentMeta airlineName={(seg.airline?.name || seg.marketing_carrier?.name || "")} flightNumber={seg.flight_number} departAt={new Date(seg.departing_at).toLocaleString()} arriveAt={new Date(seg.arriving_at).toLocaleString()} />
                               </div>
                             </div>
                           </div>
@@ -156,21 +142,17 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
 
               {offer?.conditions && (
                 <div className="flex items-center justify-end gap-2 pt-1">
-                  {offer.conditions.refund_before_departure && (
-                    <span className={`dc-baggage-item ${offer.conditions.refund_before_departure.allowed ? "" : "opacity-60"}`}>Refundable</span>
-                  )}
-                  {offer.conditions.change_before_departure && (
-                    <span className={`dc-baggage-item ${offer.conditions.change_before_departure.allowed ? "" : "opacity-60"}`}>Changeable</span>
-                  )}
+                  {offer.conditions.refund_before_departure && (<span className={`dc-baggage-item ${offer.conditions.refund_before_departure.allowed ? "" : "opacity-60"}`}>Refundable</span>)}
+                  {offer.conditions.change_before_departure && (<span className={`dc-baggage-item ${offer.conditions.change_before_departure.allowed ? "" : "opacity-60"}`}>Changeable</span>)}
                 </div>
               )}
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-end gap-2 sm:gap-3 pt-1">
-                <Button variant="secondary" className="w-full sm:w-auto h-10 rounded-2xl px-5 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => onTrackPrice?.(offer.id)}>
-                  Track price
+              <div className="flex flex-col items-stretch gap-2 pt-1">
+                <Button className="w-full h-10 rounded-full px-5 bg-gray-100 text-gray-900 border border-gray-900/50 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => onSelectOffer?.(offer)}>
+                  Continue to booking
                 </Button>
-                <Button className="w-full sm:w-auto h-10 rounded-2xl px-5 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={() => onSelectOffer?.(offer)}>
-                  Book now
+                <Button variant="secondary" className="w-full h-10 rounded-full px-5 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => onTrackPrice?.(offer.id)}>
+                  Track price
                 </Button>
               </div>
             </CardContent>
@@ -180,4 +162,3 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
     </div>
   )
 }
-
