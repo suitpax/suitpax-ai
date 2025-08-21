@@ -11,7 +11,7 @@ import { Toaster } from "react-hot-toast"
 import { motion } from "framer-motion"
 import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
-import AISearchInput from "@/components/ui/ai-search-input"
+import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
 import NavMobile from "@/components/dashboard/nav-mobile"
 import { DashboardLoadingScreen } from "@/components/ui/loaders"
 
@@ -175,7 +175,7 @@ export default function DashboardLayout({
               <Menu className="h-6 w-6" aria-hidden="true" />
             </button>
             <div className="flex-1 max-w-xs mx-4">
-              <AISearchInput size="sm" />
+              <GlobalPromptInput placeholder="Ask Suitpax AI..." className="bg-white/80 border border-gray-200" />
             </div>
             <div className="w-4"></div>
           </div>
