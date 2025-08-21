@@ -88,7 +88,7 @@ const Checkbox = ({ checked, onCheckedChange, className = "" }) => (
 
 // Custom Badge Component
 const Badge = ({ children, variant = "outline", className = "" }) => (
-  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] ${
     variant === "outline" 
       ? "border border-gray-200 bg-gray-50 text-gray-700" 
       : "bg-blue-50 text-blue-700 border border-blue-200"
@@ -144,9 +144,9 @@ const Slider = ({ value, onValueChange, min, max, step = 1, className = "" }) =>
 
   return (
     <div className={`relative ${className}`}>
-      <div className="relative h-2 bg-gray-200 rounded-lg">
+      <div className="relative h-1 bg-gray-200 rounded-full">
         <div 
-          className="absolute h-2 bg-black rounded-lg"
+          className="absolute h-1 bg-black rounded-full"
           style={{
             left: `${percentage1}%`,
             width: `${percentage2 - percentage1}%`
@@ -159,7 +159,7 @@ const Slider = ({ value, onValueChange, min, max, step = 1, className = "" }) =>
           step={step}
           value={localValue[0]}
           onChange={(e) => handleChange(0, e.target.value)}
-          className="absolute w-full h-2 bg-transparent appearance-none cursor-pointer slider-thumb"
+          className="absolute w-full h-1 bg-transparent appearance-none cursor-pointer slider-thumb"
         />
         <input
           type="range"
@@ -168,28 +168,28 @@ const Slider = ({ value, onValueChange, min, max, step = 1, className = "" }) =>
           step={step}
           value={localValue[1]}
           onChange={(e) => handleChange(1, e.target.value)}
-          className="absolute w-full h-2 bg-transparent appearance-none cursor-pointer slider-thumb"
+          className="absolute w-full h-1 bg-transparent appearance-none cursor-pointer slider-thumb"
         />
       </div>
       <style jsx>{`
         .slider-thumb::-webkit-slider-thumb {
           appearance: none;
-          height: 20px;
-          width: 20px;
+          height: 14px;
+          width: 14px;
           border-radius: 50%;
           background: #000;
           cursor: pointer;
           border: 2px solid #fff;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.08);
         }
         .slider-thumb::-moz-range-thumb {
-          height: 20px;
-          width: 20px;
+          height: 14px;
+          width: 14px;
           border-radius: 50%;
           background: #000;
           cursor: pointer;
           border: 2px solid #fff;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.08);
         }
       `}</style>
     </div>
@@ -488,22 +488,25 @@ export default function FlightFilters({
                 </div>
 
                 {/* Airlines */}
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <Label className="flex items-center">
                     <PaperAirplaneIcon className="h-4 w-4 mr-2" />
                     Airlines
                   </Label>
-                  <div className="space-y-2 max-h-48 overflow-y-auto bg-white rounded-xl border border-gray-200 p-2">
+                  <div className="space-y-1 max-h-48 overflow-y-auto bg-white rounded-xl border border-gray-200 p-2">
                     {airlines.map((airline) => (
-                      <div key={airline.code} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
+                      <div key={airline.code} className="flex items-center justify-between py-1">
+                        <div className="flex items-center gap-2">
                           <Checkbox
                             checked={tempFilters.airlines.includes(airline.code)}
                             onCheckedChange={() => toggleAirline(airline.code)}
                           />
-                          <span className="text-sm text-gray-700">{airline.name}</span>
+                          {/* Tiny symbol logo */}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${airline.code}.svg`} alt={airline.name} className="h-3 w-auto" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                          <span className="text-[12px] text-gray-800">{airline.name}</span>
                         </div>
-                        <Badge className="text-xs bg-gray-50">
+                        <Badge className="text-[10px] bg-gray-50">
                           {airline.count}
                         </Badge>
                       </div>
