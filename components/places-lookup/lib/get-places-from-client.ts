@@ -22,8 +22,23 @@ export async function getPlacesFromClient(query: string) {
   url.searchParams.set('query', normalized)
   if (likelySpanish) url.searchParams.set('locale', 'es-ES')
   const res = await fetch(url.toString())
-  if (!res.ok) return []
-  const json = await res.json()
-  return Array.isArray(json?.data) ? json.data : []
+  let primary: any[] = []
+  try {
+    const json = await res.json()
+    primary = Array.isArray(json?.data) ? json.data : []
+  } catch {}
+
+  // Complement with airports by city code if user typed a city code like LON
+  let airports: any[] = []
+  try {
+    const isCityIata = /^[a-zA-Z]{3}$/.test(normalized)
+    if (isCityIata) {
+      const ar = await fetch(new URL(`/api/flights/duffel/airports?city_iata=${normalized.toUpperCase()}`, window.location.origin).toString())
+      const j = await ar.json()
+      airports = Array.isArray(j?.data) ? j.data : []
+    }
+  } catch {}
+
+  return [...primary, ...airports]
 }
 
