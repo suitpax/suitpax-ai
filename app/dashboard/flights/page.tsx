@@ -319,8 +319,8 @@ export default function FlightsPage() {
           <p className="text-sm text-gray-600 mt-1">Find the best routes, fares and schedules — compare in seconds.</p>
         </div>
         <div className="flex flex-col w-full max-w-sm md:max-w-none md:flex-row items-stretch md:items-center gap-2">
-          <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-gradient-to-r from-gray-900 to-gray-700 text-white hover:from-gray-800 hover:to-gray-700 backdrop-blur-sm shadow-sm" onClick={() => router.push('/dashboard/suitpax-ai?tab=chat')}>Ask Suitpax AI</Button>
-          <Button id="primary-search-btn" className="w-full md:w-auto rounded-full md:rounded-2xl px-8 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search flights'}</Button>
+          <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-gradient-to-r from-gray-900 to-gray-700 text-white hover:from-gray-800 hover:to-gray-700 backdrop-blur-sm shadow-sm" onClick={() => router.push('/dashboard/suitpax-ai?tab=chat')}>Try Suitpax AI</Button>
+          <Button id="primary-search-btn" className="w-full md:w-auto rounded-full md:rounded-2xl px-8 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Start a call'}</Button>
         </div>
       </div>
 
@@ -506,7 +506,7 @@ export default function FlightsPage() {
       {/* Filters bar and panel */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">{offers.length} results</div>
-        <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={() => setFiltersOpen(true)}>
+        <Button variant="secondary" className="rounded-full h-10 px-5 border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={() => setFiltersOpen(true)}>
           <FunnelIcon className="h-4 w-4 mr-2" /> Filters
         </Button>
       </div>

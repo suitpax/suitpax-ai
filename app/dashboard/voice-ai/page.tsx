@@ -27,7 +27,6 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import dynamic from "next/dynamic"
 const Loader = dynamic(() => import("@/components/prompt-kit/loader").then(m => m.Loader), { ssr: false })
-import { motion } from "framer-motion"
 import { Progress } from "@/components/ui/progress"
 import { VoiceAIProvider, useVoiceAI } from "@/contexts/voice-ai-context"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
