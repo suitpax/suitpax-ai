@@ -2,6 +2,9 @@ import { NextRequest } from "next/server"
 import { getDuffelClient } from "@/lib/duffel/client"
 import { DuffelAirline, DuffelListResponse } from "@/lib/duffel/schemas"
 
+const airlineCacheById = new Map<string, any>()
+const airlineCacheByIata = new Map<string, any>()
+
 export async function GET(req: NextRequest) {
   try {
     const duffel = getDuffelClient()
@@ -13,15 +16,22 @@ export async function GET(req: NextRequest) {
     const before = searchParams.get("before") || undefined
 
     if (id) {
+      if (airlineCacheById.has(id)) return Response.json({ data: airlineCacheById.get(id) as DuffelAirline })
       const airline = await duffel.airlines.get(id)
+      airlineCacheById.set(id, airline)
+      if (airline?.iata_code) airlineCacheByIata.set(String(airline.iata_code).toUpperCase(), airline)
       return Response.json({ data: airline as unknown as DuffelAirline })
     }
 
     if (iata) {
+      const key = iata.toUpperCase()
+      if (airlineCacheByIata.has(key)) return Response.json({ data: airlineCacheByIata.get(key) as DuffelAirline })
       // list and filter by iata since duffel SDK lacks direct getByIata
-      const list = await duffel.airlines.list({ limit: 100 })
-      const found = list.data.find((a: any) => (a.iata_code || "").toUpperCase() === iata.toUpperCase())
+      const list = await duffel.airlines.list({ limit: 200 })
+      const found = list.data.find((a: any) => (a.iata_code || "").toUpperCase() === key)
       if (!found) return new Response(JSON.stringify({ error: "Not found" }), { status: 404 })
+      airlineCacheByIata.set(key, found)
+      if (found?.id) airlineCacheById.set(found.id, found)
       return Response.json({ data: found as DuffelAirline })
     }
 
