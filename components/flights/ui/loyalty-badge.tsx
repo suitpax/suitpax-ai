@@ -16,12 +16,15 @@ export default function LoyaltyBadge({ airlineIata, airlineId }: { airlineIata?:
   if (!lp) return null
 
   return (
-    <span className="inline-flex items-center gap-1 rounded-xl border border-gray-300 bg-white/80 px-2 py-0.5 text-[10px] text-gray-800">
+    <span className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white/80 px-2 py-0.5 text-[10px] text-gray-800">
       {lp.logo_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={lp.logo_url} alt={lp.name || "loyalty"} className="h-3 w-auto" />
       ) : null}
       <span className="truncate max-w-[90px]">{lp.name || "Loyalty"}</span>
+      {lp.alliance ? (
+        <span className="ml-1 inline-flex items-center rounded-full bg-gray-900 text-white px-1.5 py-[1px] text-[9px]">{lp.alliance}</span>
+      ) : null}
     </span>
   )
 }
