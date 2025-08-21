@@ -11,7 +11,6 @@ import { Toaster } from "react-hot-toast"
 import { motion } from "framer-motion"
 import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
-import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
 import NavMobile from "@/components/dashboard/nav-mobile"
 import { DashboardLoadingScreen } from "@/components/ui/loaders"
 
@@ -163,35 +162,15 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        {/* Mobile Header with Menu Button */}
-        <div className="lg:hidden">
-          <div className="flex items-center justify-between h-16 px-4 bg-white/80 backdrop-blur-sm border-b border-gray-200">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center p-2 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-900/20 transition-colors"
-              onClick={toggleSidebar}
-            >
-              <span className="sr-only">Open sidebar</span>
-              <Menu className="h-6 w-6" aria-hidden="true" />
-            </button>
-            <div className="flex-1 max-w-xs mx-4">
-              <GlobalPromptInput placeholder="Ask Suitpax AI..." className="bg-white/80 border border-gray-200" />
-            </div>
-            <div className="w-4"></div>
-          </div>
-        </div>
-
-        {/* Desktop Header */}
-        <div className="hidden lg:block">
-          <Header
-            user={user}
-            userPlan={userPlan}
-            subscriptionStatus={subscriptionStatus}
-            onToggleSidebar={toggleSidebar}
-            isMobile={isMobile}
-            sidebarCollapsed={sidebarCollapsed}
-          />
-        </div>
+        {/* Header for all breakpoints */}
+        <Header
+          user={user}
+          userPlan={userPlan}
+          subscriptionStatus={subscriptionStatus}
+          onToggleSidebar={toggleSidebar}
+          isMobile={isMobile}
+          sidebarCollapsed={sidebarCollapsed}
+        />
 
         {/* Main content area */}
         <main className="flex-1 overflow-y-auto pb-24 lg:pb-0">
