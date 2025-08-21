@@ -15,13 +15,17 @@ export default function CarrierLogo({ iata, name, className = "", width = 20, he
   if (!iata) return null
   const base = 'https://assets.duffel.com/img/airlines/for-light-background'
   const path = lockup ? 'full-color-lockup' : 'symbol'
+  const src = `${base}/${path}/${iata}.svg`
   return (
     <Image
-      src={`${base}/${path}/${iata}.svg`}
+      src={src}
       width={width}
       height={height}
       alt={name || iata}
       className={className}
+      onError={(e) => {
+        try { (e.target as HTMLImageElement).src = `${base}/${lockup ? 'full-color-lockup' : 'symbol'}/ZZ.svg` } catch {}
+      }}
     />
   )
 }

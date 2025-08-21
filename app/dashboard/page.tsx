@@ -19,9 +19,9 @@ export default function DashboardPage() {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-8">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <h1 className="text-5xl md:text-6xl font-medium leading-none text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-lg font-light tracking-tighter text-gray-600">Welcome back</p>
-          <p className="text-sm text-gray-500 font-light mt-1">Your business travel management overview and insights</p>
+          <h1 className="text-5xl md:text-6xl font-medium leading-none text-gray-900 mb-2">Overview</h1>
+          <p className="text-lg font-light tracking-tighter text-gray-600">Business travel and spend at a glance</p>
+          <p className="text-sm text-gray-500 font-light mt-1">Track performance, search flights, and manage policies</p>
         </motion.div>
         <div className="mt-6">
           <div className="bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-3 sm:p-4">

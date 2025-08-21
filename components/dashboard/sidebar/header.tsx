@@ -10,9 +10,7 @@ export default function DashboardSidebarHeader({ onToggle, isCollapsed, isMobile
   return (
     <SidebarHeader className="flex items-center justify-between bg-white/70">
       <div className="flex items-center gap-2">
-        <div className="w-9 h-9 rounded-xl border border-gray-200 bg-white flex items-center justify-center">
-          <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={20} height={10} className="h-3 w-auto" />
-        </div>
+        <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={72} height={20} className="h-4 w-auto" />
         {!isCollapsed && <span className="text-sm font-medium text-gray-700">Suitpax</span>}
       </div>
       <Button variant="ghost" size="sm" className="h-8 w-8 rounded-xl" onClick={onToggle || toggleSidebar}>
