@@ -81,6 +81,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
         const firstSeg = firstSlice?.segments?.[0]
         const airlineName = firstSeg?.airline?.name || firstSeg?.marketing_carrier?.name || ""
         const airlineIata = firstSeg?.airline?.iata_code || firstSeg?.marketing_carrier?.iata_code || ""
+        const airlineSymbolUrl = firstSeg?.airline?.logo_symbol_url || firstSeg?.airline?.logo_lockup_url || ""
         const overallOrigin = offer.slices?.[0]?.origin?.iata_code
         const overallDestination = offer.slices?.[offer.slices.length - 1]?.destination
         const destCityName = overallDestination?.city?.name || overallDestination?.city_name || overallDestination?.name
@@ -89,7 +90,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
           <Card key={offer.id} className="glass-card hover-raise overflow-hidden rounded-2xl border border-gray-200">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 rounded-2xl">
               <div className="flex items-center gap-3 min-w-0">
-                <CarrierLogo iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" noFallback />
+                <CarrierLogo src={airlineSymbolUrl} iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" noFallback />
                 <div className="truncate text-sm text-gray-800 tracking-tight flex items-center gap-1">
                   <span className="font-medium">{airlineName}</span>
                   {airlineIata && (<span className="text-gray-500">({airlineIata})</span>)}

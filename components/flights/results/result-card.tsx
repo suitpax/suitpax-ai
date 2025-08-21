@@ -28,13 +28,14 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
     return ''
   }
 
+  const airlineSymbolUrl = firstSeg?.airline?.logo_symbol_url || firstSeg?.airline?.logo_lockup_url || ""
+
   return (
     <Card className="hover:shadow-md transition-shadow duration-200 border border-gray-200 rounded-2xl overflow-hidden">
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-3 min-w-0">
-            <CarrierLogo iata={airlineIata} name={airlineName} lockup width={84} height={22} className="h-5 w-auto" />
-            <CarrierLogo iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" />
+            <CarrierLogo src={airlineSymbolUrl} iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" noFallback />
             <div className="truncate">
               <div className="leading-tight flex items-center gap-2">
                 <span className="font-semibold text-gray-900 text-sm md:text-base tracking-tight">{airlineName}</span>

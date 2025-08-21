@@ -502,12 +502,12 @@ export default function FlightsPage() {
               <div className="text-sm text-gray-700">Multi-city legs</div>
               {multiCityLegs.map((leg, idx) => (
                 <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <Input placeholder="Origin IATA or City" value={leg.origin} onChange={e => {
-                    const v = e.target.value.toUpperCase(); setMultiCityLegs(prev => prev.map((l, i) => i === idx ? { ...l, origin: v } : l))
-                  }} className="bg-white text-gray-900 rounded-2xl" />
-                  <Input placeholder="Destination IATA or City" value={leg.destination} onChange={e => {
-                    const v = e.target.value.toUpperCase(); setMultiCityLegs(prev => prev.map((l, i) => i === idx ? { ...l, destination: v } : l))
-                  }} className="bg-white text-gray-900 rounded-2xl" />
+                  <PlacesLookup value={leg.origin} onSelect={(item: any) => {
+                    const v = (item?.iata_code || '').toUpperCase(); setMultiCityLegs(prev => prev.map((l, i) => i === idx ? { ...l, origin: v } : l))
+                  }} placeholder="Origin IATA or City" />
+                  <PlacesLookup value={leg.destination} onSelect={(item: any) => {
+                    const v = (item?.iata_code || '').toUpperCase(); setMultiCityLegs(prev => prev.map((l, i) => i === idx ? { ...l, destination: v } : l))
+                  }} placeholder="Destination IATA or City" />
                   <Input type="date" value={leg.date} onChange={e => {
                     const v = e.target.value; setMultiCityLegs(prev => prev.map((l, i) => i === idx ? { ...l, date: v } : l))
                   }} className="bg-white text-gray-900 rounded-2xl" />
