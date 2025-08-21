@@ -18,14 +18,24 @@ export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile
   ]
   return (
     <>
-      {nav.map((item) => (
-        <SidebarMenuItem key={item.name}>
-          <Link href={item.href} onClick={isMobile ? onCloseMobile : undefined} className={cn("flex items-center gap-2 px-3 py-2 rounded-2xl hover:bg-gray-100 text-gray-900", pathname.startsWith(item.href) && "bg-gray-900 text-white hover:bg-gray-900") }>
-            <item.icon className="h-4 w-4" />
-            {!isCollapsed && <span className="text-sm font-medium">{item.name}</span>}
-          </Link>
-        </SidebarMenuItem>
-      ))}
+      {nav.map((item) => {
+        const active = pathname.startsWith(item.href)
+        return (
+          <SidebarMenuItem key={item.name}>
+            <Link
+              href={item.href}
+              onClick={isMobile ? onCloseMobile : undefined}
+              className={cn(
+                "flex items-center gap-2 px-3 py-1.5 rounded-xl text-gray-900",
+                active ? "bg-gray-200 text-gray-900 border border-gray-200" : "hover:bg-gray-100"
+              )}
+            >
+              <item.icon className="h-3.5 w-3.5" />
+              {!isCollapsed && <span className="text-[13px] font-medium">{item.name}</span>}
+            </Link>
+          </SidebarMenuItem>
+        )
+      })}
     </>
   )
 }

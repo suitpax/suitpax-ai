@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import {
-  Menu,
+  Grip,
   Bell,
   User,
   ChevronDown,
@@ -101,8 +101,12 @@ export default function Header({
   useEffect(() => {
     const getUserProfile = async () => {
       const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-      if (profile) setUserProfile(profile)
+
+      if (profile) {
+        setUserProfile(profile)
+      }
     }
+
     getUserProfile()
   }, [user.id, supabase])
 
@@ -150,7 +154,7 @@ export default function Header({
                 className="p-2 rounded-xl hover:bg-gray-100/80 transition-colors"
                 aria-label={isMobile ? "Open menu" : "Toggle sidebar"}
               >
-                <Menu className="h-5 w-5" />
+                <Grip className="h-5 w-5" />
               </Button>
             </div>
 
@@ -206,7 +210,9 @@ export default function Header({
               <DropdownMenuContent align="end" className="w-80 bg-white/95 backdrop-blur-sm border-gray-200/50">
                 <DropdownMenuLabel className="flex items-center justify-between">
                   Notifications
-                  <Badge variant="secondary" className="text-xs">0</Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    0
+                  </Badge>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <div className="p-2 text-xs text-gray-500">No notifications</div>
@@ -223,17 +229,25 @@ export default function Header({
                   <div className="w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500 ring-2 ring-blue-200/50">
                     {userProfile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={userProfile.avatar_url || "/placeholder.svg"} alt="avatar" className="w-full h-full object-cover" />
+                      <img
+                        src={userProfile.avatar_url || "/placeholder.svg"}
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">{user.email?.charAt(0).toUpperCase() || "U"}</span>
+                        <span className="text-white text-sm font-medium">
+                          {user.email?.charAt(0).toUpperCase() || "U"}
+                        </span>
                       </div>
                     )}
                   </div>
                   {!isMobile && (
                     <div className="hidden lg:flex items-center space-x-2">
                       <div className="text-left">
-                        <p className="text-sm font-medium text-gray-900">{userProfile?.full_name || user.email?.split("@")[0] || "User"}</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {userProfile?.full_name || user.email?.split("@")[0] || "User"}
+                        </p>
                         <p className="text-xs text-gray-500 capitalize">{userPlan} Plan</p>
                       </div>
                       <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -244,11 +258,15 @@ export default function Header({
 
               <DropdownMenuContent align="end" className="w-64 bg-white/95 backdrop-blur-sm border-gray-200/50">
                 <div className="px-3 py-2">
-                  <p className="text-sm font-medium text-gray-900">{userProfile?.full_name || user.email?.split("@")[0] || "User"}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {userProfile?.full_name || user.email?.split("@")[0] || "User"}
+                  </p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                   <div className="mt-2 flex items-center space-x-2">
                     {getPlanBadge()}
-                    <Badge variant="outline" className="text-xs">{subscriptionStatus}</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {subscriptionStatus}
+                    </Badge>
                   </div>
                 </div>
 
