@@ -25,12 +25,13 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Loader } from "@/components/prompt-kit/loader"
+import dynamic from "next/dynamic"
+const Loader = dynamic(() => import("@/components/prompt-kit/loader").then(m => m.Loader), { ssr: false })
 import { Progress } from "@/components/ui/progress"
-import { useVoiceAI } from "@/contexts/voice-ai-context"
+import { VoiceAIProvider, useVoiceAI } from "@/contexts/voice-ai-context"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
 
-export default function VoiceAIPage() {
+function VoiceAIContent() {
   const [user, setUser] = useState(null)
   const {
     state: voiceState,
@@ -239,15 +240,56 @@ export default function VoiceAIPage() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        {/* Voice Control Panel tweaks */}
-        {/* In the existing controls, change the voice button to our agents */}
-        {/* and add a quick language toggle. */}
+        {/* Controls */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="rounded-2xl border border-gray-200 bg-white/80 p-4 backdrop-blur-sm">
+            <div className="text-sm font-medium text-gray-700 mb-2">Transcript</div>
+            <div className="min-h-[72px] rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-800 whitespace-pre-wrap">
+              {currentTranscript || (isProcessing ? "Processing…" : "Start talking to begin a conversation")}
+            </div>
+            {currentError && <div className="mt-2 text-xs text-red-600">{String(currentError)}</div>}
+          </div>
+          <div className="rounded-2xl border border-gray-200 bg-white/80 p-4 backdrop-blur-sm">
+            <div className="text-sm font-medium text-gray-700 mb-2">Response</div>
+            <div className="min-h-[72px] rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-800 whitespace-pre-wrap">
+              {aiResponse || "—"}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-gray-200 bg-white/80 p-4 backdrop-blur-sm">
+            <div className="text-sm font-medium text-gray-700 mb-2">Quick actions</div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Find flights MAD → SFO tomorrow",
+                "Summarize this meeting",
+                "Create expense for Uber 35€",
+              ].map((q) => (
+                <Button key={q} variant="outline" className="rounded-xl" onClick={() => handleProcessMessage(q)}>
+                  {q}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
 
-        {/* Replace the existing Voice: Emma button area with: */}
-        {/* This part should be updated in the existing section where voice buttons reside. */}
+        <div className="flex items-center justify-center gap-3">
+          <Button onClick={handleStartRecording} className="rounded-2xl px-6">
+            {isRecording ? "Stop" : "Start"}
+          </Button>
+          <Button variant="outline" className="rounded-2xl" onClick={() => handleProcessMessage(currentTranscript || currentMessage)} disabled={!currentTranscript && !currentMessage}>
+            Send transcript
+          </Button>
+          <Button variant="outline" className="rounded-2xl" onClick={() => setAiResponse("")}>Clear</Button>
+        </div>
 
       </div>
     </div>
+  )
+}
+
+export default function VoiceAIPage() {
+  return (
+    <VoiceAIProvider>
+      <VoiceAIContent />
+    </VoiceAIProvider>
   )
 }

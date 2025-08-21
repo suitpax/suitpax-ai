@@ -12,7 +12,7 @@ import { ArrowsRightLeftIcon, FunnelIcon, CalendarIcon, MinusIcon, PlusIcon } fr
 import dynamic from "next/dynamic"
 const FlightResults = dynamic(() => import("@/components/flights/results/results-list"), { ssr: false })
 const FlightFilters = dynamic(() => import("@/components/flights/flight-filters"), { ssr: false })
-import type { FlightFiltersDisplay } from "@/components/flights/flight-filters"
+const FlightFiltersDisplay = dynamic(() => import("@/components/flights/flight-filters").then(m => m.FlightFiltersDisplay), { ssr: false })
 import { Checkbox } from "@/components/ui/checkbox"
 import PlacesLookup from "@/components/places-lookup/places-lookup"
 const FilterControls = dynamic(() => import("@/components/flights/results/filter-controls/filter-controls"), { ssr: false })
@@ -170,8 +170,13 @@ export default function FlightsPage() {
         if (searchParams.tripType === 'round_trip' && searchParams.returnDate) payload.return_date = searchParams.returnDate
       }
 
-      const res = await fetch('/api/flights/duffel/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      const json = await res.json()
+      const res = await fetch('/api/flights/duffel/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      let json: any = null
+      try { json = await res.json() } catch {}
       if (!res.ok) throw new Error(json?.error || 'Search failed')
       const results = Array.isArray(json?.data) ? json.data : json?.offers || []
       setOffers(results)
@@ -179,6 +184,7 @@ export default function FlightsPage() {
       setPageMeta(json?.meta || {})
       toast.success(`Found ${results.length} flights`)
     } catch (e: any) {
+      console.error('search error', e)
       toast.error(e?.message || 'Error searching flights')
     } finally {
       setSearching(false)
@@ -314,7 +320,7 @@ export default function FlightsPage() {
         </div>
         <div className="flex flex-col w-full max-w-sm md:max-w-none md:flex-row items-stretch md:items-center gap-2">
           <Button variant="secondary" className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
-          <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-8 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
+          <Button id="primary-search-btn" className="w-full md:w-auto rounded-full md:rounded-2xl px-8 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
         </div>
       </div>
 
