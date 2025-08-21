@@ -1,9 +1,9 @@
 "use client"
 
 import { useMemo } from "react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import Popover from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import { Calendar as DayPicker, DateRange } from "react-day-picker"
+import { DayPicker, DateRange } from "react-day-picker"
 import "react-day-picker/dist/style.css"
 
 type Mode = "single" | "range"
@@ -36,23 +36,28 @@ export function DateRangePicker({
   }, [value, mode, placeholder])
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline" className={`rounded-2xl bg-white text-gray-900 border-gray-300 hover:bg-gray-50 ${className}`} disabled={disabled}>
+    <Popover
+      align="start"
+      trigger={
+        <Button
+          variant="outline"
+          className={`rounded-2xl bg-white text-gray-900 border-gray-300 hover:bg-gray-50 ${className}`}
+          disabled={disabled}
+        >
           {label}
         </Button>
-      </PopoverTrigger>
-      <PopoverContent className="bg-white border border-gray-200 rounded-2xl p-2 shadow-lg" align="start">
-        <DayPicker
-          mode={mode as any}
-          selected={value as any}
-          onSelect={(v) => onChange?.(v as any)}
-          numberOfMonths={2}
-          fixedWeeks
-          weekStartsOn={1}
-          className="rdp-root"
-        />
-      </PopoverContent>
+      }
+      className="p-2"
+    >
+      <DayPicker
+        mode={mode as any}
+        selected={value as any}
+        onSelect={(v) => onChange?.(v as any)}
+        numberOfMonths={2}
+        fixedWeeks
+        weekStartsOn={1}
+        className="rdp-root"
+      />
     </Popover>
   )
 }

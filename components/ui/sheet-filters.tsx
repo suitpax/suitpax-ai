@@ -1,28 +1,45 @@
 "use client"
 
-import { useState } from "react"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 export default function SheetFilters({ trigger, children }: { trigger?: React.ReactNode; children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    const onClick = (e: MouseEvent) => { if (panelRef.current && !panelRef.current.contains(e.target as Node)) setOpen(false) }
+    if (open) {
+      document.addEventListener('keydown', onKey)
+      document.addEventListener('mousedown', onClick)
+    }
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.removeEventListener('mousedown', onClick)
+    }
+  }, [open])
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
+    <>
+      <div onClick={() => setOpen(true)}>
         {trigger || <Button variant="default" className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900">Filters</Button>}
-      </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:w-[90%] md:w-[420px] bg-white p-0">
-        <SheetHeader className="px-6 py-4 border-b border-gray-200">
-          <SheetTitle>Filters</SheetTitle>
-        </SheetHeader>
-        <div className="p-6 overflow-y-auto h-full">
-          <Accordion type="multiple" className="w-full">
-            {children}
-          </Accordion>
+      </div>
+      {open && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/30" />
+          <div ref={panelRef} className="absolute right-0 top-0 h-full w-full sm:w-[90%] md:w-[420px] bg-white shadow-xl">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-sm font-medium">Filters</h2>
+              <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-gray-700">Close</button>
+            </div>
+            <div className="p-6 overflow-y-auto h-[calc(100%-56px)]">
+              {children}
+            </div>
+          </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      )}
+    </>
   )
 }
 
