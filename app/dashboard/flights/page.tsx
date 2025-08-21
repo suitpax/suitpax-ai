@@ -16,6 +16,8 @@ import PlacesLookup from "@/components/places-lookup/places-lookup"
 import FilterControls from "@/components/flights/results/filter-controls/filter-controls"
 import AirlinesSlider from "@/components/flights/results/airlines-slider"
 import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import Loader from "@/components/prompt-kit/loader"
 
 interface SearchParams {
   origin: string
@@ -550,6 +552,26 @@ export default function FlightsPage() {
           <Button variant="secondary" className="rounded-2xl px-6 h-11 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={loadMore} disabled={loadingMore}>
             {loadingMore ? 'Loading more…' : 'Load more'}
           </Button>
+        </div>
+      )}
+
+      {searching && (
+        <div className="fixed inset-0 z-50">
+          <VantaHaloBackground className="absolute inset-0">
+            <div className="absolute inset-0 bg-white/60 backdrop-blur-sm" />
+            <div className="relative h-full w-full flex items-center justify-center p-6">
+              <div className="text-center space-y-4">
+                <div className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white/80 px-4 py-2 text-xs text-gray-700 shadow-sm">
+                  Real-time Duffel search
+                </div>
+                <h2 className="text-3xl md:text-5xl font-serif tracking-tighter text-gray-900">Searching flights</h2>
+                <div className="text-sm text-gray-600">Please wait while we fetch the best offers for your trip.</div>
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <Loader variant="text-shimmer" className="text-base md:text-lg" />
+                </div>
+              </div>
+            </div>
+          </VantaHaloBackground>
         </div>
       )}
     </div>

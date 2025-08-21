@@ -33,10 +33,13 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-3 min-w-0">
-            <CarrierLogo iata={airlineIata} name={airlineName} className="h-5 w-5" width={18} height={18} />
-            <div className="truncate text-sm text-gray-800">
-              <div className="font-medium leading-tight flex items-center gap-2">
-                <span>{airlineName} {airlineIata ? `(${airlineIata})` : ''}</span>
+            <CarrierLogo iata={airlineIata} name={airlineName} className="h-6 w-6" width={20} height={20} />
+            <div className="truncate">
+              <div className="leading-tight flex items-center gap-2">
+                <span className="font-semibold text-gray-900 text-sm md:text-base tracking-tight">{airlineName}</span>
+                {airlineIata && (
+                  <span className="inline-flex items-center rounded-md border border-gray-300 px-1.5 py-[2px] text-[10px] font-medium text-gray-700 bg-white">{airlineIata}</span>
+                )}
                 {firstSeg?.flight_number && <span className="text-gray-500 text-[11px]">{firstSeg.flight_number}</span>}
                 {firstSeg?.airline?.conditions_of_carriage_url && (
                   <a href={firstSeg.airline.conditions_of_carriage_url} target="_blank" rel="noreferrer" className="text-[10px] text-gray-500 underline hover:text-gray-700">conditions</a>
@@ -44,11 +47,11 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
               </div>
             </div>
           </div>
-          <div className="hidden sm:block text-gray-700 text-sm font-medium">
+          <div className="hidden sm:block text-gray-700 text-xs md:text-sm font-medium">
             {overallOrigin} → {overallDestination?.iata_code}
           </div>
           <div className="text-right">
-            <div className="text-2xl md:text-3xl font-bold text-gray-900 leading-none">
+            <div className="text-2xl md:text-4xl font-bold text-gray-900 leading-none">
               {new Intl.NumberFormat('en-US', { style: 'currency', currency: offer.total_currency, maximumFractionDigits: 0 }).format(parseFloat(offer.total_amount))}
             </div>
             <div className="text-[11px] text-gray-500">Total</div>
@@ -60,7 +63,7 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
             {offer.slices.map((slice: any, sliceIndex: number) => (
               <div key={slice.id} className="space-y-3">
                 {offer.slices.length > 1 && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
                     {sliceIndex === 0 ? (
                       <PlaneTakeoffIcon className="h-4 w-4" />
                     ) : (
@@ -72,7 +75,7 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mt-1">
                   <div className="flex items-center gap-6 md:gap-8">
                     <div className="text-center">
                       <div className="text-lg font-semibold text-gray-900 mt-1">
@@ -94,11 +97,11 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {slice.segments.map((segment: any) => {
                     const manuLogo = manufacturerLogo(segment.aircraft?.name)
                     return (
-                      <Badge key={segment.id} variant="outline" className="rounded-xl flex items-center gap-2">
+                      <Badge key={segment.id} variant="outline" className="rounded-xl flex items-center gap-2 border-gray-300">
                         {manuLogo && <img src={manuLogo} alt="manufacturer" className="h-3 w-3" />}
                         <span className="text-[11px]">
                           {(segment.airline?.name || segment.marketing_carrier?.name || '')} {segment.flight_number}
@@ -129,4 +132,3 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
     </Card>
   )
 }
-
