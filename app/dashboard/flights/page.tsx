@@ -333,6 +333,13 @@ export default function FlightsPage() {
         </div>
       </div>
 
+      {/* Airlines slider just under prompt */}
+      <div className="mt-4 flex justify-center">
+        <div className="w-full max-w-4xl">
+          <AirlinesSlider />
+        </div>
+      </div>
+
       {/* Badges row under subtitle (show two) */}
       <div className="flex flex-wrap items-center justify-center gap-2">
         {[
@@ -476,14 +483,14 @@ export default function FlightsPage() {
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-end gap-3">
+            {/* Actions - stacked and long */}
+            <div className="flex flex-col items-stretch gap-2">
               <div className="flex items-center gap-2">
                 <Checkbox id="directOnly" checked={directOnly} onCheckedChange={v => setDirectOnly(Boolean(v))} />
                 <Label htmlFor="directOnly" className="text-sm text-gray-700">Direct only</Label>
               </div>
-              <Button variant="secondary" className="rounded-2xl px-5 h-11 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save</Button>
-              <Button className="rounded-2xl px-6 h-11 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search'}</Button>
+              <Button variant="secondary" className="w-full rounded-full px-5 h-10 bg-gray-100 text-gray-900 border border-gray-900/50 hover:bg-white backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
+              <Button className="w-full rounded-full px-6 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search flights'}</Button>
             </div>
           </div>
         </CardContent>

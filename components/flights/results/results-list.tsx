@@ -114,6 +114,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                   {offer.slices.map((slice, idx) => (
                     <div key={slice.id} className="slice-summary py-2 first:pt-0 last:pb-0">
                       <LegSummary index={idx + 1} origin={slice.origin?.iata_code} destination={slice.destination?.iata_code} duration={formatDurationISO(slice.duration)} />
+
                       <div className="mt-2 space-y-2">
                         {slice.segments.map((seg) => (
                           <div key={seg.id} className="segment">
@@ -122,7 +123,12 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                                 <div className="font-medium truncate">
                                   {(seg.origin?.city?.name || seg.origin?.city_name || seg.origin?.name)} ({seg.origin?.iata_code}) → {(seg.destination?.city?.name || seg.destination?.city_name || seg.destination?.name)} ({seg.destination?.iata_code})
                                 </div>
-                                <SegmentMeta airlineName={(seg.airline?.name || seg.marketing_carrier?.name || "")} flightNumber={seg.flight_number} departAt={new Date(seg.departing_at).toLocaleString()} arriveAt={new Date(seg.arriving_at).toLocaleString()} />
+                                <SegmentMeta
+                                  airlineName={(seg.airline?.name || seg.marketing_carrier?.name || "")}
+                                  flightNumber={seg.flight_number}
+                                  departAt={new Date(seg.departing_at).toLocaleString()}
+                                  arriveAt={new Date(seg.arriving_at).toLocaleString()}
+                                />
                               </div>
                             </div>
                           </div>
@@ -142,8 +148,12 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
 
               {offer?.conditions && (
                 <div className="flex items-center justify-end gap-2 pt-1">
-                  {offer.conditions.refund_before_departure && (<span className={`dc-baggage-item ${offer.conditions.refund_before_departure.allowed ? "" : "opacity-60"}`}>Refundable</span>)}
-                  {offer.conditions.change_before_departure && (<span className={`dc-baggage-item ${offer.conditions.change_before_departure.allowed ? "" : "opacity-60"}`}>Changeable</span>)}
+                  {offer.conditions.refund_before_departure && (
+                    <span className={`dc-baggage-item ${offer.conditions.refund_before_departure.allowed ? "" : "opacity-60"}`}>Refundable</span>
+                  )}
+                  {offer.conditions.change_before_departure && (
+                    <span className={`dc-baggage-item ${offer.conditions.change_before_departure.allowed ? "" : "opacity-60"}`}>Changeable</span>
+                  )}
                 </div>
               )}
 
