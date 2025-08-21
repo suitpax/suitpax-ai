@@ -110,10 +110,21 @@ export default function FlightsPage() {
 
   const activeChips = useMemo(() => {
     const chips: { id: string; label: string; value: string }[] = []
+    // Inline stops selector
+    const selectedStops: number[] = Array.isArray((filters as any).stops) ? (filters as any).stops : []
+    if (selectedStops.length > 0) {
+      const label = selectedStops.length === 1 && selectedStops[0] === 0
+        ? 'Direct only'
+        : selectedStops.map(n => (n === 0 ? 'Non-stop' : `${n} stop`)).join(', ')
+      chips.push({ id: 'stops', label: 'Stops', value: label })
+    }
     if (filters.directOnly) chips.push({ id: 'directOnly', label: 'Stops', value: 'Direct only' })
     if (filters.maxStops < 3 && !filters.directOnly) chips.push({ id: 'maxStops', label: 'Stops', value: `${filters.maxStops} max` })
     if (filters.airlines.length > 0) chips.push({ id: 'airlines', label: 'Airlines', value: filters.airlines.join(', ') })
     if (filters.priceRange[0] > 0 || filters.priceRange[1] < 5000) chips.push({ id: 'price', label: 'Price', value: `${filters.priceRange[0]}-${filters.priceRange[1]}` })
+    // Inline departure time range
+    const departs = (filters as any).departs as { from?: string; to?: string } | undefined
+    if (departs?.from && departs?.to) chips.push({ id: 'departs', label: 'Departure', value: `${departs.from}–${departs.to}` })
     if (filters.departureTime.length > 0) chips.push({ id: 'dep', label: 'Departure', value: `${filters.departureTime.length} selected` })
     if (filters.refundable) chips.push({ id: 'ref', label: 'Refundable', value: 'Yes' })
     if (filters.changeable) chips.push({ id: 'chg', label: 'Changeable', value: 'Yes' })
@@ -124,10 +135,12 @@ export default function FlightsPage() {
     setFilters(prev => {
       const next = { ...prev }
       switch (id) {
+        case 'stops': delete (next as any).stops; break
         case 'directOnly': next.directOnly = false; break
         case 'maxStops': next.maxStops = 3; break
         case 'airlines': next.airlines = []; break
         case 'price': next.priceRange = [0, 5000]; break
+        case 'departs': delete (next as any).departs; break
         case 'dep': next.departureTime = []; break
         case 'ref': next.refundable = false; break
         case 'chg': next.changeable = false; break

@@ -32,7 +32,7 @@ export default function DashboardSidebarHeader({ onToggle, isCollapsed, isMobile
 	return (
 		<SidebarHeader className="flex items-center justify-between bg-white/70">
 			<div className="flex items-center gap-3 min-w-0">
-				<Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={96} height={26} className="h-5 w-auto" />
+				<Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={128} height={32} className="h-6 w-auto" />
 				{!isCollapsed && (
 					<div className="flex flex-col leading-tight min-w-0">
 						<span className="text-[11px] text-gray-500">Suitpax</span>
