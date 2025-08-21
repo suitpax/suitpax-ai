@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
@@ -222,8 +223,8 @@ export function Sidebar({
       <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-white text-lg font-bold">bl</span>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm border border-gray-200 bg-white">
+              <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={24} height={12} className="h-3 w-auto" />
             </div>
             {(!isCollapsed || isMobile) && (
               <div className="flex flex-col">
