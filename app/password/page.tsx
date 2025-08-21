@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import CityAnimateText from "@/components/ui/city-animate-text"
+import MiniCountdownBadge from "@/components/ui/mini-countdown"
 // Icons removed (unused)
 
 export default function PasswordGatePage() {
@@ -241,13 +242,8 @@ export default function PasswordGatePage() {
 
           {/* Reduced badges spacing */}
           <div className="flex items-center gap-3 mt-5">
-            <span className="inline-flex items-center rounded-xl bg-white/10 px-2.5 py-0.5 text-[9px] font-medium text-white/90 border border-white/15">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse mr-1" />
-              Launching soon
-            </span>
-            <span className="inline-flex items-center rounded-xl bg-white/10 px-2.5 py-0.5 text-[9px] font-medium text-white/90 border border-white/15">
-              Private beta
-            </span>
+            <MiniCountdownBadge target={new Date('2025-10-21T00:00:00Z')} title="Official launch" />
+            <span className="inline-flex items-center rounded-xl bg-white/10 px-2.5 py-0.5 text-[9px] font-medium text-white/90 border border-white/15">Private beta</span>
           </div>
         </div>
       </div>

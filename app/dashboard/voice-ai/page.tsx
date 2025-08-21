@@ -30,6 +30,7 @@ const Loader = dynamic(() => import("@/components/prompt-kit/loader").then(m => 
 import { Progress } from "@/components/ui/progress"
 import { VoiceAIProvider, useVoiceAI } from "@/contexts/voice-ai-context"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
+import MiniCountdownBadge from "@/components/ui/mini-countdown"
 
 function VoiceAIContent() {
   const [user, setUser] = useState(null)
@@ -257,6 +258,9 @@ function VoiceAIContent() {
               <span className="text-sm font-medium text-gray-800">{isRecording ? "Listening" : voiceState.isSpeaking ? "Speaking" : "Ready"}</span>
               <span className="text-xs text-gray-500">Wave • Sparkles</span>
             </motion.div>
+            <div className="mt-2 flex justify-center">
+              <MiniCountdownBadge target={new Date('2025-10-21T00:00:00Z')} title="Suitpax Launch" />
+            </div>
           </div>
         </div>
 

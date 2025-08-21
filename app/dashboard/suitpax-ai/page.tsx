@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import MiniCountdownBadge from "@/components/ui/mini-countdown"
 const PromptInput = dynamic(() => import("@/components/prompt-kit/prompt-input").then(m => m.PromptInput), { ssr: false })
 const ChatMessage = dynamic(() => import("@/components/prompt-kit/chat-message").then(m => m.ChatMessage), { ssr: false })
 const Loader = dynamic(() => import("@/components/prompt-kit/loader").then(m => m.Loader), { ssr: false })
@@ -203,6 +204,9 @@ export default function SuitpaxAIPage() {
               <p className="text-xl text-gray-600 mb-12 font-light">
                 Powered by advanced AI with memory for travel, expense and analytics — with room for code when you need it
               </p>
+              <div className="flex items-center justify-center gap-2">
+                <MiniCountdownBadge target={new Date('2025-10-21T00:00:00Z')} title="Suitpax Launch" />
+              </div>
             </motion.div>
             {/* AI Capabilities Grid remains */}
           </div>
