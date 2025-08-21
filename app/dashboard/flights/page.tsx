@@ -20,6 +20,7 @@ const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlin
 import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import FlightsSearchOverlay from "@/components/ui/flights-search-overlay"
+import { getPlacesFromClient } from "@/components/places-lookup/lib/get-places-from-client"
 
 interface SearchParams {
   origin: string
@@ -328,7 +329,7 @@ export default function FlightsPage() {
     <div className="p-6 space-y-6">
       <div className="flex flex-col items-center text-center gap-3">
         <div>
-          <h1 className="text-3xl md:text-5xl font-semibold tracking-tighter">Flights</h1>
+          <h1 className="text-4xl md:text-6xl font-medium tracking-tighter">Flights</h1>
           <p className="text-sm text-gray-600 mt-1">Find the best routes, fares and schedules — compare in seconds.</p>
         </div>
         <div className="flex flex-col w-full max-w-sm md:max-w-none md:flex-row items-stretch md:items-center gap-2">
@@ -340,9 +341,67 @@ export default function FlightsPage() {
       {/* AI prompt (reused global input) */}
       <div className="flex justify-center">
         <div className="w-full max-w-2xl">
-          <GlobalPromptInput placeholder="Ask Suitpax AI to plan your next flight (e.g., MAD → LHR Friday)" onSubmitNavigate={(v) => {
-            window.location.href = `/dashboard/ai-center?tab=chat&prompt=${encodeURIComponent(v)}`
-          }} />
+          <GlobalPromptInput
+            placeholder="Ask Suitpax AI to plan your next flight (e.g., MAD → LHR Friday)"
+            onSubmitNavigate={async (msg) => {
+              // Parse natural language: origin, destination, date, time window
+              const text = msg.trim()
+              const iatas = (text.match(/\b([A-Z]{3})\b/g) || []).slice(0, 2)
+              let origin = iatas[0] || ""
+              let destination = iatas[1] || ""
+              const dateIso = (() => {
+                const iso = text.match(/\b(\d{4}-\d{2}-\d{2})\b/)
+                if (iso) return iso[1]
+                const dmy = text.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/)
+                if (dmy) {
+                  const d = dmy[1].padStart(2, '0'); const m = dmy[2].padStart(2, '0'); const y = dmy[3].length === 2 ? `20${dmy[3]}` : dmy[3]
+                  return `${y}-${m}-${d}`
+                }
+                const months: Record<string, string> = { enero:"01", febrero:"02", marzo:"03", abril:"04", mayo:"05", junio:"06", julio:"07", agosto:"08", septiembre:"09", setiembre:"09", octubre:"10", noviembre:"11", diciembre:"12",
+                  january:"01", february:"02", march:"03", april:"04", may:"05", june:"06", july:"07", august:"08", september:"09", october:"10", november:"11", december:"12" }
+                const md = text.match(/(\d{1,2})\s+de\s+([a-zA-Záéíóúñ]+)|([a-zA-Z]+)\s+(\d{1,2})/i)
+                if (md) {
+                  const day = (md[1] || md[4])?.padStart(2, '0')
+                  const monKey = (md[2] || md[3] || '').toLowerCase()
+                  const mon = months[monKey]
+                  if (day && mon) {
+                    const year = new Date().getFullYear().toString()
+                    return `${year}-${mon}-${day}`
+                  }
+                }
+                return ''
+              })()
+              const timeWindow = (() => {
+                const m = text.match(/(\d{1,2})(?:[:h]\d{2})?\s*(?:a|to|\-)\s*(\d{1,2})(?:[:h]\d{2})?/i)
+                if (!m) return null
+                const from = m[1].padStart(2, '0')+":00"; const to = m[2].padStart(2, '0')+":00"
+                return { from, to }
+              })()
+              // If IATAs missing, try extract by phrases "de X a Y" / "from X to Y"
+              if (!origin || !destination) {
+                const m = text.match(/(?:de|from)\s+([^,]+?)\s+(?:a|to)\s+([^,\.]+?)(?:\s|$)/i)
+                if (m) {
+                  const [_, fromStr, toStr] = m
+                  try {
+                    const [pf, pt] = await Promise.all([
+                      getPlacesFromClient(fromStr.trim()),
+                      getPlacesFromClient(toStr.trim()),
+                    ])
+                    origin = origin || (pf?.[0]?.iata_code || pf?.[0]?.airport?.iata_code || '').toUpperCase()
+                    destination = destination || (pt?.[0]?.iata_code || pt?.[0]?.airport?.iata_code || '').toUpperCase()
+                  } catch {}
+                }
+              }
+              if (origin && destination) {
+                setSearchParams(prev => ({ ...prev, origin, destination, departureDate: dateIso || prev.departureDate }))
+                if (timeWindow) setFilters(prev => ({ ...prev, departs: timeWindow }))
+                await searchFlights()
+              } else {
+                toast.error('Could not extract route. Please specify origin and destination.')
+              }
+            }}
+            className="bg-white border border-gray-200"
+          />
         </div>
       </div>
 
@@ -381,7 +440,7 @@ export default function FlightsPage() {
       `}</style>
 
       {/* Search Card */}
-      <Card className="border-gray-200 glass-card">
+      <Card className="border-gray-200 glass-card rounded-2xl">
         <CardHeader>
           <CardTitle className="text-gray-900 text-base">Trip details</CardTitle>
         </CardHeader>
@@ -526,7 +585,7 @@ export default function FlightsPage() {
       {/* Filters bar and panel */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">{offers.length} results</div>
-        <Button variant="secondary" className="border-gray-300 bg-white text-gray-900 hover:bg-gray-100" onClick={() => setFiltersOpen(true)}>
+        <Button variant="default" className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900" onClick={() => setFiltersOpen(true)}>
           <FunnelIcon className="h-4 w-4 mr-2" /> Filters
         </Button>
       </div>
@@ -548,15 +607,15 @@ export default function FlightsPage() {
         onClose={() => setFiltersOpen(false)}
       />
 
-      {/* Inline controls */}
-      <AirlinesSlider className="mt-2" />
-      <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
-        {[
-          'Policy-aware',
-          'Price tracking',
-        ].map((b) => (
-          <span key={b} className="inline-flex items-center rounded-full px-3 py-1 text-xs border border-gray-300 bg-white/70 text-gray-800">{b}</span>
-        ))}
+      {/* Mini pulse badge CTA */}
+      <div className="flex justify-center mt-3">
+        <span className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] border border-gray-300 bg-white/80 text-gray-800">
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-black animate-pulse" />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-gray-500 animate-pulse [animation-delay:200ms]" />
+          </span>
+          Try Suitpax AI Voice
+        </span>
       </div>
 
       {/* Results */}

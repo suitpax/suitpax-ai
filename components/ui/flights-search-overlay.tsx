@@ -11,10 +11,10 @@ interface FlightsSearchOverlayProps {
 export default function FlightsSearchOverlay({ open, label = "Searching flights…", className }: FlightsSearchOverlayProps) {
   if (!open) return null
   return (
-    <div className={cn("fixed inset-0 z-50 flex items-center justify-center bg-white/85 backdrop-blur", className)}>
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-xl p-6 flex items-center gap-3">
-        <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-300 border-t-gray-900" />
-        <div className="text-sm font-medium text-gray-800">{label}</div>
+    <div className={cn("fixed top-4 left-1/2 -translate-x-1/2 z-50", className)}>
+      <div className="rounded-full border border-gray-200 bg-white/95 shadow-md px-4 py-2 flex items-center gap-2">
+        <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-gray-900" />
+        <div className="text-xs font-medium text-gray-900">{label}</div>
       </div>
     </div>
   )

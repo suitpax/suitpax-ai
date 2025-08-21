@@ -9,9 +9,10 @@ interface CarrierLogoProps {
 	width?: number
 	height?: number
 	lockup?: boolean
+	noFallback?: boolean
 }
 
-export default function CarrierLogo({ iata, name, className = "", width = 20, height = 20, lockup = false }: CarrierLogoProps) {
+export default function CarrierLogo({ iata, name, className = "", width = 20, height = 20, lockup = false, noFallback = false }: CarrierLogoProps) {
 	if (!iata) return null
 	const base = 'https://assets.duffel.com/img/airlines/for-light-background'
 	const path = lockup ? 'full-color-lockup' : 'symbol'
@@ -23,7 +24,11 @@ export default function CarrierLogo({ iata, name, className = "", width = 20, he
 			alt={name || iata}
 			className={className}
 			onError={(e) => {
-				try { (e.target as HTMLImageElement).src = "/logo/suitpax-bl-logo.webp" } catch {}
+				try {
+					const el = e.target as HTMLImageElement
+					if (noFallback) { el.style.display = 'none' }
+					else { el.src = "/logo/suitpax-bl-logo.webp" }
+				} catch {}
 			}}
 		/>
 	)

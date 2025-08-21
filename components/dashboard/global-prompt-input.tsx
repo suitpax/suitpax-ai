@@ -22,7 +22,7 @@ export function GlobalPromptInput({ placeholder = "Ask the AI to plan a trip, an
 
   return (
     <PromptInput value={value} onValueChange={setValue} onSubmit={handleSubmit} className={className || "bg-white border-gray-200 shadow-sm"}>
-      <PromptInputTextarea placeholder={placeholder} />
+      <PromptInputTextarea placeholder={placeholder} className="placeholder:text-gray-700 text-gray-900" />
       <PromptInputActions>
         <PromptInputAction tooltip="Send">
           <button type="submit" className="bg-black text-white hover:bg-gray-800 rounded-2xl h-7 w-7 p-0 inline-flex items-center justify-center">
@@ -35,4 +35,3 @@ export function GlobalPromptInput({ placeholder = "Ask the AI to plan a trip, an
 }
 
 export default GlobalPromptInput
-

@@ -86,11 +86,10 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
         const destCityName = overallDestination?.city?.name || overallDestination?.city_name || overallDestination?.name
 
         return (
-          <Card key={offer.id} className="glass-card hover-raise overflow-hidden">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+          <Card key={offer.id} className="glass-card hover-raise overflow-hidden rounded-2xl border border-gray-200">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 rounded-2xl">
               <div className="flex items-center gap-3 min-w-0">
-                <CarrierLogo iata={airlineIata} name={airlineName} lockup width={84} height={22} className="h-5 w-auto" />
-                <CarrierLogo iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" />
+                <CarrierLogo iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" noFallback />
                 <div className="truncate text-sm text-gray-800 tracking-tight flex items-center gap-1">
                   <span className="font-medium">{airlineName}</span>
                   {airlineIata && (<span className="text-gray-500">({airlineIata})</span>)}
