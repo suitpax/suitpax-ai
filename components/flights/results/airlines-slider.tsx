@@ -19,6 +19,15 @@ const AIRLINE_LOGOS = [
   { name: "Lufthansa", code: "LH" },
   { name: "British Airways", code: "BA" },
   { name: "Emirates", code: "EK" },
+  { name: "Qatar Airways", code: "QR" },
+  { name: "Turkish Airlines", code: "TK" },
+  { name: "United", code: "UA" },
+  { name: "Delta", code: "DL" },
+  { name: "American", code: "AA" },
+  { name: "Ryanair", code: "FR" },
+  { name: "easyJet", code: "U2" },
+  { name: "Singapore Airlines", code: "SQ" },
+  { name: "ANA", code: "NH" },
 ]
 
 export default function AirlinesSlider({ title = "", className = "" }: AirlinesSliderProps) {

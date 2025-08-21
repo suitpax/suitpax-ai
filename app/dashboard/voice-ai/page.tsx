@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import dynamic from "next/dynamic"
 const Loader = dynamic(() => import("@/components/prompt-kit/loader").then(m => m.Loader), { ssr: false })
+import { motion } from "framer-motion"
 import { Progress } from "@/components/ui/progress"
 import { VoiceAIProvider, useVoiceAI } from "@/contexts/voice-ai-context"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
@@ -225,18 +226,14 @@ function VoiceAIContent() {
           </div>
         </motion.div>
 
-        {/* Orb */}
+        {/* Animated Sparkles + Wave badge replacing black orb */}
         <div className="flex justify-center">
-          <div className="relative h-40 w-40 md:h-56 md:w-56 rounded-full bg-black overflow-hidden shadow-xl">
-            <div className="absolute inset-0 animate-pulse bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent_40%),radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.12),transparent_40%)]" />
-            <div className="absolute inset-0">
-              <div className="absolute inset-0 animate-[spin_6s_linear_infinite]">
-                <div className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/70 shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
-              </div>
-            </div>
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-white/70">
-              {isRecording ? "Listening…" : voiceState.isSpeaking ? "Speaking…" : "Idle"}
-            </div>
+          <div className="relative">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm px-4 py-2 flex items-center gap-2 shadow-sm">
+              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-sm font-medium text-gray-800">{isRecording ? "Listening" : voiceState.isSpeaking ? "Speaking" : "Ready"}</span>
+              <span className="text-xs text-gray-500">Wave • Sparkles</span>
+            </motion.div>
           </div>
         </div>
 
@@ -278,6 +275,17 @@ function VoiceAIContent() {
           <Button variant="outline" className="rounded-2xl" onClick={() => handleProcessMessage(currentTranscript || currentMessage)} disabled={!currentTranscript && !currentMessage}>
             Send transcript
           </Button>
+          <div className="relative">
+            <input
+              value={currentMessage}
+              onChange={(e) => setCurrentMessage(e.target.value)}
+              placeholder="Type your question to Voice AI"
+              className="rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 w-64"
+            />
+            <Button size="sm" className="absolute right-1 top-1 rounded-xl h-7 px-3" onClick={() => handleProcessMessage(currentMessage)} disabled={!currentMessage.trim()}>
+              Send
+            </Button>
+          </div>
           <Button variant="outline" className="rounded-2xl" onClick={() => setAiResponse("")}>Clear</Button>
         </div>
 
