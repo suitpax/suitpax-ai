@@ -243,6 +243,7 @@ export default function FlightFilters({
 }: FlightFiltersProps) {
   const [tempFilters, setTempFilters] = useState<FlightFilters>(filters)
   const [airlines, setAirlines] = useState<Airline[]>([])
+  const [airlinesExpanded, setAirlinesExpanded] = useState(false)
 
   // Extract available airlines from offers
   useEffect(() => {
@@ -369,6 +370,8 @@ export default function FlightFilters({
     tempFilters.maxStops < 3
   ].filter(Boolean).length
 
+  const maxAirlines = airlinesExpanded ? airlines.length : 8
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -382,13 +385,13 @@ export default function FlightFilters({
             onClick={onClose}
           />
 
-          {/* Filter Panel */}
+          {/* Fullscreen Filter Panel */}
           <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full sm:w-[90%] md:w-[420px] max-w-full bg-white shadow-2xl z-50 overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 h-full w-full bg-white shadow-2xl z-50 overflow-y-auto"
           >
             <div className="h-full border-0 rounded-none flex flex-col">
               {/* Header */}
@@ -493,8 +496,8 @@ export default function FlightFilters({
                     <PaperAirplaneIcon className="h-4 w-4 mr-2" />
                     Airlines
                   </Label>
-                  <div className="space-y-1 max-h-48 overflow-y-auto bg-white rounded-xl border border-gray-200 p-2">
-                    {airlines.map((airline) => (
+                  <div className="space-y-1 max-h-72 overflow-y-auto bg-white rounded-xl border border-gray-200 p-2">
+                    {airlines.slice(0, maxAirlines).map((airline) => (
                       <div key={airline.code} className="flex items-center justify-between py-1">
                         <div className="flex items-center gap-2">
                           <Checkbox
@@ -512,6 +515,11 @@ export default function FlightFilters({
                       </div>
                     ))}
                   </div>
+                  {airlines.length > 8 && (
+                    <button onClick={() => setAirlinesExpanded(v => !v)} className="text-xs text-gray-700 hover:underline px-2 py-1">
+                      {airlinesExpanded ? 'Show less' : 'Show more'}
+                    </button>
+                  )}
                 </div>
 
                 {/* Departure Time */}
