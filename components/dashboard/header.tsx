@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import {
-  Grip,
   Bell,
   User,
   ChevronDown,
@@ -17,6 +16,7 @@ import {
   HelpCircle,
   Sparkles,
 } from "lucide-react"
+import { PiDotsNineBold } from "react-icons/pi"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -154,7 +154,7 @@ export default function Header({
                 className="p-2 rounded-xl hover:bg-gray-100/80 transition-colors"
                 aria-label={isMobile ? "Open menu" : "Toggle sidebar"}
               >
-                <Grip className="h-5 w-5" />
+                <PiDotsNineBold className="h-5 w-5" />
               </Button>
             </div>
 

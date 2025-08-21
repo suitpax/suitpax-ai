@@ -115,7 +115,7 @@ export default function SuitpaxAIPage() {
           </div>
 
           {/* Messages */}
-          <div ref={listRef} className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-4 max-h-[55vh] overflow-y-auto space-y-6">
+          <div ref={listRef} className="rounded-3xl border border-gray-200 bg-white/70 backdrop-blur-sm p-5 max-h-[55vh] overflow-y-auto space-y-7">
             {messages.map((m) => {
               const isAssistant = m.role === "assistant"
               return (
@@ -157,32 +157,56 @@ export default function SuitpaxAIPage() {
 
           {/* Input */}
           <FileUpload onFilesAdded={handleFilesAdded} accept=".jpg,.jpeg,.png,.pdf,.docx">
-            <PromptInput value={value} onValueChange={setValue} isLoading={isLoading} onSubmit={sendMessage} className="w-full max-w-3xl mx-auto">
+            <PromptInput
+              value={value}
+              onValueChange={setValue}
+              isLoading={isLoading}
+              onSubmit={sendMessage}
+              className="w-full max-w-3xl mx-auto border border-input bg-popover rounded-3xl p-0 pt-1 shadow-xs"
+            >
               {files.length > 0 && (
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex flex-wrap gap-2 px-3 pb-2">
                   {files.map((file, index) => (
                     <div key={index} className="bg-secondary flex items-center gap-2 rounded-lg px-3 py-2 text-sm" onClick={(e) => e.stopPropagation()}>
                       <Paperclip className="size-4" />
-                      <span className="max-w-[120px] truncate">{file.name}</span>
-                      <button onClick={() => removeFile(index)} className="hover:bg-secondary/50 rounded-full p-1"><Square className="size-4" /></button>
+                      <span className="max-w-[160px] truncate">{file.name}</span>
+                      <button onClick={() => removeFile(index)} className="hover:bg-secondary/50 rounded-full p-1">
+                        <Square className="size-4" />
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
-              <PromptInputTextarea placeholder="Ask Suitpax AI..." />
-              <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
-                <PromptInputAction tooltip="Attach files">
-                  <FileUploadTrigger asChild>
-                    <div className="hover:bg-secondary-foreground/10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-2xl">
-                      <Paperclip className="text-primary size-5" />
-                    </div>
-                  </FileUploadTrigger>
-                </PromptInputAction>
-                <PromptInputAction tooltip={isLoading ? "Stop" : "Send"}>
-                  <Button variant="default" size="icon" className="h-8 w-8 rounded-full" onClick={sendMessage} disabled={isLoading || !value.trim()}>
-                    {isLoading ? <Square className="size-5 fill-current" /> : <ArrowUp className="size-5" />}
-                  </Button>
-                </PromptInputAction>
+              <PromptInputTextarea
+                placeholder="Ask anything"
+                className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3]"
+              />
+              <PromptInputActions className="mt-4 flex w-full items-center justify-between gap-2 px-3 pb-3">
+                <div className="flex items-center gap-2">
+                  <PromptInputAction tooltip="Attach files">
+                    <FileUploadTrigger asChild>
+                      <Button variant="outline" size="icon" className="size-9 rounded-full">
+                        <Paperclip className="size-4" />
+                      </Button>
+                    </FileUploadTrigger>
+                  </PromptInputAction>
+                </div>
+                <div className="flex items-center gap-2">
+                  <PromptInputAction tooltip={isLoading ? "Stop" : "Send"}>
+                    <Button
+                      size="icon"
+                      disabled={!value.trim() || isLoading}
+                      onClick={sendMessage}
+                      className="size-9 rounded-full"
+                    >
+                      {!isLoading ? (
+                        <ArrowUp className="size-4" />
+                      ) : (
+                        <span className="size-3 rounded-xs bg-white" />
+                      )}
+                    </Button>
+                  </PromptInputAction>
+                </div>
               </PromptInputActions>
             </PromptInput>
             <FileUploadContent>
