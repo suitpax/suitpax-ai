@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 
 export default function PlanUsageCard() {
   const [profile, setProfile] = useState<any>(null)
-  const [usage, setUsage] = useState<{ searches?: number; searchesLimit?: number; tracking?: number; trackingLimit?: number }>({})
+  const [usage, setUsage] = useState<{ searches?: number; searchesLimit?: number; tracking?: number; trackingLimit?: number; aiTokens?: number; aiTokensLimit?: number; temperature?: number }>({})
 
   useEffect(() => {
     const run = async () => {
@@ -14,9 +14,9 @@ export default function PlanUsageCard() {
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
-        const { data: p } = await supabase.from('profiles').select('full_name, company_name, avatar_url, plan, usage_searches, usage_searches_limit, usage_tracking, usage_tracking_limit').eq('id', user.id).single()
+        const { data: p } = await supabase.from('profiles').select('full_name, company_name, avatar_url, plan, usage_searches, usage_searches_limit, usage_tracking, usage_tracking_limit, ai_tokens_used, ai_tokens_limit, ai_temperature').eq('id', user.id).single()
         setProfile(p)
-        setUsage({ searches: p?.usage_searches || 0, searchesLimit: p?.usage_searches_limit || 100, tracking: p?.usage_tracking || 0, trackingLimit: p?.usage_tracking_limit || 20 })
+        setUsage({ searches: p?.usage_searches || 0, searchesLimit: p?.usage_searches_limit || 100, tracking: p?.usage_tracking || 0, trackingLimit: p?.usage_tracking_limit || 20, aiTokens: p?.ai_tokens_used || 0, aiTokensLimit: p?.ai_tokens_limit || 0, temperature: typeof p?.ai_temperature === 'number' ? p.ai_temperature : 1 })
         try { localStorage.setItem('suitpax_user_name', p?.full_name || '') } catch {}
       } catch {}
     }
@@ -48,6 +48,14 @@ export default function PlanUsageCard() {
         <div className="h-full bg-gray-900" style={{ width: `${Math.min(100, Math.round(((usage.tracking || 0) / (usage.trackingLimit || 1)) * 100))}%` }} />
       </div>
       <div className="text-[10px] text-gray-500">{usage.tracking}/{usage.trackingLimit}</div>
+      <div className="h-px bg-gray-200 my-1" />
+      <div className="text-[10px] text-gray-600">AI tokens</div>
+      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-full bg-gray-900" style={{ width: `${Math.min(100, Math.round(((usage.aiTokens || 0) / (usage.aiTokensLimit || 1)) * 100))}%` }} />
+      </div>
+      <div className="text-[10px] text-gray-500">{usage.aiTokens}/{usage.aiTokensLimit || '∞'}</div>
+      <div className="text-[10px] text-gray-600 mt-1">Temperature</div>
+      <div className="text-[10px] text-gray-700">{(usage.temperature ?? 1).toFixed(2)}</div>
     </div>
   )
 }
