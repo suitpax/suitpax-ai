@@ -108,7 +108,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                 {overallOrigin} → {overallDestination?.iata_code}
               </div>
               <div className="text-right">
-                <CardTitle className="text-3xl md:text-4xl font-semibold text-gray-900 leading-none">
+                <CardTitle className="text-2xl md:text-4xl font-semibold text-gray-900 leading-none">
                   {new Intl.NumberFormat("en-US", { style: "currency", currency: offer.total_currency, maximumFractionDigits: 0 }).format(parseFloat(offer.total_amount))}
                 </CardTitle>
                 <div className="text-[11px] text-gray-500">Total</div>
