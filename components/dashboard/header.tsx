@@ -1,5 +1,5 @@
-import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
 "use client"
+import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
 
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
