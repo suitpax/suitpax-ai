@@ -14,11 +14,11 @@ import {
   Calculator,
   BarChart3,
   HelpCircle,
-  Sparkles,
 } from "lucide-react"
 import { PiDotsSixBold, PiCrownBold } from "react-icons/pi"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { loader } from "@/components/ui/loaders"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -172,7 +172,7 @@ export default function Header({
                 className="w-full h-9 px-3 pl-8 pr-3 text-[13px] bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/15 focus:border-blue-300 transition-all placeholder:text-gray-400"
               />
               <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                <Sparkles className="h-3.5 w-3.5 text-gray-400" />
+                {loader({ size: "sm" })}
               </div>
             </div>
           </div>
@@ -321,7 +321,7 @@ export default function Header({
                 className="w-full h-9 px-3 pl-8 pr-3 text-[13px] bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/15 focus:border-blue-300 transition-all placeholder:text-gray-400"
               />
               <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                <Sparkles className="h-3.5 w-3.5 text-gray-400" />
+                {loader({ size: "sm" })}
               </div>
             </div>
           </div>

@@ -24,11 +24,10 @@ export default function DashboardSidebarContent({ isCollapsed, isMobile, onClose
 									id: "whats-new",
 									title: "What's new",
 									children: (
-										<ul className="list-disc pl-4 space-y-1">
-											<li>Improved Flights filters and results</li>
-											<li>New Suitpax AI chat experience</li>
-											<li>Sidebar redesign with plan usage</li>
-										</ul>
+										<div className="space-y-1">
+											<div className="text-[12px] text-gray-700">Suitpax <span className="font-light">v0.9.0</span></div>
+											<div className="text-[12px] text-gray-700">New airlines added</div>
+										</div>
 									),
 								},
 							]}
