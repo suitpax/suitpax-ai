@@ -3,7 +3,7 @@
 import { SidebarHeader, useSidebar } from "@/components/ui/primitives/sidebar"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { PiDotsNineBold } from "react-icons/pi"
+import { PiDotsSixBold } from "react-icons/pi"
 
 export default function TopSidebar({ onToggle }: { onToggle?: () => void }) {
 	const { toggleSidebar } = useSidebar()
@@ -14,7 +14,7 @@ export default function TopSidebar({ onToggle }: { onToggle?: () => void }) {
 			</div>
 			<Button variant="ghost" size="sm" className="h-8 px-2 rounded-xl text-gray-700 hover:text-gray-900" onClick={onToggle || toggleSidebar} aria-label="Toggle sidebar">
 				<div className="flex items-center gap-1.5">
-					<PiDotsNineBold className="h-4 w-4" />
+					<PiDotsSixBold className="h-4 w-4" />
 					<span className="text-[10px] leading-none">Close</span>
 				</div>
 			</Button>

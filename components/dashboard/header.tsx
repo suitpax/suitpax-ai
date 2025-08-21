@@ -16,7 +16,7 @@ import {
   HelpCircle,
   Sparkles,
 } from "lucide-react"
-import { PiDotsNineBold, PiCrownBold } from "react-icons/pi"
+import { PiDotsSixBold, PiCrownBold } from "react-icons/pi"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -153,7 +153,7 @@ export default function Header({
               className="h-8 w-8 p-0 rounded-xl hover:bg-gray-100/80 transition-colors"
               aria-label={isMobile ? "Open menu" : "Toggle sidebar"}
             >
-              <PiDotsNineBold className="h-4 w-4" />
+              <PiDotsSixBold className="h-4 w-4" />
             </Button>
 
             {/* Page Info */}

@@ -36,15 +36,15 @@ export default function PlanUsageCard() {
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white/80 p-3 space-y-2">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         {profile?.avatar_url ? (
-          <Image src={profile.avatar_url} alt="avatar" width={24} height={24} className="h-6 w-6 rounded-full border border-gray-200" />
+          <Image src={profile.avatar_url} alt="avatar" width={40} height={40} className="h-10 w-10 rounded-full border border-gray-200" />
         ) : (
-          <div className="h-6 w-6 rounded-full border border-gray-200 bg-gray-100" />
+          <div className="h-10 w-10 rounded-full border border-gray-200 bg-gray-100" />
         )}
         <div className="min-w-0">
-          <div className="text-[11px] text-gray-800 truncate">{profile?.full_name || 'User'}</div>
-          <div className="text-[10px] text-gray-500 truncate">{profile?.company_name || ''}</div>
+          <div className="text-[12px] text-gray-800 truncate">{profile?.full_name || 'User'}</div>
+          <div className="text-[11px] text-gray-500 truncate">{profile?.company_name || ''}</div>
         </div>
         <span className="ml-auto rounded-md bg-gray-900 text-white text-[10px] px-1.5 py-[1px]">{(profile?.plan || 'Free')}</span>
       </div>
