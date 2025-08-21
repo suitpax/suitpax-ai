@@ -154,8 +154,7 @@ export async function POST(request: NextRequest) {
 
     const raw = initial.content.find((c: any) => c.type === "text")?.text || ""
 
-    let text = raw.trim()
-    let reasoningInline: string | undefined
+    text = raw.trim()
     if (includeReasoningInline) {
       const match = raw.match(/<thinking>[\s\S]*?<\/thinking>/)
       if (match) {
