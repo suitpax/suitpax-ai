@@ -146,27 +146,36 @@ export default function SuitpaxAIPage() {
 
             {messages.map((m) => (
               <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`${m.role === "user" ? "bg-black text-white" : "bg-white/70 border border-gray-200 text-gray-900"} rounded-2xl px-4 py-3 max-w-[85%] sm:max-w-[75%]`}>
-                  {m.role === "assistant" ? (
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                      <Markdown>{m.content}</Markdown>
-                      {(() => {
-                        const match = m.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
-                        if (!match) return null
-                        try {
-                          const parsed = JSON.parse(match[1])
-                          return (
-                            <div className="mt-2">
-                              <ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => { if (id) window.location.href = `/dashboard/flights/book/${id}` }} />
-                            </div>
-                          )
-                        } catch { return null }
-                      })()}
-                    </div>
-                  ) : (
-                    <div className="text-sm whitespace-pre-wrap">{m.content}</div>
+                <div className="flex items-end gap-2 max-w-[85%] sm:max-w-[75%]">
+                  {m.role !== "user" && (
+                    <div className="h-6 w-6 rounded-full overflow-hidden border border-gray-200 bg-white/80 flex items-center justify-center text-[10px] text-gray-600">AI</div>
                   )}
-                  {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
+                  <div className={`${m.role === "user" ? "bg-black text-white" : "bg-white/70 border border-gray-200 text-gray-900"} rounded-2xl px-4 py-3 flex-1`}>
+                    {m.role === "assistant" ? (
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <Markdown>{m.content}</Markdown>
+                        {(() => {
+                          const match = m.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
+                          if (!match) return null
+                          try {
+                            const parsed = JSON.parse(match[1])
+                            return (
+                              <div className="mt-2">
+                                <ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => { if (id) window.location.href = `/dashboard/flights/book/${id}` }} />
+                              </div>
+                            )
+                          } catch { return null }
+                        })()}
+                      </div>
+                    ) : (
+                      <div className="text-sm whitespace-pre-wrap">{m.content}</div>
+                    )}
+                    {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
+                    <div className="mt-1 text-[10px] text-gray-500">{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                  </div>
+                  {m.role === "user" && (
+                    <div className="h-6 w-6 rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center text-[10px] text-gray-600">U</div>
+                  )}
                 </div>
               </div>
             ))}
