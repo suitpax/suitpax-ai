@@ -1,7 +1,7 @@
 "use client"
 
 import CityImage from "@/components/flights/ui/city-image"
-import CarrierLogo from "@/components/flights/ui/carrier-logo"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -37,7 +37,7 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-3 min-w-0">
-            <CarrierLogo src={airlineSymbolUrl} iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" noFallback />
+            <img src={airlineSymbolUrl || (airlineIata ? `https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${airlineIata}.svg` : "")} alt={airlineName || airlineIata || "airline"} className="h-4 w-4" loading="lazy" />
             <div className="truncate">
               <div className="leading-tight flex items-center gap-2">
                 <span className="font-semibold text-gray-900 text-sm md:text-base tracking-tight">{airlineName}</span>
