@@ -218,7 +218,7 @@ export default function Header({
                   variant="ghost"
                   className="flex items-center gap-2 h-8 px-2 rounded-xl hover:bg-gray-100/80 transition-colors"
                 >
-                  <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500">
+                  <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500">
                     {userProfile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img

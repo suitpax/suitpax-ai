@@ -6,7 +6,7 @@ import { PromptInput, PromptInputActions, PromptInputTextarea, PromptInputAction
 import { FileUpload, FileUploadContent, FileUploadTrigger } from "@/components/prompt-kit/file-upload"
 import { Button } from "@/components/ui/button"
 import { Paperclip, ArrowUp, Square } from "lucide-react"
-import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import ChatHeader from "@/components/prompt-kit/chat-header"
 import { useChatStream } from "@/hooks/use-chat-stream"
 import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
 import SourceList from "@/components/prompt-kit/source-list"
@@ -123,10 +123,13 @@ export default function SuitpaxAIPage() {
   const handleSuggestion = (prompt: string) => setValue(prompt)
 
   return (
-    <VantaHaloBackground className="bg-black/5">
+    <div className="bg-white">
       <div className="fixed inset-0 flex flex-col">
+        {/* Chat Header */}
+        {/* @ts-expect-error Async Server Component types mismatch not relevant here */}
+        <ChatHeader title="Suitpax AI" subtitle="Ask anything. Travel. Business. Code." />
         {/* Content area */}
-        <div ref={listRef} className="flex-1 overflow-y-auto">
+        <div ref={listRef} className="flex-1 overflow-y-auto" role="feed" aria-label="Chat messages">
           <div className="mx-auto w-full max-w-3xl px-4 py-6 space-y-4">
             {messages.length === 0 && !isLoading && (
               <div className="space-y-4">
@@ -188,6 +191,7 @@ export default function SuitpaxAIPage() {
                 onValueChange={setValue}
                 isLoading={isLoading || isStreaming}
                 onSubmit={handleSend}
+                aria-label="AI prompt input"
                 className="w-full border border-gray-200 rounded-3xl p-0 pt-1 bg-white"
               >
                 {files.length > 0 && (
@@ -213,7 +217,7 @@ export default function SuitpaxAIPage() {
                     </FileUploadTrigger>
                   </PromptInputAction>
                   <PromptInputAction tooltip={isLoading || isStreaming ? "Stop" : "Send"}>
-                    <Button size="icon" disabled={!value.trim() || isLoading || isStreaming} onClick={handleSend} className="h-8 w-8 rounded-full">
+                    <Button size="icon" aria-label={isLoading || isStreaming ? "Stop generation" : "Send message"} disabled={!value.trim() || isLoading || isStreaming} onClick={handleSend} className="h-8 w-8 rounded-full">
                       {!isLoading && !isStreaming ? <ArrowUp className="size-4" /> : <span className="size-3 rounded-xs bg-gray-900" />}
                     </Button>
                   </PromptInputAction>
@@ -231,6 +235,6 @@ export default function SuitpaxAIPage() {
           </div>
         </div>
       </div>
-    </VantaHaloBackground>
+    </div>
   )
 }
