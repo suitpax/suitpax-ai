@@ -30,14 +30,16 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
     return ''
   }
 
-  const airlineSymbolUrl = firstSeg?.airline?.logo_symbol_url || firstSeg?.airline?.logo_lockup_url || ""
+  const airlineSymbolUrl = firstSeg?.airline?.logo_symbol_url || (airlineIata ? `https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${airlineIata}.svg` : "")
+  const airlineLockupUrl = firstSeg?.airline?.logo_lockup_url || (airlineIata ? `https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/${airlineIata}.svg` : "")
 
   return (
     <Card className="hover:shadow-md transition-shadow duration-200 border border-gray-200 rounded-2xl overflow-hidden">
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-3 min-w-0">
-            <img src={airlineSymbolUrl || (airlineIata ? `https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${airlineIata}.svg` : "")} alt={airlineName || airlineIata || "airline"} className="h-4 w-4" loading="lazy" />
+            <img src={airlineLockupUrl} alt={airlineName || airlineIata || "airline"} className="h-4 w-auto" loading="lazy" />
+            <img src={airlineSymbolUrl} alt="symbol" className="h-3 w-auto opacity-80" loading="lazy" />
             <div className="truncate">
               <div className="leading-tight flex items-center gap-2">
                 <span className="font-semibold text-gray-900 text-sm md:text-base tracking-tight">{airlineName}</span>

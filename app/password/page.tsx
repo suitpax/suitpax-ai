@@ -164,6 +164,25 @@ export default function PasswordGatePage() {
             <span className="absolute inset-0 animate-hero-shimmer bg-[linear-gradient(110deg,#ffffff,45%,#9ca3af,55%,#ffffff)] bg-[length:200%_100%] bg-clip-text text-transparent" />
           </div>
 
+          {/* Airlines slider */}
+          <div className="mt-6 w-full max-w-3xl">
+            <div className="text-xs font-medium tracking-tighter text-gray-800 mb-2 text-left">Trusted airlines preview</div>
+            <div className="bg-white/70 backdrop-blur rounded-xl border border-gray-200 p-2">
+              {/* dynamic import to reuse component without SSR if needed */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <div className="overflow-hidden">
+                {/* Inline simple logos row (lightweight) */}
+                <div className="flex items-center gap-4 opacity-90">
+                  <img src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/IB.svg" alt="Iberia" className="h-4" />
+                  <img src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/BA.svg" alt="British Airways" className="h-4" />
+                  <img src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/AF.svg" alt="Air France" className="h-4" />
+                  <img src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/LH.svg" alt="Lufthansa" className="h-4" />
+                  <img src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/AA.svg" alt="American Airlines" className="h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Animated city text (cleaner spacing) */}
           <div className="mt-8">
             <CityAnimateText />
