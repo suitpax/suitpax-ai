@@ -281,6 +281,8 @@ export default function PasswordGatePage() {
                 placeholder="What do you want to achieve with Suitpax?"
                 className="w-full bg-white/90 border border-gray-200 rounded-2xl p-3 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur min-h-[120px]"
                 rows={4}
+                required
+                aria-label="Message"
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <input
@@ -288,15 +290,17 @@ export default function PasswordGatePage() {
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   placeholder="Work email"
-                  className="bg-white/90 border border-gray-200 rounded-2xl p-2.5 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
+                  className="w-full bg-white/90 border border-gray-200 rounded-2xl p-2.5 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
                   required
+                  aria-label="Email"
                 />
                 <input
                   value={contactCompany}
                   onChange={(e) => setContactCompany(e.target.value)}
                   placeholder="Company"
-                  className="bg-white/90 border border-gray-200 rounded-2xl p-2.5 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
+                  className="w-full bg-white/90 border border-gray-200 rounded-2xl p-2.5 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
                   required
+                  aria-label="Company"
                 />
               </div>
               <button
