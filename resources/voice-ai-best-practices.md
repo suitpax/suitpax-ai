@@ -1,0 +1,29 @@
+### Voice AI Best Practices
+
+- Audio capture:
+  - Use 16kHz mono PCM, WebAudio MediaRecorder or AudioWorklet for lower latency.
+  - Apply client-side VAD (voice activity detection) to segment utterances and cut silence.
+- Streaming STT → NLU:
+  - Send partial transcripts to your LLM for turn-taking hints.
+  - Add a 200–400ms end-of-speech timeout to avoid premature cutoff.
+- Prompting:
+  - Keep a short system prompt with explicit voice persona, safety, and brevity rules.
+  - Include conversation state summary every 3–5 turns.
+- Latency budget:
+  - Target < 1.2s perceived response. Budget: STT 200–400ms, LLM 400–700ms, TTS 200–300ms.
+  - Use streaming responses from LLM; speak as text arrives.
+- ElevenLabs TTS:
+  - Use `eleven_multilingual_v2`, `mp3_44100_128`, `optimizeStreamingLatency: 2` for balanced quality/latency.
+  - Pre-warm voices by generating a 200ms silent clip on mount.
+- Playback:
+  - Use WebAudio `AudioContext` and enqueue chunks; avoid gaps between buffers.
+  - Duck UI sounds 6–9dB while voice plays.
+- Turn-taking:
+  - Auto-stop mic when TTS starts; reopen mic near the end of playback.
+  - Visual mic state (listening/speaking/idle) with aria-live polite updates.
+- Error handling:
+  - Fallback to text-only if TTS fails; show retry.
+  - Exponential backoff on network errors.
+- Accessibility:
+  - Keyboard controls for mic toggle, playback, and repeat last.
+  - Provide subtitles and transcript download.

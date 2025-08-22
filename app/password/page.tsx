@@ -11,6 +11,8 @@ import { z } from "zod"
 import { SmallSessionLoader } from "@/components/ui/loaders"
 // Icons removed (unused)
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import dynamic from "next/dynamic"
+const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlines-slider"), { ssr: false })
 
 export default function PasswordGatePage() {
   const router = useRouter()
@@ -168,18 +170,7 @@ export default function PasswordGatePage() {
           <div className="mt-6 w-full max-w-3xl">
             <div className="text-xs font-medium tracking-tighter text-gray-800 mb-2 text-left">Trusted airlines preview</div>
             <div className="bg-white/70 backdrop-blur rounded-xl border border-gray-200 p-2">
-              {/* dynamic import to reuse component without SSR if needed */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <div className="overflow-hidden">
-                {/* Inline simple logos row (lightweight) */}
-                <div className="flex items-center gap-4 opacity-90">
-                  <img src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/IB.svg" alt="Iberia" className="h-4" />
-                  <img src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/BA.svg" alt="British Airways" className="h-4" />
-                  <img src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/AF.svg" alt="Air France" className="h-4" />
-                  <img src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/LH.svg" alt="Lufthansa" className="h-4" />
-                  <img src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/AA.svg" alt="American Airlines" className="h-4" />
-                </div>
-              </div>
+              <AirlinesSlider />
             </div>
           </div>
 
