@@ -223,7 +223,7 @@ function VoiceAIContent() {
   )
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6 bg-black text-white">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <motion.div
@@ -235,7 +235,7 @@ function VoiceAIContent() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-gray-900 mb-2">
               Voice AI Assistant
             </h1>
-            <p className="text-lg font-light text-gray-600">
+            <p className="text-lg font-light text-gray-300">
               {getGreeting()}, {getDisplayName().split(" ")[0]}! Ready to help with your business needs.
             </p>
             <div className="mt-2 flex flex-col sm:flex-row items-center gap-2">
@@ -265,11 +265,23 @@ function VoiceAIContent() {
 
         {/* Animated Sparkles + Wave badge replacing black orb */}
         <div className="flex justify-center">
-          <div className="relative">
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm px-4 py-2 flex items-center gap-2 shadow-sm">
-              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-sm font-medium text-gray-800">{isRecording ? "Listening" : voiceState.isSpeaking ? "Speaking" : "Ready"}</span>
-              <span className="text-xs text-gray-500">Wave • Sparkles</span>
+          <div className="relative flex flex-col items-center">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+              <div className="flex items-center justify-center">
+                <div className="opacity-90">
+                  <div className="relative">
+                    {/* Dark halo orb */}
+                    <div className="absolute inset-0 -z-10 flex items-center justify-center">
+                      {/* decorative orb */}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 flex items-center gap-2 shadow-sm">
+                <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-sm font-medium text-white/90">{isRecording ? "Listening" : voiceState.isSpeaking ? "Speaking" : "Ready"}</span>
+                <span className="text-xs text-white/60">Halo • Vanta</span>
+              </div>
             </motion.div>
             <div className="mt-2 flex justify-center">
               <MiniCountdownBadge target={new Date('2025-10-21T00:00:00Z')} title="Suitpax Launch" />
