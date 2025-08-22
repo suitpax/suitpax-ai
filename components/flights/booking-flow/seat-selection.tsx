@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import Loader from "@/components/prompt-kit/loader"
 
 interface Props {
   offerId: string
@@ -75,14 +76,25 @@ export default function SeatSelection({ offerId, onSelect }: Props) {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {loading && <div className="text-sm text-gray-600">Loading seat map…</div>}
+        {loading && (
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Loader variant="loading-dots" />
+          </div>
+        )}
         {error && !loading && <div className="text-sm text-red-600">{error}</div>}
         {!loading && !error && rows.length === 0 && (
           <div className="text-sm text-gray-600">No seat map available for this offer</div>
         )}
         {!loading && !error && rows.length > 0 && (
           <div className="seat-map rounded-2xl border border-gray-200 p-3 bg-gray-50">
-            <div className="text-xs text-gray-600 mb-2">Tap a seat to select</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-xs text-gray-600">Tap a seat to select</div>
+              <div className="flex items-center gap-3 text-[11px] text-gray-600">
+                <span className="inline-flex items-center gap-1"><span className="inline-block h-3 w-3 bg-white border border-gray-300 rounded-sm"></span> Available</span>
+                <span className="inline-flex items-center gap-1"><span className="inline-block h-3 w-3 bg-gray-200 rounded-sm"></span> Unavailable</span>
+                <span className="inline-flex items-center gap-1"><span className="inline-block h-3 w-3 bg-black rounded-sm"></span> Selected</span>
+              </div>
+            </div>
             <div className="space-y-2">
               {rows.map((row, idx) => (
                 <div key={idx} className="row flex items-center gap-2">
@@ -91,7 +103,10 @@ export default function SeatSelection({ offerId, onSelect }: Props) {
                     {row.elements.map((el, i) => {
                       if (el.type !== 'seat') return <div key={i} className="w-2" />
                       const isSelected = selected === el.designator
-                      const base = 'seat inline-flex items-center justify-center h-8 w-8 rounded-lg text-xs transition-soft'
+                      const isWindow = el.characteristics?.includes('window')
+                      const isAisle = el.characteristics?.includes('aisle')
+                      const hasExtraLeg = el.characteristics?.includes('extra_legroom')
+                      const base = 'seat inline-flex items-center justify-center h-8 w-8 rounded-lg text-xs transition-colors'
                       const cls = !el.available
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                         : isSelected
@@ -106,7 +121,12 @@ export default function SeatSelection({ offerId, onSelect }: Props) {
                           className={`${base} ${cls}`}
                           title={el.designator || ''}
                         >
-                          {el.designator?.replace(/[^A-Z0-9]/g, '')?.slice(-2) || '•'}
+                          <span className="relative flex items-center justify-center">
+                            {el.designator?.replace(/[^A-Z0-9]/g, '')?.slice(-2) || '•'}
+                            {isWindow && <span className="absolute -left-2 h-1 w-1 rounded-full bg-blue-500" />}
+                            {isAisle && <span className="absolute -right-2 h-1 w-1 rounded-full bg-amber-500" />}
+                            {hasExtraLeg && <span className="absolute -top-1 h-1 w-3 rounded bg-emerald-500" />}
+                          </span>
                         </button>
                       )
                     })}
@@ -119,7 +139,11 @@ export default function SeatSelection({ offerId, onSelect }: Props) {
                 Selected seat: <span className="font-medium">{selected}</span>
               </div>
             )}
-            <div className="mt-2 text-xs text-gray-500">Legend: <span className="inline-block h-3 w-3 bg-white border border-gray-300 align-middle rounded-sm mr-1"></span> Available <span className="inline-block h-3 w-3 bg-gray-200 align-middle rounded-sm mx-2"></span> Unavailable <span className="inline-block h-3 w-3 bg-black align-middle rounded-sm mx-2"></span> Selected</div>
+            <div className="mt-2 text-xs text-gray-500">
+              Seat markers: <span className="inline-flex items-center gap-1 ml-1"><span className="inline-block h-1 w-1 rounded-full bg-blue-500"></span> Window</span>
+              <span className="inline-flex items-center gap-1 ml-3"><span className="inline-block h-1 w-1 rounded-full bg-amber-500"></span> Aisle</span>
+              <span className="inline-flex items-center gap-1 ml-3"><span className="inline-block h-1 w-3 rounded bg-emerald-500"></span> Extra legroom</span>
+            </div>
           </div>
         )}
         <div className="flex justify-end">

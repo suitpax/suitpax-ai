@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { buildSystemPrompt } from "@/lib/prompts/system"
+import { buildSystemPrompt, System } from "@/lib/prompts/system"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 export const dynamic = "force-dynamic"
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const supabase = createServerSupabase()
     const { data: { user } } = await supabase.auth.getUser()
 
-    const system = buildSystemPrompt({ domain: ["general", "travel", "coding", "business"] })
+    const system = System
 
     const client = getAnthropic()
     if (!client) return new Response("AI not configured", { status: 500 })

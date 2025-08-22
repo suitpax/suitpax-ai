@@ -59,7 +59,7 @@ export default function BookOfferPage({ params }: { params: { offerId: string } 
         <button className="text-xs text-gray-500 hover:text-gray-800" onClick={() => router.back()}>Back</button>
       </div>
 
-      <div className="glass-card rounded-2xl border border-gray-200">
+      <div className="rounded-3xl border border-gray-200 bg-white/80 backdrop-blur-sm shadow-sm">
         <ResultCard offer={offer} onSelect={() => {}} />
       </div>
 
@@ -160,7 +160,7 @@ export default function BookOfferPage({ params }: { params: { offerId: string } 
           )}
         </div>
         <div className="space-y-3">
-          <div className="rounded-2xl border border-gray-200 p-4 bg-white/70">
+          <div className="rounded-2xl border border-gray-200 p-4 bg-white/80 backdrop-blur-sm">
             <div className="text-sm font-medium">Order summary</div>
             <div className="mt-2 text-sm text-gray-700">Total: {new Intl.NumberFormat("en-US", { style: "currency", currency: offer.total_currency }).format(parseFloat(offer.total_amount))}</div>
           </div>
@@ -169,4 +169,3 @@ export default function BookOfferPage({ params }: { params: { offerId: string } 
     </div>
   )
 }
-

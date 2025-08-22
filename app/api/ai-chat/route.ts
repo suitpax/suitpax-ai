@@ -1,8 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { buildSystemPrompt, buildReasoningInstruction, buildToolContext } from "@/lib/prompts/system"
+import { buildReasoningInstruction, buildToolContext, System as SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/system"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
-import { SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/enhanced-system"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
@@ -13,8 +12,10 @@ export async function POST(request: NextRequest) {
     message,
     history = [],
     includeReasoning = false,
+    includeReasoningInline = false,
     webSearch = false,
     deepSearch = false,
+    sessionId,
   } = await request.json()
   if (!message) return NextResponse.json({ error: "Message is required" }, { status: 400 })
 
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
 
   try {
     let text = ""
+    let reasoningInline: string | undefined
     const sources: Array<{ title: string; url?: string; snippet?: string }> = []
     const supabase = createServerSupabase()
     const {
@@ -32,26 +34,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
 
-    // Estimate tokens needed (rough calculation: 1 token ≈ 4 characters)
+    // Estimate tokens
     const estimatedInputTokens = Math.ceil((message + JSON.stringify(conversationHistory)).length / 4)
-    const estimatedOutputTokens = 1000 // Conservative estimate for response
+    const estimatedOutputTokens = 1000
 
-    // Check if user can use AI tokens
-    const { data: canUseTokens, error: tokenCheckError } = await supabase.rpc("can_use_ai_tokens_v2", {
+    // Token limits
+    const { data: canUseTokens } = await supabase.rpc("can_use_ai_tokens_v2", {
       user_uuid: user.id,
       tokens_needed: estimatedInputTokens + estimatedOutputTokens,
     })
-
-    if (tokenCheckError) {
-      console.error("Token check error:", tokenCheckError)
-      return NextResponse.json({ error: "Failed to check token limits" }, { status: 500 })
-    }
-
     if (!canUseTokens) {
-      // Get user's current plan limits for error message
       const { data: planLimits } = await supabase.rpc("get_user_plan_limits", { user_uuid: user.id })
       const limits = planLimits?.[0]
-
       return NextResponse.json(
         {
           error: "Token limit exceeded",
@@ -67,12 +61,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Determine per-request max_tokens based on plan (same model for all)
+    // Per-plan max tokens
     const { data: planLimitsOk } = await supabase.rpc("get_user_plan_limits", { user_uuid: user.id })
     const planName = planLimitsOk?.[0]?.plan_name?.toLowerCase?.() || "free"
     const planToMaxTokens: Record<string, number> = { free: 1024, basic: 2048, premium: 4096, pro: 4096, enterprise: 8192 }
     const maxTokensForResponse = planToMaxTokens[planName] ?? 2048
 
+    // Intent detection (tools)
     const isFlightIntent =
       /\b([A-Z]{3})\b.*\b(to|→|-|from)\b.*\b([A-Z]{3})\b/i.test(message) ||
       /\b(flight|flights|vuelo|vuelos|fly|flying|book|search)\b/i.test(message) ||
@@ -97,197 +92,112 @@ export async function POST(request: NextRequest) {
     if (isFlightIntent) {
       toolType = "flight_search"
       try {
-        const toolRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/flight-search`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: message }),
-          },
-        )
-        if (toolRes.ok) {
-          toolData = await toolRes.json()
-        }
-      } catch (error) {
-        console.error("Flight search tool error:", error)
-      }
+        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/flight-search`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: message }),
+        })
+        if (toolRes.ok) toolData = await toolRes.json()
+      } catch (error) { console.error("Flight search tool error:", error) }
     } else if (isCodeIntent) {
       toolType = "code_generation"
       try {
-        const toolRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/code-generator`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: message }),
-          },
-        )
-        if (toolRes.ok) {
-          toolData = await toolRes.json()
-        }
-      } catch (error) {
-        console.error("Code generation tool error:", error)
-      }
+        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/code-generator`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: message }),
+        })
+        if (toolRes.ok) toolData = await toolRes.json()
+      } catch (error) { console.error("Code generation tool error:", error) }
     } else if (isDocumentIntent) {
       toolType = "document_processing"
       try {
-        const toolRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/document-processor`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: message }),
-          },
-        )
-        if (toolRes.ok) {
-          toolData = await toolRes.json()
-        }
-      } catch (error) {
-        console.error("Document processing tool error:", error)
-      }
+        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/document-processor`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: message }),
+        })
+        if (toolRes.ok) toolData = await toolRes.json()
+      } catch (error) { console.error("Document processing tool error:", error) }
     } else if (isExpenseIntent) {
       toolType = "expense_analysis"
       try {
-        const toolRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/expense-analyzer`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: message, userId: user.id }),
-          },
-        )
-        if (toolRes.ok) {
-          toolData = await toolRes.json()
-        }
-      } catch (error) {
-        console.error("Expense analysis tool error:", error)
-      }
+        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/expense-analyzer`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: message, userId: user.id }),
+        })
+        if (toolRes.ok) toolData = await toolRes.json()
+      } catch (error) { console.error("Expense analysis tool error:", error) }
     }
 
-    // If Code generation, check code add-on
-    if (isCodeIntent) {
-      const estInput = Math.ceil((message + JSON.stringify(conversationHistory)).length / 4)
-      const estOutput = 2000
-      const { data: canUseCode } = await supabase.rpc("can_use_code_tokens", { user_uuid: user.id, tokens_needed: estInput + estOutput })
-      if (!canUseCode) {
-        const { data: limits } = await supabase.rpc("get_user_subscription_limits", { user_uuid: user.id })
-        return NextResponse.json({ error: "Code add-on limit exceeded", limits: limits?.[0] || null, upgradeRequired: true }, { status: 429 })
-      }
-    }
-
-    const systemPrompt = isFlightIntent
-      ? TRAVEL_AGENT_SYSTEM_PROMPT
-      : buildSystemPrompt({ domain: ["general", "travel", "coding", "business", "documents"] })
+    // Always use central System prompt; add inline-thinking instruction if requested
+    const thinkingInlineInstruction = includeReasoningInline
+      ? "\n\nWhen requested, include your high-level thinking wrapped in <thinking>...</thinking> (3–5 bullets), then the main answer. Do not include private chain-of-thought; keep it brief."
+      : ""
+    const systemPrompt = `${SUITPAX_AI_SYSTEM_PROMPT}${thinkingInlineInstruction}`.trim()
 
     let enhancedMessage = message
     if (toolData?.success) {
       enhancedMessage += buildToolContext(toolType, toolData)
     }
 
-    const initial = await anthropic.messages.create({
-      model: "claude-4.1", // Upgraded to Claude 4
-      max_tokens: maxTokensForResponse,
+    const initial: any = await (anthropic as any).messages.create({
+      model: "claude-3-7-sonnet-20250219",
+      max_tokens: Math.min(20000, maxTokensForResponse),
+      temperature: 1,
       system: systemPrompt,
       messages: [...conversationHistory, { role: "user", content: enhancedMessage }],
-    })
+      tools: [{ name: "web_search", type: "web_search_20250305" as any }],
+      betas: ["web-search-2025-03-05"],
+    } as any)
 
-    text = initial.content.find((c: any) => c.type === "text")?.text || ""
+    const raw = initial.content.find((c: any) => c.type === "text")?.text || ""
+
+    text = raw.trim()
+    if (includeReasoningInline) {
+      const match = raw.match(/<thinking>[\s\S]*?<\/thinking>/)
+      if (match) {
+        reasoningInline = match[0].replace(/<\/?thinking>/g, "").trim()
+        text = raw.replace(/<thinking>[\s\S]*?<\/thinking>/, "").trim()
+      }
+    }
 
     const actualInputTokens = (initial.usage as any)?.input_tokens || estimatedInputTokens
     const actualOutputTokens = (initial.usage as any)?.output_tokens || Math.ceil(text.length / 4)
     const totalTokensUsed = actualInputTokens + actualOutputTokens
 
-    const { data: tokenUpdateSuccess, error: tokenUpdateError } = await supabase.rpc("increment_ai_tokens", {
-      user_uuid: user.id,
-      tokens_used: totalTokensUsed,
-    })
+    await supabase.rpc("increment_ai_tokens", { user_uuid: user.id, tokens_used: totalTokensUsed })
 
-    if (tokenUpdateError || !tokenUpdateSuccess) {
-      console.error("Failed to update token usage:", tokenUpdateError)
-      // Continue with response but log the error
-    }
-
-    if (toolData?.success) {
-      if (toolType === "flight_search" && toolData.offers?.length > 0) {
-        const offers = toolData.offers
-        const searchParams = toolData.search_params
-
-        // Add destination image
-        const destinationName = getDestinationName(searchParams.destination)
-        const destinationImage = `/placeholder.svg?height=200&width=400&query=${encodeURIComponent(`${destinationName} city skyline travel destination`)}`
-
-        text += `\n\n![${destinationName}](${destinationImage})\n\n`
-
-        // Format flight offers as rich markdown
-        text += `## ✈️ Available Flights: ${searchParams.origin} → ${searchParams.destination}\n\n`
-
-        offers.forEach((offer: any, index: number) => {
-          const departureTime = new Date(offer.route.departure_time).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            timeZone: "UTC",
-          })
-          const arrivalTime = new Date(offer.route.arrival_time).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            timeZone: "UTC",
-          })
-
-          const stopsText =
-            offer.route.stops === 0 ? "Direct" : `${offer.route.stops} stop${offer.route.stops > 1 ? "s" : ""}`
-
-          text += `### ${index + 1}. ${offer.airline.name} (${offer.airline.code})\n\n`
-          text += `| Detail | Information |\n`
-          text += `|--------|-------------|\n`
-          text += `| **Price** | **${offer.price} ${offer.currency}** |\n`
-          text += `| **Departure** | ${departureTime} |\n`
-          text += `| **Arrival** | ${arrivalTime} |\n`
-          text += `| **Duration** | ${formatDuration(offer.route.duration)} |\n`
-          text += `| **Stops** | ${stopsText} |\n`
-
-          if (offer.airline.logo) {
-            text += `| **Airline** | ![${offer.airline.name}](${offer.airline.logo}) ${offer.airline.name} |\n`
-          }
-
-          text += `\n[**Book This Flight →**](${offer.booking_url})\n\n---\n\n`
-        })
-
-        text += `\n💡 **Travel Tip**: Book early for better prices and seat selection. All prices shown are subject to availability.\n\n`
-      } else if (toolType === "code_generation" && toolData.code) {
-        text += `\n\n## 💻 Generated Code\n\n`
-        text += `\`\`\`${toolData.language || "javascript"}\n${toolData.code}\n\`\`\`\n\n`
-        if (toolData.explanation) {
-          text += `### Explanation\n${toolData.explanation}\n\n`
-        }
-      } else if (toolType === "document_processing" && toolData.summary) {
-        text += `\n\n## 📄 Document Summary\n\n${toolData.summary}\n\n`
-      } else if (toolType === "expense_analysis" && toolData.summary) {
-        text += `\n\n## 💰 Expense Insights\n\n${toolData.summary}\n\n`
-      }
-    }
-
-    let reasoning: string | undefined
-    if (includeReasoning) {
-      const reasoningPrompt = toolData?.success
-        ? `Explain the ${toolType.replace("_", " ")} process and recommendations for this query: ${message}`
-        : `Mensaje del usuario: ${message}\n\nRespuesta: ${text}\n\nExplica en 3–5 puntos el razonamiento de alto nivel.`
-
+    // Secondary reasoning pass (only if requested and not inline)
+    let reasoning: string | undefined = reasoningInline
+    if (includeReasoning && !includeReasoningInline) {
       const r = await anthropic.messages.create({
         model: "claude-3-7-sonnet-20250219",
         max_tokens: 300,
         system: buildReasoningInstruction("es"),
-        messages: [{ role: "user", content: reasoningPrompt }],
+        messages: [{ role: "user", content: `Mensaje del usuario: ${message}\n\nRespuesta: ${text}\n\nExplica en 3–5 puntos el razonamiento de alto nivel.` }],
       })
       reasoning = r.content.find((c: any) => c.type === "text")?.text?.trim()
-
       const reasoningTokens = (r.usage as any)?.input_tokens + (r.usage as any)?.output_tokens || 100
-      await supabase.rpc("increment_ai_tokens", {
-        user_uuid: user.id,
-        tokens_used: reasoningTokens,
-      })
+      await supabase.rpc("increment_ai_tokens", { user_uuid: user.id, tokens_used: reasoningTokens })
     }
 
+    // Logging & sessions
+    let newSessionId: string | undefined
     try {
+      if (!sessionId) {
+        const { data: created } = await supabase
+          .from("chat_sessions")
+          .insert({ user_id: user.id, title: message.slice(0, 60) || "New chat" })
+          .select("id")
+          .single()
+        newSessionId = created?.id
+      } else {
+        newSessionId = sessionId
+        await supabase.from("chat_sessions").update({ last_message_at: new Date().toISOString() }).eq("id", sessionId).eq("user_id", user.id)
+      }
+
       await supabase.from("ai_usage").insert({
         user_id: user.id,
         model: "claude-3-7-sonnet-20250219",
@@ -296,23 +206,23 @@ export async function POST(request: NextRequest) {
         total_tokens: totalTokensUsed,
         context_type: toolType,
         provider: "anthropic",
-        cost_usd: calculateTokenCost(totalTokensUsed, "claude-3-7-sonnet-20250219"),
       })
 
-      // Increment token usage (AI and optionally Code)
       await supabase.rpc("increment_ai_tokens_v2", { user_uuid: user.id, tokens_needed: totalTokensUsed })
       if (isCodeIntent) {
         await supabase.rpc("increment_code_tokens", { p_user: user.id, p_tokens: totalTokensUsed })
       }
 
-      // Also log to ai_chat_logs for backward compatibility
       await supabase.from("ai_chat_logs").insert({
         user_id: user.id,
         message: message,
         response: text,
         tokens_used: totalTokensUsed,
-        model_used: "claude-3-7-sonnet-latest",
+        model_used: "claude-3-7-sonnet-20250219",
         context_type: toolType,
+        session_id: newSessionId || null,
+        reasoning_included: Boolean(includeReasoningInline || includeReasoning),
+        reasoning_content: reasoning || null,
       })
     } catch (e) {
       console.error("Failed to log AI usage:", e)
@@ -322,12 +232,9 @@ export async function POST(request: NextRequest) {
       response: text,
       reasoning,
       sources,
-      tokenUsage: {
-        used: totalTokensUsed,
-        inputTokens: actualInputTokens,
-        outputTokens: actualOutputTokens,
-      },
+      tokenUsage: { used: totalTokensUsed, inputTokens: actualInputTokens, outputTokens: actualOutputTokens },
       toolUsed: toolType !== "general" ? toolType : undefined,
+      sessionId: newSessionId || sessionId,
     })
   } catch (e: any) {
     const errorId = Math.random().toString(36).slice(2)

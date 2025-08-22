@@ -1,57 +1,71 @@
-import { NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from "next/server"
 
-export const runtime = 'nodejs'
-
-function extractIataCodes(query: string): string[] {
-  const codes = new Set<string>()
-  const re = /\b([A-Z]{3})\b/g
-  let m
-  while ((m = re.exec(query.toUpperCase())) !== null) {
-    codes.add(m[1])
-  }
-  return Array.from(codes)
-}
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { query } = await request.json()
-    if (!query) return NextResponse.json({ success: false, error: 'query is required' }, { status: 400 })
-
-    const iatas = extractIataCodes(query)
-    if (iatas.length < 2) {
-      return NextResponse.json({ success: false, error: 'Please include origin and destination IATA codes (e.g., MAD LHR)' }, { status: 400 })
+    if (!query || typeof query !== "string") {
+      return NextResponse.json({ success: false, error: "Query is required" }, { status: 400 })
     }
 
-    const origin = iatas[0]
-    const destination = iatas[1]
-    const departure_date = new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0]
-
-    const body = {
-      origin,
-      destination,
-      departure_date,
-      passengers: { adults: 1 },
-      cabin_class: 'economy',
-      max_connections: 1,
+    // Parse IATA like: MAD to SFO
+    const iataMatch = query.match(/\b([A-Z]{3})\b.*\b(to|→|-|from)\b.*\b([A-Z]{3})\b/i)
+    const [origin, destination] = iataMatch ? [iataMatch[1]?.toUpperCase(), iataMatch[3]?.toUpperCase()] : [null, null]
+    if (!origin || !destination) {
+      return NextResponse.json({ success: false, error: "Please include origin and destination IATA codes (e.g., MAD to SFO)" }, { status: 400 })
     }
 
-    const endpoint = new URL('/api/flights/duffel/search', (request as any).url || 'http://localhost:3000')
-    const resp = await fetch(endpoint.toString(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+    // Departure date: +14 days default
+    const departure_date = new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0]
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+    const duffelRes = await fetch(`${baseUrl}/api/flights/duffel/search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ origin, destination, departure_date, passengers: { adults: 1 }, cabin_class: "economy", max_connections: 1, max_results: 10 }),
     })
 
-    if (!resp.ok) {
-      const text = await resp.text()
-      return NextResponse.json({ success: false, error: text || 'Duffel error' }, { status: 500 })
+    if (!duffelRes.ok) {
+      const errorText = await duffelRes.text()
+      return NextResponse.json({ success: false, error: errorText || "Duffel search failed" }, { status: 500 })
     }
 
-    const json = await resp.json()
-    const offers = (json?.data?.offers || json?.data || []) as any[]
+    const { data } = await duffelRes.json()
 
-    return NextResponse.json({ success: true, offers, search_params: body })
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error?.message || 'Unexpected error' }, { status: 500 })
+    // Map Duffel offers into AI tool schema (normalized subset)
+    const offers = (Array.isArray(data) ? data : []).slice(0, 5).map((offer: any) => {
+      const slice = offer?.slices?.[0]
+      const segment = slice?.segments?.[0]
+      const marketingCarrier = segment?.marketing_carrier || offer?.owner
+      const depart = segment?.departing_at
+      const arrive = segment?.arriving_at
+      const durationMinutes = segment?.duration ? Math.max(0, Math.round((Number(segment.duration) || 0) / 60)) : 0
+      const stops = (slice?.segments?.length || 1) - 1
+
+      return {
+        airline: {
+          name: marketingCarrier?.name || offer?.owner?.name || "",
+          code: marketingCarrier?.iata_code || offer?.owner?.iata_code || "",
+          logo: marketingCarrier?.logo_symbol_url || null,
+        },
+        price: Number(offer?.total_amount) || 0,
+        currency: offer?.total_currency || "EUR",
+        route: {
+          origin: origin,
+          destination: destination,
+          departure_time: depart || new Date().toISOString(),
+          arrival_time: arrive || new Date(Date.now() + 6 * 3600000).toISOString(),
+          duration: durationMinutes,
+          stops,
+        },
+        booking_url: `/dashboard/flights/book/${encodeURIComponent(offer?.id || "")}`,
+      }
+    })
+
+    return NextResponse.json({ success: true, offers, search_params: { origin, destination, departure_date } })
+  } catch (e) {
+    console.error("flight-search tool error:", e)
+    return NextResponse.json({ success: false, error: "Failed to search flights" }, { status: 500 })
   }
 }
+
+// NOTE: For production, integrate real Duffel search in a separate tool version.

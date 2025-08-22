@@ -7,6 +7,7 @@ import CityImage from "@/components/flights/ui/city-image"
 import LegSummary from "@/components/flights/ui/leg-summary"
 import SegmentMeta from "@/components/flights/ui/segment-meta"
 import { formatDurationISO } from "./lib"
+import LoyaltyBadge from "@/components/flights/ui/loyalty-badge"
 
 interface FlightOfferSegment {
   id: string
@@ -18,7 +19,7 @@ interface FlightOfferSegment {
   operating_carrier: any
   flight_number: string
   aircraft: any
-  airline?: { name?: string; logo_symbol_url?: string; logo_lockup_url?: string; iata_code?: string }
+  airline?: { name?: string; logo_symbol_url?: string; logo_lockup_url?: string; iata_code?: string; id?: string }
 }
 
 interface FlightOfferSlice {
@@ -48,7 +49,6 @@ interface Props {
 
 function toMinutes(isoDuration?: string): number {
   if (!isoDuration) return Number.MAX_SAFE_INTEGER
-  // Minimal ISO8601 PT#H#M parser
   const match = /PT(?:(\d+)H)?(?:(\d+)M)?/i.exec(isoDuration)
   const hours = match?.[1] ? parseInt(match[1], 10) : 0
   const mins = match?.[2] ? parseInt(match[2], 10) : 0
@@ -57,14 +57,11 @@ function toMinutes(isoDuration?: string): number {
 
 function sortOffers(offers: FlightOffer[], sort?: 'recommended' | 'price' | 'duration'): FlightOffer[] {
   const list = [...offers]
-  if (sort === 'price') {
-    return list.sort((a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount))
-  }
+  if (sort === 'price') return list.sort((a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount))
   if (sort === 'duration') {
     const totalDur = (o: FlightOffer) => (o.slices || []).reduce((sum, s) => sum + toMinutes(s.duration), 0)
     return list.sort((a, b) => totalDur(a) - totalDur(b))
   }
-  // recommended: simple composite (price + penalty per stop)
   const score = (o: FlightOffer) => {
     const price = parseFloat(o.total_amount)
     const stops = (o.slices?.[0]?.segments?.length || 1) - 1
@@ -85,30 +82,28 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
         const firstSeg = firstSlice?.segments?.[0]
         const airlineName = firstSeg?.airline?.name || firstSeg?.marketing_carrier?.name || ""
         const airlineIata = firstSeg?.airline?.iata_code || firstSeg?.marketing_carrier?.iata_code || ""
+        const airlineId = (firstSeg?.airline as any)?.id
+        const airlineSymbolUrl = firstSeg?.airline?.logo_symbol_url || firstSeg?.airline?.logo_lockup_url || ""
         const overallOrigin = offer.slices?.[0]?.origin?.iata_code
         const overallDestination = offer.slices?.[offer.slices.length - 1]?.destination
         const destCityName = overallDestination?.city?.name || overallDestination?.city_name || overallDestination?.name
 
         return (
-          <Card key={offer.id} className="glass-card hover-raise overflow-hidden">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
-              <div className="flex items-center gap-2 min-w-0">
-                <CarrierLogo iata={airlineIata} name={airlineName} lockup width={72} height={20} className="h-5 w-auto" />
-                <div className="truncate text-sm text-gray-800 tracking-tight flex items-center gap-1">
-                  <span className="font-medium">{airlineName}</span>
-                  {airlineIata && (
-                    <>
-                      <span className="text-gray-500">({airlineIata})</span>
-                      <CarrierLogo iata={airlineIata} name={airlineName} width={14} height={14} className="inline-block align-middle" />
-                    </>
-                  )}
+          <Card key={offer.id} className="glass-card hover-raise overflow-hidden rounded-2xl border border-gray-200">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 rounded-2xl">
+              <div className="flex items-center gap-3 min-w-0">
+                <CarrierLogo src={airlineSymbolUrl} iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" noFallback />
+                <div className="truncate text-sm text-gray-800 tracking-tight flex items-center gap-2">
+                  <span className="font-medium truncate max-w-[140px]">{airlineName}</span>
+                  {airlineIata && (<span className="text-gray-500">({airlineIata})</span>)}
+                  <LoyaltyBadge airlineIata={airlineIata} airlineId={airlineId} />
                 </div>
               </div>
               <div className="text-center text-gray-700 font-medium hidden sm:block">
                 {overallOrigin} → {overallDestination?.iata_code}
               </div>
               <div className="text-right">
-                <CardTitle className="text-3xl md:text-4xl font-semibold text-gray-900 leading-none">
+                <CardTitle className="text-2xl md:text-4xl font-semibold text-gray-900 leading-none">
                   {new Intl.NumberFormat("en-US", { style: "currency", currency: offer.total_currency, maximumFractionDigits: 0 }).format(parseFloat(offer.total_amount))}
                 </CardTitle>
                 <div className="text-[11px] text-gray-500">Total</div>
@@ -165,12 +160,12 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                 </div>
               )}
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-end gap-2 sm:gap-3 pt-1">
-                <Button variant="secondary" className="w-full sm:w-auto h-10 rounded-2xl px-5 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => onTrackPrice?.(offer.id)}>
-                  Track price
+              <div className="flex flex-col items-stretch gap-2 pt-1">
+                <Button className="w-full h-10 rounded-full px-5 bg-gray-100 text-gray-900 border border-gray-900/50 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => onSelectOffer?.(offer)}>
+                  Continue to booking
                 </Button>
-                <Button className="w-full sm:w-auto h-10 rounded-2xl px-5 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={() => onSelectOffer?.(offer)}>
-                  Book now
+                <Button variant="secondary" className="w-full h-10 rounded-full px-5 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm" onClick={() => onTrackPrice?.(offer.id)}>
+                  Track price
                 </Button>
               </div>
             </CardContent>
@@ -180,4 +175,3 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
     </div>
   )
 }
-

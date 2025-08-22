@@ -244,7 +244,7 @@ export const FlightBookingShowcase = () => {
   )
 
   return (
-    <section className="pt-24 pb-12 relative w-full overflow-hidden bg-gradient-to-b from-black via-black/95 to-emerald-950/40">
+    <section className="pt-24 pb-12 relative w-full overflow-hidden bg-black">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-[0.02] bg-repeat bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px]"></div>
 
@@ -288,7 +288,7 @@ export const FlightBookingShowcase = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] text-white/70">{booking.flightNumber}</span>
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse"></div>
                     </div>
                   </div>
 
@@ -300,8 +300,8 @@ export const FlightBookingShowcase = () => {
                         <PiIdentificationBadgeBold className="h-3.5 w-3.5 text-white/60" />
                         <span className="text-[10px] text-white/70">Ref: {booking.bookingRef}</span>
                       </div>
-                      <div className="px-2.5 py-0.25 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center h-4">
-                        <span className="text-[8px] font-medium text-emerald-400 tracking-wider uppercase">
+                      <div className="px-2.5 py-0.25 rounded-full bg-white/10 border border-white/20 flex items-center h-4">
+                        <span className="text-[8px] font-medium text-white/80 tracking-wider uppercase">
                           {booking.status}
                         </span>
                       </div>

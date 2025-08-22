@@ -30,7 +30,7 @@ export default function AirlinesSelector({ options, value = [], onChange }: Airl
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 opacity-60"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" /></svg>
         </Button>
       }
-      className="w-72 p-2"
+      className="w-[90vw] max-w-md p-3"
       align="center"
     >
       <div className="flex items-center justify-between px-2 py-1.5">
@@ -39,12 +39,12 @@ export default function AirlinesSelector({ options, value = [], onChange }: Airl
           <button onClick={clear} className="text-xs text-gray-700 hover:underline">Clear</button>
         )}
       </div>
-      <div className="max-h-64 overflow-auto space-y-1">
+      <div className="max-h-[60vh] overflow-auto space-y-1">
         {options.map((a) => (
           <label key={a.code} className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-gray-50">
             <Checkbox checked={value.includes(a.code)} onCheckedChange={() => toggle(a.code)} />
             <Image
-              src={`https://assets.duffel.com/img/airlines/for-dark-background/full-color-logo/${a.code}.svg`}
+              src={`https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/${a.code}.svg`}
               alt={a.name}
               width={28}
               height={12}

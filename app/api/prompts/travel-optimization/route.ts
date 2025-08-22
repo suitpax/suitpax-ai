@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { TRAVEL_OPTIMIZATION_PROMPT } from "@/lib/prompts/enhanced-system"
+import { TRAVEL_OPTIMIZATION_PROMPT } from "@/lib/prompts/specialized-prompts"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
@@ -69,7 +69,7 @@ Generate a detailed travel optimization plan with specific recommendations.
     `
 
     const response = await anthropic.messages.create({
-      model: "claude-3-7-sonnet-20250219",
+      model: "claude-3-7-sonnet-latest",
       max_tokens: 4096,
       system: TRAVEL_OPTIMIZATION_PROMPT,
       messages: [{ role: "user", content: enhancedPrompt }],
@@ -82,7 +82,7 @@ Generate a detailed travel optimization plan with specific recommendations.
 
     await supabase.from("ai_usage").insert({
       user_id: user.id,
-      model: "claude-3-7-sonnet-20250219",
+      model: "claude-3-7-sonnet-latest",
       input_tokens: (response.usage as any)?.input_tokens || 0,
       output_tokens: (response.usage as any)?.output_tokens || 0,
       total_tokens: tokensUsed,

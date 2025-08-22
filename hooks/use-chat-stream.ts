@@ -1,47 +1,43 @@
+"use client"
+
 import { useCallback, useRef, useState } from "react"
 
 export function useChatStream() {
-  const [isStreaming, setIsStreaming] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const abortRef = useRef<AbortController | null>(null)
+	const [isStreaming, setIsStreaming] = useState(false)
+	const abortRef = useRef<AbortController | null>(null)
 
-  const start = useCallback(async (body: any, onToken: (t: string) => void) => {
-    setIsStreaming(true)
-    setError(null)
+	const start = useCallback(async (
+		payload: { message: string; history?: Array<{ role: "user" | "assistant"; content: string }> },
+		onToken: (token: string) => void,
+	) => {
+		if (isStreaming) return
+		setIsStreaming(true)
+		abortRef.current = new AbortController()
+		try {
+			const res = await fetch("/api/ai-chat/stream", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+				signal: abortRef.current.signal,
+			})
+			if (!res.ok || !res.body) throw new Error("Stream failed")
+			const reader = res.body.getReader()
+			const decoder = new TextDecoder()
+			while (true) {
+				const { value, done } = await reader.read()
+				if (done) break
+				onToken(decoder.decode(value))
+			}
+		} finally {
+			setIsStreaming(false)
+			abortRef.current = null
+		}
+	}, [isStreaming])
 
-    if (abortRef.current) abortRef.current.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
+	const cancel = useCallback(() => {
+		try { abortRef.current?.abort() } catch {}
+		setIsStreaming(false)
+	}, [])
 
-    try {
-      const res = await fetch("/api/ai-chat/stream", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-        signal: controller.signal,
-      })
-      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`)
-
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const chunk = decoder.decode(value)
-        onToken(chunk)
-      }
-    } catch (e: any) {
-      if (e?.name !== "AbortError") setError(e?.message || "Stream error")
-    } finally {
-      setIsStreaming(false)
-      abortRef.current = null
-    }
-  }, [])
-
-  const cancel = useCallback(() => {
-    if (abortRef.current) abortRef.current.abort()
-  }, [])
-
-  return { isStreaming, error, start, cancel }
+	return { isStreaming, start, cancel }
 }
