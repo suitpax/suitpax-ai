@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-// Vanta removed for accessibility and performance; using static gradient
+import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import CityAnimateText from "@/components/ui/city-animate-text"
 import MiniCountdownBadge from "@/components/ui/mini-countdown"
 import { z } from "zod"
@@ -128,7 +128,17 @@ export default function PasswordGatePage() {
   }
 
   return (
-    <div className="relative w-full min-h-[100vh] overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <VantaHaloBackground
+      className="relative w-full min-h-[100vh] overflow-hidden bg-white"
+      options={{
+        backgroundColor: 0xf3f4f6,
+        baseColor: 0xe5e7eb,
+        color: 0x93c5fd,
+        color2: 0xdbeafe,
+        size: 0.8,
+        amplitudeFactor: 0.7,
+      }}
+    >
       <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24">
         <div className="flex flex-col items-center text-center">
           {/* Removed separate agents banner to avoid duplication with the sticky top bar */}
@@ -353,6 +363,6 @@ export default function PasswordGatePage() {
           100% { background-position: -200% 0; }
         }
       `}</style>
-    </div>
+    </VantaHaloBackground>
   )
 }
