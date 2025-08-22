@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 export default function BillingPage() {
   const [orders, setOrders] = useState<any[]>([])
   const [payments, setPayments] = useState<any[]>([])
+  const [isAnnual, setIsAnnual] = useState(false)
 
   useEffect(() => {
     const run = async () => {
@@ -19,9 +20,28 @@ export default function BillingPage() {
     run()
   }, [])
 
+  const getLink = (plan: "free" | "basic" | "pro" | "custom") => {
+    switch (plan) {
+      case "free":
+        return "https://buy.stripe.com/4gM14obmo61614C0Tp1Nu06"
+      case "basic":
+        return isAnnual ? "https://buy.stripe.com/dRmaEYgGI4X28x48lR1Nu08" : "https://buy.stripe.com/9B6bJ23TW61600yby31Nu07"
+      case "pro":
+        return isAnnual ? "https://buy.stripe.com/fZuaEYcqs89eaFc31x1Nu0a" : "https://buy.stripe.com/bJe5kE1LO1KQ28G59F1Nu09"
+      case "custom":
+        return "mailto:hello@suitpax.com"
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-5xl mx-auto space-y-6">
+        <div className="flex items-center justify-end">
+          <div className="flex items-center bg-gray-100 p-1 rounded-full">
+            <button onClick={() => setIsAnnual(false)} className={`px-3 py-1 text-xs font-medium rounded-full ${!isAnnual ? "bg-white text-black shadow" : "text-gray-600"}`}>Monthly</button>
+            <button onClick={() => setIsAnnual(true)} className={`px-3 py-1 text-xs font-medium rounded-full ${isAnnual ? "bg-white text-black shadow" : "text-gray-600"}`}>Annual</button>
+          </div>
+        </div>
         {/* Plans and payment links */}
         <Card className="glass-card">
           <CardHeader>
@@ -36,31 +56,25 @@ export default function BillingPage() {
                     <div className="text-sm font-medium text-gray-900">Free</div>
                     <div className="text-xs text-gray-600">€0 / month</div>
                   </div>
-                  <a href="https://buy.stripe.com/4gM14obmo61614C0Tp1Nu06" target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">Select</a>
+                  <a href={getLink("free")} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">Select</a>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-sm font-medium text-gray-900">Basic</div>
-                    <div className="text-xs text-gray-600">€49 / month or €468 / year</div>
+                    <div className="text-xs text-gray-600">{isAnnual ? "€468 / year" : "€49 / month"}</div>
                   </div>
-                  <div className="flex gap-2">
-                    <a href="https://buy.stripe.com/9B6bJ23TW61600yby31Nu07" target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">Monthly</a>
-                    <a href="https://buy.stripe.com/dRmaEYgGI4X28x48lR1Nu08" target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">Annual</a>
-                  </div>
+                  <a href={getLink("basic")} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">{isAnnual ? "Select annual" : "Select monthly"}</a>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-sm font-medium text-gray-900">Pro</div>
-                    <div className="text-xs text-gray-600">€89 / month or €852 / year</div>
+                    <div className="text-xs text-gray-600">{isAnnual ? "€852 / year" : "€89 / month"}</div>
                   </div>
-                  <div className="flex gap-2">
-                    <a href="https://buy.stripe.com/bJe5kE1LO1KQ28G59F1Nu09" target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">Monthly</a>
-                    <a href="https://buy.stripe.com/fZuaEYcqs89eaFc31x1Nu0a" target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">Annual</a>
-                  </div>
+                  <a href={getLink("pro")} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">{isAnnual ? "Select annual" : "Select monthly"}</a>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
@@ -69,7 +83,7 @@ export default function BillingPage() {
                     <div className="text-sm font-medium text-gray-900">Custom</div>
                     <div className="text-xs text-gray-600">Tailored enterprise plan</div>
                   </div>
-                  <a href="mailto:hello@suitpax.com" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">Contact</a>
+                  <a href={getLink("custom")} className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">Contact</a>
                 </div>
               </div>
             </div>

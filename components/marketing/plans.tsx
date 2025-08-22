@@ -380,6 +380,14 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
   const [randomSubtitle, setRandomSubtitle] = useState("")
   const [isAnnual, setIsAnnual] = useState(false)
 
+  const getStripeLink = (planId: string) => {
+    if (planId === "free") return "https://buy.stripe.com/4gM14obmo61614C0Tp1Nu06"
+    if (planId === "basic") return isAnnual ? "https://buy.stripe.com/dRmaEYgGI4X28x48lR1Nu08" : "https://buy.stripe.com/9B6bJ23TW61600yby31Nu07"
+    if (planId === "pro") return isAnnual ? "https://buy.stripe.com/fZuaEYcqs89eaFc31x1Nu0a" : "https://buy.stripe.com/bJe5kE1LO1KQ28G59F1Nu09"
+    if (planId === "enterprise") return "mailto:hello@suitpax.com"
+    return "mailto:hello@suitpax.com"
+  }
+
   useEffect(() => {
     // Seleccionar un título aleatorio al montar el componente
     const titleIndex = Math.floor(Math.random() * titleVariations.length)
@@ -390,23 +398,9 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
     setRandomSubtitle(subtitles[subtitleIndex])
   }, [])
 
-  const handlePlanSelect = async (planId: string) => {
-    if (planId === "free") {
-      // Redirect to sign up for free plan
-      window.location.href = "https://app.suitpax.com/sign-up"
-      return
-    }
-
-    if (planId === "enterprise" || planId === "pro") {
-      // Send email for custom plans
-      window.location.href = "mailto:hello@suitpax.com"
-      return
-    }
-
-    if (planId === "basic") {
-      // Redirect to sign up page for now
-      window.location.href = "https://app.suitpax.com/sign-up"
-    }
+  const handlePlanSelect = (planId: string) => {
+    const link = getStripeLink(planId)
+    window.open(link, "_blank")
   }
 
   return (

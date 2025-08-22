@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
     }
 
     const initial: any = await (anthropic as any).messages.create({
-      model: "claude-3-7-sonnet-20250219",
+      model: "claude-3-7-sonnet-latest",
       max_tokens: Math.min(maxTokensForResponse, 1024),
       temperature: 0.7,
       system: systemPrompt,

@@ -14,6 +14,8 @@ import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
 import DocumentScanner from "@/components/prompt-kit/document-scanner"
 import { Switch } from "@/components/ui/switch"
 import { Markdown } from "@/components/prompt-kit/markdown"
+import { ChatContainerRoot, ChatContainerContent } from "@/components/prompt-kit/chat-container"
+import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 
 interface Message {
   id: string
@@ -132,8 +134,8 @@ export default function SuitpaxAIPage() {
         {/* @ts-expect-error Async Server Component types mismatch not relevant here */}
         <ChatHeader title="Suitpax AI" subtitle="Ask anything. Travel. Business. Code." />
         {/* Content area */}
-        <div ref={listRef} className="flex-1 overflow-y-auto" role="feed" aria-label="Chat messages" aria-live="polite">
-          <div className="mx-auto w-full max-w-3xl px-4 py-6 space-y-4">
+        <ChatContainerRoot className="flex-1">
+          <ChatContainerContent className="mx-auto w-full max-w-3xl px-4 py-6 space-y-4" role="feed" aria-label="Chat messages" aria-live="polite">
             {messages.length === 0 && !isLoading && (
               <div className="space-y-4">
                 <div className="text-center py-10">
@@ -183,8 +185,11 @@ export default function SuitpaxAIPage() {
             {isLoading && (
               <div className="text-sm text-gray-600">Thinking…</div>
             )}
-          </div>
-        </div>
+            <div className="fixed right-6 bottom-24">
+              <ScrollButton />
+            </div>
+          </ChatContainerContent>
+        </ChatContainerRoot>
 
         {/* Bottom docked prompt */}
         <div className="border-t border-gray-200 bg-white/70 backdrop-blur-sm">
