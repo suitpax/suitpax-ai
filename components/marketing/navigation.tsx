@@ -78,14 +78,6 @@ export default function Navigation() {
         >
           {isMobile ? (
             <div className="flex items-center gap-2">
-              <Link href="https://discord.gg/suitpax" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
-                <FaDiscord className="h-4 w-4" />
-                <span className="sr-only">Discord</span>
-              </Link>
-              <Link href="https://linkedin.com/company/suitpax" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
-                <SiLinkedin className="h-4 w-4" />
-                <span className="sr-only">LinkedIn</span>
-              </Link>
               <Link href="/" className="flex items-center">
                 <Image
                   src="/logo/suitpax-bl-logo.webp"
@@ -126,15 +118,7 @@ export default function Navigation() {
                     )}
                   </Link>
                 ))}
-              <Link
-                href="https://discord.gg/suitpax"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-2 py-0.5 text-xs bg-transparent border border-black rounded-md font-medium tracking-tighter transition-colors flex items-center gap-1 text-black"
-              >
-                <FaDiscord className="h-4 w-4" />
-                Discord (coming soon)
-              </Link>
+              
               {loading ? (
                 <div className="w-16 h-6 bg-gray-200 animate-pulse rounded-lg"></div>
               ) : user ? (
