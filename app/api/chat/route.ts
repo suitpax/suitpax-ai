@@ -138,124 +138,35 @@ export async function POST(request: NextRequest) {
     const systemPrompt = `${SUITPAX_AI_SYSTEM_PROMPT}${thinkingInlineInstruction}`.trim()
 
     let enhancedMessage = message
-    if (toolData?.success) {
-      enhancedMessage += buildToolContext(toolType, toolData)
+
+    if (includeReasoning) {
+      enhancedMessage = `${message}\n\n${buildReasoningInstruction()}`
     }
 
     const initial: any = await (anthropic as any).messages.create({
       model: "claude-3-7-sonnet-20250219",
-      max_tokens: Math.min(20000, maxTokensForResponse),
-      temperature: 1,
+      max_tokens: Math.min(maxTokensForResponse, 1024),
+      temperature: 0.7,
       system: systemPrompt,
-      messages: [...conversationHistory, { role: "user", content: enhancedMessage }],
-      tools: [{ name: "web_search", type: "web_search_20250305" as any }],
-      betas: ["web-search-2025-03-05"],
-    } as any)
-
-    const raw = initial.content.find((c: any) => c.type === "text")?.text || ""
-
-    text = raw.trim()
-    if (includeReasoningInline) {
-      const match = raw.match(/<thinking>[\s\S]*?<\/thinking>/)
-      if (match) {
-        reasoningInline = match[0].replace(/<\/?thinking>/g, "").trim()
-        text = raw.replace(/<thinking>[\s\S]*?<\/thinking>/, "").trim()
-      }
-    }
-
-    const actualInputTokens = (initial.usage as any)?.input_tokens || estimatedInputTokens
-    const actualOutputTokens = (initial.usage as any)?.output_tokens || Math.ceil(text.length / 4)
-    const totalTokensUsed = actualInputTokens + actualOutputTokens
-
-    await supabase.rpc("increment_ai_tokens", { user_uuid: user.id, tokens_used: totalTokensUsed })
-
-    // Secondary reasoning pass (only if requested and not inline)
-    let reasoning: string | undefined = reasoningInline
-    if (includeReasoning && !includeReasoningInline) {
-      const r = await anthropic.messages.create({
-        model: "claude-3-7-sonnet-20250219",
-        max_tokens: 300,
-        system: buildReasoningInstruction("es"),
-        messages: [{ role: "user", content: `Mensaje del usuario: ${message}\n\nRespuesta: ${text}\n\nExplica en 3–5 puntos el razonamiento de alto nivel.` }],
-      })
-      reasoning = r.content.find((c: any) => c.type === "text")?.text?.trim()
-      const reasoningTokens = (r.usage as any)?.input_tokens + (r.usage as any)?.output_tokens || 100
-      await supabase.rpc("increment_ai_tokens", { user_uuid: user.id, tokens_used: reasoningTokens })
-    }
-
-    // Logging & sessions
-    let newSessionId: string | undefined
-    try {
-      if (!sessionId) {
-        const { data: created } = await supabase
-          .from("chat_sessions")
-          .insert({ user_id: user.id, title: message.slice(0, 60) || "New chat" })
-          .select("id")
-          .single()
-        newSessionId = created?.id
-      } else {
-        newSessionId = sessionId
-        await supabase.from("chat_sessions").update({ last_message_at: new Date().toISOString() }).eq("id", sessionId).eq("user_id", user.id)
-      }
-
-      await supabase.from("ai_usage").insert({
-        user_id: user.id,
-        model: "claude-3-7-sonnet-20250219",
-        input_tokens: actualInputTokens,
-        output_tokens: actualOutputTokens,
-        total_tokens: totalTokensUsed,
-        context_type: toolType,
-        provider: "anthropic",
-      })
-
-      await supabase.rpc("increment_ai_tokens_v2", { user_uuid: user.id, tokens_needed: totalTokensUsed })
-      if (isCodeIntent) {
-        await supabase.rpc("increment_code_tokens", { p_user: user.id, p_tokens: totalTokensUsed })
-      }
-
-      await supabase.from("ai_chat_logs").insert({
-        user_id: user.id,
-        message: message,
-        response: text,
-        tokens_used: totalTokensUsed,
-        model_used: "claude-3-7-sonnet-20250219",
-        context_type: toolType,
-        session_id: newSessionId || null,
-        reasoning_included: Boolean(includeReasoningInline || includeReasoning),
-        reasoning_content: reasoning || null,
-      })
-    } catch (e) {
-      console.error("Failed to log AI usage:", e)
-    }
-
-    return NextResponse.json({
-      response: text,
-      reasoning,
-      sources,
-      tokenUsage: { used: totalTokensUsed, inputTokens: actualInputTokens, outputTokens: actualOutputTokens },
-      toolUsed: toolType !== "general" ? toolType : undefined,
-      sessionId: newSessionId || sessionId,
+      messages: [
+        ...conversationHistory,
+        { role: "user", content: enhancedMessage },
+      ],
     })
-  } catch (e: any) {
-    const errorId = Math.random().toString(36).slice(2)
-    console.error("AI Chat API Error:", errorId, e?.stack || e)
-    return NextResponse.json({ error: "We're experiencing technical difficulties.", errorId }, { status: 500 })
+
+    text = initial.content?.[0]?.text || initial.content?.[0]?.type === "text" ? initial.content?.[0]?.text : ""
+
+    // Build tool context (sources etc.) if any tool succeeded
+    if (toolData?.success) {
+      const toolContext = buildToolContext(toolData)
+      if (toolContext?.sources) {
+        sources.push(...toolContext.sources)
+      }
+    }
+
+    return NextResponse.json({ response: text, reasoning: reasoningInline, sources })
+  } catch (error) {
+    console.error("AI Chat error:", error)
+    return NextResponse.json({ error: "Failed to process request" }, { status: 500 })
   }
-}
-
-function calculateTokenCost(totalTokens: number, model: string): number {
-  // Anthropic Claude 3.5 Sonnet pricing (approximate)
-  const costPer1kTokens = 0.003 // $3 per 1M tokens = $0.003 per 1k tokens
-  return (totalTokens / 1000) * costPer1kTokens
-}
-
-function getDestinationName(code: string) {
-  const map: Record<string, string> = { MAD: "Madrid", BCN: "Barcelona", LHR: "London", CDG: "Paris", JFK: "New York", NRT: "Tokyo", DXB: "Dubai" }
-  return map[code] || code
-}
-
-function formatDuration(minutes: number) {
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  return `${h}h ${m}m`
 }

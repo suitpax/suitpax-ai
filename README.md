@@ -64,7 +64,7 @@ pnpm dev
 
 ## Important Endpoints
 
-- AI Chat: `POST /api/ai-chat`, `POST /api/ai-chat/stream`
+- AI Chat: `POST /api/chat`, `POST /api/chat/stream`
 - AI Tool (Flight Search): `POST /api/ai-chat/tools/flight-search`
 - Duffel Search: `POST /api/flights/duffel/search`
 - OCR: `POST /api/ocr/process`

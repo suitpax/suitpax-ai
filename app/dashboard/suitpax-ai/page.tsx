@@ -66,7 +66,7 @@ export default function SuitpaxAIPage() {
   const isFlightIntent = (text: string) => /\b([A-Z]{3})\b.*\b(to|→|-)\b.*\b([A-Z]{3})\b/i.test(text) || /\bflight|vuelo|vuelos\b/i.test(text)
 
   const sendNonStreaming = async (userMessage: Message) => {
-    const response = await fetch("/api/ai-chat", {
+    const response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
