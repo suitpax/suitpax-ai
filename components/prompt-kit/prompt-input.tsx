@@ -1,142 +1,107 @@
 "use client"
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { Textarea } from "@/components/ui/textarea"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import React, { createContext, useContext, useMemo } from "react"
 
-const PromptInputContext = React.createContext<any>(null)
-
-export type PromptInputTextareaProps = { disableAutosize?: boolean } & React.ComponentProps<typeof Textarea>
-
-export const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTextareaProps>(
-  ({ className, onKeyDown, disableAutosize = false, ...props }, ref) => {
-    const ctx = React.useContext(PromptInputContext)
-    if (!ctx) throw new Error("PromptInputTextarea must be used within PromptInput")
-    const { value, setValue, maxHeight, onSubmit, disabled, textareaRef } = ctx
-
-    React.useEffect(() => {
-      if (disableAutosize) return
-      if (!textareaRef.current) return
-      textareaRef.current.style.height = "auto"
-      textareaRef.current.style.height =
-        typeof maxHeight === "number"
-          ? `${Math.min(textareaRef.current.scrollHeight, maxHeight)}px`
-          : `min(${textareaRef.current.scrollHeight}px, ${maxHeight})`
-    }, [value, maxHeight, disableAutosize])
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault()
-        onSubmit?.()
-      }
-      onKeyDown?.(e)
-    }
-
-    return (
-      <Textarea
-        ref={(node) => {
-          ;(textareaRef as any).current = node
-          if (typeof ref === 'function') ref(node)
-          else if (ref && 'current' in (ref as any)) (ref as any).current = node
-        }}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        className={cn(
-          "text-primary min-h-[44px] w-full resize-none border-none bg-transparent shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
-          className
-        )}
-        rows={1}
-        disabled={disabled}
-        {...props}
-      />
-    )
-  }
-)
-PromptInputTextarea.displayName = "PromptInputTextarea"
-
-export const PromptInputActions = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex items-center gap-2", className)} {...props} />
-  )
-)
-PromptInputActions.displayName = "PromptInputActions"
-
-export type PromptInputActionProps = {
-  className?: string
-  tooltip: React.ReactNode
-  children: React.ReactNode
-  side?: "top" | "bottom" | "left" | "right"
-} & React.ComponentProps<typeof Tooltip>
-
-export const PromptInputAction = React.forwardRef<HTMLDivElement, PromptInputActionProps>(
-  ({ tooltip, children, className, side = "top", ...props }, ref) => (
-    <TooltipProvider>
-      <Tooltip {...props}>
-        <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
-          <div ref={ref} className={cn("flex items-center space-x-1", className)}>
-            {children}
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side={side} className={className}>
-          {tooltip}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  )
-)
-PromptInputAction.displayName = "PromptInputAction"
-
-type PromptInputProps = {
+type PromptInputContextValue = {
+  value: string
+  onValueChange: (next: string) => void
   isLoading?: boolean
-  value?: string
-  onValueChange?: (value: string) => void
-  maxHeight?: number | string
   onSubmit?: () => void
-  children: React.ReactNode
-  className?: string
 }
 
-export function PromptInput({
-  className,
-  isLoading = false,
-  maxHeight = 240,
-  value,
-  onValueChange,
-  onSubmit,
-  children,
-}: PromptInputProps) {
-  const [internalValue, setInternalValue] = React.useState(value || "")
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+const PromptInputContext = createContext<PromptInputContextValue | null>(null)
 
-  const handleChange = (newValue: string) => {
-    setInternalValue(newValue)
-    onValueChange?.(newValue)
+function usePromptInputContext() {
+  const ctx = useContext(PromptInputContext)
+  if (!ctx) throw new Error("PromptInput components must be used within <PromptInput>")
+  return ctx
+}
+
+type PromptInputProps = React.PropsWithChildren<{
+  value: string
+  onValueChange: (next: string) => void
+  isLoading?: boolean
+  onSubmit?: () => void
+  className?: string
+}>
+
+export function PromptInput(props: PromptInputProps) {
+  const { value, onValueChange, isLoading, onSubmit, className, children } = props
+  const ctx = useMemo<PromptInputContextValue>(() => ({ value, onValueChange, isLoading, onSubmit }), [value, onValueChange, isLoading, onSubmit])
+
+  return (
+    <PromptInputContext.Provider value={ctx}>
+      <div className={
+        [
+          "rounded-2xl border border-gray-200 bg-white p-3 text-gray-900 shadow-sm",
+          "focus-within:border-gray-300",
+          className || "",
+        ].join(" ")
+      }>
+        {children}
+      </div>
+    </PromptInputContext.Provider>
+  )
+}
+
+type PromptInputTextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
+
+export function PromptInputTextarea({ className, onKeyDown, ...rest }: PromptInputTextareaProps) {
+  const { value, onValueChange, onSubmit, isLoading } = usePromptInputContext()
+
+  const handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
+    if (onKeyDown) onKeyDown(e)
+    if (e.defaultPrevented) return
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      if (!isLoading) onSubmit?.()
+    }
   }
 
   return (
-    <TooltipProvider>
-      <PromptInputContext.Provider
-        value={{
-          isLoading,
-          value: value ?? internalValue,
-          setValue: onValueChange ?? handleChange,
-          maxHeight,
-          onSubmit,
-          textareaRef,
-        }}
-      >
-        <div
-          className={cn(
-            "border-input bg-background cursor-text rounded-3xl border p-2 shadow-xs",
-            className
-          )}
-          onClick={() => textareaRef.current?.focus()}
-        >
-          {children}
-        </div>
-      </PromptInputContext.Provider>
-    </TooltipProvider>
+    <textarea
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+      onKeyDown={handleKeyDown}
+      rows={3}
+      className={[
+        "w-full resize-y rounded-xl border border-transparent bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400",
+        "focus:outline-none focus:ring-0",
+        className || "",
+      ].join(" ")}
+      {...rest}
+    />
   )
 }
+
+type PromptInputActionsProps = React.HTMLAttributes<HTMLDivElement>
+
+export function PromptInputActions({ className, ...rest }: PromptInputActionsProps) {
+  return (
+    <div
+      className={[
+        "flex items-center gap-2",
+        className || "",
+      ].join(" ")}
+      {...rest}
+    />
+  )
+}
+
+type PromptInputActionProps = React.HTMLAttributes<HTMLDivElement> & { tooltip?: string }
+
+export function PromptInputAction({ className, tooltip, ...rest }: PromptInputActionProps) {
+  return (
+    <div
+      title={tooltip}
+      className={[
+        "inline-flex items-center justify-center",
+        className || "",
+      ].join(" ")}
+      {...rest}
+    />
+  )
+}
+
+export default PromptInput
+

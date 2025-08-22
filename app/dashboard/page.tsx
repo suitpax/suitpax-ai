@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { ArrowUp } from "lucide-react"
 import { BusinessMetricsChart } from "@/components/charts/business-metrics-chart"
@@ -9,6 +10,16 @@ import { BankConnectionCard } from "@/components/dashboard/bank-connection-card"
 import { PromptInput, PromptInputActions, PromptInputTextarea, PromptInputAction } from "@/components/prompt-kit/prompt-input"
 
 export default function DashboardPage() {
+  const [greet, setGreet] = useState("Good day")
+  const [name, setName] = useState("")
+  useEffect(() => {
+    const hours = new Date().getHours()
+    setGreet(hours < 12 ? 'Good morning' : hours < 18 ? 'Good afternoon' : 'Good evening')
+    try {
+      const raw = localStorage.getItem('suitpax_user_name')
+      setName(raw && raw.trim() ? raw : '')
+    } catch {}
+  }, [])
   const cards = [
     { id: "bank-connection", component: <BankConnectionCard /> },
     { id: "expense-trends", component: <ExpenseTrendsChart /> },
@@ -19,9 +30,9 @@ export default function DashboardPage() {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-8">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <h1 className="text-5xl md:text-6xl font-medium leading-none text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-lg font-light tracking-tighter text-gray-600">Welcome back</p>
-          <p className="text-sm text-gray-500 font-light mt-1">Your business travel management overview and insights</p>
+          <h1 className="text-5xl md:text-6xl font-medium tracking-tighter leading-none text-gray-900 mb-1">My Dashboard</h1>
+          <p className="text-sm font-light tracking-tighter text-gray-600">{greet}{name ? `, ${name}` : ''} — welcome to your dashboard</p>
+          <p className="text-sm text-gray-500 font-light mt-1">Track performance, search flights, and manage policies</p>
         </motion.div>
         <div className="mt-6">
           <div className="bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-3 sm:p-4">
@@ -31,11 +42,8 @@ export default function DashboardPage() {
             <PromptInput
               value={""}
               onValueChange={() => {}}
-              onSubmit={(v) => {
-                const val = typeof v === "string" ? v : ""
-                if (!val.trim()) return
-                window.location.href = `/dashboard/ai-center?tab=chat&prompt=${encodeURIComponent(val)}`
-              }}
+              onSubmit={() => {}
+              }
               isLoading={false}
               className="bg-white border-gray-200 shadow-sm"
             >

@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PlaneTakeoffIcon, PlaneIcon } from "@heroicons/react/24/outline"
+import AircraftBadge from "@/components/flights/ui/aircraft-badge"
+import LoyaltyBadge from "@/components/flights/ui/loyalty-badge"
 
 interface FlightCardProps {
   offer: any
@@ -28,18 +30,21 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
     return ''
   }
 
+  const airlineSymbolUrl = firstSeg?.airline?.logo_symbol_url || firstSeg?.airline?.logo_lockup_url || ""
+
   return (
     <Card className="hover:shadow-md transition-shadow duration-200 border border-gray-200 rounded-2xl overflow-hidden">
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-3 min-w-0">
-            <CarrierLogo iata={airlineIata} name={airlineName} className="h-6 w-6" width={20} height={20} />
+            <CarrierLogo src={airlineSymbolUrl} iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" noFallback />
             <div className="truncate">
               <div className="leading-tight flex items-center gap-2">
                 <span className="font-semibold text-gray-900 text-sm md:text-base tracking-tight">{airlineName}</span>
                 {airlineIata && (
                   <span className="inline-flex items-center rounded-md border border-gray-300 px-1.5 py-[2px] text-[10px] font-medium text-gray-700 bg-white">{airlineIata}</span>
                 )}
+                <LoyaltyBadge airlineIata={airlineIata} airlineId={(firstSeg?.airline as any)?.id} />
                 {firstSeg?.flight_number && <span className="text-gray-500 text-[11px]">{firstSeg.flight_number}</span>}
                 {firstSeg?.airline?.conditions_of_carriage_url && (
                   <a href={firstSeg.airline.conditions_of_carriage_url} target="_blank" rel="noreferrer" className="text-[10px] text-gray-500 underline hover:text-gray-700">conditions</a>
@@ -105,8 +110,10 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
                         {manuLogo && <img src={manuLogo} alt="manufacturer" className="h-3 w-3" />}
                         <span className="text-[11px]">
                           {(segment.airline?.name || segment.marketing_carrier?.name || '')} {segment.flight_number}
-                          {segment.aircraft?.name && ` • ${segment.aircraft.name}`}
                         </span>
+                        {segment?.aircraft?.iata_code || segment?.aircraft?.id ? (
+                          <AircraftBadge iata={segment?.aircraft?.iata_code} id={segment?.aircraft?.id} />
+                        ) : null}
                       </Badge>
                     )
                   })}
@@ -114,9 +121,12 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
               </div>
             ))}
 
-            <div className="flex items-center justify-end">
-              <Button onClick={() => onSelect(offer.id)} className="h-10 rounded-2xl px-5 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm">
-                Select Flight
+            <div className="flex flex-col items-stretch gap-2">
+              <Button onClick={() => onSelect(offer.id)} className="w-full h-10 rounded-full px-5 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm">
+                Continue to booking
+              </Button>
+              <Button variant="secondary" className="w-full h-10 rounded-full px-5 bg-white/80 text-gray-900 border border-gray-300 hover:bg-white backdrop-blur-sm shadow-sm">
+                Track price
               </Button>
             </div>
           </div>

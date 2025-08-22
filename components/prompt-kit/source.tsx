@@ -1,82 +1,56 @@
 "use client"
 
-import type React from "react"
-
-import Link from "next/link"
-import { ExternalLink } from "lucide-react"
+import * as React from "react"
 import { cn } from "@/lib/utils"
 
-export function Source({
-  href,
-  children,
-  className = "",
-}: {
-  href: string
-  children: React.ReactNode
-  className?: string
-}) {
+export function Source({ href, children, className, target = "_blank", rel = "noopener noreferrer" }: { href: string; children: React.ReactNode; className?: string; target?: string; rel?: string }) {
   return (
-    <Link
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={cn(
-        "group relative inline-flex items-stretch overflow-hidden rounded-xl",
-        "border border-white/20 bg-white/10 backdrop-blur-sm",
-        "hover:border-white/30 hover:bg-white/15 hover:shadow-lg",
-        "transition-all duration-200",
-        className,
-      )}
-    >
+    <a href={href} target={target} rel={rel} className={cn("group inline-flex items-start gap-2 max-w-sm", className)}>
       {children}
-    </Link>
+    </a>
   )
 }
 
-export function SourceTrigger({
-  showFavicon = false,
-  faviconUrl,
-  className = "",
-}: {
-  showFavicon?: boolean
-  faviconUrl?: string
-  className?: string
-}) {
-  const src = faviconUrl
+export function SourceTrigger({ showFavicon, label, className }: { showFavicon?: boolean; label?: string | number; className?: string }) {
   return (
-    <div
-      className={cn(
-        "flex items-center justify-center w-12 min-w-12",
-        "border-r border-white/20 bg-white/5 group-hover:bg-white/10",
-        "transition-colors duration-200",
-        className,
-      )}
-    >
-      {showFavicon && src ? (
+    <div className={cn("inline-flex h-7 min-w-7 items-center justify-center rounded-full border border-gray-300 bg-white px-2 text-xs text-gray-900", "group-hover:bg-gray-900 group-hover:text-white transition-colors", className)}>
+      {showFavicon ? <Favicon /> : label ?? ""}
+    </div>
+  )
+}
+
+export function SourceContent({ title, description, className }: { title: string; description?: string; className?: string }) {
+  return (
+    <div className={cn("rounded-xl border border-gray-200 bg-white p-3 text-left shadow-sm", "group-hover:border-gray-300", className)}>
+      <div className="line-clamp-2 text-sm font-medium text-gray-900">{title}</div>
+      {description ? <div className="mt-1 line-clamp-3 text-xs text-gray-600">{description}</div> : null}
+    </div>
+  )
+}
+
+function Favicon() {
+  const ref = React.useRef<HTMLSpanElement>(null)
+  const [src, setSrc] = React.useState<string | null>(null)
+  React.useEffect(() => {
+    try {
+      const parent = ref.current?.closest("a") as HTMLAnchorElement | null
+      if (!parent?.href) return
+      const u = new URL(parent.href)
+      const icon = `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=64`
+      setSrc(icon)
+    } catch {}
+  }, [])
+  return (
+    <span ref={ref} className="inline-flex h-4 w-4 items-center justify-center">
+      {src ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src || "/placeholder.svg"} alt="favicon" className="h-5 w-5 rounded" />
+        <img src={src} alt="favicon" className="h-4 w-4 rounded-sm" />
       ) : (
-        <ExternalLink className="h-4 w-4 text-white/60" />
+        <span className="inline-block h-3 w-3 rounded-sm bg-gray-300" />
       )}
-    </div>
-  )
-}
-
-export function SourceContent({
-  title,
-  description,
-  imageUrl,
-}: {
-  title: string
-  description?: string
-  imageUrl?: string
-}) {
-  return (
-    <div className="px-4 py-3 max-w-xs">
-      <div className="line-clamp-2 text-sm font-medium text-white/90 leading-snug">{title}</div>
-      {description && <div className="line-clamp-3 text-xs text-white/60 mt-1 leading-relaxed">{description}</div>}
-    </div>
+    </span>
   )
 }
 
 export default Source
+

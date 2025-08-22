@@ -118,4 +118,56 @@
 	/* NGS View */
 	.ngs-view { @apply space-y-3; }
 	.ngs-header { @apply flex items-center justify-between; }
+
+	/* Prompt Kit: Code themes */
+	.theme-github-dark {}
+	pre:has(> code.theme-github-dark) { @apply bg-gray-900 border-gray-800 text-gray-100; }
+	code.theme-github-dark { color: #e6edf3; }
+	code.theme-github-dark .token.comment,
+	code.theme-github-dark .token.prolog,
+	code.theme-github-dark .token.doctype,
+	code.theme-github-dark .token.cdata { color: #8b949e; }
+	code.theme-github-dark .token.punctuation { color: #e6edf3; }
+	code.theme-github-dark .token.property,
+	code.theme-github-dark .token.tag,
+	code.theme-github-dark .token.constant,
+	code.theme-github-dark .token.symbol,
+	code.theme-github-dark .token.deleted { color: #ffa657; }
+	code.theme-github-dark .token.boolean,
+	code.theme-github-dark .token.number { color: #79c0ff; }
+	code.theme-github-dark .token.selector,
+	code.theme-github-dark .token.attr-name,
+	code.theme-github-dark .token.string,
+	code.theme-github-dark .token.char,
+	code.theme-github-dark .token.builtin,
+	code.theme-github-dark .token.inserted { color: #a5d6ff; }
+	code.theme-github-dark .token.operator,
+	code.theme-github-dark .token.entity,
+	code.theme-github-dark .token.url { color: #e6edf3; }
+	code.theme-github-dark .token.atrule,
+	code.theme-github-dark .token.attr-value,
+	code.theme-github-dark .token.keyword { color: #ff7b72; }
+	code.theme-github-dark .token.function,
+	code.theme-github-dark .token.class-name { color: #d2a8ff; }
+
+	/* Light brand code theme */
+	.theme-github-light {}
+	pre:has(> code.theme-github-light) { @apply bg-white border-gray-200 text-gray-900; }
+	code.theme-github-light { color: #24292f; }
+	code.theme-github-light .token.comment { color: #6e7781; }
+	code.theme-github-light .token.punctuation { color: #24292f; }
+	code.theme-github-light .token.property,
+	code.theme-github-light .token.tag,
+	code.theme-github-light .token.constant,
+	code.theme-github-light .token.symbol,
+	code.theme-github-light .token.deleted { color: #cf222e; }
+	code.theme-github-light .token.boolean,
+	code.theme-github-light .token.number { color: #0550ae; }
+	code.theme-github-light .token.selector,
+	code.theme-github-light .token.attr-name,
+	code.theme-github-light .token.string,
+	code.theme-github-light .token.inserted { color: #0a3069; }
+	code.theme-github-light .token.keyword { color: #cf222e; }
+	code.theme-github-light .token.function,
+	code.theme-github-light .token.class-name { color: #6639ba; }
 }

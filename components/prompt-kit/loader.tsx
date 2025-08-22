@@ -1,179 +1,208 @@
 "use client"
 
-import * as React from "react"
-
-type LoaderSize = "sm" | "md" | "lg"
-type LoaderVariant =
-  | "circular"
-  | "classic"
-  | "pulse"
-  | "pulse-dot"
-  | "dots"
-  | "typing"
-  | "wave"
-  | "bars"
-  | "terminal"
-  | "text-blink"
-  | "text-shimmer"
-  | "loading-dots"
+import { cn } from "@/lib/utils"
+import React from "react"
 
 export interface LoaderProps {
-  variant?: LoaderVariant
-  size?: LoaderSize
+  variant?:
+    | "circular"
+    | "classic"
+    | "pulse"
+    | "pulse-dot"
+    | "dots"
+    | "typing"
+    | "wave"
+    | "bars"
+    | "terminal"
+    | "text-blink"
+    | "text-shimmer"
+    | "loading-dots"
+  size?: "sm" | "md" | "lg"
+  text?: string
   className?: string
-  label?: string
 }
 
-const sizeToPx: Record<LoaderSize, number> = { sm: 16, md: 24, lg: 36 }
-const dotSizeToPx: Record<LoaderSize, number> = { sm: 4, md: 6, lg: 8 }
-
-function classNames(...values: Array<string | false | null | undefined>) {
-  return values.filter(Boolean).join(" ")
+export function CircularLoader({ className, size = "md" }: { className?: string; size?: "sm" | "md" | "lg" }) {
+  const sizeClasses = { sm: "size-4", md: "size-5", lg: "size-6" }
+  return (
+    <div className={cn("border-primary animate-spin rounded-full border-2 border-t-transparent", sizeClasses[size], className)}>
+      <span className="sr-only">Loading</span>
+    </div>
+  )
 }
 
-export function Loader({ variant = "circular", size = "md", className, label }: LoaderProps) {
-  const px = sizeToPx[size]
-  const dotPx = dotSizeToPx[size]
-
-  if (variant === "circular") {
-    return (
-      <div className={classNames("inline-flex items-center gap-2", className)} aria-label={label || "Loading"}>
-        <div
-          className="inline-block animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"
-          style={{ width: px, height: px }}
-        />
-      </div>
-    )
-  }
-
-  if (variant === "classic") {
-    return (
-      <div className={classNames("inline-flex items-center gap-1", className)} aria-label={label || "Loading"}>
-        <div className="h-[3px] w-5 animate-pulse rounded bg-gray-900" />
-        <div className="h-[3px] w-3 animate-pulse rounded bg-gray-500 [animation-delay:120ms]" />
-        <div className="h-[3px] w-2 animate-pulse rounded bg-gray-300 [animation-delay:240ms]" />
-      </div>
-    )
-  }
-
-  if (variant === "pulse") {
-    return (
-      <div
-        className={classNames("inline-block animate-pulse rounded-full bg-gray-900", className)}
-        style={{ width: px, height: px }}
-        aria-label={label || "Loading"}
-      />
-    )
-  }
-
-  if (variant === "pulse-dot") {
-    return (
-      <div className={classNames("inline-flex items-center gap-1", className)} aria-label={label || "Loading"}>
-        <span
-          className="inline-block animate-pulse rounded-full bg-gray-900"
-          style={{ width: dotPx, height: dotPx }}
-        />
-      </div>
-    )
-  }
-
-  if (variant === "dots") {
-    return (
-      <div className={classNames("inline-flex items-center gap-1", className)} aria-label={label || "Loading"}>
-        <span className="inline-block animate-bounce rounded-full bg-gray-900" style={{ width: dotPx, height: dotPx }} />
-        <span className="inline-block animate-bounce rounded-full bg-gray-900 [animation-delay:120ms]" style={{ width: dotPx, height: dotPx }} />
-        <span className="inline-block animate-bounce rounded-full bg-gray-900 [animation-delay:240ms]" style={{ width: dotPx, height: dotPx }} />
-      </div>
-    )
-  }
-
-  if (variant === "typing") {
-    return (
-      <div className={classNames("inline-flex items-end gap-[2px]", className)} aria-label={label || "Typing"}>
-        <span className="h-[2px] w-[2px] animate-[ping_1s_linear_infinite] rounded-full bg-gray-900" />
-        <span className="h-[2px] w-[2px] animate-[ping_1s_linear_infinite] rounded-full bg-gray-900 [animation-delay:150ms]" />
-        <span className="h-[2px] w-[2px] animate-[ping_1s_linear_infinite] rounded-full bg-gray-900 [animation-delay:300ms]" />
-      </div>
-    )
-  }
-
-  if (variant === "wave") {
-    const barW = Math.max(2, Math.round(px / 6))
-    const barH = Math.max(10, Math.round(px * 1.2))
-    return (
-      <div className={classNames("inline-flex items-end gap-[2px]", className)} aria-label={label || "Loading"}>
-        {[0, 1, 2, 3, 4].map((i) => (
-          <span
+export function ClassicLoader({ className, size = "md" }: { className?: string; size?: "sm" | "md" | "lg" }) {
+  const sizeClasses = { sm: "size-4", md: "size-5", lg: "size-6" }
+  const barSizes = { sm: { height: "6px", width: "1.5px" }, md: { height: "8px", width: "2px" }, lg: { height: "10px", width: "2.5px" } }
+  return (
+    <div className={cn("relative", sizeClasses[size], className)}>
+      <div className="absolute h-full w-full">
+        {[...Array(12)].map((_, i) => (
+          <div
             key={i}
-            className="inline-block animate-[wave_1s_ease-in-out_infinite] bg-gray-900"
-            style={{ width: barW, height: barH, animationDelay: `${i * 120}ms` }}
-          />
-        ))}
-        <style>{`@keyframes wave { 0%, 100% { transform: scaleY(0.4) } 50% { transform: scaleY(1) } }`}</style>
-      </div>
-    )
-  }
-
-  if (variant === "bars") {
-    const barW = Math.max(3, Math.round(px / 5))
-    return (
-      <div className={classNames("inline-flex items-end gap-[3px]", className)} aria-label={label || "Loading"}>
-        {[0, 1, 2, 3].map((i) => (
-          <span
-            key={i}
-            className="inline-block bg-gray-900"
-            style={{ width: barW, height: (i + 2) * 4 }}
+            className="bg-primary absolute animate-[spinner-fade_1.2s_linear_infinite] rounded-full"
+            style={{
+              top: "0",
+              left: "50%",
+              marginLeft: size === "sm" ? "-0.75px" : size === "lg" ? "-1.25px" : "-1px",
+              transformOrigin: `${size === "sm" ? "0.75px" : size === "lg" ? "1.25px" : "1px"} ${size === "sm" ? "10px" : size === "lg" ? "14px" : "12px"}`,
+              transform: `rotate(${i * 30}deg)`,
+              opacity: 0,
+              animationDelay: `${i * 0.1}s`,
+              height: barSizes[size].height,
+              width: barSizes[size].width,
+            }}
           />
         ))}
       </div>
-    )
-  }
-
-  if (variant === "terminal") {
-    return (
-      <div className={classNames("inline-flex items-center font-mono text-sm text-gray-800", className)}>
-        <span>$</span>
-        <span className="mx-1">_</span>
-        <span className="ml-1 inline-block h-4 w-[1px] animate-pulse bg-gray-800" />
-      </div>
-    )
-  }
-
-  if (variant === "text-blink") {
-    return (
-      <span className={classNames("inline-block animate-pulse text-sm text-gray-700", className)}>Loading…</span>
-    )
-  }
-
-  if (variant === "text-shimmer") {
-    return (
-      <span
-        className={classNames(
-          "inline-block bg-[linear-gradient(110deg,#e5e7eb,45%,#f3f4f6,55%,#e5e7eb)] bg-[length:200%_100%] text-transparent [background-clip:text] animate-[shimmer_1.2s_infinite]",
-          className,
-        )}
-      >
-        Loading…
-        <style>{`@keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }`}</style>
-      </span>
-    )
-  }
-
-  if (variant === "loading-dots") {
-    return (
-      <span className={classNames("inline-flex items-center text-sm text-gray-700", className)}>
-        Loading
-        <span className="ml-1 inline-flex items-center">
-          <span className="animate-bounce [animation-delay:0ms]">.</span>
-          <span className="animate-bounce [animation-delay:120ms]">.</span>
-          <span className="animate-bounce [animation-delay:240ms]">.</span>
-        </span>
-      </span>
-    )
-  }
-
-  return null
+      <span className="sr-only">Loading</span>
+    </div>
+  )
 }
 
-export default Loader
+export function PulseLoader({ className, size = "md" }: { className?: string; size?: "sm" | "md" | "lg" }) {
+  const sizeClasses = { sm: "size-4", md: "size-5", lg: "size-6" }
+  return (
+    <div className={cn("relative", sizeClasses[size], className)}>
+      <div className="border-primary absolute inset-0 animate-[thin-pulse_1.5s_ease-in-out_infinite] rounded-full border-2" />
+      <span className="sr-only">Loading</span>
+    </div>
+  )
+}
+
+export function PulseDotLoader({ className, size = "md" }: { className?: string; size?: "sm" | "md" | "lg" }) {
+  const sizeClasses = { sm: "size-1", md: "size-2", lg: "size-3" }
+  return <div className={cn("bg-primary animate-[pulse-dot_1.2s_ease-in-out_infinite] rounded-full", sizeClasses[size], className)}><span className="sr-only">Loading</span></div>
+}
+
+export function DotsLoader({ className, size = "md" }: { className?: string; size?: "sm" | "md" | "lg" }) {
+  const dotSizes = { sm: "h-1.5 w-1.5", md: "h-2 w-2", lg: "h-2.5 w-2.5" }
+  const containerSizes = { sm: "h-4", md: "h-5", lg: "h-6" }
+  return (
+    <div className={cn("flex items-center space-x-1", containerSizes[size], className)}>
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className={cn("bg-primary animate-[bounce-dots_1.4s_ease-in-out_infinite] rounded-full", dotSizes[size])} style={{ animationDelay: `${i * 160}ms` }} />
+      ))}
+      <span className="sr-only">Loading</span>
+    </div>
+  )
+}
+
+export function TypingLoader({ className, size = "md" }: { className?: string; size?: "sm" | "md" | "lg" }) {
+  const dotSizes = { sm: "h-1 w-1", md: "h-1.5 w-1.5", lg: "h-2 w-2" }
+  const containerSizes = { sm: "h-4", md: "h-5", lg: "h-6" }
+  return (
+    <div className={cn("flex items-center space-x-1", containerSizes[size], className)}>
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className={cn("bg-primary animate-[typing_1s_infinite] rounded-full", dotSizes[size])} style={{ animationDelay: `${i * 250}ms` }} />
+      ))}
+      <span className="sr-only">Loading</span>
+    </div>
+  )
+}
+
+export function WaveLoader({ className, size = "md" }: { className?: string; size?: "sm" | "md" | "lg" }) {
+  const barWidths = { sm: "w-0.5", md: "w-0.5", lg: "w-1" }
+  const containerSizes = { sm: "h-4", md: "h-5", lg: "h-6" }
+  const heights = { sm: ["6px", "9px", "12px", "9px", "6px"], md: ["8px", "12px", "16px", "12px", "8px"], lg: ["10px", "15px", "20px", "15px", "10px"] }
+  return (
+    <div className={cn("flex items-center gap-0.5", containerSizes[size], className)}>
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className={cn("bg-primary animate-[wave_1s_ease-in-out_infinite] rounded-full", barWidths[size])} style={{ animationDelay: `${i * 100}ms`, height: heights[size][i] }} />
+      ))}
+      <span className="sr-only">Loading</span>
+    </div>
+  )
+}
+
+export function BarsLoader({ className, size = "md" }: { className?: string; size?: "sm" | "md" | "lg" }) {
+  const barWidths = { sm: "w-1", md: "w-1.5", lg: "w-2" }
+  const containerSizes = { sm: "h-4 gap-1", md: "h-5 gap-1.5", lg: "h-6 gap-2" }
+  return (
+    <div className={cn("flex", containerSizes[size], className)}>
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className={cn("bg-primary h-full animate-[wave-bars_1.2s_ease-in-out_infinite]", barWidths[size])} style={{ animationDelay: `${i * 0.2}s` }} />
+      ))}
+      <span className="sr-only">Loading</span>
+    </div>
+  )
+}
+
+export function TerminalLoader({ className, size = "md" }: { className?: string; size?: "sm" | "md" | "lg" }) {
+  const cursorSizes = { sm: "h-3 w-1.5", md: "h-4 w-2", lg: "h-5 w-2.5" }
+  const textSizes = { sm: "text-xs", md: "text-sm", lg: "text-base" }
+  const containerSizes = { sm: "h-4", md: "h-5", lg: "h-6" }
+  return (
+    <div className={cn("flex items-center space-x-1", containerSizes[size], className)}>
+      <span className={cn("text-primary font-mono", textSizes[size])}>{">"}</span>
+      <div className={cn("bg-primary animate-[blink_1s_step-end_infinite]", cursorSizes[size])} />
+      <span className="sr-only">Loading</span>
+    </div>
+  )
+}
+
+export function TextBlinkLoader({ text = "Thinking", className, size = "md" }: { text?: string; className?: string; size?: "sm" | "md" | "lg" }) {
+  const textSizes = { sm: "text-xs", md: "text-sm", lg: "text-base" }
+  return <div className={cn("animate-[text-blink_2s_ease-in-out_infinite] font-medium", textSizes[size], className)}>{text}</div>
+}
+
+export function TextShimmerLoader({ text = "Thinking", className, size = "md" }: { text?: string; className?: string; size?: "sm" | "md" | "lg" }) {
+  const textSizes = { sm: "text-xs", md: "text-sm", lg: "text-base" }
+  return (
+    <div className={cn(
+      "bg-[linear-gradient(to_right,var(--muted-foreground)_40%,var(--foreground)_60%,var(--muted-foreground)_80%)]",
+      "bg-size-[200%_auto] bg-clip-text font-medium text-transparent",
+      "animate-[shimmer_4s_infinite_linear]",
+      textSizes[size],
+      className,
+    )}>{text}</div>
+  )
+}
+
+export function TextDotsLoader({ className, text = "Thinking", size = "md" }: { className?: string; text?: string; size?: "sm" | "md" | "lg" }) {
+  const textSizes = { sm: "text-xs", md: "text-sm", lg: "text-base" }
+  return (
+    <div className={cn("inline-flex items-center", className)}>
+      <span className={cn("text-primary font-medium", textSizes[size])}>{text}</span>
+      <span className="inline-flex">
+        <span className="text-primary animate-[loading-dots_1.4s_infinite_0.2s]">.</span>
+        <span className="text-primary animate-[loading-dots_1.4s_infinite_0.4s]">.</span>
+        <span className="text-primary animate-[loading-dots_1.4s_infinite_0.6s]">.</span>
+      </span>
+    </div>
+  )
+}
+
+function Loader({ variant = "circular", size = "md", text, className }: LoaderProps) {
+  switch (variant) {
+    case "circular":
+      return <CircularLoader size={size} className={className} />
+    case "classic":
+      return <ClassicLoader size={size} className={className} />
+    case "pulse":
+      return <PulseLoader size={size} className={className} />
+    case "pulse-dot":
+      return <PulseDotLoader size={size} className={className} />
+    case "dots":
+      return <DotsLoader size={size} className={className} />
+    case "typing":
+      return <TypingLoader size={size} className={className} />
+    case "wave":
+      return <WaveLoader size={size} className={className} />
+    case "bars":
+      return <BarsLoader size={size} className={className} />
+    case "terminal":
+      return <TerminalLoader size={size} className={className} />
+    case "text-blink":
+      return <TextBlinkLoader text={text} size={size} className={className} />
+    case "text-shimmer":
+      return <TextShimmerLoader text={text} size={size} className={className} />
+    case "loading-dots":
+      return <TextDotsLoader text={text} size={size} className={className} />
+    default:
+      return <CircularLoader size={size} className={className} />
+  }
+}
+
+export { Loader }
 

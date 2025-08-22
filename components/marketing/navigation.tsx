@@ -66,26 +66,49 @@ export default function Navigation() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 flex justify-center px-3 pt-2 pb-2",
+          "fixed top-0 left-0 right-0 z-50 flex justify-center px-3 pt-1.5 pb-1.5",
           "transition-all duration-300"
         )}
       >
         <div
           className={cn(
-            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-md bg-white/90 border border-black/5 px-4 py-2",
+            "flex w-full max-w-6xl items-center justify-between rounded-xl backdrop-blur-lg bg-white/90 border border-black/5 px-4 py-1.5",
             isScrolled ? "shadow-lg border-black/10" : ""
           )}
         >
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/logo/suitpax-bl-logo.webp"
-              alt="Suitpax"
-              width={118}
-              height={24}
-              priority
-              className="h-6 w-auto" // a bit taller logo
-            />
-          </Link>
+          {isMobile ? (
+            <div className="flex items-center gap-2">
+              <Link href="https://discord.gg/suitpax" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
+                <FaDiscord className="h-4 w-4" />
+                <span className="sr-only">Discord</span>
+              </Link>
+              <Link href="https://linkedin.com/company/suitpax" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
+                <SiLinkedin className="h-4 w-4" />
+                <span className="sr-only">LinkedIn</span>
+              </Link>
+              <Link href="/" className="flex items-center">
+                <Image
+                  src="/logo/suitpax-bl-logo.webp"
+                  alt="Suitpax"
+                  width={118}
+                  height={24}
+                  priority
+                  className="h-5 w-auto"
+                />
+              </Link>
+            </div>
+          ) : (
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/logo/suitpax-bl-logo.webp"
+                alt="Suitpax"
+                width={118}
+                height={24}
+                priority
+                className="h-6 w-auto"
+              />
+            </Link>
+          )}
 
           {!isMobile && (
             <div className="hidden md:flex items-center space-x-5">
@@ -141,14 +164,19 @@ export default function Navigation() {
           )}
 
           {isMobile && (
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-1.5 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
-            >
-              <div className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
-                {isOpen ? <PiDotsSixBold size={18} /> : <PiDotsNineBold size={18} />}
-              </div>
-            </button>
+            <div className="flex items-center gap-2">
+              <Link href="mailto:hello@suitpax.com" className="px-2.5 py-1 rounded-full bg-black text-white text-[10px] font-medium">
+                Ask anything
+              </Link>
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-1 rounded-lg text-gray-700 hover:text-black hover:bg-gray-100 transition-colors border border-black/10 bg-gray-100"
+              >
+                <div className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
+                  {isOpen ? <PiDotsSixBold size={16} /> : <PiDotsNineBold size={16} />}
+                </div>
+              </button>
+            </div>
           )}
         </div>
       </motion.nav>

@@ -1,0 +1,41 @@
+"use client"
+
+import type { User as SupabaseUser } from "@supabase/supabase-js"
+import Link from "next/link"
+import Image from "next/image"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { usePathname } from "next/navigation"
+import { MessageSquare, Mic, Plane, LayoutDashboard, BarChart3, Settings, CreditCard } from "lucide-react"
+import TopSidebar from "./top-sidebar"
+import DashboardSidebarContent from "./content"
+import FooterSidebar from "./footer"
+
+export interface DashboardSidebarProps {
+  onUserUpdate?: (user: SupabaseUser) => void
+  isCollapsed: boolean
+  isMobile: boolean
+  onCloseMobile: () => void
+  onToggleCollapse?: () => void
+  userPlan: string
+  subscriptionStatus: string
+}
+
+export default function DashboardSidebar({ isCollapsed, isMobile, onCloseMobile, onToggleCollapse, userPlan, subscriptionStatus }: DashboardSidebarProps) {
+  return (
+    <div
+      className={cn(
+        "flex h-full w-full flex-col bg-gray-100 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-r border-gray-200 transition-all duration-300",
+        isCollapsed ? "w-16" : "w-64",
+        isMobile ? "pb-14" : ""
+      )}
+    >
+      <TopSidebar onToggle={onToggleCollapse} />
+      <div className="flex-1 overflow-y-auto">
+        <DashboardSidebarContent isCollapsed={isCollapsed} isMobile={isMobile} onCloseMobile={onCloseMobile} />
+      </div>
+      <FooterSidebar userPlan={userPlan} subscriptionStatus={subscriptionStatus} />
+    </div>
+  )
+}
+

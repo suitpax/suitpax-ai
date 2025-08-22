@@ -12,13 +12,13 @@ export default function TimeRangeSelector({ value, onChange }: TimeRangeSelector
         type="time"
         value={value?.from || ""}
         onChange={(e) => onChange?.({ from: e.target.value, to: value?.to })}
-        className="rounded-lg border border-gray-300 px-2 py-1 text-sm"
+        className="rounded-lg border border-gray-300 px-2 py-1 text-sm text-gray-900"
       />
       <input
         type="time"
         value={value?.to || ""}
         onChange={(e) => onChange?.({ from: value?.from, to: e.target.value })}
-        className="rounded-lg border border-gray-300 px-2 py-1 text-sm"
+        className="rounded-lg border border-gray-300 px-2 py-1 text-sm text-gray-900"
       />
     </div>
   )

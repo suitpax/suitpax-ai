@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import {
-  Menu,
   Bell,
   User,
   ChevronDown,
@@ -15,10 +14,11 @@ import {
   Calculator,
   BarChart3,
   HelpCircle,
-  Sparkles,
 } from "lucide-react"
+import { PiDotsNineBold, PiCrownBold } from "react-icons/pi"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { loader } from "@/components/ui/loaders"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,11 +92,7 @@ export default function Header({
 }: HeaderProps) {
   const pathname = usePathname()
   const [userProfile, setUserProfile] = useState<any>(null)
-  const [notifications, setNotifications] = useState([
-    { id: 1, title: "Flight confirmed to NYC", time: "2 min ago", type: "booking" },
-    { id: 2, title: "Expense report approved", time: "1 hour ago", type: "expense" },
-    { id: 3, title: "Team meeting reminder", time: "3 hours ago", type: "meeting" },
-  ])
+  const [notifications, setNotifications] = useState<any[]>([])
   const [commandOpen, setCommandOpen] = useState(false)
   const supabase = createClient()
 
@@ -122,21 +118,21 @@ export default function Header({
     switch (userPlan.toLowerCase()) {
       case "pro":
         return (
-          <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 text-xs">
+          <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 text-[10px]">
             <Crown className="h-3 w-3 mr-1" />
             Pro
           </Badge>
         )
       case "enterprise":
         return (
-          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 text-xs">
-            <Sparkles className="h-3 w-3 mr-1" />
+          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 text-[10px]">
+            <Crown className="h-3 w-3 mr-1" />
             Enterprise
           </Badge>
         )
       default:
         return (
-          <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200 text-xs">
+          <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200 text-[10px]">
             Free
           </Badge>
         )
@@ -145,48 +141,40 @@ export default function Header({
 
   return (
     <>
-      <header className="bg-white/70 backdrop-blur-sm border-b border-white/20 px-4 lg:px-6 py-4 sticky top-0 z-40">
-        <div className="flex items-center justify-between">
+      <header className="bg-white/70 backdrop-blur-sm border-b border-gray-200 px-3 lg:px-4 py-2 sticky top-0 z-40">
+        <div className="flex items-center justify-between gap-3">
           {/* Left Section */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 min-w-0">
             {/* Sidebar Toggle + Brand */}
-            <div className="flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onToggleSidebar}
-                className="p-2 rounded-xl hover:bg-gray-100/80 transition-colors"
-                aria-label={isMobile ? "Open menu" : "Toggle sidebar"}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            </div>
-
-            {/* Page Info */}
-            <div className="hidden sm:block">
-              <h1 className="text-xl font-medium text-gray-900 tracking-tight">{pageInfo.title}</h1>
-              {pageInfo.description && <p className="text-sm text-gray-500 mt-0.5">{pageInfo.description}</p>}
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleSidebar}
+              className="h-8 w-8 p-0 rounded-xl hover:bg-gray-100/80 transition-colors"
+              aria-label={isMobile ? "Open menu" : "Toggle sidebar"}
+            >
+              <PiDotsNineBold className="h-4 w-4" />
+            </Button>
+            <span className="text-[14px] font-medium text-black leading-none">Home</span>
+            {/* Optional small logo can be added here if approved */}
           </div>
 
           {/* Center Section - AI Search */}
-          <div className="hidden lg:flex flex-1 max-w-lg mx-8">
-            <div className="w-full">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search or ask AI anything..."
-                  className="w-full px-4 py-2.5 pl-10 pr-4 text-sm bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all placeholder:text-gray-400"
-                />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Sparkles className="h-4 w-4 text-gray-400" />
-                </div>
+          <div className="hidden lg:flex flex-1 max-w-lg mx-2">
+            <div className="w-full relative">
+              <input
+                type="text"
+                placeholder="Search or ask AI anything..."
+                className="w-full h-9 px-3 pl-8 pr-3 text-[13px] bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/15 focus:border-blue-300 transition-all placeholder:text-gray-400"
+              />
+              <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                {loader({ size: "sm" })}
               </div>
             </div>
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-2">
             {/* Plan Badge */}
             <div className="hidden md:block">{getPlanBadge()}</div>
 
@@ -194,10 +182,10 @@ export default function Header({
             <Button
               variant="outline"
               size="sm"
-              className="hidden md:flex items-center space-x-2 rounded-xl border-gray-200/50 hover:bg-gray-50/80 bg-white/50 backdrop-blur-sm"
+              className="hidden md:inline-flex items-center gap-1.5 h-8 rounded-xl border-gray-200/60 hover:bg-gray-50/80 bg-white/50 backdrop-blur-sm"
             >
               <Plus className="h-4 w-4" />
-              <span className="text-sm">New</span>
+              <span className="text-[12px]">New</span>
             </Button>
 
             {/* Notifications */}
@@ -206,30 +194,20 @@ export default function Header({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="relative p-2.5 rounded-xl hover:bg-gray-100/80 transition-colors"
+                  className="relative h-8 w-8 p-0 rounded-xl hover:bg-gray-100/80 transition-colors"
                 >
-                  <Bell className="h-5 w-5 text-gray-600" />
-                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></div>
+                  <Bell className="h-4 w-4 text-gray-600" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-80 bg-white/95 backdrop-blur-sm border-gray-200/50">
                 <DropdownMenuLabel className="flex items-center justify-between">
                   Notifications
                   <Badge variant="secondary" className="text-xs">
-                    3
+                    0
                   </Badge>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <div className="p-2 space-y-2">
-                  <div className="p-3 rounded-xl bg-blue-50/50 border border-blue-100/50">
-                    <p className="text-sm font-medium text-gray-900">Flight confirmed to NYC</p>
-                    <p className="text-xs text-gray-500 mt-1">2 minutes ago</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-green-50/50 border border-green-100/50">
-                    <p className="text-sm font-medium text-gray-900">Expense report approved</p>
-                    <p className="text-xs text-gray-500 mt-1">1 hour ago</p>
-                  </div>
-                </div>
+                <div className="p-2 text-xs text-gray-500">No notifications</div>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -238,9 +216,9 @@ export default function Header({
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100/80 transition-colors"
+                  className="flex items-center gap-2 h-8 px-2 rounded-xl hover:bg-gray-100/80 transition-colors"
                 >
-                  <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500 ring-2 ring-blue-200/50">
+                  <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500">
                     {userProfile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -257,14 +235,14 @@ export default function Header({
                     )}
                   </div>
                   {!isMobile && (
-                    <div className="hidden lg:flex items-center space-x-2">
+                    <div className="hidden lg:flex items-center gap-1.5">
                       <div className="text-left">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-[12px] font-medium text-gray-900 leading-none">
                           {userProfile?.full_name || user.email?.split("@")[0] || "User"}
                         </p>
-                        <p className="text-xs text-gray-500 capitalize">{userPlan} Plan</p>
+                        <p className="text-[10px] text-gray-500 capitalize leading-none mt-0.5">{userPlan} Plan</p>
                       </div>
-                      <ChevronDown className="h-4 w-4 text-gray-400" />
+                      <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
                     </div>
                   )}
                 </Button>
@@ -310,8 +288,8 @@ export default function Header({
                 {userPlan === "free" && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-purple-600 focus:text-purple-700 focus:bg-purple-50">
-                      <Crown className="h-4 w-4 mr-2" />
+                    <DropdownMenuItem className="text-gray-900 focus:text-gray-900 focus:bg-gray-100">
+                      <PiCrownBold className="h-4 w-4 mr-2" />
                       Upgrade to Pro
                       <CommandShortcut>⇧</CommandShortcut>
                     </DropdownMenuItem>
@@ -331,15 +309,15 @@ export default function Header({
 
         {/* Mobile Search */}
         {isMobile && (
-          <div className="mt-4 sm:hidden">
+          <div className="mt-2 sm:hidden">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search or ask AI..."
-                className="w-full px-4 py-2.5 pl-10 pr-4 text-sm bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all placeholder:text-gray-400"
+                className="w-full h-9 px-3 pl-8 pr-3 text-[13px] bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/15 focus:border-blue-300 transition-all placeholder:text-gray-400"
               />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Sparkles className="h-4 w-4 text-gray-400" />
+              <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                {loader({ size: "sm" })}
               </div>
             </div>
           </div>

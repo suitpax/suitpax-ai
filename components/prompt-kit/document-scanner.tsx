@@ -1,66 +1,31 @@
 "use client"
 
-import { useRef, useState } from "react"
-import { FileUp, Loader2, Check } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useRef } from "react"
+import { Button } from "@/components/ui/button"
+import { FileText } from "lucide-react"
 
-export type DocumentScannerResult = {
-  raw_text?: string
-  parsed?: any
-}
-
-export default function DocumentScanner({ onScanned, className }: { onScanned?: (r: DocumentScannerResult) => void; className?: string }) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [done, setDone] = useState(false)
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    inputRef.current?.click()
-  }
-
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setIsUploading(true)
-    setDone(false)
-    try {
-      const form = new FormData()
-      form.append("receipt", file)
-      form.append("parseOnly", "true")
-      const resp = await fetch("/api/expenses", { method: "POST", body: form })
-      const data = await resp.json()
-      if (data?.success !== false) {
-        setDone(true)
-        onScanned?.({ raw_text: data?.raw_text, parsed: data?.parsed })
-      }
-    } catch {
-      // ignore
-    } finally {
-      setIsUploading(false)
-      setTimeout(() => setDone(false), 1500)
-      if (inputRef.current) inputRef.current.value = ""
-    }
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={cn(
-        "flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-2xl transition-colors hover:bg-gray-100 text-gray-700 relative",
-        className
-      )}
-      aria-label="Scan document"
-    >
-      <input ref={inputRef} type="file" accept="image/*,application/pdf" capture="environment" className="hidden" onChange={handleChange} />
-      {isUploading ? (
-        <Loader2 className="size-3.5 sm:size-4 animate-spin" />
-      ) : done ? (
-        <Check className="size-3.5 sm:size-4 text-emerald-600" />
-      ) : (
-        <FileUp className="size-3.5 sm:size-4" />
-      )}
-    </button>
-  )
+export default function DocumentScanner({ onScanned }: { onScanned: (result: { raw_text?: string }) => void }) {
+	const inputRef = useRef<HTMLInputElement>(null)
+	return (
+		<>
+			<input ref={inputRef} type="file" accept=".txt,.md,.json,.pdf,.docx,.png,.jpg,.jpeg" className="hidden" onChange={async (e) => {
+				const f = e.target.files?.[0]
+				if (!f) return
+				try {
+					// Minimal placeholder: read as text when possible
+					if (f.type.startsWith("text/") || f.type === "application/json") {
+						const txt = await f.text()
+						onScanned({ raw_text: txt.slice(0, 10000) })
+					} else {
+						onScanned({ raw_text: `Attached file: ${f.name} (${f.type || "unknown"})` })
+					}
+				} catch {
+					onScanned({ raw_text: `Attached file: ${f.name}` })
+				}
+			}} />
+			<Button type="button" variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 rounded-2xl" onClick={() => inputRef.current?.click()}>
+				<FileText className="h-4 w-4" />
+			</Button>
+		</>
+	)
 }
