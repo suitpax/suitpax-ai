@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail, SiDiscord } from "react-icons/si"
+import { SiX, SiGithub, SiLinkedin, SiCrunchbase, SiGmail, SiDiscord, SiReddit } from "react-icons/si"
 import { PiArrowUpRightBold, PiCalendarCheckBold } from "react-icons/pi"
 import { useEffect, useState } from "react"
 
@@ -237,6 +237,15 @@ export const Footer = () => {
                   <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
                 </svg>
                 <span className="sr-only">Instagram</span>
+              </Link>
+              <Link
+                href="https://www.reddit.com/r/t5_ey63ck/s/7AcTYrnTiH"
+                className="text-gray-400 hover:text-gray-200 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <SiReddit className="h-5 w-5" />
+                <span className="sr-only">Reddit</span>
               </Link>
               <Link
                 href="https://www.crunchbase.com/organization/suitpax"

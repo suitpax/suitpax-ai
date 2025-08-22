@@ -185,17 +185,22 @@ export default function PasswordGatePage() {
 
           {/* Removed city example cards to declutter */}
 
-          {/* Key highlights (2 only, glass) */}
+          {/* Key highlights */}
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl w-full">
-            {[
-              { title: 'Predictive Travel', desc: 'From intent to itinerary', tone: 'bg-white/80 border border-gray-200 text-gray-900' },
-              { title: 'Enterprise‑grade', desc: 'Security. Compliance. Control.', tone: 'bg-white/80 border border-gray-200 text-gray-900' },
-            ].map((c, i) => (
-              <div key={i} className={`rounded-2xl p-4 ${c.tone} backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-sm transition-shadow`}>
-                <div className="text-sm font-medium tracking-tight">{c.title}</div>
-                <div className="text-[12px] opacity-80 mt-1">{c.desc}</div>
+            <div className="rounded-2xl p-4 bg-white/80 border border-gray-200 text-gray-900 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-sm transition-shadow">
+              <div className="text-sm font-medium tracking-tight">Predictive Travel</div>
+              <div className="text-[12px] opacity-80 mt-1">From intent to itinerary</div>
+            </div>
+            <div className="rounded-2xl p-4 bg-black text-white border border-black/10 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-black/20 transition-shadow">
+              <div className="text-xs font-medium tracking-tight opacity-90">Changelog</div>
+              <div className="mt-1 space-y-1.5">
+                <div className="text-[12px] font-light">• New: Seat maps and ancillaries flow</div>
+                <div className="text-[12px] font-light">• Update: Faster AI expense analyzer</div>
+                <div className="text-[12px] font-light">• Fix: OAuth stability for Google</div>
+                <div className="text-[12px] font-light">• UI: Cleaner dashboard navigation</div>
               </div>
-            ))}
+              <a href="/changelog" className="inline-block mt-3 text-[11px] font-medium underline underline-offset-4 opacity-90 hover:opacity-100">See all updates →</a>
+            </div>
           </div>
 
           {/* Contact form (Brevo-ready): message, email, company */}

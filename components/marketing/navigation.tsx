@@ -238,6 +238,13 @@ export default function Navigation() {
                     <SiGmail className="h-4 w-4" />
                     <span className="sr-only">Email</span>
                   </Link>
+                  <Link href="https://www.reddit.com/r/t5_ey63ck/s/7AcTYrnTiH" className="text-gray-500 hover:text-black">
+                    {/* Reddit icon via SVG to avoid extra import weight */}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                      <path d="M14.5 3a1 1 0 0 0-1 1v2.126a7.96 7.96 0 0 0-2.5 0V4a1 1 0 1 0-2 0v2.585A8.003 8.003 0 0 0 4 14c0 4.418 4.03 8 9 8s9-3.582 9-8a8.003 8.003 0 0 0-5-7.415V4a1 1 0 0 0-1-1h-1.5ZM9 13a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm9 1.5a1.5 1.5 0 1 0-3.001-.001A1.5 1.5 0 0 0 18 14.5Zm-7.243 3.707a1 1 0 1 1 1.486-1.341c.492.545 1.233.634 1.75.634.517 0 1.258-.089 1.75-.634a1 1 0 1 1 1.486 1.341C16.43 19.216 15.338 19.5 14 19.5s-2.43-.284-3.243-1.293Z"/>
+                    </svg>
+                    <span className="sr-only">Reddit</span>
+                  </Link>
                 </div>
               </div>
 
