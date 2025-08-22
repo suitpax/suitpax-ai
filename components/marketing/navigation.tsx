@@ -165,6 +165,14 @@ export default function Navigation() {
 
           {isMobile && (
             <div className="flex items-center gap-2">
+              <Link href="https://discord.gg/suitpax" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
+                <FaDiscord className="h-4 w-4" />
+                <span className="sr-only">Discord</span>
+              </Link>
+              <Link href="https://linkedin.com/company/suitpax" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
+                <SiLinkedin className="h-4 w-4" />
+                <span className="sr-only">LinkedIn</span>
+              </Link>
               <Link href="mailto:hello@suitpax.com" className="px-2.5 py-1 rounded-full bg-black text-white text-[10px] font-medium">
                 Ask anything
               </Link>
