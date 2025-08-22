@@ -254,10 +254,10 @@ export default function PasswordGatePage() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-2.5 py-0.5 text-[10px] font-medium border border-white/20">
                   <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse [animation-delay:150ms]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-pulse [animation-delay:150ms]" />
                   </span>
-                  <span>Our AI Agents están trabajando...</span>
+                  <span>Our AI Agents are working…</span>
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-xl bg-white/10 px-2.5 py-0.5 text-[10px] font-medium border border-white/20">
                   <SmallSessionLoader label="" />

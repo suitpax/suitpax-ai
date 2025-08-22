@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowLeft, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -19,6 +20,7 @@ export default function ChatHeader({ title = "Suitpax AI", subtitle = "Ask anyth
 					<Link href={backHref} aria-label="Back to dashboard" className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-gray-200 bg-white hover:bg-gray-50">
 						<ArrowLeft className="h-4 w-4" />
 					</Link>
+					<Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={60} height={12} className="h-3.5 w-auto ml-1" />
 					<div className="min-w-0">
 						<h1 className="text-sm font-medium tracking-tight text-gray-900 leading-none truncate">{title}</h1>
 						<p className="text-[11px] text-gray-600 truncate">{subtitle}</p>
