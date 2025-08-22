@@ -7,6 +7,7 @@ import { motion } from "framer-motion"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import CityAnimateText from "@/components/ui/city-animate-text"
 import MiniCountdownBadge from "@/components/ui/mini-countdown"
+import { z } from "zod"
 // Icons removed (unused)
 
 export default function PasswordGatePage() {
@@ -20,6 +21,18 @@ export default function PasswordGatePage() {
   const [contactMessage, setContactMessage] = useState("")
   const [contactMsg, setContactMsg] = useState<string | null>(null)
   const [contactLoading, setContactLoading] = useState(false)
+  // Add visibility toggle
+  const [showPassword, setShowPassword] = useState(false)
+
+  const accessSchema = z.object({
+    password: z.string().min(6, "Access key must be at least 6 characters"),
+  })
+
+  const contactSchema = z.object({
+    email: z.string().email("Enter a valid email"),
+    company: z.string().min(2, "Company is required"),
+    message: z.string().min(10, "Message should be at least 10 characters"),
+  })
 
   useEffect(() => {
     const titles = [
@@ -60,6 +73,11 @@ export default function PasswordGatePage() {
     setLoading(true)
     setError("")
     try {
+      const parsed = accessSchema.safeParse({ password })
+      if (!parsed.success) {
+        setError(parsed.error.errors[0]?.message || "Invalid password")
+        return
+      }
       const res = await fetch("/api/password/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -84,6 +102,11 @@ export default function PasswordGatePage() {
     setContactMsg(null)
     setContactLoading(true)
     try {
+      const parsed = contactSchema.safeParse({ email: contactEmail, company: contactCompany, message: contactMessage })
+      if (!parsed.success) {
+        setContactMsg(parsed.error.errors[0]?.message || 'Invalid data')
+        return
+      }
       const resp = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -163,13 +186,28 @@ export default function PasswordGatePage() {
                 </video>
               </div>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter access key to continue"
                 className="flex-1 bg-transparent text-[12px] md:text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-8"
                 required
+                aria-invalid={!!error}
+                aria-describedby={error ? "password-error" : undefined}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-10 inline-flex items-center justify-center text-gray-400 hover:text-gray-600"
+                aria-label={showPassword ? "Hide access key" : "Show access key"}
+                title={showPassword ? "Hide access key" : "Show access key"}
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.11 1 12c.62-1.43 1.5-2.75 2.59-3.89M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.89 11 8-1 2.3-2.5 4.17-4.33 5.5M14 14a3 3 0 1 1-4-4"/><path d="M1 1l22 22"/></svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                )}
+              </button>
               <button
                 type="submit"
                 disabled={loading}
@@ -180,7 +218,7 @@ export default function PasswordGatePage() {
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </button>
             </div>
-            {error && <div className="mt-2 text-xs text-red-600">{error}</div>}
+            {error && <div id="password-error" className="mt-2 text-xs text-red-600">{error}</div>}
           </form>
 
           {/* Removed city example cards to declutter */}
