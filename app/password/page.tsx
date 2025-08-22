@@ -8,6 +8,7 @@ import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import CityAnimateText from "@/components/ui/city-animate-text"
 import MiniCountdownBadge from "@/components/ui/mini-countdown"
 import { z } from "zod"
+import { SmallSessionLoader } from "@/components/ui/loaders"
 // Icons removed (unused)
 
 export default function PasswordGatePage() {
@@ -230,14 +231,20 @@ export default function PasswordGatePage() {
               <div className="text-[12px] opacity-80 mt-1">From intent to itinerary</div>
             </div>
             <div className="rounded-2xl p-4 bg-black text-white border border-black/10 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-black/20 transition-shadow">
-              <div className="text-xs font-medium tracking-tight opacity-90">Changelog</div>
-              <div className="mt-1 space-y-1.5">
-                <div className="text-[12px] font-light">• New: Seat maps and ancillaries flow</div>
-                <div className="text-[12px] font-light">• Update: Faster AI expense analyzer</div>
-                <div className="text-[12px] font-light">• Fix: OAuth stability for Google</div>
-                <div className="text-[12px] font-light">• UI: Cleaner dashboard navigation</div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-2.5 py-0.5 text-[10px] font-medium border border-white/20">
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse [animation-delay:150ms]" />
+                  </span>
+                  <span>Our AI Agents están trabajando...</span>
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-xl bg-white/10 px-2.5 py-0.5 text-[10px] font-medium border border-white/20">
+                  <SmallSessionLoader label="" />
+                  <span>Booting services</span>
+                </span>
+                <a href="/changelog" className="inline-flex items-center rounded-xl bg-white/10 px-2.5 py-0.5 text-[10px] font-medium border border-white/20 hover:bg-white/15">Changelog →</a>
               </div>
-              <a href="/changelog" className="inline-block mt-3 text-[11px] font-medium underline underline-offset-4 opacity-90 hover:opacity-100">See all updates →</a>
             </div>
           </div>
 
