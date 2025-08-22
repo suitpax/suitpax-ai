@@ -10,6 +10,8 @@ import ChatHeader from "@/components/prompt-kit/chat-header"
 import { useChatStream } from "@/hooks/use-chat-stream"
 import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
 import SourceList from "@/components/prompt-kit/source-list"
+import { Message as PKMessage, MessageAvatar, MessageContent as PKMessageContent, MessageActions as PKMessageActions, MessageAction as PKMessageAction } from "@/components/prompt-kit/message"
+import { Copy, ThumbsUp, ThumbsDown } from "lucide-react"
 import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
 import DocumentScanner from "@/components/prompt-kit/document-scanner"
 import { Switch } from "@/components/ui/switch"
@@ -146,15 +148,21 @@ export default function SuitpaxAIPage() {
               </div>
             )}
 
-            {messages.map((m) => (
-              <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className="flex items-end gap-2 max-w-[85%] sm:max-w-[75%]">
-                  {m.role !== "user" && (
-                    <div className="h-6 w-6 rounded-full overflow-hidden border border-gray-200 bg-white/80 flex items-center justify-center text-[10px] text-gray-600">AI</div>
-                  )}
-                  <div className={`${m.role === "user" ? "bg-black text-white" : "bg-white/70 border border-gray-200 text-gray-900"} rounded-2xl px-4 py-3 flex-1`}>
-                    {m.role === "assistant" ? (
-                      <div className="prose prose-sm dark:prose-invert max-w-none">
+            {messages.map((m, idx) => {
+              const isAssistant = m.role === "assistant"
+              const isLast = idx === messages.length - 1
+              return (
+                <PKMessage
+                  key={m.id}
+                  className={`mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6 ${isAssistant ? "items-start" : "items-end"}`}
+                >
+                  {isAssistant ? (
+                    <div className="group flex w-full flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <MessageAvatar src="/logo/suitpax-bl-logo.webp" alt="AI" fallback="AI" />
+                        <div className="text-[10px] text-gray-500">{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                      </div>
+                      <PKMessageContent className="text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0" markdown>
                         <Markdown>{m.content}</Markdown>
                         {(() => {
                           const match = m.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
@@ -168,19 +176,40 @@ export default function SuitpaxAIPage() {
                             )
                           } catch { return null }
                         })()}
+                        {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
+                      </PKMessageContent>
+                      <PKMessageActions className={`-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 ${isLast ? "opacity-100" : ""}`}>
+                        <PKMessageAction tooltip="Copy" delayDuration={100}>
+                          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigator.clipboard.writeText(m.content)}>
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </PKMessageAction>
+                        <PKMessageAction tooltip="Upvote" delayDuration={100}>
+                          <Button variant="ghost" size="icon" className="rounded-full">
+                            <ThumbsUp className="h-4 w-4" />
+                          </Button>
+                        </PKMessageAction>
+                        <PKMessageAction tooltip="Downvote" delayDuration={100}>
+                          <Button variant="ghost" size="icon" className="rounded-full">
+                            <ThumbsDown className="h-4 w-4" />
+                          </Button>
+                        </PKMessageAction>
+                      </PKMessageActions>
+                    </div>
+                  ) : (
+                    <div className="group flex flex-col items-end gap-1">
+                      <div className="flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center text-[10px] text-gray-600">U</div>
+                        <div className="text-[10px] text-gray-500">{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                       </div>
-                    ) : (
-                      <div className="text-sm whitespace-pre-wrap">{m.content}</div>
-                    )}
-                    {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
-                    <div className="mt-1 text-[10px] text-gray-500">{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                  </div>
-                  {m.role === "user" && (
-                    <div className="h-6 w-6 rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center text-[10px] text-gray-600">U</div>
+                      <PKMessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 sm:max-w-[75%]">
+                        {m.content}
+                      </PKMessageContent>
+                    </div>
                   )}
-                </div>
-              </div>
-            ))}
+                </PKMessage>
+              )
+            })}
 
             {isLoading && (
               <div className="text-sm text-gray-600">Thinking…</div>
