@@ -32,6 +32,14 @@ import { VoiceAIProvider, useVoiceAI } from "@/contexts/voice-ai-context"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
 import MiniCountdownBadge from "@/components/ui/mini-countdown"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import { AgentSelector } from "@/components/voice-ai/agent-selector"
+import { VoiceLevelsMeter } from "@/components/voice-ai/voice-levels-meter"
+import { RecorderButton } from "@/components/voice-ai/recorder-button"
+import { WaveformVisualizer } from "@/components/voice-ai/waveform-visualizer"
+import { TranscriptPanel } from "@/components/voice-ai/transcript-panel"
+import { ResponsePanel } from "@/components/voice-ai/response-panel"
+import { CommandChips } from "@/components/voice-ai/command-chips"
+import { routeVoiceQuery } from "@/lib/voice-ai/router"
 
 function VoiceAIContent() {
   const [user, setUser] = useState<any>(null)
@@ -239,23 +247,19 @@ function VoiceAIContent() {
               :global(.animate-hero-shimmer) { animation: shimmer 2.8s linear infinite; background-size: 200% 100%; }
             `}</style>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="relative">
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="hidden md:block min-w-[240px]">
+              <AgentSelector />
+            </div>
+            <div className="flex-1 md:flex-none">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search conversations..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-64 rounded-2xl border-gray-200 bg-white/80 backdrop-blur-sm"
+                className="pl-10 w-full md:w-64 rounded-2xl border-gray-200 bg-white/80 backdrop-blur-sm"
               />
             </div>
-            <Button
-              variant="outline"
-              className="rounded-2xl bg-white/80 backdrop-blur-sm border-gray-200"
-              onClick={() => updateSettings({ autoSpeak: !voiceSettings.autoSpeak })}
-            >
-              {voiceSettings.autoSpeak ? "Auto-speak: On" : "Auto-speak: Off"}
-            </Button>
           </div>
         </motion.div>
 
@@ -277,37 +281,20 @@ function VoiceAIContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="rounded-2xl border border-gray-200 bg-white/80 p-4 backdrop-blur-sm">
             <div className="text-sm font-medium text-gray-700 mb-2">Transcript</div>
-            <div className="min-h-[72px] rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-800 whitespace-pre-wrap">
-              {currentTranscript || (isProcessing ? "Processing…" : "Start talking to begin a conversation")}
-            </div>
-            {currentError && <div className="mt-2 text-xs text-red-600">{String(currentError)}</div>}
+            <TranscriptPanel text={currentTranscript || (isProcessing ? "Processing…" : "")} />
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white/80 p-4 backdrop-blur-sm">
             <div className="text-sm font-medium text-gray-700 mb-2">Response</div>
-            <div className="min-h-[72px] rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-800 whitespace-pre-wrap">
-              {aiResponse || "—"}
-            </div>
+            <ResponsePanel text={aiResponse} />
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white/80 p-4 backdrop-blur-sm">
             <div className="text-sm font-medium text-gray-700 mb-2">Quick actions</div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                "Find flights MAD → SFO tomorrow",
-                "Summarize this meeting",
-                "Create expense for Uber 35€",
-              ].map((q) => (
-                <Button key={q} variant="outline" className="rounded-xl" onClick={() => handleProcessMessage(q)}>
-                  {q}
-                </Button>
-              ))}
-            </div>
+            <CommandChips items={["Find flights MAD → SFO tomorrow", "Summarize this meeting", "Create expense for Uber 35€"]} onPick={(q) => handleProcessMessage(q)} />
           </div>
         </div>
 
         <div className="flex items-center justify-center gap-3">
-          <Button onClick={handleStartRecording} className="rounded-2xl px-6">
-            {isRecording ? "Stop" : "Start"}
-          </Button>
+          <RecorderButton recording={isRecording} onClick={handleStartRecording} />
           <Button variant="outline" className="rounded-2xl" onClick={() => handleProcessMessage(currentTranscript || currentMessage)} disabled={!currentTranscript && !currentMessage}>
             Send transcript
           </Button>
