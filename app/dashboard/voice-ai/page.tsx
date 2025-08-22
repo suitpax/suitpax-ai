@@ -31,7 +31,7 @@ import { Progress } from "@/components/ui/progress"
 import { VoiceAIProvider, useVoiceAI } from "@/contexts/voice-ai-context"
 import { useSpeechToText } from "@/hooks/use-speech-recognition"
 import MiniCountdownBadge from "@/components/ui/mini-countdown"
-import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+// Vanta removed elsewhere; keep here if desired, otherwise consider static backgrounds for performance
 import { AgentSelector } from "@/components/voice-ai/agent-selector"
 import { VoiceLevelsMeter } from "@/components/voice-ai/voice-levels-meter"
 import { RecorderButton } from "@/components/voice-ai/recorder-button"

@@ -10,6 +10,7 @@ import MiniCountdownBadge from "@/components/ui/mini-countdown"
 import { z } from "zod"
 import { SmallSessionLoader } from "@/components/ui/loaders"
 // Icons removed (unused)
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function PasswordGatePage() {
   const router = useRouter()
@@ -163,7 +164,26 @@ export default function PasswordGatePage() {
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Design. Ship. Scale.</span>
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Predict. Plan. Automate.</span>
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Flights. Hotels. Finance.</span>
-            <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Chat. Voice. Agents.</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button className="inline-flex items-center rounded-lg bg-black text-white px-2 py-0.5 border border-black/10">
+                    <span className="flex items-center gap-1 mr-1">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-gray-300 animate-pulse [animation-delay:150ms]" />
+                    </span>
+                    Our AI Agents are working…
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-black text-white border border-white/20">
+                  <div className="space-y-1">
+                    <div className="text-[11px]">Systems updating and calibrating.</div>
+                    <div className="text-[11px]">Real-time analytics warming up.</div>
+                    <div className="text-[11px]">You can continue — no action needed.</div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           {/* Removed small city strip */}
 

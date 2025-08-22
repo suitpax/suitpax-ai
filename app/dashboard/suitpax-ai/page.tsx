@@ -52,6 +52,9 @@ export default function SuitpaxAIPage() {
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" })
+    // Extra scroll tick to avoid freeze on rapid updates
+    const id = window.requestAnimationFrame(() => listRef.current?.scrollTo({ top: listRef.current!.scrollHeight }))
+    return () => window.cancelAnimationFrame(id)
   }, [messages])
 
   const handleFilesAdded = (newFiles: File[]) => setFiles(prev => [...prev, ...newFiles])
@@ -129,7 +132,7 @@ export default function SuitpaxAIPage() {
         {/* @ts-expect-error Async Server Component types mismatch not relevant here */}
         <ChatHeader title="Suitpax AI" subtitle="Ask anything. Travel. Business. Code." />
         {/* Content area */}
-        <div ref={listRef} className="flex-1 overflow-y-auto" role="feed" aria-label="Chat messages">
+        <div ref={listRef} className="flex-1 overflow-y-auto" role="feed" aria-label="Chat messages" aria-live="polite">
           <div className="mx-auto w-full max-w-3xl px-4 py-6 space-y-4">
             {messages.length === 0 && !isLoading && (
               <div className="space-y-4">
