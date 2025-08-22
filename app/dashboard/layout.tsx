@@ -139,8 +139,6 @@ export default function DashboardLayout({
         </main>
       </div>
 
-      <Toaster position="top-right" />
-
       {/* Mobile bottom navigation */}
       <NavMobile />
     </div>
