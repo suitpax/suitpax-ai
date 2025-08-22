@@ -337,7 +337,7 @@ export default function PoliciesPage() {
         <Card className="border-gray-200">
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-4"><div className="p-2 bg-purple-100 rounded-xl"><Brain className="h-5 w-5 text-purple-600" /></div><div><h3 className="font-medium tracking-tighter text-black">AI Policy Generator</h3><p className="text-sm text-gray-600">Describe your needs and get a custom policy</p></div></div>
-            <AIPolicyGenerator />
+            <div className="text-sm text-gray-600">Coming soon</div>
           </CardContent>
         </Card>
       </div>

@@ -13,8 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
 import { useDropzone } from "react-dropzone"
-import { useEditor, EditorContent } from "@tiptap/react"
-import StarterKit from "@tiptap/starter-kit"
+// Temporarily remove TipTap due to type conflicts; use a textarea editor
 
 interface Task {
   id: string
@@ -95,15 +94,7 @@ export default function TasksPage() {
 
   const supabase = createClient()
 
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: "",
-    editorProps: {
-      attributes: {
-        class: "prose prose-sm max-w-none focus:outline-none min-h-[100px] p-3 rounded-lg border",
-      },
-    },
-  })
+  const [richText, setRichText] = useState("")
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -157,7 +148,7 @@ export default function TasksPage() {
     const task: Task = {
       id: Date.now().toString(),
       title: newTask.title,
-      description: editor?.getHTML() || newTask.description,
+      description: richText || newTask.description,
       status: "todo",
       priority: newTask.priority,
       assignee: newTask.assignee,
@@ -176,7 +167,7 @@ export default function TasksPage() {
       dueDate: "",
       tags: [],
     })
-    editor?.commands.clearContent()
+    setRichText("")
   }
 
   return (
@@ -217,9 +208,12 @@ export default function TasksPage() {
 
                   <div>
                     <Label className="text-sm font-medium text-gray-700">Description</Label>
-                    <div className="mt-1 border border-gray-200 rounded-xl overflow-hidden">
-                      <EditorContent editor={editor} />
-                    </div>
+                    <textarea
+                      value={richText}
+                      onChange={(e) => setRichText(e.target.value)}
+                      className="mt-1 w-full min-h-[120px] rounded-xl border border-gray-200 p-3 text-sm"
+                      placeholder="Describe the task details..."
+                    />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">

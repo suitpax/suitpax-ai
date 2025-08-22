@@ -48,7 +48,7 @@ interface FlightFilter {
   id: string
   label: string
   value: string
-  type: 'cabin' | 'airline' | 'stops' | 'price' | 'time'
+  type?: 'cabin' | 'airline' | 'stops' | 'price' | 'time'
 }
 
 interface FlightFiltersDisplayProps {

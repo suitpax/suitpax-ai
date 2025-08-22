@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
     if (id) {
       if (lpCacheById.has(id)) return Response.json({ data: lpCacheById.get(id) as DuffelLoyaltyProgramme })
-      const item = await duffel.loyaltyProgrammes.get(id)
+      const item = await (duffel as any).loyaltyProgrammes.get(id)
       lpCacheById.set(id, item)
       return Response.json({ data: item as unknown as DuffelLoyaltyProgramme })
     }
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     if (ownerAirlineId) {
       const key = ownerAirlineId
       if (lpCacheByOwner.has(key)) return Response.json({ data: lpCacheByOwner.get(key) as DuffelLoyaltyProgramme[] })
-      const list = await duffel.loyaltyProgrammes.list({ limit: 200 })
+      const list = await (duffel as any).loyaltyProgrammes.list({ limit: 200 })
       const arr = list.data.filter((l: any) => l.owner_airline_id === ownerAirlineId)
       lpCacheByOwner.set(key, arr)
       return Response.json({ data: arr as DuffelLoyaltyProgramme[] })
@@ -36,13 +36,13 @@ export async function GET(req: NextRequest) {
     if (alliance) {
       const key = alliance.toLowerCase()
       if (lpCacheByAlliance.has(key)) return Response.json({ data: lpCacheByAlliance.get(key) as DuffelLoyaltyProgramme[] })
-      const list = await duffel.loyaltyProgrammes.list({ limit: 200 })
+      const list = await (duffel as any).loyaltyProgrammes.list({ limit: 200 })
       const arr = list.data.filter((l: any) => (l.alliance || "").toLowerCase() === key)
       lpCacheByAlliance.set(key, arr)
       return Response.json({ data: arr as DuffelLoyaltyProgramme[] })
     }
 
-    const result = await duffel.loyaltyProgrammes.list({ limit, after, before })
+    const result = await (duffel as any).loyaltyProgrammes.list({ limit, after, before })
     return Response.json(result as DuffelListResponse<DuffelLoyaltyProgramme>)
   } catch (e: any) {
     return new Response(JSON.stringify({ error: e?.message || "Duffel error" }), { status: 500 })

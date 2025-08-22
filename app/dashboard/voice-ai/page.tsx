@@ -34,7 +34,7 @@ import MiniCountdownBadge from "@/components/ui/mini-countdown"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 
 function VoiceAIContent() {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<any>(null)
   const {
     state: voiceState,
     settings: voiceSettings,

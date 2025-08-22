@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       if (aircraftCacheById.has(id)) return Response.json({ data: aircraftCacheById.get(id) as DuffelAircraft })
       const aircraft = await duffel.aircraft.get(id)
       aircraftCacheById.set(id, aircraft)
-      if (aircraft?.iata_code) aircraftCacheByIata.set(String(aircraft.iata_code).toUpperCase(), aircraft)
+      if ((aircraft as any)?.iata_code) aircraftCacheByIata.set(String((aircraft as any).iata_code).toUpperCase(), aircraft)
       return Response.json({ data: aircraft as unknown as DuffelAircraft })
     }
 

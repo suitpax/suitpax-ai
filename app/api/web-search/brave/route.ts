@@ -13,22 +13,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Brave API key not configured" }, { status: 500 })
     }
 
-    const response = await fetch("https://api.search.brave.com/res/v1/web/search", {
+    const url = new URL("https://api.search.brave.com/res/v1/web/search")
+    url.search = new URLSearchParams({
+      q: query,
+      count: count.toString(),
+      offset: offset.toString(),
+      search_lang: "en",
+      country: "US",
+      safesearch: "moderate",
+      freshness: "pw",
+    }).toString()
+
+    const response = await fetch(url.toString(), {
       method: "GET",
       headers: {
         Accept: "application/json",
         "Accept-Encoding": "gzip",
         "X-Subscription-Token": braveApiKey,
       },
-      params: new URLSearchParams({
-        q: query,
-        count: count.toString(),
-        offset: offset.toString(),
-        search_lang: "en",
-        country: "US",
-        safesearch: "moderate",
-        freshness: "pw", // Past week for business travel relevance
-      }),
     })
 
     if (!response.ok) {

@@ -42,11 +42,8 @@ export default function DashboardPage() {
             <PromptInput
               value={""}
               onValueChange={() => {}}
-              onSubmit={(v) => {
-                const val = typeof v === "string" ? v : ""
-                if (!val.trim()) return
-                window.location.href = `/dashboard/ai-center?tab=chat&prompt=${encodeURIComponent(val)}`
-              }}
+              onSubmit={() => {}
+              }
               isLoading={false}
               className="bg-white border-gray-200 shadow-sm"
             >

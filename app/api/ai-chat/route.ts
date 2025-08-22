@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
       enhancedMessage += buildToolContext(toolType, toolData)
     }
 
-    const initial: any = await anthropic.beta.messages.create({
+    const initial: any = await (anthropic as any).messages.create({
       model: "claude-3-7-sonnet-20250219",
       max_tokens: Math.min(20000, maxTokensForResponse),
       temperature: 1,
