@@ -1,4 +1,4 @@
-import { ElevenLabsApi } from "elevenlabs"
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js"
 
 const apiKey = process.env.ELEVENLABS_API_KEY
 
@@ -6,9 +6,7 @@ if (!apiKey) {
   throw new Error("ELEVENLABS_API_KEY is not set")
 }
 
-const elevenlabs = new ElevenLabsApi({
-  apiKey,
-})
+const elevenlabs = new ElevenLabsClient({ apiKey })
 
 export interface Voice {
   voice_id: string
@@ -55,19 +53,22 @@ export const AGENT_VOICES: Record<string, Voice> = {
 
 export async function generateSpeech(text: string, voiceId: string): Promise<ArrayBuffer> {
   try {
-    const audio = await elevenlabs.generate({
-      voice: voiceId,
+    const res = await elevenlabs.textToSpeech.convert({
+      voiceId,
+      outputFormat: "mp3_44100_128",
+      modelId: "eleven_multilingual_v2",
       text,
-      model_id: "eleven_multilingual_v2",
-      voice_settings: {
+      applyTextNormalization: true,
+      optimizeStreamingLatency: 2,
+      voiceSettings: {
         stability: 0.5,
-        similarity_boost: 0.8,
+        similarityBoost: 0.8,
         style: 0.2,
-        use_speaker_boost: true,
+        useSpeakerBoost: true,
       },
     })
-
-    return audio
+    const arrayBuffer = await res.arrayBuffer()
+    return arrayBuffer
   } catch (error) {
     console.error("Error generating speech:", error)
     throw error
@@ -76,13 +77,13 @@ export async function generateSpeech(text: string, voiceId: string): Promise<Arr
 
 export async function getAvailableVoices(): Promise<Voice[]> {
   try {
-    const voices = await elevenlabs.voices.getAll()
-    return voices.voices.map((voice) => ({
+    const { voices } = await elevenlabs.voices.getAll()
+    return voices.map((voice: any) => ({
       voice_id: voice.voice_id,
       name: voice.name,
-      category: voice.category || "general",
-      description: voice.description || "",
-      preview_url: voice.preview_url,
+      category: (voice as any).category || "general",
+      description: (voice as any).description || "",
+      preview_url: (voice as any).preview_url,
     }))
   } catch (error) {
     console.error("Error fetching voices:", error)

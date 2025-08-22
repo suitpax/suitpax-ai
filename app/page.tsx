@@ -14,7 +14,6 @@ import ContactForm from "@/components/marketing/contact-form"
 // Removed AIAirlinesHero to avoid airline logos in homepage partners context
 import APITravel from "@/components/marketing/api-travel"
 import BusinessTravelSlider from "@/components/marketing/business-travel-slider"
-import FlightBookingShowcase from "@/components/marketing/flight-booking-showcase"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -84,7 +83,6 @@ export default function Home() {
         <AIVoiceAssistant />
         <APITravel />
         <BusinessTravelSlider />
-        <FlightBookingShowcase />
         <HyperspeedBooking />
         {/* AIAirlinesHero removed per request */}
         <AIMeetingsAttachment />
