@@ -25,7 +25,6 @@ export default function CarrierLogo({ iata, name, className = "", width = 20, he
 			height={height}
 			alt={name || iata}
 			className={className}
-			unoptimized
 			onError={(e) => {
 				try {
 					const el = e.target as HTMLImageElement
