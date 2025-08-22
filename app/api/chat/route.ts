@@ -86,6 +86,8 @@ export async function POST(request: NextRequest) {
       /\b(expense|expenses|cost|costs|spending|budget|financial)\b/i.test(message) ||
       /\b(analyze|review).*\b(expenses|costs|spending)\b/i.test(message)
 
+    const wantsWeb = (webSearch === true) || /\b(search|buscar|who\s+is|what\s+is|news|latest|cite|source|sources)\b/i.test(message)
+
     let toolData: any = null
     let toolType = "general"
 
@@ -131,11 +133,34 @@ export async function POST(request: NextRequest) {
       } catch (error) { console.error("Expense analysis tool error:", error) }
     }
 
-    // Always use central System prompt; add inline-thinking instruction if requested
+    // Web search context (Brave) → citations
+    let webContext = ""
+    if (wantsWeb) {
+      try {
+        const ws = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/web-search/brave`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: message })
+        })
+        if (ws.ok) {
+          const json = await ws.json()
+          const items = (json?.results || []).slice(0, 5)
+          for (const r of items) {
+            sources.push({ title: r.title, url: r.url, snippet: r.snippet })
+          }
+          if (items.length > 0) {
+            const lines = items.map((r: any, i: number) => `- [${i + 1}] ${r.title} — ${r.url}`)
+            webContext = `\n\nWeb context:\n${lines.join("\n")}\nUse and cite sources when applicable.`
+          }
+        }
+      } catch (e) { console.error("Web search error:", e) }
+    }
+
+    // Always use central System prompt; add inline-thinking instruction if requested + web context
     const thinkingInlineInstruction = includeReasoningInline
       ? "\n\nWhen requested, include your high-level thinking wrapped in <thinking>...</thinking> (3–5 bullets), then the main answer. Do not include private chain-of-thought; keep it brief."
       : ""
-    const systemPrompt = `${SUITPAX_AI_SYSTEM_PROMPT}${thinkingInlineInstruction}`.trim()
+    const systemPrompt = `${SUITPAX_AI_SYSTEM_PROMPT}${thinkingInlineInstruction}${webContext}`.trim()
 
     let enhancedMessage = message
 
