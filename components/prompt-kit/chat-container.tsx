@@ -1,171 +1,133 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 
-const useAutoScroll = (
-  containerRef: React.RefObject<HTMLDivElement | null>,
-  enabled: boolean
-) => {
-  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true)
-  const lastScrollTopRef = useRef(0)
-  const autoScrollingRef = useRef(false)
-  const [newMessageAdded, setNewMessageAdded] = useState(false)
-  const prevChildrenCountRef = useRef(0)
-  const scrollTriggeredRef = useRef(false)
-
-  const isAtBottom = useCallback((element: HTMLDivElement) => {
-    const { scrollTop, scrollHeight, clientHeight } = element
-    return scrollHeight - scrollTop - clientHeight <= 8
-  }, [])
-
-  const scrollToBottom = useCallback(
-    (behavior: ScrollBehavior = "smooth") => {
-      const container = containerRef.current
-      if (!container) return
-
-      autoScrollingRef.current = true
-      scrollTriggeredRef.current = true
-
-      const targetScrollTop = container.scrollHeight - container.clientHeight
-
-      container.scrollTo({
-        top: targetScrollTop,
-        behavior: behavior,
-      })
-
-      const checkScrollEnd = () => {
-        if (Math.abs(container.scrollTop - targetScrollTop) < 5) {
-          autoScrollingRef.current = false
-          scrollTriggeredRef.current = false
-          return
-        }
-        requestAnimationFrame(checkScrollEnd)
-      }
-      requestAnimationFrame(checkScrollEnd)
-
-      const safetyTimeout = setTimeout(() => {
-        autoScrollingRef.current = false
-        scrollTriggeredRef.current = false
-      }, 500)
-
-      try {
-        const handleScrollEnd = () => {
-          autoScrollingRef.current = false
-          scrollTriggeredRef.current = false
-          clearTimeout(safetyTimeout)
-          container.removeEventListener("scrollend", handleScrollEnd)
-        }
-        container.addEventListener("scrollend", handleScrollEnd, { once: true })
-      } catch (e) {
-        // fallback when scrollend unsupported
-      }
-    },
-    [containerRef]
-  )
-
-  useEffect(() => {
-    if (!enabled) return
-    const container = containerRef?.current
-    if (!container) return
-
-    lastScrollTopRef.current = container.scrollTop
-
-    const handleScroll = () => {
-      if (autoScrollingRef.current) return
-      const currentScrollTop = container.scrollTop
-      if (currentScrollTop < lastScrollTopRef.current && autoScrollEnabled) setAutoScrollEnabled(false)
-      if (isAtBottom(container) && !autoScrollEnabled) setAutoScrollEnabled(true)
-      lastScrollTopRef.current = currentScrollTop
-    }
-
-    const handleWheel = (e: WheelEvent) => { if (e.deltaY < 0 && autoScrollEnabled) setAutoScrollEnabled(false) }
-    const handleTouchStart = () => { lastScrollTopRef.current = container.scrollTop }
-    const handleTouchMove = () => {
-      if (container.scrollTop < lastScrollTopRef.current && autoScrollEnabled) setAutoScrollEnabled(false)
-      lastScrollTopRef.current = container.scrollTop
-    }
-    const handleTouchEnd = () => { if (isAtBottom(container) && !autoScrollEnabled) setAutoScrollEnabled(true) }
-
-    container.addEventListener("scroll", handleScroll, { passive: true })
-    container.addEventListener("wheel", handleWheel, { passive: true })
-    container.addEventListener("touchstart", handleTouchStart, { passive: true })
-    container.addEventListener("touchmove", handleTouchMove, { passive: true })
-    container.addEventListener("touchend", handleTouchEnd, { passive: true })
-
-    return () => {
-      container.removeEventListener("scroll", handleScroll)
-      container.removeEventListener("wheel", handleWheel)
-      container.removeEventListener("touchstart", handleTouchStart)
-      container.removeEventListener("touchmove", handleTouchMove)
-      container.removeEventListener("touchend", handleTouchEnd)
-    }
-  }, [containerRef, enabled, autoScrollEnabled, isAtBottom])
-
-  return { autoScrollEnabled, scrollToBottom, isScrolling: autoScrollingRef.current, scrollTriggered: scrollTriggeredRef.current, newMessageAdded, setNewMessageAdded, prevChildrenCountRef }
+// Context para compartir el estado del scroll
+type ChatContainerContextType = {
+  isScrolledToBottom: boolean
+  scrollToBottom: () => void
+  containerRef: React.RefObject<HTMLDivElement>
 }
 
-export type ChatContainerProps = {
+const ChatContainerContext = createContext<ChatContainerContextType | null>(null)
+
+export function useChatContainer() {
+  const context = useContext(ChatContainerContext)
+  if (!context) {
+    throw new Error("useChatContainer must be used within a ChatContainerRoot")
+  }
+  return context
+}
+
+export type ChatContainerRootProps = {
   children: React.ReactNode
   className?: string
-  autoScroll?: boolean
-  scrollToRef?: React.RefObject<HTMLDivElement | null>
-  ref?: React.RefObject<HTMLDivElement | null>
 } & React.HTMLAttributes<HTMLDivElement>
 
-function ChatContainer({ className, children, autoScroll = true, scrollToRef, ref, ...props }: ChatContainerProps) {
+export function ChatContainerRoot({
+  children,
+  className,
+  ...props
+}: ChatContainerRootProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const localBottomRef = useRef<HTMLDivElement>(null)
-  const bottomRef = scrollToRef || localBottomRef
-  const chatContainerRef = ref || containerRef
-  const prevChildrenRef = useRef<React.ReactNode>(null)
-  const contentChangedWithoutNewMessageRef = useRef(false)
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(true)
 
-  const { autoScrollEnabled, scrollToBottom, isScrolling, scrollTriggered, newMessageAdded, setNewMessageAdded, prevChildrenCountRef } = useAutoScroll(chatContainerRef, autoScroll)
-
-  useEffect(() => { scrollToBottom("auto") }, [scrollToBottom])
-
-  useEffect(() => {
-    const childrenArray = React.Children.toArray(children)
-    const currentChildrenCount = childrenArray.length
-    if (currentChildrenCount > prevChildrenCountRef.current) setNewMessageAdded(true)
-    else if (prevChildrenRef.current !== children) contentChangedWithoutNewMessageRef.current = true
-    prevChildrenCountRef.current = currentChildrenCount
-    prevChildrenRef.current = children
-  }, [children, setNewMessageAdded])
-
-  useEffect(() => {
-    if (!autoScroll) return
-    const scrollHandler = () => {
-      if (newMessageAdded) { scrollToBottom("smooth"); setNewMessageAdded(false); contentChangedWithoutNewMessageRef.current = false }
-      else if (contentChangedWithoutNewMessageRef.current && autoScrollEnabled && !isScrolling && !scrollTriggered) {
-        scrollToBottom("smooth"); contentChangedWithoutNewMessageRef.current = false
-      }
+  const scrollToBottom = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({
+        top: containerRef.current.scrollHeight,
+        behavior: "smooth",
+      })
     }
-    requestAnimationFrame(scrollHandler)
-  }, [children, autoScroll, autoScrollEnabled, isScrolling, scrollTriggered, scrollToBottom, newMessageAdded, setNewMessageAdded])
+  }
+
+  const handleScroll = () => {
+    if (containerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = containerRef.current
+      const threshold = 100 // px from bottom
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < threshold
+      setIsScrolledToBottom(isAtBottom)
+    }
+  }
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (container) {
+      container.addEventListener("scroll", handleScroll)
+      return () => container.removeEventListener("scroll", handleScroll)
+    }
+  }, [])
+
+  const contextValue: ChatContainerContextType = {
+    isScrolledToBottom,
+    scrollToBottom,
+    containerRef,
+  }
 
   return (
-    <div className={cn("flex flex-col overflow-y-auto", className)} role="log" ref={chatContainerRef} {...props}>
+    <ChatContainerContext.Provider value={contextValue}>
+      <div
+        ref={containerRef}
+        className={cn("relative overflow-y-auto", className)}
+        {...props}
+      >
+        {children}
+      </div>
+    </ChatContainerContext.Provider>
+  )
+}
+
+export type ChatContainerContentProps = {
+  children: React.ReactNode
+  className?: string
+} & React.HTMLAttributes<HTMLDivElement>
+
+export function ChatContainerContent({
+  children,
+  className,
+  ...props
+}: ChatContainerContentProps) {
+  return (
+    <div className={cn("w-full", className)} {...props}>
       {children}
-      <div ref={bottomRef} className="h-[1px] w-full flex-shrink-0 scroll-mt-4" aria-hidden="true" />
     </div>
   )
 }
 
-export { ChatContainer }
+export type ChatContainerScrollAnchorProps = {
+  className?: string
+} & React.HTMLAttributes<HTMLDivElement>
 
-// Additional primitives to match new layout API
-export function ChatContainerRoot({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <div className={cn("flex h-full flex-col", className)}>{children}</div>
-}
+export function ChatContainerScrollAnchor({
+  className,
+  ...props
+}: ChatContainerScrollAnchorProps) {
+  const { isScrolledToBottom, scrollToBottom } = useChatContainer()
+  const anchorRef = useRef<HTMLDivElement>(null)
 
-export function ChatContainerContent({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <ChatContainer className={cn("flex-1 min-h-0", className)}>{children}</ChatContainer>
-}
+  useEffect(() => {
+    if (isScrolledToBottom && anchorRef.current) {
+      anchorRef.current.scrollIntoView({ behavior: "smooth" })
+    }
+  }, [isScrolledToBottom])
 
-export function ChatContainerScrollAnchor() {
-  const ref = useRef<HTMLDivElement>(null)
-  return <div ref={ref} className="h-4" aria-hidden="true" />
+  // Auto-scroll when new content is added and user is at bottom
+  useEffect(() => {
+    if (isScrolledToBottom) {
+      const timer = setTimeout(() => {
+        scrollToBottom()
+      }, 50)
+      return () => clearTimeout(timer)
+    }
+  }, [isScrolledToBottom, scrollToBottom])
+
+  return (
+    <div
+      ref={anchorRef}
+      className={cn("h-1 w-full", className)}
+      {...props}
+    />
+  )
 }
 
