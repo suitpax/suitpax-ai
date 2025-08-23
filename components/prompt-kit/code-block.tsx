@@ -1,8 +1,7 @@
 "use client"
 
+import React, { memo } from "react"
 import { cn } from "@/lib/utils"
-import { memo } from "react"
-import type React from "react"
 
 export function CodeBlock({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
@@ -22,8 +21,8 @@ export function CodeBlockGroup({ className, children }: { className?: string; ch
 
 export const CodeBlockCode = memo(function CodeBlockCode({ code, language }: { code: string; language: string }) {
   return (
-    <pre>
-      <code className={`language-${language}`}>{code}</code>
+    <pre className="overflow-x-auto p-3 text-xs">
+      <code className={language ? `language-${language}` : undefined}>{code}</code>
     </pre>
   )
 })
