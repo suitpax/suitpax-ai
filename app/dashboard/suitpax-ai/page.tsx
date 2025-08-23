@@ -143,8 +143,12 @@ export default function AIChat() {
   }
 
   const handleSend = async () => {
+    // Bloquear si ya hay loading o si el input está vacío
     if (!input.trim() || loading) return;
 
+    setLoading(true);
+
+    // Mensaje que se va a agregar cuando se reciba la respuesta
     const userMessage: Message = {
       id: Date.now().toString(),
       content: input.trim(),
@@ -152,19 +156,19 @@ export default function AIChat() {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setFiles([]);
-    setLoading(true);
+    // NO actualizar el estado del historial antes de la petición
+    // Esto evita que history contenga el mensaje duplicado
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           message: userMessage.content,
-          history: messages,
-          context: "travel_booking", // O ajusta esto según el dominio
+          history: messages, // Pasa aquí SÓLO el historial actual, sin el mensaje nuevo
+          context: "travel_booking",
           includeReasoning: showReasoning,
         }),
       });
@@ -200,17 +204,19 @@ export default function AIChat() {
         parsedOffers = data.offers;
       }
 
-      // Mensaje normal del asistente
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: typeof data.response === "string" ? data.response.replace(blockRegex, "").trim() : "",
-        role: "assistant",
-        timestamp: new Date(),
-        reasoning: data.reasoning, // Razonamiento real del API
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-      setTypingMessageId(assistantMessage.id);
+      // Solo ahora, agrega el mensaje del usuario y la respuesta del asistente
+      const assistantId = (Date.now() + 1).toString()
+      setMessages(prev => [
+        ...prev,
+        userMessage,
+        {
+          id: assistantId,
+          content: typeof data.response === "string" ? data.response.replace(blockRegex, "").trim() : "",
+          role: "assistant",
+          timestamp: new Date(),
+          reasoning: data.reasoning,
+        },
+      ]);
 
       // Renderiza las ofertas si existen
       if (parsedOffers && parsedOffers.length > 0) {
@@ -222,21 +228,26 @@ export default function AIChat() {
         };
         setMessages((prev) => [...prev, blockMessage]);
       }
+
+      setInput("");
+      setFiles([]);
+      setTypingMessageId(assistantId);
     } catch (error) {
-      console.error("Error sending message:", error);
-      setMessages((prev) => [
+      // Manejo de errores
+      setMessages(prev => [
         ...prev,
+        userMessage,
         {
-          id: (Date.now() + 1).toString(),
+          id: (Date.now() + 2).toString(),
           content: "Sorry, I encountered an error. Please try again.",
           role: "assistant",
           timestamp: new Date(),
           reasoning: showReasoning
-            ? "An error occurred while processing the request. The system attempted to maintain connection and provide a helpful response despite technical difficulties."
+            ? "An error occurred while processing the request."
             : undefined,
         },
       ]);
-      setTypingMessageId(null);
+      setTypingMessageId((Date.now() + 2).toString());
     } finally {
       setLoading(false);
     }
@@ -356,7 +367,7 @@ export default function AIChat() {
             
             {loading && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-                <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 max-w-[90%] sm:max-w-xs">
+                <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 max-w-[95%] sm:max-w-sm md:max-w-md">
                   <div className="flex items-center space-x-2 mb-2">
                     <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
                       <Image
@@ -385,7 +396,7 @@ export default function AIChat() {
           
           {/* Scroll Button flotante */}
           <ScrollButton className="bottom-20 sm:bottom-24 right-4 sm:right-6" />
-          <MetricsHUD estimatedInputTokens={Math.ceil((input + JSON.stringify(messages)).length / 4)} estimatedOutputTokens={800} />
+          <MetricsHUD visible={false} estimatedInputTokens={Math.ceil((input + JSON.stringify(messages)).length / 4)} estimatedOutputTokens={800} />
         </ChatContainerRoot>
       </div>
 
