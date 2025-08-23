@@ -1,12 +1,10 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 let anthropicClient: Anthropic | null = null;
-function getAnthropicClient(): Anthropic {
+export function getAnthropicClient(): Anthropic {
   if (!anthropicClient) {
     const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      throw new Error("ANTHROPIC_API_KEY is not set");
-    }
+    if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set");
     anthropicClient = new Anthropic({ apiKey });
   }
   return anthropicClient;
@@ -17,34 +15,33 @@ export interface ConversationMessage {
   content: string;
 }
 
-// Configuración según tu pricing y criterio de modelos
-const PLAN_CONFIGS = {
+export const PLAN_CONFIGS = {
   free: {
-    model: "claude-3-7-sonnet-20250219",
-    maxTokens: 1000,
-    monthlyTokens: 10_000,
+    model: "claude-sonnet-4-20250514",
+    maxTokensPerCall: 1000,     // Límite por respuesta
+    monthlyTokens: 7500,        // Límite mensual
   },
   starter: {
-    model: "claude-3-7-sonnet-20250219",
-    maxTokens: 2000,
-    monthlyTokens: 50_000,
+    model: "claude-sonnet-4-20250514",
+    maxTokensPerCall: 2000,
+    monthlyTokens: 20000,
   },
   pro: {
-    model: "claude-3-7-sonnet-20250219",
-    maxTokens: 4000,
-    monthlyTokens: 250_000,
+    model: "claude-sonnet-4-20250514",
+    maxTokensPerCall: 4000,
+    monthlyTokens: 35000,
   },
   scale: {
-    model: "claude-3-7-sonnet-20250219",
-    maxTokens: 8000,
-    monthlyTokens: 1_000_000,
+    model: "claude-sonnet-4-20250514",
+    maxTokensPerCall: 8000,
+    monthlyTokens: 80000,
   },
   enterprise: {
-    model: "claude-3-7-sonnet-20250219",
-    maxTokens: 8000,
-    monthlyTokens: undefined,
-  }
-} as const
+    model: "claude-sonnet-4-20250514",
+    maxTokensPerCall: 8000,
+    monthlyTokens: null as number | null,        // Sin límite
+  },
+} as const;
 
 export type UserPlan = keyof typeof PLAN_CONFIGS;
 
@@ -54,26 +51,33 @@ export async function generateAgentResponseByPlan(
   temperature: number = 0.7,
   systemPrompt?: string
 ): Promise<{ text: string; inputTokens?: number; outputTokens?: number; model: string }> {
-  const config = PLAN_CONFIGS[userPlan] || PLAN_CONFIGS["free"];
-  try {
-    const anthropic = getAnthropicClient();
-    const response = await anthropic.messages.create({
-      model: config.model,
-      max_tokens: config.maxTokens,
-      temperature,
-      system: systemPrompt,
-      messages: messages.map((msg) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-    });
-    const text = (response as any).content?.find?.((c: any) => c.type === "text")?.text || "";
-    const usage = (response as any).usage || {};
-    return { text, inputTokens: usage.input_tokens, outputTokens: usage.output_tokens, model: config.model };
-  } catch (error) {
-    console.error("Error generating agent response:", error);
-    throw error;
-  }
+  const config = PLAN_CONFIGS[userPlan] || PLAN_CONFIGS['free'];
+  const anthropic = getAnthropicClient();
+
+  const response = await anthropic.messages.create({
+    model: config.model,
+    max_tokens: config.maxTokensPerCall,
+    temperature,
+    system: systemPrompt,
+    messages: messages.map((msg) => ({
+      role: msg.role,
+      content: msg.content,
+    })),
+  });
+
+  const responseBlock = (response as any).content?.[0];
+  const text = responseBlock && responseBlock.type === "text" && typeof responseBlock.text === "string"
+    ? responseBlock.text.trim()
+    : "";
+
+  const usage = (response as any).usage || {};
+
+  return {
+    text,
+    inputTokens: usage.input_tokens,
+    outputTokens: usage.output_tokens,
+    model: config.model,
+  };
 }
 
 export async function streamAgentResponse(

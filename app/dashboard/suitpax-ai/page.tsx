@@ -72,7 +72,7 @@ const TypingText: React.FC<{ text: string; speed?: number; onComplete?: () => vo
   return <span>{displayedText}</span>
 }
 
-export default function AIChatPage() {
+export default function AIChat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
@@ -143,90 +143,102 @@ export default function AIChatPage() {
   }
 
   const handleSend = async () => {
-    if (!input.trim() || loading) return
+    if (!input.trim() || loading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       content: input.trim(),
       role: "user",
       timestamp: new Date(),
-    }
+    };
 
-    setMessages((prev) => [...prev, userMessage])
-    setInput("")
-    setFiles([])
-    setLoading(true)
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setFiles([]);
+    setLoading(true);
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: userMessage.content,
           history: messages,
-          context: "travel_booking", // Contexto específico para Suitpax
-          includeReasoning: showReasoning, // Incluir razonamiento si está activado
+          context: "travel_booking", // O ajusta esto según el dominio
+          includeReasoning: showReasoning,
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to get response")
+        // Error de límites de tokens (plan agotado)
+        if (response.status === 429) {
+          const errData = await response.json();
+          alert(
+            errData.details?.message ||
+            "You've reached your AI token limit for your current plan. Please upgrade or wait for your quota to reset."
+          );
+        } else {
+          alert("Error fetching response from Suitpax AI. Please try again.");
+        }
+        setLoading(false);
+        return;
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
-      // Parse optional :::flight_offers_json block from response
-      let parsedOffers: Array<ChatFlightOffer> | null = null
-      const blockRegex = /:::flight_offers_json[\s\S]*?\n({[\s\S]*?})\n:::/
-      const match = typeof data.response === "string" ? data.response.match(blockRegex) : null
+      // Parseador del bloque :::flight_offers_json
+      let parsedOffers: Array<ChatFlightOffer> | null = null;
+      const blockRegex = /:::flight_offers_json[\s\S]*?\n({[\s\S]*?})\n:::/;
+      const match = typeof data.response === "string" ? data.response.match(blockRegex) : null;
       if (match && match[1]) {
         try {
-          const obj = JSON.parse(match[1])
-          if (Array.isArray(obj?.offers)) parsedOffers = obj.offers
+          const obj = JSON.parse(match[1]);
+          if (Array.isArray(obj?.offers)) parsedOffers = obj.offers;
         } catch {}
       }
-      // Fallback to tool payload offers if present
       if (!parsedOffers && Array.isArray(data.offers)) {
-        parsedOffers = data.offers
+        parsedOffers = data.offers;
       }
 
+      // Mensaje normal del asistente
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: (typeof data.response === "string" ? data.response.replace(blockRegex, "").trim() : ""),
+        content: typeof data.response === "string" ? data.response.replace(blockRegex, "").trim() : "",
         role: "assistant",
         timestamp: new Date(),
         reasoning: data.reasoning, // Razonamiento real del API
-      }
+      };
 
-      setMessages((prev) => [...prev, assistantMessage])
-      setTypingMessageId(assistantMessage.id)
+      setMessages((prev) => [...prev, assistantMessage]);
+      setTypingMessageId(assistantMessage.id);
 
-      // Render block if we have offers
+      // Renderiza las ofertas si existen
       if (parsedOffers && parsedOffers.length > 0) {
-        // Store a synthetic assistant block message with a marker; we'll render cards inline below the text.
         const blockMessage: Message = {
           id: (Date.now() + 2).toString(),
           content: JSON.stringify({ __type: "flight_offers", offers: parsedOffers }),
           role: "assistant",
           timestamp: new Date(),
-        }
-        setMessages((prev) => [...prev, blockMessage])
+        };
+        setMessages((prev) => [...prev, blockMessage]);
       }
     } catch (error) {
-      console.error("Error sending message:", error)
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "Sorry, I encountered an error. Please try again.",
-        role: "assistant",
-        timestamp: new Date(),
-        reasoning: showReasoning ? "An error occurred while processing the request. The system attempted to maintain connection and provide a helpful response despite technical difficulties." : undefined,
-      }
-      setMessages((prev) => [...prev, errorMessage])
-      setTypingMessageId(errorMessage.id)
+      console.error("Error sending message:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          content: "Sorry, I encountered an error. Please try again.",
+          role: "assistant",
+          timestamp: new Date(),
+          reasoning: showReasoning
+            ? "An error occurred while processing the request. The system attempted to maintain connection and provide a helpful response despite technical difficulties."
+            : undefined,
+        },
+      ]);
+      setTypingMessageId(null);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
