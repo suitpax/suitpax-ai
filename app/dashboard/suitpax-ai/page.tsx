@@ -28,7 +28,7 @@ import {
 } from "@/components/prompt-kit/reasoning"
 import Markdown from "@/components/prompt-kit/markdown"
 import ChatHeader from "@/components/prompt-kit/chat-header"
-import FlightOffersBlock, { type ChatFlightOffer } from "@/components/prompt-kit/blocks/flight-offers-block"
+import FlightOffersBlock, { type ChatFlightOffer } from "@/components/prompt-kit/flight-offers-block"
 import { useRouter } from "next/navigation"
 import VoiceButton from "@/components/prompt-kit/voice-button"
 import MetricsHUD from "@/components/prompt-kit/metrics-hud"
