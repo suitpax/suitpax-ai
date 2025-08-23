@@ -87,6 +87,18 @@ export default function AIChatPage() {
     "From intent to itinerary.",
     "Plan, approve, reconcile.",
   ]
+  const [heroTitle, setHeroTitle] = useState("")
+  const emptyTitles = [
+    "Ask anything to Suitpax AI",
+    "Plan business travel with AI",
+    "Your AI copilot for travel & expense",
+    "Search flights, hotels and policies",
+    "Book smarter with MCP agents",
+    "Travel, expense, and approvals — simplified",
+    "From intent to itinerary in one flow",
+    "Conversations that get trips done",
+    "AI that understands your travel",
+  ]
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
@@ -98,6 +110,7 @@ export default function AIChatPage() {
 
   useEffect(() => {
     setHeroSubtitle(emptySubtitles[Math.floor(Math.random() * emptySubtitles.length)])
+    setHeroTitle(emptyTitles[Math.floor(Math.random() * emptyTitles.length)])
   }, [])
 
   useEffect(() => {
@@ -198,7 +211,7 @@ export default function AIChatPage() {
           <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4">
             {messages.length === 0 && !loading && (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif tracking-tighter text-gray-900">Ask anything to Suitpax AI</h1>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif tracking-tighter text-gray-900">{heroTitle}</h1>
                 <p className="text-xs sm:text-sm text-gray-600 font-light mt-2">{heroSubtitle}</p>
               </div>
             )}
