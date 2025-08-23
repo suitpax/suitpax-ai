@@ -9,7 +9,7 @@ import remarkBreaks from "remark-breaks"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import rehypeKatex from "rehype-katex"
-import { ButtonCopy } from "../common/button-copy"
+import { ButtonCopy } from "../commons/button-copy"
 import { CodeBlock, CodeBlockCode, CodeBlockGroup } from "./code-block"
 
 export type MarkdownProps = { children: string; id?: string; className?: string; components?: Partial<Components> }
