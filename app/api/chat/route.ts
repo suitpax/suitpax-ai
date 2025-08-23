@@ -33,40 +33,44 @@ export async function POST(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser()
 
-    if (!user?.id) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
-    }
+    // Proceed even if not authenticated (anonymous defaults to free tier)
+    const userId = user?.id || null
 
     // Estimate tokens
     const estimatedInputTokens = Math.ceil((message + JSON.stringify(conversationHistory)).length / 4)
     const estimatedOutputTokens = 1000
 
     // Token limits
-    const { data: canUseTokens } = await supabase.rpc("can_use_ai_tokens_v2", {
-      user_uuid: user.id,
-      tokens_needed: estimatedInputTokens + estimatedOutputTokens,
-    })
-    if (!canUseTokens) {
-      const { data: planLimits } = await supabase.rpc("get_user_plan_limits", { user_uuid: user.id })
-      const limits = planLimits?.[0]
-      return NextResponse.json(
-        {
-          error: "Token limit exceeded",
-          details: {
-            message: `You've reached your AI token limit for the ${limits?.plan_name || "current"} plan.`,
-            tokensUsed: limits?.ai_tokens_used || 0,
-            tokensLimit: limits?.ai_tokens_limit || 0,
-            planName: limits?.plan_name || "free",
-            upgradeRequired: true,
+    if (userId) {
+      const { data: canUseTokens } = await supabase.rpc("can_use_ai_tokens_v2", {
+        user_uuid: userId,
+        tokens_needed: estimatedInputTokens + estimatedOutputTokens,
+      })
+      if (!canUseTokens) {
+        const { data: planLimits } = await supabase.rpc("get_user_plan_limits", { user_uuid: userId })
+        const limits = planLimits?.[0]
+        return NextResponse.json(
+          {
+            error: "Token limit exceeded",
+            details: {
+              message: `You've reached your AI token limit for the ${limits?.plan_name || "current"} plan.`,
+              tokensUsed: limits?.ai_tokens_used || 0,
+              tokensLimit: limits?.ai_tokens_limit || 0,
+              planName: limits?.plan_name || "free",
+              upgradeRequired: true,
+            },
           },
-        },
-        { status: 429 },
-      )
+          { status: 429 },
+        )
+      }
     }
 
     // Per-plan max tokens
-    const { data: planLimitsOk } = await supabase.rpc("get_user_plan_limits", { user_uuid: user.id })
-    const planName = (planLimitsOk?.[0]?.plan_name?.toLowerCase?.() || "free").replace("basic","starter").replace("premium","pro")
+    let planName = "free"
+    if (userId) {
+      const { data: planLimitsOk } = await supabase.rpc("get_user_plan_limits", { user_uuid: userId })
+      planName = (planLimitsOk?.[0]?.plan_name?.toLowerCase?.() || "free").replace("basic","starter").replace("premium","pro")
+    }
     const planToMaxTokens: Record<string, number> = { free: 1000, starter: 2000, pro: 4000, scale: 8000, enterprise: 8000 }
     const maxTokensForResponse = planToMaxTokens[planName] ?? 2048
 
