@@ -4,11 +4,11 @@ import MCPAIAgents from "@/components/marketing/mcp-ai-agents"
 import AITravelAgents from "@/components/marketing/ai-travel-agents"
 
 export const metadata: Metadata = {
-	title: "AI Agents for Business Travel",
+	title: "Suitpax",
 	description:
 		"Meet Suitpax AI Agents powered by MCP. Persistent context, multi‑step planning, and deep integrations to automate business travel and expenses.",
 	openGraph: {
-		title: "Suitpax AI Agents — MCP context and automations",
+		title: "Suitpax",
 		description:
 			"Agents with long‑term memory, workflow orchestration and real‑time travel intelligence.",
 		url: "https://suitpax.com/ai-agents",
