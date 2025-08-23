@@ -6,16 +6,28 @@ import { HOTELS_EXPERT_SYSTEM_PROMPT } from "@/lib/prompts/agents/hotels-expert"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 export async function POST(request: NextRequest) {
-  const {
-    message,
-    history = [],
-    includeReasoning = false,
-    includeReasoningInline = false,
-    webSearch = false,
-    agent,
-  } = await request.json();
+  let message: string | undefined
+  let history: any[] = []
+  let includeReasoning = false
+  let includeReasoningInline = false
+  let webSearch = false
+  let agent: string | undefined
 
-  if (!message) return NextResponse.json({ error: "Message is required" }, { status: 400 });
+  try {
+    const body = await request.json()
+    message = body?.message
+    history = Array.isArray(body?.history) ? body.history : []
+    includeReasoning = Boolean(body?.includeReasoning)
+    includeReasoningInline = Boolean(body?.includeReasoningInline)
+    webSearch = Boolean(body?.webSearch)
+    agent = body?.agent
+  } catch (e: any) {
+    return NextResponse.json({ error: 'Invalid JSON body', details: process.env.NODE_ENV === 'development' ? e?.message : undefined }, { status: 400 })
+  }
+
+  if (!message) {
+    return NextResponse.json({ error: 'Message is required' }, { status: 400 })
+  }
 
   const conversationHistory = history.map((msg: any) => ({
     role: msg.role,
@@ -216,8 +228,11 @@ export async function POST(request: NextRequest) {
       tool: toolData,
       offers: toolData?.offers || null,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("AI Chat error:", error);
-    return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Internal server error",
+      details: process.env.NODE_ENV === 'development' ? error?.message : undefined
+    }, { status: 500 });
   }
 }
