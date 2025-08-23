@@ -14,7 +14,7 @@ export interface ChatRouterInput {
   includeReasoning?: boolean
   userPlan?: UserPlan
   baseUrl?: string
-  agent?: "flights" | "hotels"
+  agent?: "core" | "flights" | "hotels"
 }
 
 export interface ChatRouterOutput {
@@ -86,9 +86,10 @@ async function callTool(intent: ChatIntent, message: string, baseUrl: string, us
   return null
 }
 
-function buildSystemForIntent(intent: ChatIntent, agent?: "flights" | "hotels"): string {
+function buildSystemForIntent(intent: ChatIntent, agent?: "core" | "flights" | "hotels"): string {
   if (agent === "flights") return FLIGHTS_EXPERT_SYSTEM_PROMPT
   if (agent === "hotels") return HOTELS_EXPERT_SYSTEM_PROMPT
+  if (agent === "core") return SUITPAX_AI_SYSTEM_PROMPT
   if (intent === "flight_search") return SUITPAX_AI_SYSTEM_PROMPT
   if (intent === "code_generation") return SUITPAX_CODE_SYSTEM_PROMPT
   return buildSystemPrompt({ domain: ["general", "travel", "coding", "business", "documents", "expenses"] })

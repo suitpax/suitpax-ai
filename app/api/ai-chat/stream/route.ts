@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { buildSystemPrompt, System } from "@/lib/prompts/system"
+import { FLIGHTS_EXPERT_SYSTEM_PROMPT } from "@/lib/prompts/agents/flights-expert"
+import { HOTELS_EXPERT_SYSTEM_PROMPT } from "@/lib/prompts/agents/hotels-expert"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 export const dynamic = "force-dynamic"
@@ -13,13 +15,13 @@ function getAnthropic() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, history = [] } = await req.json()
+    const { message, history = [], agent }: { message: string; history?: Array<{ role: "user" | "assistant"; content: string }>; agent?: "core" | "flights" | "hotels" } = await req.json()
     if (!message) return new Response("Message required", { status: 400 })
 
     const supabase = createServerSupabase()
     const { data: { user } } = await supabase.auth.getUser()
 
-    const system = System
+    const system = agent === "flights" ? FLIGHTS_EXPERT_SYSTEM_PROMPT : agent === "hotels" ? HOTELS_EXPERT_SYSTEM_PROMPT : System
 
     const client = getAnthropic()
     if (!client) return new Response("AI not configured", { status: 500 })

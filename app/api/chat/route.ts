@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { buildReasoningInstruction, buildToolContext, System as SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/system"
+import { FLIGHTS_EXPERT_SYSTEM_PROMPT } from "@/lib/prompts/agents/flights-expert"
+import { HOTELS_EXPERT_SYSTEM_PROMPT } from "@/lib/prompts/agents/hotels-expert"
 import { createClient as createServerSupabase } from "@/lib/supabase/server"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
@@ -16,6 +18,7 @@ export async function POST(request: NextRequest) {
     webSearch = false,
     deepSearch = false,
     sessionId,
+    agent,
   } = await request.json()
   if (!message) return NextResponse.json({ error: "Message is required" }, { status: 400 })
 
@@ -160,7 +163,8 @@ export async function POST(request: NextRequest) {
     const thinkingInlineInstruction = includeReasoningInline
       ? "\n\nWhen requested, include your high-level thinking wrapped in <thinking>...</thinking> (3–5 bullets), then the main answer. Do not include private chain-of-thought; keep it brief."
       : ""
-    const systemPrompt = `${SUITPAX_AI_SYSTEM_PROMPT}${thinkingInlineInstruction}${webContext}`.trim()
+    const baseSystem = agent === "flights" ? FLIGHTS_EXPERT_SYSTEM_PROMPT : agent === "hotels" ? HOTELS_EXPERT_SYSTEM_PROMPT : SUITPAX_AI_SYSTEM_PROMPT
+    const systemPrompt = `${baseSystem}${thinkingInlineInstruction}${webContext}`.trim()
 
     let enhancedMessage = message
 

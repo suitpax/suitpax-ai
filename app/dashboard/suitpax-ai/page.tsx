@@ -42,6 +42,7 @@ export default function SuitpaxAIPage() {
   const [files, setFiles] = useState<File[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [includeReasoningInline, setIncludeReasoningInline] = useState(true)
+  const [agent, setAgent] = useState<"core" | "flights" | "hotels">("core")
   const listRef = useRef<HTMLDivElement>(null)
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const { isStreaming, start, cancel } = useChatStream()
@@ -53,6 +54,15 @@ export default function SuitpaxAIPage() {
     }
     run()
   }, [supabase])
+
+  useEffect(() => {
+    function onAgentChange(e: any) {
+      const a = e?.detail?.agent
+      if (a === "core" || a === "flights" || a === "hotels") setAgent(a)
+    }
+    window.addEventListener("suitpax-agent-change", onAgentChange as any)
+    return () => window.removeEventListener("suitpax-agent-change", onAgentChange as any)
+  }, [])
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" })
@@ -77,6 +87,7 @@ export default function SuitpaxAIPage() {
         message: userMessage.content,
         history: messages,
         includeReasoningInline,
+        agent,
       }),
     })
     if (!response.ok) throw new Error("Failed to get response")
@@ -107,7 +118,7 @@ export default function SuitpaxAIPage() {
         await sendNonStreaming(userMessage)
       } else {
         let streamed = ""
-        await start({ message: userMessage.content, history: messages }, async (token) => {
+        await start({ message: userMessage.content, history: messages, agent }, async (token) => {
           streamed += token
           setMessages((prev) => {
             const others = prev.filter((m) => m.id !== "stream-temp")
