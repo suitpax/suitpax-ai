@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { User, Mail, Phone, Building, Globe, Save, Loader2 } from "lucide-react"
 import { createBrowserClient } from "@supabase/ssr"
-import toast from "react-hot-toast"
+import { showToast, showError } from "@/lib/toast"
 
 interface UserProfile {
   full_name?: string
@@ -46,10 +46,10 @@ export default function ProfilePage() {
         setUser(data.user)
         setProfile(data.profile || {})
       } else {
-        toast.error("Failed to load profile")
+        showError("Failed to load profile")
       }
     } catch (error) {
-      toast.error("Error loading profile")
+      showError("Error loading profile")
     } finally {
       setLoading(false)
     }
@@ -68,12 +68,12 @@ export default function ProfilePage() {
       })
 
       if (response.ok) {
-        toast.success("Profile updated successfully")
+        showToast("Profile updated successfully")
       } else {
-        toast.error("Failed to update profile")
+        showError("Failed to update profile")
       }
     } catch (error) {
-      toast.error("Error updating profile")
+      showError("Error updating profile")
     } finally {
       setSaving(false)
     }

@@ -4,6 +4,7 @@ import ClientLayout from "./ClientLayout"
 import { Suspense } from "react"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import ToastProvider from "@/components/ui/toast-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }
           >
             <ClientLayout>{children}</ClientLayout>
+            <ToastProvider />
           </Suspense>
         </ThemeProvider>
       </body>

@@ -1,63 +1,29 @@
 "use client"
 
 import { useCallback } from "react"
-import toast from "react-hot-toast"
-
-interface ErrorHandlerOptions {
-  showToast?: boolean
-  logError?: boolean
-  redirectOnAuth?: boolean
-}
+import { dismissToast, showError, showLoading, showToast } from "@/lib/toast"
 
 export function useErrorHandler() {
-  const handleError = useCallback((error: any, options: ErrorHandlerOptions = {}) => {
-    const { showToast = true, logError = true, redirectOnAuth = true } = options
-
-    // Log del error
-    if (logError) {
-      console.error("Error handled:", error)
-    }
-
-    // Determinar el mensaje de error
-    let message = "Ha ocurrido un error inesperado"
-
-    if (error?.response?.data?.message) {
-      message = error.response.data.message
-    } else if (error?.message) {
-      message = error.message
-    }
-
-    // Mostrar toast si está habilitado
-    if (showToast) {
-      toast.error(message)
-    }
-
-    // Manejar errores de autenticación
-    if (error?.response?.status === 401 && redirectOnAuth) {
-      setTimeout(() => {
-        window.location.href = "/auth/login"
-      }, 1500)
-    }
-
-    return message
+  const handleError = useCallback((message = "Something went wrong") => {
+    showError(message)
   }, [])
 
-  const handleSuccess = useCallback((message = "Operación exitosa") => {
-    toast.success(message)
+  const handleSuccess = useCallback((message = "Operation successful") => {
+    showToast(message)
   }, [])
 
-  const handleLoading = useCallback((message = "Cargando...") => {
-    return toast.loading(message)
+  const handleLoading = useCallback((message = "Loading…") => {
+    return showLoading(message)
   }, [])
 
-  const dismissToast = useCallback((toastId: string) => {
-    toast.dismiss(toastId)
+  const handleDismiss = useCallback((toastId?: string) => {
+    dismissToast(toastId)
   }, [])
 
   return {
     handleError,
     handleSuccess,
     handleLoading,
-    dismissToast,
+    handleDismiss,
   }
 }

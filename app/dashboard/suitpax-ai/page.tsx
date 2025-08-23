@@ -6,14 +6,18 @@ import { PromptInput, PromptInputActions, PromptInputTextarea, PromptInputAction
 import { FileUpload, FileUploadContent, FileUploadTrigger } from "@/components/prompt-kit/file-upload"
 import { Button } from "@/components/ui/button"
 import { Paperclip, ArrowUp, Square } from "lucide-react"
-import VantaHaloBackground from "@/components/ui/vanta-halo-background"
+import ChatHeader from "@/components/prompt-kit/chat-header"
 import { useChatStream } from "@/hooks/use-chat-stream"
 import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
 import SourceList from "@/components/prompt-kit/source-list"
+import { Message as PKMessage, MessageAvatar, MessageContent as PKMessageContent, MessageActions as PKMessageActions, MessageAction as PKMessageAction } from "@/components/prompt-kit/message"
+import { Copy, ThumbsUp, ThumbsDown } from "lucide-react"
 import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
 import DocumentScanner from "@/components/prompt-kit/document-scanner"
 import { Switch } from "@/components/ui/switch"
 import { Markdown } from "@/components/prompt-kit/markdown"
+import { ChatContainerRoot, ChatContainerContent } from "@/components/prompt-kit/chat-container"
+import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 
 interface Message {
   id: string
@@ -52,6 +56,9 @@ export default function SuitpaxAIPage() {
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" })
+    // Extra scroll tick to avoid freeze on rapid updates
+    const id = window.requestAnimationFrame(() => listRef.current?.scrollTo({ top: listRef.current!.scrollHeight }))
+    return () => window.cancelAnimationFrame(id)
   }, [messages])
 
   const handleFilesAdded = (newFiles: File[]) => setFiles(prev => [...prev, ...newFiles])
@@ -63,7 +70,7 @@ export default function SuitpaxAIPage() {
   const isFlightIntent = (text: string) => /\b([A-Z]{3})\b.*\b(to|→|-)\b.*\b([A-Z]{3})\b/i.test(text) || /\bflight|vuelo|vuelos\b/i.test(text)
 
   const sendNonStreaming = async (userMessage: Message) => {
-    const response = await fetch("/api/ai-chat", {
+    const response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -123,11 +130,14 @@ export default function SuitpaxAIPage() {
   const handleSuggestion = (prompt: string) => setValue(prompt)
 
   return (
-    <VantaHaloBackground className="bg-black/5">
+    <div className="bg-white">
       <div className="fixed inset-0 flex flex-col">
+        {/* Chat Header */}
+        {/* @ts-expect-error Async Server Component types mismatch not relevant here */}
+        <ChatHeader title="Suitpax AI" subtitle="Ask anything. Travel. Business. Code." />
         {/* Content area */}
-        <div ref={listRef} className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-3xl px-4 py-6 space-y-4">
+        <ChatContainerRoot className="flex-1">
+          <ChatContainerContent className="mx-auto w-full max-w-3xl px-4 py-6 space-y-4" role="feed" aria-label="Chat messages" aria-live="polite">
             {messages.length === 0 && !isLoading && (
               <div className="space-y-4">
                 <div className="text-center py-10">
@@ -138,38 +148,77 @@ export default function SuitpaxAIPage() {
               </div>
             )}
 
-            {messages.map((m) => (
-              <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`${m.role === "user" ? "bg-black text-white" : "bg-white/70 border border-gray-200 text-gray-900"} rounded-2xl px-4 py-3 max-w-[85%] sm:max-w-[75%]`}>
-                  {m.role === "assistant" ? (
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                      <Markdown>{m.content}</Markdown>
-                      {(() => {
-                        const match = m.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
-                        if (!match) return null
-                        try {
-                          const parsed = JSON.parse(match[1])
-                          return (
-                            <div className="mt-2">
-                              <ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => { if (id) window.location.href = `/dashboard/flights/book/${id}` }} />
-                            </div>
-                          )
-                        } catch { return null }
-                      })()}
+            {messages.map((m, idx) => {
+              const isAssistant = m.role === "assistant"
+              const isLast = idx === messages.length - 1
+              return (
+                <PKMessage
+                  key={m.id}
+                  className={`mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6 ${isAssistant ? "items-start" : "items-end"}`}
+                >
+                  {isAssistant ? (
+                    <div className="group flex w-full flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <MessageAvatar src="/logo/suitpax-bl-logo.webp" alt="AI" fallback="AI" />
+                        <div className="text-[10px] text-gray-500">{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                      </div>
+                      <PKMessageContent className="text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0" markdown>
+                        <Markdown>{m.content}</Markdown>
+                        {(() => {
+                          const match = m.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
+                          if (!match) return null
+                          try {
+                            const parsed = JSON.parse(match[1])
+                            return (
+                              <div className="mt-2">
+                                <ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => { if (id) window.location.href = `/dashboard/flights/book/${id}` }} />
+                              </div>
+                            )
+                          } catch { return null }
+                        })()}
+                        {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
+                      </PKMessageContent>
+                      <PKMessageActions className={`-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 ${isLast ? "opacity-100" : ""}`}>
+                        <PKMessageAction tooltip="Copy" delayDuration={100}>
+                          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigator.clipboard.writeText(m.content)}>
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </PKMessageAction>
+                        <PKMessageAction tooltip="Upvote" delayDuration={100}>
+                          <Button variant="ghost" size="icon" className="rounded-full">
+                            <ThumbsUp className="h-4 w-4" />
+                          </Button>
+                        </PKMessageAction>
+                        <PKMessageAction tooltip="Downvote" delayDuration={100}>
+                          <Button variant="ghost" size="icon" className="rounded-full">
+                            <ThumbsDown className="h-4 w-4" />
+                          </Button>
+                        </PKMessageAction>
+                      </PKMessageActions>
                     </div>
                   ) : (
-                    <div className="text-sm whitespace-pre-wrap">{m.content}</div>
+                    <div className="group flex flex-col items-end gap-1">
+                      <div className="flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center text-[10px] text-gray-600">U</div>
+                        <div className="text-[10px] text-gray-500">{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                      </div>
+                      <PKMessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 sm:max-w-[75%]">
+                        {m.content}
+                      </PKMessageContent>
+                    </div>
                   )}
-                  {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
-                </div>
-              </div>
-            ))}
+                </PKMessage>
+              )
+            })}
 
             {isLoading && (
               <div className="text-sm text-gray-600">Thinking…</div>
             )}
-          </div>
-        </div>
+            <div className="fixed right-6 bottom-24">
+              <ScrollButton />
+            </div>
+          </ChatContainerContent>
+        </ChatContainerRoot>
 
         {/* Bottom docked prompt */}
         <div className="border-t border-gray-200 bg-white/70 backdrop-blur-sm">
@@ -188,6 +237,7 @@ export default function SuitpaxAIPage() {
                 onValueChange={setValue}
                 isLoading={isLoading || isStreaming}
                 onSubmit={handleSend}
+                aria-label="AI prompt input"
                 className="w-full border border-gray-200 rounded-3xl p-0 pt-1 bg-white"
               >
                 {files.length > 0 && (
@@ -213,7 +263,7 @@ export default function SuitpaxAIPage() {
                     </FileUploadTrigger>
                   </PromptInputAction>
                   <PromptInputAction tooltip={isLoading || isStreaming ? "Stop" : "Send"}>
-                    <Button size="icon" disabled={!value.trim() || isLoading || isStreaming} onClick={handleSend} className="h-8 w-8 rounded-full">
+                    <Button size="icon" aria-label={isLoading || isStreaming ? "Stop generation" : "Send message"} disabled={!value.trim() || isLoading || isStreaming} onClick={handleSend} className="h-8 w-8 rounded-full">
                       {!isLoading && !isStreaming ? <ArrowUp className="size-4" /> : <span className="size-3 rounded-xs bg-gray-900" />}
                     </Button>
                   </PromptInputAction>
@@ -231,6 +281,6 @@ export default function SuitpaxAIPage() {
           </div>
         </div>
       </div>
-    </VantaHaloBackground>
+    </div>
   )
 }

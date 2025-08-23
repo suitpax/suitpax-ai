@@ -78,14 +78,6 @@ export default function Navigation() {
         >
           {isMobile ? (
             <div className="flex items-center gap-2">
-              <Link href="https://discord.gg/suitpax" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
-                <FaDiscord className="h-4 w-4" />
-                <span className="sr-only">Discord</span>
-              </Link>
-              <Link href="https://linkedin.com/company/suitpax" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
-                <SiLinkedin className="h-4 w-4" />
-                <span className="sr-only">LinkedIn</span>
-              </Link>
               <Link href="/" className="flex items-center">
                 <Image
                   src="/logo/suitpax-bl-logo.webp"
@@ -126,15 +118,7 @@ export default function Navigation() {
                     )}
                   </Link>
                 ))}
-              <Link
-                href="https://discord.gg/suitpax"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-2 py-0.5 text-xs bg-transparent border border-black rounded-md font-medium tracking-tighter transition-colors flex items-center gap-1 text-black"
-              >
-                <FaDiscord className="h-4 w-4" />
-                Discord (coming soon)
-              </Link>
+              
               {loading ? (
                 <div className="w-16 h-6 bg-gray-200 animate-pulse rounded-lg"></div>
               ) : user ? (
@@ -165,6 +149,14 @@ export default function Navigation() {
 
           {isMobile && (
             <div className="flex items-center gap-2">
+              <Link href="https://discord.gg/suitpax" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
+                <FaDiscord className="h-4 w-4" />
+                <span className="sr-only">Discord</span>
+              </Link>
+              <Link href="https://linkedin.com/company/suitpax" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
+                <SiLinkedin className="h-4 w-4" />
+                <span className="sr-only">LinkedIn</span>
+              </Link>
               <Link href="mailto:hello@suitpax.com" className="px-2.5 py-1 rounded-full bg-black text-white text-[10px] font-medium">
                 Ask anything
               </Link>
@@ -237,6 +229,13 @@ export default function Navigation() {
                   <Link href="mailto:hello@suitpax.com" className="text-gray-500 hover:text-black">
                     <SiGmail className="h-4 w-4" />
                     <span className="sr-only">Email</span>
+                  </Link>
+                  <Link href="https://www.reddit.com/r/t5_ey63ck/s/7AcTYrnTiH" className="text-gray-500 hover:text-black">
+                    {/* Reddit icon via SVG to avoid extra import weight */}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                      <path d="M14.5 3a1 1 0 0 0-1 1v2.126a7.96 7.96 0 0 0-2.5 0V4a1 1 0 1 0-2 0v2.585A8.003 8.003 0 0 0 4 14c0 4.418 4.03 8 9 8s9-3.582 9-8a8.003 8.003 0 0 0-5-7.415V4a1 1 0 0 0-1-1h-1.5ZM9 13a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm9 1.5a1.5 1.5 0 1 0-3.001-.001A1.5 1.5 0 0 0 18 14.5Zm-7.243 3.707a1 1 0 1 1 1.486-1.341c.492.545 1.233.634 1.75.634.517 0 1.258-.089 1.75-.634a1 1 0 1 1 1.486 1.341C16.43 19.216 15.338 19.5 14 19.5s-2.43-.284-3.243-1.293Z"/>
+                    </svg>
+                    <span className="sr-only">Reddit</span>
                   </Link>
                 </div>
               </div>

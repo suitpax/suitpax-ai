@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
+import { z } from "zod"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -40,6 +41,55 @@ interface SavedSearchItem {
   name: string
   created_at: string
   search_params: SearchParams
+}
+
+const showToast = (message: string) => {
+  return toast.custom(
+    () => (
+      <div className="inline-flex items-center gap-2 rounded-xl bg-gray-200 text-black border border-gray-300 px-3 py-2 shadow-sm">
+        <span className="flex items-center gap-1">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-black animate-pulse" />
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-gray-300 animate-pulse [animation-delay:150ms]" />
+        </span>
+        <span className="text-sm">{message}</span>
+      </div>
+    ),
+    { duration: 2500 }
+  )
+}
+
+const iataSchema = z.string().length(3).regex(/^[A-Z]{3}$/)
+const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+
+const searchParamsSchema = z.object({
+  origin: iataSchema,
+  destination: iataSchema,
+  departureDate: dateSchema,
+  returnDate: z.string().optional(),
+  passengers: z.number().min(1).max(9),
+  cabinClass: z.enum(["economy","premium_economy","business","first"]),
+  tripType: z.enum(["one_way","round_trip","multi_city"]),
+})
+
+const validateSearchParams = (params: any, multiCityLegs?: Array<{ origin: string; destination: string; date: string }>) => {
+  if (params.tripType === "multi_city") {
+    const legs = (multiCityLegs || []).filter(l => l.origin && l.destination && l.date)
+    if (legs.length < 2) return "Please add at least 2 valid legs"
+    for (const l of legs) {
+      if (!iataSchema.safeParse((l.origin || '').toUpperCase()).success) return "Invalid origin IATA in legs"
+      if (!iataSchema.safeParse((l.destination || '').toUpperCase()).success) return "Invalid destination IATA in legs"
+      if (!dateSchema.safeParse(l.date).success) return "Invalid date format in legs (YYYY-MM-DD)"
+    }
+    return null
+  }
+  const res = searchParamsSchema.safeParse({
+    ...params,
+    origin: (params.origin || '').toUpperCase(),
+    destination: (params.destination || '').toUpperCase(),
+  })
+  if (!res.success) return res.error.errors[0]?.message || "Invalid search"
+  if (params.tripType === "round_trip" && !params.returnDate) return "Please add a return date"
+  return null
 }
 
 export default function FlightsPage() {
@@ -101,11 +151,11 @@ export default function FlightsPage() {
     }
     const next = [item, ...savedSearches].slice(0, 6)
     persistSavedSearches(next)
-    toast.success("Search saved")
+    showToast("Search saved")
   }
   const loadSavedSearch = (item: SavedSearchItem) => {
     setSearchParams(item.search_params)
-    toast("Loaded saved search")
+    showToast("Loaded saved search")
   }
 
   // Persist filters
@@ -158,16 +208,8 @@ export default function FlightsPage() {
   }
 
   const searchFlights = async () => {
-    if (!searchParams.origin || !searchParams.destination || !searchParams.departureDate) {
-      if (searchParams.tripType !== 'multi_city') {
-        toast.error("Please fill in origin, destination and date")
-        return
-      }
-    }
-    if (searchParams.tripType === "round_trip" && !searchParams.returnDate) {
-      toast.error("Please add a return date")
-      return
-    }
+    const validationError = validateSearchParams(searchParams, multiCityLegs)
+    if (validationError) { showToast(validationError); return }
 
     setSearching(true)
     setOffers([])
@@ -199,7 +241,7 @@ export default function FlightsPage() {
       setOffers(results)
       setOfferRequestId(json?.offer_request_id || null)
       setPageMeta(json?.meta || {})
-      toast.success(`Found ${results.length} flights`)
+      showToast(`Found ${results.length} flights`)
     } catch (e: any) {
       console.error('search error', e)
       toast.error(e?.message || 'Error searching flights')
@@ -222,6 +264,7 @@ export default function FlightsPage() {
       const more = Array.isArray(json?.data) ? json.data : []
       setOffers(prev => [...prev, ...more])
       setPageMeta(json?.meta || {})
+      showToast(`Loaded ${more.length} more offers`) 
     } catch (e: any) {
       toast.error(e?.message || 'Failed to load more')
     } finally {
@@ -657,7 +700,7 @@ export default function FlightsPage() {
 
       <FlightResults
         offers={filteredOffers}
-        onTrackPrice={(id) => toast.success(`Tracking price for ${id}`)}
+        onTrackPrice={(id) => showToast(`Tracking price for ${id}`)}
         onSelectOffer={(offer) => router.push(`/dashboard/flights/book/${offer.id}`)}
         className={`${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2' : 'space-y-4'} ${density === 'compact' ? 'gap-3' : 'gap-6'}`}
       />

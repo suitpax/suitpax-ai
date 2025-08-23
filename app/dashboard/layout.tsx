@@ -7,7 +7,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { SidebarProvider } from "@/components/ui/primitives/sidebar"
 import DashboardSidebar from "@/components/dashboard/sidebar/sidebar"
 import Header from "@/components/dashboard/header"
-import { Toaster } from "react-hot-toast"
+// toast provider removed (we use inline custom toasts where needed)
 import { motion } from "framer-motion"
 import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
@@ -101,7 +101,7 @@ export default function DashboardLayout({
               </motion.div>
             </main>
           </div>
-          <Toaster position="top-right" />
+          {/* Toast provider removed for full-screen AI; custom toasts render inline where needed */}
         </div>
       </SidebarProvider>
     )
@@ -138,8 +138,6 @@ export default function DashboardLayout({
           </motion.div>
         </main>
       </div>
-
-      <Toaster position="top-right" />
 
       {/* Mobile bottom navigation */}
       <NavMobile />

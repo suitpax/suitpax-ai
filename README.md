@@ -45,7 +45,11 @@ pnpm install
 pnpm dev
 ```
 
-2) Required Environment Variables
+2) Environment
+
+- Copy `.env.example` to `.env.local` and fill values (Supabase, Duffel, Anthropic, etc.).
+
+3) Required Environment Variables
 
 - NEXT_PUBLIC_BASE_URL
 - NEXT_PUBLIC_SUPABASE_URL
@@ -54,13 +58,13 @@ pnpm dev
 - DUFFEL_API_KEY
 - GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET (Drive/Gmail integrations)
 
-3) Supabase (optional but recommended)
+4) Supabase (optional but recommended)
 
 - Apply SQL migrations in `scripts/` as needed for plans, usage, integrations, and snippets.
 
 ## Important Endpoints
 
-- AI Chat: `POST /api/ai-chat`, `POST /api/ai-chat/stream`
+- AI Chat: `POST /api/chat`, `POST /api/chat/stream`
 - AI Tool (Flight Search): `POST /api/ai-chat/tools/flight-search`
 - Duffel Search: `POST /api/flights/duffel/search`
 - OCR: `POST /api/ocr/process`
@@ -79,6 +83,18 @@ pnpm dev
 
 - `PromptInput` is the canonical export for the rich prompt field
 - All Duffel flight searching goes through `/api/flights/duffel/search`
+
+## Validation with Zod
+
+- We use Zod for input validation in UI and API.
+- Examples:
+  - Password Gate: access key and contact form schemas
+  - Flights: search parameter schema and leg validation
+
+## Prompt Kit ChatHeader
+
+- Reusable `ChatHeader` at `components/prompt-kit/chat-header.tsx`.
+- Integrated in `app/dashboard/suitpax-ai/page.tsx` to provide a clean chat header separate from the dashboard header.
 
 ## Roadmap and Improvements
 
@@ -99,4 +115,4 @@ pnpm dev
 
 ## License
 
-Proprietary — Suitpax. All rights reserved.
+See `LICENSE` (MIT).

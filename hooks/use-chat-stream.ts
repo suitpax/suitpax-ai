@@ -14,7 +14,7 @@ export function useChatStream() {
 		setIsStreaming(true)
 		abortRef.current = new AbortController()
 		try {
-			const res = await fetch("/api/ai-chat/stream", {
+			const res = await fetch("/api/chat/stream", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(payload),
