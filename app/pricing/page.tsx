@@ -25,13 +25,11 @@ const subtitles = [
 ]
 
 export const metadata: Metadata = {
-  title: "Pricing & Plans | Suitpax - AI-powered Business Travel Management",
+  title: "Suitpax",
   description:
     "Choose the right plan for your business travel needs. From startups to enterprises, we have flexible pricing options that fit your team size and travel requirements.",
-  keywords:
-    "business travel pricing, corporate travel plans, Suitpax pricing, AI travel management cost, travel management subscription, business travel platform",
   openGraph: {
-    title: "Pricing & Plans | Suitpax - AI-powered Business Travel Management",
+    title: "Suitpax",
     description:
       "Choose the right plan for your business travel needs. From startups to enterprises, we have flexible pricing options that fit your team size and travel requirements.",
     url: "https://suitpax.com/pricing",
@@ -47,13 +45,6 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Pricing & Plans | Suitpax - AI-powered Business Travel Management",
-    description:
-      "Choose the right plan for your business travel needs. From startups to enterprises, we have flexible pricing options that fit your team size and travel requirements.",
-    images: ["/twitter-image.png"],
-  },
   alternates: {
     canonical: "https://suitpax.com/pricing",
   },
@@ -63,28 +54,26 @@ export default function PricingPage() {
 	const selectedTitle = titleVariations[Math.floor(Math.random() * titleVariations.length)]
 	const selectedSubtitle = subtitles[Math.floor(Math.random() * subtitles.length)]
 
+  const softwareSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Suitpax",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    url: "https://suitpax.com",
+    description:
+      "AI-powered business travel platform: conversational booking, policy compliance, expenses, and analytics.",
+    offers: [
+      { "@type": "Offer", price: 0, priceCurrency: "EUR", name: "Free" },
+      { "@type": "Offer", price: 49, priceCurrency: "EUR", name: "Basic", priceSpecification: { "@type": "UnitPriceSpecification", price: 49, priceCurrency: "EUR", unitText: "MONTH" } },
+      { "@type": "Offer", price: 89, priceCurrency: "EUR", name: "Pro", priceSpecification: { "@type": "UnitPriceSpecification", price: 89, priceCurrency: "EUR", unitText: "MONTH" } },
+    ],
+    brand: { "@type": "Brand", name: "Suitpax" },
+  }
+
   return (
     <>
-      <Script
-        id="pricing-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            name: "Pricing & Plans | Suitpax",
-            description:
-              "Choose the right plan for your business travel needs. From startups to enterprises, we have flexible pricing options that fit your team size and travel requirements.",
-            url: "https://suitpax.com/pricing",
-            mainEntity: {
-              "@type": "PriceSpecification",
-              name: "Suitpax Business Travel Management Plans",
-              description: "Flexible pricing plans for businesses of all sizes",
-              priceCurrency: "USD",
-            },
-          }),
-        }}
-      />
+      <Script id="pricing-software-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }} />
       
       <main className="flex min-h-screen flex-col pt-14 md:pt-16">
         {/* Badge + dynamic titles (moved here) */}
@@ -107,6 +96,12 @@ export default function PricingPage() {
             Suitpax Pricing Plans
           </h2>
           <Plans hideHeader />
+          {/* Token footnote */}
+          <div className="max-w-5xl mx-auto px-6 pb-8">
+            <p className="mt-3 text-[11px] text-gray-600">
+              * Tokens represent AI processing capacity across chat, planning, and enrichment tasks. Typical usage: 1 search ≈ 300–600 tokens; itinerary planning ≈ 1.5–3k tokens; voice actions vary. Unused tokens do not roll over. We alert you before limits and never block critical actions.
+            </p>
+          </div>
         </section>
 
         {/* Compare Plans Section */}

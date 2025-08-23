@@ -9,6 +9,8 @@ import AppErrorBoundary from "@/components/error-boundary"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
+import BreadcrumbsJsonLd from "@/components/seo/BreadcrumbsJsonLd"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -38,6 +40,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       <Navigation />
       <main className="overflow-hidden w-full">{children}</main>
       <Footer />
+      <BreadcrumbsJsonLd />
     </>
   )
 }
@@ -53,11 +56,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
         }
       >
-        <LayoutContent>{children}</LayoutContent>
-        <IntercomProvider />
-        {/* Toast provider removed; custom inline toasts are used via showToast helper */}
-        <Analytics />
-        <SpeedInsights />
+        <TooltipProvider>
+          <LayoutContent>{children}</LayoutContent>
+          <IntercomProvider />
+          {/* Toast provider removed; custom inline toasts are used via showToast helper */}
+          <Analytics />
+          <SpeedInsights />
+        </TooltipProvider>
       </Suspense>
     </AppErrorBoundary>
   )

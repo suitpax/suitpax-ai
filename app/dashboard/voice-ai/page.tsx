@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { motion } from "framer-motion"
 import {
@@ -33,7 +33,7 @@ import { useSpeechToText } from "@/hooks/use-speech-recognition"
 import MiniCountdownBadge from "@/components/ui/mini-countdown"
 // Vanta removed elsewhere; keep here if desired, otherwise consider static backgrounds for performance
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
-import { AgentSelector } from "@/components/voice-ai/agent-selector"
+import { AgentSelectorInline } from "@/components/prompt-kit/agent-selector"
 import { VoiceLevelsMeter } from "@/components/voice-ai/voice-levels-meter"
 import { RecorderButton } from "@/components/voice-ai/recorder-button"
 import { WaveformVisualizer } from "@/components/voice-ai/waveform-visualizer"
@@ -210,6 +210,35 @@ function VoiceAIContent() {
     }
   }
 
+  // Remote transcription with Whisper when local recognition ends and we have a blob
+  const mediaBlobRef = useRef<Blob | null>(null)
+  useEffect(() => {
+    // hook into our recorder if it exposes blobs; otherwise skip
+    // assume RecorderButton dispatches a 'voice-recording-stopped' with detail { blob }
+    const onStopped = async (e: any) => {
+      try {
+        const blob = e?.detail?.blob as Blob | undefined
+        if (!blob) return
+        mediaBlobRef.current = blob
+        const fd = new FormData()
+        fd.append("audio", blob, "audio.webm")
+        const res = await fetch("/api/whisper/transcribe", { method: "POST", body: fd })
+        if (res.ok) {
+          const json = await res.json()
+          const text = json?.text || ""
+          if (text) {
+            setCurrentMessage(text)
+            await handleProcessMessage(text)
+          }
+        }
+      } catch (err) {
+        console.error("Remote transcription failed", err)
+      }
+    }
+    window.addEventListener("voice-recording-stopped", onStopped as any)
+    return () => window.removeEventListener("voice-recording-stopped", onStopped as any)
+  }, [handleProcessMessage])
+
   const handleVoiceChange = (voiceId: string) => setVoice(voiceId)
   const handleLanguageChange = (language: "en-US" | "es-ES" | "fr-FR" | "de-DE") => updateSettings({ language })
 
@@ -250,7 +279,7 @@ function VoiceAIContent() {
           </div>
           <div className="flex items-center gap-3 w-full md:w-auto">
             <div className="hidden md:block min-w-[240px]">
-              <AgentSelector />
+              <AgentSelectorInline />
             </div>
             <div className="flex-1 md:flex-none">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />

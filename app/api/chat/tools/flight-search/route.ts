@@ -7,14 +7,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Query is required" }, { status: 400 })
     }
 
-    // Parse IATA like: MAD to SFO
     const iataMatch = query.match(/\b([A-Z]{3})\b.*\b(to|→|-|from)\b.*\b([A-Z]{3})\b/i)
     const [origin, destination] = iataMatch ? [iataMatch[1]?.toUpperCase(), iataMatch[3]?.toUpperCase()] : [null, null]
     if (!origin || !destination) {
       return NextResponse.json({ success: false, error: "Please include origin and destination IATA codes (e.g., MAD to SFO)" }, { status: 400 })
     }
 
-    // Departure date: +14 days default
     const departure_date = new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0]
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
@@ -31,7 +29,6 @@ export async function POST(request: NextRequest) {
 
     const { data } = await duffelRes.json()
 
-    // Map Duffel offers into AI tool schema (normalized subset)
     const offers = (Array.isArray(data) ? data : []).slice(0, 5).map((offer: any) => {
       const slice = offer?.slices?.[0]
       const segment = slice?.segments?.[0]
@@ -67,5 +64,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: "Failed to search flights" }, { status: 500 })
   }
 }
-
-// NOTE: For production, integrate real Duffel search in a separate tool version.

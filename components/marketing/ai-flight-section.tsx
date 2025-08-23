@@ -19,7 +19,7 @@ const flights = [
     route: "Berlin (BER) → London (LHR)",
     airline: "British Airways",
     logo: "/logos/british-airways.png",
-    image: "/images/urban-life-in-motion-new.png",
+    image: "/images/urban-life-in-motion.jpeg",
     time: "1h 55m",
     price: "€220",
   },

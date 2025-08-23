@@ -7,12 +7,7 @@ import { motion } from "framer-motion"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import CityAnimateText from "@/components/ui/city-animate-text"
 import MiniCountdownBadge from "@/components/ui/mini-countdown"
-import { z } from "zod"
-import { SmallSessionLoader } from "@/components/ui/loaders"
 // Icons removed (unused)
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import dynamic from "next/dynamic"
-const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlines-slider"), { ssr: false })
 
 export default function PasswordGatePage() {
   const router = useRouter()
@@ -20,23 +15,12 @@ export default function PasswordGatePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [headline, setHeadline] = useState("Suitpax AI: Build. Travel. Code.")
+  const [predictiveSubtitle, setPredictiveSubtitle] = useState("From intent to itinerary")
   const [contactEmail, setContactEmail] = useState("")
   const [contactCompany, setContactCompany] = useState("")
   const [contactMessage, setContactMessage] = useState("")
   const [contactMsg, setContactMsg] = useState<string | null>(null)
   const [contactLoading, setContactLoading] = useState(false)
-  // Add visibility toggle
-  const [showPassword, setShowPassword] = useState(false)
-
-  const accessSchema = z.object({
-    password: z.string().min(6, "Access key must be at least 6 characters"),
-  })
-
-  const contactSchema = z.object({
-    email: z.string().email("Enter a valid email"),
-    company: z.string().min(2, "Company is required"),
-    message: z.string().min(10, "Message should be at least 10 characters"),
-  })
 
   useEffect(() => {
     const titles = [
@@ -52,6 +36,19 @@ export default function PasswordGatePage() {
       "Smarter flights. Faster finance.",
     ]
     setHeadline(titles[Math.floor(Math.random() * titles.length)])
+  }, [])
+
+  useEffect(() => {
+    const predictiveVariants = [
+      "From intent to itinerary",
+      "Predict. Plan. Rebook — automatically",
+      "Live fares, policy‑aware results",
+      "Smart filters. Real logos. Real offers.",
+      "Voice to booking in one flow",
+      "Compliance by design, savings in real‑time",
+      "Best value. Fastest. Policy‑perfect.",
+    ]
+    setPredictiveSubtitle(predictiveVariants[Math.floor(Math.random() * predictiveVariants.length)])
   }, [])
 
   const launchPhrases = [
@@ -77,11 +74,6 @@ export default function PasswordGatePage() {
     setLoading(true)
     setError("")
     try {
-      const parsed = accessSchema.safeParse({ password })
-      if (!parsed.success) {
-        setError(parsed.error.errors[0]?.message || "Invalid password")
-        return
-      }
       const res = await fetch("/api/password/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -106,15 +98,10 @@ export default function PasswordGatePage() {
     setContactMsg(null)
     setContactLoading(true)
     try {
-      const parsed = contactSchema.safeParse({ email: contactEmail, company: contactCompany, message: contactMessage })
-      if (!parsed.success) {
-        setContactMsg(parsed.error.errors[0]?.message || 'Invalid data')
-        return
-      }
       const resp = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: contactEmail, company: contactCompany, message: contactMessage }),
+        body: JSON.stringify({ name: 'Website Visitor', subject: 'Early access request', email: contactEmail, company: contactCompany, message: contactMessage }),
       })
       const json = await resp.json()
       if (!resp.ok) throw new Error(json?.error || 'Message failed')
@@ -153,7 +140,7 @@ export default function PasswordGatePage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-serif tracking-tighter text-black leading-tight max-w-4xl"
+            className="text-3xl md:text-4xl lg:text-5xl font-serif tracking-tighter text-black leading-tight max-w-4xl"
           >
             {headline}
           </motion.h1>
@@ -166,14 +153,6 @@ export default function PasswordGatePage() {
             <span className="absolute inset-0 animate-hero-shimmer bg-[linear-gradient(110deg,#ffffff,45%,#9ca3af,55%,#ffffff)] bg-[length:200%_100%] bg-clip-text text-transparent" />
           </div>
 
-          {/* Airlines slider */}
-          <div className="mt-6 w-full max-w-3xl">
-            <div className="text-xs font-medium tracking-tighter text-gray-800 mb-2 text-left">Trusted airlines preview</div>
-            <div className="bg-white/70 backdrop-blur rounded-xl border border-gray-200 p-2">
-              <AirlinesSlider />
-            </div>
-          </div>
-
           {/* Animated city text (cleaner spacing) */}
           <div className="mt-8">
             <CityAnimateText />
@@ -184,26 +163,7 @@ export default function PasswordGatePage() {
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Design. Ship. Scale.</span>
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Predict. Plan. Automate.</span>
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Flights. Hotels. Finance.</span>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button className="inline-flex items-center rounded-lg bg-black text-white px-2 py-0.5 border border-black/10">
-                    <span className="flex items-center gap-1 mr-1">
-                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-gray-300 animate-pulse [animation-delay:150ms]" />
-                    </span>
-                    Our AI Agents are working…
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="bg-black text-white border border-white/20">
-                  <div className="space-y-1">
-                    <div className="text-[11px]">Systems updating and calibrating.</div>
-                    <div className="text-[11px]">Real-time analytics warming up.</div>
-                    <div className="text-[11px]">You can continue — no action needed.</div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Chat. Voice. Agents.</span>
           </div>
           {/* Removed small city strip */}
 
@@ -217,28 +177,13 @@ export default function PasswordGatePage() {
                 </video>
               </div>
               <input
-                type={showPassword ? "text" : "password"}
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter access key to continue"
                 className="flex-1 bg-transparent text-[12px] md:text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none h-8"
                 required
-                aria-invalid={!!error}
-                aria-describedby={error ? "password-error" : undefined}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-10 inline-flex items-center justify-center text-gray-400 hover:text-gray-600"
-                aria-label={showPassword ? "Hide access key" : "Show access key"}
-                title={showPassword ? "Hide access key" : "Show access key"}
-              >
-                {showPassword ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.11 1 12c.62-1.43 1.5-2.75 2.59-3.89M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.89 11 8-1 2.3-2.5 4.17-4.33 5.5M14 14a3 3 0 1 1-4-4"/><path d="M1 1l22 22"/></svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                )}
-              </button>
               <button
                 type="submit"
                 disabled={loading}
@@ -249,32 +194,26 @@ export default function PasswordGatePage() {
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </button>
             </div>
-            {error && <div id="password-error" className="mt-2 text-xs text-red-600">{error}</div>}
+            {error && <div className="mt-2 text-xs text-red-600">{error}</div>}
           </form>
 
           {/* Removed city example cards to declutter */}
 
           {/* Key highlights */}
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl w-full">
-            <div className="rounded-2xl p-4 bg-white/80 border border-gray-200 text-gray-900 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-sm transition-shadow">
+            <div className="rounded-2xl p-4 bg-gray-50/80 border border-gray-200 text-gray-900 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-sm transition-shadow">
               <div className="text-sm font-medium tracking-tight">Predictive Travel</div>
-              <div className="text-[12px] opacity-80 mt-1">From intent to itinerary</div>
+              <div className="text-[12px] opacity-80 mt-1">{predictiveSubtitle}</div>
             </div>
-            <div className="rounded-2xl p-4 bg-black text-white border border-black/10 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-black/20 transition-shadow">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-2.5 py-0.5 text-[10px] font-medium border border-white/20">
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-pulse [animation-delay:150ms]" />
-                  </span>
-                  <span>Our AI Agents are working…</span>
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-xl bg-white/10 px-2.5 py-0.5 text-[10px] font-medium border border-white/20">
-                  <SmallSessionLoader label="" />
-                  <span>Booting services</span>
-                </span>
-                <a href="/changelog" className="inline-flex items-center rounded-xl bg-white/10 px-2.5 py-0.5 text-[10px] font-medium border border-white/20 hover:bg-white/15">Changelog →</a>
+            <div className="rounded-xl px-3 py-3 bg-black text-white border border-black/10 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-black/20 transition-shadow max-h-[140px] overflow-hidden">
+              <div className="text-[11px] font-medium tracking-tight opacity-90">Changelog</div>
+              <div className="mt-1 space-y-1">
+                <div className="text-[11px] leading-tight font-light">• New: Seat maps and ancillaries flow</div>
+                <div className="text-[11px] leading-tight font-light">• Update: Faster AI expense analyzer</div>
+                <div className="text-[11px] leading-tight font-light">• Fix: OAuth stability for Google</div>
+                <div className="text-[11px] leading-tight font-light">• UI: Cleaner dashboard navigation</div>
               </div>
+              <a href="/changelog" className="inline-block mt-2 text-[10px] font-medium underline underline-offset-4 opacity-90 hover:opacity-100">See all updates →</a>
             </div>
           </div>
 
@@ -291,8 +230,6 @@ export default function PasswordGatePage() {
                 placeholder="What do you want to achieve with Suitpax?"
                 className="w-full bg-white/90 border border-gray-200 rounded-2xl p-3 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur min-h-[120px]"
                 rows={4}
-                required
-                aria-label="Message"
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <input
@@ -300,17 +237,15 @@ export default function PasswordGatePage() {
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   placeholder="Work email"
-                  className="w-full bg-white/90 border border-gray-200 rounded-2xl p-2.5 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
+                  className="bg-white/90 border border-gray-200 rounded-2xl p-2.5 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
                   required
-                  aria-label="Email"
                 />
                 <input
                   value={contactCompany}
                   onChange={(e) => setContactCompany(e.target.value)}
                   placeholder="Company"
-                  className="w-full bg-white/90 border border-gray-200 rounded-2xl p-2.5 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
+                  className="bg-white/90 border border-gray-200 rounded-2xl p-2.5 text-[13px] text-gray-900 placeholder:text-gray-500 focus:outline-none backdrop-blur"
                   required
-                  aria-label="Company"
                 />
               </div>
               <button

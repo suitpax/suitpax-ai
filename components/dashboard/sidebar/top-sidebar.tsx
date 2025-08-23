@@ -8,7 +8,7 @@ import { PiDotsSixBold } from "react-icons/pi"
 export default function TopSidebar({ onToggle }: { onToggle?: () => void }) {
 	const { toggleSidebar } = useSidebar()
 	return (
-		<SidebarHeader className="flex items-center justify-between bg-gray-100 px-4 border-b border-gray-100 py-2.5">
+		<SidebarHeader className="flex items-center justify-between bg-gray-100 px-4 border-b border-gray-200 py-2.5">
 			<div className="flex items-center gap-3 min-w-0 pt-0.5">
 				<Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={128} height={32} className="h-6 w-auto" />
 			</div>

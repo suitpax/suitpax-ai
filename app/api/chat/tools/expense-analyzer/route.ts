@@ -28,7 +28,6 @@ export async function POST(request: NextRequest) {
 
     const text = (res as any).content?.find?.((c: any) => c.type === "text")?.text || ""
 
-    // Try to split insights
     const insights = text
       .split(/\n+/)
       .filter((l: string) => /^[\-*\d]/.test(l))
