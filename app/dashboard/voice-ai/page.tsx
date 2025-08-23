@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { motion } from "framer-motion"
 import {
@@ -209,6 +209,35 @@ function VoiceAIContent() {
       }
     }
   }
+
+  // Remote transcription with Whisper when local recognition ends and we have a blob
+  const mediaBlobRef = useRef<Blob | null>(null)
+  useEffect(() => {
+    // hook into our recorder if it exposes blobs; otherwise skip
+    // assume RecorderButton dispatches a 'voice-recording-stopped' with detail { blob }
+    const onStopped = async (e: any) => {
+      try {
+        const blob = e?.detail?.blob as Blob | undefined
+        if (!blob) return
+        mediaBlobRef.current = blob
+        const fd = new FormData()
+        fd.append("audio", blob, "audio.webm")
+        const res = await fetch("/api/whisper/transcribe", { method: "POST", body: fd })
+        if (res.ok) {
+          const json = await res.json()
+          const text = json?.text || ""
+          if (text) {
+            setCurrentMessage(text)
+            await handleProcessMessage(text)
+          }
+        }
+      } catch (err) {
+        console.error("Remote transcription failed", err)
+      }
+    }
+    window.addEventListener("voice-recording-stopped", onStopped as any)
+    return () => window.removeEventListener("voice-recording-stopped", onStopped as any)
+  }, [handleProcessMessage])
 
   const handleVoiceChange = (voiceId: string) => setVoice(voiceId)
   const handleLanguageChange = (language: "en-US" | "es-ES" | "fr-FR" | "de-DE") => updateSettings({ language })
