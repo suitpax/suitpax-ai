@@ -52,28 +52,28 @@ async function callTool(intent: ChatIntent, message: string, baseUrl: string, us
   const urlBase = baseUrl || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
   try {
     if (intent === "flight_search") {
-      const res = await fetch(`${urlBase}/api/ai-chat/tools/flight-search`, {
+      const res = await fetch(`${urlBase}/api/chat/tools/flight-search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: message }),
       })
       if (res.ok) return await res.json()
     } else if (intent === "code_generation") {
-      const res = await fetch(`${urlBase}/api/ai-chat/tools/code-generator`, {
+      const res = await fetch(`${urlBase}/api/chat/tools/code-generator`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: message }),
       })
       if (res.ok) return await res.json()
     } else if (intent === "document_processing") {
-      const res = await fetch(`${urlBase}/api/ai-chat/tools/document-processor`, {
+      const res = await fetch(`${urlBase}/api/chat/tools/document-processor`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: message }),
       })
       if (res.ok) return await res.json()
     } else if (intent === "expense_analysis") {
-      const res = await fetch(`${urlBase}/api/ai-chat/tools/expense-analyzer`, {
+      const res = await fetch(`${urlBase}/api/chat/tools/expense-analyzer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: message, userId }),

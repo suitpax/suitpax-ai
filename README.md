@@ -6,7 +6,7 @@ Suitpax AI is a Next.js 15 application that fuses AI chat/agents, predictive fli
 
 - AI Chat and Tools
   - Intent router (`lib/chat/router.ts`) dispatches to specialized tools
-  - Flight Search tool (`/api/ai-chat/tools/flight-search`) integrates predictive resolver and Duffel
+  - Flight Search tool (`/api/chat/tools/flight-search`) integrates predictive resolver and Duffel
   - Streaming and structured responses supported
 
 - Predictive Flight Search (Duffel)
@@ -65,7 +65,7 @@ pnpm dev
 ## Important Endpoints
 
 - AI Chat: `POST /api/chat`, `POST /api/chat/stream`
-- AI Tool (Flight Search): `POST /api/ai-chat/tools/flight-search`
+- AI Tool (Flight Search): `POST /api/chat/tools/flight-search`
 - Duffel Search: `POST /api/flights/duffel/search`
 - OCR: `POST /api/ocr/process`
 - Snippets: `POST /api/snippets/save`

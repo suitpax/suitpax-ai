@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     if (isFlightIntent) {
       toolType = "flight_search"
       try {
-        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/flight-search`, {
+        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/chat/tools/flight-search`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: message }),
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
     } else if (isCodeIntent) {
       toolType = "code_generation"
       try {
-        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/code-generator`, {
+        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/chat/tools/code-generator`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: message }),
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     } else if (isDocumentIntent) {
       toolType = "document_processing"
       try {
-        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/document-processor`, {
+        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/chat/tools/document-processor`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: message }),
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
     } else if (isExpenseIntent) {
       toolType = "expense_analysis"
       try {
-        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/ai-chat/tools/expense-analyzer`, {
+        const toolRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/chat/tools/expense-analyzer`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: message, userId: user.id }),
