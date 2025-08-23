@@ -66,8 +66,8 @@ export async function POST(request: NextRequest) {
 
     // Per-plan max tokens
     const { data: planLimitsOk } = await supabase.rpc("get_user_plan_limits", { user_uuid: user.id })
-    const planName = planLimitsOk?.[0]?.plan_name?.toLowerCase?.() || "free"
-    const planToMaxTokens: Record<string, number> = { free: 1024, basic: 2048, premium: 4096, pro: 4096, enterprise: 8192 }
+    const planName = (planLimitsOk?.[0]?.plan_name?.toLowerCase?.() || "free").replace("basic","starter").replace("premium","pro")
+    const planToMaxTokens: Record<string, number> = { free: 1000, starter: 2000, pro: 4000, scale: 8000, enterprise: 8000 }
     const maxTokensForResponse = planToMaxTokens[planName] ?? 2048
 
     // Intent detection (tools)

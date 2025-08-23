@@ -87,7 +87,7 @@ export default function PasswordGatePage() {
       const resp = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: contactEmail, company: contactCompany, message: contactMessage }),
+        body: JSON.stringify({ name: 'Website Visitor', subject: 'Early access request', email: contactEmail, company: contactCompany, message: contactMessage }),
       })
       const json = await resp.json()
       if (!resp.ok) throw new Error(json?.error || 'Message failed')

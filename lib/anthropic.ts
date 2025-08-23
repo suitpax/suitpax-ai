@@ -21,25 +21,30 @@ export interface ConversationMessage {
 const PLAN_CONFIGS = {
   free: {
     model: "claude-3-7-sonnet-20250219",
-    maxTokens: 1024,
-    monthlyTokens: 5_000,
+    maxTokens: 1000,
+    monthlyTokens: 10_000,
   },
-  basic: {
+  starter: {
     model: "claude-3-7-sonnet-20250219",
-    maxTokens: 2048,
-    monthlyTokens: 15_000,
+    maxTokens: 2000,
+    monthlyTokens: 50_000,
   },
   pro: {
     model: "claude-3-7-sonnet-20250219",
-    maxTokens: 4096,
-    monthlyTokens: 25_000,
+    maxTokens: 4000,
+    monthlyTokens: 250_000,
+  },
+  scale: {
+    model: "claude-3-7-sonnet-20250219",
+    maxTokens: 8000,
+    monthlyTokens: 1_000_000,
   },
   enterprise: {
     model: "claude-3-7-sonnet-20250219",
-    maxTokens: 8192,
+    maxTokens: 8000,
     monthlyTokens: undefined,
   }
-};
+} as const
 
 export type UserPlan = keyof typeof PLAN_CONFIGS;
 
