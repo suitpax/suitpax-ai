@@ -88,3 +88,4 @@ const Markdown = memo(MarkdownComponent)
 Markdown.displayName = "Markdown"
 
 export { Markdown }
+export default Markdown

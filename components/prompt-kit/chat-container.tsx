@@ -155,3 +155,17 @@ function ChatContainer({ className, children, autoScroll = true, scrollToRef, re
 
 export { ChatContainer }
 
+// Additional primitives to match new layout API
+export function ChatContainerRoot({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <div className={cn("flex h-full flex-col", className)}>{children}</div>
+}
+
+export function ChatContainerContent({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <ChatContainer className={cn("flex-1 min-h-0", className)}>{children}</ChatContainer>
+}
+
+export function ChatContainerScrollAnchor() {
+  const ref = useRef<HTMLDivElement>(null)
+  return <div ref={ref} className="h-4" aria-hidden="true" />
+}
+

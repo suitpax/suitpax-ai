@@ -28,3 +28,5 @@ export const CodeBlockCode = memo(function CodeBlockCode({ code, language }: { c
   )
 })
 
+export default CodeBlock
+
