@@ -12,7 +12,14 @@ import { SmallSessionLoader } from "@/components/ui/loaders"
 // Icons removed (unused)
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import dynamic from "next/dynamic"
+import type { Metadata } from "next"
 const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlines-slider"), { ssr: false })
+
+export const metadata: Metadata = {
+	title: "Private Preview Access",
+	description: "Enter your access key to explore Suitpax — AI-powered business travel platform.",
+	alternates: { canonical: "https://suitpax.com/password" },
+}
 
 export default function PasswordGatePage() {
 	const router = useRouter()

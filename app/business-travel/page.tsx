@@ -7,8 +7,20 @@ import AITravelAgents from "@/components/marketing/ai-travel-agents"
 import AIFlightSection from "@/components/marketing/ai-flight-section"
 
 export const metadata: Metadata = {
-	title: "Business Travel | Suitpax",
-	description: "AI-powered business travel: smarter booking, policy compliance, and seamless management.",
+	title: "Business Travel Platform",
+	description:
+		"AI-powered business travel for modern companies. Conversational booking, policy compliance, expenses and analytics in one intelligent flow.",
+	openGraph: {
+		title: "Suitpax Business Travel Platform",
+		description:
+			"Reduce cost and complexity with MCP agents, smart policies, and unified travel + expense workflows.",
+		url: "https://suitpax.com/business-travel",
+		siteName: "Suitpax",
+		images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Suitpax Business Travel" }],
+		locale: "en_US",
+		type: "website",
+	},
+	alternates: { canonical: "https://suitpax.com/business-travel" },
 }
 
 export default function BusinessTravelPage() {
