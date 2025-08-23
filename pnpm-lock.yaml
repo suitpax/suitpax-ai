@@ -402,7 +402,7 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       openai:
-        specifier: ^4.80.0
+        specifier: ^4.104.0
         version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.64)
       opencv.js:
         specifier: ^1.2.1
