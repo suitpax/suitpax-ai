@@ -56,7 +56,7 @@ export default function BillingPage() {
                     <div className="text-sm font-medium text-gray-900">Free</div>
                     <div className="text-xs text-gray-600">€0 / month</div>
                   </div>
-                  <a href={getLink("free")} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">Select</a>
+                  <a href={getLink("free")} className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">Select</a>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
@@ -65,7 +65,7 @@ export default function BillingPage() {
                     <div className="text-sm font-medium text-gray-900">Basic</div>
                     <div className="text-xs text-gray-600">{isAnnual ? "€468 / year" : "€49 / month"}</div>
                   </div>
-                  <a href={getLink("basic")} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">{isAnnual ? "Select annual" : "Select monthly"}</a>
+                  <a href={getLink("basic")} className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">{isAnnual ? "Select annual" : "Select monthly"}</a>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
@@ -74,7 +74,7 @@ export default function BillingPage() {
                     <div className="text-sm font-medium text-gray-900">Pro</div>
                     <div className="text-xs text-gray-600">{isAnnual ? "€852 / year" : "€89 / month"}</div>
                   </div>
-                  <a href={getLink("pro")} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">{isAnnual ? "Select annual" : "Select monthly"}</a>
+                  <a href={getLink("pro")} className="inline-flex items-center rounded-2xl px-3 py-1 text-xs border border-gray-300 bg-white hover:bg-gray-100">{isAnnual ? "Select annual" : "Select monthly"}</a>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">

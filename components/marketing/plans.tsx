@@ -398,10 +398,7 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
     setRandomSubtitle(subtitles[subtitleIndex])
   }, [])
 
-  const handlePlanSelect = (planId: string) => {
-    const link = getStripeLink(planId)
-    window.open(link, "_blank")
-  }
+  const getHref = (planId: string) => getStripeLink(planId)
 
   return (
     <>
@@ -540,8 +537,8 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
                 {plan.id !== "beta" && plan.communityImages && <CommunityCarousel images={plan.communityImages} />}
 
                 <div className="mt-3">
-                  <button
-                    onClick={() => handlePlanSelect(plan.id)}
+                  <a
+                    href={getHref(plan.id)}
                     className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors ${
                       plan.popular
                         ? "bg-black text-white hover:bg-gray-800"
@@ -549,7 +546,7 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
                     } block mx-auto max-w-[220px]`}
                   >
                     {plan.cta}
-                  </button>
+                  </a>
                 </div>
               </motion.div>
             ))}
