@@ -106,6 +106,7 @@ export default function AIChat() {
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
   const router = useRouter()
+  const greetingAddedRef = useRef(false)
 
   useEffect(() => {
     const onReasoning = (e: any) => setShowReasoning(Boolean(e?.detail?.enabled))
@@ -128,6 +129,19 @@ export default function AIChat() {
     getUser()
   }, [supabase])
 
+  // Saludo primario del asistente en el contenedor
+  useEffect(() => {
+    if (!greetingAddedRef.current) {
+      greetingAddedRef.current = true
+      setMessages([{
+        id: `greet-${Date.now()}`,
+        role: "assistant",
+        content: "Hi, I’m Suitpax AI. I can plan business travel, optimize expenses, and keep your trips compliant. How can I help today?",
+        timestamp: new Date(),
+      }])
+    }
+  }, [])
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const newFiles = Array.from(event.target.files)
@@ -143,12 +157,10 @@ export default function AIChat() {
   }
 
   const handleSend = async () => {
-    // Bloquear si ya hay loading o si el input está vacío
     if (!input.trim() || loading) return;
 
     setLoading(true);
 
-    // Mensaje que se va a agregar cuando se reciba la respuesta
     const userMessage: Message = {
       id: Date.now().toString(),
       content: input.trim(),
@@ -156,8 +168,19 @@ export default function AIChat() {
       timestamp: new Date(),
     };
 
-    // NO actualizar el estado del historial antes de la petición
-    // Esto evita que history contenga el mensaje duplicado
+    // 1) Agregar mensaje del usuario inmediatamente
+    setMessages(prev => [...prev, userMessage])
+    setInput("")
+
+    // 2) Agregar PILL del asistente inmediatamente en el contenedor
+    const assistantId = (Date.now() + 1).toString()
+    setMessages(prev => [...prev, {
+      id: assistantId,
+      role: "assistant",
+      content: "Thinking…",
+      timestamp: new Date(),
+    }])
+    setTypingMessageId(assistantId)
 
     try {
       const response = await fetch("/api/chat", {
@@ -167,25 +190,24 @@ export default function AIChat() {
         },
         body: JSON.stringify({
           message: userMessage.content,
-          history: messages, // Pasa aquí SÓLO el historial actual, sin el mensaje nuevo
+          history: [...messages, userMessage],
           context: "travel_booking",
           includeReasoning: showReasoning,
         }),
       });
 
+      // Manejo de errores HTTP con detalles
       if (!response.ok) {
-        // Error de límites de tokens (plan agotado)
-        if (response.status === 429) {
-          const errData = await response.json();
-          alert(
-            errData.details?.message ||
-            "You've reached your AI token limit for your current plan. Please upgrade or wait for your quota to reset."
-          );
-        } else {
-          alert("Error fetching response from Suitpax AI. Please try again.");
-        }
-        setLoading(false);
-        return;
+        let errText = "Sorry, I encountered an error. Please try again."
+        try {
+          const errData = await response.json()
+          errText = errData?.details?.message || errData?.error || errText
+        } catch {}
+        // Actualizar el mensaje placeholder del asistente
+        setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: errText } : m))
+        setTypingMessageId(null)
+        setLoading(false)
+        return
       }
 
       const data = await response.json();
@@ -204,21 +226,11 @@ export default function AIChat() {
         parsedOffers = data.offers;
       }
 
-      // Solo ahora, agrega el mensaje del usuario y la respuesta del asistente
-      const assistantId = (Date.now() + 1).toString()
-      setMessages(prev => [
-        ...prev,
-        userMessage,
-        {
-          id: assistantId,
-          content: typeof data.response === "string" ? data.response.replace(blockRegex, "").trim() : "",
-          role: "assistant",
-          timestamp: new Date(),
-          reasoning: data.reasoning,
-        },
-      ]);
+      // 3) Actualizar SOLO el mensaje del asistente (evita duplicados)
+      const cleanResponse = typeof data.response === "string" ? data.response.replace(blockRegex, "").trim() : ""
+      setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: cleanResponse, reasoning: data.reasoning } : m))
 
-      // Renderiza las ofertas si existen
+      // 4) Añadir bloque de ofertas si aplica
       if (parsedOffers && parsedOffers.length > 0) {
         const blockMessage: Message = {
           id: (Date.now() + 2).toString(),
@@ -229,27 +241,13 @@ export default function AIChat() {
         setMessages((prev) => [...prev, blockMessage]);
       }
 
-      setInput("");
-      setFiles([]);
-      setTypingMessageId(assistantId);
     } catch (error) {
-      // Manejo de errores
-      setMessages(prev => [
-        ...prev,
-        userMessage,
-        {
-          id: (Date.now() + 2).toString(),
-          content: "Sorry, I encountered an error. Please try again.",
-          role: "assistant",
-          timestamp: new Date(),
-          reasoning: showReasoning
-            ? "An error occurred while processing the request."
-            : undefined,
-        },
-      ]);
-      setTypingMessageId((Date.now() + 2).toString());
+      // Error de red u otros — actualizar placeholder sin duplicar usuario
+      setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: "Sorry, I encountered a network error. Please try again." } : m))
     } finally {
+      setTypingMessageId(null)
       setLoading(false);
+      setFiles([])
     }
   }
 
@@ -348,6 +346,15 @@ export default function AIChat() {
 
                     // Default text rendering
                     if (message.role === "assistant") {
+                      // Mostrar loader sutil si es el PILL y aún cargando
+                      if (typingMessageId === message.id && (message.content === "Thinking…" || message.content === "")) {
+                        return (
+                          <div className="flex items-center gap-2 text-gray-600 text-sm">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>Thinking…</span>
+                          </div>
+                        )
+                      }
                       return typingMessageId === message.id ? (
                         <p className="text-sm font-light leading-relaxed break-words">
                           <TypingText text={message.content} speed={30} onComplete={handleTypingComplete} />
@@ -365,30 +372,6 @@ export default function AIChat() {
               </motion.div>
             ))}
             
-            {loading && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-                <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 max-w-[95%] sm:max-w-sm md:max-w-md">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md overflow-hidden border border-gray-200 bg-white">
-                      <Image
-                        src="/agents/agent-2.png"
-                        alt="Suitpax AI"
-                        width={24}
-                        height={24}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <span className="text-xs font-medium text-gray-700">Suitpax AI</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
-                    <span className="text-sm text-gray-600 font-light">
-                      {showReasoning ? "Analyzing and thinking..." : "Thinking..."}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            )}
           </ChatContainerContent>
           
           {/* Scroll Anchor para auto-scroll */}
