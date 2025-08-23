@@ -26,6 +26,7 @@ import {
   ReasoningContent,
   ReasoningResponse,
 } from "@/components/prompt-kit/reasoning"
+import Markdown from "@/components/prompt-kit/markdown"
 
 interface Message {
   id: string
@@ -287,17 +288,17 @@ export default function AIChatPage() {
                   )}
 
                   {/* Main message content */}
-                  <p className="text-sm font-light leading-relaxed break-words">
-                    {message.role === "assistant" && typingMessageId === message.id ? (
-                      <TypingText 
-                        text={message.content} 
-                        speed={30} 
-                        onComplete={handleTypingComplete}
-                      />
+                  {message.role === "assistant" ? (
+                    typingMessageId === message.id ? (
+                      <p className="text-sm font-light leading-relaxed break-words">
+                        <TypingText text={message.content} speed={30} onComplete={handleTypingComplete} />
+                      </p>
                     ) : (
-                      message.content
-                    )}
-                  </p>
+                      <Markdown>{message.content}</Markdown>
+                    )
+                  ) : (
+                    <p className="text-sm font-light leading-relaxed break-words">{message.content}</p>
+                  )}
                   <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
                     {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </p>
