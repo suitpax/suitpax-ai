@@ -1,21 +1,22 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { ChevronDown as ChevronDownIcon } from "lucide-react"
-import React, { createContext, useContext, useEffect, useRef, useState } from "react"
-import { Markdown } from "@/components/prompt-kit/markdown"
+import { ChevronDown, ChevronRight } from "lucide-react"
+import React, { createContext, useContext, useState } from "react"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
+// Context para el componente Reasoning
 type ReasoningContextType = {
   isOpen: boolean
-  onOpenChange: (open: boolean) => void
+  setIsOpen: (open: boolean) => void
 }
 
-const ReasoningContext = createContext<ReasoningContextType | undefined>(undefined)
+const ReasoningContext = createContext<ReasoningContextType | null>(null)
 
-function useReasoningContext() {
+function useReasoning() {
   const context = useContext(ReasoningContext)
   if (!context) {
-    throw new Error("useReasoningContext must be used within a Reasoning provider")
+    throw new Error("useReasoning must be used within a Reasoning component")
   }
   return context
 }
@@ -25,103 +26,170 @@ export type ReasoningProps = {
   className?: string
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  isStreaming?: boolean
-}
+} & React.ComponentProps<typeof Collapsible>
 
-export function Reasoning({ children, className, open, onOpenChange, isStreaming }: ReasoningProps) {
+export function Reasoning({
+  children,
+  className,
+  open,
+  onOpenChange,
+  ...props
+}: ReasoningProps) {
   const [internalOpen, setInternalOpen] = useState(false)
-  const [wasAutoOpened, setWasAutoOpened] = useState(false)
-
+  
   const isControlled = open !== undefined
-  const isOpen = isControlled ? Boolean(open) : internalOpen
-
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!isControlled) setInternalOpen(newOpen)
-    onOpenChange?.(newOpen)
+  const isOpen = isControlled ? open : internalOpen
+  
+  const setIsOpen = (newOpen: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(newOpen)
+    } else {
+      setInternalOpen(newOpen)
+    }
   }
 
-  useEffect(() => {
-    if (isStreaming && !wasAutoOpened) {
-      if (!isControlled) setInternalOpen(true)
-      setWasAutoOpened(true)
-    }
-    if (!isStreaming && wasAutoOpened) {
-      if (!isControlled) setInternalOpen(false)
-      setWasAutoOpened(false)
-    }
-  }, [isStreaming, wasAutoOpened, isControlled])
+  const contextValue: ReasoningContextType = {
+    isOpen,
+    setIsOpen,
+  }
 
   return (
-    <ReasoningContext.Provider value={{ isOpen, onOpenChange: handleOpenChange }}>
-      <div className={className}>{children}</div>
+    <ReasoningContext.Provider value={contextValue}>
+      <Collapsible
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        className={cn("w-full", className)}
+        {...props}
+      >
+        {children}
+      </Collapsible>
     </ReasoningContext.Provider>
   )
 }
 
-export type ReasoningTriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  children: React.ReactNode
+export type ReasoningTriggerProps = {
+  children?: React.ReactNode
   className?: string
-}
+} & React.ComponentProps<typeof CollapsibleTrigger>
 
-export function ReasoningTrigger({ children, className, ...props }: ReasoningTriggerProps) {
-  const { isOpen, onOpenChange } = useReasoningContext()
+export function ReasoningTrigger({
+  children,
+  className,
+  ...props
+}: ReasoningTriggerProps) {
+  const { isOpen } = useReasoning()
+
   return (
-    <button
-      className={cn("flex cursor-pointer items-center gap-2 text-sm", className)}
-      onClick={() => onOpenChange(!isOpen)}
+    <CollapsibleTrigger
+      className={cn(
+        "flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors",
+        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm",
+        "py-1 px-2 -mx-2", // Add padding and negative margin for better click area
+        className
+      )}
       {...props}
     >
-      <span className="text-primary">{children}</span>
-      <div className={cn("transform transition-transform", isOpen ? "rotate-180" : "")}>
-        <ChevronDownIcon className="size-4" />
-      </div>
-    </button>
+      {isOpen ? (
+        <ChevronDown className="h-4 w-4 transition-transform" />
+      ) : (
+        <ChevronRight className="h-4 w-4 transition-transform" />
+      )}
+      {children || (
+        <span className="font-medium">
+          {isOpen ? "Hide reasoning" : "Show reasoning"}
+        </span>
+      )}
+    </CollapsibleTrigger>
   )
 }
 
-export type ReasoningContentProps = React.HTMLAttributes<HTMLDivElement> & {
+export type ReasoningContentProps = {
   children: React.ReactNode
   className?: string
-  markdown?: boolean
-  contentClassName?: string
-}
+} & React.ComponentProps<typeof CollapsibleContent>
 
-export function ReasoningContent({ children, className, contentClassName, markdown = false, ...props }: ReasoningContentProps) {
-  const contentRef = useRef<HTMLDivElement>(null)
-  const innerRef = useRef<HTMLDivElement>(null)
-  const { isOpen } = useReasoningContext()
-
-  useEffect(() => {
-    if (!contentRef.current || !innerRef.current) return
-    const el = contentRef.current
-    const inner = innerRef.current
-    const observer = new ResizeObserver(() => {
-      if (el && inner && isOpen) {
-        el.style.maxHeight = `${inner.scrollHeight}px`
-      }
-    })
-    observer.observe(inner)
-    if (isOpen) {
-      el.style.maxHeight = `${inner.scrollHeight}px`
-    }
-    return () => observer.disconnect()
-  }, [isOpen])
-
-  const content = markdown ? <Markdown>{children as string}</Markdown> : children
-
+export function ReasoningContent({
+  children,
+  className,
+  ...props
+}: ReasoningContentProps) {
   return (
-    <div
-      ref={contentRef}
-      className={cn("overflow-hidden transition-[max-height] duration-150 ease-out", className)}
-      style={{ maxHeight: isOpen ? contentRef.current?.scrollHeight : "0px" }}
+    <CollapsibleContent
+      className={cn(
+        "mt-2 space-y-2 overflow-hidden transition-all",
+        "border-l-2 border-muted pl-4 ml-2",
+        "text-sm text-muted-foreground",
+        className
+      )}
       {...props}
     >
-      <div ref={innerRef} className={cn("text-muted-foreground prose prose-sm dark:prose-invert", contentClassName)}>
-        {content}
-      </div>
+      {children}
+    </CollapsibleContent>
+  )
+}
+
+// Componente para mostrar texto con efecto de streaming (simplificado)
+export type ReasoningResponseProps = {
+  text: string | AsyncIterable<string>
+  className?: string
+  onComplete?: () => void
+} & React.HTMLAttributes<HTMLDivElement>
+
+export function ReasoningResponse({
+  text,
+  className,
+  onComplete,
+  ...props
+}: ReasoningResponseProps) {
+  const [displayedText, setDisplayedText] = React.useState("")
+  const [isComplete, setIsComplete] = React.useState(false)
+
+  React.useEffect(() => {
+    if (typeof text === "string") {
+      setDisplayedText(text)
+      setIsComplete(true)
+      onComplete?.()
+      return
+    }
+
+    // Para AsyncIterable (streaming)
+    let isCancelled = false
+    setDisplayedText("")
+    setIsComplete(false)
+
+    async function processStream() {
+      try {
+        for await (const chunk of text) {
+          if (isCancelled) break
+          setDisplayedText(prev => prev + chunk)
+        }
+        if (!isCancelled) {
+          setIsComplete(true)
+          onComplete?.()
+        }
+      } catch (error) {
+        console.error("Error processing reasoning stream:", error)
+        if (!isCancelled) {
+          setIsComplete(true)
+          onComplete?.()
+        }
+      }
+    }
+
+    processStream()
+
+    return () => {
+      isCancelled = true
+    }
+  }, [text, onComplete])
+
+  return (
+    <div className={cn("whitespace-pre-wrap", className)} {...props}>
+      {displayedText}
+      {!isComplete && (
+        <span className="animate-pulse">|</span>
+      )}
     </div>
   )
 }
-
-export default Reasoning
 
