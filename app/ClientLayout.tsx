@@ -9,6 +9,7 @@ import AppErrorBoundary from "@/components/error-boundary"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
+import BreadcrumbsJsonLd from "@/components/seo/BreadcrumbsJsonLd"
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -38,6 +39,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       <Navigation />
       <main className="overflow-hidden w-full">{children}</main>
       <Footer />
+      <BreadcrumbsJsonLd />
     </>
   )
 }
