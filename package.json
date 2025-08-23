@@ -127,6 +127,7 @@
     "eventsource-parser": "^3.0.0",
     "express": "^5.0.1",
     "express-rate-limit": "^7.5.0",
+    "exa-js": "^1.0.0",
     "file-saver": "^2.0.5",
     "file-type": "^19.6.0",
     "framer-motion": "^11.20.0",
