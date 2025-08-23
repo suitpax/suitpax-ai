@@ -5,7 +5,6 @@ import Image from "next/image"
 import { ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface ChatHeaderProps {
 	title?: string
@@ -15,16 +14,11 @@ interface ChatHeaderProps {
 }
 
 export default function ChatHeader({ title = "Suitpax AI", subtitle = "Try the superpowers", className = "", backHref = "/dashboard" }: ChatHeaderProps) {
-	const [agent, setAgent] = useState<"core" | "flights" | "hotels">("core")
-	const [reasoning, setReasoning] = useState<boolean>(true)
+	const [agent] = useState<"core">("core")
 
 	useEffect(() => {
-		window.dispatchEvent(new CustomEvent("suitpax-agent-change", { detail: { agent } }))
-	}, [agent])
-
-	useEffect(() => {
-		window.dispatchEvent(new CustomEvent("suitpax-reasoning-toggle", { detail: { enabled: reasoning } }))
-	}, [reasoning])
+		window.dispatchEvent(new CustomEvent("suitpax-agent-change", { detail: { agent: "core" } }))
+	}, [])
 
 	return (
 		<header className={cn("bg-white/70 backdrop-blur-sm border-b border-gray-200 px-3 lg:px-4 py-2 sticky top-0 z-40", className)} aria-label="Chat header">
@@ -40,19 +34,14 @@ export default function ChatHeader({ title = "Suitpax AI", subtitle = "Try the s
 					</div>
 				</div>
 				<div className="flex items-center gap-3">
-					{/* Agent selector using UI Select */}
-					<div className="min-w-[140px]">
-						<Select value={agent} onValueChange={(v) => setAgent(v as any)}>
-							<SelectTrigger className="h-8 rounded-xl border-gray-200 bg-white text-gray-800">
-								<SelectValue placeholder="Agent" />
-							</SelectTrigger>
-							<SelectContent className="rounded-xl border-gray-200">
-								<SelectItem value="core">Core</SelectItem>
-								<SelectItem value="flights">Flights</SelectItem>
-								<SelectItem value="hotels">Hotels</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
+					{/* Core pill + dual pulse orb */}
+					<span className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-2.5 py-1 text-[10px] text-gray-800">
+						Core
+						<span className="inline-flex items-center gap-1">
+							<span className="h-2 w-2 rounded-full bg-gray-400 animate-pulse" />
+							<span className="h-2 w-2 rounded-full bg-blue-200 animate-pulse" />
+						</span>
+					</span>
 				</div>
 			</div>
 		</header>
