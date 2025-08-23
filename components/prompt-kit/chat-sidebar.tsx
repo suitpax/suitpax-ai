@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
-import { Pencil, Trash2 } from "lucide-react"
+import { Pencil, Trash2, Camera } from "lucide-react"
 import { useVoiceAI } from "@/contexts/voice-ai-context"
 import { Switch } from "@/components/ui/switch"
 import TokenIndicator from "@/components/prompt-kit/token-indicator"
@@ -26,6 +26,7 @@ export default function ChatSidebar({ open, onClose, user, onSelectSession }: Ch
   const [voices, setVoices] = useState<{ id: string; name: string; preview?: string }[]>([])
   const [isVoicesLoading, setIsVoicesLoading] = useState(false)
   const [selectedAgent, setSelectedAgent] = useState<string>(() => typeof window !== 'undefined' ? (localStorage.getItem('suitpax.selectedAgent') || 'emma') : 'emma')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.image || null)
 
   const supabase = createClient()
 
@@ -36,7 +37,6 @@ export default function ChatSidebar({ open, onClose, user, onSelectSession }: Ch
   ]
 
   useEffect(() => {
-    // Fetch voices
     const loadVoices = async () => {
       try {
         setIsVoicesLoading(true)
@@ -50,6 +50,15 @@ export default function ChatSidebar({ open, onClose, user, onSelectSession }: Ch
       }
     }
     loadVoices()
+  }, [])
+
+  useEffect(() => {
+    const onProfileUpdated = (e: any) => {
+      const next = e?.detail?.avatar_url
+      if (next) setAvatarUrl(next)
+    }
+    window.addEventListener('profile:updated', onProfileUpdated as any)
+    return () => window.removeEventListener('profile:updated', onProfileUpdated as any)
   }, [])
 
   const fetchSessions = async () => {
@@ -111,14 +120,39 @@ export default function ChatSidebar({ open, onClose, user, onSelectSession }: Ch
     try { localStorage.setItem('suitpax.selectedVoiceId', voiceId) } catch {}
   }
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user?.id) return
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `avatars/${user.id}.${ext}`
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+      if (uploadError) return
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+      setAvatarUrl(data.publicUrl)
+      // Propagate to rest of app
+      window.dispatchEvent(new CustomEvent('profile:updated', { detail: { avatar_url: data.publicUrl } }))
+      // Optionally update auth metadata
+      await supabase.auth.updateUser({ data: { avatar_url: data.publicUrl } })
+    } catch {}
+  }
+
   return (
     <div className={cn("fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200 shadow-sm transition-transform duration-300 ease-in-out", open ? "translate-x-0" : "-translate-x-full")}
       role="dialog" aria-modal="true" aria-label="Chat history sidebar">
       <div className="h-full flex flex-col">
         <div className="p-3 border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-white border border-gray-200 overflow-hidden flex items-center justify-center">
-              <Image src={user?.image || "/logo/suitpax-symbol.webp"} alt="User" width={20} height={20} className="object-contain" />
+            <div className="relative w-7 h-7 rounded-md bg-white border border-gray-200 overflow-hidden flex items-center justify-center">
+              {avatarUrl ? (
+                <Image src={avatarUrl} alt="User" width={20} height={20} className="object-cover w-full h-full" />
+              ) : (
+                <Image src={user?.image || "/logo/suitpax-symbol.webp"} alt="User" width={20} height={20} className="object-contain" />
+              )}
+              <label htmlFor="sidebar-avatar-upload" className="absolute -bottom-1 -right-1 bg-white border border-gray-200 rounded-full p-0.5 cursor-pointer hover:bg-gray-50">
+                <Camera className="h-3 w-3 text-gray-600" />
+              </label>
+              <input id="sidebar-avatar-upload" type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
             </div>
             <div className="min-w-0">
               <div className="text-xs font-medium truncate">{user?.name || user?.email || "Guest"}</div>

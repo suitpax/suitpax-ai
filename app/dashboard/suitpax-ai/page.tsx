@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Loader2, ArrowUp, Paperclip, X, Square } from "lucide-react"
+import { Loader2, ArrowUp, Paperclip, X, Square, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
@@ -28,6 +28,7 @@ import {
 } from "@/components/prompt-kit/reasoning"
 import Markdown from "@/components/prompt-kit/markdown"
 import ChatHeader from "@/components/prompt-kit/chat-header"
+import ChatSidebar from "@/components/prompt-kit/chat-sidebar"
 import FlightOffersBlock, { type ChatFlightOffer } from "@/components/prompt-kit/flight-offers-block"
 import { useRouter } from "next/navigation"
 import VoiceButton from "@/components/prompt-kit/voice-button"
@@ -107,6 +108,7 @@ export default function AIChat() {
   const supabase = createClient()
   const router = useRouter()
   const greetingAddedRef = useRef(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     const onReasoning = (e: any) => setShowReasoning(Boolean(e?.detail?.enabled))
@@ -141,6 +143,8 @@ export default function AIChat() {
       }])
     }
   }, [])
+
+  const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "there"
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -257,7 +261,17 @@ export default function AIChat() {
 
   return (
     <div className="fixed inset-0 flex flex-col bg-gray-50 overflow-hidden" style={{ height: '100svh' }}>
-      <ChatHeader className="flex-shrink-0" />
+      {/* Sidebar */}
+      <ChatSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} user={{ id: user?.id, name: user?.user_metadata?.full_name || user?.email, email: user?.email, image: user?.user_metadata?.avatar_url || user?.image }} />
+
+      {/* Header with open sidebar button and dynamic subtitle */}
+      <div className="relative">
+        <ChatHeader className="flex-shrink-0" title="Suitpax AI" subtitle={`Hello, ${displayName}`} />
+        <button onClick={() => setSidebarOpen(true)} className="absolute right-3 top-2 inline-flex h-8 items-center gap-1 rounded-2xl border border-gray-300 bg-white px-2 text-[11px] text-gray-800 hover:bg-gray-50">
+          <History className="h-3.5 w-3.5" /> History
+        </button>
+      </div>
+
       <div className="flex-1 min-h-0" style={{ height: 'calc(100svh - 60px)' }}>
         <ChatContainerRoot className="h-full">
           <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4">
