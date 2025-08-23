@@ -81,7 +81,7 @@ const pricingPlans = [
   {
     id: "free",
     name: "Free",
-    description: "For small business teams getting started with AI travel management",
+    description: "For small teams getting started with AI travel",
     price: "€0",
     annualPrice: "€0",
     period: "forever",
@@ -90,14 +90,13 @@ const pricingPlans = [
       "Suitpax AI assistant access",
       "Voice AI Agent (limited)",
       "7,500 AI tokens/month",
-      "15 AI travel searches per month",
-      "Up to 5 team members",
-      "Basic AI travel planning",
-      "Email support",
-      "Basic expense tracking",
-      "Simple itinerary management",
-      "Basic travel policy templates",
-      "Suitpax Connect (trial)",
+      "15 AI travel searches/month",
+      "Up to 10 team members",
+      "Expense control (basic) • 1 cost center",
+      "OCR receipts (basic)",
+      "Auto‑apply policies (basic template)",
+      "+30 NDC airlines • Access to 200+ airlines (BA, AF, IB, LH)",
+      "Integrations: Gmail, Google Calendar (basic)",
     ],
     cta: "Get Started",
     badge: "Free",
@@ -107,9 +106,9 @@ const pricingPlans = [
     bgGradient: "from-gray-50 to-gray-100",
   },
   {
-    id: "basic",
-    name: "Basic",
-    description: "For growing teams ready to optimize their travel experience",
+    id: "starter",
+    name: "Starter",
+    description: "For growing teams ready to optimize travel workflows",
     price: "€49",
     annualPrice: "€39",
     period: "per month",
@@ -118,16 +117,13 @@ const pricingPlans = [
       "Suitpax AI assistant access",
       "Voice AI Agent",
       "20,000 AI tokens/month",
-      "40 AI travel searches per month",
-      "Up to 20 team members",
-      "Standard AI travel planning",
-      "Priority email support",
-      "Advanced expense tracking",
-      "Enhanced itinerary management",
-      "Standard travel policy templates",
-      "Basic CRM integration",
-      "Suitpax Connect (limited)",
-      "Additional users: €8/user",
+      "40 AI travel searches/month",
+      "Up to 25 team members (extra seats +€8)",
+      "Expense control • 3 cost centers",
+      "OCR receipts (standard)",
+      "Auto‑apply policies (templates)",
+      "+30 NDC airlines • Access to 200+ airlines (BA, AF, IB, LH)",
+      "Integrations: Gmail, Google Calendar, Slack (standard)",
     ],
     cta: "Start 14-day trial",
     badge: "Starter",
@@ -139,28 +135,26 @@ const pricingPlans = [
   {
     id: "pro",
     name: "Pro",
-    description: "For businesses ready to fully optimize their travel operations",
-    price: "€89",
-    annualPrice: "€71",
+    description: "AI Agents+ for finance and operations",
+    price: "€99",
+    annualPrice: "€79",
     period: "per month",
     annualPeriod: "per month, billed annually",
     features: [
-      "Suitpax AI assistant access",
-      "Voice AI Agent",
+      "MCP AI agents with memory",
+      "Voice AI Agent (full)",
       "35,000 AI tokens/month",
-      "80 AI travel searches per month",
-      "Up to 50 team members",
-      "AI-powered expense management",
-      "Advanced itinerary planning",
-      "Automatic travel policies (Auto-Policy)",
-      "24/5 priority support",
-      "Team travel coordination",
-      "Suitpax Connect (bank connections)",
-      "Advanced CRM intelligence",
-      "Additional users: €10/user",
+      "80 AI travel searches/month",
+      "Up to 100 team members (extra seats +€10)",
+      "Expense control • 10 cost centers",
+      "OCR receipts (advanced) • auto‑coding",
+      "Auto‑apply policies (rules engine)",
+      "+30 NDC airlines • Access to 200+ airlines",
+      "Integrations: Gmail, Google Calendar, Slack, ERP/HRIS (starter)",
+      "Priority support (24/5)",
     ],
-    cta: "Contact us",
-    badge: "Advanced",
+    cta: "Upgrade to Pro",
+    badge: "AI Agents+",
     popular: false,
     agentImage: "/agents/agent-marcus.jpeg",
     communityImages: [
@@ -172,31 +166,52 @@ const pricingPlans = [
     bgGradient: "from-gray-50 to-gray-100",
   },
   {
+    id: "scale",
+    name: "Scale",
+    description: "For large teams and fast‑growing companies",
+    price: "€299",
+    annualPrice: "€239",
+    period: "per month",
+    annualPeriod: "per month, billed annually",
+    features: [
+      "MCP AI agents with org‑level context",
+      "Voice AI Agent + AI Rebooking",
+      "80,000 AI tokens/month",
+      "200 AI travel searches/month",
+      "Up to 250 team members (overage seats)",
+      "Expense control • cost centers unlimited",
+      "OCR receipts (enterprise) • policy‑aware",
+      "Auto‑apply policies (conditional, multi‑approver)",
+      "+30 NDC airlines • Access to 200+ airlines",
+      "Integrations+: SSO/SCIM, ERP/HRIS, Webhooks",
+      "Priority support (24/5) • Success manager",
+    ],
+    cta: "Choose Scale",
+    badge: "Best value",
+    popular: false,
+    agentImage: "/agents/agent-alex.jpeg",
+    communityImages: ["/community/ammar-foley.webp", "/community/owen-harding.webp"],
+    bgGradient: "from-gray-50 to-gray-100",
+  },
+  {
     id: "enterprise",
     name: "Enterprise",
-    description: "Enterprise-grade travel management for global companies",
+    description: "Global programs, compliance and SLAs",
     price: "Custom Pricing",
     annualPrice: "Custom Pricing",
-    period: "tailored for enterprise",
-    annualPeriod: "tailored for enterprise",
+    period: "tailored",
+    annualPeriod: "tailored",
     features: [
-      "Unlimited AI tokens",
-      "Unlimited AI travel searches",
-      "Unlimited team members",
-      "Suitpax AI assistant access",
-      "Voice AI Agent",
-      "Full AI travel intelligence suite",
-      "Enterprise CRM integration",
-      "Global travel compliance",
-      "24/7 VIP support",
-      "Automatic travel policies (Auto-Policy)",
-      "Custom AI workflows",
-      "Executive travel program",
-      "Suitpax Code (included)",
-      "Full bank API integration",
-      "Multi-currency management",
+      "Unlimited tokens, searches and seats",
+      "MCP agents across orgs/entities",
+      "Voice AI • Concierge 24/7 • SLAs",
+      "Expense control and cost centers at scale",
+      "OCR & audit trails • retention policies",
+      "Advanced policy engine • global compliance",
+      "+30 NDC airlines • Access to 200+ airlines",
+      "Integrations+: ERP/HRIS/DWH • Custom ETL",
     ],
-    cta: "Contact us",
+    cta: "Talk to Sales",
     badge: "Enterprise",
     popular: false,
     agentImage: "/agents/agent-alex.jpeg",
@@ -209,7 +224,7 @@ const pricingPlans = [
       "/community/ashton-blackwell.webp",
       "/community/scott-clayton.webp",
     ],
-    bgGradient: "from-gray-50 to-gray-100",
+    bgGradient: "from-black to-black",
   },
 ]
 
@@ -380,6 +395,15 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
   const [randomSubtitle, setRandomSubtitle] = useState("")
   const [isAnnual, setIsAnnual] = useState(false)
 
+  const getStripeLink = (planId: string) => {
+    if (planId === "free") return "https://buy.stripe.com/4gM14obmo61614C0Tp1Nu06"
+    if (planId === "starter") return isAnnual ? "https://buy.stripe.com/dRmaEYgGI4X28x48lR1Nu08" : "https://buy.stripe.com/9B6bJ23TW61600yby31Nu07"
+    if (planId === "pro") return isAnnual ? "https://buy.stripe.com/fZuaEYcqs89eaFc31x1Nu0a" : "https://buy.stripe.com/bJe5kE1LO1KQ28G59F1Nu09"
+    if (planId === "scale") return "mailto:hello@suitpax.com"
+    if (planId === "enterprise") return "mailto:hello@suitpax.com"
+    return "mailto:hello@suitpax.com"
+  }
+
   useEffect(() => {
     // Seleccionar un título aleatorio al montar el componente
     const titleIndex = Math.floor(Math.random() * titleVariations.length)
@@ -390,24 +414,7 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
     setRandomSubtitle(subtitles[subtitleIndex])
   }, [])
 
-  const handlePlanSelect = async (planId: string) => {
-    if (planId === "free") {
-      // Redirect to sign up for free plan
-      window.location.href = "https://app.suitpax.com/sign-up"
-      return
-    }
-
-    if (planId === "enterprise" || planId === "pro") {
-      // Send email for custom plans
-      window.location.href = "mailto:hello@suitpax.com"
-      return
-    }
-
-    if (planId === "basic") {
-      // Redirect to sign up page for now
-      window.location.href = "https://app.suitpax.com/sign-up"
-    }
-  }
+  const getHref = (planId: string) => getStripeLink(planId)
 
   return (
     <>
@@ -478,8 +485,8 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
             {pricingPlans.map((plan, index) => (
               <motion.div
                 key={plan.id}
-                className={`relative overflow-hidden bg-gradient-to-br ${plan.bgGradient} border border-black rounded-xl p-3 sm:p-4 flex flex-col h-full ${
-                  plan.popular ? "border-2 shadow-lg" : "border shadow-sm"
+                className={`relative overflow-hidden bg-gradient-to-br ${plan.bgGradient} rounded-xl p-3 sm:p-4 flex flex-col h-full ${
+                  plan.id === "enterprise" ? "border border-white/20" : plan.popular ? "border-2 border-black shadow-lg" : "border border-black shadow-sm"
                 }`}
                 whileHover={{
                   y: -4,
@@ -493,8 +500,8 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
                 {/* Diseño más compacto */}
                 <div className="mb-2 sm:mb-3 flex items-start justify-between">
                   <div>
-                    <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">{plan.name}</h3>
-                    <p className="text-[9px] sm:text-[10px] text-gray-600 mt-0.5 line-clamp-2">{plan.description}</p>
+                    <h3 className={`text-base sm:text-lg font-medium tracking-tighter ${plan.id === "enterprise" ? "text-gray-200" : "text-black"}`}>{plan.name}</h3>
+                    <p className={`text-[9px] sm:text-[10px] mt-0.5 line-clamp-2 ${plan.id === "enterprise" ? "text-gray-400" : "text-gray-600"}`}>{plan.description}</p>
                   </div>
                   {plan.badge && (
                     <span className="inline-flex items-center rounded-xl bg-transparent border border-black px-2 py-0.5 text-[8px] sm:text-[9px] font-medium text-black">
@@ -505,10 +512,10 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
 
                 <div className="mb-2 sm:mb-3">
                   <div className="flex items-baseline">
-                    <span className="text-2xl sm:text-3xl font-medium tracking-tighter text-black">
+                    <span className={`text-2xl sm:text-3xl font-medium tracking-tighter ${plan.id === "enterprise" ? "text-gray-100" : "text-black"}`}>
                       {isAnnual ? plan.annualPrice : plan.price}
                     </span>
-                    <span className="text-[9px] sm:text-[10px] text-gray-700 font-semibold ml-1">
+                    <span className={`text-[9px] sm:text-[10px] font-semibold ml-1 ${plan.id === "enterprise" ? "text-gray-300" : "text-gray-700"}`}>
                       /{isAnnual ? plan.annualPeriod : plan.period}
                     </span>
                   </div>
@@ -519,7 +526,7 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start">
                       <svg
-                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-600 mt-0.5 mr-1.5 flex-shrink-0"
+                        className={`w-3 h-3 sm:w-3.5 sm:h-3.5 mt-0.5 mr-1.5 flex-shrink-0 ${plan.id === "enterprise" ? "text-gray-300" : "text-gray-600"}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -527,7 +534,7 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                       </svg>
-                      <span className="text-[9px] sm:text-[10px] font-medium text-gray-700">{feature}</span>
+                      <span className={`text-[9px] sm:text-[10px] font-medium ${plan.id === "enterprise" ? "text-gray-200" : "text-gray-700"}`}>{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -546,16 +553,18 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
                 {plan.id !== "beta" && plan.communityImages && <CommunityCarousel images={plan.communityImages} />}
 
                 <div className="mt-3">
-                  <button
-                    onClick={() => handlePlanSelect(plan.id)}
-                    className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors ${
-                      plan.popular
+                  <a
+                    href={getHref(plan.id)}
+                    className={`w-full py-2.5 px-4 rounded-2xl text-center text-xs sm:text-sm font-semibold transition-colors block mx-auto max-w-[220px] ${
+                      plan.id === "enterprise"
+                        ? "bg-white text-black hover:bg-gray-100"
+                        : plan.popular
                         ? "bg-black text-white hover:bg-gray-800"
                         : "bg-white text-black border border-black hover:bg-gray-100"
-                    } block mx-auto max-w-[220px]`}
+                    }`}
                   >
                     {plan.cta}
-                  </button>
+                  </a>
                 </div>
               </motion.div>
             ))}
@@ -592,19 +601,7 @@ export const Plans = ({ hideHeader = false }: { hideHeader?: boolean }) => {
           </div>
         </div>
       </section>
-      <section id="code" className="py-10">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-3xl mx-auto border border-gray-200 rounded-2xl p-4 bg-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base sm:text-lg font-medium tracking-tighter text-black">Suitpax Code</h3>
-                <p className="text-xs text-gray-600">Private preview for enterprise customers only.</p>
-              </div>
-              <span className="inline-flex items-center rounded-full border border-black px-2.5 py-0.5 text-[10px] font-medium text-black">Coming soon</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Removed old Suitpax Code section */}
     </>
   )
 }

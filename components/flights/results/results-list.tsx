@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import CarrierLogo from "@/components/flights/ui/carrier-logo"
+
 import CityImage from "@/components/flights/ui/city-image"
 import LegSummary from "@/components/flights/ui/leg-summary"
 import SegmentMeta from "@/components/flights/ui/segment-meta"
@@ -83,7 +83,8 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
         const airlineName = firstSeg?.airline?.name || firstSeg?.marketing_carrier?.name || ""
         const airlineIata = firstSeg?.airline?.iata_code || firstSeg?.marketing_carrier?.iata_code || ""
         const airlineId = (firstSeg?.airline as any)?.id
-        const airlineSymbolUrl = firstSeg?.airline?.logo_symbol_url || firstSeg?.airline?.logo_lockup_url || ""
+        const airlineSymbolUrl = firstSeg?.airline?.logo_symbol_url || (airlineIata ? `https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${airlineIata}.svg` : "")
+        const airlineLockupUrl = firstSeg?.airline?.logo_lockup_url || (airlineIata ? `https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/${airlineIata}.svg` : "")
         const overallOrigin = offer.slices?.[0]?.origin?.iata_code
         const overallDestination = offer.slices?.[offer.slices.length - 1]?.destination
         const destCityName = overallDestination?.city?.name || overallDestination?.city_name || overallDestination?.name
@@ -92,7 +93,8 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
           <Card key={offer.id} className="glass-card hover-raise overflow-hidden rounded-2xl border border-gray-200">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 rounded-2xl">
               <div className="flex items-center gap-3 min-w-0">
-                <CarrierLogo src={airlineSymbolUrl} iata={airlineIata} name={airlineName} width={18} height={18} className="h-4 w-4" noFallback />
+                <img src={airlineLockupUrl} alt={airlineName || airlineIata || "airline"} className="h-4 w-auto" loading="lazy" />
+                <img src={airlineSymbolUrl} alt="symbol" className="h-3 w-auto opacity-80" loading="lazy" />
                 <div className="truncate text-sm text-gray-800 tracking-tight flex items-center gap-2">
                   <span className="font-medium truncate max-w-[140px]">{airlineName}</span>
                   {airlineIata && (<span className="text-gray-500">({airlineIata})</span>)}

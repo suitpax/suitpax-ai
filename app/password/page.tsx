@@ -15,6 +15,7 @@ export default function PasswordGatePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [headline, setHeadline] = useState("Suitpax AI: Build. Travel. Code.")
+  const [predictiveSubtitle, setPredictiveSubtitle] = useState("From intent to itinerary")
   const [contactEmail, setContactEmail] = useState("")
   const [contactCompany, setContactCompany] = useState("")
   const [contactMessage, setContactMessage] = useState("")
@@ -35,6 +36,19 @@ export default function PasswordGatePage() {
       "Smarter flights. Faster finance.",
     ]
     setHeadline(titles[Math.floor(Math.random() * titles.length)])
+  }, [])
+
+  useEffect(() => {
+    const predictiveVariants = [
+      "From intent to itinerary",
+      "Predict. Plan. Rebook — automatically",
+      "Live fares, policy‑aware results",
+      "Smart filters. Real logos. Real offers.",
+      "Voice to booking in one flow",
+      "Compliance by design, savings in real‑time",
+      "Best value. Fastest. Policy‑perfect.",
+    ]
+    setPredictiveSubtitle(predictiveVariants[Math.floor(Math.random() * predictiveVariants.length)])
   }, [])
 
   const launchPhrases = [
@@ -87,7 +101,7 @@ export default function PasswordGatePage() {
       const resp = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: contactEmail, company: contactCompany, message: contactMessage }),
+        body: JSON.stringify({ name: 'Website Visitor', subject: 'Early access request', email: contactEmail, company: contactCompany, message: contactMessage }),
       })
       const json = await resp.json()
       if (!resp.ok) throw new Error(json?.error || 'Message failed')
@@ -126,7 +140,7 @@ export default function PasswordGatePage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-serif tracking-tighter text-black leading-tight max-w-4xl"
+            className="text-3xl md:text-4xl lg:text-5xl font-serif tracking-tighter text-black leading-tight max-w-4xl"
           >
             {headline}
           </motion.h1>

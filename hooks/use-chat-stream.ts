@@ -7,14 +7,14 @@ export function useChatStream() {
 	const abortRef = useRef<AbortController | null>(null)
 
 	const start = useCallback(async (
-		payload: { message: string; history?: Array<{ role: "user" | "assistant"; content: string }> },
+		payload: { message: string; history?: Array<{ role: "user" | "assistant"; content: string }>; agent?: "core" | "flights" | "hotels" },
 		onToken: (token: string) => void,
 	) => {
 		if (isStreaming) return
 		setIsStreaming(true)
 		abortRef.current = new AbortController()
 		try {
-			const res = await fetch("/api/ai-chat/stream", {
+			const res = await fetch("/api/chat/stream", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(payload),

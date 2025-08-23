@@ -17,11 +17,11 @@ import BusinessTravelSlider from "@/components/marketing/business-travel-slider"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Suitpax | AI-Powered Business Travel Platform",
+  title: "Suitpax",
   description:
     "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
   openGraph: {
-    title: "Suitpax | AI-Powered Business Travel Platform",
+    title: "Suitpax",
     description:
       "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
     url: "https://suitpax.com",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Suitpax | AI-Powered Business Travel Platform",
+        alt: "Suitpax",
       },
     ],
     locale: "en_US",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Suitpax | AI-Powered Business Travel Platform",
+    title: "Suitpax",
     description:
       "Suitpax is an AI-powered business travel platform that simplifies booking, expense management, and travel policies for modern companies.",
     images: ["/twitter-image.png"],

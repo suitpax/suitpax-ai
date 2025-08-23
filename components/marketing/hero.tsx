@@ -292,7 +292,19 @@ export const Hero = () => {
   }, [])
 
   return (
-    <VantaHaloBackground className="w-full min-h-[100vh] md:min-h-[90vh] lg:min-h-[100vh]">
+    <VantaHaloBackground
+      className="w-full min-h-[100vh] md:min-h-[90vh] lg:min-h-[100vh]"
+      options={{
+        backgroundColor: 0xf3f4f6,
+        baseColor: 0xe5e7eb,
+        color: 0xffffff,
+        color2: 0xCFE8FF,
+        size: 0.8,
+        amplitudeFactor: 1.0,
+        xOffset: 0,
+        yOffset: 0,
+      }}
+    >
       <section
         aria-label="hero"
         className="relative w-full overflow-hidden py-20 md:py-32 lg:py-40 pt-24 flex items-center justify-center min-h-[100vh] md:min-h-[90vh] lg:min-h-[100vh]"
@@ -310,7 +322,7 @@ export const Hero = () => {
             <div className="mb-2 text-xs sm:text-sm text-gray-600">
               <FadeSpan>{greeting}</FadeSpan>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif tracking-tighter text-black leading-none max-w-4xl">
               <FadeSpan>{randomTitle}</FadeSpan>
             </h1>
 

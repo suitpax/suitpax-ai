@@ -1,65 +1,55 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { ArrowDown } from "lucide-react"
+import { ChevronDown } from "lucide-react"
+import React from "react"
+import { useChatContainer } from "./chat-container"
 
-function getNearestScrollableParent(element: HTMLElement | null): HTMLElement | null {
-  let el: HTMLElement | null = element
-  while (el) {
-    const style = window.getComputedStyle(el)
-    const overflowY = style.getPropertyValue("overflow-y")
-    const isScrollable = /(auto|scroll)/.test(overflowY)
-    if (isScrollable && el.scrollHeight > el.clientHeight) return el
-    el = el.parentElement
-  }
-  return document.scrollingElement as HTMLElement | null
-}
+export type ScrollButtonProps = {
+  className?: string
+  variant?: "default" | "outline" | "ghost"
+  size?: "sm" | "default" | "lg"
+  threshold?: number
+} & React.ComponentProps<typeof Button>
 
-export function ScrollButton({ className }: { className?: string }) {
-  const selfRef = useRef<HTMLButtonElement>(null)
-  const [show, setShow] = useState(false)
-  const scrollParentRef = useRef<HTMLElement | null>(null)
+export function ScrollButton({
+  className,
+  variant = "default",
+  size = "sm",
+  threshold = 100,
+  children,
+  onClick,
+  ...props
+}: ScrollButtonProps) {
+  const { isScrolledToBottom, scrollToBottom } = useChatContainer()
 
-  useEffect(() => {
-    const parent = getNearestScrollableParent(selfRef.current?.parentElement || null)
-    scrollParentRef.current = parent
-    if (!parent) return
-
-    const onScroll = () => {
-      const atBottom = parent.scrollTop + parent.clientHeight >= parent.scrollHeight - 4
-      setShow(!atBottom)
-    }
-    onScroll()
-    parent.addEventListener("scroll", onScroll, { passive: true })
-    return () => parent.removeEventListener("scroll", onScroll)
-  }, [])
-
-  const scrollToBottom = () => {
-    const parent = scrollParentRef.current
-    if (!parent) return
-    parent.scrollTo({ top: parent.scrollHeight, behavior: "smooth" })
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    scrollToBottom()
+    onClick?.(event)
   }
 
-  if (!show) return null
+  // No mostrar el botón si ya estamos en el fondo
+  if (isScrolledToBottom) {
+    return null
+  }
 
   return (
-    <button
-      ref={selfRef}
-      type="button"
-      onClick={scrollToBottom}
+    <Button
+      variant={variant}
+      size={size}
       className={cn(
-        "inline-flex items-center justify-center h-10 w-10 rounded-full",
-        "bg-black text-white shadow-sm hover:bg-gray-900 transition-colors",
-        "border border-gray-900/50",
-        className,
+        "fixed bottom-20 right-4 z-50 rounded-full shadow-lg transition-all duration-200 ease-in-out",
+        "hover:scale-105 active:scale-95",
+        "bg-white hover:bg-gray-50 border border-gray-200",
+        "text-gray-700 hover:text-gray-900",
+        className
       )}
-      title="Scroll to bottom"
+      onClick={handleClick}
+      {...props}
     >
-      <ArrowDown className="h-5 w-5" />
-    </button>
+      {children || <ChevronDown className="h-4 w-4" />}
+    </Button>
   )
 }
-
-export default ScrollButton
 

@@ -27,7 +27,7 @@ export default function DashboardSidebar({ isCollapsed, isMobile, onCloseMobile,
       className={cn(
         "flex h-full w-full flex-col bg-gray-100 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-r border-gray-200 transition-all duration-300",
         isCollapsed ? "w-16" : "w-64",
-        isMobile ? "pb-14" : ""
+        isMobile ? "pb-16" : "pb-4"
       )}
     >
       <TopSidebar onToggle={onToggleCollapse} />

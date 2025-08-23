@@ -1,1 +1,1 @@
-export { POST } from "../ai-chat/route"
+export { POST } from "../chat/route"
