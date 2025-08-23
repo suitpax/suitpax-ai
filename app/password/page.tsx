@@ -126,7 +126,7 @@ export default function PasswordGatePage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-serif tracking-tighter text-black leading-tight max-w-4xl"
+            className="text-3xl md:text-4xl lg:text-5xl font-serif tracking-tighter text-black leading-tight max-w-4xl"
           >
             {headline}
           </motion.h1>

@@ -322,7 +322,7 @@ export const Hero = () => {
             <div className="mb-2 text-xs sm:text-sm text-gray-600">
               <FadeSpan>{greeting}</FadeSpan>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-black leading-none max-w-4xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif tracking-tighter text-black leading-none max-w-4xl">
               <FadeSpan>{randomTitle}</FadeSpan>
             </h1>
 
