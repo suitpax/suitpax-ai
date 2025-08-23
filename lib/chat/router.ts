@@ -2,6 +2,8 @@ import { System as SUITPAX_AI_SYSTEM_PROMPT } from "@/lib/prompts/system"
 import { buildSystemPrompt, buildReasoningInstruction, buildToolContext } from "@/lib/prompts/system"
 import { generateAgentResponseByPlan, toAnthropicMessages, type ConversationMessage, type UserPlan } from "@/lib/anthropic"
 import { SUITPAX_CODE_SYSTEM_PROMPT } from "@/lib/prompts/code"
+import { FLIGHTS_EXPERT_SYSTEM_PROMPT } from "@/lib/prompts/agents/flights-expert"
+import { HOTELS_EXPERT_SYSTEM_PROMPT } from "@/lib/prompts/agents/hotels-expert"
 
 export type ChatIntent = "flight_search" | "code_generation" | "document_processing" | "expense_analysis" | "general"
 
@@ -12,6 +14,7 @@ export interface ChatRouterInput {
   includeReasoning?: boolean
   userPlan?: UserPlan
   baseUrl?: string
+  agent?: "flights" | "hotels"
 }
 
 export interface ChatRouterOutput {
@@ -83,17 +86,19 @@ async function callTool(intent: ChatIntent, message: string, baseUrl: string, us
   return null
 }
 
-function buildSystemForIntent(intent: ChatIntent): string {
+function buildSystemForIntent(intent: ChatIntent, agent?: "flights" | "hotels"): string {
+  if (agent === "flights") return FLIGHTS_EXPERT_SYSTEM_PROMPT
+  if (agent === "hotels") return HOTELS_EXPERT_SYSTEM_PROMPT
   if (intent === "flight_search") return SUITPAX_AI_SYSTEM_PROMPT
   if (intent === "code_generation") return SUITPAX_CODE_SYSTEM_PROMPT
   return buildSystemPrompt({ domain: ["general", "travel", "coding", "business", "documents", "expenses"] })
 }
 
-export async function routeChat({ message, history = [], userId, includeReasoning = false, userPlan = "free", baseUrl }: ChatRouterInput): Promise<ChatRouterOutput> {
+export async function routeChat({ message, history = [], userId, includeReasoning = false, userPlan = "free", baseUrl, agent }: ChatRouterInput) {
   const intent = detectIntent(message)
 
   const toolData = await callTool(intent, message, baseUrl || "", userId)
-  const system = buildSystemForIntent(intent)
+  const system = buildSystemForIntent(intent, agent)
 
   let userMessage = message
   if (toolData?.success) {
