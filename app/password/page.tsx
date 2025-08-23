@@ -15,6 +15,7 @@ export default function PasswordGatePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [headline, setHeadline] = useState("Suitpax AI: Build. Travel. Code.")
+  const [predictiveSubtitle, setPredictiveSubtitle] = useState("From intent to itinerary")
   const [contactEmail, setContactEmail] = useState("")
   const [contactCompany, setContactCompany] = useState("")
   const [contactMessage, setContactMessage] = useState("")
@@ -35,6 +36,19 @@ export default function PasswordGatePage() {
       "Smarter flights. Faster finance.",
     ]
     setHeadline(titles[Math.floor(Math.random() * titles.length)])
+  }, [])
+
+  useEffect(() => {
+    const predictiveVariants = [
+      "From intent to itinerary",
+      "Predict. Plan. Rebook — automatically",
+      "Live fares, policy‑aware results",
+      "Smart filters. Real logos. Real offers.",
+      "Voice to booking in one flow",
+      "Compliance by design, savings in real‑time",
+      "Best value. Fastest. Policy‑perfect.",
+    ]
+    setPredictiveSubtitle(predictiveVariants[Math.floor(Math.random() * predictiveVariants.length)])
   }, [])
 
   const launchPhrases = [
@@ -187,19 +201,19 @@ export default function PasswordGatePage() {
 
           {/* Key highlights */}
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl w-full">
-            <div className="rounded-2xl p-4 bg-white/80 border border-gray-200 text-gray-900 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-sm transition-shadow">
+            <div className="rounded-2xl p-4 bg-gray-50/80 border border-gray-200 text-gray-900 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-sm transition-shadow">
               <div className="text-sm font-medium tracking-tight">Predictive Travel</div>
-              <div className="text-[12px] opacity-80 mt-1">From intent to itinerary</div>
+              <div className="text-[12px] opacity-80 mt-1">{predictiveSubtitle}</div>
             </div>
-            <div className="rounded-2xl p-4 bg-black text-white border border-black/10 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-black/20 transition-shadow">
-              <div className="text-xs font-medium tracking-tight opacity-90">Changelog</div>
-              <div className="mt-1 space-y-1.5">
-                <div className="text-[12px] font-light">• New: Seat maps and ancillaries flow</div>
-                <div className="text-[12px] font-light">• Update: Faster AI expense analyzer</div>
-                <div className="text-[12px] font-light">• Fix: OAuth stability for Google</div>
-                <div className="text-[12px] font-light">• UI: Cleaner dashboard navigation</div>
+            <div className="rounded-xl px-3 py-3 bg-black text-white border border-black/10 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-black/20 transition-shadow max-h-[140px] overflow-hidden">
+              <div className="text-[11px] font-medium tracking-tight opacity-90">Changelog</div>
+              <div className="mt-1 space-y-1">
+                <div className="text-[11px] leading-tight font-light">• New: Seat maps and ancillaries flow</div>
+                <div className="text-[11px] leading-tight font-light">• Update: Faster AI expense analyzer</div>
+                <div className="text-[11px] leading-tight font-light">• Fix: OAuth stability for Google</div>
+                <div className="text-[11px] leading-tight font-light">• UI: Cleaner dashboard navigation</div>
               </div>
-              <a href="/changelog" className="inline-block mt-3 text-[11px] font-medium underline underline-offset-4 opacity-90 hover:opacity-100">See all updates →</a>
+              <a href="/changelog" className="inline-block mt-2 text-[10px] font-medium underline underline-offset-4 opacity-90 hover:opacity-100">See all updates →</a>
             </div>
           </div>
 
