@@ -213,7 +213,7 @@
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/react-syntax-highlighter": "^15.6.0",
+    "@types/react-syntax-highlighter": "15.5.13",
     "@types/sanitize-html": "^2.16.0",
     "@types/word-extractor": "^1.0.0",
     "@types/ws": "^8.5.16",
