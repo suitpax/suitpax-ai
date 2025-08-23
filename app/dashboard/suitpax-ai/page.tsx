@@ -30,6 +30,8 @@ import Markdown from "@/components/prompt-kit/markdown"
 import ChatHeader from "@/components/prompt-kit/chat-header"
 import FlightOffersBlock, { type ChatFlightOffer } from "@/components/prompt-kit/blocks/flight-offers-block"
 import { useRouter } from "next/navigation"
+import VoiceButton from "@/components/prompt-kit/voice-button"
+import MetricsHUD from "@/components/prompt-kit/metrics-hud"
 
 interface Message {
   id: string
@@ -371,6 +373,7 @@ export default function AIChatPage() {
           
           {/* Scroll Button flotante */}
           <ScrollButton className="bottom-20 sm:bottom-24 right-4 sm:right-6" />
+          <MetricsHUD estimatedInputTokens={Math.ceil((input + JSON.stringify(messages)).length / 4)} estimatedOutputTokens={800} />
         </ChatContainerRoot>
       </div>
 
@@ -448,6 +451,9 @@ export default function AIChatPage() {
                     <Paperclip className="text-gray-600 size-4 sm:size-5" />
                   </label>
                 </PromptInputAction>
+                <PromptInputAction tooltip="Voice input">
+                  <VoiceButton onTranscript={(text) => { setInput((prev) => (prev ? prev + " " : "") + text); }} />
+                </PromptInputAction>
 
                 <PromptInputAction
                   tooltip={loading ? "Stop generation" : "Send message"}
@@ -455,15 +461,13 @@ export default function AIChatPage() {
                   <Button
                     variant="default"
                     size="icon"
-                    className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-black hover:bg-gray-800 text-white"
-                    onClick={handleSend}
-                    disabled={!input.trim() || loading}
+                    className={`h-7 w-7 sm:h-8 sm:w-8 rounded-2xl ${loading ? 'bg-gray-200 text-gray-600' : 'bg-black text-white hover:bg-gray-800'}`}
+                    onClick={() => {
+                      if (loading) return
+                      handleSend()
+                    }}
                   >
-                    {loading ? (
-                      <Square className="size-3 sm:size-4 fill-current" />
-                    ) : (
-                      <ArrowUp className="size-3 sm:size-4" />
-                    )}
+                    {loading ? <Square className="size-4" /> : <ArrowUp className="size-4" />}
                   </Button>
                 </PromptInputAction>
               </PromptInputActions>
