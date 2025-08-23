@@ -258,9 +258,9 @@ export default function AIChat() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-gray-50 overflow-hidden">
+    <div className="fixed inset-0 flex flex-col bg-gray-50 overflow-hidden" style={{ height: '100svh' }}>
       <ChatHeader className="flex-shrink-0" />
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0" style={{ height: 'calc(100svh - 60px)' }}>
         <ChatContainerRoot className="h-full">
           <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4">
             {messages.length === 0 && !loading && (
