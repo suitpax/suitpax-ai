@@ -494,12 +494,12 @@ export const FlightBookingShowcase = () => {
 
           <div className="flex justify-center mt-6">
             <div className="inline-flex items-center px-3 py-1.5 bg-black/60 border border-white/20 text-white text-xs font-medium rounded-xl shadow-sm backdrop-blur-sm hover:bg-black/70 transition-colors">
-              +50 airlines API connected
+              +30 NDC airlines • Access to 200+ airlines
             </div>
           </div>
 
           <p className="mt-8 text-xs text-white/60 max-w-lg">
-            Suitpax maintains direct partnerships with over 350 airlines worldwide, ensuring seamless booking
+            Suitpax connects you to 200+ airlines worldwide, with +30 NDC carriers for modern, seamless booking
             experiences and exclusive corporate rates.
           </p>
         </div>
