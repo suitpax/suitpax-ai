@@ -28,6 +28,8 @@ import {
 } from "@/components/prompt-kit/reasoning"
 import Markdown from "@/components/prompt-kit/markdown"
 import ChatHeader from "@/components/prompt-kit/chat-header"
+import FlightOffersBlock, { type ChatFlightOffer } from "@/components/prompt-kit/blocks/flight-offers-block"
+import { useRouter } from "next/navigation"
 
 interface Message {
   id: string
@@ -101,6 +103,7 @@ export default function AIChatPage() {
   ]
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
+  const router = useRouter()
 
   useEffect(() => {
     const onReasoning = (e: any) => setShowReasoning(Boolean(e?.detail?.enabled))
@@ -172,17 +175,43 @@ export default function AIChatPage() {
 
       const data = await response.json()
 
+      // Parse optional :::flight_offers_json block from response
+      let parsedOffers: Array<ChatFlightOffer> | null = null
+      const blockRegex = /:::flight_offers_json[\s\S]*?\n({[\s\S]*?})\n:::/
+      const match = typeof data.response === "string" ? data.response.match(blockRegex) : null
+      if (match && match[1]) {
+        try {
+          const obj = JSON.parse(match[1])
+          if (Array.isArray(obj?.offers)) parsedOffers = obj.offers
+        } catch {}
+      }
+      // Fallback to tool payload offers if present
+      if (!parsedOffers && Array.isArray(data.offers)) {
+        parsedOffers = data.offers
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: (typeof data.response === "string" ? data.response.replace(blockRegex, "").trim() : ""),
         role: "assistant",
         timestamp: new Date(),
         reasoning: data.reasoning, // Razonamiento real del API
       }
 
-      // Agregar el mensaje y activar el efecto typing
       setMessages((prev) => [...prev, assistantMessage])
       setTypingMessageId(assistantMessage.id)
+
+      // Render block if we have offers
+      if (parsedOffers && parsedOffers.length > 0) {
+        // Store a synthetic assistant block message with a marker; we'll render cards inline below the text.
+        const blockMessage: Message = {
+          id: (Date.now() + 2).toString(),
+          content: JSON.stringify({ __type: "flight_offers", offers: parsedOffers }),
+          role: "assistant",
+          timestamp: new Date(),
+        }
+        setMessages((prev) => [...prev, blockMessage])
+      }
     } catch (error) {
       console.error("Error sending message:", error)
       const errorMessage: Message = {
@@ -264,18 +293,46 @@ export default function AIChatPage() {
                     </div>
                   )}
 
-                  {/* Main message content */}
-                  {message.role === "assistant" ? (
-                    typingMessageId === message.id ? (
-                      <p className="text-sm font-light leading-relaxed break-words">
-                        <TypingText text={message.content} speed={30} onComplete={handleTypingComplete} />
-                      </p>
-                    ) : (
-                      renderMarkdown ? <Markdown>{message.content}</Markdown> : <p className="text-sm font-light leading-relaxed break-words">{message.content}</p>
-                    )
-                  ) : (
-                    <p className="text-sm font-light leading-relaxed break-words">{message.content}</p>
-                  )}
+                  {/* Main message content or structured blocks */}
+                  {(() => {
+                    // Detect synthetic flight offers block
+                    if (message.role === "assistant" && typeof message.content === "string") {
+                      try {
+                        const parsed = JSON.parse(message.content)
+                        if (parsed && parsed.__type === "flight_offers" && Array.isArray(parsed.offers)) {
+                          const offers = parsed.offers as Array<ChatFlightOffer>
+                          return (
+                            <div className="mt-1">
+                              <FlightOffersBlock
+                                offers={offers}
+                                onBook={(offer) => {
+                                  const id = offer.offer_id || offer.id
+                                  const url = offer.booking_url || (id ? `/dashboard/flights/book/${encodeURIComponent(id)}` : undefined)
+                                  if (url) router.push(url)
+                                }}
+                                onDetails={(offer) => {
+                                  const id = offer.offer_id || offer.id
+                                  if (id) router.push(`/dashboard/flights/details/${encodeURIComponent(id)}`)
+                                }}
+                              />
+                            </div>
+                          )
+                        }
+                      } catch {}
+                    }
+
+                    // Default text rendering
+                    if (message.role === "assistant") {
+                      return typingMessageId === message.id ? (
+                        <p className="text-sm font-light leading-relaxed break-words">
+                          <TypingText text={message.content} speed={30} onComplete={handleTypingComplete} />
+                        </p>
+                      ) : (
+                        renderMarkdown ? <Markdown>{message.content}</Markdown> : <p className="text-sm font-light leading-relaxed break-words">{message.content}</p>
+                      )
+                    }
+                    return <p className="text-sm font-light leading-relaxed break-words">{message.content}</p>
+                  })()}
                   <p className={`text-xs mt-2 ${message.role === "user" ? "text-gray-300" : "text-gray-500"}`}>
                     {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </p>

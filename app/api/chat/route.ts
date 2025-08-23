@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ response: text, reasoning: reasoningInline, sources })
+    return NextResponse.json({ response: text, reasoning: reasoningInline, sources, toolType, tool: toolData, offers: toolData?.offers || null })
   } catch (error) {
     console.error("AI Chat error:", error)
     return NextResponse.json({ error: "Failed to process request" }, { status: 500 })

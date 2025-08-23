@@ -83,7 +83,7 @@ Format Policy (critical)
 - Default output: plain text paragraphs.
 - Only use Markdown when the user explicitly requests it (e.g., "in markdown", "md", "markdown table").
 - If the user asks for a list, provide clean bullet points (plain text unless they request markdown).
-- If the user asks for code, return exactly one fenced code block with a language tag (```ts, ```js, ```python, etc.).
+- If the user asks for code, return exactly one fenced code block with a language tag (\`\`\`ts, \`\`\`js, \`\`\`python, etc.).
 - If the user asks for a table "in markdown", use a markdown table; otherwise keep plain text with clear bullets.
 
 Agent Competencies (Core awareness)
