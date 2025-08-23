@@ -77,6 +77,16 @@ export default function AIChatPage() {
   const [files, setFiles] = useState<File[]>([])
   const [showReasoning, setShowReasoning] = useState(true)
   const [renderMarkdown, setRenderMarkdown] = useState(false)
+  const [heroSubtitle, setHeroSubtitle] = useState("")
+  const emptySubtitles = [
+    "Travel. Expense. Policies.",
+    "Voice and MCP agents.",
+    "Real-time savings & compliance.",
+    "Book smarter. Spend better.",
+    "Context-aware travel ops.",
+    "From intent to itinerary.",
+    "Plan, approve, reconcile.",
+  ]
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
@@ -84,6 +94,10 @@ export default function AIChatPage() {
     const onReasoning = (e: any) => setShowReasoning(Boolean(e?.detail?.enabled))
     window.addEventListener("suitpax-reasoning-toggle", onReasoning as any)
     return () => window.removeEventListener("suitpax-reasoning-toggle", onReasoning as any)
+  }, [])
+
+  useEffect(() => {
+    setHeroSubtitle(emptySubtitles[Math.floor(Math.random() * emptySubtitles.length)])
   }, [])
 
   useEffect(() => {
@@ -183,8 +197,9 @@ export default function AIChatPage() {
         <ChatContainerRoot className="h-full">
           <ChatContainerContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4">
             {messages.length === 0 && !loading && (
-              <div className="flex items-center justify-center py-12">
+              <div className="flex flex-col items-center justify-center py-12 text-center">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif tracking-tighter text-gray-900">Ask anything to Suitpax AI</h1>
+                <p className="text-xs sm:text-sm text-gray-600 font-light mt-2">{heroSubtitle}</p>
               </div>
             )}
             {messages.map((message, index) => (
@@ -332,9 +347,21 @@ export default function AIChatPage() {
                 placeholder="Ask me about flights, hotels, or travel planning..." 
                 className="text-gray-900 placeholder-gray-500 font-light text-sm sm:text-base"
                 disabled={loading}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend() } }}
               />
 
               <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
+                <div className="inline-flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setShowReasoning(v => !v) }}
+                    className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors ${showReasoning ? 'bg-black' : 'bg-gray-300'}`}
+                    aria-label="Toggle reasoning"
+                  >
+                    <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${showReasoning ? 'translate-x-5' : 'translate-x-1'}`} />
+                  </button>
+                  <span className="text-[11px] text-gray-600 font-light select-none">Reasoning</span>
+                </div>
                 <PromptInputAction tooltip="Attach files">
                   <label
                     htmlFor="file-upload"
