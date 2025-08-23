@@ -192,7 +192,6 @@ const pricingPlans = [
       "Automatic travel policies (Auto-Policy)",
       "Custom AI workflows",
       "Executive travel program",
-      "Suitpax Code (included)",
       "Full bank API integration",
       "Multi-currency management",
     ],
