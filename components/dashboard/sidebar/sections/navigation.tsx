@@ -14,7 +14,6 @@ export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile
     { name: "Analytics", href: "/dashboard/analytics", icon: PiChartBarBold },
     { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatsBold },
     { name: "Voice AI", href: "/dashboard/voice-ai", icon: PiMicrophoneBold },
-    { name: "AI Agents", href: "/dashboard/agents", icon: PiChatsBold },
     { name: "Settings", href: "/dashboard/settings", icon: PiGearBold },
   ]
   return (
