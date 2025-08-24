@@ -221,7 +221,7 @@ export default function DashboardOnboarding({ userId, onComplete, onSkip }: Dash
   }
 
   return (
-    <Card className="border border-gray-200 shadow-sm">
+    <Card className="glass-card">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>

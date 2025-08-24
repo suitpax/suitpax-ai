@@ -13,6 +13,7 @@ import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 import NavMobile from "@/components/dashboard/nav-mobile"
 import { DashboardLoadingScreen } from "@/components/ui/loaders"
+import DashboardOnboarding from "@/components/dashboard/dashboard-onboarding"
 
 export default function DashboardLayout({
   children,
@@ -27,6 +28,8 @@ export default function DashboardLayout({
   const [isMobile, setIsMobile] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [sidebarHovered, setSidebarHovered] = useState(false)
+  const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null)
+  const [skippedOnboarding, setSkippedOnboarding] = useState(false)
 
   const supabase = createClient()
   const router = useRouter()
@@ -63,10 +66,11 @@ export default function DashboardLayout({
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) { router.push("/auth/login"); return }
         setUser(user)
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+        const { data: profileData } = await supabase.from("profiles").select("onboarding_completed, subscription_status, subscription_plan, first_name, full_name").eq("id", user.id).single()
         if (profileData) {
-          setUserPlan(profileData.plan || "free")
+          setUserPlan(profileData.subscription_plan || "free")
           setSubscriptionStatus(profileData.subscription_status || "inactive")
+          setOnboardingCompleted(!!profileData.onboarding_completed)
         }
       } catch (error) {
         console.error("Error fetching user:", error)
@@ -80,6 +84,13 @@ export default function DashboardLayout({
     })
     return () => subscription.unsubscribe()
   }, [supabase, router])
+
+  useEffect(() => {
+    try {
+      const skipped = localStorage.getItem("suitpax_onboarding_skipped")
+      setSkippedOnboarding(skipped === "true")
+    } catch {}
+  }, [])
 
   const toggleSidebar = () => { if (isMobile) setMobileMenuOpen(!mobileMenuOpen); else setSidebarCollapsed(!sidebarCollapsed) }
   const closeMobileMenu = () => { setMobileMenuOpen(false) }
@@ -134,7 +145,18 @@ export default function DashboardLayout({
         {/* Main content area */}
         <main className="flex-1 overflow-y-auto pb-24 lg:pb-0">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="h-full">
-            {children}
+            {/* Global onboarding gate: block subroutes until completed, unless user explicitly skipped */}
+            {onboardingCompleted === false && !skippedOnboarding && user ? (
+              <div className="max-w-3xl mx-auto p-6">
+                <DashboardOnboarding
+                  userId={user.id}
+                  onComplete={() => setOnboardingCompleted(true)}
+                  onSkip={() => setSkippedOnboarding(true)}
+                />
+              </div>
+            ) : (
+              children
+            )}
           </motion.div>
         </main>
       </div>
