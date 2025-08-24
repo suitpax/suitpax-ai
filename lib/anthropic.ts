@@ -91,7 +91,7 @@ export async function streamAgentResponse(
   },
 ) {
   const model = options?.model || PLAN_CONFIGS.free.model
-  const max_tokens = options?.maxTokens || PLAN_CONFIGS.free.maxTokens
+  const max_tokens = options?.maxTokens ?? PLAN_CONFIGS.free.maxTokensPerCall
   const temperature = options?.temperature ?? 0.7
 
   const anthropic = getAnthropicClient();
