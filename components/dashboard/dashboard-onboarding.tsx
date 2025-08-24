@@ -221,43 +221,43 @@ export default function DashboardOnboarding({ userId, onComplete, onSkip }: Dash
   }
 
   return (
-    <Card className="glass-card">
+    <Card className="relative overflow-hidden bg-gradient-to-br from-black to-black rounded-2xl border border-white/20 shadow-lg">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-xl font-medium tracking-tighter">Set up your dashboard</CardTitle>
-            <CardDescription>We will personalize your experience in a few quick steps</CardDescription>
+            <CardTitle className="text-xl font-medium tracking-tighter text-gray-100">Set up your dashboard</CardTitle>
+            <CardDescription className="text-gray-400">We will personalize your experience in a few quick steps</CardDescription>
           </div>
           <div className="text-right">
-            <div className="text-sm font-medium text-gray-900">{currentStep + 1} of {steps.length}</div>
-            <div className="text-xs text-gray-500">steps</div>
+            <div className="text-sm font-medium text-gray-200">{currentStep + 1} of {steps.length}</div>
+            <div className="text-xs text-gray-400">steps</div>
           </div>
         </div>
         <div className="mt-4">
-          <Progress value={progress} className="h-2" />
+          <Progress value={progress} className="h-2 bg-white/10" />
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-100 text-gray-600 inline-flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-white/10 text-white inline-flex items-center justify-center">
             {steps[currentStep].icon}
           </div>
           <div>
-            <div className="font-medium text-gray-900">{steps[currentStep].title}</div>
-            <div className="text-sm text-gray-600">{steps[currentStep].description}</div>
+            <div className="font-medium text-white">{steps[currentStep].title}</div>
+            <div className="text-sm text-gray-300">{steps[currentStep].description}</div>
           </div>
           <div className="ml-auto">
-            <Button type="button" variant="ghost" className="text-xs" onClick={() => { localStorage.setItem("suitpax_onboarding_skipped", "true"); onSkip?.() }}>Skip for now</Button>
+            <Button type="button" variant="ghost" className="text-xs text-gray-300 hover:text-white" onClick={() => { localStorage.setItem("suitpax_onboarding_skipped", "true"); onSkip?.() }}>Skip for now</Button>
           </div>
         </div>
 
         {renderContent()}
 
         <div className="flex items-center justify-between pt-2">
-          <Button type="button" variant="outline" className="rounded-xl" onClick={handleBack} disabled={currentStep === 0 || loading}>
+          <Button type="button" variant="outline" className="rounded-xl border-white/30 text-white hover:bg-white/10" onClick={handleBack} disabled={currentStep === 0 || loading}>
             <ArrowLeft className="h-4 w-4 mr-2" /> Back
           </Button>
-          <Button type="button" className="rounded-xl bg-black text-white hover:bg-gray-800" onClick={handleNext} disabled={loading}>
+          <Button type="button" className="rounded-xl bg-white text-black hover:bg-gray-100" onClick={handleNext} disabled={loading}>
             {currentStep < steps.length - 1 ? <>Continue <ArrowRight className="h-4 w-4 ml-2" /></> : <>Finish <CheckCircle className="h-4 w-4 ml-2" /></>}
           </Button>
         </div>
