@@ -3,25 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { motion } from "framer-motion"
-import {
-  Search,
-  Plus,
-  Calendar,
-  TrendingUp,
-  Users,
-  BarChart3,
-  Clock,
-  Settings,
-  Filter,
-  MicIcon,
-  Volume2,
-  Pause,
-  MessageSquare,
-  Zap,
-  Brain,
-  Headphones,
-} from "lucide-react"
-import { Card } from "@/components/ui/card"
+import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -34,13 +16,10 @@ import MiniCountdownBadge from "@/components/ui/mini-countdown"
 // Vanta removed elsewhere; keep here if desired, otherwise consider static backgrounds for performance
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import { AgentSelectorInline } from "@/components/prompt-kit/agent-selector"
-import { VoiceLevelsMeter } from "@/components/voice-ai/voice-levels-meter"
 import { RecorderButton } from "@/components/voice-ai/recorder-button"
-import { WaveformVisualizer } from "@/components/voice-ai/waveform-visualizer"
 import { TranscriptPanel } from "@/components/voice-ai/transcript-panel"
 import { ResponsePanel } from "@/components/voice-ai/response-panel"
 import { CommandChips } from "@/components/voice-ai/command-chips"
-import { routeVoiceQuery } from "@/lib/voice-ai/router"
 
 function VoiceAIContent() {
   const [user, setUser] = useState<any>(null)
