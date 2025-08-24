@@ -380,6 +380,73 @@ export interface Database {
           created_at?: string
         }
       }
+      agent_runs: {
+        Row: {
+          id: string
+          agent_id: string
+          user_id: string
+          model: string | null
+          input_message: string
+          output: string | null
+          status: string
+          input_tokens: number | null
+          output_tokens: number | null
+          created_at: string
+          completed_at: string | null
+        }
+        Insert: {
+          id?: string
+          agent_id: string
+          user_id: string
+          model?: string | null
+          input_message: string
+          output?: string | null
+          status?: string
+          input_tokens?: number | null
+          output_tokens?: number | null
+          created_at?: string
+          completed_at?: string | null
+        }
+        Update: {
+          id?: string
+          agent_id?: string
+          user_id?: string
+          model?: string | null
+          input_message?: string
+          output?: string | null
+          status?: string
+          input_tokens?: number | null
+          output_tokens?: number | null
+          created_at?: string
+          completed_at?: string | null
+        }
+      }
+      agent_run_events: {
+        Row: {
+          id: string
+          run_id: string
+          user_id: string
+          type: string
+          data: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          run_id: string
+          user_id: string
+          type: string
+          data?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          run_id?: string
+          user_id?: string
+          type?: string
+          data?: Json | null
+          created_at?: string
+        }
+      }
       user_preferences: {
         Row: {
           id: string
