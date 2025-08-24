@@ -375,7 +375,7 @@ export default function FlightsPage() {
     <div className="p-6 space-y-6">
       <div className="flex flex-col items-center text-center gap-3">
         <div>
-          <h1 className="text-4xl md:text-6xl font-medium tracking-tighter">Flights</h1>
+          <h1 className="text-4xl md:text-5xl font-medium tracking-tighter">Flights</h1>
           <p className="text-sm text-gray-600 mt-1">Find the best routes, fares and schedules — compare in seconds.</p>
         </div>
         <div className="flex flex-col w-full max-w-sm md:max-w-none md:flex-row items-stretch md:items-center gap-2">
