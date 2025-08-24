@@ -109,6 +109,13 @@ const titleVariations = [
   "Flight booking with superpowers.",
   "Travel management with superpowers.",
   "Hey there — your AI travel copilot is ready.",
+  // Policies (new)
+  "Policy-aware travel: auto-approve within budget, auto-escalate when needed.",
+  "Smart Policies: enforce budgets, routes, and classes—automatically.",
+  "Zero-friction compliance: approvals that happen before you notice.",
+  "Approval intelligence: learn preferences, cut admin, stay compliant.",
+  "Dynamic policy guardrails that adapt to price and disruption.",
+  "From request to approval: policy automation for modern teams.",
 ]
 
 // Badge update messages with time-based logic
@@ -380,7 +387,7 @@ export const Hero = () => {
             <div className="mb-2 text-xs sm:text-sm text-gray-600">
               <FadeSpan>{greeting}</FadeSpan>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif tracking-tighter text-black leading-none max-w-4xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif tracking-tighter text-black leading-none max-w-4xl">
               <FadeSpan>{randomTitle}</FadeSpan>
             </h1>
 
