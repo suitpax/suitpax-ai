@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
           // True streaming from Anthropic SDK
           // @ts-ignore - stream API events are loosely typed in this SDK version
           const astream = await (client as any).messages.stream({
-            model: "claude-3-7-sonnet-20250219",
+            model: "claude-sonnet-4-20250514",
             max_tokens: 4096,
             system,
             messages: [...history.map((m: any) => ({ role: m.role, content: m.content })), { role: "user", content: message }],
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
             if (user?.id) {
               await supabase.from('ai_usage').insert({
                 user_id: user.id,
-                model: "claude-3-7-sonnet-20250219",
+                model: "claude-sonnet-4-20250514",
                 input_tokens: inputTokens,
                 output_tokens: outputTokens,
                 context_type: /flight|vuelo/i.test(message) ? 'flight_search' : 'general',

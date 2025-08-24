@@ -1,4 +1,4 @@
-export type AgentModel = "claude-3-7-sonnet-20250219" | "claude-3-7-haiku-20250219"
+export type AgentModel = "claude-sonnet-4-20250514" | "claude-haiku-4-20241022"
 
 export interface AgentToolDefinition {
 	name: string

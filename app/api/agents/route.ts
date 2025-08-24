@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 			name: String(payload?.name || "Untitled Agent"),
 			description: String(payload?.description || ""),
 			persona: String(payload?.persona || ""),
-			config: payload?.config || { model: "claude-3-7-sonnet-20250219", temperature: 0.7, maxTokens: 1000 },
+			config: payload?.config || { model: "claude-sonnet-4-20250514", temperature: 0.7, maxTokens: 1000 },
 		}
 		const { data, error } = await supabase.from("agents").insert(agent).select("*").single()
 		if (error) throw error

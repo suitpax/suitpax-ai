@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     if (!client) return NextResponse.json({ success: false, error: "AI not configured" }, { status: 500 })
 
     const res = await client.messages.create({
-      model: "claude-3-7-sonnet-20250219",
+      model: "claude-sonnet-4-20250514",
       max_tokens: 1200,
       system: EXPENSE_PROMPT,
       messages: [{ role: "user", content: input }],

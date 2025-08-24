@@ -18,7 +18,7 @@ export default function NewAgentPage() {
 			const res = await fetch("/api/agents", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name, description, persona, config: { model: "claude-3-7-sonnet-20250219", temperature: 0.7, maxTokens: 1200 } }),
+				body: JSON.stringify({ name, description, persona, config: { model: "claude-sonnet-4-20250514", temperature: 0.7, maxTokens: 1200 } }),
 			})
 			const json = await res.json()
 			if (res.ok && json.agent?.id) router.push(`/dashboard/agents/${json.agent.id}`)
