@@ -28,14 +28,21 @@ const titleVariations = [
   "Business travel that enhances your workflow.",
   "Designed by humans. Powered by AI agents.",
   "AI-driven travel for modern business.",
-  // Nuevos títulos enfocados en MCP (Model Context Protocol)
+  // Agentic AI / MCP
+  "Agentic AI for business travel: autonomous, tool-using, goal-driven.",
+  "Suitpax Agentic AI: MCP-powered agents that plan, book, and optimize.",
+  "Agentic AI copilots that coordinate your entire travel workflow.",
+  "Context-aware, tool-calling agents with real-time web and NDC.",
+  "Agentic AI that learns your policies and executes end-to-end.",
+  "From intent to itinerary with Agentic AI orchestration.",
+  // MCP (Model Context Protocol)
   "MCP: AI agents that understand your business travel needs.",
   "Business travel platform with MCP-powered intelligence.",
   "MCP + AI agents: The perfect travel management duo.",
   "Suitpax MCP: Smarter business travel decisions.",
   "AI travel agents with MCP: Context-aware recommendations.",
   "MCP business travel: Where AI meets human expertise.",
-  // Nuevos títulos con "all in one"
+  // All in one
   "All in one business travel platform for startups and growing companies.",
   "The all in one solution for your company's travel needs.",
   "Suitpax: All in one travel management for teams of all sizes.",
@@ -44,12 +51,12 @@ const titleVariations = [
   "All in one travel infrastructure for modern businesses.",
   "The all in one travel solution that grows with your company.",
   "All in one travel management with human-centered design.",
-  // Nuevo título añadido
+  // Ecosystem
   "The complete business travel ecosystem: Flights, Hotels, Cars, and Expense Management.",
   "Human vision. AI execution. Reinventing business travel and expense management.",
   "Human-led. AI-empowered. Transforming how companies travel and manage expenses.",
   "Where human intuition meets AI agents to redefine corporate travel and financial control.",
-  // Nuevos títulos sobre AI-first y business travel
+  // AI-first
   "AI-first business travel platform for the modern enterprise.",
   "Redefining business travel with AI-first principles and human expertise.",
   "AI-first approach to solving business travel complexity.",
@@ -65,7 +72,7 @@ const titleVariations = [
   "Transforming business travel with AI-first innovation.",
   "The future of business travel is AI-first and human-guided.",
   "AI-first business travel: Smarter journeys, better outcomes.",
-  // Nuevos títulos con workforce, AI-travel, business, platform
+  // Workforce
   "Empowering your workforce with intelligent travel solutions.",
   "AI-travel platform designed for the modern workforce.",
   "Transforming business travel for distributed workforce teams.",
@@ -91,7 +98,7 @@ const titleVariations = [
   "Workforce travel management reimagined for modern business.",
   "AI-travel intelligence built for business efficiency.",
   "The business platform that makes workforce travel effortless.",
-  // Nuevos títulos sobre TMS (Travel Management System)
+  // TMS
   "TMS reimagined: AI-powered travel management like never before.",
   "The TMS revolution: Where artificial intelligence meets travel expertise.",
   "Next-generation TMS with AI agents that think like your travel team.",
