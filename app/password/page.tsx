@@ -147,7 +147,7 @@ export default function PasswordGatePage() {
 
           {/* Thin airline slider badge */}
           <div className="mt-3 inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 text-[9px] font-medium text-gray-700 border border-black/10">
-            Live airline partners
+            NDC superpowers • Live fares & ancillaries
           </div>
           <div className="mt-3 w-full max-w-4xl">
             <AirlinesSlider className="opacity-90" />
