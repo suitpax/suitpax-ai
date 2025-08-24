@@ -7,6 +7,7 @@ import { motion } from "framer-motion"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import CityAnimateText from "@/components/ui/city-animate-text"
 import MiniCountdownBadge from "@/components/ui/mini-countdown"
+import AirlinesSlider from "@/components/ui/airlines-slider"
 // Icons removed (unused)
 
 export default function PasswordGatePage() {
@@ -130,7 +131,6 @@ export default function PasswordGatePage() {
     >
       <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24">
         <div className="flex flex-col items-center text-center">
-          {/* Removed separate agents banner to avoid duplication with the sticky top bar */}
           <div className="inline-flex items-center rounded-xl bg-white px-2.5 py-0.5 text-[10px] font-medium text-gray-900 mb-4 border border-gray-200">
             <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={60} height={15} className="h-3 w-auto mr-1" />
             Private preview access
@@ -145,29 +145,30 @@ export default function PasswordGatePage() {
             {headline}
           </motion.h1>
 
-          {/* Intro copy moved closer to the input */}
+          {/* Thin airline slider badge */}
+          <div className="mt-3 inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 text-[9px] font-medium text-gray-700 border border-black/10">
+            Live airline partners
+          </div>
+          <div className="mt-3 w-full max-w-4xl">
+            <AirlinesSlider className="opacity-90" />
+          </div>
 
-          {/* Shimmer text */}
           <div className="mt-4 text-gray-700 text-sm font-medium relative inline-block">
             <span className="relative z-10">Shaping the next‑gen of business travel</span>
             <span className="absolute inset-0 animate-hero-shimmer bg-[linear-gradient(110deg,#ffffff,45%,#9ca3af,55%,#ffffff)] bg-[length:200%_100%] bg-clip-text text-transparent" />
           </div>
 
-          {/* Animated city text (cleaner spacing) */}
           <div className="mt-8">
             <CityAnimateText />
           </div>
 
-          {/* Mini badges under animated text */}
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[10px] text-gray-700">
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Design. Ship. Scale.</span>
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Predict. Plan. Automate.</span>
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Flights. Hotels. Finance.</span>
             <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 border border-black/10">Chat. Voice. Agents.</span>
           </div>
-          {/* Removed small city strip */}
 
-          {/* Access input */}
           <div className="mt-6 text-[11px] text-gray-600">Enter the access key to explore our next‑gen business travel platform.</div>
           <form onSubmit={handleSubmit} className="mt-2 w-full max-w-xl mx-auto px-2">
             <div className="flex items-center gap-2 bg-white/90 backdrop-blur border border-gray-200 rounded-full p-1.5 shadow-sm">
@@ -197,9 +198,6 @@ export default function PasswordGatePage() {
             {error && <div className="mt-2 text-xs text-red-600">{error}</div>}
           </form>
 
-          {/* Removed city example cards to declutter */}
-
-          {/* Key highlights */}
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl w-full">
             <div className="rounded-2xl p-4 bg-white/80 border border-gray-200 text-gray-900 backdrop-blur supports-[backdrop-filter]:backdrop-blur hover:shadow-sm transition-shadow">
               <div className="text-sm font-medium tracking-tight">Predictive Travel</div>
@@ -217,7 +215,6 @@ export default function PasswordGatePage() {
             </div>
           </div>
 
-          {/* Contact form (Brevo-ready): message, email, company */}
           <div className="mt-10 w-full max-w-2xl">
             <div className="text-center mb-3">
               <div className="text-xs font-semibold tracking-widest text-gray-700 uppercase">Get early access</div>
@@ -259,7 +256,6 @@ export default function PasswordGatePage() {
             {contactMsg && <div className="mt-2 text-center text-xs text-gray-700">{contactMsg}</div>}
           </div>
 
-          {/* Reduced badges spacing */}
           <div className="flex items-center gap-3 mt-5">
             <MiniCountdownBadge target={new Date('2025-10-21T00:00:00Z')} title="Official launch" />
             <span className="inline-flex items-center rounded-xl bg-white/10 px-2.5 py-0.5 text-[9px] font-medium text-white/90 border border-white/15">Private beta</span>
@@ -267,7 +263,6 @@ export default function PasswordGatePage() {
         </div>
       </div>
 
-      {/* Top sticky banner (full width) — merged with AI Agents marquee */}
       <div className="absolute inset-x-0 top-0 z-20">
         <div className="flex items-center gap-3 px-4 py-2 bg-black/95 text-gray-300 text-[11px] font-medium tracking-tight border-b border-white/10">
           <div className="flex -space-x-2">
@@ -284,13 +279,12 @@ export default function PasswordGatePage() {
               </div>
             </div>
           </div>
-          <a href="mailto:ai@suitpax.com" className="rounded-xl border border-white/10 bg-white/20 px-2.5 py-1 text-[10px] text-black hover:bg-white/30 backdrop-blur">
+          <a href="mailto:ai@suitpax.com" className="rounded-xl border border-white/10 bg.white/20 px-2.5 py-1 text-[10px] text-black hover:bg-white/30 backdrop-blur">
             Contact us
           </a>
         </div>
       </div>
 
-      {/* Bottom banner */}
       <div className="absolute inset-x-0 bottom-0 z-10">
         <div className="px-4 py-2 bg-black/95 text-gray-300 text-center text-[11px] font-medium tracking-tight">
           Private preview • Building the future of business travel

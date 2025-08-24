@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const prompt = `\n${System}\n\nGenerate a professional ${type} policy.\n\nCompany profile:\n- Size: ${size}\n- Budget: ${budget}\n- Context: ${JSON.stringify(context)}\n\nRequirements:\n1) Sections: Purpose, Scope, Roles, Booking/Approval Procedures, Allowable Expenses, Exclusions, Reimbursement, Compliance, Examples/Templates.\n2) Keep it concise, editable, and enterprise-ready.\n3) Use clear headings and bullets.\n4) Output in ${language}.`
 
     const res = await client.messages.create({
-      model: "claude-3-7-sonnet-20250219",
+      model: "claude-sonnet-4-20250514",
       max_tokens: 3000,
       system: System,
       messages: [{ role: "user", content: prompt }],

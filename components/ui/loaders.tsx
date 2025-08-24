@@ -38,9 +38,16 @@ export function DashboardLoadingScreen({ className = "" }: { className?: string 
 	return (
 		<div className={`min-h-screen flex items-center justify-center bg-gray-50 ${className}`}>
 			<div className="text-center">
-				<div className="mx-auto h-16 w-16 rounded-full border-4 border-black border-t-transparent animate-spin mb-5" />
+				<div className="mx-auto mb-3">
+					{/* Smaller loader using AI Loader */}
+					{/* eslint-disable-next-line @next/next/no-img-element */}
+					<div className="inline-flex items-center justify-center">
+						{/* dynamic import avoided; simple CSS spinner inline to reduce overhead */}
+						<span className="inline-block h-6 w-6 rounded-full border-3 border-black border-t-transparent animate-spin" />
+					</div>
+				</div>
 				<div className="inline-block">
-					<span className="text-lg font-medium text-black tracking-tight">{tagline}</span>
+					<span className="text-sm font-medium text-black tracking-tight">{tagline}</span>
 				</div>
 			</div>
 		</div>

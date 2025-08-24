@@ -3,25 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { motion } from "framer-motion"
-import {
-  Search,
-  Plus,
-  Calendar,
-  TrendingUp,
-  Users,
-  BarChart3,
-  Clock,
-  Settings,
-  Filter,
-  MicIcon,
-  Volume2,
-  Pause,
-  MessageSquare,
-  Zap,
-  Brain,
-  Headphones,
-} from "lucide-react"
-import { Card } from "@/components/ui/card"
+import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -34,13 +16,10 @@ import MiniCountdownBadge from "@/components/ui/mini-countdown"
 // Vanta removed elsewhere; keep here if desired, otherwise consider static backgrounds for performance
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import { AgentSelectorInline } from "@/components/prompt-kit/agent-selector"
-import { VoiceLevelsMeter } from "@/components/voice-ai/voice-levels-meter"
 import { RecorderButton } from "@/components/voice-ai/recorder-button"
-import { WaveformVisualizer } from "@/components/voice-ai/waveform-visualizer"
 import { TranscriptPanel } from "@/components/voice-ai/transcript-panel"
 import { ResponsePanel } from "@/components/voice-ai/response-panel"
 import { CommandChips } from "@/components/voice-ai/command-chips"
-import { routeVoiceQuery } from "@/lib/voice-ai/router"
 
 function VoiceAIContent() {
   const [user, setUser] = useState<any>(null)
@@ -147,42 +126,51 @@ function VoiceAIContent() {
 
     setIsProcessing(true)
     try {
-      const response = await fetch("/api/suitpax-ai", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, userId: user.id }),
+        body: JSON.stringify({ message, history: [], agent: undefined }),
       })
-      const data = await response.json()
-      setAiResponse(data.response)
 
-      if (voiceSettings.autoSpeak && data.response) await speak(data.response)
+      if (!response.ok) {
+        let errText = "Sorry, I encountered an error processing your request."
+        try {
+          const errData = await response.json()
+          errText = errData?.details?.message || errData?.error || errText
+        } catch {}
+        setAiResponse(errText)
+      } else {
+        const data = await response.json()
+        const text = typeof data.response === "string" ? data.response : ""
+        setAiResponse(text)
+        if (voiceSettings.autoSpeak && text) await speak(text)
 
-      const newConversation = {
-        id: Date.now(),
-        message,
-        response: data.response,
-        timestamp: new Date().toISOString(),
-        memoriesUsed: data.memoriesUsed || [],
-        knowledgeUsed: data.knowledgeUsed || [],
-      }
-      setConversations((prev) => [newConversation, ...prev])
+        const newConversation = {
+          id: Date.now(),
+          message,
+          response: text,
+          timestamp: new Date().toISOString(),
+          memoriesUsed: data.memoriesUsed || [],
+          knowledgeUsed: data.knowledgeUsed || [],
+        }
+        setConversations((prev) => [newConversation, ...prev])
 
-      // Simple intent: if user mentions flight booking/search, try to extract route and date and navigate to Flights
-      const intent = /\b(flight|flights|book|search)\b/i.test(message)
-      if (intent) {
-        // naive extract IATA like ABC or patterns "MAD" "LHR" and an ISO date
-        const iatas = (message.match(/\b([A-Z]{3})\b/g) || []).slice(0, 2)
-        const dateMatch = message.match(/\b(\d{4}-\d{2}-\d{2})\b/)
-        const params = new URLSearchParams()
-        if (iatas[0]) params.set('origin', iatas[0])
-        if (iatas[1]) params.set('destination', iatas[1])
-        if (dateMatch) params.set('date', dateMatch[1])
-        params.set('autosearch', '1')
-        window.location.href = `/dashboard/flights?${params.toString()}`
+        // Simple intent: if user mentions flight booking/search, try to extract route and date and navigate to Flights
+        const intent = /\b(flight|flights|book|search)\b/i.test(message)
+        if (intent) {
+          const iatas = (message.match(/\b([A-Z]{3})\b/g) || []).slice(0, 2)
+          const dateMatch = message.match(/\b(\d{4}-\d{2}-\d{2})\b/)
+          const params = new URLSearchParams()
+          if (iatas[0]) params.set('origin', iatas[0])
+          if (iatas[1]) params.set('destination', iatas[1])
+          if (dateMatch) params.set('date', dateMatch[1])
+          params.set('autosearch', '1')
+          window.location.href = `/dashboard/flights?${params.toString()}`
+        }
       }
     } catch (error) {
       console.error("Error processing voice message:", error)
-      setAiResponse("Sorry, I encountered an error processing your request.")
+      setAiResponse("Sorry, I encountered a network error. Please try again.")
     } finally {
       setIsProcessing(false)
       setCurrentMessage("")
@@ -222,7 +210,7 @@ function VoiceAIContent() {
         mediaBlobRef.current = blob
         const fd = new FormData()
         fd.append("audio", blob, "audio.webm")
-        const res = await fetch("/api/whisper/transcribe", { method: "POST", body: fd })
+        const res = await fetch("/api/elevenlabs/speech-to-text", { method: "POST", body: fd })
         if (res.ok) {
           const json = await res.json()
           const text = json?.text || ""

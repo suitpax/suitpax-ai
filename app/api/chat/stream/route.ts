@@ -26,38 +26,47 @@ export async function POST(req: NextRequest) {
     const client = getAnthropic()
     if (!client) return new Response("AI not configured", { status: 500 })
 
-    const res = await client.messages.create({
-      model: "claude-3-7-sonnet-20250219",
-      max_tokens: 4096,
-      system,
-      messages: [...history.map((m: any) => ({ role: m.role, content: m.content })), { role: "user", content: message }],
-    })
-
-    const text = (res as any).content?.find?.((c: any) => c.type === "text")?.text || ""
-
-    try {
-      const inputTokens = (res as any)?.usage?.input_tokens || 0
-      const outputTokens = (res as any)?.usage?.output_tokens || Math.ceil(text.length / 4)
-      if (user?.id) {
-        await supabase.from('ai_usage').insert({
-          user_id: user.id,
-          model: "claude-3-7-sonnet-20250219",
-          input_tokens: inputTokens,
-          output_tokens: outputTokens,
-          context_type: /flight|vuelo/i.test(message) ? 'flight_search' : 'general',
-        })
-      }
-    } catch {}
-
     const encoder = new TextEncoder()
-    const stream = new ReadableStream({
-      start(controller) {
-        const chunkSize = 64
-        for (let i = 0; i < text.length; i += chunkSize) {
-          const slice = text.slice(i, i + chunkSize)
-          controller.enqueue(encoder.encode(slice))
+
+    const stream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        try {
+          // True streaming from Anthropic SDK
+          // @ts-ignore - stream API events are loosely typed in this SDK version
+          const astream = await (client as any).messages.stream({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 4096,
+            system,
+            messages: [...history.map((m: any) => ({ role: m.role, content: m.content })), { role: "user", content: message }],
+          })
+
+          // Stream deltas as they arrive
+          for await (const event of astream) {
+            if (event?.type === "content_block_delta" && event?.delta?.type === "text_delta" && typeof event.delta.text === "string") {
+              controller.enqueue(encoder.encode(event.delta.text))
+            }
+          }
+
+          // Finalize and log usage
+          const final = await astream.finalMessage()
+          try {
+            const inputTokens = (final as any)?.usage?.input_tokens || 0
+            const outputTokens = (final as any)?.usage?.output_tokens || 0
+            if (user?.id) {
+              await supabase.from('ai_usage').insert({
+                user_id: user.id,
+                model: "claude-sonnet-4-20250514",
+                input_tokens: inputTokens,
+                output_tokens: outputTokens,
+                context_type: /flight|vuelo/i.test(message) ? 'flight_search' : 'general',
+              })
+            }
+          } catch {}
+
+          controller.close()
+        } catch (e) {
+          controller.error(e)
         }
-        controller.close()
       }
     })
 
