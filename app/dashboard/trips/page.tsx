@@ -26,7 +26,7 @@ export default function TripsPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl md:text-5xl font-semibold tracking-tighter">Past Trips</h1>
+        <h1 className="text-4xl md:text-5xl font-medium tracking-tighter">Past Trips</h1>
         <p className="text-sm text-gray-600 mt-1">Your travel history at a glance</p>
       </div>
 
