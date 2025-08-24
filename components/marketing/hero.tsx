@@ -28,14 +28,21 @@ const titleVariations = [
   "Business travel that enhances your workflow.",
   "Designed by humans. Powered by AI agents.",
   "AI-driven travel for modern business.",
-  // Nuevos títulos enfocados en MCP (Model Context Protocol)
+  // Agentic AI / MCP
+  "Agentic AI for business travel: autonomous, tool-using, goal-driven.",
+  "Suitpax Agentic AI: MCP-powered agents that plan, book, and optimize.",
+  "Agentic AI copilots that coordinate your entire travel workflow.",
+  "Context-aware, tool-calling agents with real-time web and NDC.",
+  "Agentic AI that learns your policies and executes end-to-end.",
+  "From intent to itinerary with Agentic AI orchestration.",
+  // MCP (Model Context Protocol)
   "MCP: AI agents that understand your business travel needs.",
   "Business travel platform with MCP-powered intelligence.",
   "MCP + AI agents: The perfect travel management duo.",
   "Suitpax MCP: Smarter business travel decisions.",
   "AI travel agents with MCP: Context-aware recommendations.",
   "MCP business travel: Where AI meets human expertise.",
-  // Nuevos títulos con "all in one"
+  // All in one
   "All in one business travel platform for startups and growing companies.",
   "The all in one solution for your company's travel needs.",
   "Suitpax: All in one travel management for teams of all sizes.",
@@ -44,12 +51,12 @@ const titleVariations = [
   "All in one travel infrastructure for modern businesses.",
   "The all in one travel solution that grows with your company.",
   "All in one travel management with human-centered design.",
-  // Nuevo título añadido
+  // Ecosystem
   "The complete business travel ecosystem: Flights, Hotels, Cars, and Expense Management.",
   "Human vision. AI execution. Reinventing business travel and expense management.",
   "Human-led. AI-empowered. Transforming how companies travel and manage expenses.",
   "Where human intuition meets AI agents to redefine corporate travel and financial control.",
-  // Nuevos títulos sobre AI-first y business travel
+  // AI-first
   "AI-first business travel platform for the modern enterprise.",
   "Redefining business travel with AI-first principles and human expertise.",
   "AI-first approach to solving business travel complexity.",
@@ -65,7 +72,7 @@ const titleVariations = [
   "Transforming business travel with AI-first innovation.",
   "The future of business travel is AI-first and human-guided.",
   "AI-first business travel: Smarter journeys, better outcomes.",
-  // Nuevos títulos con workforce, AI-travel, business, platform
+  // Workforce
   "Empowering your workforce with intelligent travel solutions.",
   "AI-travel platform designed for the modern workforce.",
   "Transforming business travel for distributed workforce teams.",
@@ -91,7 +98,7 @@ const titleVariations = [
   "Workforce travel management reimagined for modern business.",
   "AI-travel intelligence built for business efficiency.",
   "The business platform that makes workforce travel effortless.",
-  // Nuevos títulos sobre TMS (Travel Management System)
+  // TMS
   "TMS reimagined: AI-powered travel management like never before.",
   "The TMS revolution: Where artificial intelligence meets travel expertise.",
   "Next-generation TMS with AI agents that think like your travel team.",
@@ -102,6 +109,13 @@ const titleVariations = [
   "Flight booking with superpowers.",
   "Travel management with superpowers.",
   "Hey there — your AI travel copilot is ready.",
+  // Policies (new)
+  "Policy-aware travel: auto-approve within budget, auto-escalate when needed.",
+  "Smart Policies: enforce budgets, routes, and classes—automatically.",
+  "Zero-friction compliance: approvals that happen before you notice.",
+  "Approval intelligence: learn preferences, cut admin, stay compliant.",
+  "Dynamic policy guardrails that adapt to price and disruption.",
+  "From request to approval: policy automation for modern teams.",
 ]
 
 // Badge update messages with time-based logic
@@ -127,95 +141,146 @@ const getBadgeMessage = () => {
 
 // Cities for the animated text
 const cities = [
-  "San Francisco",
-  "New York",
-  "London",
-  "Barcelona",
-  "Tokyo",
-  "Berlin",
-  "Singapore",
-  "Sydney",
-  "Paris",
-  "Dubai",
-  "Toronto",
-  "Hong Kong",
-  "Amsterdam",
-  "Madrid",
-  "Seoul",
-  "Mumbai",
-  "Mexico City",
-  "São Paulo",
-  "Bangkok",
-  "Istanbul",
-  "Vienna",
-  "Copenhagen",
-  "Stockholm",
-  "Zurich",
-  "Prague",
-  "Buenos Aires",
-  "Rio de Janeiro",
-  "Cape Town",
-  "Melbourne",
-  "Vancouver",
-  "Montreal",
-  "Lisbon",
-  "Athens",
-  "Dublin",
-  "Oslo",
-  "Helsinki",
-  "Milan",
-  "Munich",
-  "Brussels",
-  "Frankfurt",
-  "Geneva",
-  "Zurich",
-  "Manchester",
-  "Birmingham",
-  "Lyon",
-  "Marseille",
-  "Hamburg",
-  "Cologne",
-  "Rotterdam",
-  "Turin",
-  "Bologna",
-  "Florence",
-  "Valencia",
-  "Seville",
-  "Porto",
-  "Warsaw",
-  "Krakow",
-  "Budapest",
-  "Vienna",
-  "Prague",
-  "Bratislava",
-  "Ljubljana",
-  "Zagreb",
-  "Belgrade",
-  "Bucharest",
-  "Sofia",
-  "Thessaloniki",
-  "Tallinn",
-  "Riga",
-  "Vilnius",
-  "Luxembourg",
-  "Monaco",
-  "Basel",
-  "Antwerp",
-  "Ghent",
-  "Düsseldorf",
-  "Stuttgart",
-  "Nuremberg",
-  "Hannover",
-  "Leipzig",
-  "Dresden",
-  "Gothenburg",
-  "Malmö",
-  "Tampere",
-  "Aarhus",
-  "Odense",
-  "Bergen",
-  "Stavanger",
-  "Reykjavik",
+	"San Francisco",
+	"New York",
+	"London",
+	"Barcelona",
+	"Tokyo",
+	"Berlin",
+	"Singapore",
+	"Sydney",
+	"Paris",
+	"Dubai",
+	"Toronto",
+	"Hong Kong",
+	"Amsterdam",
+	"Madrid",
+	"Seoul",
+	"Mumbai",
+	"Mexico City",
+	"São Paulo",
+	"Bangkok",
+	"Istanbul",
+	"Vienna",
+	"Copenhagen",
+	"Stockholm",
+	"Zurich",
+	"Prague",
+	"Buenos Aires",
+	"Cape Town",
+	"Melbourne",
+	"Vancouver",
+	"Montreal",
+	"Lisbon",
+	"Athens",
+	"Dublin",
+	"Oslo",
+	"Helsinki",
+	"Milan",
+	"Munich",
+	"Brussels",
+	"Frankfurt",
+	"Geneva",
+	"Manchester",
+	"Birmingham",
+	"Lyon",
+	"Marseille",
+	"Hamburg",
+	"Cologne",
+	"Rotterdam",
+	"Turin",
+	"Bologna",
+	"Florence",
+	"Valencia",
+	"Seville",
+	"Porto",
+	"Warsaw",
+	"Krakow",
+	"Budapest",
+	"Bratislava",
+	"Ljubljana",
+	"Zagreb",
+	"Belgrade",
+	"Bucharest",
+	"Sofia",
+	"Thessaloniki",
+	"Tallinn",
+	"Riga",
+	"Vilnius",
+	"Luxembourg",
+	"Monaco",
+	"Basel",
+	"Antwerp",
+	"Ghent",
+	"Düsseldorf",
+	"Stuttgart",
+	"Nuremberg",
+	"Hannover",
+	"Leipzig",
+	"Dresden",
+	"Gothenburg",
+	"Malmö",
+	"Tampere",
+	"Aarhus",
+	"Odense",
+	"Bergen",
+	"Stavanger",
+	"Reykjavik",
+	// Added globally important hubs
+	"Los Angeles",
+	"Chicago",
+	"Boston",
+	"Washington, D.C.",
+	"Atlanta",
+	"Miami",
+	"San Diego",
+	"Austin",
+	"Dallas",
+	"Houston",
+	"Seattle",
+	"Philadelphia",
+	"Phoenix",
+	"San Jose",
+	"Minneapolis",
+	"Denver",
+	"Detroit",
+	"Charlotte",
+	"Nashville",
+	"Newark",
+	"Guadalajara",
+	"Bogotá",
+	"Lima",
+	"Santiago",
+	"Quito",
+	"Caracas",
+	"Panama City",
+	"San Juan",
+	"San José",
+	"Rio de Janeiro",
+	"Brasília",
+	"Johannesburg",
+	"Nairobi",
+	"Lagos",
+	"Accra",
+	"Casablanca",
+	"Doha",
+	"Kuwait City",
+	"Riyadh",
+	"Jeddah",
+	"Abu Dhabi",
+	"Manila",
+	"Jakarta",
+	"Kuala Lumpur",
+	"Taipei",
+	"Shenzhen",
+	"Guangzhou",
+	"Chengdu",
+	"Beijing",
+	"Shanghai",
+	"Hanoi",
+	"Ho Chi Minh City",
+	"Auckland",
+	"Wellington",
 ]
 
 // Reemplazar algunos de los subtitles con estas nuevas versiones:
@@ -322,7 +387,7 @@ export const Hero = () => {
             <div className="mb-2 text-xs sm:text-sm text-gray-600">
               <FadeSpan>{greeting}</FadeSpan>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif tracking-tighter text-black leading-none max-w-4xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif tracking-tighter text-black leading-none max-w-4xl">
               <FadeSpan>{randomTitle}</FadeSpan>
             </h1>
 
@@ -331,7 +396,7 @@ export const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-8 bg-white/70 backdrop-blur-sm p-6 rounded-xl border border-gray-200 relative"
+              className="mt-8 bg-white/60 backdrop-blur-md p-6 sm:p-7 md:p-8 rounded-2xl border border-gray-200/70 relative max-w-3xl mx-auto w-full"
             >
               <CityAnimateText cities={cities} />
             </motion.div>
@@ -340,17 +405,17 @@ export const Hero = () => {
               <FadeSpan>{randomSubtitle}</FadeSpan>
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-10 w-full">
               <Button
                 asChild
-                className="rounded-xl bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
+                className="rounded-2xl bg-black text-white hover:bg-black/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[220px] md:min-w-[260px] font-medium shadow-lg text-base md:text-lg"
               >
                 <Link href="/manifesto">Read the manifesto</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="rounded-xl bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[180px] md:min-w-[220px] font-medium shadow-lg text-base md:text-lg"
+                className="rounded-2xl bg-white/80 backdrop-blur-md border-gray-300 text-black hover:bg-white/90 px-8 py-3 md:px-10 md:py-4 w-full sm:w-auto min-w-[220px] md:min-w-[260px] font-medium shadow-lg text-base md:text-lg"
               >
                 <Link href="https://cal.com/team/founders/partnership">Talk to founder</Link>
               </Button>
@@ -368,16 +433,16 @@ export const Hero = () => {
 
           {/* Mini Chat Component */}
           <motion.div
-            className="mt-4 max-w-md mx-auto"
+            className="mt-4 w-full max-w-3xl mx-auto px-4"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             whileHover={{
-              scale: 1.05,
+              scale: 1.03,
               transition: { duration: 0.2 },
             }}
           >
-            <div className="bg-white/80 backdrop-blur-lg rounded-xl border border-gray-200 overflow-hidden">
+            <div className="bg-white/65 backdrop-blur-2xl rounded-2xl border border-gray-200/80 overflow-hidden shadow-lg">
               <MiniChat />
             </div>
           </motion.div>

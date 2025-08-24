@@ -71,8 +71,8 @@ export const Footer = () => {
               <Link href="/business-travel" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Business Travel
               </Link>
-              <Link href="/ai-agents" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
-                AI Agents
+              <Link href="/agentic-ai" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
+                Agentic AI
               </Link>
               <Link href="/enterprise" className="text-gray-400 hover:text-gray-200 transition-colors text-sm">
                 Enterprise

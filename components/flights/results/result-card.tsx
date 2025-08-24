@@ -38,8 +38,8 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-3 min-w-0">
-            <img src={airlineLockupUrl} alt={airlineName || airlineIata || "airline"} className="h-4 w-auto" loading="lazy" />
-            <img src={airlineSymbolUrl} alt="symbol" className="h-3 w-auto opacity-80" loading="lazy" />
+            <img src={airlineLockupUrl} alt={airlineName || airlineIata || "airline"} className="h-5 w-auto" loading="lazy" />
+            <img src={airlineSymbolUrl} alt="symbol" className="h-4 w-auto opacity-80" loading="lazy" />
             <div className="truncate">
               <div className="leading-tight flex items-center gap-2">
                 <span className="font-semibold text-gray-900 text-sm md:text-base tracking-tight">{airlineName}</span>

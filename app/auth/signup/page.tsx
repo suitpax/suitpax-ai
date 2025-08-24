@@ -93,6 +93,9 @@ export default function SignupPage() {
               <span className="text-sm text-gray-600 font-light">Already have an account? </span>
               <Link href="/auth/login" className="text-sm font-medium text-black hover:text-gray-700 transition-colors">Sign in</Link>
             </div>
+            <p className="mt-4 text-sm font-light text-gray-600 text-center">
+              By continuing, you agree to Suitpax's <Link href="/terms" className="underline">Terms of Service</Link> and <Link href="/privacy" className="underline">Privacy Policy</Link>, and to receive periodic emails with updates.
+            </p>
           </form>
         </div>
       </div>

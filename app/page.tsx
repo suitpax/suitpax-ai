@@ -14,6 +14,7 @@ import ContactForm from "@/components/marketing/contact-form"
 // Removed AIAirlinesHero to avoid airline logos in homepage partners context
 import APITravel from "@/components/marketing/api-travel"
 import BusinessTravelSlider from "@/components/marketing/business-travel-slider"
+import MemoUserUI from "@/components/marketing/memo-user-ui"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -73,6 +74,7 @@ export default function Home() {
     <>
       <main id="main-content" className="w-full">
         <Hero />
+        <MemoUserUI />
         <PartnersShowcase />
         <AITravelAgents />
         <BusinessTravelRevolution />

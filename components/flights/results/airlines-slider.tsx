@@ -34,6 +34,16 @@ const AIRLINE_LOGOS = [
   { name: "SAS", code: "SK" },
   { name: "Tap Air Portugal", code: "TP" },
   { name: "Etihad", code: "EY" },
+  { name: "LATAM", code: "LA" },
+  { name: "Qantas", code: "QF" },
+  { name: "Hawaiian", code: "HA" },
+  { name: "Air Canada", code: "AC" },
+  { name: "Avianca", code: "AV" },
+  { name: "Azul", code: "AD" },
+  { name: "Copa", code: "CM" },
+  { name: "Alaska", code: "AS" },
+  { name: "JetBlue", code: "B6" },
+  { name: "All Nippon Cargo", code: "KX" },
 ]
 
 export default function AirlinesSlider({ title = "", className = "" }: AirlinesSliderProps) {

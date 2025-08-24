@@ -49,9 +49,9 @@ export default function FlightOffersBlock({
 						<div className="flex items-center justify-between gap-2">
 							<div className="flex items-center gap-2 min-w-0">
 								{logoUrl ? (
-									<div className="relative h-5 w-20">
-										<Image src={logoUrl} alt={o.airline?.name || "Airline"} fill className="object-contain" />
-									</div>
+																	<div className="relative h-6 w-24">
+									<Image src={logoUrl} alt={o.airline?.name || "Airline"} fill className="object-contain" />
+								</div>
 								) : (
 									<div className="text-xs font-medium text-gray-700 truncate">{o.airline?.name || "Airline"}</div>
 								)}
