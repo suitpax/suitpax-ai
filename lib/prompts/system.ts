@@ -3,6 +3,8 @@ export { EXPENSE_PROMPT } from "./expense"
 export { FLIGHTS_PROMPT } from "./flights"
 export { HOTELS_PROMPT } from "./hotels"
 export { CODE_ASSIST_PROMPT } from "./code"
+export { MEETING_INTELLIGENCE_PROMPT } from "./meeting"
+export { DATA_ANALYSIS_PROMPT } from "./analytics"
 export type SystemPromptOptions = {
   domain?: Array<"travel" | "coding" | "business" | "general" | "documents" | "expenses">
   language?: "es" | "en"
@@ -116,9 +118,7 @@ ${CODING_RULES}
 ${BUSINESS_RULES}`
 
 // --- Specialized prompts consolidated here ---
-// Optional: meeting and analytics prompts can move to their own files later
-export const MEETING_INTELLIGENCE_PROMPT = `You are Suitpax Meeting AI, specialized in meeting management, scheduling optimization, and productivity enhancement.`
-export const DATA_ANALYSIS_PROMPT = `You are Suitpax Data AI, specialized in business intelligence, analytics, and data-driven insights.`
+// (Meeting and Analytics prompts are now provided by their own modules)
 
 // --- Policy extraction helper (migrated from API) ---
 export const PolicyDataSchema = z.object({
