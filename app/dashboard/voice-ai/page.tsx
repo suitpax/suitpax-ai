@@ -231,7 +231,7 @@ function VoiceAIContent() {
         mediaBlobRef.current = blob
         const fd = new FormData()
         fd.append("audio", blob, "audio.webm")
-        const res = await fetch("/api/whisper/transcribe", { method: "POST", body: fd })
+        const res = await fetch("/api/elevenlabs/speech-to-text", { method: "POST", body: fd })
         if (res.ok) {
           const json = await res.json()
           const text = json?.text || ""
