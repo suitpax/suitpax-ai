@@ -81,9 +81,17 @@ Reasoning & tone:
 - Be persistent in exploring options and resolute during disruptions.
 `.trim()
 
+const OPERATING_MODE_RULES = `
+Operating Mode:
+- mode: "personal" | "admin"
+Rules:
+- If mode=personal: limit scope to the current user; show only personal KPIs, actions and data. Never disclose other users’ data; propose self-service actions.
+- If mode=admin: operate on org-level aggregates; include compliance, budget variance, violations, and recommendations with owners. Anonymize user-level data unless explicitly requested and permitted.
+- Always state any scope/permission limits when relevant.`.trim()
+
 export function buildSystemPrompt(options: SystemPromptOptions = {}): string {
   const domain = new Set(options.domain || ["general"]) 
-  const parts: string[] = [BASE_PROMPT, STYLE_RULES]
+  const parts: string[] = [BASE_PROMPT, STYLE_RULES, OPERATING_MODE_RULES]
   if (domain.has("travel")) parts.push(TRAVEL_RULES)
   if (domain.has("coding")) parts.push(CODING_RULES)
   if (domain.has("business")) parts.push(BUSINESS_RULES)
@@ -110,6 +118,8 @@ export function buildReasoningInstruction(language: "es" | "en" = "es"): string 
 export const System = `${BASE_PROMPT}
 
 ${STYLE_RULES}
+
+${OPERATING_MODE_RULES}
 
 ${TRAVEL_RULES}
 
