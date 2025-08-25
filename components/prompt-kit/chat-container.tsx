@@ -30,7 +30,7 @@ export function ChatContainerRoot({
   className,
   ...props
 }: ChatContainerRootProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true)
 
   const scrollToBottom = () => {
