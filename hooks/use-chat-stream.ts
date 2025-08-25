@@ -7,7 +7,7 @@ export function useChatStream() {
 	const abortRef = useRef<AbortController | null>(null)
 
 	const start = useCallback(async (
-		payload: { message: string; history?: Array<{ role: "user" | "assistant"; content: string }>; agent?: "core" | "flights" | "hotels" },
+		payload: { message: string; history?: Array<{ role: "user" | "assistant"; content: string }> },
 		onToken: (token: string) => void,
 	) => {
 		if (isStreaming) return
