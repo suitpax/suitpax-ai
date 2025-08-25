@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   Bell,
   User,
@@ -91,6 +91,7 @@ export default function Header({
   sidebarCollapsed,
 }: HeaderProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [userProfile, setUserProfile] = useState<any>(null)
   const [notifications, setNotifications] = useState<any[]>([])
   const [commandOpen, setCommandOpen] = useState(false)
@@ -139,6 +140,14 @@ export default function Header({
     }
   }
 
+  const isPersonalMode = pathname.startsWith("/dashboard/user")
+  const modeLabel = isPersonalMode ? "Personal" : "Admin"
+
+  const switchMode = (target: "personal" | "admin") => {
+    if (target === "personal") router.push("/dashboard/user")
+    else router.push("/dashboard")
+  }
+
   return (
     <>
       <header className="bg-white/70 backdrop-blur-sm border-b border-gray-200 px-3 lg:px-4 py-2 sticky top-0 z-40">
@@ -155,7 +164,11 @@ export default function Header({
             >
               <PiDotsNineBold className="h-4 w-4" />
             </Button>
-            <span className="text-[14px] font-medium text-black leading-none">Home</span>
+            <span className="text-[14px] font-medium text-black leading-none">{modeLabel}</span>
+            <div className="ml-1 inline-flex items-center gap-1 bg-gray-100 rounded-full p-0.5">
+              <button onClick={() => switchMode("personal")} className={`px-2 py-0.5 text-[11px] rounded-full ${isPersonalMode ? "bg-white text-black shadow" : "text-gray-600"}`}>Personal</button>
+              <button onClick={() => switchMode("admin")} className={`px-2 py-0.5 text-[11px] rounded-full ${!isPersonalMode ? "bg-white text-black shadow" : "text-gray-600"}`}>Admin</button>
+            </div>
             {/* Optional small logo can be added here if approved */}
           </div>
 
