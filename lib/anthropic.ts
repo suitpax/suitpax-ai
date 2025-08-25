@@ -48,7 +48,7 @@ export type UserPlan = keyof typeof PLAN_CONFIGS;
 export async function generateAgentResponseByPlan(
   messages: ConversationMessage[],
   userPlan: UserPlan = "free",
-  temperature: number = 0.7,
+  temperature: number = 0.3,
   systemPrompt?: string
 ): Promise<{ text: string; inputTokens?: number; outputTokens?: number; model: string }> {
   const config = PLAN_CONFIGS[userPlan] || PLAN_CONFIGS['free'];
@@ -57,7 +57,7 @@ export async function generateAgentResponseByPlan(
   const response = await anthropic.messages.create({
     model: config.model,
     max_tokens: config.maxTokensPerCall,
-    temperature,
+    temperature: Math.max(0, Math.min(1, temperature ?? 0.3)),
     system: systemPrompt,
     messages: messages.map((msg) => ({
       role: msg.role,
@@ -92,13 +92,13 @@ export async function streamAgentResponse(
 ) {
   const model = options?.model || PLAN_CONFIGS.free.model
   const max_tokens = options?.maxTokens ?? PLAN_CONFIGS.free.maxTokensPerCall
-  const temperature = options?.temperature ?? 0.7
+  const temperature = options?.temperature ?? 0.3
 
   const anthropic = getAnthropicClient();
   const res = await anthropic.messages.create({
     model,
     max_tokens,
-    temperature,
+    temperature: Math.max(0, Math.min(1, temperature)),
     system: options?.system,
     messages: messages.map((m) => ({ role: m.role, content: m.content })),
   })

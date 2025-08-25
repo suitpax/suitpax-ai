@@ -99,14 +99,14 @@ export default function PasswordGatePage() {
     setContactMsg(null)
     setContactLoading(true)
     try {
-      const resp = await fetch('/api/contact', {
+      const resp = await fetch('/api/public/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'Website Visitor', subject: 'Early access request', email: contactEmail, company: contactCompany, message: contactMessage }),
+        body: JSON.stringify({ name: 'Website Visitor', email: contactEmail, company: contactCompany, message: contactMessage }),
       })
       const json = await resp.json()
-      if (!resp.ok) throw new Error(json?.error || 'Message failed')
-      setContactMsg('Thanks! We will reach out shortly.')
+      if (!resp.ok || json?.success === false) throw new Error(json?.error || json?.message || 'Message failed')
+      setContactMsg(json?.message || 'Thanks! We will reach out shortly.')
       setContactEmail("")
       setContactCompany("")
       setContactMessage("")
@@ -281,7 +281,7 @@ export default function PasswordGatePage() {
               </div>
             </div>
           </div>
-          <a href="mailto:ai@suitpax.com" className="rounded-xl border border-white/10 bg.white/20 px-2.5 py-1 text-[10px] text-black hover:bg-white/30 backdrop-blur">
+          <a href="mailto:ai@suitpax.com" className="rounded-xl border border-white/10 bg-white/20 px-2.5 py-1 text-[10px] text-white hover:bg-white/30 hover:text-black backdrop-blur">
             Contact us
           </a>
         </div>

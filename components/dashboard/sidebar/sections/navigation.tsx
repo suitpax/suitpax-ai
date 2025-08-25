@@ -18,9 +18,12 @@ export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile
         { name: "Flights", href: "/dashboard/flights", icon: PiAirplaneTiltBold },
         { name: "Stays", href: "/dashboard/hotels", icon: PiBuildingsBold },
         { name: "Rail", href: "/dashboard/trains", icon: PiTrainBold },
+        { name: "Networking", href: "/dashboard/networking", icon: PiChartBarBold },
+        { name: "Scoring", href: "/dashboard/scoring", icon: PiChartBarBold },
         { name: "Analytics", href: "/dashboard/analytics", icon: PiChartBarBold },
         { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatsBold },
         { name: "Voice AI", href: "/dashboard/voice-ai", icon: PiMicrophoneBold },
+        { name: "AI Studio", href: "/dashboard/ai-studio", icon: PiChatsBold },
         { name: "Settings", href: "/dashboard/settings", icon: PiGearBold },
       ]
     : [
@@ -50,7 +53,7 @@ export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile
         )
       })}
 
-      {/* Configuration section (expandable), shown mainly for admin */}
+      {/* Configuration (collapsible) */}
       {isAdmin && (
         <div className="mt-1">
           <button
@@ -62,11 +65,11 @@ export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile
             )}
           >
             <PiShieldCheckBold className="h-3.5 w-3.5" />
-            {!isCollapsed && <span className="text-[13px] font-medium flex-1 text-left">Configuration</span>}
+            {!isCollapsed && <span className="text-[10px] uppercase tracking-wider text-gray-500 flex-1 text-left">Configuration</span>}
             {!isCollapsed && <PiCaretDownBold className={cn("h-3.5 w-3.5 transition-transform", configOpen ? "rotate-180" : "rotate-0")} />}
           </button>
           {configOpen && (
-            <div className="mt-1 pl-2">
+            <div className="mt-1">
               {[
                 { name: "Smart Policies", href: "/dashboard/policies", icon: PiShieldCheckBold },
                 { name: "Organization", href: "/dashboard/organization", icon: PiBuildingsBold },
@@ -79,7 +82,7 @@ export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile
                       href={item.href}
                       onClick={isMobile ? onCloseMobile : undefined}
                       className={cn(
-                        "ml-5 flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-900",
+                        "flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-900",
                         active ? "bg-gray-100 text-gray-900 border border-gray-200" : "hover:bg-gray-100"
                       )}
                     >

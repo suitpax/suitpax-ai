@@ -3,8 +3,13 @@
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 
-export default function SheetFilters({ trigger, children }: { trigger?: React.ReactNode; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
+export default function SheetFilters({ trigger, children, open: controlledOpen, onOpenChange, renderFooter }: { trigger?: React.ReactNode; children: React.ReactNode; open?: boolean; onOpenChange?: (v: boolean) => void; renderFooter?: (close: () => void) => React.ReactNode }) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
+  const open = typeof controlledOpen === 'boolean' ? controlledOpen : uncontrolledOpen
+  const setOpen = (v: boolean) => {
+    if (typeof controlledOpen === 'boolean' && onOpenChange) onOpenChange(v)
+    else setUncontrolledOpen(v)
+  }
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -33,9 +38,14 @@ export default function SheetFilters({ trigger, children }: { trigger?: React.Re
               <h2 className="text-sm font-medium">Filters</h2>
               <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-gray-700">Close</button>
             </div>
-            <div className="p-6 overflow-y-auto h-[calc(100%-56px)]">
+            <div className="p-4 overflow-y-auto" style={{ height: renderFooter ? 'calc(100% - 104px)' : 'calc(100% - 56px)' }}>
               {children}
             </div>
+            {renderFooter && (
+              <div className="px-4 py-3 border-t border-gray-200 bg-white">
+                {renderFooter(() => setOpen(false))}
+              </div>
+            )}
           </div>
         </div>
       )}

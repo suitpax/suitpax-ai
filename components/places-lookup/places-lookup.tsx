@@ -92,9 +92,9 @@ export default function PlacesLookup({ value, onSelect, placeholder }: Props) {
 
   return (
     <div className="places">
-      <Input value={query} onChange={e => { setQuery(e.target.value); setOpen(true) }} onFocus={() => setOpen(true)} onKeyDown={handleKeyDown} placeholder={placeholder} className="bg-white text-gray-900 rounded-2xl" />
+      <Input value={query} onChange={e => { setQuery(e.target.value); setOpen(true) }} onFocus={() => setOpen(true)} onKeyDown={handleKeyDown} placeholder={placeholder} className="bg-white text-gray-900 rounded-2xl text-[13px]" />
       {open && items.length > 0 && (
-        <div className="places-panel">
+        <div className="places-panel max-w-[480px]">
           <div className="p-2 space-y-2">
             {loading && (
               <div className="px-3 py-2 text-xs text-gray-600">Searching…</div>

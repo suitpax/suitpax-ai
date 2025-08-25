@@ -21,6 +21,7 @@ import { DateRangePicker } from "@/components/ui/date-range-picker"
 import SheetFilters from "@/components/ui/sheet-filters"
 const FilterControls = dynamic(() => import("@/components/flights/results/filter-controls/filter-controls"), { ssr: false })
 const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlines-slider"), { ssr: false })
+const AirlinesModal = dynamic(() => import("@/components/flights/results/airlines-modal"), { ssr: false })
 import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import FlightsSearchOverlay from "@/components/ui/flights-search-overlay"
@@ -131,6 +132,7 @@ export default function FlightsPage() {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [density, setDensity] = useState<'compact' | 'cozy'>('cozy')
+  const [airlinesOpen, setAirlinesOpen] = useState(false)
   const [offerRequestId, setOfferRequestId] = useState<string | null>(null)
   const [pageMeta, setPageMeta] = useState<any>({})
   const [loadingMore, setLoadingMore] = useState(false)
@@ -408,7 +410,7 @@ export default function FlightsPage() {
           <p className="text-sm text-gray-600 mt-1">Find the best routes, fares and schedules — compare in seconds.</p>
         </div>
         <div className="flex flex-col w-full max-w-sm md:max-w-none md:flex-row items-stretch md:items-center gap-2">
-          <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-gray-200 text-black hover:bg-gray-300 backdrop-blur-sm shadow-sm" onClick={() => router.push('/dashboard/suitpax-ai?tab=chat')}>Ask Suitpax AI</Button>
+          <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 backdrop-blur-sm shadow-sm" onClick={() => router.push('/dashboard/suitpax-ai?tab=chat')}>Ask Suitpax AI</Button>
           <Button id="primary-search-btn" className="w-full md:w-auto rounded-full md:rounded-2xl px-8 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search flights'}</Button>
         </div>
       </div>
@@ -483,7 +485,9 @@ export default function FlightsPage() {
       {/* Airlines slider just under prompt */}
       <div className="mt-4 flex justify-center">
         <div className="w-full max-w-4xl">
-          <AirlinesSlider />
+          <button onClick={() => setAirlinesOpen(true)} className="w-full rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors">
+            <AirlinesSlider />
+          </button>
         </div>
       </div>
 
@@ -607,10 +611,10 @@ export default function FlightsPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
             {/* Departure */}
             <div>
-              <Label className="text-sm text-gray-700">Departure</Label>
+              <Label className="text-sm text-gray-700 mb-2 inline-block">Departure</Label>
               <DateRangePicker
                 mode={searchParams.tripType === 'round_trip' ? 'range' : 'single'}
                 value={searchParams.tripType === 'round_trip' ? { from: searchParams.departureDate ? new Date(searchParams.departureDate) : undefined, to: searchParams.returnDate ? new Date(searchParams.returnDate) : undefined } : (searchParams.departureDate ? new Date(searchParams.departureDate) : undefined)}
@@ -653,7 +657,7 @@ export default function FlightsPage() {
                 <Checkbox id="directOnly" checked={directOnly} onCheckedChange={v => setDirectOnly(Boolean(v))} />
                 <Label htmlFor="directOnly" className="text-sm text-gray-700">Direct only</Label>
               </div>
-              <Button variant="secondary" className="w-full rounded-full px-5 h-10 bg-gray-200 text-black border border-gray-300 hover:bg-gray-300 backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
+              <Button variant="secondary" className="w-full rounded-full px-5 h-10 bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
               <Button className="w-full rounded-full px-6 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search flights'}</Button>
             </div>
           </div>
@@ -677,13 +681,47 @@ export default function FlightsPage() {
       {/* Filters bar and panel */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">{offers.length} results</div>
-        <Button variant="default" className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900" onClick={() => setFiltersOpen(true)}>
-          <FunnelIcon className="h-4 w-4 mr-2" /> Filters
-        </Button>
+        <div className="hidden md:block">
+          <Button variant="default" className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900" onClick={() => setFiltersOpen(true)}>
+            <FunnelIcon className="h-4 w-4 mr-2" /> Filters
+          </Button>
+        </div>
+        <div className="md:hidden">
+          <SheetFilters
+            trigger={
+              <div className="flex items-center gap-2">
+                <Button className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900">
+                  <FunnelIcon className="h-4 w-4 mr-2" /> Filters
+                </Button>
+                {activeChips.length > 0 && (
+                  <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 text-[9px] font-medium text-gray-700 border border-black/10">
+                    {activeChips.length} active
+                  </span>
+                )}
+              </div>
+            }
+            renderFooter={(close) => (
+              <div className="flex items-center justify-end gap-2">
+                <Button variant="secondary" className="rounded-full h-9 px-4" onClick={() => { setFilters({ priceRange: [0, 5000], maxStops: 3, airlines: [], departureTime: [], arrivalTime: [], duration: [0, 1440], cabinClass: [], refundable: false, changeable: false, directOnly: false }); close(); }}>Reset</Button>
+                <Button className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900" onClick={() => close()}>Apply</Button>
+              </div>
+            )}
+          >
+            <div className="p-2">
+              <FlightFilters
+                offers={offers}
+                filters={{ ...filters, density }}
+                onFiltersChange={(f) => { setFilters(f); if ((f as any).density) setDensity((f as any).density) }}
+                isOpen={true}
+                onClose={() => {}}
+              />
+            </div>
+          </SheetFilters>
+        </div>
       </div>
 
       {/* Lightweight inline controls (time range, stops, sorting) */}
-      <FilterControls onChange={(partial) => setFilters(prev => ({ ...prev, ...partial }))} airlines={airlineOptions} />
+      <FilterControls onChange={(partial) => setFilters(prev => ({ ...prev, ...partial }))} airlines={airlineOptions} sortValue={(filters as any).sort || 'recommended'} />
 
       <FlightFiltersDisplay
         filters={activeChips}
@@ -691,21 +729,38 @@ export default function FlightsPage() {
         onClearAll={() => setFilters({ priceRange: [0, 5000], maxStops: 3, airlines: [], departureTime: [], arrivalTime: [], duration: [0, 1440], cabinClass: [], refundable: false, changeable: false, directOnly: false })}
       />
 
-      {/* Mobile drawer filters (Sheet) */}
-      <div className="md:hidden">
-        <SheetFilters trigger={<Button className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900"><FunnelIcon className="h-4 w-4 mr-2" /> Filters</Button>}>
-          {/* Mount existing filter panel inside accordion body as children */}
-          <div className="p-2">
-            <FlightFilters
-              offers={offers}
-              filters={{ ...filters, density }}
-              onFiltersChange={(f) => { setFilters(f); if ((f as any).density) setDensity((f as any).density) }}
-              isOpen={true}
-              onClose={() => {}}
-            />
+      {/* Desktop side panel (opens from Filters button) */}
+      {filtersOpen && (
+        <div className="hidden md:block">
+          <div className="fixed inset-0 z-40">
+            <div className="absolute inset-0 bg-black/30" onClick={() => setFiltersOpen(false)} />
+            <div className="absolute right-0 top-0 h-full w-full sm:w-[90%] md:w-[480px] bg-white shadow-xl">
+              <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 className="text-sm font-medium">Filters</h2>
+                <button onClick={() => setFiltersOpen(false)} className="text-gray-500 hover:text-gray-700">Close</button>
+              </div>
+              <div className="p-4 overflow-y-auto h-[calc(100%-56px)]">
+                <FlightFilters
+                  offers={offers}
+                  filters={{ ...filters, density }}
+                  onFiltersChange={(f) => { setFilters(f); if ((f as any).density) setDensity((f as any).density) }}
+                  isOpen={true}
+                  onClose={() => setFiltersOpen(false)}
+                />
+              </div>
+            </div>
           </div>
-        </SheetFilters>
-      </div>
+        </div>
+      )}
+
+      {/* Airlines modal */}
+      <AirlinesModal
+        open={airlinesOpen}
+        onOpenChange={setAirlinesOpen}
+        airlines={airlineOptions.map(a => ({ code: a.code, name: a.name, logo: `/logo/airlines/${a.code.toLowerCase()}.svg` }))}
+        selected={filters.airlines}
+        onChange={(codes) => setFilters(prev => ({ ...prev, airlines: codes }))}
+      />
 
       {/* Mini pulse badge CTA */}
       <div className="flex justify-center mt-3">

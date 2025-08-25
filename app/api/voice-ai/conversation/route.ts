@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookieStore } from "@/lib/supabase/cookies"
 import Anthropic from "@anthropic-ai/sdk"
-import { SUITPAX_VOICE_SYSTEM_PROMPT } from "@/lib/prompts/voice"
+import { VOICE_SYSTEM_PROMPT } from "@/lib/prompts/voice"
 
 function getAnthropic() {
   const key = process.env.ANTHROPIC_API_KEY
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       model: "claude-sonnet-4-20250514",
       max_tokens: 500,
       temperature: 0.7,
-      system: `${SUITPAX_VOICE_SYSTEM_PROMPT}
+      system: `${VOICE_SYSTEM_PROMPT}
 
 Context: ${context || "No additional context provided"}`,
       messages: [
