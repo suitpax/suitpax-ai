@@ -18,9 +18,12 @@ export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile
         { name: "Flights", href: "/dashboard/flights", icon: PiAirplaneTiltBold },
         { name: "Stays", href: "/dashboard/hotels", icon: PiBuildingsBold },
         { name: "Rail", href: "/dashboard/trains", icon: PiTrainBold },
+        { name: "Networking", href: "/dashboard/networking", icon: PiChartBarBold },
+        { name: "Scoring", href: "/dashboard/scoring", icon: PiChartBarBold },
         { name: "Analytics", href: "/dashboard/analytics", icon: PiChartBarBold },
         { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatsBold },
         { name: "Voice AI", href: "/dashboard/voice-ai", icon: PiMicrophoneBold },
+        { name: "AI Studio", href: "/dashboard/ai-studio", icon: PiChatsBold },
         { name: "Settings", href: "/dashboard/settings", icon: PiGearBold },
       ]
     : [

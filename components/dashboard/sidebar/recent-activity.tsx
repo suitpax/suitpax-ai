@@ -2,8 +2,8 @@
 
 import Image from "next/image"
 
-export default function RecentActivitySidebar() {
-	const events = [
+export default function RecentActivitySidebar({ events: external }: { events?: Array<{ id: number|string; user: string; action: string; time: string; avatar_url?: string }> }) {
+	const events = external && external.length ? external : [
 		{ id: 1, user: "Alice", action: "booked flight MAD → LHR", time: "4m" },
 		{ id: 2, user: "Bob", action: "submitted expense report", time: "1h" },
 		{ id: 3, user: "Carol", action: "checked price trends", time: "2h" },
@@ -15,7 +15,7 @@ export default function RecentActivitySidebar() {
 				{events.map((e) => (
 					<div key={e.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-gray-50 focus-within:ring-1 focus-within:ring-gray-300">
 						<div className="h-6 w-6 rounded-full border border-gray-200 bg-gray-100 overflow-hidden">
-							<Image src="/avatars/placeholder.png" alt="avatar" width={24} height={24} className="h-full w-full object-cover" />
+							<Image src={e.avatar_url || "/avatars/placeholder.png"} alt="avatar" width={24} height={24} className="h-full w-full object-cover" />
 						</div>
 						<div className="min-w-0">
 							<div className="text-[12px] text-gray-900 truncate">{e.user} {e.action}</div>

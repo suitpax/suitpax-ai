@@ -1,7 +1,7 @@
 "use client"
 
-export default function AlertsCardSidebar() {
-	const alerts = [
+export default function AlertsCardSidebar({ alerts: external }: { alerts?: Array<{ id: number|string; title: string; time: string }> }) {
+	const alerts = external && external.length ? external : [
 		{ id: 1, title: "Price drop on MAD → LHR", time: "2h ago" },
 		{ id: 2, title: "Expense report ready", time: "Today" },
 		{ id: 3, title: "Policy update: Hotels", time: "Yesterday" },
