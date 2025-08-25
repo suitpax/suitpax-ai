@@ -3,7 +3,7 @@
 ## 📁 Project Organization
 
 ### `/app` - Next.js App Router
-\`\`\`
+```
 app/
 ├── layout.tsx              # Root layout with navigation & footer
 ├── page.tsx                # Homepage with main components
@@ -20,13 +20,17 @@ app/
 │   └── travel-policies/
 │       └── page.tsx        # Travel policies solution
 └── api/                    # API routes
+    ├── chat/tools/         # Agent tool endpoints
+    │   ├── flight-search/
+    │   ├── code-generator/
+    │   └── expense-analyzer/
     ├── elevenlabs/         # Voice AI endpoints
     ├── ai-chat/            # Chat functionality
     └── sitemap/            # Dynamic sitemap
-\`\`\`
+```
 
 ### `/components` - Reusable Components
-\`\`\`
+```
 components/
 ├── ui/                     # Base UI components (shadcn/ui)
 │   ├── button.tsx
@@ -44,26 +48,35 @@ components/
 │   └── ...
 ├── voice-ai/              # Voice AI components
 └── intercom/              # Customer support
-\`\`\`
+```
 
 ### `/lib` - Utilities & Configuration
-\`\`\`
+```
 lib/
 ├── utils.ts               # Utility functions
 ├── elevenlabs.ts          # Voice AI integration
-└── language-detection.ts  # Language detection
-\`\`\`
+├── language-detection.ts  # Language detection
+├── chat/                  # Chat intent routing and helpers
+│   └── router.ts
+├── prompts/               # System prompts per agent
+│   ├── system.ts
+│   └── code/
+│       └── index.ts
+└── agents/                # Agent runner/types
+    ├── runner.ts
+    └── types.ts
+```
 
 ### `/hooks` - Custom React Hooks
-\`\`\`
+```
 hooks/
 ├── use-speech-recognition.ts  # Speech-to-text
 ├── use-audio-recorder.ts      # Audio recording
 └── use-media-query.ts         # Responsive utilities
-\`\`\`
+```
 
 ### `/public` - Static Assets
-\`\`\`
+```
 public/
 ├── logo/                  # Brand logos
 ├── agents/                # AI agent avatars
@@ -73,7 +86,7 @@ public/
 ├── manifest.json          # PWA manifest
 ├── sitemap.xml           # SEO sitemap
 └── robots.txt            # SEO robots
-\`\`\`
+```
 
 ## 🎯 Key Features
 
@@ -111,22 +124,22 @@ public/
 ## 🚀 Development Workflow
 
 ### Getting Started
-\`\`\`bash
-npm install
-npm run dev
-\`\`\`
+```bash
+pnpm install
+pnpm dev
+```
 
 ### Build & Deploy
-\`\`\`bash
-npm run build
-npm run start
-\`\`\`
+```bash
+pnpm build
+pnpm start
+```
 
 ### Code Quality
-\`\`\`bash
-npm run lint
-npm run type-check
-\`\`\`
+```bash
+pnpm lint
+pnpm type-check
+```
 
 ## 📱 Responsive Breakpoints
 - **Mobile**: < 768px

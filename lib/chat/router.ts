@@ -1,7 +1,7 @@
 import { System as SYSTEM_PROMPT } from "@/lib/prompts/system"
 import { buildSystemPrompt, buildReasoningInstruction, buildToolContext } from "@/lib/prompts/system"
 import { generateAgentResponseByPlan, toAnthropicMessages, type ConversationMessage, type UserPlan } from "@/lib/anthropic"
-import { SUITPAX_CODE_SYSTEM_PROMPT } from "@/lib/prompts/code"
+import { SUITPAX_CODE_SYSTEM_PROMPT } from "@/lib/prompts/code/index"
 import { FLIGHTS_EXPERT_SYSTEM_PROMPT } from "@/lib/prompts/agents/flights-expert"
 import { HOTELS_EXPERT_SYSTEM_PROMPT } from "@/lib/prompts/agents/hotels-expert"
 
