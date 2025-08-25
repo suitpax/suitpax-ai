@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
         if (ws.ok) {
           const json = await ws.json()
           const items = (json?.results || []).slice(0, 5)
-          for (const r of items) { sources.push({ title: r.title, url: r.url, snippet: r.snippet }) }
+          for (const r of items) { sources.push({ title: r.title, url: r.url, snippet: r.description || r.snippet }) }
           if (items.length > 0) {
             const lines = items.map((r: any, i: number) => `- [${i + 1}] ${r.title} — ${r.url}`)
             webContext = `\n\nWeb context:\n${lines.join("\n")}\nUse and cite sources when applicable.`

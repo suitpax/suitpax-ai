@@ -38,7 +38,6 @@ export default function SuitpaxAIPage() {
   const [files, setFiles] = useState<File[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [includeReasoningInline, setIncludeReasoningInline] = useState(false)
-  const listRef = useRef<HTMLDivElement>(null)
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const { isStreaming, start, cancel } = useChatStream()
 
@@ -51,9 +50,7 @@ export default function SuitpaxAIPage() {
   }, [supabase])
 
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" })
-    const id = window.requestAnimationFrame(() => listRef.current?.scrollTo({ top: listRef.current!.scrollHeight }))
-    return () => window.cancelAnimationFrame(id)
+    // optional: rely on ChatContainer auto-scroll or ScrollButton
   }, [messages])
 
   const handleFilesAdded = (newFiles: File[]) => setFiles(prev => [...prev, ...newFiles])
@@ -128,18 +125,26 @@ export default function SuitpaxAIPage() {
     timestamp
   }: { isUser: boolean, children: React.ReactNode, timestamp?: string }) => (
     <div className={`flex mb-1 ${isUser ? "justify-end" : "justify-start"}`}>
-      <div
-        className={
-          isUser
-            ? "rounded-[20px] bg-gradient-to-tr from-blue-900 via-blue-600 to-blue-400 text-white font-semibold px-6 py-3 shadow-lg max-w-[74%] md:max-w-xl text-base leading-relaxed"
-            : "rounded-[20px] bg-gradient-to-tr from-gray-100 via-gray-50 to-white text-gray-900 px-6 py-3 shadow-sm max-w-[80%] md:max-w-xl text-base leading-relaxed border border-gray-200 font-medium"
-        }
-      >
-        <div>{children}</div>
-        {timestamp && (
-          <span className={`text-xs mt-2 block ${isUser ? "text-blue-100 opacity-80" : "text-gray-400 opacity-70"}`}>
-            {timestamp}
-          </span>
+      <div className="flex items-start gap-2 max-w-full">
+        {!isUser && (
+          <div className="h-6 w-6 rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center text-[10px] text-gray-600">AI</div>
+        )}
+        <div
+          className={
+            isUser
+              ? "rounded-[20px] bg-gradient-to-tr from-blue-900 via-blue-600 to-blue-400 text-white font-semibold px-4 sm:px-5 py-2.5 sm:py-3 shadow-lg max-w-[85%] sm:max-w-[78%] md:max-w-xl text-[15px] sm:text-base leading-relaxed"
+              : "rounded-[20px] bg-gradient-to-tr from-gray-100 via-gray-50 to-white text-gray-900 px-4 sm:px-5 py-2.5 sm:py-3 shadow-sm max-w-[88%] sm:max-w-[80%] md:max-w-xl text-[15px] sm:text-base leading-relaxed border border-gray-200 font-medium"
+          }
+        >
+          <div className="break-words">{children}</div>
+          {timestamp && (
+            <span className={`text-[11px] sm:text-xs mt-2 block ${isUser ? "text-blue-100 opacity-80" : "text-gray-400 opacity-70"}`}>
+              {timestamp}
+            </span>
+          )}
+        </div>
+        {isUser && (
+          <div className="h-6 w-6 rounded-full overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center text-[10px] sm:text-[10px] text-black font-normal">U</div>
         )}
       </div>
     </div>
@@ -151,7 +156,6 @@ export default function SuitpaxAIPage() {
         <ChatHeader title="Suitpax AI" loading={isLoading || isStreaming} />
         <ChatContainerRoot className="flex-1">
           <ChatContainerContent
-            ref={listRef}
             className="mx-auto w-full max-w-3xl px-4 py-6 space-y-4"
             role="feed" aria-label="Chat messages" aria-live="polite"
           >
