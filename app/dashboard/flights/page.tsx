@@ -685,6 +685,12 @@ export default function FlightsPage() {
         <div className="md:hidden">
           <SheetFilters
             trigger={<Button className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900"><FunnelIcon className="h-4 w-4 mr-2" /> Filters</Button>}
+            renderFooter={(close) => (
+              <div className="flex items-center justify-end gap-2">
+                <Button variant="secondary" className="rounded-full h-9 px-4" onClick={() => { setFilters({ priceRange: [0, 5000], maxStops: 3, airlines: [], departureTime: [], arrivalTime: [], duration: [0, 1440], cabinClass: [], refundable: false, changeable: false, directOnly: false }); close(); }}>Reset</Button>
+                <Button className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900" onClick={() => close()}>Apply</Button>
+              </div>
+            )}
           >
             <div className="p-2">
               <FlightFilters
