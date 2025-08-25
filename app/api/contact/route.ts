@@ -100,13 +100,15 @@ export async function POST(request: NextRequest) {
 
       const createContact = new brevo.CreateContact()
       createContact.email = validatedData.email
-      createContact.attributes = {
+      const attributes: any = {
         FIRSTNAME: validatedData.name.split(" ")[0],
         LASTNAME: validatedData.name.split(" ").slice(1).join(" ") || "",
         COMPANY: validatedData.company || "",
         CONTACT_SOURCE: "Website Contact Form",
         CONTACT_SUBJECT: validatedData.subject,
       }
+      // Brevo SDK typings expect `object` but runtime accepts strings; cast to any
+      createContact.attributes = attributes as any
       createContact.listIds = [1] // Add to your main contact list (adjust ID as needed)
 
       await contactsApi.createContact(createContact)
