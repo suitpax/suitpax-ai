@@ -31,3 +31,11 @@ Docs:
 - Basics: https://cloud.google.com/text-to-speech/docs/basics
 - Product: https://cloud.google.com/text-to-speech#what-problem-are-you-trying-to-solve
 
+Multi‑speaker (experimental):
+- Google exposes multi‑speaker dialogue (allowlist, en‑US Studio voice, speakers R/S/T/U)
+- Our endpoint `/api/voice-ai/google/tts-multispeaker` currently approximates this by using the Studio Multispeaker voice with labeled lines. When official Node support is available, replace with v1beta1 API and structured turns.
+- Ideas:
+  - Agentic demos: product walkthroughs with Q/A (R=Guide, S=User)
+  - Interactive onboarding scripts per role
+  - E‑learning dialogues and scenario practice
+

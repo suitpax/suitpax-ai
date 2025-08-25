@@ -2,12 +2,12 @@
 
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import Notebook from "@/components/ai-studio/notebook"
+import AgenticVoice from "@/components/ai-studio/agentic-voice"
 import PodcastStudio from "@/components/ai-studio/podcast-studio"
 import DocSummarizer from "@/components/ai-studio/doc-summarizer"
 
 export default function AIStudioPage() {
-  const [tab, setTab] = useState<'notebook'|'podcast'|'docs'>('notebook')
+  const [tab, setTab] = useState<'agentic'|'podcast'|'docs'>('agentic')
   return (
     <div className="space-y-6 p-4 lg:p-0">
       <div className="flex items-center justify-between">
@@ -20,14 +20,14 @@ export default function AIStudioPage() {
       <Card>
         <CardContent className="p-2">
           <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-xl w-fit">
-            <button onClick={() => setTab('notebook')} className={`px-3 py-1.5 rounded-lg text-sm ${tab==='notebook' ? 'bg-white shadow-sm' : ''}`}>Notebook</button>
+            <button onClick={() => setTab('agentic')} className={`px-3 py-1.5 rounded-lg text-sm ${tab==='agentic' ? 'bg-white shadow-sm' : ''}`}>Agentic Voice</button>
             <button onClick={() => setTab('podcast')} className={`px-3 py-1.5 rounded-lg text-sm ${tab==='podcast' ? 'bg-white shadow-sm' : ''}`}>Podcast</button>
             <button onClick={() => setTab('docs')} className={`px-3 py-1.5 rounded-lg text-sm ${tab==='docs' ? 'bg-white shadow-sm' : ''}`}>Docs</button>
           </div>
         </CardContent>
       </Card>
 
-      {tab === 'notebook' && <Notebook />}
+      {tab === 'agentic' && <AgenticVoice />}
       {tab === 'podcast' && <PodcastStudio />}
       {tab === 'docs' && <DocSummarizer />}
     </div>
