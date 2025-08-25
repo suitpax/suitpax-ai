@@ -21,6 +21,7 @@ import { DateRangePicker } from "@/components/ui/date-range-picker"
 import SheetFilters from "@/components/ui/sheet-filters"
 const FilterControls = dynamic(() => import("@/components/flights/results/filter-controls/filter-controls"), { ssr: false })
 const AirlinesSlider = dynamic(() => import("@/components/flights/results/airlines-slider"), { ssr: false })
+const AirlinesModal = dynamic(() => import("@/components/flights/results/airlines-modal"), { ssr: false })
 import GlobalPromptInput from "@/components/dashboard/global-prompt-input"
 import VantaHaloBackground from "@/components/ui/vanta-halo-background"
 import FlightsSearchOverlay from "@/components/ui/flights-search-overlay"
@@ -131,6 +132,7 @@ export default function FlightsPage() {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [density, setDensity] = useState<'compact' | 'cozy'>('cozy')
+  const [airlinesOpen, setAirlinesOpen] = useState(false)
   const [offerRequestId, setOfferRequestId] = useState<string | null>(null)
   const [pageMeta, setPageMeta] = useState<any>({})
   const [loadingMore, setLoadingMore] = useState(false)
@@ -483,7 +485,9 @@ export default function FlightsPage() {
       {/* Airlines slider just under prompt */}
       <div className="mt-4 flex justify-center">
         <div className="w-full max-w-4xl">
-          <AirlinesSlider />
+          <button onClick={() => setAirlinesOpen(true)} className="w-full rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors">
+            <AirlinesSlider />
+          </button>
         </div>
       </div>
 
@@ -748,6 +752,9 @@ export default function FlightsPage() {
           </div>
         </div>
       )}
+
+      {/* Airlines modal */}
+      <AirlinesModal open={airlinesOpen} onOpenChange={setAirlinesOpen} airlines={airlineOptions.map(a => ({ code: a.code, name: a.name, logo: `/logo/airlines/${a.code.toLowerCase()}.svg` }))} />
 
       {/* Mini pulse badge CTA */}
       <div className="flex justify-center mt-3">
