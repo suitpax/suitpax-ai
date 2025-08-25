@@ -133,7 +133,6 @@ export default function SuitpaxAIPage() {
     <div className="bg-white">
       <div className="fixed inset-0 flex flex-col">
         {/* Chat Header */}
-        {/* @ts-expect-error Async Server Component types mismatch not relevant here */}
         <ChatHeader title="Suitpax AI" subtitle="Ask anything. Travel. Business. Code." />
         {/* Content area */}
         <ChatContainerRoot className="flex-1">
@@ -179,17 +178,17 @@ export default function SuitpaxAIPage() {
                         {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
                       </PKMessageContent>
                       <PKMessageActions className={`-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 ${isLast ? "opacity-100" : ""}`}>
-                        <PKMessageAction tooltip="Copy" delayDuration={100}>
+                        <PKMessageAction tooltip="Copy">
                           <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigator.clipboard.writeText(m.content)}>
                             <Copy className="h-4 w-4" />
                           </Button>
                         </PKMessageAction>
-                        <PKMessageAction tooltip="Upvote" delayDuration={100}>
+                        <PKMessageAction tooltip="Upvote">
                           <Button variant="ghost" size="icon" className="rounded-full">
                             <ThumbsUp className="h-4 w-4" />
                           </Button>
                         </PKMessageAction>
-                        <PKMessageAction tooltip="Downvote" delayDuration={100}>
+                        <PKMessageAction tooltip="Downvote">
                           <Button variant="ghost" size="icon" className="rounded-full">
                             <ThumbsDown className="h-4 w-4" />
                           </Button>
