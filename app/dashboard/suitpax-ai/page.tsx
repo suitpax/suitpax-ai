@@ -37,7 +37,7 @@ export default function SuitpaxAIPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [messages, setMessages] = useState<Message[]>([])
-  const [includeReasoningInline, setIncludeReasoningInline] = useState(true)
+  const [includeReasoningInline, setIncludeReasoningInline] = useState(false)
   const listRef = useRef<HTMLDivElement>(null)
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const { isStreaming, start, cancel } = useChatStream()
@@ -148,7 +148,7 @@ export default function SuitpaxAIPage() {
   return (
     <div className="bg-white min-h-screen">
       <div className="fixed inset-0 flex flex-col">
-        <ChatHeader title="Suitpax AI" subtitle="Ask anything. Travel. Business. Code." />
+        <ChatHeader title="Suitpax AI" loading={isLoading || isStreaming} />
         <ChatContainerRoot className="flex-1">
           <ChatContainerContent
             ref={listRef}
@@ -158,8 +158,7 @@ export default function SuitpaxAIPage() {
             {messages.length === 0 && !isLoading && (
               <div className="space-y-4">
                 <div className="text-center py-10">
-                  <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-blue-900">Ask anything. Travel. Business. Code.</h2>
-                  <p className="mt-2 text-base text-blue-700 opacity-80">Powered by Suitpax AI</p>
+                  <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-blue-900">Ask. Plan. Book.</h2>
                 </div>
                 <PromptSuggestions suggestions={defaultSuggestions} onSelect={handleSuggestion} />
               </div>

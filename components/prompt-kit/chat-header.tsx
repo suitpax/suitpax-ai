@@ -11,9 +11,10 @@ interface ChatHeaderProps {
 	subtitle?: string
 	className?: string
 	backHref?: string
+  loading?: boolean
 }
 
-export default function ChatHeader({ title = "Suitpax AI", subtitle = "Try the superpowers", className = "", backHref = "/dashboard" }: ChatHeaderProps) {
+export default function ChatHeader({ title = "Suitpax AI", subtitle = "", className = "", backHref = "/dashboard", loading = false }: ChatHeaderProps) {
 	const [agent] = useState<"core">("core")
 
 	useEffect(() => {
@@ -29,8 +30,8 @@ export default function ChatHeader({ title = "Suitpax AI", subtitle = "Try the s
 					</Link>
 					<Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={60} height={12} className="h-3.5 w-auto ml-1" />
 					<div className="min-w-0">
-						<h1 className="text-sm font-medium tracking-tight text-gray-900 leading-none truncate">{title}</h1>
-						<p className="text-[11px] text-gray-600 truncate">{subtitle}</p>
+						<h1 className="text-sm font-medium tracking-tight text-gray-900 leading-none truncate flex items-center gap-2">{title} {loading && <span className="inline-flex items-center gap-1 text-[10px] text-gray-500"><span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-pulse" /><span>loading…</span></span>}</h1>
+						{subtitle && <p className="text-[11px] text-gray-600 truncate">{subtitle}</p>}
 					</div>
 				</div>
 				<div className="flex items-center gap-3">
