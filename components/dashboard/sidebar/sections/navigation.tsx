@@ -9,13 +9,18 @@ import { useState } from "react"
 
 export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile }: { isCollapsed?: boolean; isMobile?: boolean; onCloseMobile?: () => void }) {
   const pathname = usePathname()
-  const isAdmin = pathname.startsWith("/dashboard/admin")
+  const isPersonal = pathname.startsWith("/dashboard/user")
+  const isAdmin = !isPersonal
   const [configOpen, setConfigOpen] = useState(true)
   const nav = isAdmin
     ? [
-        { name: "Admin", href: "/dashboard/admin", icon: PiSquaresFourBold },
+        { name: "Dashboard", href: "/dashboard", icon: PiSquaresFourBold },
+        { name: "Flights", href: "/dashboard/flights", icon: PiAirplaneTiltBold },
+        { name: "Stays", href: "/dashboard/hotels", icon: PiBuildingsBold },
+        { name: "Rail", href: "/dashboard/trains", icon: PiTrainBold },
         { name: "Analytics", href: "/dashboard/analytics", icon: PiChartBarBold },
         { name: "Suitpax AI", href: "/dashboard/suitpax-ai", icon: PiChatsBold },
+        { name: "Voice AI", href: "/dashboard/voice-ai", icon: PiMicrophoneBold },
         { name: "Settings", href: "/dashboard/settings", icon: PiGearBold },
       ]
     : [
