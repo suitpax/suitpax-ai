@@ -1,63 +1,71 @@
 "use client"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import * as React from "react"
 import { cn } from "@/lib/utils"
-import dynamic from "next/dynamic"
-import type React from "react"
 
-const Markdown = dynamic(() => import("./markdown").then((mod) => mod.Markdown))
+export type MessageProps = React.HTMLAttributes<HTMLDivElement>
 
-export type MessageProps = { children: React.ReactNode; className?: string } & React.HTMLProps<HTMLDivElement>
-
-const Message = ({ children, className, ...props }: MessageProps) => (
-  <div className={cn("flex gap-3", className)} {...props}>
-    {children}
-  </div>
-)
-
-export type MessageAvatarProps = { src: string; alt: string; fallback?: string; delayMs?: number; className?: string }
-
-const MessageAvatar = ({ src, alt, fallback, delayMs, className }: MessageAvatarProps) => {
+export function Message({ className, children, ...rest }: MessageProps) {
   return (
-    <Avatar className={cn("h-8 w-8 shrink-0", className)}>
-      <AvatarImage src={src} alt={alt} />
-      {fallback && <AvatarFallback delayMs={delayMs}>{fallback}</AvatarFallback>}
-    </Avatar>
+    <div className={cn("flex items-start gap-3", className)} {...rest}>
+      {children}
+    </div>
   )
 }
 
-export type MessageContentProps = { children: React.ReactNode; markdown?: boolean; className?: string } & React.ComponentProps<typeof Markdown> & React.HTMLProps<HTMLDivElement>
+export type MessageAvatarProps = React.ImgHTMLAttributes<HTMLImageElement> & {
+  fallback?: string
+}
 
-const MessageContent = ({ children, markdown = false, className, ...props }: MessageContentProps) => {
-  const classNames = cn("rounded-lg p-2 text-foreground bg-secondary prose break-words whitespace-normal", className)
-  return markdown ? (
-    // @ts-ignore - dynamic component typing
-    <Markdown className={classNames} {...props}>
-      {children as string}
-    </Markdown>
+export function MessageAvatar({ className, src, alt, fallback, ...rest }: MessageAvatarProps) {
+  return src ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} className={cn("h-8 w-8 rounded-full object-cover", className)} {...rest} />
   ) : (
-    <div className={classNames} {...props}>{children}</div>
+    <div className={cn("h-8 w-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-medium", className)}>
+      {fallback?.slice(0, 2) || "AI"}
+    </div>
   )
 }
 
-export type MessageActionsProps = { children: React.ReactNode; className?: string } & React.HTMLProps<HTMLDivElement>
+export type MessageContentProps = React.HTMLAttributes<HTMLDivElement> & {
+  markdown?: boolean
+}
 
-const MessageActions = ({ children, className, ...props }: MessageActionsProps) => (
-  <div className={cn("text-muted-foreground flex items-center gap-2", className)} {...props}>
-    {children}
-  </div>
-)
-
-export type MessageActionProps = { className?: string; tooltip: React.ReactNode; children: React.ReactNode; side?: "top" | "bottom" | "left" | "right" } & React.ComponentProps<typeof Tooltip>
-
-const MessageAction = ({ tooltip, children, className, side = "top", ...props }: MessageActionProps) => {
+export function MessageContent({ className, markdown, children, ...rest }: MessageContentProps) {
   return (
-    <Tooltip {...props}>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side={side} className={className}>{tooltip}</TooltipContent>
-    </Tooltip>
+    <div
+      className={cn(
+        "max-w-prose rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-900 border border-gray-200",
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
   )
 }
 
-export { Message, MessageAvatar, MessageContent, MessageActions, MessageAction }
+export type MessageActionsProps = React.HTMLAttributes<HTMLDivElement>
+
+export function MessageActions({ className, children, ...rest }: MessageActionsProps) {
+  return (
+    <div className={cn("flex items-center gap-1", className)} {...rest}>
+      {children}
+    </div>
+  )
+}
+
+export type MessageActionProps = React.HTMLAttributes<HTMLDivElement> & {
+  tooltip?: string
+}
+
+export function MessageAction({ className, tooltip, children, ...rest }: MessageActionProps) {
+  return (
+    <div title={tooltip} className={cn("inline-flex items-center justify-center", className)} {...rest}>
+      {children}
+    </div>
+  )
+}
+
+export default Message
