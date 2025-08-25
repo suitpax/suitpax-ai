@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { SUITPAX_CODE_SYSTEM_PROMPT } from "@/lib/prompts/code"
+import { CODE_ASSIST_PROMPT } from "@/lib/prompts/code"
 
 function getAnthropic() {
   const key = process.env.ANTHROPIC_API_KEY
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const { query, language, framework } = await request.json()
     if (!query) return NextResponse.json({ success: false, error: "Query is required" }, { status: 400 })
 
-    const enhanced = `${SUITPAX_CODE_SYSTEM_PROMPT}\n\nRequest:\n- Task: ${query}\n- Language: ${language || "best-fit"}\n- Framework: ${framework || "best-fit"}\n\nRemember: output EXACTLY ONE fenced code block with a proper language tag. If a webpage, return full HTML document; if Next.js, return a complete TSX component/page.`
+    const enhanced = `${CODE_ASSIST_PROMPT}\n\nRequest:\n- Task: ${query}\n- Language: ${language || "best-fit"}\n- Framework: ${framework || "best-fit"}\n\nRemember: output EXACTLY ONE fenced code block with a proper language tag. If a webpage, return full HTML document; if Next.js, return a complete TSX component/page.`
 
     const client = getAnthropic()
     if (!client) return NextResponse.json({ success: false, error: "AI not configured" }, { status: 500 })
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const res = await client.messages.create({
       model: "claude-4.1",
       max_tokens: 3500,
-      system: SUITPAX_CODE_SYSTEM_PROMPT,
+      system: CODE_ASSIST_PROMPT,
       messages: [{ role: "user", content: enhanced }],
       temperature: 0.2,
     })

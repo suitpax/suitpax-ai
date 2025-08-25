@@ -183,6 +183,14 @@ export default function Header({
               <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                 {loader({ size: "sm" })}
               </div>
+              <button
+                type="button"
+                onClick={() => router.push("/dashboard/suitpax-ai")}
+                className="absolute inset-y-0 right-1 my-1 px-2 text-[11px] rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
+                aria-label="Open Suitpax AI"
+              >
+                AI
+              </button>
             </div>
           </div>
 
