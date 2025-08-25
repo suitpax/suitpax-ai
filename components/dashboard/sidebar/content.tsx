@@ -2,7 +2,7 @@
 
 import { SidebarMenu } from "@/components/ui/primitives/sidebar"
 import { NavigationSection } from "./sections"
-import PlanUsageCard from "@/components/ui/plan-usage-card"
+import AccountUsageCard from "@/components/dashboard/sidebar/account-usage-card"
 import { Accordion } from "@/components/ui/accordion"
 import UserBadgeSidebar from "@/components/dashboard/sidebar/user-badge"
 import QuickLinksSidebar from "@/components/dashboard/sidebar/quick-links"
@@ -20,7 +20,7 @@ export default function DashboardSidebarContent({ isCollapsed, isMobile, onClose
 			{!isCollapsed && (
 				<>
 					<div className="px-3 space-y-2">
-						<UserBadgeSidebar />
+						<AccountUsageCard mode="admin" />
 						<Accordion
 							className="rounded-2xl border border-gray-200 bg-white/80"
 							items={[
@@ -52,10 +52,7 @@ export default function DashboardSidebarContent({ isCollapsed, isMobile, onClose
 						<RecentActivitySidebar />
 					</div>
 					<div className="h-px bg-gray-200 mx-3 my-2" />
-					<div className="px-3 pb-3 space-y-2">
-						<div className="px-2 py-1 text-[10px] uppercase tracking-wider text-gray-500">Usage</div>
-						<PlanUsageCard />
-					</div>
+					<div className="px-3 pb-3 space-y-2"></div>
 				</>
 			)}
 		</SidebarMenu>
