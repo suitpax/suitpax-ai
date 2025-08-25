@@ -13,6 +13,7 @@ import { Menu } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 import NavMobile from "@/components/dashboard/nav-mobile"
 import { DashboardLoadingScreen } from "@/components/ui/loaders"
+import OnboardingModal from "@/components/dashboard/onboarding-modal"
 import DashboardOnboarding from "@/components/dashboard/dashboard-onboarding"
 
 export default function DashboardLayout({
@@ -30,6 +31,7 @@ export default function DashboardLayout({
   const [sidebarHovered, setSidebarHovered] = useState(false)
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null)
   const [skippedOnboarding, setSkippedOnboarding] = useState(false)
+  const [onboardingOpen, setOnboardingOpen] = useState(false)
 
   const supabase = createClient()
   const router = useRouter()
@@ -89,6 +91,7 @@ export default function DashboardLayout({
     try {
       const skipped = localStorage.getItem("suitpax_onboarding_skipped")
       setSkippedOnboarding(skipped === "true")
+      setOnboardingOpen(!skipped)
     } catch {}
   }, [])
 
@@ -147,13 +150,10 @@ export default function DashboardLayout({
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="h-full">
             {/* Global onboarding gate: block subroutes until completed, unless user explicitly skipped */}
             {onboardingCompleted === false && !skippedOnboarding && user ? (
-              <div className="max-w-3xl mx-auto p-6">
-                <DashboardOnboarding
-                  userId={user.id}
-                  onComplete={() => setOnboardingCompleted(true)}
-                  onSkip={() => setSkippedOnboarding(true)}
-                />
-              </div>
+              <>
+                <OnboardingModal userId={user.id} open={onboardingOpen} onOpenChange={(v) => setOnboardingOpen(v)} onComplete={() => setOnboardingCompleted(true)} />
+                {children}
+              </>
             ) : (
               children
             )}

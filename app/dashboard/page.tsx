@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { ArrowUp } from "lucide-react"
+import Link from "next/link"
 import { BusinessMetricsChart } from "@/components/charts/business-metrics-chart"
 import { ExpenseTrendsChart } from "@/components/charts/expense-trends-chart"
 import { BankConnectionCard } from "@/components/dashboard/bank-connection-card"
@@ -76,6 +77,11 @@ export default function DashboardPage() {
           <p className="text-sm font-light tracking-tighter text-gray-600">{greet}{name ? `, ${name}` : ''} — welcome to your dashboard</p>
           <p className="text-sm text-gray-500 font-light mt-1">Track performance, search flights, and manage policies</p>
         </motion.div>
+        {onboardingCompleted === false && skippedOnboarding && (
+          <div className="mt-3 flex justify-end">
+            <Link href="#" onClick={(e) => { e.preventDefault(); try { localStorage.setItem('suitpax_onboarding_skipped','false') } catch {}; window.location.reload() }} className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] border border-gray-300 bg-gray-100 text-gray-900">Finish setup</Link>
+          </div>
+        )}
         {onboardingCompleted === false && skippedOnboarding && (
           <div className="mt-4">
             <OnboardingPrompt userName={name} onDismiss={() => setSkippedOnboarding(true)} />

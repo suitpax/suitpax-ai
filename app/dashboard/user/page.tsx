@@ -25,6 +25,17 @@ export default function PersonalDashboardPage() {
         </div>
       </motion.div>
 
+      {/* Quick actions */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.05 }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[{ name: 'Book flight', href: `/dashboard/flights?tripType=${tripType}` }, { name: 'Book hotel', href: `/dashboard/hotels?tripType=${tripType}` }, { name: 'Track price', href: '/dashboard/flights' }, { name: 'View trips', href: '/dashboard/trips' }].map(a => (
+            <Link key={a.name} href={a.href} className="text-center rounded-xl border border-gray-200 bg-white/80 px-3 py-2 text-sm text-gray-900 hover:bg-white">
+              {a.name}
+            </Link>
+          ))}
+        </div>
+      </motion.div>
+
       {/* Booking entry points */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.08 }}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
