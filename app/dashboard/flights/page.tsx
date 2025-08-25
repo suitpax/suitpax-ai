@@ -684,7 +684,18 @@ export default function FlightsPage() {
         </div>
         <div className="md:hidden">
           <SheetFilters
-            trigger={<Button className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900"><FunnelIcon className="h-4 w-4 mr-2" /> Filters</Button>}
+            trigger={
+              <div className="flex items-center gap-2">
+                <Button className="rounded-full h-9 px-4 bg-black text-white hover:bg-gray-900">
+                  <FunnelIcon className="h-4 w-4 mr-2" /> Filters
+                </Button>
+                {activeChips.length > 0 && (
+                  <span className="inline-flex items-center rounded-lg bg-black/5 px-2 py-0.5 text-[9px] font-medium text-gray-700 border border-black/10">
+                    {activeChips.length} active
+                  </span>
+                )}
+              </div>
+            }
             renderFooter={(close) => (
               <div className="flex items-center justify-end gap-2">
                 <Button variant="secondary" className="rounded-full h-9 px-4" onClick={() => { setFilters({ priceRange: [0, 5000], maxStops: 3, airlines: [], departureTime: [], arrivalTime: [], duration: [0, 1440], cabinClass: [], refundable: false, changeable: false, directOnly: false }); close(); }}>Reset</Button>
