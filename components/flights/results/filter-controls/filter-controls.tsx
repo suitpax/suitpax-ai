@@ -6,9 +6,9 @@ import SortingControl from "./sorting-control"
 import { Slider } from "@/components/ui/slider"
 import AirlinesSelector from "./airlines-selector"
 
-interface FilterControlsProps { onChange?: (filters: any) => void; airlines?: Array<{ code: string; name: string }> }
+interface FilterControlsProps { onChange?: (filters: any) => void; airlines?: Array<{ code: string; name: string }>; sortValue?: 'recommended' | 'price' | 'duration' }
 
-export default function FilterControls({ onChange, airlines = [] }: FilterControlsProps) {
+export default function FilterControls({ onChange, airlines = [], sortValue = 'recommended' }: FilterControlsProps) {
 	return (
 		<div className="grid grid-cols-1 sm:grid-cols-5 gap-3 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-3">
 			<div>
@@ -21,7 +21,7 @@ export default function FilterControls({ onChange, airlines = [] }: FilterContro
 			</div>
 			<div>
 				<div className="text-[11px] sm:text-xs text-gray-800 mb-1">Sort by</div>
-				<SortingControl onChange={(v) => onChange?.({ sort: v })} />
+				<SortingControl value={sortValue} onChange={(v) => onChange?.({ sort: v })} />
 			</div>
 			<div>
 				<div className="text-[11px] sm:text-xs text-gray-800 mb-1">Price range</div>

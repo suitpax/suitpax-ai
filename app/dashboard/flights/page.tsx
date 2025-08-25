@@ -721,7 +721,7 @@ export default function FlightsPage() {
       </div>
 
       {/* Lightweight inline controls (time range, stops, sorting) */}
-      <FilterControls onChange={(partial) => setFilters(prev => ({ ...prev, ...partial }))} airlines={airlineOptions} />
+      <FilterControls onChange={(partial) => setFilters(prev => ({ ...prev, ...partial }))} airlines={airlineOptions} sortValue={(filters as any).sort || 'recommended'} />
 
       <FlightFiltersDisplay
         filters={activeChips}
