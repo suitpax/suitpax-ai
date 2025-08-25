@@ -3,8 +3,13 @@
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 
-export default function SheetFilters({ trigger, children }: { trigger?: React.ReactNode; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
+export default function SheetFilters({ trigger, children, open: controlledOpen, onOpenChange }: { trigger?: React.ReactNode; children: React.ReactNode; open?: boolean; onOpenChange?: (v: boolean) => void }) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
+  const open = typeof controlledOpen === 'boolean' ? controlledOpen : uncontrolledOpen
+  const setOpen = (v: boolean) => {
+    if (typeof controlledOpen === 'boolean' && onOpenChange) onOpenChange(v)
+    else setUncontrolledOpen(v)
+  }
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
