@@ -53,7 +53,7 @@ export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile
         )
       })}
 
-      {/* Navigation section (renamed from Configuration) */}
+      {/* Configuration (collapsible) */}
       {isAdmin && (
         <div className="mt-1">
           <button
@@ -65,7 +65,7 @@ export default function NavigationSection({ isCollapsed, isMobile, onCloseMobile
             )}
           >
             <PiShieldCheckBold className="h-3.5 w-3.5" />
-            {!isCollapsed && <span className="text-[13px] font-medium flex-1 text-left">Navigation</span>}
+            {!isCollapsed && <span className="text-[10px] uppercase tracking-wider text-gray-500 flex-1 text-left">Configuration</span>}
             {!isCollapsed && <PiCaretDownBold className={cn("h-3.5 w-3.5 transition-transform", configOpen ? "rotate-180" : "rotate-0")} />}
           </button>
           {configOpen && (

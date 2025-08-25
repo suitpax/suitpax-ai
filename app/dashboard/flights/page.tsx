@@ -408,7 +408,7 @@ export default function FlightsPage() {
           <p className="text-sm text-gray-600 mt-1">Find the best routes, fares and schedules — compare in seconds.</p>
         </div>
         <div className="flex flex-col w-full max-w-sm md:max-w-none md:flex-row items-stretch md:items-center gap-2">
-          <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-gray-200 text-black hover:bg-gray-300 backdrop-blur-sm shadow-sm" onClick={() => router.push('/dashboard/suitpax-ai?tab=chat')}>Ask Suitpax AI</Button>
+          <Button className="w-full md:w-auto rounded-full md:rounded-2xl px-6 h-10 bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 backdrop-blur-sm shadow-sm" onClick={() => router.push('/dashboard/suitpax-ai?tab=chat')}>Ask Suitpax AI</Button>
           <Button id="primary-search-btn" className="w-full md:w-auto rounded-full md:rounded-2xl px-8 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search flights'}</Button>
         </div>
       </div>
@@ -607,10 +607,10 @@ export default function FlightsPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
             {/* Departure */}
             <div>
-              <Label className="text-sm text-gray-700">Departure</Label>
+              <Label className="text-sm text-gray-700 mb-2 inline-block">Departure</Label>
               <DateRangePicker
                 mode={searchParams.tripType === 'round_trip' ? 'range' : 'single'}
                 value={searchParams.tripType === 'round_trip' ? { from: searchParams.departureDate ? new Date(searchParams.departureDate) : undefined, to: searchParams.returnDate ? new Date(searchParams.returnDate) : undefined } : (searchParams.departureDate ? new Date(searchParams.departureDate) : undefined)}
@@ -653,7 +653,7 @@ export default function FlightsPage() {
                 <Checkbox id="directOnly" checked={directOnly} onCheckedChange={v => setDirectOnly(Boolean(v))} />
                 <Label htmlFor="directOnly" className="text-sm text-gray-700">Direct only</Label>
               </div>
-              <Button variant="secondary" className="w-full rounded-full px-5 h-10 bg-gray-200 text-black border border-gray-300 hover:bg-gray-300 backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
+              <Button variant="secondary" className="w-full rounded-full px-5 h-10 bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 backdrop-blur-sm shadow-sm" onClick={saveSearch}>Save search</Button>
               <Button className="w-full rounded-full px-6 h-10 bg-black text-white hover:bg-gray-900 backdrop-blur-sm shadow-sm" onClick={searchFlights} disabled={searching}>{searching ? 'Searching…' : 'Search flights'}</Button>
             </div>
           </div>
