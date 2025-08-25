@@ -2,11 +2,13 @@
 
 import { SidebarFooter } from "@/components/ui/primitives/sidebar"
 import Image from "next/image"
+import AccountUsageCard from "@/components/dashboard/sidebar/account-usage-card"
 
 export default function FooterSidebar({ userPlan, subscriptionStatus }: { userPlan: string; subscriptionStatus: string }) {
   return (
     <SidebarFooter>
       <div className="space-y-2 px-2">
+        <AccountUsageCard mode="admin" />
         <div className="flex items-center gap-2 text-[11px] text-gray-700">
           <Image src="/logo/suitpax-bl-logo.webp" alt="Suitpax" width={60} height={16} className="h-3.5 w-auto" />
           <span className="ml-auto">© {new Date().getFullYear()}</span>
