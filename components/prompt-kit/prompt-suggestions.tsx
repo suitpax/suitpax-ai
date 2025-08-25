@@ -11,4 +11,4 @@ export default function PromptSuggestions({ suggestions, onSelect }: { suggestio
 			))}
 		</div>
 	)
-}
+} 
