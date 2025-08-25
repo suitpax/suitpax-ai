@@ -754,7 +754,13 @@ export default function FlightsPage() {
       )}
 
       {/* Airlines modal */}
-      <AirlinesModal open={airlinesOpen} onOpenChange={setAirlinesOpen} airlines={airlineOptions.map(a => ({ code: a.code, name: a.name, logo: `/logo/airlines/${a.code.toLowerCase()}.svg` }))} />
+      <AirlinesModal
+        open={airlinesOpen}
+        onOpenChange={setAirlinesOpen}
+        airlines={airlineOptions.map(a => ({ code: a.code, name: a.name, logo: `/logo/airlines/${a.code.toLowerCase()}.svg` }))}
+        selected={filters.airlines}
+        onChange={(codes) => setFilters(prev => ({ ...prev, airlines: codes }))}
+      />
 
       {/* Mini pulse badge CTA */}
       <div className="flex justify-center mt-3">
