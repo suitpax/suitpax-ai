@@ -17,4 +17,4 @@ export default function SourceList({ items }: { items: Array<{ title: string; ur
 			))}
 		</div>
 	)
-}
+} 
