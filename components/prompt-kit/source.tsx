@@ -53,4 +53,3 @@ function Favicon() {
 }
 
 export default Source
-
