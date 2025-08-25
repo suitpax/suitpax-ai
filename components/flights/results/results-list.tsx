@@ -37,6 +37,10 @@ interface FlightOffer {
   expires_at: string
   slices: FlightOfferSlice[]
   conditions?: any
+  display_total_amount?: string
+  display_total_currency?: string
+  service_fee?: number
+  pricing_mode?: 'personal' | 'business'
 }
 
 interface Props {
@@ -106,7 +110,7 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
               </div>
               <div className="text-right">
                 <CardTitle className="text-2xl md:text-4xl font-semibold text-gray-900 leading-none">
-                  {new Intl.NumberFormat("en-US", { style: "currency", currency: offer.total_currency, maximumFractionDigits: 0 }).format(parseFloat(offer.total_amount))}
+                  {new Intl.NumberFormat("en-US", { style: "currency", currency: (offer.display_total_currency || offer.total_currency), maximumFractionDigits: 0 }).format(parseFloat(offer.display_total_amount || offer.total_amount))}
                 </CardTitle>
                 <div className="text-[11px] text-gray-500">Total</div>
                 <div className="text-[10px] text-gray-400 mt-0.5">Expires {new Date(offer.expires_at).toLocaleString()}</div>
@@ -159,6 +163,12 @@ export default function FlightResults({ offers, onSelectOffer, onTrackPrice, cla
                   {offer.conditions.change_before_departure && (
                     <span className={`dc-baggage-item ${offer.conditions.change_before_departure.allowed ? "" : "opacity-60"}`}>Changeable</span>
                   )}
+                </div>
+              )}
+
+              {(typeof offer.service_fee === 'number') && (
+                <div className="flex items-center justify-end text-[11px] text-gray-600">
+                  <span className="px-2 py-0.5 rounded-full bg-gray-100 border border-gray-200">Service fee: {new Intl.NumberFormat("en-US", { style: "currency", currency: (offer.display_total_currency || offer.total_currency), maximumFractionDigits: 0 }).format(offer.service_fee || 0)}</span>
                 </div>
               )}
 

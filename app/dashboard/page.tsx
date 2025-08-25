@@ -4,21 +4,54 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { ArrowUp } from "lucide-react"
+import Link from "next/link"
 import { BusinessMetricsChart } from "@/components/charts/business-metrics-chart"
 import { ExpenseTrendsChart } from "@/components/charts/expense-trends-chart"
 import { BankConnectionCard } from "@/components/dashboard/bank-connection-card"
 import { PromptInput, PromptInputActions, PromptInputTextarea, PromptInputAction } from "@/components/prompt-kit/prompt-input"
+import { createClient } from "@/lib/supabase/client"
+import DashboardOnboarding from "@/components/dashboard/dashboard-onboarding"
+import { OnboardingPrompt } from "@/components/dashboard/onboarding-prompt"
 
 export default function DashboardPage() {
   const [greet, setGreet] = useState("Good day")
   const [name, setName] = useState("")
+  const [userId, setUserId] = useState<string | null>(null)
+  const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null)
+  const [skippedOnboarding, setSkippedOnboarding] = useState(false)
+  const supabase = createClient()
   useEffect(() => {
     const hours = new Date().getHours()
     setGreet(hours < 12 ? 'Good morning' : hours < 18 ? 'Good afternoon' : 'Good evening')
     try {
       const raw = localStorage.getItem('suitpax_user_name')
       setName(raw && raw.trim() ? raw : '')
+      const skipped = localStorage.getItem('suitpax_onboarding_skipped')
+      setSkippedOnboarding(skipped === 'true')
     } catch {}
+  }, [])
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+        setUserId(user.id)
+        const { data: profile } = await supabase.from('profiles').select('onboarding_completed, full_name, first_name').eq('id', user.id).single()
+        if (profile) {
+          setOnboardingCompleted(!!profile.onboarding_completed)
+          if (!name && (profile.first_name || profile.full_name)) {
+            setName(profile.first_name || profile.full_name || '')
+          }
+        } else {
+          setOnboardingCompleted(false)
+        }
+      } catch (e) {
+        console.error(e)
+        setOnboardingCompleted(false)
+      }
+    }
+    load()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const cards = [
     { id: "bank-connection", component: <BankConnectionCard /> },
@@ -28,12 +61,32 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+      {/* Onboarding gate: show full flow if not completed and not skipped; otherwise show compact prompt until completed */}
+      {onboardingCompleted === false && userId && !skippedOnboarding && (
+        <div className="mb-8">
+          <DashboardOnboarding
+            userId={userId}
+            onComplete={() => { setOnboardingCompleted(true); setSkippedOnboarding(false) }}
+            onSkip={() => { setSkippedOnboarding(true) }}
+          />
+        </div>
+      )}
       <div className="mb-8">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none text-gray-900 mb-1">My Dashboard</h1>
           <p className="text-sm font-light tracking-tighter text-gray-600">{greet}{name ? `, ${name}` : ''} — welcome to your dashboard</p>
           <p className="text-sm text-gray-500 font-light mt-1">Track performance, search flights, and manage policies</p>
         </motion.div>
+        {onboardingCompleted === false && skippedOnboarding && (
+          <div className="mt-3 flex justify-end">
+            <Link href="#" onClick={(e) => { e.preventDefault(); try { localStorage.setItem('suitpax_onboarding_skipped','false') } catch {}; window.location.reload() }} className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] border border-gray-300 bg-gray-100 text-gray-900">Finish setup</Link>
+          </div>
+        )}
+        {onboardingCompleted === false && skippedOnboarding && (
+          <div className="mt-4">
+            <OnboardingPrompt userName={name} onDismiss={() => setSkippedOnboarding(true)} />
+          </div>
+        )}
         <div className="mt-6">
           <div className="bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-3 sm:p-4">
             <div className="flex items-center justify-between mb-2">

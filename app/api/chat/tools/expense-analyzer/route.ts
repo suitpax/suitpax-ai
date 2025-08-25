@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { EXPENSE_PROMPT } from "@/lib/prompts/specialized-prompts"
+import { EXPENSE_PROMPT } from "@/lib/prompts/system"
 
 function getAnthropic() {
   const key = process.env.ANTHROPIC_API_KEY

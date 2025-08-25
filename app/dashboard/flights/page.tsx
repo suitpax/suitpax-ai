@@ -95,6 +95,7 @@ const validateSearchParams = (params: any, multiCityLegs?: Array<{ origin: strin
 export default function FlightsPage() {
   const router = useRouter()
   const [aiQuery, setAiQuery] = useState("")
+  const [travelMode, setTravelMode] = useState<'personal'|'business'>("business")
 
   const [searchParams, setSearchParams] = useState<SearchParams>({
     origin: "JFK",
@@ -136,6 +137,13 @@ export default function FlightsPage() {
 
   // Load saved searches
   useEffect(() => {
+    // detect travel mode from query
+    try {
+      const sp = new URLSearchParams(window.location.search)
+      const tt = (sp.get('tripType') || '').toLowerCase()
+      if (tt === 'personal') setTravelMode('personal')
+      else if (tt === 'corporate' || tt === 'business') setTravelMode('business')
+    } catch {}
     try { const raw = localStorage.getItem("suitpax_saved_searches"); if (raw) setSavedSearches(JSON.parse(raw)) } catch {}
   }, [])
   const persistSavedSearches = (next: SavedSearchItem[]) => {
@@ -360,6 +368,27 @@ export default function FlightsPage() {
     }
     return copy
   }, [offers, applyFilters, filters])
+
+  // Pricing engine per mode (display only)
+  const displayedOffers = useMemo(() => {
+    const pctPersonal = Number(process.env.NEXT_PUBLIC_PERSONAL_MARKUP_PCT || 0.03)
+    const minPersonal = Number(process.env.NEXT_PUBLIC_PERSONAL_MIN_FEE || 5)
+    const pctBusiness = Number(process.env.NEXT_PUBLIC_BUSINESS_MARKUP_PCT || 0.01)
+    const minBusiness = Number(process.env.NEXT_PUBLIC_BUSINESS_MIN_FEE || 2)
+    return filteredOffers.map((o: any) => {
+      const base = parseFloat(o.total_amount)
+      if (!Number.isFinite(base)) return o
+      const currency = o.total_currency || 'USD'
+      if (travelMode === 'personal') {
+        const fee = Math.max(minPersonal, Math.round(base * pctPersonal))
+        const display = (base + fee).toFixed(0)
+        return { ...o, display_total_amount: display, display_total_currency: currency, service_fee: fee, pricing_mode: 'personal' }
+      }
+      const fee = Math.max(minBusiness, Math.round(base * pctBusiness))
+      const display = (base + fee).toFixed(0)
+      return { ...o, display_total_amount: display, display_total_currency: currency, service_fee: fee, pricing_mode: 'business' }
+    })
+  }, [filteredOffers, travelMode])
 
   // Airline options for inline selector
   const airlineOptions = useMemo(() => {
@@ -699,7 +728,7 @@ export default function FlightsPage() {
       </div>
 
       <FlightResults
-        offers={filteredOffers}
+        offers={displayedOffers}
         onTrackPrice={(id) => showToast(`Tracking price for ${id}`)}
         onSelectOffer={(offer) => router.push(`/dashboard/flights/book/${offer.id}`)}
         className={`${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2' : 'space-y-4'} ${density === 'compact' ? 'gap-3' : 'gap-6'}`}

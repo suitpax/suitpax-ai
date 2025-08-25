@@ -31,6 +31,7 @@ import {
   Trash2,
   Target,
 } from "lucide-react"
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line } from "recharts"
 
 interface Policy {
   id: string
@@ -318,6 +319,23 @@ export default function PoliciesPage() {
   const totalViolations = policies.reduce((sum, p) => sum + p.violations, 0)
   const avgCompliance = Math.round(policies.reduce((sum, p) => sum + p.compliance, 0) / Math.max(1, policies.length))
 
+  // Travel-focused metrics
+  const travelPolicies = useMemo(() => policies.filter((p) => p.category === "travel"), [policies])
+  const travelTotal = travelPolicies.length
+  const travelActive = travelPolicies.filter((p) => p.status === "active").length
+  const travelViolations = travelPolicies.reduce((sum, p) => sum + p.violations, 0)
+  const travelCompliance = Math.round(travelPolicies.reduce((sum, p) => sum + p.compliance, 0) / Math.max(1, travelPolicies.length))
+
+  const travelViolationsChart = travelPolicies.map((p) => ({ name: p.name, violations: p.violations }))
+  const travelComplianceTrend = [
+    { month: "Jan", value: Math.max(70, Math.min(99, (travelCompliance - 6))) },
+    { month: "Feb", value: Math.max(70, Math.min(99, (travelCompliance - 4))) },
+    { month: "Mar", value: Math.max(70, Math.min(99, (travelCompliance - 2))) },
+    { month: "Apr", value: Math.max(70, Math.min(99, (travelCompliance - 3))) },
+    { month: "May", value: Math.max(70, Math.min(99, (travelCompliance - 1))) },
+    { month: "Jun", value: Math.max(70, Math.min(99, travelCompliance)) },
+  ]
+
   return (
     <div className="space-y-6 p-4 lg:p-0">
       {/* Header */}
@@ -342,12 +360,22 @@ export default function PoliciesPage() {
         </Card>
       </div>
 
+      {/* Travel KPIs */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.08 }}>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Travel Policies</p><p className="text-2xl font-medium tracking-tighter text-black">{travelTotal}</p></div><div className="p-3 bg-gray-100 rounded-xl"><Plane className="h-5 w-5 text-gray-600" /></div></div></Card>
+          <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Active Travel</p><p className="text-2xl font-medium tracking-tetter text-black">{travelActive}</p></div><div className="p-3 bg-emerald-100 rounded-xl"><CheckCircle className="h-5 w-5 text-emerald-600" /></div></div></Card>
+          <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Travel Violations</p><p className="text-2xl font-medium tracking-tetter text-black">{travelViolations}</p></div><div className="p-3 bg-red-100 rounded-xl"><AlertTriangle className="h-5 w-5 text-red-600" /></div></div></Card>
+          <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Travel Compliance</p><p className="text-2xl font-medium tracking-tetter text-black">{isNaN(travelCompliance) ? 0 : travelCompliance}%</p></div><div className="p-3 bg-blue-100 rounded-xl"><Globe className="h-5 w-5 text-blue-600" /></div></div></Card>
+        </div>
+      </motion.div>
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Total Policies</p><p className="text-2xl font-medium tracking-tighter text-black">{totalPolicies}</p></div><div className="p-3 bg-gray-100 rounded-xl"><FileText className="h-5 w-5 text-gray-600" /></div></div></Card>
-        <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Active Policies</p><p className="text-2xl font-medium tracking-tighter text-black">{activePolicies}</p></div><div className="p-3 bg-emerald-100 rounded-xl"><CheckCircle className="h-5 w-5 text-emerald-600" /></div></div></Card>
-        <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Violations</p><p className="text-2xl font-medium tracking-tighter text-black">{totalViolations}</p></div><div className="p-3 bg-red-100 rounded-xl"><AlertTriangle className="h-5 w-5 text-red-600" /></div></div></Card>
-        <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Avg Compliance</p><p className="text-2xl font-medium tracking-tighter text-black">{avgCompliance}%</p></div><div className="p-3 bg-blue-100 rounded-xl"><Globe className="h-5 w-5 text-blue-600" /></div></div></Card>
+        <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Total Policies</p><p className="text-2xl font-medium tracking-tetter text-black">{totalPolicies}</p></div><div className="p-3 bg-gray-100 rounded-xl"><FileText className="h-5 w-5 text-gray-600" /></div></div></Card>
+        <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Active Policies</p><p className="text-2xl font-medium tracking-tetter text-black">{activePolicies}</p></div><div className="p-3 bg-emerald-100 rounded-xl"><CheckCircle className="h-5 w-5 text-emerald-600" /></div></div></Card>
+        <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Violations</p><p className="text-2xl font-medium tracking-tetter text-black">{totalViolations}</p></div><div className="p-3 bg-red-100 rounded-xl"><AlertTriangle className="h-5 w-5 text-red-600" /></div></div></Card>
+        <Card className="bg-white/80 backdrop-blur-sm p-6 border border-gray-200 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Avg Compliance</p><p className="text-2xl font-medium tracking-tetter text-black">{avgCompliance}%</p></div><div className="p-3 bg-blue-100 rounded-xl"><Globe className="h-5 w-5 text-blue-600" /></div></div></Card>
       </div>
 
       {/* Filters */}
@@ -363,6 +391,50 @@ export default function PoliciesPage() {
         </div>
       </Card>
 
+      {/* Travel charts */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.16 }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="bg-white border-gray-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-medium tracking-tetter">Violations by Travel Policy</h2>
+                <Badge className="bg-gray-200 text-gray-700 border-gray-200">Last 6 months</Badge>
+              </div>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={travelViolationsChart} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} interval={0} angle={-10} height={50} textAnchor="end" />
+                    <YAxis tickLine={false} axisLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
+                    <Tooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+                    <Bar dataKey="violations" fill="#111827" radius={[8,8,0,0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border-gray-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-medium tracking-tetter">Travel Compliance Trend</h2>
+                <Badge className="bg-gray-200 text-gray-700 border-gray-200">6 months</Badge>
+              </div>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={travelComplianceTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
+                    <YAxis tickLine={false} axisLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} domain={[0, 100]} />
+                    <Tooltip formatter={(v: any) => `${v}%`} />
+                    <Line type="monotone" dataKey="value" stroke="#111827" strokeWidth={2} dot={{ r: 3, fill: '#111827' }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </motion.div>
+
       {/* Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredPolicies.map((policy) => (
@@ -371,7 +443,7 @@ export default function PoliciesPage() {
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gray-100 rounded-lg">{policy.category === 'travel' ? <Plane className="h-4 w-4" /> : policy.category === 'expense' ? <DollarSign className="h-4 w-4" /> : policy.category === 'approval' ? <CheckCircle className="h-4 w-4" /> : <Shield className="h-4 w-4" />}</div>
                 <div>
-                  <h3 className="font-medium tracking-tighter text-black text-lg">{policy.name}</h3>
+                  <h3 className="font-medium tracking-tetter text-black text-lg">{policy.name}</h3>
                   <Badge className={`text-xs ${policy.status === 'active' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : policy.status === 'draft' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-gray-100 text-gray-800 border-gray-200'}`}>{policy.status}</Badge>
                 </div>
               </div>

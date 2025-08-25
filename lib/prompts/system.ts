@@ -1,3 +1,10 @@
+import { z } from "zod"
+export { EXPENSE_PROMPT } from "./expense"
+export { FLIGHTS_PROMPT } from "./flights"
+export { HOTELS_PROMPT } from "./hotels"
+export { CODE_ASSIST_PROMPT } from "./code"
+export { MEETING_INTELLIGENCE_PROMPT } from "./meeting"
+export { DATA_ANALYSIS_PROMPT } from "./analytics"
 export type SystemPromptOptions = {
   domain?: Array<"travel" | "coding" | "business" | "general" | "documents" | "expenses">
   language?: "es" | "en"
@@ -74,9 +81,17 @@ Reasoning & tone:
 - Be persistent in exploring options and resolute during disruptions.
 `.trim()
 
+const OPERATING_MODE_RULES = `
+Operating Mode:
+- mode: "personal" | "admin"
+Rules:
+- If mode=personal: limit scope to the current user; show only personal KPIs, actions and data. Never disclose other users’ data; propose self-service actions.
+- If mode=admin: operate on org-level aggregates; include compliance, budget variance, violations, and recommendations with owners. Anonymize user-level data unless explicitly requested and permitted.
+- Always state any scope/permission limits when relevant.`.trim()
+
 export function buildSystemPrompt(options: SystemPromptOptions = {}): string {
   const domain = new Set(options.domain || ["general"]) 
-  const parts: string[] = [BASE_PROMPT, STYLE_RULES]
+  const parts: string[] = [BASE_PROMPT, STYLE_RULES, OPERATING_MODE_RULES]
   if (domain.has("travel")) parts.push(TRAVEL_RULES)
   if (domain.has("coding")) parts.push(CODING_RULES)
   if (domain.has("business")) parts.push(BUSINESS_RULES)
@@ -104,8 +119,42 @@ export const System = `${BASE_PROMPT}
 
 ${STYLE_RULES}
 
+${OPERATING_MODE_RULES}
+
 ${TRAVEL_RULES}
 
 ${CODING_RULES}
 
 ${BUSINESS_RULES}`
+
+// --- Specialized prompts consolidated here ---
+// (Meeting and Analytics prompts are now provided by their own modules)
+
+// --- Policy extraction helper (migrated from API) ---
+export const PolicyDataSchema = z.object({
+  companyName: z.string().optional(),
+  employeeCount: z.number().optional(),
+  industry: z.string().optional(),
+  budget: z.number().optional(),
+  travelFrequency: z.enum(["low", "medium", "high"]).optional(),
+  regions: z.array(z.string()).optional(),
+  policies: z.array(z.string()).optional(),
+})
+
+export function buildPolicyExtractionPrompt(text: string) {
+  return `
+Analyze the following document text and extract structured data about the company's travel policies and requirements:
+
+Text: ${text}
+
+Extract:
+- Company name
+- Number of employees (if mentioned)
+- Industry sector
+- Travel budget (if mentioned)
+- Travel frequency (low/medium/high based on context)
+- Regions they operate in
+- Existing policies mentioned
+
+Return structured data that can be used to recommend appropriate travel policies.`.trim()
+}
