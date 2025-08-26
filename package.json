@@ -35,6 +35,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "2.0.6",
     "@anthropic-ai/sdk": "0.30.1",
+    "@browserbasehq/sdk": "^2.6.0",
     "@cloudflare/workers-types": "4.20250816.0",
     "@duffel/api": "4.15.1",
     "@duffel/components": "3.11.0",
@@ -204,6 +205,7 @@
     "swr": "2.3.6",
     "tailwind-merge": "2.5.5",
     "tailwindcss-animate": "1.0.7",
+    "tavily": "^1.0.2",
     "tesseract.js": "6.0.1",
     "use-stick-to-bottom": "1.1.1",
     "uuid": "11.1.0",
@@ -248,9 +250,9 @@
     "prettier": "3.6.2",
     "prettier-plugin-tailwindcss": "0.6.14",
     "tailwindcss": "3.4.17",
+    "tsx": "4.19.1",
     "typescript": "5.9.2",
-    "unpdf": "1.1.0",
-    "tsx": "4.19.1"
+    "unpdf": "1.1.0"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
