@@ -18,6 +18,7 @@ import { Switch } from "@/components/ui/switch"
 import { Markdown } from "@/components/prompt-kit/markdown"
 import { ChatContainerRoot, ChatContainerContent } from "@/components/prompt-kit/chat-container"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
+import { DashboardLoadingScreen, loader as OrbLoader } from "@/components/ui/loaders"
 
 interface Message {
   id: string
@@ -147,6 +148,13 @@ export default function SuitpaxAIPage() {
               </div>
             )}
 
+            {/* Main loader when there are no messages but loading (initial ask) */}
+            {messages.length === 0 && isLoading && (
+              <div className="py-16">
+                <DashboardLoadingScreen className="bg-transparent" />
+              </div>
+            )}
+
             {messages.map((m, idx) => {
               const isAssistant = m.role === "assistant"
               const isLast = idx === messages.length - 1
@@ -210,8 +218,12 @@ export default function SuitpaxAIPage() {
               )
             })}
 
+            {/* Inline small loader above the thinking text, using text color */}
             {isLoading && (
-              <div className="text-sm text-gray-600">Thinking…</div>
+              <div className="flex flex-col items-start gap-2">
+                <span className="inline-block h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin text-gray-600" />
+                <div className="text-sm text-gray-600">Thinking…</div>
+              </div>
             )}
             <div className="fixed right-6 bottom-24">
               <ScrollButton />

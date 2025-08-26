@@ -60,6 +60,15 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+      {/* Loader while onboarding status is loading */}
+      {onboardingCompleted === null && (
+        <div className="mb-4">
+          <div className="flex flex-col items-start gap-2 text-gray-700">
+            <span className="inline-block h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+            <p className="text-sm">Loading dashboard…</p>
+          </div>
+        </div>
+      )}
       {/* Onboarding gate: show full flow if not completed and not skipped; otherwise show compact prompt until completed */}
       {onboardingCompleted === false && userId && !skippedOnboarding && (
         <div className="mb-8">
