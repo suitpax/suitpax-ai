@@ -24,7 +24,7 @@
     "preinstall": "node scripts/enforce-pnpm.js",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "mcp:server": "node lib/mcp/server.js",
+    "mcp:server": "tsx lib/mcp/server.ts",
     "start": "next start",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf .next dist",
@@ -39,8 +39,6 @@
     "@duffel/api": "4.15.1",
     "@duffel/components": "3.11.0",
     "@elevenlabs/elevenlabs-js": "2.8.0",
-    "@emotion/is-prop-valid": "1.3.1",
-    "@emotion/react": "11.14.0",
     "@getbrevo/brevo": "2.5.0",
     "@google-cloud/speech": "^7.2.0",
     "@google-cloud/text-to-speech": "^6.2.0",
@@ -251,7 +249,8 @@
     "prettier-plugin-tailwindcss": "0.6.14",
     "tailwindcss": "3.4.17",
     "typescript": "5.9.2",
-    "unpdf": "1.1.0"
+    "unpdf": "1.1.0",
+    "tsx": "4.19.1"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
