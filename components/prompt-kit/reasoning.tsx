@@ -15,21 +15,14 @@ function useReasoning() {
   return context
 }
 
-export type ReasoningProps = {
-  children: React.ReactNode
-  className?: string
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-} & React.ComponentProps<typeof Collapsible>
+export type ReasoningProps = { children: React.ReactNode; className?: string; open?: boolean; onOpenChange?: (open: boolean) => void } & React.ComponentProps<typeof Collapsible>
 
 export function Reasoning({ children, className, open, onOpenChange, ...props }: ReasoningProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const isControlled = open !== undefined
   const isOpen = isControlled ? open : internalOpen
   const setIsOpen = (newOpen: boolean) => { isControlled ? onOpenChange?.(newOpen) : setInternalOpen(newOpen) }
-
   const contextValue: ReasoningContextType = { isOpen, setIsOpen }
-
   return (
     <ReasoningContext.Provider value={contextValue}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className={cn("w-full", className)} {...props}>
@@ -46,14 +39,14 @@ export function ReasoningTrigger({ children, className, ...props }: ReasoningTri
   return (
     <CollapsibleTrigger
       className={cn(
-        "flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 transition-colors",
-        "focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 rounded-md",
+        "flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors",
+        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm",
         "py-1 px-2 -mx-2",
         className
       )}
       {...props}
     >
-      {isOpen ? <ChevronDown className="h-3.5 w-3.5 transition-transform" /> : <ChevronRight className="h-3.5 w-3.5 transition-transform" />}
+      {isOpen ? <ChevronDown className="h-4 w-4 transition-transform" /> : <ChevronRight className="h-4 w-4 transition-transform" />}
       {children || <span className="font-medium">{isOpen ? "Hide reasoning" : "Show reasoning"}</span>}
     </CollapsibleTrigger>
   )
@@ -66,8 +59,8 @@ export function ReasoningContent({ children, className, ...props }: ReasoningCon
     <CollapsibleContent
       className={cn(
         "mt-2 space-y-2 overflow-hidden transition-all",
-        "border-l-2 border-gray-200 pl-3 ml-1",
-        "text-xs text-gray-600",
+        "border-l-2 border-muted pl-4 ml-2",
+        "text-sm text-muted-foreground",
         className
       )}
       {...props}
@@ -100,7 +93,8 @@ export function ReasoningResponse({ text, className, onComplete, ...props }: Rea
           setDisplayedText((prev) => prev + chunk)
         }
         if (!isCancelled) { setIsComplete(true); onComplete?.() }
-      } catch {
+      } catch (error) {
+        console.error("Error processing reasoning stream:", error)
         if (!isCancelled) { setIsComplete(true); onComplete?.() }
       }
     }
