@@ -14,8 +14,16 @@ const DELAY_DOT_2 = 0.1
 const DELAY_DOT_3 = 0.2
 
 // Animation settings
-const ANIMATION = { y: ["0%", "-60%", "0%"], opacity: [1, 0.7, 1] }
-const TRANSITION = { duration: ANIMATION_DURATION, ease: "easeInOut", repeat: Number.POSITIVE_INFINITY, repeatType: "loop" as const }
+const ANIMATION = {
+  y: ["0%", "-60%", "0%"],
+  opacity: [1, 0.7, 1],
+}
+
+const TRANSITION = {
+  duration: ANIMATION_DURATION,
+  ease: [0.42, 0, 0.58, 1] as [number, number, number, number],
+  repeat: Number.POSITIVE_INFINITY,
+}
 
 export function Loader() {
   return (
@@ -28,6 +36,14 @@ export function Loader() {
 }
 
 function Dot({ delay }: { delay: number }) {
-  return <motion.div className={`${DOT_SIZE} ${DOT_COLOR} rounded-full`} animate={ANIMATION} transition={{ ...TRANSITION, delay }} />
+  return (
+    <motion.div
+      className={`${DOT_SIZE} ${DOT_COLOR} rounded-full`}
+      animate={ANIMATION}
+      transition={{
+        ...TRANSITION,
+        delay,
+      }}
+    />
+  )
 }
-

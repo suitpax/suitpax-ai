@@ -8,7 +8,7 @@ import { CaretLeft, SealCheck, Spinner } from "@phosphor-icons/react"
 import { AnimatePresence, motion } from "motion/react"
 import { useEffect, useState } from "react"
 
-const TRANSITION_CONTENT = { ease: "easeOut", duration: 0.2 }
+const TRANSITION_CONTENT = { ease: [0.16, 1, 0.3, 1] as [number, number, number, number], duration: 0.2 }
 
 type FeedbackFormProps = { authUserId?: string; onClose: () => void }
 

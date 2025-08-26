@@ -3,7 +3,6 @@ import * as pdfjsLib from "pdfjs-dist"
 import pdfParse from "pdf-parse"
 import mammoth from "mammoth"
 import * as XLSX from "xlsx"
-import Jimp from "jimp"
 
 export class ComprehensiveDocumentService {
   private static instance: ComprehensiveDocumentService
@@ -47,20 +46,17 @@ export class ComprehensiveDocumentService {
 
   private async processPDF(buffer: Uint8Array): Promise<any> {
     try {
-      // Method 1: Using pdf-parse for text extraction
       const pdfData = await pdfParse(buffer)
-
-      // Method 2: Using pdfjs-dist for advanced processing
       const loadingTask = pdfjsLib.getDocument({ data: buffer })
       const pdf = await loadingTask.promise
 
       let fullText = ""
-      const pages = []
+      const pages = [] as any[]
 
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i)
         const textContent = await page.getTextContent()
-        const pageText = textContent.items.map((item: any) => item.str).join(" ")
+        const pageText = (textContent.items as any[]).map((item: any) => item.str).join(" ")
 
         pages.push({
           pageNumber: i,
@@ -70,7 +66,6 @@ export class ComprehensiveDocumentService {
         fullText += pageText + "\n"
       }
 
-      // Extract structured data using AI patterns
       const extractedData = this.extractStructuredData(fullText)
 
       return {
@@ -78,12 +73,12 @@ export class ComprehensiveDocumentService {
         content: fullText,
         metadata: {
           pages: pdf.numPages,
-          title: pdfData.info?.Title,
-          author: pdfData.info?.Author,
-          creator: pdfData.info?.Creator,
-          producer: pdfData.info?.Producer,
-          creationDate: pdfData.info?.CreationDate,
-          modificationDate: pdfData.info?.ModDate,
+          title: (pdfData as any).info?.Title,
+          author: (pdfData as any).info?.Author,
+          creator: (pdfData as any).info?.Creator,
+          producer: (pdfData as any).info?.Producer,
+          creationDate: (pdfData as any).info?.CreationDate,
+          modificationDate: (pdfData as any).info?.ModDate,
         },
         extractedData,
         pages,
@@ -96,8 +91,8 @@ export class ComprehensiveDocumentService {
 
   private async processWord(buffer: Uint8Array): Promise<any> {
     try {
-      const result = await mammoth.extractRawText({ buffer })
-      const htmlResult = await mammoth.convertToHtml({ buffer })
+      const result = await (mammoth as any).extractRawText({ buffer })
+      const htmlResult = await (mammoth as any).convertToHtml({ buffer })
 
       const extractedData = this.extractStructuredData(result.value)
 
@@ -154,26 +149,17 @@ export class ComprehensiveDocumentService {
 
   private async processImage(buffer: Uint8Array, mimeType: string): Promise<any> {
     try {
-      // Process image with Jimp for enhancement
-      const image = await Jimp.read(Buffer.from(buffer))
-
-      // Enhance image for better OCR
-      const enhancedImage = image.greyscale().contrast(0.3).normalize()
-
-      const enhancedBuffer = await enhancedImage.getBufferAsync(Jimp.MIME_PNG)
-
-      // OCR processing would go here (using Google Vision or OCR.space)
-      const ocrText = await this.performOCR(enhancedBuffer)
+      const ocrText = await this.performOCR(Buffer.from(buffer))
       const extractedData = this.extractStructuredData(ocrText)
 
       return {
         type: "image",
         content: ocrText,
         metadata: {
-          width: image.getWidth(),
-          height: image.getHeight(),
+          width: undefined,
+          height: undefined,
           mimeType,
-          enhanced: true,
+          enhanced: false,
         },
         extractedData,
       }
@@ -184,17 +170,14 @@ export class ComprehensiveDocumentService {
   }
 
   private async performOCR(buffer: Buffer): Promise<string> {
-    // This would integrate with Google Vision API or OCR.space
-    // For now, return placeholder
     return "OCR text extraction would be implemented here"
   }
 
   private extractStructuredData(text: string): any {
-    // Extract common business document patterns
     const patterns = {
       emails: text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g) || [],
       phones: text.match(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g) || [],
-      dates: text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/g) || [],
+      dates: text.match(/\b\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}\b/g) || [],
       amounts: text.match(/\$\d+(?:,\d{3})*(?:\.\d{2})?/g) || [],
       companies: this.extractCompanyNames(text),
       addresses: this.extractAddresses(text),
@@ -204,7 +187,6 @@ export class ComprehensiveDocumentService {
   }
 
   private extractCompanyNames(text: string): string[] {
-    // Simple company name extraction (would be enhanced with NLP)
     const companyPatterns = [
       /\b[A-Z][a-z]+ (?:Inc|LLC|Corp|Corporation|Company|Co)\b/g,
       /\b[A-Z][a-z]+ & [A-Z][a-z]+\b/g,
@@ -220,7 +202,6 @@ export class ComprehensiveDocumentService {
   }
 
   private extractAddresses(text: string): string[] {
-    // Simple address extraction
     const addressPattern =
       /\d+\s+[A-Za-z\s]+(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Drive|Dr|Lane|Ln|Way|Court|Ct)\b/g
     return text.match(addressPattern) || []
@@ -231,13 +212,11 @@ export class ComprehensiveDocumentService {
     confidence: number
     reasoning: string[]
   }> {
-    // Analyze extracted data to recommend travel policies
     const reasoning: string[] = []
     let confidence = 0.7
 
-    // Company size analysis
     if (extractedData.amounts && extractedData.amounts.length > 0) {
-      const amounts = extractedData.amounts.map((a: string) => Number.parseFloat(a.replace(/[$,]/g, "")))
+      const amounts = extractedData.amounts.map((a: string) => Number.parseFloat(a.replace(/[,$]/g, "")))
       const maxAmount = Math.max(...amounts)
 
       if (maxAmount > 1000000) {
@@ -249,7 +228,6 @@ export class ComprehensiveDocumentService {
       }
     }
 
-    // Industry analysis based on company names
     if (extractedData.companies && extractedData.companies.length > 0) {
       reasoning.push(`${extractedData.companies.length} companies identified`)
       confidence += 0.1

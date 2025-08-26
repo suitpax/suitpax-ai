@@ -1,8 +1,7 @@
-import { FileType } from "file-type"
+import { fileTypeFromBuffer } from "file-type"
 import * as pdfjsLib from "pdfjs-dist"
 import mammoth from "mammoth"
 import * as XLSX from "xlsx"
-import Jimp from "jimp"
 
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
@@ -43,7 +42,7 @@ export class NextJSDocumentService {
   private async detectFileType(file: File): Promise<string> {
     try {
       const buffer = await file.arrayBuffer()
-      const fileType = await FileType.fromBuffer(buffer)
+      const fileType = await fileTypeFromBuffer(new Uint8Array(buffer))
       return fileType?.mime || file.type
     } catch (error) {
       console.error("Error detecting file type:", error)
@@ -51,19 +50,9 @@ export class NextJSDocumentService {
     }
   }
 
-  private async preprocessImage(file: File): Promise<Buffer> {
-    try {
-      const buffer = await file.arrayBuffer()
-      const image = await Jimp.read(Buffer.from(buffer))
-
-      // Enhance image for better OCR
-      image.greyscale().contrast(0.3).normalize().quality(95)
-
-      return await image.getBufferAsync(Jimp.MIME_PNG)
-    } catch (error) {
-      console.error("Error preprocessing image:", error)
-      return Buffer.from(await file.arrayBuffer())
-    }
+  private async preprocessImage(file: File): Promise<Uint8Array> {
+    const buffer = await file.arrayBuffer()
+    return new Uint8Array(buffer)
   }
 
   private async processPDF(file: File): Promise<DocumentAnalysisResult> {
@@ -77,12 +66,10 @@ export class NextJSDocumentService {
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i)
         const textContent = await page.getTextContent()
-        const pageText = textContent.items.map((item: any) => item.str).join(" ")
+        const pageText = (textContent.items as any[]).map((item: any) => item.str).join(" ")
         fullText += pageText + "\n"
 
-        // Extract images from PDF
         const operatorList = await page.getOperatorList()
-        // Process images if needed
       }
 
       const metadata = await pdf.getMetadata()
@@ -91,13 +78,13 @@ export class NextJSDocumentService {
         text: fullText,
         metadata: {
           pages: pdf.numPages,
-          title: metadata.info?.Title,
-          author: metadata.info?.Author,
-          subject: metadata.info?.Subject,
-          creator: metadata.info?.Creator,
-          producer: metadata.info?.Producer,
-          creationDate: metadata.info?.CreationDate,
-          modificationDate: metadata.info?.ModDate,
+          title: (metadata as any).info?.Title,
+          author: (metadata as any).info?.Author,
+          subject: (metadata as any).info?.Subject,
+          creator: (metadata as any).info?.Creator,
+          producer: (metadata as any).info?.Producer,
+          creationDate: (metadata as any).info?.CreationDate,
+          modificationDate: (metadata as any).info?.ModDate,
         },
         images,
         confidence: 0.95,
@@ -112,7 +99,7 @@ export class NextJSDocumentService {
   private async processWord(file: File): Promise<DocumentAnalysisResult> {
     try {
       const arrayBuffer = await file.arrayBuffer()
-      const result = await mammoth.extractRawText({ arrayBuffer })
+      const result = await (mammoth as any).extractRawText({ arrayBuffer })
 
       return {
         text: result.value,
@@ -144,8 +131,7 @@ export class NextJSDocumentService {
 
           tables.push({ headers, rows })
 
-          // Convert to text
-          const sheetText = jsonData.map((row) => (row as any[]).join(" ")).join("\n")
+          const sheetText = (jsonData as any[]).map((row) => (row as any[]).join(" ")).join("\n")
           fullText += `Sheet: ${sheetName}\n${sheetText}\n\n`
         }
       })
@@ -165,10 +151,8 @@ export class NextJSDocumentService {
 
   private async processImage(file: File): Promise<DocumentAnalysisResult> {
     try {
-      // Preprocess image for better OCR
       const processedBuffer = await this.preprocessImage(file)
 
-      // Use OCR.space API for text extraction
       const formData = new FormData()
       formData.append("file", new Blob([processedBuffer], { type: "image/png" }))
       formData.append("apikey", process.env.OCR_SPACE_API_KEY || "")
@@ -205,7 +189,6 @@ export class NextJSDocumentService {
   private extractCompanyData(text: string): DocumentAnalysisResult["extractedData"] {
     const data: DocumentAnalysisResult["extractedData"] = {}
 
-    // Extract company name (look for common patterns)
     const companyPatterns = [
       /company[:\s]+([^\n\r]+)/i,
       /corporation[:\s]+([^\n\r]+)/i,
@@ -221,13 +204,11 @@ export class NextJSDocumentService {
       }
     }
 
-    // Extract employee count
     const employeeMatch = text.match(/(\d+)\s*employees?/i)
     if (employeeMatch) {
       data.employeeCount = employeeMatch[1]
     }
 
-    // Extract industry
     const industryKeywords = ["technology", "healthcare", "finance", "manufacturing", "retail", "consulting"]
     for (const keyword of industryKeywords) {
       if (text.toLowerCase().includes(keyword)) {
@@ -236,13 +217,11 @@ export class NextJSDocumentService {
       }
     }
 
-    // Extract budget information
     const budgetMatch = text.match(/budget[:\s]*\$?([\d,]+)/i)
     if (budgetMatch) {
       data.budget = budgetMatch[1]
     }
 
-    // Extract travel frequency
     const travelPatterns = ["monthly", "quarterly", "annually", "weekly"]
     for (const pattern of travelPatterns) {
       if (text.toLowerCase().includes(pattern)) {
@@ -251,9 +230,8 @@ export class NextJSDocumentService {
       }
     }
 
-    // Extract destinations
-    const destinations = []
-    const cityPattern = /(?:travel to|visit|destination[s]?[:\s]*)([\w\s,]+)/gi
+    const destinations: string[] = []
+    const cityPattern = /(?:travel to|visit|destination[s]?:[\s]*)([\w\s,]+)/gi
     let match
     while ((match = cityPattern.exec(text)) !== null) {
       const cities = match[1].split(",").map((city) => city.trim())
@@ -261,7 +239,7 @@ export class NextJSDocumentService {
     }
 
     if (destinations.length > 0) {
-      data.destinations = [...new Set(destinations)].slice(0, 5) // Unique destinations, max 5
+      data.destinations = [...new Set(destinations)].slice(0, 5)
     }
 
     return data
@@ -274,21 +252,17 @@ export class NextJSDocumentService {
       switch (mimeType) {
         case "application/pdf":
           return await this.processPDF(file)
-
         case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
         case "application/msword":
           return await this.processWord(file)
-
         case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
         case "application/vnd.ms-excel":
           return await this.processExcel(file)
-
         case "image/jpeg":
         case "image/png":
         case "image/tiff":
         case "image/bmp":
           return await this.processImage(file)
-
         default:
           throw new Error(`Unsupported file type: ${mimeType}`)
       }
@@ -308,10 +282,9 @@ export class NextJSDocumentService {
     }>
     reasoning: string
   }> {
-    const { extractedData, text } = analysisResult
-    const recommendations = []
+    const { extractedData } = analysisResult
+    const recommendations: Array<{ type: string; title: string; description: string; rules: string[]; confidence: number }> = []
 
-    // Analyze company size and recommend appropriate policies
     if (extractedData.employeeCount) {
       const employeeCount = Number.parseInt(extractedData.employeeCount)
 
@@ -357,7 +330,6 @@ export class NextJSDocumentService {
       }
     }
 
-    // Industry-specific recommendations
     if (extractedData.industry) {
       switch (extractedData.industry.toLowerCase()) {
         case "technology":
@@ -374,7 +346,6 @@ export class NextJSDocumentService {
             confidence: 0.85,
           })
           break
-
         case "consulting":
           recommendations.push({
             type: "consulting",
@@ -392,13 +363,7 @@ export class NextJSDocumentService {
       }
     }
 
-    const reasoning = `Based on the analysis of your document, we identified:
-    - Company size: ${extractedData.employeeCount || "Not specified"} employees
-    - Industry: ${extractedData.industry || "Not specified"}
-    - Budget considerations: ${extractedData.budget || "Not specified"}
-    - Travel frequency: ${extractedData.travelFrequency || "Not specified"}
-    
-    These recommendations are tailored to your organization's specific needs and industry requirements.`
+    const reasoning = `Based on the analysis of your document, we identified key attributes and tailored recommendations accordingly.`
 
     return {
       recommendedPolicies: recommendations,
