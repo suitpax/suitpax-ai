@@ -3,28 +3,31 @@
 import { useCallback, useEffect, useState } from "react"
 
 export function useChatDraft(storageKey: string) {
-	const [draft, setDraft] = useState<string>("")
+	const [draft, setDraftState] = useState<string>("")
 	const [loaded, setLoaded] = useState(false)
 
 	useEffect(() => {
 		try {
 			const raw = localStorage.getItem(storageKey)
-			setDraft(raw || "")
+			setDraftState(raw || "")
 		} catch {
-			setDraft("")
+			setDraftState("")
 		} finally {
 			setLoaded(true)
 		}
 	}, [storageKey])
 
-	const save = useCallback((value: string) => {
-		setDraft(value)
-		try { localStorage.setItem(storageKey, value) } catch {}
+	const setDraft = useCallback((value: string | ((prev: string) => string)) => {
+		setDraftState((prev) => {
+			const next = value instanceof Function ? value(prev) : value
+			try { localStorage.setItem(storageKey, next) } catch {}
+			return next
+		})
 	}, [storageKey])
 
 	const clear = useCallback(() => {
-		save("")
-	}, [save])
+		setDraft("")
+	}, [setDraft])
 
-	return { draft, setDraft: save, clear, loaded }
+	return { draft, setDraft, clear, loaded }
 }

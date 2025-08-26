@@ -20,6 +20,7 @@ import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 import { DashboardLoadingScreen } from "@/components/ui/loaders"
 import { useChatPreview } from "@/hooks/use-chat-preview"
 import { useBreakpoint } from "@/hooks/use-breakpoint"
+import { useChatDraft } from "@/hooks/use-chat-draft"
 
 interface Message {
   id: string
@@ -39,7 +40,7 @@ const defaultSuggestions = [
 export default function SuitpaxAIPage() {
   const supabase = createClient()
   const [userId, setUserId] = useState<string | null>(null)
-  const [value, setValue] = useState("")
+  const { draft: value, setDraft: setValue, clear: clearDraft } = useChatDraft("suitpax_ai_input_draft")
   const [isLoading, setIsLoading] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [messages, setMessages] = useState<Message[]>([])
@@ -105,7 +106,7 @@ export default function SuitpaxAIPage() {
 
     const userMessage: Message = { id: Date.now().toString(), content: value.trim(), role: "user", timestamp: new Date() }
     setMessages((prev) => [...prev, userMessage])
-    setValue("")
+    clearDraft()
     setFiles([])
     setIsLoading(true)
 
