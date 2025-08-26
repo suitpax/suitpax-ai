@@ -54,7 +54,7 @@ export function ReasoningTrigger({ children, className, ...props }: ReasoningTri
       {...props}
     >
       {isOpen ? <ChevronDown className="h-3.5 w-3.5 transition-transform" /> : <ChevronRight className="h-3.5 w-3.5 transition-transform" />}
-      {children || <span className="font-medium">{isOpen ? "Ocultar razonamiento" : "Ver razonamiento"}</span>}
+      {children || <span className="font-medium">{isOpen ? "Hide reasoning" : "Show reasoning"}</span>}
     </CollapsibleTrigger>
   )
 }
