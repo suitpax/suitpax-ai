@@ -133,7 +133,6 @@ export default function SuitpaxAIPage() {
     <div className="bg-white">
       <div className="fixed inset-0 flex flex-col">
         {/* Chat Header */}
-        {/* @ts-expect-error Async Server Component types mismatch not relevant here */}
         <ChatHeader title="Suitpax AI" subtitle="Ask anything. Travel. Business. Code." />
         {/* Content area */}
         <ChatContainerRoot className="flex-1">
@@ -163,33 +162,33 @@ export default function SuitpaxAIPage() {
                         <div className="text-[10px] text-gray-500">{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                       </div>
                       <PKMessageContent className="text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0" markdown>
-                        <Markdown>{m.content}</Markdown>
-                        {(() => {
-                          const match = m.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
-                          if (!match) return null
-                          try {
-                            const parsed = JSON.parse(match[1])
-                            return (
-                              <div className="mt-2">
-                                <ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => { if (id) window.location.href = `/dashboard/flights/book/${id}` }} />
-                              </div>
-                            )
-                          } catch { return null }
-                        })()}
-                        {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
+                        {m.content}
                       </PKMessageContent>
+                      {(() => {
+                        const match = m.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
+                        if (!match) return null
+                        try {
+                          const parsed = JSON.parse(match[1])
+                          return (
+                            <div className="mt-2">
+                              <ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => { if (id) window.location.href = `/dashboard/flights/book/${id}` }} />
+                            </div>
+                          )
+                        } catch { return null }
+                      })()}
+                      {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
                       <PKMessageActions className={`-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 ${isLast ? "opacity-100" : ""}`}>
-                        <PKMessageAction tooltip="Copy" delayDuration={100}>
+                        <PKMessageAction tooltip="Copy">
                           <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigator.clipboard.writeText(m.content)}>
                             <Copy className="h-4 w-4" />
                           </Button>
                         </PKMessageAction>
-                        <PKMessageAction tooltip="Upvote" delayDuration={100}>
+                        <PKMessageAction tooltip="Upvote">
                           <Button variant="ghost" size="icon" className="rounded-full">
                             <ThumbsUp className="h-4 w-4" />
                           </Button>
                         </PKMessageAction>
-                        <PKMessageAction tooltip="Downvote" delayDuration={100}>
+                        <PKMessageAction tooltip="Downvote">
                           <Button variant="ghost" size="icon" className="rounded-full">
                             <ThumbsDown className="h-4 w-4" />
                           </Button>

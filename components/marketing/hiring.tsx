@@ -5,7 +5,6 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { PiDotsNineBold, PiDotsSixBold, PiDotsThreeBold, PiArrowRightBold } from "react-icons/pi"
 import { BsHeartFill } from "react-icons/bs"
-import { keyframes } from "@emotion/react"
 import { useState, useEffect } from "react"
 
 // Componente de simulación de chat con efecto de borde animado
@@ -45,21 +44,16 @@ const ChatSimulator = () => {
     return () => clearTimeout(timeout)
   }, [typedText, isTyping, currentMessage, messages])
 
-  // Animación del borde tipo circuito
-  const borderAnimation = keyframes`
-    0% { background-position: 0% 0%; }
-    100% { background-position: 200% 0%; }
-  `
-
   return (
     <div className="relative p-0.5 rounded-xl overflow-hidden">
       {/* Borde animado */}
       <motion.div
         className="absolute inset-0 z-0"
+        animate={{ backgroundPositionX: ["0%", "200%"] }}
+        transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
         style={{
           background: "linear-gradient(90deg, #065f46, white, black, white)",
           backgroundSize: "200% 100%",
-          animation: `${borderAnimation} 3s linear infinite`,
         }}
       />
 
@@ -98,11 +92,6 @@ const ChatSimulator = () => {
     </div>
   )
 }
-
-const marquee = keyframes`
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-`
 
 // Títulos alternativos para el componente
 const titleVariations = [
@@ -216,7 +205,7 @@ export const Hiring = () => {
       {/* Coordenadas decorativas como en el diseño de referencia */}
       <div className="container mx-auto px-4 md:px-6 relative">
         <div className="absolute top-0 left-0 right-0 overflow-hidden whitespace-nowrap">
-          <div className="animate-marquee inline-block">
+          <div className="inline-block">
             <div className="flex justify-between text-xs border-b border-black/20 pb-2 mb-8 w-[200%]">
               <span>37° 46' 30.0"</span>
               <span>N</span>
@@ -327,40 +316,6 @@ export const Hiring = () => {
               </div>
             ))}
           </div>
-
-          {/* Posiciones disponibles - Estilo de tarjetas similar a los screenshots */}
-          {/* Eliminar esta sección:
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {positions.map((position) => (
-              <motion.div
-                key={position.id}
-                className="bg-transparent backdrop-blur-xl p-6 rounded-md border border-black/20 relative overflow-hidden"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-              >
-                {/* Efecto de fondo }
-                <div className="absolute -inset-1 bg-black/5 blur-xl"></div>
-
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-black/10 rounded-md">{position.icon}</div>
-                    <h3 className="text-xl font-medium tracking-tighter">{position.title}</h3>
-                  </div>
-
-                  <p className="text-sm text-black/70 mb-4">{position.description}</p>
-
-                  <div className="space-y-2">
-                    {position.requirements.map((req, idx) => (
-                      <div key={idx} className="flex items-start gap-2">
-                        <p className="text-xs text-black/80">{req}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-          */}
 
           {/* Reemplazar con: */}
           <div className="mb-12">

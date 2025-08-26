@@ -38,7 +38,7 @@ export default function LoaderExamples() {
       <div className="grid grid-cols-2 gap-8 p-4 sm:grid-cols-3 md:grid-cols-4">
         {variants.map((variant) => (
           <div key={variant} className="flex flex-col items-center justify-center gap-2 p-4">
-            <Loader variant={variant} size={size} />
+            <Loader />
             <span className="text-muted-foreground text-sm">{variant}</span>
           </div>
         ))}

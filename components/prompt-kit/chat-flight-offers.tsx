@@ -1,19 +1,24 @@
 "use client"
 
-export default function ChatFlightOffers({ offers, onSelect }: { offers: Array<any>; onSelect: (id: string) => void }) {
-	if (!Array.isArray(offers) || offers.length === 0) return null
+import React from "react"
+
+type Offer = { id?: string; title?: string; price?: string; [key: string]: any }
+
+export default function ChatFlightOffers({ offers, onSelect }: { offers: Offer[]; onSelect?: (id?: string) => void }) {
+	if (!offers?.length) return null
 	return (
-		<div className="rounded-xl border border-gray-200 bg-white/80 divide-y">
-			{offers.slice(0, 5).map((o: any, idx: number) => (
-				<button key={o.id || idx} onClick={() => onSelect(o.id || o.offer_id || "")} className="w-full text-left px-3 py-2 hover:bg-white focus:outline-none focus-visible:ring-1 focus-visible:ring-gray-300">
-					<div className="flex items-center justify-between">
-						<div className="text-[12px] text-gray-900 font-medium">{o.airline?.name || o.airline || "Airline"} • {o.route?.duration || o.duration || ""}</div>
-						<div className="text-[12px] text-gray-900 font-semibold">{o.price ? `${o.price} ${o.currency || ""}` : ""}</div>
+		<div className="rounded-lg border border-gray-200 p-3 space-y-2">
+			{offers.map((offer, idx) => (
+				<div key={offer.id ?? idx} className="flex items-center justify-between text-sm">
+					<div className="truncate">
+						{offer.title ?? `Offer ${idx + 1}`} {offer.price ? `• ${offer.price}` : ""}
 					</div>
-					<div className="text-[11px] text-gray-600">
-						{o.route?.departure_time || o.departure_time || ""} → {o.route?.arrival_time || o.arrival_time || ""} • {o.route?.stops === 0 ? "Direct" : `${o.route?.stops || 0} stops`}
-					</div>
-				</button>
+					{onSelect ? (
+						<button className="text-primary underline" onClick={() => onSelect(offer.id)}>
+							Select
+						</button>
+					) : null}
+				</div>
 			))}
 		</div>
 	)

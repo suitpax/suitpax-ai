@@ -1,55 +1,42 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { type VariantProps } from "class-variance-authority"
 import { ChevronDown } from "lucide-react"
-import React from "react"
-import { useChatContainer } from "./chat-container"
+import { useStickToBottomContext } from "use-stick-to-bottom"
 
 export type ScrollButtonProps = {
   className?: string
-  variant?: "default" | "outline" | "ghost"
-  size?: "sm" | "default" | "lg"
-  threshold?: number
-} & React.ComponentProps<typeof Button>
+  variant?: VariantProps<typeof buttonVariants>["variant"]
+  size?: VariantProps<typeof buttonVariants>["size"]
+} & React.ButtonHTMLAttributes<HTMLButtonElement>
 
-export function ScrollButton({
+function ScrollButton({
   className,
-  variant = "default",
+  variant = "outline",
   size = "sm",
-  threshold = 100,
-  children,
-  onClick,
   ...props
 }: ScrollButtonProps) {
-  const { isScrolledToBottom, scrollToBottom } = useChatContainer()
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    scrollToBottom()
-    onClick?.(event)
-  }
-
-  // No mostrar el botón si ya estamos en el fondo
-  if (isScrolledToBottom) {
-    return null
-  }
+  const { isAtBottom, scrollToBottom } = useStickToBottomContext()
 
   return (
     <Button
       variant={variant}
       size={size}
       className={cn(
-        "fixed bottom-20 right-4 z-50 rounded-full shadow-lg transition-all duration-200 ease-in-out",
-        "hover:scale-105 active:scale-95",
-        "bg-white hover:bg-gray-50 border border-gray-200",
-        "text-gray-700 hover:text-gray-900",
+        "h-10 w-10 rounded-full transition-all duration-150 ease-out",
+        !isAtBottom
+          ? "translate-y-0 scale-100 opacity-100"
+          : "pointer-events-none translate-y-4 scale-95 opacity-0",
         className
       )}
-      onClick={handleClick}
+      onClick={() => scrollToBottom()}
       {...props}
     >
-      {children || <ChevronDown className="h-4 w-4" />}
+      <ChevronDown className="h-5 w-5" />
     </Button>
   )
 }
 
+export { ScrollButton }
