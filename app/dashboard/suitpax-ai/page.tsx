@@ -286,9 +286,18 @@ export default function SuitpaxAIPage() {
                           <DialogDescription>Power up Suitpax AI with your files, emails and calendar.</DialogDescription>
                         </DialogHeader>
                         <div className="grid grid-cols-1 gap-2">
-                          <a href="/api/integrations/google/drive/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50">Connect Google Drive</a>
-                          <a href="/api/integrations/google/gmail/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50">Connect Gmail</a>
-                          <a href="/api/integrations/google/calendar/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50">Connect Calendar</a>
+                          <a href="/api/integrations/google/drive/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50 inline-flex items-center gap-2">
+                            <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://drive.google.com" alt="Drive" className="size-4 grayscale" />
+                            <span>Connect Google Drive</span>
+                          </a>
+                          <a href="/api/integrations/google/gmail/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50 inline-flex items-center gap-2">
+                            <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://mail.google.com" alt="Gmail" className="size-4 grayscale" />
+                            <span>Connect Gmail</span>
+                          </a>
+                          <a href="/api/integrations/google/calendar/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50 inline-flex items-center gap-2">
+                            <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://calendar.google.com" alt="Calendar" className="size-4 grayscale" />
+                            <span>Connect Calendar</span>
+                          </a>
                         </div>
                       </DialogContent>
                     </Dialog>
