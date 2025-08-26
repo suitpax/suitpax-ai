@@ -12,13 +12,14 @@ export interface WebSearchResponse {
   total: number
 }
 
-function getPreferredProvider(): "exa" | "brave" {
+function getPreferredProvider(): "exa" | "brave" | "tavily" {
   const pref = (process.env.NEXT_PUBLIC_WEB_SEARCH_PROVIDER || "").toLowerCase()
   if (pref === "exa") return "exa"
+  if (pref === "tavily") return "tavily"
   return "brave"
 }
 
-async function callProvider(path: "/api/web-search/brave" | "/api/web-search/exa", query: string, count = 5): Promise<WebSearchResponse> {
+async function callProvider(path: "/api/web/brave" | "/api/web/exa" | "/api/web/tavily", query: string, count = 5): Promise<WebSearchResponse> {
   const response = await fetch(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -32,20 +33,22 @@ export async function searchWeb(query: string, count = 5): Promise<WebSearchResp
   const provider = getPreferredProvider()
   try {
     if (provider === "exa") {
-      return await callProvider("/api/web-search/exa", query, count)
+      return await callProvider("/api/web/exa", query, count)
     }
-    return await callProvider("/api/web-search/brave", query, count)
+    if (provider === "tavily") {
+      return await callProvider("/api/web/tavily", query, count)
+    }
+    return await callProvider("/api/web/brave", query, count)
   } catch (primaryError) {
     try {
-      // Fallback to the other provider
-      if (provider === "exa") {
-        return await callProvider("/api/web-search/brave", query, count)
-      } else {
-        return await callProvider("/api/web-search/exa", query, count)
+      // Fallback order: brave -> exa -> tavily
+      return await callProvider("/api/web/brave", query, count)
+    } catch (err1) {
+      try {
+        return await callProvider("/api/web/exa", query, count)
+      } catch (err2) {
+        return await callProvider("/api/web/tavily", query, count)
       }
-    } catch (fallbackError) {
-      console.error("Web search error:", primaryError, fallbackError)
-      return { query, results: [], total: 0 }
     }
   }
 }
