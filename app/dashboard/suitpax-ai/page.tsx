@@ -142,7 +142,18 @@ export default function SuitpaxAIPage() {
     <div className="bg-white">
       <div className="fixed inset-0 flex flex-col">
         {/* Chat Header */}
-        <ChatHeader title="Suitpax AI" subtitle={isSmall ? undefined : "Ask anything. Travel. Business. Code."} />
+        <div className="border-b border-gray-200">
+          <div className="mx-auto w-full max-w-4xl px-4 py-3 flex items-center justify-between">
+            <div>
+              <h1 className="text-xl md:text-2xl font-medium tracking-tight">Suitpax AI</h1>
+              {!isSmall && <p className="text-sm text-muted-foreground mt-1">Ask anything. Travel. Business. Code.</p>}
+            </div>
+            <div className="flex items-center gap-2 text-[12px] text-gray-700">
+              <span>High-level reasoning</span>
+              <Switch checked={includeReasoningInline} onCheckedChange={setIncludeReasoningInline} />
+            </div>
+          </div>
+        </div>
         {/* Content area */}
         <ChatContainerRoot className="flex-1">
           <ChatContainerContent className={`mx-auto w-full max-w-3xl ${isSmall ? "px-2 py-3" : "px-4 py-6"} space-y-4`} role="feed" aria-label="Chat messages" aria-live="polite">
@@ -241,90 +252,73 @@ export default function SuitpaxAIPage() {
         </ChatContainerRoot>
 
         {/* Bottom docked prompt */}
-        <div className="border-t border-gray-200 bg-white/70 backdrop-blur-sm">
-          <div className={`mx-auto w-full max-w-4xl ${isSmall ? "px-2 py-2" : "px-4 py-3"}`}>
-            <div className={`flex items-center justify-between gap-3 ${isSmall ? "mb-1" : "mb-2"}`}>
-              <div className="flex items-center gap-2 text-[12px] text-gray-700">
-                <span>High-level reasoning</span>
-                <Switch checked={includeReasoningInline} onCheckedChange={setIncludeReasoningInline} />
-              </div>
-              {/* DocumentScanner disabled: component not present */}
-            </div>
-
-            <FileUpload onFilesAdded={handleFilesAdded} accept=".jpg,.jpeg,.png,.pdf,.docx">
-              <PromptInput
-                value={value}
-                onValueChange={setValue}
-                isLoading={isLoading || isStreaming}
-                onSubmit={handleSend}
-                aria-label="AI prompt input"
-                className="w-full border border-gray-200 rounded-3xl p-0 pt-1 bg-white"
-              >
-                {files.length > 0 && (
-                  <div className="flex flex-wrap gap-2 px-3 pb-2">
-                    {files.map((file, index) => (
-                      <div key={index} className="bg-gray-100 flex items-center gap-2 rounded-lg px-3 py-2 text-sm" onClick={(e) => e.stopPropagation()}>
-                        <Paperclip className="size-4" />
-                        <span className="max-w-[160px] truncate">{file.name}</span>
-                        <button onClick={() => removeFile(index)} className="hover:bg-gray-200 rounded-full p-1">
-                          <Square className="size-4" />
-                        </button>
+        <div className="border-t border-transparent bg-transparent">
+          <div className={`mx-auto w-full max-w-4xl ${isSmall ? "px-2 py-3" : "px-4 py-4"}`}>
+            <div className="pointer-events-none relative">
+              <FileUpload onFilesAdded={handleFilesAdded} accept=".jpg,.jpeg,.png,.pdf,.docx">
+                <div className="pointer-events-auto">
+                  <PromptInput
+                    value={value}
+                    onValueChange={setValue}
+                    isLoading={isLoading || isStreaming}
+                    onSubmit={handleSend}
+                    aria-label="AI prompt input"
+                    className="shadow-md border border-gray-200 bg-white/90 backdrop-blur-sm"
+                  >
+                    {files.length > 0 && (
+                      <div className="flex flex-wrap gap-2 px-3 pb-2">
+                        {files.map((file, index) => (
+                          <div key={index} className="bg-gray-100 flex items-center gap-2 rounded-lg px-3 py-2 text-sm" onClick={(e) => e.stopPropagation()}>
+                            <Paperclip className="size-4" />
+                            <span className="max-w-[160px] truncate">{file.name}</span>
+                            <button onClick={() => removeFile(index)} className="hover:bg-gray-200 rounded-full p-1">
+                              <Square className="size-4" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
-                <PromptInputTextarea placeholder="Ask about flights, policies, finance or code…" className={`${isSmall ? "min-h-[40px] pt-2 pl-3 text-[15px]" : "min-h-[44px] pt-3 pl-4 text-base"} leading-[1.3]`} />
-                <PromptInputActions className={`mt-2 flex w-full items-center justify-between gap-2 ${isSmall ? "px-2 pb-2" : "px-3 pb-3"}`}>
-                  <div className="flex items-center gap-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <button type="button" className="rounded-full border border-gray-300 px-2 py-0.5 text-[11px] text-gray-700 bg-white hover:bg-gray-100">+ Connect</button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Connect your Google apps</DialogTitle>
-                          <DialogDescription>Power up Suitpax AI with your files, emails and calendar.</DialogDescription>
-                        </DialogHeader>
-                        <div className="grid grid-cols-1 gap-2">
-                          <a href="/api/integrations/google/drive/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50 inline-flex items-center gap-2">
-                            <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://drive.google.com" alt="Drive" className="size-4 grayscale" />
-                            <span>Connect Google Drive</span>
-                          </a>
-                          <a href="/api/integrations/google/gmail/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50 inline-flex items-center gap-2">
-                            <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://mail.google.com" alt="Gmail" className="size-4 grayscale" />
-                            <span>Connect Gmail</span>
-                          </a>
-                          <a href="/api/integrations/google/calendar/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50 inline-flex items-center gap-2">
-                            <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://calendar.google.com" alt="Calendar" className="size-4 grayscale" />
-                            <span>Connect Calendar</span>
-                          </a>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                  <PromptInputAction tooltip="Attach files">
-                    <FileUploadTrigger asChild>
-                      <Button variant="outline" size="icon" className={`${isSmall ? "h-7 w-7" : "h-8 w-8"} rounded-full`}>
-                        <Paperclip className="size-4" />
-                      </Button>
-                    </FileUploadTrigger>
-                  </PromptInputAction>
-                  <PromptInputAction tooltip={isLoading || isStreaming ? "Stop" : "Send"}>
-                    <Button size="icon" aria-label={isLoading || isStreaming ? "Stop generation" : "Send message"} disabled={!value.trim() || isLoading || isStreaming} onClick={handleSend} className={`${isSmall ? "h-7 w-7" : "h-8 w-8"} rounded-full`}>
-                      {!isLoading && !isStreaming ? <ArrowUp className="size-4" /> : <span className="size-3 rounded-xs bg-gray-900" />}
-                    </Button>
-                  </PromptInputAction>
-                </PromptInputActions>
-              </PromptInput>
-              <FileUploadContent>
-                <div className="flex min-height-[200px] w-full items-center justify-center backdrop-blur-sm">
-                  <div className="bg-background/90 m-4 w-full max-w-md rounded-lg border p-8 shadow-lg">
-                    <h3 className="mb-2 text-center text-base font-medium">Drop files to upload</h3>
-                    <p className="text-muted-foreground text-center text-sm">Release to add files to your message</p>
-                  </div>
+                    )}
+                    <PromptInputTextarea placeholder="Ask about flights, policies, finance or code…" className={`${isSmall ? "min-h-[52px] pt-3 pl-4 text-[15px]" : "min-h-[56px] pt-4 pl-5 text-base"} leading-[1.3]`} />
+                    <PromptInputActions className={`mt-2 flex w-full items-center justify-between gap-2 ${isSmall ? "px-2 pb-2" : "px-3 pb-3"}`}>
+                      <div className="flex items-center gap-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <button type="button" className="rounded-full border border-gray-300 px-2 py-0.5 text-[11px] text-gray-700 bg-white hover:bg-gray-100">+ Connect</button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Connect your Google apps</DialogTitle>
+                              <DialogDescription>Power up Suitpax AI with your files, emails and calendar.</DialogDescription>
+                            </DialogHeader>
+                            <div className="grid grid-cols-1 gap-2">
+                              <a href="/api/integrations/google/drive/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50 inline-flex items-center gap-2">
+                                <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://drive.google.com" alt="Drive" className="size-4 grayscale" />
+                                <span>Connect Google Drive</span>
+                              </a>
+                              <a href="/api/integrations/google/gmail/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50 inline-flex items-center gap-2">
+                                <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://mail.google.com" alt="Gmail" className="size-4 grayscale" />
+                                <span>Connect Gmail</span>
+                              </a>
+                              <a href="/api/integrations/google/calendar/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50 inline-flex items-center gap-2">
+                                <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://calendar.google.com" alt="Calendar" className="size-4 grayscale" />
+                                <span>Connect Calendar</span>
+                              </a>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                      <div className="ml-auto">
+                        <PromptInputAction tooltip={isLoading || isStreaming ? "Stop" : "Send"}>
+                          <Button size="icon" aria-label={isLoading || isStreaming ? "Stop generation" : "Send message"} disabled={!value.trim() || isLoading || isStreaming} onClick={handleSend} className={`${isSmall ? "h-9 w-9" : "h-10 w-10"} rounded-full`}>
+                            {!isLoading && !isStreaming ? <ArrowUp className="size-4" /> : <span className="size-3 rounded-xs bg-gray-900" />}
+                          </Button>
+                        </PromptInputAction>
+                      </div>
+                    </PromptInputActions>
+                  </PromptInput>
                 </div>
-              </FileUploadContent>
-            </FileUpload>
+              </FileUpload>
+            </div>
           </div>
         </div>
       </div>
