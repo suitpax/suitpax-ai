@@ -22,6 +22,7 @@ import { useChatPreview } from "@/hooks/use-chat-preview"
 import { useBreakpoint } from "@/hooks/use-breakpoint"
 import { useChatDraft } from "@/hooks/use-chat-draft"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
+import { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse } from "@/components/prompt-kit/reasoning"
 
 interface Message {
   id: string
@@ -203,6 +204,16 @@ export default function SuitpaxAIPage() {
                       <PKMessageContent className="text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0" markdown>
                         {m.content}
                       </PKMessageContent>
+                      {includeReasoningInline && m.reasoning && (
+                        <div className="mt-1">
+                          <Reasoning>
+                            <ReasoningTrigger />
+                            <ReasoningContent>
+                              <ReasoningResponse text={m.reasoning} />
+                            </ReasoningContent>
+                          </Reasoning>
+                        </div>
+                      )}
                       {/* Flight offers rendering disabled: component not present */}
                       {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
                       <PKMessageActions className={`-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 ${isLast ? "opacity-100" : ""}`}>
