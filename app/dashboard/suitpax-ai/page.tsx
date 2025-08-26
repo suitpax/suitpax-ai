@@ -21,6 +21,7 @@ import { DashboardLoadingScreen } from "@/components/ui/loaders"
 import { useChatPreview } from "@/hooks/use-chat-preview"
 import { useBreakpoint } from "@/hooks/use-breakpoint"
 import { useChatDraft } from "@/hooks/use-chat-draft"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
 
 interface Message {
   id: string
@@ -275,9 +276,22 @@ export default function SuitpaxAIPage() {
                 <PromptInputTextarea placeholder="Ask about flights, policies, finance or code…" className={`${isSmall ? "min-h-[40px] pt-2 pl-3 text-[15px]" : "min-h-[44px] pt-3 pl-4 text-base"} leading-[1.3]`} />
                 <PromptInputActions className={`mt-2 flex w-full items-center justify-between gap-2 ${isSmall ? "px-2 pb-2" : "px-3 pb-3"}`}>
                   <div className="flex items-center gap-2">
-                    <a href="/api/integrations/google/drive/auth" className="rounded-full border border-gray-300 px-2 py-0.5 text-[11px] text-gray-700 bg-white hover:bg-gray-100">+ Connect</a>
-                    <a href="/api/integrations/google/gmail/auth" className="rounded-full border border-gray-300 px-2 py-0.5 text-[11px] text-gray-700 bg-white hover:bg-gray-100">Gmail</a>
-                    <a href="/api/integrations/google/calendar/auth" className="rounded-full border border-gray-300 px-2 py-0.5 text-[11px] text-gray-700 bg-white hover:bg-gray-100">Calendar</a>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button type="button" className="rounded-full border border-gray-300 px-2 py-0.5 text-[11px] text-gray-700 bg-white hover:bg-gray-100">+ Connect</button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Connect your Google apps</DialogTitle>
+                          <DialogDescription>Power up Suitpax AI with your files, emails and calendar.</DialogDescription>
+                        </DialogHeader>
+                        <div className="grid grid-cols-1 gap-2">
+                          <a href="/api/integrations/google/drive/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50">Connect Google Drive</a>
+                          <a href="/api/integrations/google/gmail/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50">Connect Gmail</a>
+                          <a href="/api/integrations/google/calendar/auth" className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50">Connect Calendar</a>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                   <PromptInputAction tooltip="Attach files">
                     <FileUploadTrigger asChild>
