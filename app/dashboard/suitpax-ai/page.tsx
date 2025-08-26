@@ -18,6 +18,7 @@ import { Switch } from "@/components/ui/switch"
 import { ChatContainerRoot, ChatContainerContent } from "@/components/prompt-kit/chat-container"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 import { DashboardLoadingScreen } from "@/components/ui/loaders"
+import { useChatPreview } from "@/hooks/use-chat-preview"
 
 interface Message {
   id: string
@@ -45,6 +46,8 @@ export default function SuitpaxAIPage() {
   const listRef = useRef<HTMLDivElement>(null)
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const { isStreaming, start, cancel } = useChatStream()
+
+  const previewNode = useChatPreview(value, { className: "prose prose-sm text-gray-900" })
 
   useEffect(() => {
     const run = async () => {
@@ -144,6 +147,14 @@ export default function SuitpaxAIPage() {
                   <p className="mt-2 text-sm text-gray-600">Powered by Suitpax AI</p>
                 </div>
                 <PromptSuggestions suggestions={defaultSuggestions} onSelect={handleSuggestion} />
+              </div>
+            )}
+
+            {/* Live preview of current input */}
+            {value.trim() && (
+              <div className="border border-gray-200 rounded-xl p-4 bg-white/80">
+                <div className="text-[11px] text-gray-500 mb-2">Preview</div>
+                {previewNode}
               </div>
             )}
 
