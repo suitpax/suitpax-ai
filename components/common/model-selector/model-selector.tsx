@@ -1,6 +1,6 @@
 "use client"
 
-import { useBreakpoint } from "@/app/hooks/use-breakpoint"
+import { useBreakpoint } from "@/hooks/use-breakpoint"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
