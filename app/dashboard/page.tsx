@@ -11,6 +11,7 @@ import { PromptInput, PromptInputActions, PromptInputTextarea, PromptInputAction
 import { createClient } from "@/lib/supabase/client"
 import DashboardOnboarding from "@/components/dashboard/dashboard-onboarding"
 import { OnboardingPrompt } from "@/components/dashboard/onboarding-prompt"
+import { useBreakpoint } from "@/hooks/use-breakpoint"
 
 export default function DashboardPage() {
   const [greet, setGreet] = useState("Good day")
@@ -19,6 +20,8 @@ export default function DashboardPage() {
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null)
   const [skippedOnboarding, setSkippedOnboarding] = useState(false)
   const supabase = createClient()
+  const { down } = useBreakpoint()
+  const isSmall = down("sm")
   useEffect(() => {
     const hours = new Date().getHours()
     setGreet(hours < 12 ? 'Good morning' : hours < 18 ? 'Good afternoon' : 'Good evening')
@@ -59,7 +62,16 @@ export default function DashboardPage() {
   ]
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className={`${isSmall ? "p-4" : "p-6"} max-w-7xl mx-auto`}>
+      {/* Loader while onboarding status is loading */}
+      {onboardingCompleted === null && (
+        <div className="mb-4">
+          <div className="flex flex-col items-start gap-2 text-gray-700">
+            <span className="inline-block h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+            <p className="text-sm">Loading dashboard…</p>
+          </div>
+        </div>
+      )}
       {/* Onboarding gate: show full flow if not completed and not skipped; otherwise show compact prompt until completed */}
       {onboardingCompleted === false && userId && !skippedOnboarding && (
         <div className="mb-8">
@@ -70,11 +82,11 @@ export default function DashboardPage() {
           />
         </div>
       )}
-      <div className="mb-8">
+      <div className={`${isSmall ? "mb-6" : "mb-8"}`}>
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none text-gray-900 mb-1">My Dashboard</h1>
+          <h1 className={`${isSmall ? "text-3xl" : "text-4xl md:text-5xl"} font-medium tracking-tighter leading-none text-gray-900 mb-1`}>My Dashboard</h1>
           <p className="text-sm font-light tracking-tighter text-gray-600">{greet}{name ? `, ${name}` : ''} — welcome to your dashboard</p>
-          <p className="text-sm text-gray-500 font-light mt-1">Track performance, search flights, and manage policies</p>
+          {!isSmall && <p className="text-sm text-gray-500 font-light mt-1">Track performance, search flights, and manage policies</p>}
         </motion.div>
         {onboardingCompleted === false && skippedOnboarding && (
           <div className="mt-3 flex justify-end">
@@ -102,7 +114,7 @@ export default function DashboardPage() {
               <PromptInputTextarea placeholder="Ask the AI to plan a trip, analyze an expense, or draft a policy…" />
               <PromptInputActions>
                 <PromptInputAction tooltip="Send">
-                  <button type="submit" className="bg-black text-white hover:bg-gray-800 rounded-2xl h-7 w-7 p-0 inline-flex items-center justify-center">
+                  <button type="submit" className={`${isSmall ? "h-7 w-7" : "h-7 w-7"} bg-black text-white hover:bg-gray-800 rounded-2xl p-0 inline-flex items-center justify-center`}>
                     <ArrowUp className="size-3.5" />
                   </button>
                 </PromptInputAction>
@@ -118,7 +130,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="mt-8">
+      <div className={`${isSmall ? "mt-6" : "mt-8"}`}>
         <Link href="/dashboard/ai-center" className="block group">
           <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 p-6 rounded-2xl border border-gray-800 shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:scale-[1.02]">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-out"></div>

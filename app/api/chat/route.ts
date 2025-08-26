@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
     let webContext = "";
     if (wantsWeb) {
       try {
-        const ws = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/web-search/brave`, {
+        const ws = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/web/brave`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: message })

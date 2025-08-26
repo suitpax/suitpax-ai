@@ -1,0 +1,1 @@
+export { getBrowserbaseClient, createBrowserbaseSession } from "@/lib/browserbase/client"

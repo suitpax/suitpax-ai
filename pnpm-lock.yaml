@@ -14,6 +14,9 @@ importers:
       '@anthropic-ai/sdk':
         specifier: 0.30.1
         version: 0.30.1(encoding@0.1.13)
+      '@browserbasehq/sdk':
+        specifier: ^2.6.0
+        version: 2.6.0(encoding@0.1.13)
       '@cloudflare/workers-types':
         specifier: 4.20250816.0
         version: 4.20250816.0
@@ -192,14 +195,17 @@ importers:
         specifier: 0.5.15
         version: 0.5.15(tailwindcss@3.4.17)
       '@tanstack/react-query':
-        specifier: 5.84.1
+        specifier: ^5.80.6
         version: 5.84.1(react@19.1.0)
       '@tanstack/react-query-devtools':
-        specifier: 5.84.1
+        specifier: ^5.80.6
         version: 5.84.1(@tanstack/react-query@5.84.1(react@19.1.0))(react@19.1.0)
       '@tanstack/react-table':
         specifier: 8.21.3
         version: 8.21.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@tavily/core':
+        specifier: ^0.5.11
+        version: 0.5.11
       '@tiptap/core':
         specifier: 3.2.1
         version: 3.2.1(@tiptap/pm@3.2.1)
@@ -498,7 +504,7 @@ importers:
         specifier: 0.33.5
         version: 0.33.5
       shiki:
-        specifier: 3.11.0
+        specifier: ^3.4.0
         version: 3.11.0
       slugify:
         specifier: 1.6.6
@@ -521,6 +527,9 @@ importers:
       tailwindcss-animate:
         specifier: 1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
+      tavily:
+        specifier: ^1.0.2
+        version: 1.0.2
       tesseract.js:
         specifier: 6.0.1
         version: 6.0.1(encoding@0.1.13)
@@ -4094,6 +4103,9 @@ packages:
   '@tanstack/table-core@8.21.3':
     resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
     engines: {node: '>=12'}
+
+  '@tavily/core@0.5.11':
+    resolution: {integrity: sha512-SHYjpWgeyHpJNZh8RZCUcRtb228ymLzNlVOqrfCql6vOlSiz8q3wy5VEVtfdN881pg6wHPLa2Rra3xVyPhuYuw==}
 
   '@tiptap/core@3.2.1':
     resolution: {integrity: sha512-ZLQbzGLxf3Jw7K+cqWb1fFvKcKQkYvaBuOwASnPG98DrGPyKSnI2jby8/PTXHdjeBq4LbENrSIuQDHQAminrQg==}
@@ -7912,6 +7924,10 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
+  ky@1.9.0:
+    resolution: {integrity: sha512-NgBeR/cu7kuC4BAeF1rnXhfoI2uQ9RBe8zl5vo87ASsf1iIQoCeOxyt6Io6K4Ki++5ItCavXAtbEWWCGFciQ6g==}
+    engines: {node: '>=18'}
+
   langchain@0.3.31:
     resolution: {integrity: sha512-C7n7WGa44RytsuxEtGcArVcXidRqzjl6UWQxaG3NdIw4gIqErWoOlNC1qADAa04H5JAOARxuE6S99+WNXB/rzA==}
     engines: {node: '>=18'}
@@ -10956,6 +10972,10 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+
+  tavily@1.0.2:
+    resolution: {integrity: sha512-Lu9qLmOXsQEwVch+BJvmmCTEUnd7ns1b6ZRkOHJX6ZEwK6Zc5pzQSM3ew4cgpqTxrSsDNyyREPyoZoJx83ERzQ==}
+    engines: {node: '>=18'}
 
   teeny-request@10.1.0:
     resolution: {integrity: sha512-3ZnLvgWF29jikg1sAQ1g0o+lr5JX6sVgYvfUJazn7ZjJroDBUTWp44/+cFVX0bULjv4vci+rBD+oGVAkWqhUbw==}
@@ -15170,6 +15190,15 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
 
   '@tanstack/table-core@8.21.3': {}
+
+  '@tavily/core@0.5.11':
+    dependencies:
+      axios: 1.11.0(debug@4.4.1)
+      https-proxy-agent: 7.0.6
+      js-tiktoken: 1.0.21
+    transitivePeerDependencies:
+      - debug
+      - supports-color
 
   '@tiptap/core@3.2.1(@tiptap/pm@3.2.1)':
     dependencies:
@@ -19954,6 +19983,8 @@ snapshots:
   kleur@4.1.5:
     optional: true
 
+  ky@1.9.0: {}
+
   langchain@0.3.31(@langchain/core@0.3.71(@opentelemetry/api@1.9.0)(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.64)))(@opentelemetry/api@1.9.0)(axios@1.11.0)(cheerio@1.1.2)(handlebars@4.7.8)(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.64))(ws@8.18.3):
     dependencies:
       '@langchain/core': 0.3.71(@opentelemetry/api@1.9.0)(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.64))
@@ -23844,6 +23875,10 @@ snapshots:
       minizlib: 2.1.2
       mkdirp: 1.0.4
       yallist: 4.0.0
+
+  tavily@1.0.2:
+    dependencies:
+      ky: 1.9.0
 
   teeny-request@10.1.0:
     dependencies:

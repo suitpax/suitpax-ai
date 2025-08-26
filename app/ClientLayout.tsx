@@ -47,6 +47,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
 // Removed html/head/body tags - these should only be in the server component
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const hideIntercom = pathname.startsWith("/dashboard/suitpax-ai")
   return (
     <AppErrorBoundary>
       <Suspense
@@ -58,7 +60,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       >
         <TooltipProvider>
           <LayoutContent>{children}</LayoutContent>
-          <IntercomProvider />
+          {!hideIntercom && <IntercomProvider />}
           {/* Toast provider removed; custom inline toasts are used via showToast helper */}
           <Analytics />
           <SpeedInsights />
