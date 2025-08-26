@@ -203,6 +203,9 @@ importers:
       '@tanstack/react-table':
         specifier: 8.21.3
         version: 8.21.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@tavily/core':
+        specifier: ^0.5.11
+        version: 0.5.11
       '@tiptap/core':
         specifier: 3.2.1
         version: 3.2.1(@tiptap/pm@3.2.1)
@@ -4100,6 +4103,9 @@ packages:
   '@tanstack/table-core@8.21.3':
     resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
     engines: {node: '>=12'}
+
+  '@tavily/core@0.5.11':
+    resolution: {integrity: sha512-SHYjpWgeyHpJNZh8RZCUcRtb228ymLzNlVOqrfCql6vOlSiz8q3wy5VEVtfdN881pg6wHPLa2Rra3xVyPhuYuw==}
 
   '@tiptap/core@3.2.1':
     resolution: {integrity: sha512-ZLQbzGLxf3Jw7K+cqWb1fFvKcKQkYvaBuOwASnPG98DrGPyKSnI2jby8/PTXHdjeBq4LbENrSIuQDHQAminrQg==}
@@ -15184,6 +15190,15 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
 
   '@tanstack/table-core@8.21.3': {}
+
+  '@tavily/core@0.5.11':
+    dependencies:
+      axios: 1.11.0(debug@4.4.1)
+      https-proxy-agent: 7.0.6
+      js-tiktoken: 1.0.21
+    transitivePeerDependencies:
+      - debug
+      - supports-color
 
   '@tiptap/core@3.2.1(@tiptap/pm@3.2.1)':
     dependencies:

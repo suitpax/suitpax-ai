@@ -1,0 +1,1 @@
+export { getTavilyClient, tavilySearch } from "@/lib/tavily/client"
