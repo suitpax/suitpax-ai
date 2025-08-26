@@ -19,6 +19,7 @@ import { ChatContainerRoot, ChatContainerContent } from "@/components/prompt-kit
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 import { DashboardLoadingScreen } from "@/components/ui/loaders"
 import { useChatPreview } from "@/hooks/use-chat-preview"
+import { useBreakpoint } from "@/hooks/use-breakpoint"
 
 interface Message {
   id: string
@@ -46,6 +47,9 @@ export default function SuitpaxAIPage() {
   const listRef = useRef<HTMLDivElement>(null)
   const uploadInputRef = useRef<HTMLInputElement>(null)
   const { isStreaming, start, cancel } = useChatStream()
+
+  const { down } = useBreakpoint()
+  const isSmall = down("sm")
 
   const previewNode = useChatPreview(value, { className: "prose prose-sm text-gray-900" })
 
@@ -136,15 +140,15 @@ export default function SuitpaxAIPage() {
     <div className="bg-white">
       <div className="fixed inset-0 flex flex-col">
         {/* Chat Header */}
-        <ChatHeader title="Suitpax AI" subtitle="Ask anything. Travel. Business. Code." />
+        <ChatHeader title="Suitpax AI" subtitle={isSmall ? undefined : "Ask anything. Travel. Business. Code."} />
         {/* Content area */}
         <ChatContainerRoot className="flex-1">
-          <ChatContainerContent className="mx-auto w-full max-w-3xl px-4 py-6 space-y-4" role="feed" aria-label="Chat messages" aria-live="polite">
+          <ChatContainerContent className={`mx-auto w-full max-w-3xl ${isSmall ? "px-2 py-3" : "px-4 py-6"} space-y-4`} role="feed" aria-label="Chat messages" aria-live="polite">
             {messages.length === 0 && !isLoading && (
               <div className="space-y-4">
                 <div className="text-center py-10">
-                  <h2 className="text-3xl md:text-4xl font-medium tracking-tighter">Ask anything. Travel. Business. Code.</h2>
-                  <p className="mt-2 text-sm text-gray-600">Powered by Suitpax AI</p>
+                  <h2 className={`${isSmall ? "text-2xl" : "text-3xl md:text-4xl"} font-medium tracking-tighter`}>Ask anything. Travel. Business. Code.</h2>
+                  {!isSmall && <p className="mt-2 text-sm text-gray-600">Powered by Suitpax AI</p>}
                 </div>
                 <PromptSuggestions suggestions={defaultSuggestions} onSelect={handleSuggestion} />
               </div>
@@ -171,7 +175,7 @@ export default function SuitpaxAIPage() {
               return (
                 <PKMessage
                   key={m.id}
-                  className={`mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6 ${isAssistant ? "items-start" : "items-end"}`}
+                  className={`mx-auto flex w-full max-w-3xl flex-col gap-2 ${isSmall ? "px-0" : "px-0 md:px-6"} ${isAssistant ? "items-start" : "items-end"}`}
                 >
                   {isAssistant ? (
                     <div className="group flex w-full flex-col gap-1">
@@ -243,8 +247,8 @@ export default function SuitpaxAIPage() {
 
         {/* Bottom docked prompt */}
         <div className="border-t border-gray-200 bg-white/70 backdrop-blur-sm">
-          <div className="mx-auto w-full max-w-4xl px-4 py-3">
-            <div className="flex items-center justify-between gap-3 mb-2">
+          <div className={`mx-auto w-full max-w-4xl ${isSmall ? "px-2 py-2" : "px-4 py-3"}`}>
+            <div className={`flex items-center justify-between gap-3 ${isSmall ? "mb-1" : "mb-2"}`}>
               <div className="flex items-center gap-2 text-[12px] text-gray-700">
                 <span>High-level reasoning</span>
                 <Switch checked={includeReasoningInline} onCheckedChange={setIncludeReasoningInline} />
@@ -274,17 +278,17 @@ export default function SuitpaxAIPage() {
                     ))}
                   </div>
                 )}
-                <PromptInputTextarea placeholder="Ask about flights, policies, finance or code…" className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3]" />
-                <PromptInputActions className="mt-2 flex w-full items-center justify-between gap-2 px-3 pb-3">
+                <PromptInputTextarea placeholder="Ask about flights, policies, finance or code…" className={`${isSmall ? "min-h-[40px] pt-2 pl-3 text-[15px]" : "min-h-[44px] pt-3 pl-4 text-base"} leading-[1.3]`} />
+                <PromptInputActions className={`mt-2 flex w-full items-center justify-between gap-2 ${isSmall ? "px-2 pb-2" : "px-3 pb-3"}`}>
                   <PromptInputAction tooltip="Attach files">
                     <FileUploadTrigger asChild>
-                      <Button variant="outline" size="icon" className="h-8 w-8 rounded-full">
+                      <Button variant="outline" size="icon" className={`${isSmall ? "h-7 w-7" : "h-8 w-8"} rounded-full`}>
                         <Paperclip className="size-4" />
                       </Button>
                     </FileUploadTrigger>
                   </PromptInputAction>
                   <PromptInputAction tooltip={isLoading || isStreaming ? "Stop" : "Send"}>
-                    <Button size="icon" aria-label={isLoading || isStreaming ? "Stop generation" : "Send message"} disabled={!value.trim() || isLoading || isStreaming} onClick={handleSend} className="h-8 w-8 rounded-full">
+                    <Button size="icon" aria-label={isLoading || isStreaming ? "Stop generation" : "Send message"} disabled={!value.trim() || isLoading || isStreaming} onClick={handleSend} className={`${isSmall ? "h-7 w-7" : "h-8 w-8"} rounded-full`}>
                       {!isLoading && !isStreaming ? <ArrowUp className="size-4" /> : <span className="size-3 rounded-xs bg-gray-900" />}
                     </Button>
                   </PromptInputAction>
