@@ -15,10 +15,9 @@ import { Copy, ThumbsUp, ThumbsDown } from "lucide-react"
 import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
 import DocumentScanner from "@/components/prompt-kit/document-scanner"
 import { Switch } from "@/components/ui/switch"
-import { Markdown } from "@/components/prompt-kit/markdown"
 import { ChatContainerRoot, ChatContainerContent } from "@/components/prompt-kit/chat-container"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
-import { DashboardLoadingScreen, loader as OrbLoader } from "@/components/ui/loaders"
+import { DashboardLoadingScreen } from "@/components/ui/loaders"
 
 interface Message {
   id: string
