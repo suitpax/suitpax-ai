@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button"
 import { Paperclip, ArrowUp, Square } from "lucide-react"
 import ChatHeader from "@/components/prompt-kit/chat-header"
 import { useChatStream } from "@/hooks/use-chat-stream"
-import PromptSuggestions from "@/components/prompt-kit/prompt-suggestions"
+import { PromptSuggestion } from "@/components/prompt-kit/prompt-suggestion"
 import SourceList from "@/components/prompt-kit/source-list"
 import { Message as PKMessage, MessageAvatar, MessageContent as PKMessageContent, MessageActions as PKMessageActions, MessageAction as PKMessageAction } from "@/components/prompt-kit/message"
 import { Copy, ThumbsUp, ThumbsDown } from "lucide-react"
-import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
-import DocumentScanner from "@/components/prompt-kit/document-scanner"
+// import ChatFlightOffers from "@/components/prompt-kit/chat-flight-offers"
+// import DocumentScanner from "@/components/prompt-kit/document-scanner"
 import { Switch } from "@/components/ui/switch"
 import { ChatContainerRoot, ChatContainerContent } from "@/components/prompt-kit/chat-container"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
@@ -151,7 +151,11 @@ export default function SuitpaxAIPage() {
                   <h2 className={`${isSmall ? "text-2xl" : "text-3xl md:text-4xl"} font-medium tracking-tighter`}>Ask anything. Travel. Business. Code.</h2>
                   {!isSmall && <p className="mt-2 text-sm text-gray-600">Powered by Suitpax AI</p>}
                 </div>
-                <PromptSuggestions suggestions={defaultSuggestions} onSelect={handleSuggestion} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {defaultSuggestions.map((s) => (
+                    <PromptSuggestion key={s.id} onClick={() => handleSuggestion(s.prompt)}>{s.title}</PromptSuggestion>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -187,18 +191,7 @@ export default function SuitpaxAIPage() {
                       <PKMessageContent className="text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0" markdown>
                         {m.content}
                       </PKMessageContent>
-                      {(() => {
-                        const match = m.content.match(/:::flight_offers_json\n([\s\S]*?)\n:::/)
-                        if (!match) return null
-                        try {
-                          const parsed = JSON.parse(match[1])
-                          return (
-                            <div className="mt-2">
-                              <ChatFlightOffers offers={parsed.offers || []} onSelect={(id) => { if (id) window.location.href = `/dashboard/flights/book/${id}` }} />
-                            </div>
-                          )
-                        } catch { return null }
-                      })()}
+                      {/* Flight offers rendering disabled: component not present */}
                       {m.sources && m.sources.length > 0 && <SourceList items={m.sources} />}
                       <PKMessageActions className={`-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 ${isLast ? "opacity-100" : ""}`}>
                         <PKMessageAction tooltip="Copy">
@@ -254,7 +247,7 @@ export default function SuitpaxAIPage() {
                 <span>High-level reasoning</span>
                 <Switch checked={includeReasoningInline} onCheckedChange={setIncludeReasoningInline} />
               </div>
-              <DocumentScanner onScanned={(r) => { if (r?.raw_text) setValue((prev) => prev ? `${prev}\n\n${r.raw_text}` : r.raw_text || "") }} />
+              {/* DocumentScanner disabled: component not present */}
             </div>
 
             <FileUpload onFilesAdded={handleFilesAdded} accept=".jpg,.jpeg,.png,.pdf,.docx">
